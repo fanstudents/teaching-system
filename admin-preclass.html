@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課前設定 — 教學系統</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css?v=2">
+    <link rel="stylesheet" href="styles/admin-layout.css?v=2">
+    <link rel="stylesheet" href="styles/admin-preclass-page.css?v=3">
+    <style>
+        /* ── Drag & Drop ── */
+        .manage-item {
+            cursor: grab;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .manage-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.97);
+        }
+
+        .manage-item.drag-over {
+            border-top: 2.5px solid #6366f1;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #cbd5e1;
+            margin-right: 6px;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .drag-handle:hover {
+            color: #6366f1;
+        }
+
+        /* ── Login Field Chips ── */
+        .field-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .field-chip:hover {
+            border-color: #94a3b8;
+        }
+
+        .field-chip:has(input:checked) {
+            border-color: #6366f1;
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .field-chip input {
+            accent-color: #6366f1;
+        }
+
+        .custom-field-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .custom-field-row .field-name {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .custom-field-row .remove-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+
+        .custom-field-row .remove-btn:hover {
+            color: #ef4444;
+        }
+
+        /* ── Section Cards ── */
+        .setup-section {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+
+        .setup-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .setup-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setup-section-title .material-symbols-rounded {
+            font-size: 20px;
+            color: #6366f1;
+        }
+
+        /* ── Inline field groups ── */
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .field-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .field-input,
+        .field-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            color: #0f172a;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .field-input:focus,
+        .field-textarea:focus {
+            border-color: #6366f1;
+        }
+
+        .field-textarea {
+            resize: vertical;
+            min-height: 64px;
+        }
+
+        .save-indicator {
+            font-size: 0.78rem;
+            color: #22c55e;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 640px) {
+            .field-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">
+                課前設定
+                <span id="topbarProjectName"
+                    style="font-weight:400;font-size:0.85rem;color:#5f6368;margin-left:6px;"></span>
+            </div>
+            <div class="admin-header-info" id="topbarSessionInfo"
+                style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:#5f6368;"></div>
+        </div>
+
+        <div class="container">
+            <!-- 學生入口連結 -->
+            <div id="shareLinkBar"
+                style="display:none;margin-bottom:20px;background:#f0f5ff;border:1px solid #d0e1ff;border-radius:10px;padding:14px 16px;">
+                <div
+                    style="display:flex;align-items:center;gap:4px;font-size:0.82rem;font-weight:600;color:#1a56db;margin-bottom:10px;">
+                    <span class="material-symbols-rounded" style="font-size:16px;">link</span> 學生入口連結
+                </div>
+                <div id="shareLinkWithSession" style="display:none;margin-bottom:8px;">
+                    <div style="font-size:0.75rem;color:#64748b;margin-bottom:3px;">🔗 含場次代碼（學生不需手動輸入）</div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <input type="text" id="shareLinkInputSession" readonly
+                            style="flex:1;min-width:200px;padding:6px 10px;border:1px solid #d0e1ff;border-radius:6px;font-size:0.78rem;color:#1e293b;background:#fff;font-family:'SF Mono','Fira Code',monospace;">
+                        <button class="btn btn-sm btn-primary" onclick="copyLink('shareLinkInputSession', this)">
+                            <span class="material-symbols-rounded" style="font-size:16px;">content_copy</span> 複製
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size:0.75rem;color:#64748b;margin-bottom:3px;">🌐 通用連結（學生需自行輸入場次代碼）</div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <input type="text" id="shareLinkInputGeneral" readonly
+                            style="flex:1;min-width:200px;padding:6px 10px;border:1px solid #d0e1ff;border-radius:6px;font-size:0.78rem;color:#1e293b;background:#fff;font-family:'SF Mono','Fira Code',monospace;">
+                        <button class="btn btn-sm btn-outline" onclick="copyLink('shareLinkInputGeneral', this)">
+                            <span class="material-symbols-rounded" style="font-size:16px;">content_copy</span> 複製
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ 課程附加資訊 ═══════ -->
+            <!-- ═══════ 學員登入欄位設定 ═══════ -->
+            <div class="setup-section" id="loginFieldsSection">
+                <div class="setup-section-header">
+                    <div class="setup-section-title">
+                        <span class="material-symbols-rounded">login</span> 學員登入欄位
+                    </div>
+                    <span class="save-indicator" id="loginFieldsSaveStatus">✓ 已儲存</span>
+                </div>
+                <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+                    Email、姓名、場次代碼為必填，以下為可選欄位（勾選後學員登入時需額外填寫）
+                </p>
+                <div id="loginFieldsConfig" style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <label class="field-chip">
+                        <input type="checkbox" value="group" onchange="saveLoginFields()"> 組別
+                    </label>
+                    <label class="field-chip">
+                        <input type="checkbox" value="company" onchange="saveLoginFields()"> 公司 / 單位
+                    </label>
+                </div>
+                <div style="margin-top:14px;border-top:1px solid #f0f2f5;padding-top:14px;">
+                    <p style="font-size:0.82rem;color:#64748b;margin-bottom:8px;">自訂欄位</p>
+                    <div id="customFieldsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" id="newCustomFieldName" class="field-input" placeholder="欄位名稱"
+                            style="flex:1;">
+                        <button class="btn btn-sm btn-primary" onclick="addCustomField()" style="white-space:nowrap;">
+                            <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ 主視覺圖片 ═══════ -->
+            <div class="setup-section" id="heroImageSection">
+                <div class="setup-section-header">
+                    <div class="setup-section-title">
+                        <span class="material-symbols-rounded">image</span> 主視覺圖片
+                    </div>
+                    <span class="save-indicator" id="heroImageSaveStatus">✓ 已儲存</span>
+                </div>
+                <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+                    建議尺寸 1200×620px，學生登入頁面會顯示此圖片（非必填）
+                </p>
+                <div id="heroImagePreview"
+                    style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+                    <img id="heroImageImg" style="width:100%;height:auto;display:block;" alt="主視覺">
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="url" class="field-input" id="fieldHeroImageUrl" placeholder="貼上圖片 URL 或上傳"
+                        style="flex:1;">
+                    <label class="btn btn-sm btn-outline" style="cursor:pointer;white-space:nowrap;">
+                        <span class="material-symbols-rounded" style="font-size:16px;">upload</span> 上傳
+                        <input type="file" id="heroImageUpload" accept="image/*" style="display:none;">
+                    </label>
+                    <button class="btn btn-sm btn-outline" id="heroImageClear" style="color:#ef4444;" title="清除">
+                        <span class="material-symbols-rounded" style="font-size:16px;">delete</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ═══════ 課前頁面設定 ═══════ -->
+            <div class="setup-section" id="sessionInfoSection">
+                <div class="setup-section-header">
+                    <div class="setup-section-title">
+                        <span class="material-symbols-rounded">tune</span> 課前頁面設定
+                    </div>
+                    <span class="save-indicator" id="infoSaveStatus">✓ 已儲存</span>
+                </div>
+                <div class="field-row full">
+                    <div>
+                        <label class="field-label">交通資訊</label>
+                        <textarea class="field-textarea" id="fieldTransport" rows="3"
+                            placeholder="輸入交通方式，每行一項&#10;例如：捷運至中山站 4 號出口，步行約 5 分鐘"></textarea>
+                    </div>
+                </div>
+                <div class="field-row full">
+                    <div>
+                        <label class="field-label">溫馨提醒</label>
+                        <textarea class="field-textarea" id="fieldReminders" rows="3"
+                            placeholder="每行一項提醒&#10;例如：請攜帶筆電與充電器"></textarea>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div>
+                        <label class="field-label">群組連結 URL</label>
+                        <input class="field-input" type="url" id="fieldGroupUrl" placeholder="https://lin.ee/...">
+                    </div>
+                    <div>
+                        <label class="field-label">群組按鈕文字</label>
+                        <input class="field-input" type="text" id="fieldGroupLabel" placeholder="例如：加入 LINE 群組">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ 準備清單 ═══════ -->
+            <div class="setup-section">
+                <div class="setup-section-header">
+                    <div class="setup-section-title">
+                        <span class="material-symbols-rounded">checklist</span> 課前準備清單
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="showAddChecklist()">
+                        <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增項目
+                    </button>
+                </div>
+                <ul class="manage-list" id="checklistList">
+                    <li class="empty-msg">載入中…</li>
+                </ul>
+            </div>
+
+            <!-- ═══════ 問卷題目 ═══════ -->
+            <div class="setup-section">
+                <div class="setup-section-header">
+                    <div class="setup-section-title">
+                        <span class="material-symbols-rounded">quiz</span> 課前問卷題目
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="showAddQuestion()">
+                        <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增題目
+                    </button>
+                </div>
+                <ul class="manage-list" id="surveyList">
+                    <li class="empty-msg">載入中…</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Modal：新增/編輯清單項目 -->
+        <div class="modal-overlay" id="checklistModal">
+            <div class="modal">
+                <h3 id="checklistModalTitle">新增準備項目</h3>
+                <input type="hidden" id="checklistEditId">
+                <div class="form-field">
+                    <label>項目名稱</label>
+                    <input type="text" id="checklistTitle" placeholder="例如：註冊 ChatGPT 帳號">
+                </div>
+                <div class="form-field">
+                    <label>說明（選填）</label>
+                    <textarea id="checklistDesc" rows="2" placeholder="補充說明…"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeModal('checklistModal')">取消</button>
+                    <button class="btn btn-primary" onclick="saveChecklist()">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal：新增/編輯問卷題目 -->
+        <div class="modal-overlay" id="surveyModal">
+            <div class="modal">
+                <h3 id="surveyModalTitle">新增問卷題目</h3>
+                <input type="hidden" id="surveyEditId">
+                <div class="form-field">
+                    <label>題型</label>
+                    <select id="surveyType" onchange="toggleSurveyOptions()">
+                        <option value="choice">選擇</option>
+                        <option value="truefalse">是非</option>
+                        <option value="fillblank">簡答</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>題目</label>
+                    <textarea id="surveyText" rows="2" placeholder="請輸入問題…"></textarea>
+                </div>
+                <div class="form-field" id="optionsField">
+                    <label>選項</label>
+                    <div id="optionsEditor">
+                        <div class="option-row"><input type="text" class="opt-input" placeholder="選項 1"></div>
+                        <div class="option-row"><input type="text" class="opt-input" placeholder="選項 2"></div>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="addOption()">+ 新增選項</button>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeModal('surveyModal')">取消</button>
+                    <button class="btn btn-primary" onclick="saveSurveyQuestion()">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <script type="module">
+            import { db } from './scripts/supabase.js';
+            import { showToast, showConfirm } from './scripts/ui.js';
+
+            // ── 取得當前專案 ──
+            const urlParams = new URLSearchParams(location.search);
+            const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+            const urlJoinCode = urlParams.get('code') || hashParams.get('code') || '';
+            const urlSessionCode = urlParams.get('session') || hashParams.get('session') || '';
+
+            async function getCurrentProject() {
+                if (urlJoinCode) {
+                    try {
+                        const { data } = await db.select('projects', {
+                            filter: { join_code: `eq.${urlJoinCode}` }, limit: 1
+                        });
+                        if (data?.[0]) return { joinCode: data[0].join_code, name: data[0].name, id: data[0].id };
+                    } catch { }
+                }
+                return null;
+            }
+            const _proj = await getCurrentProject();
+            const joinCode = _proj?.joinCode || urlJoinCode;
+            const dataCode = urlSessionCode || joinCode;
+            let sessionId = null; // for saving session fields
+
+            const projectNameEl = document.getElementById('topbarProjectName');
+            if (projectNameEl) projectNameEl.textContent = _proj?.name ? `— ${_proj.name}` : '';
+
+            // ── Login Fields Config ──
+            let _loginFields = []; // e.g. [{key:'group',label:'組別'},{key:'company',label:'公司'},{key:'custom_xxx',label:'部門'}]
+
+            async function loadLoginFields() {
+                if (!_proj?.id) return;
+                try {
+                    const { data } = await db.select('projects', {
+                        filter: { id: `eq.${_proj.id}` }, limit: 1, columns: 'login_fields'
+                    });
+                    _loginFields = data?.[0]?.login_fields || [];
+                } catch { _loginFields = []; }
+                renderLoginFields();
+            }
+
+            function renderLoginFields() {
+                // Check built-in checkboxes
+                document.querySelectorAll('#loginFieldsConfig input[type=checkbox]').forEach(cb => {
+                    cb.checked = _loginFields.some(f => f.key === cb.value);
+                });
+                // Render custom fields
+                const container = document.getElementById('customFieldsList');
+                container.innerHTML = '';
+                _loginFields.filter(f => !['group', 'company'].includes(f.key)).forEach(f => {
+                    const row = document.createElement('div');
+                    row.className = 'custom-field-row';
+                    row.innerHTML = `
+                        <span class="field-name">${f.label}</span>
+                        <button class="remove-btn" onclick="removeCustomField('${f.key}')" title="移除">✕</button>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            async function _saveLoginFieldsToDB() {
+                if (!_proj?.id) return;
+                try {
+                    await db.update('projects', { login_fields: _loginFields }, { id: `eq.${_proj.id}` });
+                    const indicator = document.getElementById('loginFieldsSaveStatus');
+                    indicator.classList.add('show');
+                    setTimeout(() => indicator.classList.remove('show'), 2000);
+                } catch (e) { console.warn('Save login fields error:', e); }
+            }
+
+            window.saveLoginFields = function () {
+                const builtIns = { group: '組別', company: '公司 / 單位' };
+                const customs = _loginFields.filter(f => !['group', 'company'].includes(f.key));
+                const checked = [];
+                document.querySelectorAll('#loginFieldsConfig input[type=checkbox]').forEach(cb => {
+                    if (cb.checked) checked.push({ key: cb.value, label: builtIns[cb.value] || cb.value });
+                });
+                _loginFields = [...checked, ...customs];
+                _saveLoginFieldsToDB();
+            };
+
+            window.addCustomField = function () {
+                const input = document.getElementById('newCustomFieldName');
+                const label = input.value.trim();
+                if (!label) return;
+                const key = 'custom_' + Date.now();
+                _loginFields.push({ key, label });
+                input.value = '';
+                renderLoginFields();
+                _saveLoginFieldsToDB();
+            };
+
+            window.removeCustomField = function (key) {
+                _loginFields = _loginFields.filter(f => f.key !== key);
+                renderLoginFields();
+                _saveLoginFieldsToDB();
+            };
+
+            loadLoginFields();
+
+            // ── 場次資訊 ──
+            if (urlSessionCode && _proj?.id) {
+                try {
+                    const { data: sessions } = await db.select('project_sessions', {
+                        filter: { session_code: `eq.${urlSessionCode}`, project_id: `eq.${_proj.id}` },
+                        limit: 1
+                    });
+                    if (sessions?.[0]) {
+                        const s = sessions[0];
+                        sessionId = s.id;
+                        const infoParts = [];
+                        if (s.date) infoParts.push(`<span class="material-symbols-rounded" style="font-size:16px">event</span> ${s.date}`);
+                        if (s.time) infoParts.push(`<span class="material-symbols-rounded" style="font-size:16px">schedule</span> ${s.time}`);
+                        if (s.venue) infoParts.push(`<span class="material-symbols-rounded" style="font-size:16px">location_on</span> ${s.venue}`);
+                        const infoEl = document.getElementById('topbarSessionInfo');
+                        if (infoEl && infoParts.length) {
+                            infoEl.innerHTML = infoParts.join('<span style="color:#dadce0;margin:0 4px;">|</span>');
+                        }
+                        // Populate session fields
+                        document.getElementById('fieldTransport').value = s.transport_info || '';
+                        document.getElementById('fieldReminders').value = s.reminders || '';
+                        document.getElementById('fieldGroupUrl').value = s.group_link_url || '';
+                        document.getElementById('fieldGroupLabel').value = s.group_link_label || '';
+                        // Hero image
+                        if (s.hero_image_url) {
+                            document.getElementById('fieldHeroImageUrl').value = s.hero_image_url;
+                            document.getElementById('heroImageImg').src = s.hero_image_url;
+                            document.getElementById('heroImagePreview').style.display = '';
+                        }
+                    }
+                } catch (e) { console.warn('Session info fetch failed:', e); }
+            }
+
+            // ── Auto-save session fields (debounced) ──
+            let _saveTimer = null;
+            function autoSaveSessionField() {
+                if (!sessionId) return;
+                clearTimeout(_saveTimer);
+                _saveTimer = setTimeout(async () => {
+                    try {
+                        await db.update('project_sessions', {
+                            transport_info: document.getElementById('fieldTransport').value.trim(),
+                            reminders: document.getElementById('fieldReminders').value.trim(),
+                            group_link_url: document.getElementById('fieldGroupUrl').value.trim(),
+                            group_link_label: document.getElementById('fieldGroupLabel').value.trim(),
+                            hero_image_url: document.getElementById('fieldHeroImageUrl').value.trim() || null,
+                        }, { id: `eq.${sessionId}` });
+                        const indicator = document.getElementById('infoSaveStatus');
+                        indicator.classList.add('show');
+                        setTimeout(() => indicator.classList.remove('show'), 2000);
+                    } catch (e) { showToast('儲存失敗: ' + e.message, { type: 'error' }); }
+                }, 800);
+            }
+            ['fieldTransport', 'fieldReminders', 'fieldGroupUrl', 'fieldGroupLabel'].forEach(id => {
+                document.getElementById(id).addEventListener('input', autoSaveSessionField);
+            });
+            // Show warning if no session (fields visible but can't save)
+            if (!sessionId) {
+                const warn = '<p style="font-size:0.78rem;color:#d97706;margin-bottom:8px;">⚠️ 未偵測到場次參數，填寫後無法自動儲存。請從專案管理的場次進入此頁面。</p>';
+                document.getElementById('sessionInfoSection').insertAdjacentHTML('afterbegin', warn);
+                document.getElementById('heroImageSection').insertAdjacentHTML('afterbegin', warn);
+            }
+
+            // ── Hero Image handlers ──
+            document.getElementById('fieldHeroImageUrl').addEventListener('input', () => {
+                const url = document.getElementById('fieldHeroImageUrl').value.trim();
+                if (url) {
+                    document.getElementById('heroImageImg').src = url;
+                    document.getElementById('heroImagePreview').style.display = '';
+                } else {
+                    document.getElementById('heroImagePreview').style.display = 'none';
+                }
+                autoSaveSessionField();
+            });
+
+            document.getElementById('heroImageUpload').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const { storage } = await import('./scripts/supabase.js');
+                    const ext = file.name.split('.').pop();
+                    const path = `hero-images/${Date.now()}.${ext}`;
+                    const { data, error } = await storage.upload('homework', path, file);
+                    if (error) throw new Error(error.message || JSON.stringify(error));
+                    const url = data.url;
+                    document.getElementById('fieldHeroImageUrl').value = url;
+                    document.getElementById('heroImageImg').src = url;
+                    document.getElementById('heroImagePreview').style.display = '';
+                    autoSaveSessionField();
+                } catch (err) { showToast('上傳失敗: ' + err.message, { type: 'error' }); }
+                e.target.value = '';
+            });
+
+            document.getElementById('heroImageClear').addEventListener('click', () => {
+                document.getElementById('fieldHeroImageUrl').value = '';
+                document.getElementById('heroImagePreview').style.display = 'none';
+                autoSaveSessionField();
+            });
+
+            // ── Share Link ──
+            if (joinCode) {
+                const base = location.origin + location.pathname.replace(/\/[^/]*$/, '');
+                // 通用連結（不含場次）
+                const generalUrl = `${base}/portal.html?code=${joinCode}`;
+                document.getElementById('shareLinkInputGeneral').value = generalUrl;
+                // 含場次連結
+                if (urlSessionCode) {
+                    const sessionUrl = `${base}/portal.html?code=${joinCode}&session=${urlSessionCode}`;
+                    document.getElementById('shareLinkInputSession').value = sessionUrl;
+                    document.getElementById('shareLinkWithSession').style.display = '';
+                }
+                document.getElementById('shareLinkBar').style.display = '';
+            }
+
+            window.copyLink = function (inputId, btn) {
+                const input = document.getElementById(inputId);
+                input.select();
+                navigator.clipboard.writeText(input.value).then(() => {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px;">check</span> 已複製';
+                    setTimeout(() => { btn.innerHTML = original; }, 2000);
+                });
+            };
+
+            // ══════════════════════════════════════
+            //   Drag & Drop helper
+            // ══════════════════════════════════════
+            function enableDragSort(listEl, items, onReorder) {
+                let dragItem = null;
+                listEl.addEventListener('dragstart', e => {
+                    const li = e.target.closest('.manage-item');
+                    if (!li) return;
+                    dragItem = li;
+                    li.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                listEl.addEventListener('dragend', e => {
+                    const li = e.target.closest('.manage-item');
+                    if (li) li.classList.remove('dragging');
+                    listEl.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                    dragItem = null;
+                });
+                listEl.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    const li = e.target.closest('.manage-item');
+                    if (!li || li === dragItem) return;
+                    listEl.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                    li.classList.add('drag-over');
+                });
+                listEl.addEventListener('dragleave', e => {
+                    const li = e.target.closest('.manage-item');
+                    if (li) li.classList.remove('drag-over');
+                });
+                listEl.addEventListener('drop', async e => {
+                    e.preventDefault();
+                    const targetLi = e.target.closest('.manage-item');
+                    if (!targetLi || !dragItem || targetLi === dragItem) return;
+                    targetLi.classList.remove('drag-over');
+                    const allItems = [...listEl.querySelectorAll('.manage-item')];
+                    const fromIdx = allItems.indexOf(dragItem);
+                    const toIdx = allItems.indexOf(targetLi);
+                    if (fromIdx < 0 || toIdx < 0) return;
+                    // Reorder array
+                    const moved = items.splice(fromIdx, 1)[0];
+                    items.splice(toIdx, 0, moved);
+                    // Update sort_order in DB
+                    await onReorder(items);
+                });
+            }
+
+            // ══════════════════════════════════════
+            //   Checklist CRUD
+            // ══════════════════════════════════════
+            let checklistItems = [];
+
+            async function loadChecklist() {
+                const list = document.getElementById('checklistList');
+                try {
+                    const { data } = await db.select('checklist_items', {
+                        order: 'sort_order.asc',
+                        filter: dataCode ? { session_code: `eq.${dataCode}` } : {}
+                    });
+                    checklistItems = data || [];
+                    if (checklistItems.length === 0 && dataCode) { await seedDefaultChecklist(); return; }
+                    renderChecklist();
+                } catch (err) {
+                    list.innerHTML = `<li class="empty-msg" style="color:#d93025;">載入失敗：${err.message}</li>`;
+                }
+            }
+
+            async function seedDefaultChecklist() {
+                const defaults = [
+                    { title: '註冊 ChatGPT 帳號', description: '請至 chat.openai.com 註冊免費帳號，並確認可以正常登入使用。建議使用 Google 帳號直接註冊，方便快速。', sort_order: 1 },
+                    { title: '註冊 Claude 帳號', description: '請至 claude.ai 註冊帳號，作為課堂上的備用 AI 工具。Claude 提供免費方案，無需付費即可體驗。', sort_order: 2 },
+                    { title: '攜帶筆記型電腦', description: '課程需要實際操作，請務必攜帶已充飽電的筆電，並確認 Wi-Fi 功能正常。若無筆電，平板也可以但操作體驗會稍受限。', sort_order: 3 },
+                    { title: '更新瀏覽器至最新版本', description: '建議使用 Chrome 或 Edge 瀏覽器，並更新至最新版本以確保相容性。部分 AI 工具在舊版瀏覽器上可能無法正常使用。', sort_order: 4 },
+                    { title: '準備一段您的工作情境描述', description: '請事先想好 1-2 個您工作中想用 AI 解決的具體問題或場景，課堂上會直接拿來練習。', sort_order: 5 },
+                    { title: '加入課程 LINE 群組', description: '掃描課前通知信中的 QR Code 加入課程群組，方便課中即時提問與分享連結。', sort_order: 6 },
+                    { title: '填寫課前問卷', description: '請完成下方的課前問卷，讓講師了解您的背景與學習期待，以便提供更貼近需求的內容。', sort_order: 7 },
+                ];
+                try {
+                    for (const item of defaults) {
+                        await db.insert('checklist_items', { ...item, session_code: dataCode });
+                    }
+                    await loadChecklist();
+                } catch (err) { console.error('Seed checklist failed:', err); }
+            }
+
+            function renderChecklist() {
+                const list = document.getElementById('checklistList');
+                if (checklistItems.length === 0) {
+                    list.innerHTML = '<li class="empty-msg">尚未建立準備項目</li>';
+                    return;
+                }
+                list.innerHTML = checklistItems.map((item, i) => `
+                <li class="manage-item" draggable="true" data-id="${item.id}">
+                    <span class="material-symbols-rounded drag-handle">drag_indicator</span>
+                    <span class="item-order">${i + 1}</span>
+                    <div class="item-info">
+                        <div class="item-title">${item.title}</div>
+                        ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
+                    </div>
+                    <div class="item-actions">
+                        <button class="icon-btn" onclick="editChecklist('${item.id}')" title="編輯">
+                            <span class="material-symbols-rounded">edit</span>
+                        </button>
+                        <button class="icon-btn danger" onclick="deleteChecklist('${item.id}')" title="刪除">
+                            <span class="material-symbols-rounded">delete</span>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+                enableDragSort(list, checklistItems, reorderChecklist);
+            }
+
+            async function reorderChecklist(items) {
+                try {
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].sort_order = i + 1;
+                        await db.update('checklist_items', { sort_order: i + 1 }, { id: `eq.${items[i].id}` });
+                    }
+                    renderChecklist();
+                    showToast('排序已更新');
+                } catch (e) { showToast('排序失敗', { type: 'error' }); }
+            }
+
+            window.showAddChecklist = function () {
+                document.getElementById('checklistModalTitle').textContent = '新增準備項目';
+                document.getElementById('checklistEditId').value = '';
+                document.getElementById('checklistTitle').value = '';
+                document.getElementById('checklistDesc').value = '';
+                document.getElementById('checklistModal').classList.add('active');
+            };
+
+            window.editChecklist = function (id) {
+                const item = checklistItems.find(i => i.id === id);
+                if (!item) return;
+                document.getElementById('checklistModalTitle').textContent = '編輯準備項目';
+                document.getElementById('checklistEditId').value = id;
+                document.getElementById('checklistTitle').value = item.title;
+                document.getElementById('checklistDesc').value = item.description || '';
+                document.getElementById('checklistModal').classList.add('active');
+            };
+
+            window.saveChecklist = async function () {
+                const id = document.getElementById('checklistEditId').value;
+                const title = document.getElementById('checklistTitle').value.trim();
+                const description = document.getElementById('checklistDesc').value.trim();
+                if (!title) { showToast('請輸入項目名稱', { type: 'error' }); return; }
+                const sort_order = id
+                    ? checklistItems.find(i => i.id === id)?.sort_order || 0
+                    : checklistItems.length + 1;
+                try {
+                    if (id) {
+                        await db.update('checklist_items', { title, description, sort_order }, { id: `eq.${id}` });
+                    } else {
+                        await db.insert('checklist_items', { title, description, sort_order, session_code: dataCode });
+                    }
+                    closeModal('checklistModal');
+                    await loadChecklist();
+                } catch (err) { showToast('儲存失敗：' + err.message, { type: 'error' }); }
+            };
+
+            window.deleteChecklist = async function (id) {
+                const ok = await showConfirm('確定刪除此項目？', { title: '刪除確認', confirmText: '刪除', danger: true });
+                if (!ok) return;
+                try {
+                    await db.delete('checklist_items', { id: `eq.${id}` });
+                    await loadChecklist();
+                } catch (err) { showToast('刪除失敗：' + err.message, { type: 'error' }); }
+            };
+
+            // ══════════════════════════════════════
+            //   Survey CRUD
+            // ══════════════════════════════════════
+            let surveyQuestions = [];
+
+            async function loadSurvey() {
+                const list = document.getElementById('surveyList');
+                try {
+                    const { data } = await db.select('survey_questions', {
+                        order: 'sort_order.asc',
+                        filter: dataCode ? { session_code: `eq.${dataCode}` } : {}
+                    });
+                    surveyQuestions = data || [];
+                    if (surveyQuestions.length === 0 && dataCode) { await seedDefaultSurvey(); return; }
+                    renderSurvey();
+                } catch (err) {
+                    list.innerHTML = `<li class="empty-msg" style="color:#d93025;">載入失敗：${err.message}</li>`;
+                }
+            }
+
+            async function seedDefaultSurvey() {
+                const defaults = [
+                    { question_type: 'fillblank', question_text: '您目前的公司名稱與職級為何？（例如：OO公司 行銷主管）', sort_order: 1 },
+                    { question_type: 'choice', question_text: '您目前使用 AI 工具的頻率？', options: JSON.stringify(['每天都用', '每週幾次', '偶爾使用', '很少使用', '從未使用過']), sort_order: 2 },
+                    { question_type: 'choice', question_text: '您目前使用過哪些 AI 工具？（可複選）', options: JSON.stringify(['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Midjourney / DALL-E', 'Notion AI', 'Perplexity', 'Make / Zapier 自動化', '都沒用過', '其他']), sort_order: 3 },
+                    { question_type: 'fillblank', question_text: '您目前工作中，覺得 AI 最有可能應用在哪些場景？（可列舉 2-3 個）', sort_order: 4 },
+                    { question_type: 'choice', question_text: '您最想在這堂課中學習哪些內容？（可複選）', options: JSON.stringify(['Prompt 工程技巧', 'AI 文案撰寫', 'AI 圖像生成', 'AI 數據分析', 'AI 簡報製作', 'AI 自動化流程', 'AI 程式開發輔助', '其他']), sort_order: 5 },
+                    { question_type: 'fillblank', question_text: '您希望在課程中解決什麼具體的工作問題？（越具體越好）', sort_order: 6 },
+                    { question_type: 'choice', question_text: '您偏好的學習方式？（可複選）', options: JSON.stringify(['講師示範後自己操作', '直接動手做再討論', '看案例分析', '小組討論', '一對一指導']), sort_order: 7 },
+                    { question_type: 'fillblank', question_text: '對本次課程有什麼期待或想對講師說的話？（選填）', sort_order: 8 },
+                ];
+                try {
+                    for (const q of defaults) { await db.insert('survey_questions', { ...q, session_code: dataCode }); }
+                    await loadSurvey();
+                } catch (err) { console.error('Seed survey failed:', err); }
+            }
+
+            function renderSurvey() {
+                const list = document.getElementById('surveyList');
+                if (surveyQuestions.length === 0) {
+                    list.innerHTML = '<li class="empty-msg">尚未建立問卷題目</li>';
+                    return;
+                }
+                const typeBadges = {
+                    choice: '<span class="item-badge badge-choice">選擇</span>',
+                    truefalse: '<span class="item-badge badge-truefalse">是非</span>',
+                    fillblank: '<span class="item-badge badge-fillblank">簡答</span>'
+                };
+                list.innerHTML = surveyQuestions.map((q, i) => {
+                    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                    return `
+                    <li class="manage-item" draggable="true" data-id="${q.id}">
+                        <span class="material-symbols-rounded drag-handle">drag_indicator</span>
+                        <span class="item-order">${i + 1}</span>
+                        <div class="item-info">
+                            <div class="item-title">${typeBadges[q.question_type] || ''} ${q.question_text}</div>
+                            ${opts.length > 0 ? `<div class="item-desc">${opts.join(' / ')}</div>` : ''}
+                        </div>
+                        <div class="item-actions">
+                            <button class="icon-btn" onclick="editQuestion('${q.id}')" title="編輯">
+                                <span class="material-symbols-rounded">edit</span>
+                            </button>
+                            <button class="icon-btn danger" onclick="deleteQuestion('${q.id}')" title="刪除">
+                                <span class="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+                    </li>
+                `;
+                }).join('');
+                enableDragSort(list, surveyQuestions, reorderSurvey);
+            }
+
+            async function reorderSurvey(items) {
+                try {
+                    for (let i = 0; i < items.length; i++) {
+                        items[i].sort_order = i + 1;
+                        await db.update('survey_questions', { sort_order: i + 1 }, { id: `eq.${items[i].id}` });
+                    }
+                    renderSurvey();
+                    showToast('排序已更新');
+                } catch (e) { showToast('排序失敗', { type: 'error' }); }
+            }
+
+            window.showAddQuestion = function () {
+                document.getElementById('surveyModalTitle').textContent = '新增問卷題目';
+                document.getElementById('surveyEditId').value = '';
+                document.getElementById('surveyType').value = 'choice';
+                document.getElementById('surveyText').value = '';
+                document.getElementById('optionsEditor').innerHTML = `
+                <div class="option-row"><input type="text" class="opt-input" placeholder="選項 1"></div>
+                <div class="option-row"><input type="text" class="opt-input" placeholder="選項 2"></div>
+            `;
+                toggleSurveyOptions();
+                document.getElementById('surveyModal').classList.add('active');
+            };
+
+            window.editQuestion = function (id) {
+                const q = surveyQuestions.find(x => x.id === id);
+                if (!q) return;
+                document.getElementById('surveyModalTitle').textContent = '編輯問卷題目';
+                document.getElementById('surveyEditId').value = id;
+                document.getElementById('surveyType').value = q.question_type;
+                document.getElementById('surveyText').value = q.question_text;
+                const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                const editor = document.getElementById('optionsEditor');
+                editor.innerHTML = opts.length > 0
+                    ? opts.map((o, i) => `<div class="option-row"><input type="text" class="opt-input" placeholder="選項 ${i + 1}" value="${o}"></div>`).join('')
+                    : `<div class="option-row"><input type="text" class="opt-input" placeholder="選項 1"></div>
+                       <div class="option-row"><input type="text" class="opt-input" placeholder="選項 2"></div>`;
+                toggleSurveyOptions();
+                document.getElementById('surveyModal').classList.add('active');
+            };
+
+            window.toggleSurveyOptions = function () {
+                const type = document.getElementById('surveyType').value;
+                const field = document.getElementById('optionsField');
+                if (type === 'fillblank') {
+                    field.style.display = 'none';
+                } else {
+                    field.style.display = 'block';
+                    if (type === 'truefalse') {
+                        document.getElementById('optionsEditor').innerHTML = `
+                        <div class="option-row"><input type="text" class="opt-input" value="是" readonly></div>
+                        <div class="option-row"><input type="text" class="opt-input" value="否" readonly></div>
+                    `;
+                    }
+                }
+            };
+
+            window.addOption = function () {
+                const editor = document.getElementById('optionsEditor');
+                const count = editor.querySelectorAll('.option-row').length;
+                const row = document.createElement('div');
+                row.className = 'option-row';
+                row.innerHTML = `<input type="text" class="opt-input" placeholder="選項 ${count + 1}">`;
+                editor.appendChild(row);
+            };
+
+            window.saveSurveyQuestion = async function () {
+                const id = document.getElementById('surveyEditId').value;
+                const question_type = document.getElementById('surveyType').value;
+                const question_text = document.getElementById('surveyText').value.trim();
+                if (!question_text) { showToast('請輸入題目', { type: 'error' }); return; }
+                let options = [];
+                if (question_type !== 'fillblank') {
+                    document.querySelectorAll('#optionsEditor .opt-input').forEach(inp => {
+                        if (inp.value.trim()) options.push(inp.value.trim());
+                    });
+                }
+                const sort_order = id
+                    ? surveyQuestions.find(x => x.id === id)?.sort_order || 0
+                    : surveyQuestions.length + 1;
+                try {
+                    const payload = { question_type, question_text, options: JSON.stringify(options), sort_order };
+                    if (id) {
+                        await db.update('survey_questions', payload, { id: `eq.${id}` });
+                    } else {
+                        payload.session_code = dataCode;
+                        await db.insert('survey_questions', payload);
+                    }
+                    closeModal('surveyModal');
+                    await loadSurvey();
+                } catch (err) { showToast('儲存失敗：' + err.message, { type: 'error' }); }
+            };
+
+            window.deleteQuestion = async function (id) {
+                const ok = await showConfirm('確定刪除此題目？學員已作答的資料也會一併刪除。', { title: '刪除確認', confirmText: '刪除', danger: true });
+                if (!ok) return;
+                try {
+                    await db.delete('survey_questions', { id: `eq.${id}` });
+                    await loadSurvey();
+                } catch (err) { showToast('刪除失敗：' + err.message, { type: 'error' }); }
+            };
+
+            // ── Modal helpers ──
+            window.closeModal = function (id) {
+                document.getElementById(id).classList.remove('active');
+            };
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) overlay.classList.remove('active');
+                });
+            });
+
+            // ── Init ──
+            loadChecklist();
+            loadSurvey();
+        </script>
+    </div><!-- /admin-main -->
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

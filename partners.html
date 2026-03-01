@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合作夥伴管理 — 教學系統</title>
+    <meta name="description" content="管理聯盟行銷夥伴與講師資料">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/manage-page.css">
+</head>
+
+<body>
+    <script type="module" src="components/nav.js"></script>
+
+    <div class="admin-main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">合作夥伴管理</h1>
+            </div>
+
+            <div class="main-tabs">
+                <button class="main-tab active" data-tab="affiliates">
+                    <span class="material-symbols-outlined">handshake</span> 聯盟行銷
+                </button>
+                <button class="main-tab" data-tab="instructors">
+                    <span class="material-symbols-outlined">school</span> 講師
+                </button>
+            </div>
+
+            <!-- Tab: 聯盟行銷 -->
+            <div class="tab-panel active" id="tab-affiliates">
+                <div class="share-link-bar" style="border-radius:8px;margin-bottom:14px;padding:10px 14px;">
+                    <div class="share-link-inner" style="max-width:none;">
+                        <span class="material-symbols-outlined"
+                            style="font-size:18px;color:var(--accent-primary);">link</span>
+                        <span class="share-link-label" style="color:var(--text-secondary);">對外申請表單：</span>
+                        <code id="affPublicUrl"
+                            style="background:#fff;border:1px solid var(--border-color);border-radius:4px;padding:2px 8px;font-size:0.78rem;user-select:all;">affiliate-register.html</code>
+                        <div style="margin-left:auto;display:flex;gap:6px;">
+                            <button class="btn btn-sm" id="btnCopyAffUrl" title="複製連結">
+                                <span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span> 複製
+                            </button>
+                            <a class="btn btn-sm" href="affiliate-register.html" target="_blank"
+                                style="text-decoration:none;">
+                                <span class="material-symbols-outlined" style="font-size:0.9rem;">open_in_new</span> 預覽
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-bar">
+                    <input type="text" id="affSearch" placeholder="搜尋姓名或 Email…">
+                    <select id="affStatusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="pending">待審核</option>
+                        <option value="approved">已通過</option>
+                        <option value="rejected">已拒絕</option>
+                    </select>
+                    <button class="btn btn-dark" id="btnImportAff">
+                        <span class="material-symbols-outlined">upload_file</span> 匯入名單
+                    </button>
+                    <button class="btn btn-dark" id="btnRefreshAff">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="affTable">
+                        <thead>
+                            <tr>
+                                <th>姓名</th>
+                                <th>Email</th>
+                                <th>折扣碼</th>
+                                <th>銀行</th>
+                                <th>狀態</th>
+                                <th>申請日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="affBody">
+                            <tr>
+                                <td colspan="7" style="text-align:center;color:#999;padding:40px;">
+                                    <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: 講師 -->
+            <div class="tab-panel" id="tab-instructors">
+                <div class="filter-bar">
+                    <input type="text" id="instrSearch" placeholder="搜尋姓名或 Email…">
+                    <button class="btn btn-dark" id="btnAddInstructor">
+                        <span class="material-symbols-outlined">add</span> 新增講師
+                    </button>
+                    <button class="btn btn-dark" id="btnImportInstr">
+                        <span class="material-symbols-outlined">upload_file</span> 匯入名單
+                    </button>
+                    <button class="btn btn-dark" id="btnRefreshInstr">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="instrTable">
+                        <thead>
+                            <tr>
+                                <th>姓名</th>
+                                <th>Email</th>
+                                <th>銀行</th>
+                                <th>課程編號</th>
+                                <th>建立日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instrBody">
+                            <tr>
+                                <td colspan="6" style="text-align:center;color:#999;padding:40px;">
+                                    <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Affiliate Detail Modal -->
+    <div class="modal-overlay" id="affDetailOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>聯盟行銷申請詳情</h3>
+                <button class="modal-close" onclick="closeModal('affDetailOverlay')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="affDetailId">
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="affDetailName" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="affDetailEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label>折扣碼</label>
+                    <input type="text" id="affDetailCoupon" readonly>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>銀行名稱</label>
+                        <input type="text" id="affDetailBank" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>戶名</label>
+                        <input type="text" id="affDetailHolder" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>銀行帳號</label>
+                    <input type="text" id="affDetailAccount" readonly>
+                </div>
+                <div class="form-group">
+                    <label>備註</label>
+                    <textarea id="affDetailNotes" placeholder="管理員備註"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>狀態</label>
+                    <select id="affDetailStatus">
+                        <option value="pending">待審核</option>
+                        <option value="approved">已通過</option>
+                        <option value="rejected">已拒絕</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="affDetailDelete">刪除</button>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('affDetailOverlay')">取消</button>
+                    <button class="btn btn-dark" id="affDetailSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructor Modal -->
+    <div class="modal-overlay" id="instrOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="instrModalTitle">新增講師</h3>
+                <button class="modal-close" onclick="closeModal('instrOverlay')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="instrEditId">
+                <div class="form-group">
+                    <label>姓名 <span style="color:#dc2626">*</span></label>
+                    <input type="text" id="instrName" placeholder="講師姓名">
+                </div>
+                <div class="form-group">
+                    <label>Email <span style="color:#dc2626">*</span></label>
+                    <input type="email" id="instrEmail" placeholder="email@example.com">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>銀行名稱</label>
+                        <input type="text" id="instrBankName" placeholder="例：玉山銀行">
+                    </div>
+                    <div class="form-group">
+                        <label>戶名</label>
+                        <input type="text" id="instrHolder" placeholder="帳戶戶名">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>銀行帳號</label>
+                    <input type="text" id="instrBankAccount" placeholder="帳號（含分行代碼）">
+                </div>
+                <div class="form-group">
+                    <label>課程編號（Teachify Product ID）</label>
+                    <div id="courseIdTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" id="instrCourseIdInput" placeholder="輸入課程編號後按 Enter 或點新增">
+                        <button type="button" class="btn btn-dark" id="btnAddCourseId" style="flex-shrink:0;">
+                            <span class="material-symbols-outlined">add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>備註</label>
+                    <textarea id="instrNotes" placeholder="選填"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger hidden" id="instrDelete">刪除</button>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('instrOverlay')">取消</button>
+                    <button class="btn btn-dark" id="instrSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="importOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="importModalTitle">匯入名單</h3>
+                <button class="modal-close" onclick="closeModal('importOverlay')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>選擇 CSV 檔案</label>
+                    <input type="file" id="importFile" accept=".csv"
+                        style="padding:8px;border:1px dashed #ddd;border-radius:8px;width:100%;">
+                </div>
+                <div id="importPreview" style="margin-top:12px;max-height:240px;overflow:auto;"></div>
+                <div
+                    style="margin-top:12px;padding:10px;background:#f9fafb;border-radius:8px;font-size:0.75rem;color:#888;">
+                    <strong>CSV 格式：</strong><br>
+                    <span id="importFormatHint"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('importOverlay')">取消</button>
+                    <button class="btn btn-dark" id="btnImportConfirm">確認匯入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        let affiliates = [];
+        let instructors = [];
+        let instrCourseIds = []; // temp state for course id tags
+
+        // ── Toast ──
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        window.closeModal = function (id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        // ── Tab switching ──
+        document.querySelectorAll('.main-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        // ── Load Data ──
+        async function loadAffiliates() {
+            const { data } = await db.select('affiliates', { order: 'created_at.desc' });
+            affiliates = data || [];
+            renderAffiliates();
+        }
+
+        async function loadInstructors() {
+            const { data } = await db.select('instructors', { order: 'created_at.desc' });
+            instructors = data || [];
+            renderInstructors();
+        }
+
+        // ── Render Affiliates ──
+        function renderAffiliates() {
+            const search = document.getElementById('affSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('affStatusFilter').value;
+
+            let filtered = affiliates;
+            if (search) {
+                filtered = filtered.filter(a =>
+                    (a.name || '').toLowerCase().includes(search) ||
+                    (a.email || '').toLowerCase().includes(search)
+                );
+            }
+            if (statusFilter) {
+                filtered = filtered.filter(a => a.status === statusFilter);
+            }
+
+            const statusLabel = { pending: '待審核', approved: '已通過', rejected: '已拒絕' };
+            const statusClass = { pending: 'refunded', approved: 'paid', rejected: '' };
+
+            const tbody = document.getElementById('affBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:40px;">尚無資料</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(a => `
+                <tr>
+                    <td><strong>${a.name || ''}</strong></td>
+                    <td style="font-size:0.78rem;color:#666;">${a.email}</td>
+                    <td><span class="card-code">${a.coupon_code}</span></td>
+                    <td style="font-size:0.78rem;color:#888;">${a.bank_name || '—'}</td>
+                    <td><span class="status-badge ${statusClass[a.status] || ''}">${statusLabel[a.status] || a.status}</span></td>
+                    <td style="font-size:0.78rem;color:#999;">${a.created_at ? new Date(a.created_at).toLocaleDateString('zh-TW') : ''}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="openAffDetail('${a.id}')" title="詳情">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ── Render Instructors ──
+        function renderInstructors() {
+            const search = document.getElementById('instrSearch').value.toLowerCase();
+
+            let filtered = instructors;
+            if (search) {
+                filtered = filtered.filter(i =>
+                    (i.name || '').toLowerCase().includes(search) ||
+                    (i.email || '').toLowerCase().includes(search)
+                );
+            }
+
+            const tbody = document.getElementById('instrBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;padding:40px;">尚無資料</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(i => {
+                const courseIds = (i.course_ids || []);
+                const courseDisplay = courseIds.length > 0
+                    ? courseIds.map(c => `<span class="card-code" style="font-size:0.68rem;">${c}</span>`).join(' ')
+                    : '<span style="color:#ccc;">—</span>';
+
+                return `
+                <tr>
+                    <td><strong>${i.name || ''}</strong></td>
+                    <td style="font-size:0.78rem;color:#666;">${i.email}</td>
+                    <td style="font-size:0.78rem;color:#888;">${i.bank_name || '—'}</td>
+                    <td>${courseDisplay}</td>
+                    <td style="font-size:0.78rem;color:#999;">${i.created_at ? new Date(i.created_at).toLocaleDateString('zh-TW') : ''}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="openInstrEdit('${i.id}')" title="編輯">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Affiliate Detail ──
+        window.openAffDetail = function (id) {
+            const a = affiliates.find(x => x.id === id);
+            if (!a) return;
+            document.getElementById('affDetailId').value = id;
+            document.getElementById('affDetailName').value = a.name || '';
+            document.getElementById('affDetailEmail').value = a.email || '';
+            document.getElementById('affDetailCoupon').value = a.coupon_code || '';
+            document.getElementById('affDetailBank').value = a.bank_name || '';
+            document.getElementById('affDetailHolder').value = a.account_holder || '';
+            document.getElementById('affDetailAccount').value = a.bank_account || '';
+            document.getElementById('affDetailNotes').value = a.notes || '';
+            document.getElementById('affDetailStatus').value = a.status || 'pending';
+            document.getElementById('affDetailOverlay').classList.add('active');
+        };
+
+        document.getElementById('affDetailSave').addEventListener('click', async () => {
+            const id = document.getElementById('affDetailId').value;
+            const status = document.getElementById('affDetailStatus').value;
+            const notes = document.getElementById('affDetailNotes').value.trim();
+            try {
+                const updateData = { status, notes };
+
+                // Generate login token when approving
+                const a = affiliates.find(x => x.id === id);
+                if (status === 'approved' && a && a.status !== 'approved') {
+                    updateData.login_token = crypto.randomUUID();
+                    updateData.approved_at = new Date().toISOString();
+                }
+
+                await db.update('affiliates', updateData, { id: `eq.${id}` });
+
+                if (a) {
+                    Object.assign(a, updateData);
+                }
+                renderAffiliates();
+                closeModal('affDetailOverlay');
+
+                // Show dashboard link after approval
+                if (updateData.login_token) {
+                    const dashUrl = `${location.origin}/affiliate-dashboard.html?token=${updateData.login_token}`;
+                    const copyLink = confirm(
+                        `已通過！夥伴後台連結：\n\n${dashUrl}\n\n是否複製連結？（請透過 Email 傳送給夥伴）`
+                    );
+                    if (copyLink) {
+                        await navigator.clipboard.writeText(dashUrl);
+                        showToast('連結已複製');
+                    }
+                } else {
+                    showToast('已更新');
+                }
+            } catch (e) { showToast('更新失敗'); }
+        });
+
+        document.getElementById('affDetailDelete').addEventListener('click', async () => {
+            const id = document.getElementById('affDetailId').value;
+            if (!confirm('確定刪除此申請？')) return;
+            try {
+                await db.delete('affiliates', { id: `eq.${id}` });
+                affiliates = affiliates.filter(x => x.id !== id);
+                renderAffiliates();
+                closeModal('affDetailOverlay');
+                showToast('已刪除');
+            } catch (e) { showToast('刪除失敗'); }
+        });
+
+        // ── Instructor Modal ──
+        function renderCourseIdTags() {
+            const container = document.getElementById('courseIdTags');
+            container.innerHTML = instrCourseIds.map((cid, i) => `
+                <span style="display:inline-flex;align-items:center;gap:4px;background:#f5f5f5;border:1px solid #e5e5e5;border-radius:5px;padding:3px 8px;font-size:0.75rem;font-family:monospace;">
+                    ${cid}
+                    <button type="button" onclick="removeCourseId(${i})" style="background:none;border:none;cursor:pointer;color:#999;font-size:0.9rem;line-height:1;padding:0;">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        window.removeCourseId = function (i) {
+            instrCourseIds.splice(i, 1);
+            renderCourseIdTags();
+        };
+
+        function addCourseId() {
+            const input = document.getElementById('instrCourseIdInput');
+            const val = input.value.trim();
+            if (!val) return;
+            if (!instrCourseIds.includes(val)) {
+                instrCourseIds.push(val);
+                renderCourseIdTags();
+            }
+            input.value = '';
+            input.focus();
+        }
+
+        document.getElementById('btnAddCourseId').addEventListener('click', addCourseId);
+        document.getElementById('instrCourseIdInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); addCourseId(); }
+        });
+
+        document.getElementById('btnAddInstructor').addEventListener('click', () => {
+            document.getElementById('instrModalTitle').textContent = '新增講師';
+            document.getElementById('instrEditId').value = '';
+            document.getElementById('instrName').value = '';
+            document.getElementById('instrEmail').value = '';
+            document.getElementById('instrBankName').value = '';
+            document.getElementById('instrBankAccount').value = '';
+            document.getElementById('instrHolder').value = '';
+            document.getElementById('instrNotes').value = '';
+            instrCourseIds = [];
+            renderCourseIdTags();
+            document.getElementById('instrDelete').classList.add('hidden');
+            document.getElementById('instrOverlay').classList.add('active');
+        });
+
+        window.openInstrEdit = function (id) {
+            const i = instructors.find(x => x.id === id);
+            if (!i) return;
+            document.getElementById('instrModalTitle').textContent = '編輯講師';
+            document.getElementById('instrEditId').value = id;
+            document.getElementById('instrName').value = i.name || '';
+            document.getElementById('instrEmail').value = i.email || '';
+            document.getElementById('instrBankName').value = i.bank_name || '';
+            document.getElementById('instrBankAccount').value = i.bank_account || '';
+            document.getElementById('instrHolder').value = i.account_holder || '';
+            document.getElementById('instrNotes').value = i.notes || '';
+            instrCourseIds = [...(i.course_ids || [])];
+            renderCourseIdTags();
+            document.getElementById('instrDelete').classList.remove('hidden');
+            document.getElementById('instrOverlay').classList.add('active');
+        };
+
+        document.getElementById('instrSave').addEventListener('click', async () => {
+            const editId = document.getElementById('instrEditId').value;
+            const name = document.getElementById('instrName').value.trim();
+            const email = document.getElementById('instrEmail').value.trim();
+            if (!name || !email) { showToast('請填寫姓名和 Email'); return; }
+
+            const data = {
+                name, email,
+                bank_name: document.getElementById('instrBankName').value.trim(),
+                bank_account: document.getElementById('instrBankAccount').value.trim(),
+                account_holder: document.getElementById('instrHolder').value.trim(),
+                course_ids: instrCourseIds,
+                notes: document.getElementById('instrNotes').value.trim()
+            };
+
+            try {
+                if (editId) {
+                    await db.update('instructors', data, { id: `eq.${editId}` });
+                    showToast('已更新');
+                } else {
+                    await db.insert('instructors', data);
+                    showToast('講師已建立');
+                }
+                await loadInstructors();
+                closeModal('instrOverlay');
+            } catch (e) { showToast('儲存失敗：' + e.message); }
+        });
+
+        document.getElementById('instrDelete').addEventListener('click', async () => {
+            const id = document.getElementById('instrEditId').value;
+            if (!confirm('確定刪除此講師？')) return;
+            try {
+                await db.delete('instructors', { id: `eq.${id}` });
+                instructors = instructors.filter(x => x.id !== id);
+                renderInstructors();
+                closeModal('instrOverlay');
+                showToast('已刪除');
+            } catch (e) { showToast('刪除失敗'); }
+        });
+
+        // ── Search & Refresh ──
+        document.getElementById('affSearch').addEventListener('input', () => renderAffiliates());
+        document.getElementById('affStatusFilter').addEventListener('change', () => renderAffiliates());
+        document.getElementById('instrSearch').addEventListener('input', () => renderInstructors());
+        document.getElementById('btnRefreshAff').addEventListener('click', () => loadAffiliates());
+        document.getElementById('btnRefreshInstr').addEventListener('click', () => loadInstructors());
+
+        // ── CSV Import ──
+        let importTarget = ''; // 'affiliates' | 'instructors'
+        let importRows = [];
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return [];
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            return lines.slice(1).map(line => {
+                const vals = line.split(',').map(v => v.trim());
+                const obj = {};
+                headers.forEach((h, i) => obj[h] = vals[i] || '');
+                return obj;
+            });
+        }
+
+        document.getElementById('btnImportAff').addEventListener('click', () => {
+            importTarget = 'affiliates';
+            document.getElementById('importModalTitle').textContent = '匯入聯盟行銷名單';
+            document.getElementById('importFormatHint').textContent = 'name, email, coupon_code, bank_name, account_holder, bank_account, status (可省略 = pending)';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').innerHTML = '';
+            importRows = [];
+            document.getElementById('importOverlay').classList.add('active');
+        });
+
+        document.getElementById('btnImportInstr').addEventListener('click', () => {
+            importTarget = 'instructors';
+            document.getElementById('importModalTitle').textContent = '匯入講師名單';
+            document.getElementById('importFormatHint').textContent = 'name, email, bank_name, account_holder, bank_account, course_ids (多個用分號分隔)';
+            document.getElementById('importFile').value = '';
+            document.getElementById('importPreview').innerHTML = '';
+            importRows = [];
+            document.getElementById('importOverlay').classList.add('active');
+        });
+
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                importRows = parseCSV(ev.target.result);
+                const preview = document.getElementById('importPreview');
+                if (importRows.length === 0) {
+                    preview.innerHTML = '<p style="color:#dc2626;font-size:0.8rem;">無法解析 CSV，請確認格式</p>';
+                    return;
+                }
+                const cols = Object.keys(importRows[0]);
+                preview.innerHTML = `
+                    <p style="font-size:0.78rem;color:#666;margin-bottom:6px;">預覽 ${importRows.length} 筆資料：</p>
+                    <table class="data-table" style="font-size:0.72rem;">
+                        <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+                        <tbody>${importRows.slice(0, 5).map(r => `<tr>${cols.map(c => `<td>${r[c]}</td>`).join('')}</tr>`).join('')}</tbody>
+                    </table>
+                    ${importRows.length > 5 ? `<p style="font-size:0.72rem;color:#999;margin-top:4px;">…還有 ${importRows.length - 5} 筆</p>` : ''}
+                `;
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('btnImportConfirm').addEventListener('click', async () => {
+            if (importRows.length === 0) { showToast('請先選擇檔案'); return; }
+            const btn = document.getElementById('btnImportConfirm');
+            btn.disabled = true;
+            btn.textContent = '匯入中…';
+
+            try {
+                if (importTarget === 'affiliates') {
+                    const records = importRows.map(r => ({
+                        name: r.name || '',
+                        email: r.email || '',
+                        coupon_code: r.coupon_code || r.coupon || '',
+                        bank_name: r.bank_name || '',
+                        account_holder: r.account_holder || '',
+                        bank_account: r.bank_account || '',
+                        status: r.status || 'pending'
+                    }));
+                    for (const rec of records) {
+                        await db.insert('affiliates', rec);
+                    }
+                    await loadAffiliates();
+                } else {
+                    const records = importRows.map(r => ({
+                        name: r.name || '',
+                        email: r.email || '',
+                        bank_name: r.bank_name || '',
+                        account_holder: r.account_holder || '',
+                        bank_account: r.bank_account || '',
+                        course_ids: r.course_ids ? r.course_ids.split(';').map(s => s.trim()).filter(Boolean) : [],
+                        notes: r.notes || ''
+                    }));
+                    for (const rec of records) {
+                        await db.insert('instructors', rec);
+                    }
+                    await loadInstructors();
+                }
+                showToast(`已匯入 ${importRows.length} 筆資料`);
+                closeModal('importOverlay');
+            } catch (e) {
+                showToast('匯入失敗：' + e.message);
+            }
+            btn.disabled = false;
+            btn.textContent = '確認匯入';
+        });
+
+        // ── Init ──
+        // Hash-based tab switching
+        function switchToHash() {
+            const hash = location.hash.replace('#', '');
+            if (hash === 'affiliates' || hash === 'instructors') {
+                document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelector(`.main-tab[data-tab="${hash}"]`)?.classList.add('active');
+                document.getElementById(`tab-${hash}`)?.classList.add('active');
+            }
+        }
+        switchToHash();
+        window.addEventListener('hashchange', switchToHash);
+
+        // Copy affiliate public URL
+        const affUrlEl = document.getElementById('affPublicUrl');
+        const fullUrl = new URL('affiliate-register.html', location.href).href;
+        affUrlEl.textContent = fullUrl;
+        document.getElementById('btnCopyAffUrl').addEventListener('click', () => {
+            navigator.clipboard.writeText(fullUrl).then(() => showToast('連結已複製'));
+        });
+
+        loadAffiliates();
+        loadInstructors();
+    </script>
+</body>
+
+</html>

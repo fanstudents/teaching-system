@@ -1,0 +1,948 @@
+/* ========================================
+   互動模組設計系統 — CSS Custom Properties
+   修改以下變數即可調整所有互動模組的全局風格
+   ======================================== */
+:root {
+    --ix-bg: #ffffff;
+    --ix-bg-subtle: #f8fafc;
+    --ix-border: #e5e7eb;
+    --ix-border-focus: #6366f1;
+    --ix-radius: 14px;
+    --ix-radius-sm: 8px;
+    --ix-radius-full: 9999px;
+    --ix-text: #1f2937;
+    --ix-text-muted: #6b7280;
+    --ix-text-light: #9ca3af;
+    --ix-primary: #6366f1;
+    --ix-primary-light: #818cf8;
+    --ix-primary-bg: rgba(99, 102, 241, 0.08);
+    --ix-success: #10b981;
+    --ix-success-bg: rgba(16, 185, 129, 0.08);
+    --ix-danger: #f43f5e;
+    --ix-danger-bg: rgba(244, 63, 94, 0.08);
+    --ix-warning: #f59e0b;
+    --ix-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --ix-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --ix-font: inherit;
+    --ix-transition: 0.2s ease;
+}
+
+/* ── 通用容器覆蓋 ── */
+.truefalse-container,
+.opentext-container,
+.scale-container,
+.buzzer-container,
+.wordcloud-container,
+.hotspot-container {
+    background: var(--ix-bg);
+    border: 1px solid var(--ix-border);
+    border-radius: var(--ix-radius);
+    box-shadow: var(--ix-shadow);
+    font-family: var(--ix-font);
+    padding: 24px 28px;
+}
+
+/* ── 通用重新作答按鈕覆蓋 ── */
+.interactive-reset-btn {
+    border: 1px solid var(--ix-border);
+    border-radius: var(--ix-radius-full);
+    background: var(--ix-bg);
+    color: var(--ix-text-muted);
+    box-shadow: var(--ix-shadow-sm);
+    top: 10px;
+    right: 10px;
+    padding: 5px 12px;
+}
+
+.interactive-reset-btn:hover {
+    background: var(--ix-bg-subtle);
+    color: var(--ix-text);
+    border-color: #d1d5db;
+}
+
+/* ========================================
+   是非題
+   ======================================== */
+.tf-question {
+    color: var(--ix-text);
+}
+
+.tf-btn {
+    border: 3px solid var(--ix-border);
+    background: var(--ix-bg);
+    color: var(--ix-text-muted);
+    transition: all var(--ix-transition);
+}
+
+.tf-btn:hover {
+    box-shadow: var(--ix-shadow);
+}
+
+.tf-btn.correct {
+    background: var(--ix-success-bg);
+    border-color: var(--ix-success);
+    color: #065f46;
+}
+
+.tf-btn.wrong {
+    background: var(--ix-danger-bg);
+    border-color: var(--ix-danger);
+    color: #881337;
+}
+
+.tf-result.success {
+    color: var(--ix-success);
+}
+
+.tf-result.error {
+    color: var(--ix-danger);
+}
+
+/* 簡報模式隱藏互動標籤 */
+.presentation-slide .interactive-label,
+.presentation-mode .interactive-label {
+    display: none !important;
+}
+
+.tf-stats {
+    margin-top: 16px;
+    width: 100%;
+    max-width: 320px;
+    align-self: center;
+}
+
+.tf-stats-bar {
+    height: 5px;
+    border-radius: 3px;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+
+.tf-stats-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ix-success), #34d399);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.tf-stats-label {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--ix-text-light);
+    text-align: center;
+}
+
+/* ========================================
+   開放問答
+   ======================================== */
+.opentext-question {
+    color: var(--ix-text);
+}
+
+.opentext-textarea {
+    border: 1.5px solid var(--ix-border);
+    border-radius: var(--ix-radius-sm);
+    color: var(--ix-text);
+    font-family: var(--ix-font);
+    transition: border-color var(--ix-transition);
+}
+
+.opentext-textarea:focus {
+    outline: none;
+    border-color: var(--ix-border-focus);
+}
+
+.opentext-textarea:disabled {
+    background: var(--ix-bg-subtle);
+    color: var(--ix-text-muted);
+}
+
+.opentext-submit {
+    background: var(--ix-primary);
+    border-radius: var(--ix-radius-sm);
+    font-family: var(--ix-font);
+    transition: all var(--ix-transition);
+}
+
+.opentext-submit:hover {
+    background: var(--ix-primary-light);
+}
+
+.opentext-submit:disabled {
+    background: #d1d5db;
+}
+
+.opentext-result.success {
+    color: var(--ix-success);
+}
+
+/* ========================================
+   量表
+   ======================================== */
+.scale-question {
+    color: var(--ix-text);
+}
+
+.scale-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #e0e7ff, var(--ix-primary));
+}
+
+.scale-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ix-primary);
+    border: 3px solid white;
+    box-shadow: 0 1px 6px rgba(99, 102, 241, 0.3);
+    cursor: pointer;
+}
+
+.scale-value {
+    color: var(--ix-primary);
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.scale-submit {
+    background: var(--ix-primary);
+    border-radius: var(--ix-radius-sm);
+    font-family: var(--ix-font);
+    transition: all var(--ix-transition);
+}
+
+.scale-submit:hover {
+    background: var(--ix-primary-light);
+}
+
+.scale-submit:disabled {
+    background: #d1d5db;
+}
+
+.scale-result.success {
+    color: var(--ix-success);
+}
+
+.scale-labels {
+    color: var(--ix-text-light);
+}
+
+/* ========================================
+   搶答
+   ======================================== */
+.buzzer-question {
+    color: var(--ix-text);
+}
+
+.buzzer-input-row {
+    max-width: 420px;
+    align-self: center;
+}
+
+.buzzer-text-input {
+    border: 1.5px solid var(--ix-border);
+    border-radius: var(--ix-radius-sm);
+    color: var(--ix-text);
+    font-family: var(--ix-font);
+    transition: border-color var(--ix-transition);
+}
+
+.buzzer-text-input:focus {
+    outline: none;
+    border-color: var(--ix-border-focus);
+}
+
+.buzzer-text-input:disabled {
+    background: var(--ix-bg-subtle);
+    color: var(--ix-text-muted);
+}
+
+.buzzer-submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--ix-danger);
+    border-radius: var(--ix-radius-sm);
+    font-family: var(--ix-font);
+    transition: all var(--ix-transition);
+}
+
+.buzzer-submit-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.buzzer-submit-btn.pressed,
+.buzzer-submit-btn:disabled {
+    background: #d1d5db;
+    filter: none;
+    transform: none;
+}
+
+.buzzer-status {
+    text-align: center;
+}
+
+.buzzer-status.claimed {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ix-danger);
+    font-weight: 600;
+    padding: 8px 16px;
+    background: var(--ix-danger-bg);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    border-radius: var(--ix-radius-sm);
+}
+
+.buzzer-result {
+    justify-content: center;
+}
+
+.buzzer-result.success {
+    color: var(--ix-success);
+}
+
+.buzzer-ranking {
+    max-width: 420px;
+    align-self: center;
+}
+
+.buzzer-rank-title {
+    border-bottom: 1px solid var(--ix-border);
+    padding-bottom: 6px;
+    color: var(--ix-text-muted);
+}
+
+.buzzer-rank-item {
+    color: var(--ix-text);
+    border-bottom-color: #f3f4f6;
+}
+
+.buzzer-rank-answer {
+    color: var(--ix-text-light);
+}
+
+/* ========================================
+   文字雲
+   ======================================== */
+.wordcloud-question {
+    color: var(--ix-text);
+}
+
+.wc-count {
+    color: var(--ix-text-light);
+}
+
+.wordcloud-input {
+    border: 1.5px solid var(--ix-border);
+    border-radius: var(--ix-radius-sm);
+    color: var(--ix-text);
+    font-family: var(--ix-font);
+    transition: border-color var(--ix-transition);
+}
+
+.wordcloud-input:focus {
+    outline: none;
+    border-color: var(--ix-border-focus);
+}
+
+.wordcloud-input:disabled {
+    background: var(--ix-bg-subtle);
+    color: var(--ix-text-muted);
+}
+
+.wordcloud-submit {
+    background: var(--ix-primary);
+    border-radius: var(--ix-radius-sm);
+    font-family: var(--ix-font);
+    transition: all var(--ix-transition);
+}
+
+.wordcloud-submit:hover {
+    background: var(--ix-primary-light);
+}
+
+.wordcloud-submit:disabled {
+    background: #d1d5db;
+}
+
+.wordcloud-result.success {
+    color: var(--ix-success);
+}
+
+.wordcloud-cloud {
+    border: 1px solid var(--ix-border);
+    border-radius: var(--ix-radius-sm);
+    padding: 14px;
+    min-height: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.wordcloud-word {
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.wordcloud-empty {
+    color: var(--ix-text-light);
+}
+
+.wc-submitted .wc-inputs {
+    display: none;
+}
+
+.wc-submitted .wc-footer {
+    justify-content: flex-end;
+}
+
+.wc-submitted .wordcloud-submit {
+    display: none;
+}
+
+.wc-cloud-expanded {
+    flex: 1;
+    min-height: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    border: none;
+}
+
+.wc-sync {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 10px;
+    font-size: 12px;
+    color: var(--ix-text-light);
+    font-weight: 400;
+}
+
+.wc-sync-icon {
+    font-size: 14px !important;
+    animation: wc-spin 1.5s linear infinite;
+}
+
+@keyframes wc-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   圖片標註 — 節點選擇版
+   ======================================== */
+.hotspot-question {
+    color: var(--ix-text);
+}
+
+.hotspot-image-wrap {
+    border: 1px solid var(--ix-border);
+    border-radius: var(--ix-radius-sm);
+    cursor: default;
+}
+
+.hotspot-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.hotspot-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--ix-text-light);
+    font-size: 14px;
+    background: var(--ix-bg-subtle);
+}
+
+/* 節點圓圈 */
+.hs-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ix-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 5;
+    border: 2.5px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.hs-node:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+}
+
+.hs-node.hs-selected {
+    background: var(--ix-warning);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3), 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.hs-node.hs-correct {
+    background: var(--ix-success);
+    cursor: default;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: hs-node-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hs-node.hs-wrong {
+    background: var(--ix-danger);
+    cursor: default;
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.25), 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: hs-node-shake 0.5s ease;
+}
+
+.hs-node.hs-missed {
+    background: transparent;
+    cursor: default;
+    border: 2.5px dashed var(--ix-success);
+    color: var(--ix-success);
+    box-shadow: none;
+}
+
+@keyframes hs-node-pop {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes hs-node-shake {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%);
+    }
+
+    20% {
+        transform: translate(calc(-50% + 4px), -50%);
+    }
+
+    40% {
+        transform: translate(calc(-50% - 4px), -50%);
+    }
+
+    60% {
+        transform: translate(calc(-50% + 2px), -50%);
+    }
+
+    80% {
+        transform: translate(calc(-50% - 2px), -50%);
+    }
+}
+
+/* 送出按鈕 */
+.hotspot-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.hs-submit-btn {
+    padding: 8px 28px;
+    border: none;
+    border-radius: var(--ix-radius-sm);
+    background: var(--ix-primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--ix-font);
+    cursor: pointer;
+    transition: all var(--ix-transition);
+}
+
+.hs-submit-btn:hover {
+    background: var(--ix-primary-light);
+}
+
+.hs-submit-btn:disabled {
+    background: #d1d5db;
+    cursor: default;
+}
+
+/* 結果 */
+.hotspot-result {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+}
+
+.hotspot-result .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.hotspot-result.success {
+    color: var(--ix-success);
+}
+
+.hotspot-result.error {
+    color: var(--ix-danger);
+}
+
+/* ── 編輯器節點管理 ── */
+.hs-node-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 13px;
+}
+
+.hs-node-label {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--ix-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.hs-node-correct-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6b7280;
+    flex: 1;
+    cursor: pointer;
+}
+
+.hs-node-correct-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.hs-node-delete {
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hs-node-delete:hover {
+    background: #fef2f2;
+    color: var(--ix-danger);
+}
+
+/* ── 背景音樂控制 ── */
+.bgm-toggle {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 100;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.bgm-toggle:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.bgm-toggle .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* ========================================
+   觀眾模式 + 手機適配
+   ======================================== */
+/* 觀眾模式裡互動元素改為流式佈局 */
+.aud-interaction-wrap .editable-element {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    transform: none !important;
+}
+
+/* 容器適配 */
+.aud-interaction-wrap .matching-container,
+.aud-interaction-wrap .fill-blank-container,
+.aud-interaction-wrap .ordering-container,
+.aud-interaction-wrap .quiz-container,
+.aud-interaction-wrap .poll-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 640px) {
+
+    /* 通用 */
+    .truefalse-container,
+    .opentext-container,
+    .scale-container,
+    .buzzer-container,
+    .wordcloud-container,
+    .hotspot-container {
+        padding: 16px 14px;
+    }
+
+    .interactive-reset-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    /* 是非題 */
+    .tf-question {
+        font-size: 16px;
+    }
+
+    .tf-btn {
+        min-height: 100px;
+    }
+
+    .tf-icon {
+        font-size: 36px;
+    }
+
+    .tf-label {
+        font-size: 18px;
+    }
+
+    .tf-stats,
+    .tf-stats-area {
+        max-width: 100%;
+    }
+
+    /* 開放問答 */
+    .opentext-question {
+        font-size: 15px;
+    }
+
+    .opentext-textarea {
+        font-size: 14px;
+        min-height: 80px;
+    }
+
+    .opentext-submit {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* 量表 */
+    .scale-question {
+        font-size: 15px;
+    }
+
+    .scale-value {
+        font-size: 24px;
+    }
+
+    .scale-range {
+        width: 100%;
+    }
+
+    .scale-submit {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* 搶答 */
+    .buzzer-question {
+        font-size: 15px;
+    }
+
+    .buzzer-input-row {
+        max-width: 100%;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .buzzer-text-input {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .buzzer-submit-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* 文字雲 */
+    .wordcloud-question {
+        font-size: 15px;
+    }
+
+    .wordcloud-input {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .wordcloud-submit {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* 圖片標註 */
+    .hotspot-question {
+        font-size: 15px;
+    }
+
+    .hs-node {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .hs-submit-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    /* 選擇題 / 投票 */
+    .quiz-container,
+    .poll-container {
+        padding: 16px 14px;
+    }
+
+    .quiz-question,
+    .poll-question {
+        font-size: 15px;
+    }
+
+    .quiz-option,
+    .poll-option {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 44px;
+        /* 觸控友善 */
+        touch-action: manipulation;
+    }
+
+    /* 連連看 */
+    .matching-container {
+        padding: 12px;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .matching-column {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .matching-item {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    /* 排序 */
+    .ordering-container {
+        flex-direction: column;
+    }
+
+    .ordering-chip {
+        font-size: 13px;
+        padding: 8px 10px;
+        touch-action: manipulation;
+    }
+
+    .ordering-slot {
+        font-size: 13px;
+        min-height: 40px;
+    }
+
+    /* 填空 */
+    .fill-blank-container {
+        padding: 16px 14px;
+    }
+
+    .fill-blank-content {
+        font-size: 14px;
+    }
+
+    .fill-blank-input {
+        font-size: 14px;
+        min-width: 50px;
+    }
+
+    .fill-blank-check-btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+    /* 通用觸控最佳化 */
+    button,
+    .quiz-option,
+    .poll-option,
+    .tf-btn,
+    .hs-node {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+}

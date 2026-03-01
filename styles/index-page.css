@@ -1,0 +1,456 @@
+/* ========================================
+   index.html — 專案總覽頁面
+   ======================================== */
+
+body {
+    background: var(--bg-primary);
+}
+
+/* ── Project Dashboard ── */
+.project-dashboard {
+    min-height: 100vh;
+}
+
+.pd-body {
+    flex: 1;
+    padding: 0 40px 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.pd-section-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #8b8fa3;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 16px;
+}
+
+/* ── Hierarchical List ── */
+.pd-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+/* ── Project Row ── */
+.pd-card {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background .15s;
+    position: relative;
+}
+
+.pd-card:last-child {
+    border-bottom: none;
+}
+
+.pd-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 14px;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.pd-row:hover {
+    background: #fafbfc;
+}
+
+.pd-card:hover {
+    background: #fcfcfd;
+}
+
+.pd-expand-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: transform .2s ease;
+}
+
+.pd-expand-icon .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.pd-card.expanded .pd-expand-icon {
+    transform: rotate(90deg);
+}
+
+.pd-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    line-height: 1.4;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-card-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 0.78rem;
+    color: #8b8fa3;
+    flex-shrink: 0;
+}
+
+.pd-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.pd-card-meta .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.pd-card-code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 3px 8px;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+.pd-row-actions {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.pd-row-action {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all .15s;
+}
+
+.pd-row-action:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.pd-row-action.danger:hover {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.pd-row-action .material-symbols-outlined {
+    font-size: 17px;
+}
+
+/* ── Expandable Children ── */
+.pd-children {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .25s ease;
+    background: #f8f9fb;
+}
+
+.pd-card.expanded .pd-children {
+    max-height: 800px;
+}
+
+.pd-children-inner {
+    padding: 2px 20px 12px 56px;
+}
+
+/* ── Session Items (nested) ── */
+.pd-session-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border: 1px solid #e8ecf1;
+    transition: border-color .15s;
+}
+
+.pd-session-item:hover {
+    border-color: #c7d2fe;
+}
+
+.pd-session-item .session-date {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.pd-session-item .session-detail {
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
+
+.pd-session-item .session-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.pd-session-item .session-action-btn,
+.pd-session-item .session-join {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    padding: 0;
+}
+
+.pd-session-item .session-action-btn:hover {
+    background: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.pd-session-item .session-action-btn .material-symbols-outlined {
+    font-size: 15px;
+}
+
+.pd-session-item .session-join {
+    width: auto;
+    font-size: 0.72rem;
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+.pd-session-item .session-join:hover {
+    background: #c7d2fe;
+}
+
+.pd-add-session {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 4px;
+    font-size: 0.76rem;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px dashed #d1d5db;
+    background: none;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.pd-add-session:hover {
+    color: #4285f4;
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.pd-add-session .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.pd-no-session {
+    font-size: 0.76rem;
+    color: #cbd5e1;
+    padding: 4px 0;
+}
+
+/* ── Session phase select ── */
+.session-phase-select {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: #f8fafc;
+    color: var(--text-secondary);
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    flex-shrink: 0;
+    transition: border-color .15s;
+}
+
+.session-phase-select:focus {
+    border-color: #818cf8;
+}
+
+/* ── Project action buttons (inside expanded area) ── */
+.pd-project-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e8ecf1;
+}
+
+.pd-proj-btn {
+    height: 32px;
+    border: 1px solid var(--border-color);
+    background: #fff;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 12px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-family: inherit;
+    text-decoration: none;
+    transition: all .15s;
+}
+
+.pd-proj-btn:hover {
+    background: #eef2ff;
+    border-color: #818cf8;
+    color: #4338ca;
+}
+
+.pd-proj-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* ── Settings panel ── */
+.pd-settings-panel {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+
+.pd-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+}
+
+.pd-settings-grid label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.pd-setting-input {
+    font-size: 0.78rem;
+    padding: 5px 8px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 6px;
+    background: #fff;
+    transition: border-color .2s;
+    font-family: inherit;
+}
+
+.pd-setting-input:focus {
+    outline: none;
+    border-color: #4285f4;
+}
+
+.pd-settings-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+/* ── Sessions header ── */
+.pd-sessions-header {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.pd-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.pd-empty-icon {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 12px;
+}
+
+.pd-empty p {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .pd-header {
+        padding: 20px 16px 16px;
+    }
+
+    .pd-body {
+        padding: 0 16px 32px;
+    }
+
+    .pd-row {
+        padding: 12px 14px;
+        gap: 8px;
+    }
+
+    .pd-card-meta {
+        display: none;
+    }
+
+    .pd-children-inner {
+        padding-left: 36px;
+    }
+}
+
+/* ── Modals ── */
+#createProjectModal,
+#createSessionModal {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+}
+
+/* (modal-box, form-field, form-error, modal-btn 已統一至 base.css) */

@@ -1,0 +1,308 @@
+/**
+ * 互動狀態管理器 — 統一快取 + DB 持久化
+ * 各互動模組共用，負責 save / load 學員互動記錄
+ */
+import { db } from '../supabase.js';
+
+class InteractionState {
+    constructor() {
+        /** @type {Map<string, object>} key → submission record */
+        this._cache = new Map();
+    }
+
+    /** 組合快取 key */
+    _key(sessionId, elementId, email) {
+        return `${sessionId || ''}::${elementId}::${email || ''}`;
+    }
+
+    /** 取得當前學員 */
+    getUser() {
+        return JSON.parse(sessionStorage.getItem('homework_user') || 'null');
+    }
+
+    /** 取得 session code */
+    getSessionCode() {
+        return new URLSearchParams(location.search).get('code')
+            || new URLSearchParams(location.search).get('session')
+            || '';
+    }
+
+    /**
+     * 從 db.select 結果中取出 rows 陣列
+     */
+    _unwrap(result) {
+        if (!result) return [];
+        if (result.data && Array.isArray(result.data)) return result.data;
+        if (Array.isArray(result)) return result;
+        return [];
+    }
+
+    /**
+     * 儲存互動結果（記憶體 + DB upsert）
+     */
+    async save(elementId, data) {
+        const user = this.getUser();
+        const sessionId = this.getSessionCode();
+        const email = user ? (user.email || '') : 'guest';
+
+        const record = {
+            session_id: sessionId || null,
+            element_id: elementId,
+            student_name: user ? user.name : '訪客',
+            student_email: email,
+            student_group: user ? user.group : '',
+            assignment_title: data.title || '',
+            type: data.type,
+            content: data.content || '',
+            is_correct: data.isCorrect ?? null,
+            score: data.score != null ? String(data.score) : null,
+            state: data.state || {},
+            submitted_at: new Date().toISOString(),
+        };
+
+        // 記憶體快取
+        const k = this._key(sessionId, elementId, email);
+        this._cache.set(k, record);
+
+        // 如果是訪客，不寫入 DB
+        if (!user) return;
+
+        // DB upsert
+        try {
+            const raw = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${sessionId || ''}`,
+                    element_id: `eq.${elementId}`,
+                    student_email: `eq.${email}`,
+                },
+            });
+            const existing = this._unwrap(raw);
+
+            if (existing.length > 0) {
+                await db.update('submissions', {
+                    content: record.content,
+                    is_correct: record.is_correct,
+                    score: record.score,
+                    state: record.state,
+                    submitted_at: record.submitted_at,
+                }, { id: `eq.${existing[0].id}` });
+            } else {
+                await db.insert('submissions', record);
+            }
+        } catch (e) {
+            console.warn('[stateManager] save failed, trying insert:', e);
+            try {
+                await db.insert('submissions', record);
+            } catch (e2) {
+                console.warn('[stateManager] insert also failed:', e2);
+            }
+        }
+    }
+
+    /**
+     * 載入某元素的互動記錄
+     */
+    async load(elementId) {
+        const user = this.getUser();
+        const sessionId = this.getSessionCode();
+        const email = user ? (user.email || '') : 'guest';
+        const k = this._key(sessionId, elementId, email);
+
+        // 記憶體快取命中 (訪客也會命中這裡)
+        if (this._cache.has(k)) {
+            return this._cache.get(k);
+        }
+
+        // 訪客沒有 DB 資料可查
+        if (!user) return null;
+
+        // 從 DB 查詢
+        try {
+            const raw = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${sessionId || ''}`,
+                    element_id: `eq.${elementId}`,
+                    student_email: `eq.${email}`,
+                },
+            });
+            const rows = this._unwrap(raw);
+            if (rows.length > 0) {
+                const record = rows[0];
+                if (typeof record.state === 'string') {
+                    try { record.state = JSON.parse(record.state); } catch { record.state = {}; }
+                }
+                this._cache.set(k, record);
+                return record;
+            }
+        } catch (e) {
+            console.warn('[stateManager] load failed:', e);
+        }
+        return null;
+    }
+
+    /**
+     * 清除某元素的互動記錄（重新作答用）
+     */
+    async clear(elementId) {
+        const user = this.getUser();
+        const sessionId = this.getSessionCode();
+        const email = user ? (user.email || '') : 'guest';
+        const k = this._key(sessionId, elementId, email);
+
+        // 清除記憶體快取
+        this._cache.delete(k);
+
+        // 清除 DB 記錄
+        if (!user) return;
+        try {
+            await db.delete('submissions', {
+                session_id: `eq.${sessionId || ''}`,
+                element_id: `eq.${elementId}`,
+                student_email: `eq.${email}`,
+            });
+        } catch (e) {
+            console.warn('[stateManager] clear failed:', e);
+        }
+    }
+
+    /**
+     * 載入某學員在某 session 的所有互動記錄（email 模組用）
+     * @param {string} sessionId
+     * @param {string} email
+     */
+    async loadAll(sessionId, email) {
+        try {
+            const raw = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${sessionId}`,
+                    student_email: `eq.${email}`,
+                    element_id: 'neq.',
+                },
+            });
+            return this._unwrap(raw);
+        } catch (e) {
+            console.warn('[stateManager] loadAll failed:', e);
+            return [];
+        }
+    }
+
+    /**
+     * 計算百分比（贏過幾 % 的同學）
+     */
+    async getPercentile(sessionId, elementId, currentScoreStr) {
+        if (!sessionId || !elementId) return null;
+        try {
+            // 從 DB 撈取該 session + 該元素 的所有非訪客分數
+            const raw = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${sessionId}`,
+                    element_id: `eq.${elementId}`,
+                    student_email: 'neq.guest' // 排除未登入的訪客
+                }
+            });
+            const rows = this._unwrap(raw);
+            if (rows.length === 0) return 100;
+
+            const myScore = parseFloat(currentScoreStr) || 0;
+
+            // 計算比自己低分的人數 (或是同分但提交較晚，這裡簡單用分數算)
+            let lowerCount = 0;
+            rows.forEach(r => {
+                const s = parseFloat(r.score) || 0;
+                if (s < myScore) {
+                    lowerCount++;
+                }
+            });
+
+            const total = rows.length;
+            if (total === 0) return 100;
+
+            // 避免計算出 0%，至少給 1% 鼓勵，或是直接計算。
+            // 例如有 10 人，你最高，贏過 9 人 -> 90%
+            const pct = Math.round((lowerCount / total) * 100);
+            return pct;
+        } catch (e) {
+            console.warn('[stateManager] getPercentile failed:', e);
+            return null;
+        }
+    }
+
+    /**
+     * 播放成功的煙火動畫與音效
+     */
+    playSuccessFeedback(container) {
+        // --- 1. 煙火動畫 ---
+        const colors = ['#4A7AE8', '#22c55e', '#f59e0b', '#ec4899', '#8b5cf6'];
+        // 如果容器有 relative，就在容器內；沒有的話，先設定
+        if (getComputedStyle(container).position === 'static') {
+            container.style.position = 'relative';
+        }
+
+        for (let i = 0; i < 30; i++) {
+            const dot = document.createElement('div');
+            // 可以沿用 ordering-confetti class 如果有定義，如果沒有就寫 inline style
+            dot.className = 'interactive-confetti';
+            dot.style.position = 'absolute';
+            dot.style.width = '8px';
+            dot.style.height = '8px';
+            dot.style.borderRadius = '50%';
+            dot.style.pointerEvents = 'none';
+            dot.style.zIndex = '999';
+            dot.style.setProperty('--x', `${(Math.random() - 0.5) * 200}px`);
+            dot.style.setProperty('--y', `${-60 - Math.random() * 120}px`);
+            dot.style.setProperty('--r', `${Math.random() * 720 - 360}deg`);
+
+            // CSS Animation
+            dot.animate([
+                { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+                { transform: `translate(var(--x), var(--y)) rotate(var(--r))`, opacity: 0 }
+            ], {
+                duration: 800 + Math.random() * 400,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                fill: 'forwards',
+                delay: Math.random() * 200
+            });
+
+            dot.style.left = `${40 + Math.random() * 20}%`;
+            dot.style.bottom = '20px';
+            dot.style.background = colors[i % colors.length];
+            container.appendChild(dot);
+            setTimeout(() => dot.remove(), 1500);
+        }
+
+        // --- 2. 成功音效 (Web Audio API) ---
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                const ctx = new AudioContext();
+                const playTone = (freq, startTime, duration) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+
+                    gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+                    gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + startTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(ctx.currentTime + startTime);
+                    osc.stop(ctx.currentTime + startTime + duration);
+                };
+
+                // 播放一個輕快的琶音 C5 -> E5 -> G5 -> C6
+                playTone(523.25, 0, 0.3);    // C5
+                playTone(659.25, 0.1, 0.3);  // E5
+                playTone(783.99, 0.2, 0.3);  // G5
+                playTone(1046.50, 0.3, 0.5); // C6
+            }
+        } catch (e) {
+            console.warn('[stateManager] play audio failed:', e);
+        }
+    }
+}
+
+/** 全域單例 */
+export const stateManager = new InteractionState();

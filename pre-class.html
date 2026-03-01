@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課前須知 — AI 職場應用工作坊</title>
+    <meta name="description" content="課前準備頁面，完成課前須知與準備事項">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css?v=20260223">
+    <link rel="stylesheet" href="styles/pre-class-page.css?v=20260223">
+</head>
+
+<body>
+    <!-- 登入 Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <h2>👋 歡迎加入課程</h2>
+            <p>請輸入您的資料與場次代碼以開始</p>
+            <div class="login-field">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com">
+            </div>
+            <div class="login-field">
+                <label for="loginName">姓名</label>
+                <input type="text" id="loginName" placeholder="請輸入姓名">
+            </div>
+            <div class="login-field">
+                <label for="loginCode">場次代碼</label>
+                <input type="text" id="loginCode" placeholder=""
+                    style="font-family:'SF Mono','Fira Code',monospace;letter-spacing:1px;">
+            </div>
+            <button class="login-btn" id="loginBtn">進入課程</button>
+            <div class="login-error" id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+        <nav id="heroBreadcrumb"
+            style="display:flex;align-items:center;gap:6px;font-size:0.82rem;color:#94a3b8;margin-bottom:14px;flex-wrap:wrap;position:relative;z-index:1;">
+            <a id="backToPortal" href="#"
+                style="display:inline-flex;align-items:center;gap:4px;color:#94a3b8;text-decoration:none;transition:color 0.15s;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.08);"
+                onmouseover="this.style.color='#60a5fa';this.style.background='rgba(255,255,255,0.15)'"
+                onmouseout="this.style.color='#94a3b8';this.style.background='rgba(255,255,255,0.08)'">
+                <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+                學習入口
+            </a>
+            <span style="color:#475569;">›</span>
+            <span style="color:#cbd5e1;font-weight:500;">課前須知</span>
+        </nav>
+        <script>
+            (function () {
+                var p = new URLSearchParams(location.search);
+                var code = p.get('code') || '';
+                var session = p.get('session') || '';
+                if (code) {
+                    var q = session ? '&session=' + session : '';
+                    document.getElementById('backToPortal').href = 'portal.html?code=' + code + q;
+                } else {
+                    document.getElementById('heroBreadcrumb').style.display = 'none';
+                }
+            })();
+        </script>
+        <h1 class="hero-title" id="heroTitle"></h1>
+        <div id="heroSessionInfo"
+            style="display:none;position:relative;margin-top:6px;font-size:0.85rem;color:rgba(255,255,255,0.6);">
+            <span class="material-symbols-outlined"
+                style="font-size:14px;vertical-align:middle;margin-right:4px;">event</span>
+            <span id="heroSessionLabel"></span>
+        </div>
+        <p class="hero-subtitle">歡迎您參加本次課程，請在上課前完成以下準備事項</p>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container hidden" id="mainContent">
+
+        <!-- 進度條 -->
+        <div class="progress-bar-wrapper">
+            <div class="progress-header">
+                <span class="progress-label">準備進度</span>
+                <span class="progress-count" id="progressCount">0 / 0</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+        </div>
+
+        <!-- 課程資訊 -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon blue">
+                    <span class="material-symbols-outlined">info</span>
+                </div>
+                <h2 class="section-title">課程資訊</h2>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;">
+                <div
+                    style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+                    <span class="material-symbols-outlined"
+                        style="color:#6366f1;font-size:20px;margin-top:2px;">calendar_today</span>
+                    <div>
+                        <div style="font-size:0.75rem;color:#94a3b8;font-weight:500;margin-bottom:2px;">日期</div>
+                        <div style="font-size:0.92rem;font-weight:600;color:#0f172a;" id="infoDate"></div>
+                    </div>
+                </div>
+                <div
+                    style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+                    <span class="material-symbols-outlined"
+                        style="color:#6366f1;font-size:20px;margin-top:2px;">schedule</span>
+                    <div>
+                        <div style="font-size:0.75rem;color:#94a3b8;font-weight:500;margin-bottom:2px;">時間</div>
+                        <div style="font-size:0.92rem;font-weight:600;color:#0f172a;" id="infoTime"></div>
+                    </div>
+                </div>
+                <div
+                    style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+                    <span class="material-symbols-outlined"
+                        style="color:#6366f1;font-size:20px;margin-top:2px;">location_on</span>
+                    <div>
+                        <div style="font-size:0.75rem;color:#94a3b8;font-weight:500;margin-bottom:2px;">地點</div>
+                        <div style="font-size:0.92rem;font-weight:600;color:#0f172a;" id="infoVenue"></div>
+                    </div>
+                </div>
+                <div
+                    style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+                    <span class="material-symbols-outlined"
+                        style="color:#6366f1;font-size:20px;margin-top:2px;">person</span>
+                    <div>
+                        <div style="font-size:0.75rem;color:#94a3b8;font-weight:500;margin-bottom:2px;">講師</div>
+                        <div style="font-size:0.92rem;font-weight:600;color:#0f172a;" id="infoInstructor"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 課前準備清單（動態） -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon green">
+                    <span class="material-symbols-outlined">laptop_mac</span>
+                </div>
+                <h2 class="section-title">課前準備清單</h2>
+            </div>
+            <p style="font-size:0.9rem;color:#64748b;margin-bottom:14px;line-height:1.6;">
+                請勾選讓老師知道您的準備狀況，以便掌握現場學習的進度
+            </p>
+            <ul class="checklist" id="checklistContainer">
+                <li class="loading-spinner">
+                    <span class="material-symbols-outlined spin">progress_activity</span>
+                    載入中…
+                </li>
+            </ul>
+        </div>
+
+        <!-- 課前問卷（動態） -->
+        <div class="section-card" id="surveySection">
+            <div class="section-header">
+                <div class="section-icon purple">
+                    <span class="material-symbols-outlined">quiz</span>
+                </div>
+                <h2 class="section-title">課前問卷</h2>
+            </div>
+            <div id="surveyContainer">
+                <div class="loading-spinner">
+                    <span class="material-symbols-outlined spin">progress_activity</span>
+                    載入中…
+                </div>
+            </div>
+        </div>
+
+        <!-- 交通資訊（動態） -->
+        <div class="section-card" id="transportSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-icon orange">
+                    <span class="material-symbols-outlined">directions</span>
+                </div>
+                <h2 class="section-title">交通資訊</h2>
+            </div>
+            <div id="transportContent" style="font-size:0.92rem;line-height:1.8;color:#334155;white-space:pre-line;">
+            </div>
+        </div>
+
+        <!-- 溫馨提醒（動態） -->
+        <div class="section-card" id="remindersSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-icon orange">
+                    <span class="material-symbols-outlined">emoji_objects</span>
+                </div>
+                <h2 class="section-title">溫馨提醒</h2>
+            </div>
+            <div id="remindersContent" style="font-size:0.92rem;line-height:1.8;color:#334155;white-space:pre-line;">
+            </div>
+        </div>
+
+        <!-- 加入群組（動態） -->
+        <div class="section-card" id="groupSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-icon pink">
+                    <span class="material-symbols-outlined">groups</span>
+                </div>
+                <h2 class="section-title">加入課程群組</h2>
+            </div>
+            <p style="font-size:0.92rem;line-height:1.7;color:#475569;margin-bottom:16px;">
+                為了方便課程中的即時互動、資料分享與課後交流，請您先加入以下群組。
+            </p>
+            <div class="link-group">
+                <a href="#" class="link-btn green" id="groupLinkBtn" target="_blank" style="display:none;">
+                    <span class="material-symbols-outlined">chat</span>
+                    <span id="groupLinkLabel">加入群組</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="reminder-box" id="contactBox" style="margin-bottom: 20px; display:none;">
+            <span class="material-symbols-outlined">info</span>
+            <p>如有任何問題，歡迎透過群組或 Email 聯繫我們。我們期待與您一同探索 AI 在職場上的無限可能！</p>
+        </div>
+
+        <div class="page-footer">
+            © 2026 AI 職場應用工作坊 · 丁老師 · 課前須知
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+        import { getCourseConfig } from './scripts/courseConfig.js';
+
+        const joinCode = new URLSearchParams(location.search).get('code') || '';
+        let currentUser = null;
+
+        const sessionParam = new URLSearchParams(location.search).get('session') || '';
+
+        // ── Load course config ──
+        (async () => {
+            const sessionParam = new URLSearchParams(window.location.search).get('session') || '';
+            const config = await getCourseConfig(joinCode, db, sessionParam);
+            if (config.courseName) document.getElementById('heroTitle').textContent = config.courseName;
+            // 場次資訊（標題下方）
+            if (config.date || config.time) {
+                const parts = [];
+                if (config.date) parts.push(config.date);
+                if (config.time) parts.push(config.time);
+                document.getElementById('heroSessionLabel').textContent = parts.join('　');
+                document.getElementById('heroSessionInfo').style.display = '';
+            }
+            if (config.date) document.getElementById('infoDate').textContent = config.date;
+            if (config.time) document.getElementById('infoTime').textContent = config.time;
+            if (config.venue) document.getElementById('infoVenue').textContent = config.venue;
+            if (config.instructor) document.getElementById('infoInstructor').textContent = config.instructor;
+
+            // 交通資訊
+            if (config.transportInfo) {
+                document.getElementById('transportSection').style.display = '';
+                document.getElementById('transportContent').textContent = config.transportInfo;
+            }
+
+            // 溫馨提醒
+            if (config.reminders) {
+                document.getElementById('remindersSection').style.display = '';
+                document.getElementById('remindersContent').textContent = config.reminders;
+            }
+
+            // 群組連結
+            if (config.groupLinkUrl) {
+                document.getElementById('groupSection').style.display = '';
+                const btn = document.getElementById('groupLinkBtn');
+                btn.href = config.groupLinkUrl;
+                btn.style.display = '';
+                if (config.groupLinkLabel) {
+                    document.getElementById('groupLinkLabel').textContent = config.groupLinkLabel;
+                }
+                document.getElementById('contactBox').style.display = '';
+            }
+        })();
+
+        // ── 自動還原登入狀態 ──
+        const savedSession = localStorage.getItem('student_session');
+        if (savedSession) {
+            try {
+                const s = JSON.parse(savedSession);
+                if (s.sessionCode) {
+                    currentUser = { email: s.email, name: s.name };
+                    // 確保 URL 有正確參數
+                    const url = new URL(location.href);
+                    if (!url.searchParams.get('session')) {
+                        url.searchParams.set('session', s.sessionCode);
+                        if (s.joinCode) url.searchParams.set('code', s.joinCode);
+                        history.replaceState(null, '', url);
+                    }
+                    showMainContent();
+                }
+            } catch { /* show login */ }
+        }
+
+        // ── 預填場次代碼（從 URL ?s=XXX） ──
+        const urlSession = new URLSearchParams(location.search).get('s') || '';
+        if (urlSession) document.getElementById('loginCode').value = urlSession;
+
+        // ── 動態登入欄位（根據專案設定） ──
+        let _extraFields = [];
+        if (urlSession) {
+            (async () => {
+                try {
+                    const { data: sess } = await db.select('project_sessions', {
+                        filter: { session_code: `eq.${urlSession}` }, limit: 1
+                    });
+                    if (sess?.[0]) {
+                        const { data: proj } = await db.select('projects', {
+                            filter: { id: `eq.${sess[0].project_id}` }, limit: 1, columns: 'login_fields'
+                        });
+                        _extraFields = proj?.[0]?.login_fields || [];
+                    }
+                } catch { /* ignore */ }
+                if (_extraFields.length > 0) {
+                    const container = document.getElementById('loginCode').closest('.login-field');
+                    _extraFields.forEach(f => {
+                        const div = document.createElement('div');
+                        div.className = 'login-field';
+                        div.innerHTML = `
+                            <label for="extra_${f.key}">${f.label}</label>
+                            <input type="text" id="extra_${f.key}" placeholder="">
+                        `;
+                        container.parentNode.insertBefore(div, container.nextSibling);
+                    });
+                }
+            })();
+        }
+
+        // ── 登入 ──
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+
+        loginBtn.addEventListener('click', handleLogin);
+        document.getElementById('loginEmail').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('loginName').focus();
+        });
+        document.getElementById('loginName').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('loginCode').focus();
+        });
+        document.getElementById('loginCode').addEventListener('keydown', e => {
+            if (e.key === 'Enter') handleLogin();
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const name = document.getElementById('loginName').value.trim();
+            const code = document.getElementById('loginCode').value.trim().toUpperCase();
+
+            loginError.style.display = 'none';
+
+            if (!email || !email.includes('@')) {
+                loginError.textContent = '請輸入有效的 Email';
+                loginError.style.display = 'block';
+                return;
+            }
+            if (!name) {
+                loginError.textContent = '請輸入姓名';
+                loginError.style.display = 'block';
+                return;
+            }
+            if (!code) {
+                loginError.textContent = '請輸入場次代碼';
+                loginError.style.display = 'block';
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = '驗證中…';
+
+            try {
+                // 1. 驗證場次代碼
+                const { data: sessions } = await db.select('project_sessions', {
+                    filter: { session_code: `eq.${code}` }, limit: 1
+                });
+                if (!sessions || sessions.length === 0) {
+                    loginError.textContent = '找不到此場次代碼，請確認後重試';
+                    loginError.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '進入課程';
+                    return;
+                }
+                const session = sessions[0];
+
+                // 2. 查找所屬專案
+                let projectName = '';
+                let joinCodeVal = '';
+                try {
+                    const { data: projRows } = await db.select('projects', {
+                        filter: { id: `eq.${session.project_id}` }, limit: 1
+                    });
+                    if (projRows?.[0]) {
+                        projectName = projRows[0].name;
+                        joinCodeVal = projRows[0].join_code;
+                    }
+                } catch { /* ok */ }
+
+                // 3. 註冊 / 更新學員
+                const insertData = {
+                    email, name,
+                    joined_at: new Date().toISOString(),
+                    project_id: session.project_id,
+                    session_code: code
+                };
+                await db.insert('students', insertData).catch(async () => {
+                    await db.update('students', { name }, {
+                        email: `eq.${email}`, session_code: `eq.${code}`
+                    });
+                });
+
+                // 4. 收集額外欄位
+                const extraData = {};
+                _extraFields.forEach(f => {
+                    const el = document.getElementById(`extra_${f.key}`);
+                    if (el) extraData[f.key] = el.value.trim();
+                });
+                // 存到 students 表（group_name, company 有對應欄位）
+                const studentUpdate = {};
+                if (extraData.group) studentUpdate.group_name = extraData.group;
+                if (extraData.company) studentUpdate.company = extraData.company;
+                if (Object.keys(studentUpdate).length > 0) {
+                    try {
+                        await db.update('students', studentUpdate, {
+                            email: `eq.${email}`, session_code: `eq.${code}`
+                        });
+                    } catch { /* ok */ }
+                }
+
+                // 5. 儲存登入狀態
+                currentUser = { email, name };
+                const sessionData = {
+                    email, name,
+                    sessionCode: code,
+                    joinCode: joinCodeVal,
+                    projectId: session.project_id,
+                    projectName,
+                    extra: extraData
+                };
+                localStorage.setItem('student_session', JSON.stringify(sessionData));
+                sessionStorage.setItem('homework_user', JSON.stringify({
+                    name, email, joinedAt: new Date().toISOString()
+                }));
+                // 相容舊 key
+                if (joinCodeVal) {
+                    sessionStorage.setItem(`portal_user_${joinCodeVal}`, JSON.stringify(currentUser));
+                }
+
+                // 5. 更新 URL 參數
+                const url = new URL(location.href);
+                url.searchParams.set('session', code);
+                if (joinCodeVal) url.searchParams.set('code', joinCodeVal);
+                history.replaceState(null, '', url);
+
+                // 6. 重新載入 config 並顯示
+                location.reload();
+            } catch (err) {
+                loginError.textContent = '登入失敗：' + err.message;
+                loginError.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = '進入課程';
+            }
+        }
+
+        function showMainContent() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            loadChecklist();
+            loadSurvey();
+        }
+
+        // ── 課前準備清單 ──
+        let checklistItems = [];
+        let checklistProgress = {};
+
+        async function loadChecklist() {
+            const container = document.getElementById('checklistContainer');
+            try {
+                const filter = sessionParam ? { session_code: `eq.${sessionParam}` } : (joinCode ? { session_code: `eq.${joinCode}` } : {});
+                const { data: items } = await db.select('checklist_items', {
+                    order: 'sort_order.asc',
+                    filter
+                });
+                checklistItems = items || [];
+
+                // 載入進度
+                const { data: progress } = await db.select('checklist_progress', {
+                    filter: { student_email: `eq.${currentUser.email}` }
+                });
+                (progress || []).forEach(p => {
+                    checklistProgress[p.checklist_item_id] = p.completed;
+                });
+
+                renderChecklist();
+            } catch (err) {
+                container.innerHTML = `<li style="color:#ef4444;">載入失敗：${err.message}</li>`;
+            }
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            if (checklistItems.length === 0) {
+                container.innerHTML = '<li style="color:#94a3b8;">目前沒有準備項目</li>';
+                return;
+            }
+
+            container.innerHTML = checklistItems.map(item => {
+                const done = checklistProgress[item.id] || false;
+                return `
+                    <li>
+                        <span class="check-icon ${done ? 'checked' : ''}"
+                              data-item-id="${item.id}"
+                              onclick="window.__toggleCheck(this)">✓</span>
+                        <div class="item-content">
+                            <strong>${item.title}</strong>
+                            ${item.description ? `<span class="desc">${item.description}</span>` : ''}
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            updateProgress();
+        }
+
+        // Global toggle handler
+        window.__toggleCheck = async function (el) {
+            const itemId = el.dataset.itemId;
+            const isChecked = el.classList.contains('checked');
+            const newState = !isChecked;
+
+            el.classList.add('saving');
+
+            try {
+                if (newState) {
+                    // Insert or update
+                    try {
+                        await db.insert('checklist_progress', {
+                            student_email: currentUser.email,
+                            checklist_item_id: itemId,
+                            completed: true,
+                            completed_at: new Date().toISOString()
+                        });
+                    } catch {
+                        await db.update('checklist_progress', {
+                            completed: true,
+                            completed_at: new Date().toISOString()
+                        }, {
+                            filter: {
+                                student_email: `eq.${currentUser.email}`,
+                                checklist_item_id: `eq.${itemId}`
+                            }
+                        });
+                    }
+                } else {
+                    await db.update('checklist_progress', {
+                        completed: false,
+                        completed_at: null
+                    }, {
+                        filter: {
+                            student_email: `eq.${currentUser.email}`,
+                            checklist_item_id: `eq.${itemId}`
+                        }
+                    });
+                }
+
+                checklistProgress[itemId] = newState;
+                el.classList.toggle('checked', newState);
+                updateProgress();
+            } catch (err) {
+                console.error('Toggle failed:', err);
+            } finally {
+                el.classList.remove('saving');
+            }
+        };
+
+        function updateProgress() {
+            const total = checklistItems.length;
+            const done = checklistItems.filter(i => checklistProgress[i.id]).length;
+            document.getElementById('progressCount').textContent = `${done} / ${total}`;
+            const pct = total > 0 ? (done / total * 100) : 0;
+            document.getElementById('progressFill').style.width = `${pct}%`;
+        }
+
+        // ── 課前問卷 ──
+        let surveyQuestions = [];
+        let surveyAnswers = {};
+        let surveySubmitted = false;
+
+        async function loadSurvey() {
+            const container = document.getElementById('surveyContainer');
+            try {
+                const filter = sessionParam ? { session_code: `eq.${sessionParam}` } : (joinCode ? { session_code: `eq.${joinCode}` } : {});
+                const { data: questions } = await db.select('survey_questions', {
+                    order: 'sort_order.asc',
+                    filter
+                });
+                surveyQuestions = questions || [];
+
+                // Check existing responses
+                const { data: responses } = await db.select('survey_responses', {
+                    filter: { student_email: `eq.${currentUser.email}` }
+                });
+
+                if (responses && responses.length > 0) {
+                    surveySubmitted = true;
+                    responses.forEach(r => {
+                        surveyAnswers[r.question_id] = r.answer;
+                    });
+                }
+
+                renderSurvey();
+            } catch (err) {
+                container.innerHTML = `<div style="color:#ef4444;padding:16px;">載入失敗：${err.message}</div>`;
+            }
+        }
+
+        function renderSurvey() {
+            const container = document.getElementById('surveyContainer');
+            if (surveyQuestions.length === 0) {
+                document.getElementById('surveySection').style.display = 'none';
+                return;
+            }
+
+            let html = surveyQuestions.map((q, i) => {
+                const answered = surveyAnswers[q.id] || '';
+                let optionsHtml = '';
+
+                if (q.question_type === 'fillblank') {
+                    optionsHtml = `<textarea class="sq-textarea"
+                        data-qid="${q.id}"
+                        placeholder="請輸入您的回答…"
+                        ${surveySubmitted ? 'disabled' : ''}
+                        onchange="window.__surveyAnswer('${q.id}', this.value)">${answered}</textarea>`;
+                } else {
+                    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                    optionsHtml = `<div class="sq-options">` +
+                        opts.map(opt => `
+                            <div class="sq-option ${answered === opt ? 'selected' : ''} ${surveySubmitted ? '' : ''}"
+                                 data-qid="${q.id}"
+                                 data-value="${opt}"
+                                 ${surveySubmitted ? '' : `onclick="window.__selectOption(this)"`}>
+                                <span class="radio"></span>
+                                ${opt}
+                            </div>
+                        `).join('') +
+                        `</div>`;
+                }
+
+                return `
+                    <div class="survey-question">
+                        <div class="sq-text">
+                            <span class="sq-num">${i + 1}.</span>
+                            <span>${q.question_text}</span>
+                        </div>
+                        ${optionsHtml}
+                    </div>
+                `;
+            }).join('');
+
+            if (surveySubmitted) {
+                html += `
+                    <div class="survey-submit-row">
+                        <div class="survey-done">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            問卷已完成，感謝您的填寫！
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="survey-submit-row">
+                        <button class="survey-submit-btn" id="surveySubmitBtn" onclick="window.__submitSurvey()">
+                            提交問卷
+                        </button>
+                        <span class="survey-status" id="surveyStatus"></span>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        window.__selectOption = function (el) {
+            if (surveySubmitted) return;
+            const qid = el.dataset.qid;
+            const value = el.dataset.value;
+            surveyAnswers[qid] = value;
+
+            // Update UI
+            el.closest('.sq-options').querySelectorAll('.sq-option').forEach(o => {
+                o.classList.toggle('selected', o.dataset.value === value);
+            });
+        };
+
+        window.__surveyAnswer = function (qid, value) {
+            if (surveySubmitted) return;
+            surveyAnswers[qid] = value;
+        };
+
+        window.__submitSurvey = async function () {
+            // Check all answered
+            const unanswered = surveyQuestions.filter(q => !surveyAnswers[q.id] || !surveyAnswers[q.id].trim());
+            if (unanswered.length > 0) {
+                document.getElementById('surveyStatus').textContent = `還有 ${unanswered.length} 題未回答`;
+                return;
+            }
+
+            const btn = document.getElementById('surveySubmitBtn');
+            btn.disabled = true;
+            btn.textContent = '提交中…';
+
+            try {
+                for (const q of surveyQuestions) {
+                    await db.insert('survey_responses', {
+                        student_email: currentUser.email,
+                        question_id: q.id,
+                        answer: surveyAnswers[q.id],
+                        submitted_at: new Date().toISOString()
+                    });
+                }
+
+                surveySubmitted = true;
+                renderSurvey();
+            } catch (err) {
+                document.getElementById('surveyStatus').textContent = '提交失敗：' + err.message;
+                btn.disabled = false;
+                btn.textContent = '提交問卷';
+            }
+        };
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,323 @@
+/* ========================================
+   organizations.html — 開課單位管理
+   ======================================== */
+
+body {
+    background: #f5f5f5;
+    color: #111;
+}
+
+/* ── Container ── */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 24px;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+/* ── Buttons ── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 16px;
+    border-radius: 7px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #555;
+}
+
+.btn:hover {
+    border-color: #aaa;
+    color: #111;
+}
+
+.btn-dark {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+.btn-dark:hover {
+    background: #333;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+}
+
+.btn-danger {
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+.btn-danger:hover {
+    background: #fef2f2;
+}
+
+.btn .material-symbols-outlined {
+    font-size: 0.9rem;
+}
+
+/* ── Org Cards ── */
+.org-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.org-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.org-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.org-card-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+}
+
+.org-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.org-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.org-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.org-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.org-meta {
+    font-size: 0.72rem;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.org-meta span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.org-meta .material-symbols-outlined {
+    font-size: 0.85rem;
+}
+
+.org-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.org-expand-icon {
+    color: #ccc;
+    transition: transform 0.2s;
+}
+
+.org-card.expanded .org-expand-icon {
+    transform: rotate(90deg);
+}
+
+/* Expanded detail */
+.org-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    border-top: 0 solid #f0f0f0;
+}
+
+.org-card.expanded .org-detail {
+    max-height: 600px;
+    border-top-width: 1px;
+}
+
+.org-detail-inner {
+    padding: 14px 20px;
+}
+
+.org-detail-section {
+    margin-bottom: 12px;
+}
+
+.org-detail-section h4 {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+}
+
+.org-line-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 0.78rem;
+}
+
+.org-line-info .line-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.org-line-info .line-label {
+    font-size: 0.68rem;
+    color: #bbb;
+}
+
+.org-line-info .line-value {
+    color: #555;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.72rem;
+    word-break: break-all;
+}
+
+.org-line-info .line-value.empty {
+    color: #ddd;
+    font-style: italic;
+    font-family: inherit;
+}
+
+/* Project list in detail */
+.org-projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.org-project-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #fafafa;
+    border-radius: 6px;
+    font-size: 0.78rem;
+}
+
+.org-project-item .material-symbols-outlined {
+    font-size: 0.9rem;
+    color: #bbb;
+}
+
+.org-no-projects {
+    font-size: 0.75rem;
+    color: #ccc;
+    padding: 6px 0;
+}
+
+/* ── Modal overrides ── */
+.modal {
+    width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.form-input:focus {
+    border-color: #999;
+}
+
+.form-hint {
+    font-size: 0.68rem;
+    color: #bbb;
+    margin-top: 3px;
+}
+
+.form-section-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 18px 0 10px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.form-error {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 8px;
+    display: none;
+}

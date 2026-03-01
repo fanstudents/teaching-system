@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作業中心 — 教學系統</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/admin-page.css">
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">
+                作業中心
+                <span class="text-muted-sm" id="topbarProjectName"></span>
+            </div>
+            <div class="admin-header-actions">
+                <select class="filter-select" id="sessionSelector">
+                    <option value="">所有場次</option>
+                </select>
+                <button class="btn btn-ghost" id="refreshBtn">
+                    <span class="material-symbols-rounded">refresh</span>
+                    重新整理
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <!-- 統計卡片 -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAssignments">0</div>
+                    <div class="stat-label">作業數量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalSubmissions">0</div>
+                    <div class="stat-label">總繳交數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="uniqueStudents">0</div>
+                    <div class="stat-label">學生人數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgRate">0%</div>
+                    <div class="stat-label">平均繳交率</div>
+                </div>
+            </div>
+
+            <!-- 作業卡片網格 -->
+            <div class="assignment-grid" id="assignmentGrid">
+                <div class="empty-state" id="emptyState">
+                    <div class="icon">📋</div>
+                    <p>尚無作業資料，請先至管理後台建立作業</p>
+                </div>
+            </div>
+        </div>
+    </div><!-- /admin-main -->
+
+    <!-- 預覽模態框 -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h3 id="previewTitle">預覽</h3>
+                <button class="preview-close" id="previewClose">×</button>
+            </div>
+            <div class="preview-body" id="previewBody"></div>
+            <div class="preview-meta" id="previewMeta"></div>
+        </div>
+    </div>
+
+    <!-- 展示模式 -->
+    <div class="showcase-overlay" id="showcaseOverlay">
+        <div class="showcase-topbar">
+            <span class="showcase-title" id="showcaseTitle">學員作品展示</span>
+            <span class="showcase-counter" id="showcaseCounter">0 / 0</span>
+            <button class="showcase-close-btn" id="showcaseCloseBtn">ESC 退出</button>
+        </div>
+        <div class="showcase-body">
+            <button class="showcase-nav prev" id="showcasePrev">‹</button>
+            <div class="showcase-card" id="showcaseCard">
+                <!-- 動態內容 -->
+            </div>
+            <button class="showcase-nav next" id="showcaseNext">›</button>
+        </div>
+        <div class="showcase-hint">← → 鍵盤左右鍵切換作品 ・ ESC 退出展示模式</div>
+    </div>
+
+    <script type="module">
+        import { showToast, showConfirm } from './scripts/ui.js';
+        import { db } from './scripts/supabase.js';
+
+        // ── State ──
+        let allSessions = [];
+        let allProjects = [];
+        let allStudents = [];
+        let assignments = [];   // session_assignments
+        let submissions = [];   // submissions table
+
+        // ── Showcase state ──
+        let showcaseIndex = 0;
+        let showcaseList = [];
+
+        // ── 取得當前專案 ──
+        async function getCurrentProject() {
+            const currentId = localStorage.getItem('current_project_id');
+            if (!currentId) return null;
+            try {
+                const res = await db.select('projects', { filter: { id: `eq.${currentId}` } });
+                const rows = res?.data || (Array.isArray(res) ? res : []);
+                if (rows[0]) return { id: rows[0].id, joinCode: rows[0].join_code, name: rows[0].name };
+            } catch { }
+            return null;
+        }
+
+        const _proj = await getCurrentProject();
+        const _joinCode = _proj?.joinCode || '';
+        const _pnEl = document.getElementById('topbarProjectName');
+        if (_pnEl) _pnEl.textContent = _proj?.name ? `— ${_proj.name}` : '';
+
+        // ── Load session list ──
+        async function loadSessionList() {
+            try {
+                const [projRes, sessRes] = await Promise.all([
+                    db.select('projects', { order: 'created_at.desc' }),
+                    db.select('project_sessions', { order: 'date.desc' })
+                ]);
+                allProjects = projRes?.data || (Array.isArray(projRes) ? projRes : []);
+                allSessions = sessRes?.data || (Array.isArray(sessRes) ? sessRes : []);
+
+                const sel = document.getElementById('sessionSelector');
+                sel.innerHTML = '<option value="">所有場次</option>';
+                allSessions.forEach(s => {
+                    const proj = allProjects.find(p => p.id === s.project_id);
+                    const label = `${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})`;
+                    sel.innerHTML += `<option value="${s.id}">${label}</option>`;
+                });
+            } catch (e) {
+                console.warn('Failed to load sessions:', e);
+            }
+        }
+
+        // ── Load students for counting ──
+        async function loadStudents() {
+            try {
+                const res = await db.select('students', { order: 'created_at.desc' });
+                allStudents = res?.data || (Array.isArray(res) ? res : []);
+            } catch { allStudents = []; }
+        }
+
+        // ── Load assignments from session_assignments ──
+        async function loadAssignments() {
+            try {
+                const selectedSession = document.getElementById('sessionSelector').value;
+                const opts = { order: 'sort_order.asc,created_at.desc' };
+                if (selectedSession) {
+                    opts.filter = { session_id: `eq.${selectedSession}` };
+                }
+                const res = await db.select('session_assignments', opts);
+                assignments = res?.data || (Array.isArray(res) ? res : []);
+            } catch (e) {
+                console.warn('Failed to load assignments:', e);
+                assignments = [];
+            }
+        }
+
+        // ── Load submissions ──
+        async function loadSubmissions() {
+            try {
+                const selectedSession = document.getElementById('sessionSelector').value;
+                const opts = { order: 'submitted_at.desc' };
+                if (selectedSession) {
+                    // session_id in submissions stores the session_code
+                    const sess = allSessions.find(s => s.id === selectedSession);
+                    if (sess) {
+                        opts.filter = { session_id: `eq.${sess.session_code || selectedSession}` };
+                    }
+                } else if (_joinCode) {
+                    opts.filter = { session_id: `eq.${_joinCode}` };
+                }
+                const res = await db.select('submissions', opts);
+                submissions = res?.data || (Array.isArray(res) ? res : []);
+            } catch (e) {
+                console.warn('Failed to load submissions:', e);
+                submissions = [];
+            }
+        }
+
+        // ── Load all data ──
+        async function loadAll() {
+            await Promise.all([loadSessionList(), loadStudents()]);
+            await Promise.all([loadAssignments(), loadSubmissions()]);
+            render();
+        }
+
+        // ── Render ──
+        function render() {
+            renderStats();
+            renderAssignmentCards();
+        }
+
+        function renderStats() {
+            const selectedSession = document.getElementById('sessionSelector').value;
+            document.getElementById('totalAssignments').textContent = assignments.length;
+            document.getElementById('totalSubmissions').textContent = submissions.length;
+
+            const uniqueNames = new Set(submissions.map(s => s.student_name || s.student_email));
+            document.getElementById('uniqueStudents').textContent = uniqueNames.size;
+
+            // 平均繳交率
+            if (assignments.length > 0) {
+                // 計算每個作業的繳交人數
+                let totalRate = 0;
+                const sess = selectedSession ? allSessions.find(s => s.id === selectedSession) : null;
+                const studentCount = sess
+                    ? allStudents.filter(s => s.session_id === selectedSession).length
+                    : allStudents.length;
+                const denominator = studentCount || 1;
+
+                assignments.forEach(a => {
+                    const subs = getSubmissionsForAssignment(a);
+                    const rate = Math.min(subs.length / denominator, 1);
+                    totalRate += rate;
+                });
+                const avg = Math.round((totalRate / assignments.length) * 100);
+                document.getElementById('avgRate').textContent = `${avg}%`;
+            } else {
+                document.getElementById('avgRate').textContent = '0%';
+            }
+        }
+
+        function getSubmissionsForAssignment(assignment) {
+            // Match by assignment_title (current submissions schema uses assignment_title)
+            return submissions.filter(s =>
+                s.assignment_title === assignment.title
+            );
+        }
+
+        const typeLabels = {
+            text: '文字', file: '檔案', url: '連結', mixed: '混合',
+            image: '圖片', video: '影片', audio: '音檔', link: '連結'
+        };
+
+        function renderAssignmentCards() {
+            const grid = document.getElementById('assignmentGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (assignments.length === 0) {
+                grid.innerHTML = '';
+                grid.appendChild(emptyState);
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            const selectedSession = document.getElementById('sessionSelector').value;
+            const sess = selectedSession ? allSessions.find(s => s.id === selectedSession) : null;
+            const studentCount = sess
+                ? allStudents.filter(s => s.session_id === selectedSession).length
+                : allStudents.length;
+            const denominator = studentCount || 1;
+
+            grid.innerHTML = assignments.map(a => {
+                const subs = getSubmissionsForAssignment(a);
+                const subCount = subs.length;
+                const rate = Math.min(Math.round((subCount / denominator) * 100), 100);
+
+                // Find session info
+                const session = allSessions.find(s => s.id === a.session_id);
+                const proj = session ? allProjects.find(p => p.id === session.project_id) : null;
+                const sessionLabel = session ? `${session.date || ''} ${session.venue || ''}`.trim() : '';
+
+                const dueStr = a.due_date ? new Date(a.due_date).toLocaleString('zh-TW', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : '';
+
+                const isOverdue = a.due_date && new Date(a.due_date) < new Date();
+
+                return `
+                    <div class="hw-card" data-id="${a.id}">
+                        <div class="hw-card-header" onclick="toggleDetail('${a.id}')">
+                            <div class="hw-card-title">
+                                ${a.title || '未命名作業'}
+                                <span class="type-tag">${typeLabels[a.type] || a.type || '文字'}</span>
+                            </div>
+                            ${a.description ? `<div class="hw-card-desc">${a.description}</div>` : ''}
+                            <div class="hw-card-meta">
+                                ${sessionLabel ? `<span><span class="material-symbols-rounded">event</span>${sessionLabel}</span>` : ''}
+                                ${dueStr ? `<span style="${isOverdue ? 'color:#d93025;' : ''}"><span class="material-symbols-rounded">schedule</span>${dueStr}${isOverdue ? ' (已截止)' : ''}</span>` : ''}
+                                ${proj ? `<span><span class="material-symbols-rounded">folder</span>${proj.name}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="hw-progress">
+                            <div class="hw-progress-bar">
+                                <div class="hw-progress-fill" style="width:${rate}%"></div>
+                            </div>
+                            <div class="hw-progress-text">${subCount}/${denominator} (${rate}%)</div>
+                        </div>
+                        <div class="hw-card-actions">
+                            <button class="btn-expand" onclick="toggleDetail('${a.id}')">
+                                <span class="material-symbols-rounded">expand_more</span>
+                                繳交明細
+                            </button>
+                            <button class="btn-showcase" onclick="openShowcaseForAssignment('${a.id}')">
+                                <span class="material-symbols-rounded">slideshow</span>
+                                展示
+                            </button>
+                        </div>
+                        <div class="hw-card-detail" id="detail-${a.id}">
+                            ${renderDetailTable(subs)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDetailTable(subs) {
+            if (subs.length === 0) {
+                return '<div class="hw-detail-empty">尚無學生繳交</div>';
+            }
+
+            const rows = subs.map(s => {
+                const dateStr = s.submitted_at
+                    ? new Date(s.submitted_at).toLocaleString('zh-TW', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })
+                    : '-';
+
+                return `
+                    <tr>
+                        <td><strong>${s.student_name || s.student_email || '-'}</strong></td>
+                        <td><span class="submission-type ${s.type || 'text'}">${typeLabels[s.type] || s.type || '-'}</span></td>
+                        <td class="text-muted-sm">${dateStr}</td>
+                        <td>
+                            <button class="action-btn preview-btn" onclick="previewSubmission('${s.id}')">預覽</button>
+                            <button class="action-btn delete-btn" onclick="deleteSubmission('${s.id}')">刪除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                <table class="hw-detail-table">
+                    <thead><tr><th>學生</th><th>類型</th><th>時間</th><th>操作</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        }
+
+        // ── Toggle detail ──
+        window.toggleDetail = function (assignmentId) {
+            const detail = document.getElementById(`detail-${assignmentId}`);
+            if (!detail) return;
+            detail.classList.toggle('open');
+
+            // Update expand button icon
+            const card = detail.closest('.hw-card');
+            const btn = card?.querySelector('.btn-expand .material-symbols-rounded');
+            if (btn) {
+                btn.textContent = detail.classList.contains('open') ? 'expand_less' : 'expand_more';
+            }
+        };
+
+        // ── Preview submission ──
+        window.previewSubmission = function (subId) {
+            const s = submissions.find(x => x.id === subId);
+            if (!s) return;
+
+            document.getElementById('previewTitle').textContent =
+                `${s.student_name || '未知'} — ${s.assignment_title || ''}`;
+            document.getElementById('previewBody').innerHTML = renderContent(s);
+
+            const dateStr = s.submitted_at
+                ? new Date(s.submitted_at).toLocaleString('zh-TW')
+                : '-';
+            document.getElementById('previewMeta').innerHTML = `
+                <p><strong>提交者：</strong>${s.student_name || '-'}</p>
+                <p><strong>提交時間：</strong>${dateStr}</p>
+            `;
+
+            document.getElementById('previewModal').classList.add('active');
+        };
+
+        function renderContent(s) {
+            const type = s.type || 'text';
+            const content = s.content || '';
+            const fileUrl = s.file_url || '';
+
+            switch (type) {
+                case 'text':
+                    return `<div class="preview-text">${escapeHtml(content)}</div>`;
+                case 'image':
+                    const imgSrc = fileUrl || (typeof content === 'object' ? content.data : content);
+                    return `<img src="${imgSrc}" alt="作品" style="max-width:100%;border-radius:12px;">`;
+                case 'video':
+                    const vidSrc = fileUrl || (typeof content === 'object' ? content.data : content);
+                    return `<video src="${vidSrc}" controls style="width:100%;border-radius:12px;"></video>`;
+                case 'audio':
+                    const audSrc = fileUrl || (typeof content === 'object' ? content.data : content);
+                    return `<div style="text-align:center;padding:30px;">
+                        <div style="font-size:3rem;margin-bottom:16px;">🎵</div>
+                        <audio src="${audSrc}" controls></audio>
+                    </div>`;
+                case 'link':
+                case 'url':
+                    const url = content || fileUrl;
+                    return `<div class="preview-link" style="padding:20px;background:var(--bg-tertiary);border-radius:12px;">
+                        <span>🔗</span>
+                        <a href="${url}" target="_blank">${url}</a>
+                    </div>`;
+                case 'file':
+                    return fileUrl
+                        ? `<a href="${fileUrl}" target="_blank" style="color:var(--accent-primary);">下載檔案</a>`
+                        : '<p>無法預覽</p>';
+                default:
+                    return content ? `<div class="preview-text">${escapeHtml(content)}</div>` : '<p>無法預覽</p>';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return String(str);
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ── Delete submission ──
+        window.deleteSubmission = async function (subId) {
+            const ok = await showConfirm('確定要刪除這份繳交紀錄嗎？', {
+                title: '刪除確認', confirmText: '刪除', danger: true
+            });
+            if (!ok) return;
+            try {
+                await db.delete('submissions', { id: `eq.${subId}` });
+                showToast('已刪除');
+                await loadSubmissions();
+                render();
+            } catch (e) {
+                showToast('刪除失敗：' + e.message);
+            }
+        };
+
+        // ── Showcase ──
+        window.openShowcaseForAssignment = function (assignmentId) {
+            const assignment = assignments.find(a => a.id === assignmentId);
+            if (!assignment) return;
+
+            showcaseList = getSubmissionsForAssignment(assignment);
+            if (showcaseList.length === 0) {
+                showToast('此作業尚無繳交紀錄');
+                return;
+            }
+
+            showcaseIndex = 0;
+            document.getElementById('showcaseTitle').textContent =
+                `${assignment.title} — 學員作品展示`;
+            document.getElementById('showcaseOverlay').classList.add('active');
+            renderShowcaseSlide();
+        };
+
+        function renderShowcaseSlide() {
+            const s = showcaseList[showcaseIndex];
+            if (!s) return;
+
+            document.getElementById('showcaseCounter').textContent =
+                `${showcaseIndex + 1} / ${showcaseList.length}`;
+
+            document.getElementById('showcasePrev').disabled = showcaseIndex === 0;
+            document.getElementById('showcaseNext').disabled = showcaseIndex === showcaseList.length - 1;
+
+            const dateStr = s.submitted_at
+                ? new Date(s.submitted_at).toLocaleString('zh-TW', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                })
+                : '';
+
+            const bodyHtml = renderContent(s);
+            const name = s.student_name || s.student_email || '未知';
+
+            document.getElementById('showcaseCard').innerHTML = `
+                <div class="showcase-card-header">
+                    <div class="showcase-avatar">${name.charAt(0)}</div>
+                    <div class="showcase-user-info">
+                        <h4>${name}</h4>
+                        <span>${dateStr}</span>
+                    </div>
+                </div>
+                <div class="showcase-card-body">${bodyHtml}</div>
+            `;
+        }
+
+        function showcaseNav(direction) {
+            const newIndex = showcaseIndex + direction;
+            if (newIndex < 0 || newIndex >= showcaseList.length) return;
+            showcaseIndex = newIndex;
+            renderShowcaseSlide();
+        }
+
+        function closeShowcase() {
+            document.getElementById('showcaseOverlay').classList.remove('active');
+        }
+
+        // ── Event bindings ──
+
+        // Preview close
+        document.getElementById('previewClose').addEventListener('click', () => {
+            document.getElementById('previewModal').classList.remove('active');
+        });
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'previewModal') {
+                document.getElementById('previewModal').classList.remove('active');
+            }
+        });
+
+        // Session selector
+        document.getElementById('sessionSelector').addEventListener('change', async () => {
+            await Promise.all([loadAssignments(), loadSubmissions()]);
+            render();
+        });
+
+        // Refresh
+        document.getElementById('refreshBtn').addEventListener('click', async () => {
+            showToast('重新整理中…');
+            await loadAll();
+            showToast('已更新');
+        });
+
+        // Showcase
+        document.getElementById('showcaseCloseBtn').addEventListener('click', closeShowcase);
+        document.getElementById('showcasePrev').addEventListener('click', () => showcaseNav(-1));
+        document.getElementById('showcaseNext').addEventListener('click', () => showcaseNav(1));
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('showcaseOverlay').classList.contains('active')) return;
+            if (e.key === 'Escape') closeShowcase();
+            if (e.key === 'ArrowLeft') showcaseNav(-1);
+            if (e.key === 'ArrowRight') showcaseNav(1);
+        });
+
+        // ── Init ──
+        await loadAll();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

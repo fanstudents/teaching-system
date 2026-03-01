@@ -1,0 +1,249 @@
+{
+  "slides": [
+    {
+      "id": "sl_cgm_01",
+      "elements": [
+        {"id": "el_cgm_01_bg", "type": "shape", "x": 0, "y": 0, "width": 960, "height": 540, "shapeType": "rectangle", "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"},
+        {"id": "el_cgm_01_t1", "type": "text", "x": 80, "y": 140, "width": 800, "height": 80, "fontSize": 42, "bold": true, "content": "<b style=\"font-size:42px;color:#f8fafc;\">ChatGPT & Gemini 新手入門教學</b>"},
+        {"id": "el_cgm_01_t2", "type": "text", "x": 80, "y": 240, "width": 800, "height": 50, "fontSize": 20, "content": "<span style=\"font-size:20px;color:#94a3b8;\">從零開始，掌握 AI 對話工具的完整指南</span>"},
+        {"id": "el_cgm_01_t3", "type": "text", "x": 80, "y": 340, "width": 800, "height": 40, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#64748b;\">講師：樊松蒲 ｜ 適合對象：完全沒用過 AI 的初學者</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_02",
+      "elements": [
+        {"id": "el_cgm_02_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">課程大綱</b>"},
+        {"id": "el_cgm_02_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">本課程分為 6 大章節，帶你從零開始認識並熟練使用 AI 對話工具：<br><br>• 第一章：認識 AI 對話工具（什麼是生成式 AI、ChatGPT vs Gemini）<br>• 第二章：介面認識與第一次對話（註冊、介面導覽、第一個 Prompt）<br>• 第三章：Prompt 基礎技巧（角色 + 任務 + 格式三要素）<br>• 第四章：進階應用場景（文案、分析、翻譯、程式碼）<br>• 第五章：ChatGPT & Gemini 獨家功能（GPTs、DALL-E、Google 整合）<br>• 第六章：安全與最佳實踐（隱私、AI 幻覺、事實查核）</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_03",
+      "elements": [
+        {"id": "el_cgm_03_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">什麼是生成式 AI？</b>"},
+        {"id": "el_cgm_03_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">「生成式 AI」是一種能夠根據輸入產生全新內容的人工智慧技術。<br><br>與傳統 AI 不同，生成式 AI 不只是分類或預測，而是能「創造」——包括文字、圖片、程式碼、音樂等。<br><br>• 傳統 AI：辨識一張圖片是貓還是狗（分類）<br>• 生成式 AI：根據「一隻穿太空衣的貓」這段文字，畫出一張全新的圖片（創造）<br><br>ChatGPT 和 Gemini 都屬於生成式 AI 的「大型語言模型」（LLM），它們被訓練過數十億筆文字資料，能夠理解並生成自然語言。<br><br>你可以把它想像成一個非常博學的對話夥伴，你問它問題，它用文字回答你。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_04",
+      "elements": [
+        {"id": "el_cgm_04_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">ChatGPT vs Gemini 差異比較</b>"},
+        {"id": "el_cgm_04_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">這兩個是目前市場上最主流的 AI 對話工具，各有優勢：<br><br>ChatGPT（OpenAI 開發）：<br>• 模型：GPT-4o / GPT-4o mini<br>• 優勢：寫作品質高、邏輯推理強、生態系豐富（GPTs 商店）<br>• 特色：可生成圖片（DALL-E）、分析檔案、上網搜尋<br><br>Gemini（Google 開發）：<br>• 模型：Gemini 2.0 Flash / Pro<br>• 優勢：與 Google 生態深度整合（Gmail、Docs、Sheets）<br>• 特色：多模態理解（圖片 + 文字）、即時搜尋能力強<br><br>選擇建議：如果你重度使用 Google 工具 → Gemini；如果你需要強大的寫作和創意能力 → ChatGPT。其實兩個都學最好！</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_05",
+      "elements": [
+        {"id": "el_cgm_05_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">如何註冊與登入</b>"},
+        {"id": "el_cgm_05_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">ChatGPT 註冊：<br>1. 前往 chat.openai.com<br>2. 點擊 Sign Up → 使用 Google 帳號或 Email 註冊<br>3. 免費方案即可使用 GPT-4o mini，付費 Plus 方案可用完整 GPT-4o<br><br>Gemini 註冊：<br>1. 前往 gemini.google.com<br>2. 使用你的 Google 帳號直接登入<br>3. 免費方案即可使用 Gemini Pro，付費 Advanced 方案可用 Gemini Ultra<br><br>小提醒：<br>• 兩個平台都支援手機 App，建議也安裝行動版<br>• 免費版已經足夠日常使用，不需急著付費<br>• 建議先選一個平台專心學習，熟練後再嘗試另一個</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_06",
+      "elements": [
+        {"id": "el_cgm_06_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">小測驗：AI 基礎概念</b>"},
+        {"id": "el_cgm_06_quiz", "type": "quiz", "x": 60, "y": 100, "width": 840, "height": 380, "id": "el_cgm_06_quiz",
+          "questions": [
+            {"question": "生成式 AI 的核心能力是什麼？", "options": ["分類現有資料", "根據輸入創造全新內容", "刪除重複資料", "壓縮檔案大小"], "answer": 1},
+            {"question": "ChatGPT 是由哪家公司開發的？", "options": ["Google", "Meta", "OpenAI", "Microsoft"], "answer": 2},
+            {"question": "以下哪個說法正確？", "options": ["Gemini 不能免費使用", "ChatGPT 不支援圖片生成", "兩個平台都有免費版本供日常使用", "只有付費版才能打字對話"], "answer": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sl_cgm_07",
+      "elements": [
+        {"id": "el_cgm_07_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">ChatGPT 介面導覽</b>"},
+        {"id": "el_cgm_07_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">打開 ChatGPT 後，你會看到以下主要區域：<br><br>1. 左側欄（Sidebar）：<br>   • 歷史對話紀錄，可隨時回顧之前的對話<br>   • 新增對話按鈕（每次開新話題建議開新對話）<br><br>2. 中央對話區：<br>   • 你和 AI 的對話內容會依序顯示<br>   • AI 的回答可以一鍵複製、重新生成<br><br>3. 底部輸入框：<br>   • 輸入你的問題或指令（我們稱為 Prompt）<br>   • 可以上傳圖片、檔案讓 AI 分析<br><br>4. 模型選擇：<br>   • 左上角可切換 GPT-4o / GPT-4o mini<br>   • GPT-4o 更聰明但有使用次數限制；mini 更快更省</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_08",
+      "elements": [
+        {"id": "el_cgm_08_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">Gemini 介面導覽</b>"},
+        {"id": "el_cgm_08_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">Gemini 的介面同樣簡潔直覺：<br><br>1. 左側欄：<br>   • 歷史對話列表<br>   • 可以固定重要的對話<br><br>2. 中央對話區：<br>   • 支援文字 + 圖片混合輸入<br>   • 回答可以直接匯出到 Google Docs<br><br>3. Google 整合功能：<br>   • 點擊「@」可以呼叫 Google Maps、YouTube、Flights 等擴充功能<br>   • 直接在對話中搜尋 Gmail 郵件內容<br><br>4. 雙重回答：<br>   • Gemini 有時會提供多個版本的回答<br>   • 點擊「查看其他草稿」可以切換不同版本<br><br>Gemini 最大的優勢就是與 Google 生態系的無縫整合，如果你日常用 Gmail + Google Drive，會特別方便。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_09",
+      "elements": [
+        {"id": "el_cgm_09_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">你的第一個 Prompt</b>"},
+        {"id": "el_cgm_09_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">Prompt 就是你給 AI 的指令或問題。你的第一個 Prompt 不需要很複雜：<br><br>試試看直接問：<br>「請用簡單的方式解釋什麼是人工智慧」<br><br>AI 會立刻給你一段易懂的說明。接下來可以繼續追問：<br>「可以舉一個生活中的例子嗎？」<br><br>這就是「多輪對話」——AI 會記住之前的對話內容，你可以持續追問。<br><br>好的 Prompt 開頭示範：<br>• 「請幫我...」<br>• 「你能不能...」<br>• 「用淺顯易懂的方式解釋...」<br>• 「假設我是初學者...」<br><br>重點：不要害怕問錯，AI 不會生氣，你隨時可以重新提問或換個方式說。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_10",
+      "elements": [
+        {"id": "el_cgm_10_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">常見錯誤示範</b>"},
+        {"id": "el_cgm_10_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">初學者常犯的 Prompt 錯誤：<br><br>❌ 太模糊：「幫我寫東西」<br>✅ 具體版：「幫我寫一封給客戶的感謝信，語氣友善專業，約 150 字」<br><br>❌ 太冗長：把所有需求寫成一大段不分段的文字<br>✅ 改善版：用條列式列出你的需求<br><br>❌ 缺乏上下文：「這個怎麼改？」（AI 不知道你在說什麼）<br>✅ 改善版：「以下是我寫的 Email 內容，請幫我潤稿讓語氣更正式：[內容]」<br><br>❌ 一次問太多：「幫我分析市場、寫報告、做簡報、翻譯成英文」<br>✅ 改善版：一次處理一個任務，再逐步追加<br><br>記住：「先求有，再求好」——先得到 AI 的初步回答，再用追問來調整。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_11",
+      "elements": [
+        {"id": "el_cgm_11_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">配對練習：介面功能配對</b>"},
+        {"id": "el_cgm_11_match", "type": "matching", "x": 60, "y": 100, "width": 840, "height": 380,
+          "pairs": [
+            {"left": "左側歷史紀錄", "right": "回顧之前的對話"},
+            {"left": "底部輸入框", "right": "輸入 Prompt 指令"},
+            {"left": "模型切換", "right": "選擇 AI 的版本"},
+            {"left": "上傳按鈕", "right": "傳送圖片或檔案給 AI"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sl_cgm_12",
+      "elements": [
+        {"id": "el_cgm_12_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">Prompt 的三要素</b>"},
+        {"id": "el_cgm_12_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">寫出好 Prompt 的關鍵在於掌握三個要素：<br><br>1. 角色（Role）：告訴 AI 它要扮演什麼身份<br>   • 例：「你是一位資深行銷經理」<br>   • 例：「請以國中老師的角度」<br><br>2. 任務（Task）：明確說明你要 AI 做什麼<br>   • 例：「幫我寫一段 Instagram 貼文」<br>   • 例：「分析這份數據並找出關鍵趨勢」<br><br>3. 格式（Format）：指定你想要的輸出形式<br>   • 例：「請用表格呈現」<br>   • 例：「用條列式說明，每點不超過 20 字」<br>   • 例：「字數控制在 200 字以內」<br><br>完整示範：<br>「你是一位資深行銷經理（角色），請幫我寫一段推廣 AI 課程的 Instagram 貼文（任務），用輕鬆活潑的語氣，包含 3 個 hashtag，字數 100-150 字（格式）」</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_13",
+      "elements": [
+        {"id": "el_cgm_13_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">角色設定技巧</b>"},
+        {"id": "el_cgm_13_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">角色設定是提升 AI 回答品質最簡單的技巧。不同角色會讓 AI 用不同的專業視角回答：<br><br>常用角色範本：<br>• 「你是一位有 10 年經驗的文案寫手」→ 寫作更有深度<br>• 「你是一位 Python 資深工程師」→ 程式碼品質更高<br>• 「你是一位國小三年級老師」→ 用字遣詞更簡單<br>• 「你是我的職涯顧問」→ 回答會更加個人化<br><br>進階技巧：<br>• 指定專業領域：「你是一位專精 B2B SaaS 行銷的經理」<br>• 指定語氣：「你是一位幽默風趣的科普作家」<br>• 指定受眾：「你的讀者是完全不懂技術的長輩」<br><br>你不設角色，AI 也會回答。但設了角色之後，回答的品質和方向會明顯提升。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_14",
+      "elements": [
+        {"id": "el_cgm_14_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">任務描述與範例</b>"},
+        {"id": "el_cgm_14_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">任務要描述得夠具體，AI 才知道方向。看看模糊 vs 具體的差異：<br><br>寫作類：<br>❌「幫我寫一篇文章」<br>✅「幫我寫一篇 500 字的 LinkedIn 貼文，主題是 AI 如何提升工作效率，目標讀者是中階主管」<br><br>分析類：<br>❌「幫我看看這個數據」<br>✅「請分析以下銷售數據，找出成長最快的產品線，並說明可能的原因」<br><br>潤稿類：<br>❌「幫我改好一點」<br>✅「請幫我潤稿這封客戶回覆信，讓語氣更柔和但保持專業，同時修正文法錯誤」<br><br>學習類：<br>❌「教我 Excel」<br>✅「請用 step-by-step 的方式教我用 Excel 做 VLOOKUP，我是完全的初學者，請附上範例」</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_15",
+      "elements": [
+        {"id": "el_cgm_15_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">格式指定</b>"},
+        {"id": "el_cgm_15_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">你可以要求 AI 用特定格式回答，省下後續整理的時間：<br><br>常見格式指令：<br>• 「請用表格呈現」→ 自動產生 Markdown 表格<br>• 「用條列式說明」→ 清楚的 bullet points<br>• 「用 1-5 的評分」→ 量化評估<br>• 「請分成優點和缺點兩欄」→ 對比分析<br>• 「輸出 JSON 格式」→ 程式可直接使用的結構化資料<br><br>字數控制：<br>• 「精簡版：50 字以內」<br>• 「詳細版：500-800 字」<br>• 「一句話總結」<br><br>語氣指定：<br>• 「正式公文語氣」<br>• 「口語化，像朋友聊天」<br>• 「專業但不艱澀」<br><br>AI 對格式指令的配合度非常高，善用這點能大幅提升效率。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_16",
+      "elements": [
+        {"id": "el_cgm_16_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">填空練習：Prompt 結構</b>"},
+        {"id": "el_cgm_16_fill", "type": "fillblank", "x": 60, "y": 100, "width": 840, "height": 380,
+          "sentence": "好的 Prompt 包含三個要素：告訴 AI 扮演什麼身份的 ___，明確說明任務內容的 ___，以及指定輸出形式的 ___。寫 Prompt 時應避免 ___ 太模糊的描述。",
+          "blanks": ["角色", "任務", "格式", "缺乏上下文"]
+        }
+      ]
+    },
+    {
+      "id": "sl_cgm_17",
+      "elements": [
+        {"id": "el_cgm_17_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">文案撰寫與潤稿</b>"},
+        {"id": "el_cgm_17_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">AI 最常被使用的場景之一就是文案撰寫。以下是實用的 Prompt 範本：<br><br>行銷文案：<br>「你是一位社群行銷專家。請幫我寫 3 個版本的 Facebook 廣告文案，產品是線上英語課程，目標受眾是 25-35 歲上班族，風格輕鬆有趣。每個版本 80-100 字。」<br><br>Email 潤稿：<br>「以下是我寫的客戶回覆信，請幫我潤稿，維持原意但讓語氣更專業溫和：[貼上原文]」<br><br>社群貼文：<br>「請幫我寫一則 Instagram 貼文，分享我今天參加 AI 課程的心得。用活潑的語氣，附上 5 個相關 hashtag。」<br><br>進階技巧：請 AI 同時給你 3 個版本，比較後再選擇或混搭。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_18",
+      "elements": [
+        {"id": "el_cgm_18_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">資料分析與摘要</b>"},
+        {"id": "el_cgm_18_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">AI 能幫你快速消化大量資訊：<br><br>長文摘要：<br>「請將以下文章摘要成 3 個重點，每點不超過 30 字：[貼上文章]」<br><br>會議紀錄整理：<br>「以下是今天會議的逐字稿。請整理成：<br>1. 會議重點（3-5 點）<br>2. 待辦事項（列出負責人和期限）<br>3. 下次會議議題」<br><br>數據分析（直接上傳 Excel/CSV）：<br>「請分析這份銷售數據：<br>1. 哪個月份業績最好？<br>2. 哪個產品線成長最快？<br>3. 有什麼需要注意的趨勢？<br>請用表格呈現。」<br><br>ChatGPT（付費版）和 Gemini 都支援直接上傳檔案進行分析。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_19",
+      "elements": [
+        {"id": "el_cgm_19_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">翻譯與多語言</b>"},
+        {"id": "el_cgm_19_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">AI 翻譯遠超傳統翻譯工具，因為它能理解上下文和語氣：<br><br>基礎翻譯：<br>「請將以下中文翻譯成英文，語氣正式：[內容]」<br><br>專業翻譯：<br>「你是一位醫學翻譯專家。請將以下臨床報告翻譯成繁體中文，保留所有專有名詞的英文原文，用括號標注：[內容]」<br><br>語氣調整：<br>「請將這封正式的英文商業信改寫成輕鬆友善的語氣，但保持專業形象」<br><br>雙語對照：<br>「請用表格呈現，左欄英文、右欄中文翻譯」<br><br>多語言切換：<br>「請將這段文字同時翻譯成英文、日文、韓文，用表格呈現」<br><br>AI 翻譯的最大優勢是可以指定語氣和專業領域，比 Google Translate 更精確。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_20",
+      "elements": [
+        {"id": "el_cgm_20_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">程式碼輔助</b>"},
+        {"id": "el_cgm_20_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">即使你不是工程師，AI 也能幫你處理簡單的程式任務：<br><br>Excel 公式：<br>「我想在 Excel 中根據 A 欄的日期判斷是否為週末，週末顯示『休假』否則顯示『上班』，請給我公式」<br><br>Google Sheets 腳本：<br>「請寫一個 Google Apps Script，自動將 Sheet1 中新增的資料同步到 Sheet2」<br><br>網頁修改：<br>「以下是我的 HTML 程式碼，請幫我把標題改成置中對齊，字體改為 24px：[程式碼]」<br><br>Debug：<br>「這段 Python 程式碼執行時出現以下錯誤：[錯誤訊息]。請解釋原因並修正。」<br><br>重點：你不需要學會程式語言，你只需要學會「描述你想要的結果」讓 AI 來寫。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_21",
+      "elements": [
+        {"id": "el_cgm_21_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">小測驗：應用場景</b>"},
+        {"id": "el_cgm_21_quiz", "type": "quiz", "x": 60, "y": 100, "width": 840, "height": 380,
+          "questions": [
+            {"question": "要讓 AI 寫出高品質文案，最重要的是？", "options": ["使用付費版本", "在 Prompt 中指定角色、任務和格式", "用英文提問", "問越短越好"], "answer": 1},
+            {"question": "以下哪一個 Prompt 最具體？", "options": ["幫我寫東西", "寫一篇文章", "幫我寫一封 150 字的客戶感謝信，語氣溫暖專業", "翻譯"], "answer": 2},
+            {"question": "AI 處理 Excel 公式問題時，你應該怎麼做？", "options": ["直接說『幫我做 Excel』", "描述你想要的結果和資料位置", "只傳檔案不說話", "請 AI 猜你要做什麼"], "answer": 1}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sl_cgm_22",
+      "elements": [
+        {"id": "el_cgm_22_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">ChatGPT：GPTs 與 Plugin</b>"},
+        {"id": "el_cgm_22_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">GPTs 是 ChatGPT 的獨家功能，讓你使用或建立專門用途的 AI 助手：<br><br>什麼是 GPTs？<br>• 由其他用戶或官方建立的「客製化 ChatGPT」<br>• 每個 GPT 已經預設好角色和技能<br>• 不需要自己寫複雜的 Prompt<br><br>熱門 GPTs 推薦：<br>• Canva：直接在對話中設計圖片和簡報<br>• Consensus：搜尋學術論文並摘要<br>• Data Analyst：上傳 CSV 自動分析 + 畫圖表<br>• DALL-E：用文字生成圖片<br><br>如何找到 GPTs？<br>1. ChatGPT 左側欄 → 探索 GPTs<br>2. 搜尋你需要的功能<br>3. 點擊即可開始使用<br><br>進階：你也可以自己建立 GPTs，把常用的 Prompt 和指令打包成一個專屬助手。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_23",
+      "elements": [
+        {"id": "el_cgm_23_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">ChatGPT：圖片生成 DALL-E</b>"},
+        {"id": "el_cgm_23_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">DALL-E 是 ChatGPT 內建的圖片生成功能，你只要描述畫面就能產出圖片：<br><br>基礎用法：<br>「請幫我畫一張圖：一隻柴犬坐在咖啡廳裡看書，插畫風格」<br><br>Prompt 技巧：<br>• 指定風格：「水彩風格」「3D 渲染」「flat design」「照片寫實」<br>• 指定構圖：「俯瞰角度」「特寫」「全身」<br>• 指定色調：「暖色調」「簡約白色背景」「夢幻粉紫」<br><br>實用場景：<br>• 社群貼文配圖<br>• 簡報裝飾插圖<br>• 產品概念設計<br>• 教學素材製作<br><br>注意事項：<br>• 免費版有次數限制<br>• DALL-E 處理文字（英文或中文字）不夠精確<br>• 生成的圖片版權歸你所有（OpenAI 政策）</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_24",
+      "elements": [
+        {"id": "el_cgm_24_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">Gemini：Google 生態整合</b>"},
+        {"id": "el_cgm_24_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">Gemini 的最大優勢在於與 Google 工具的深度整合：<br><br>Gmail 整合：<br>• 「幫我找上週 David 寄來的信，摘要重點」<br>• 「用完這封信的上下文，幫我草擬回覆」<br><br>Google Docs 整合：<br>• 對話結果可以一鍵匯出到 Google Docs<br>• 在 Docs 中直接呼叫 Gemini 潤稿<br><br>Google Sheets 整合：<br>• 「幫我寫一個公式計算每月營收成長率」<br>• 直接在 Sheets 側邊欄使用 Gemini<br><br>Google Maps + Flights：<br>• 「幫我規劃一趟 3 天的東京自由行，預算 3 萬台幣」<br>• 自動附上地圖和航班資訊<br><br>YouTube 整合：<br>• 「搜尋並摘要最新的 AI 教學影片」<br><br>這些整合讓 Gemini 成為 Google 重度用戶的首選 AI 助手。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_25",
+      "elements": [
+        {"id": "el_cgm_25_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">Gemini：多模態與圖片理解</b>"},
+        {"id": "el_cgm_25_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">「多模態」代表 Gemini 不只懂文字，也懂圖片：<br><br>圖片分析：<br>• 上傳一張圖 →「請描述這張圖的內容」<br>• 上傳截圖 →「這個錯誤訊息是什麼意思？」<br>• 上傳菜單 →「幫我翻譯這份日文菜單」<br><br>文件理解：<br>• 上傳 PDF →「摘要這份報告的前 3 個重點」<br>• 上傳合約 →「這份合約中有什麼需要注意的條款？」<br><br>手寫辨識：<br>• 拍照白板上的筆記 →「請幫我整理成數位文字」<br><br>圖表分析：<br>• 上傳柱狀圖 →「這張圖表顯示了什麼趨勢？」<br><br>ChatGPT 也支援圖片理解（GPT-4o），兩者在這方面的能力相當。Gemini 的優勢在於更常與 Google 生態整合使用。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_26",
+      "elements": [
+        {"id": "el_cgm_26_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">配對練習：平台特色配對</b>"},
+        {"id": "el_cgm_26_match", "type": "matching", "x": 60, "y": 100, "width": 840, "height": 380,
+          "pairs": [
+            {"left": "GPTs 商店", "right": "ChatGPT 獨家功能"},
+            {"left": "Gmail 整合搜尋", "right": "Gemini 獨家功能"},
+            {"left": "DALL-E 圖片生成", "right": "ChatGPT 獨家功能"},
+            {"left": "Google Sheets 側邊欄", "right": "Gemini 獨家功能"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sl_cgm_27",
+      "elements": [
+        {"id": "el_cgm_27_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">隱私與資料安全</b>"},
+        {"id": "el_cgm_27_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">使用 AI 工具的第一守則：注意你輸入了什麼。<br><br>絕對不要輸入的資料：<br>• 身分證字號、信用卡號碼<br>• 公司機密（未公開的財務、策略、客戶名單）<br>• 個人醫療資訊<br>• 密碼或 API 金鑰<br><br>企業資安注意：<br>• ChatGPT 和 Gemini 的「免費版」可能將對話用於模型訓練<br>• 企業使用建議用 ChatGPT Team/Enterprise 或 Gemini for Workspace<br>• 這些付費方案保證不會用你的資料訓練模型<br><br>保護自己的方法：<br>• 輸入資料前先去識別化（用假名取代真名）<br>• 使用時想像「全世界都能看到這段對話」<br>• 在 ChatGPT 設定中可以關閉「改善模型」選項<br><br>記住：AI 是工具，不是保險箱。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_28",
+      "elements": [
+        {"id": "el_cgm_28_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">AI 的極限與幻覺</b>"},
+        {"id": "el_cgm_28_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 400, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#334155;\">AI 不是全能的。了解它的限制能幫你更好地使用它：<br><br>「幻覺」（Hallucination）：<br>• AI 有時會「一本正經地胡說八道」<br>• 它可能編造不存在的書籍、論文、法條<br>• 數字和日期特別容易出錯<br><br>為什麼會這樣？<br>• AI 本質上是在「預測下一個最可能的字」<br>• 它不是在「查資料」，而是在「生成看起來合理的內容」<br><br>如何避免？<br>• 重要事實一定要自己查核（Google 搜尋確認）<br>• 請 AI 附上資料來源，然後逐一驗證<br>• 越重要的決策，越不能完全依賴 AI<br><br>其他限制：<br>• 不擅長即時新聞（訓練資料有時間差）<br>• 數學計算有時會出錯（建議搭配 Python 或 Excel）<br>• 不擅長偵測細微的情緒和文化差異<br><br>最佳態度：把 AI 當作聰明但偶爾犯錯的實習生。</span>"}
+      ]
+    },
+    {
+      "id": "sl_cgm_29",
+      "elements": [
+        {"id": "el_cgm_29_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "fontSize": 30, "bold": true, "content": "<b style=\"font-size:30px;color:#1e293b;\">填空練習：安全守則</b>"},
+        {"id": "el_cgm_29_fill", "type": "fillblank", "x": 60, "y": 100, "width": 840, "height": 380,
+          "sentence": "使用 AI 時，絕對不要輸入 ___ 和公司機密。AI 有時候會產生虛假資訊，這種現象稱為 ___。重要事實一定要進行 ___。企業使用建議採用 ___ 方案來保護資料安全。",
+          "blanks": ["個人敏感資料", "幻覺", "事實查核", "企業付費"]
+        }
+      ]
+    },
+    {
+      "id": "sl_cgm_30",
+      "elements": [
+        {"id": "el_cgm_30_bg", "type": "shape", "x": 0, "y": 0, "width": 960, "height": 540, "shapeType": "rectangle", "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"},
+        {"id": "el_cgm_30_t1", "type": "text", "x": 80, "y": 80, "width": 800, "height": 60, "fontSize": 36, "bold": true, "content": "<b style=\"font-size:36px;color:#f8fafc;\">課程總結</b>"},
+        {"id": "el_cgm_30_t2", "type": "text", "x": 80, "y": 160, "width": 800, "height": 300, "fontSize": 16, "content": "<span style=\"font-size:16px;color:#94a3b8;\">今天你學到了：<br><br>✓ ChatGPT 和 Gemini 的差異與各自優勢<br>✓ Prompt 三要素：角色 + 任務 + 格式<br>✓ 實用場景：文案、分析、翻譯、程式碼<br>✓ 各平台獨家功能：GPTs、DALL-E、Google 整合<br>✓ 安全守則：隱私保護與 AI 幻覺防範<br><br>接下來的作業：<br>1. 用 ChatGPT 或 Gemini 完成一項工作任務並截圖分享<br>2. 撰寫 3 個不同角色設定的 Prompt 並記錄 AI 的回應結果<br><br>記住：AI 是你的助手，不是替代品。最強大的能力是學會問對問題。</span>"}
+      ]
+    }
+  ]
+}

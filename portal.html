@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學習入口 — 教學系統</title>
+    <meta name="description" content="學員學習入口，查看課程資訊與學習進度">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/portal-page.css">
+</head>
+
+<body>
+    <!-- 找不到專案 -->
+    <div class="error-screen" id="errorScreen">
+        <div>
+            <div class="error-icon"><span class="material-symbols-outlined icon-inherit">link_off</span>
+            </div>
+            <div class="error-title">找不到此課程</div>
+            <div class="error-msg">請確認您的連結是否正確，或聯繫授課老師取得入口連結。</div>
+        </div>
+    </div>
+
+    <!-- 登入 Overlay -->
+    <div class="login-overlay hidden" id="loginOverlay">
+        <!-- Left Panel — Hero Image / Branding -->
+        <div class="login-left" id="loginLeftPanel">
+            <div id="loginHeroImage" class="login-hero-image" style="display:none;">
+                <img id="loginHeroImg" alt="">
+            </div>
+            <div class="login-left-brand">
+                <h1 id="loginCourseName">AI 職場應用工作坊</h1>
+                <p><a href="https://tbr.digital" target="_blank" style="color:inherit;text-decoration:none;">數位簡報室</a> —
+                    互動式教學簡報系統</p>
+            </div>
+        </div>
+        <!-- Right Panel — Login Form -->
+        <div class="login-right">
+            <div class="login-card">
+                <div class="course-badge" id="loginCourseBadge">AI 課程</div>
+                <h2>👋 歡迎加入</h2>
+                <p>請填寫您的資料以進入課程</p>
+                <div class="login-field">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <div class="login-field">
+                    <label for="loginName">姓名</label>
+                    <input type="text" id="loginName" placeholder="請輸入姓名">
+                </div>
+                <div class="login-field">
+                    <label for="loginSessionCode">場次代碼</label>
+                    <input type="text" id="loginSessionCode" placeholder=""
+                        style="font-family:'SF Mono','Fira Code',monospace;letter-spacing:1px;">
+                </div>
+                <div id="extraLoginFields"></div>
+                <button class="login-btn" id="loginBtn">進入課程</button>
+                <div class="login-error" id="loginError"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主內容（登入後顯示） -->
+    <div id="mainContent" class="hidden">
+        <!-- Topbar -->
+        <div class="portal-topbar">
+            <div class="topbar-brand">
+                <div class="topbar-brand-icon">
+                    <span class="material-symbols-outlined">school</span>
+                </div>
+                <span class="topbar-brand-text" id="topbarCourseName">課程名稱</span>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-phase-badge pre-class" id="topbarPhaseBadge">
+                    <span class="material-symbols-outlined icon-xs">radio_button_checked</span>
+                    課前準備
+                </span>
+                <div class="topbar-user" onclick="window.__editName()" style="cursor:pointer;" title="點擊修改姓名">
+                    <div class="topbar-avatar" id="topbarAvatar">?</div>
+                    <span id="topbarUserName">學員</span>
+                    <span class="material-symbols-outlined icon-xs" style="opacity:0.5;margin-left:2px;">edit</span>
+                </div>
+                <button class="topbar-btn" onclick="logout()">
+                    <span class="material-symbols-outlined icon-sm">logout</span>
+                    登出
+                </button>
+            </div>
+        </div>
+
+        <!-- Hero -->
+        <div class="portal-hero">
+            <div id="mainHeroImage" class="main-hero-image" style="display:none;">
+                <img id="mainHeroImg" alt="">
+            </div>
+            <h1 class="hero-title" id="heroTitle">AI 職場應用工作坊</h1>
+            <p class="hero-subtitle">歡迎您參加本次課程，以下是您的課程入口</p>
+        </div>
+
+        <!-- Main Container -->
+        <div class="portal-container">
+
+            <!-- 課程資訊 -->
+            <div class="section-card" id="courseInfoSection">
+                <div class="section-header">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+                        <span class="material-symbols-outlined">info</span>
+                    </div>
+                    <h2 class="section-title">課程資訊</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="material-symbols-outlined">calendar_today</span>
+                        <div>
+                            <div class="info-label">日期</div>
+                            <div class="info-value" id="infoDate">—</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="material-symbols-outlined">schedule</span>
+                        <div>
+                            <div class="info-label">時間</div>
+                            <div class="info-value" id="infoTime">—</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="material-symbols-outlined">location_on</span>
+                        <div>
+                            <div class="info-label">地點</div>
+                            <div class="info-value" id="infoVenue">—</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="material-symbols-outlined">person</span>
+                        <div>
+                            <div class="info-label">講師</div>
+                            <div class="info-value" id="infoInstructor">—</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 交通資訊（嵌入課程資訊底部） -->
+                <div id="transportArea" style="display:none;">
+                    <div class="transport-divider"></div>
+                    <div id="transportContent" class="text-content"></div>
+                    <div id="transportMapWrap" class="transport-map-wrap" style="display:none;">
+                        <iframe id="transportMap" class="transport-map" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                        <a id="transportMapLink" class="transport-map-link" href="#" target="_blank">
+                            <span class="material-symbols-outlined">near_me</span>
+                            導航前往
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 課前準備清單 -->
+            <div class="section-card collapsible" id="checklistSection">
+                <div class="section-header" onclick="window.__toggleCollapse('checklistSection')">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#059669,#34d399);">
+                        <span class="material-symbols-outlined">checklist</span>
+                    </div>
+                    <h2 class="section-title">課前準備清單</h2>
+                    <span class="guide-tag" id="checklistGuide">待完成</span>
+                    <span class="material-symbols-outlined collapse-arrow">expand_more</span>
+                </div>
+                <div class="section-body" id="checklistBody">
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-header">
+                            <span class="progress-label">準備進度</span>
+                            <span class="progress-count" id="progressCount">0 / 0</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <ul class="checklist" id="checklistContainer">
+                        <li class="loading-item"><span class="material-symbols-outlined spin">progress_activity</span>
+                            載入中…</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 課前問卷 -->
+            <div class="section-card collapsible" id="surveySection">
+                <div class="section-header" onclick="window.__toggleCollapse('surveySection')">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+                        <span class="material-symbols-outlined">quiz</span>
+                    </div>
+                    <h2 class="section-title">課前問卷</h2>
+                    <span class="guide-tag" id="surveyGuide">待填寫</span>
+                    <span class="material-symbols-outlined collapse-arrow">expand_more</span>
+                </div>
+                <div class="section-body" id="surveyBody">
+                    <div id="surveyContainer">
+                        <div class="loading-item"><span class="material-symbols-outlined spin">progress_activity</span>
+                            載入中…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 溫馨提醒 -->
+            <div class="section-card" id="remindersSection" style="display:none;">
+                <div class="section-header">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
+                        <span class="material-symbols-outlined">emoji_objects</span>
+                    </div>
+                    <h2 class="section-title">溫馨提醒</h2>
+                </div>
+                <div id="remindersContent" class="text-content"></div>
+            </div>
+
+            <!-- 群組連結 -->
+            <div class="section-card" id="groupSection" style="display:none;">
+                <div class="section-header">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#059669,#34d399);">
+                        <span class="material-symbols-outlined">groups</span>
+                    </div>
+                    <h2 class="section-title">課程群組</h2>
+                </div>
+                <a class="group-link-btn" id="btnGroup" href="#" target="_blank">
+                    <span class="material-symbols-outlined">chat</span>
+                    <span id="groupLabel">加入群組</span>
+                    <span class="material-symbols-outlined" style="margin-left:auto;font-size:18px;">open_in_new</span>
+                </a>
+            </div>
+
+            <!-- 課程資源 -->
+            <div class="res-section">
+                <div class="res-section-label">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    課程資源
+                </div>
+
+                <!-- Featured: 講義 (full-width hero link) -->
+                <a class="res-hero-card locked" id="btnSlides" href="#" aria-disabled="true">
+                    <div class="res-hero-bg slides-bg"></div>
+                    <div class="res-hero-content">
+                        <div class="res-hero-icon">
+                            <span class="material-symbols-outlined">slideshow</span>
+                        </div>
+                        <div class="res-hero-text">
+                            <div class="res-hero-title">上課講義</div>
+                            <div class="res-hero-desc">互動式簡報教材，包含課程完整內容</div>
+                        </div>
+                        <div class="res-status" id="slidesStatus">
+                            <span class="material-symbols-outlined">lock</span>
+                            <span id="slidesHint">課程當天開放</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Secondary: 摘要 + 作業 (two-column) -->
+                <div class="res-duo">
+                    <button class="res-card" id="btnHomework" onclick="goToHomework()" disabled>
+                        <div class="res-card-icon homework-gradient">
+                            <span class="material-symbols-outlined">upload_file</span>
+                        </div>
+                        <div class="res-card-title">我的作業</div>
+                        <div class="res-card-desc">查看並提交課程作業</div>
+                        <div class="res-card-status" id="homeworkStatus">
+                            <span class="material-symbols-outlined">lock</span>
+                            <span id="homeworkHint">上課時開放</span>
+                        </div>
+                    </button>
+                    <button class="res-card" id="btnSummary" onclick="goToSummary()" disabled>
+                        <div class="res-card-icon summary-gradient">
+                            <span class="material-symbols-outlined">summarize</span>
+                        </div>
+                        <div class="res-card-title">課後摘要</div>
+                        <div class="res-card-desc">AI 整理的課程重點</div>
+                        <div class="res-card-status" id="summaryStatus">
+                            <span class="material-symbols-outlined">lock</span>
+                            <span id="summaryHint">課後開放</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="portal-footer"><a href="https://tbr.digital" target="_blank"
+                    style="color:inherit;text-decoration:none;">數位簡報室</a> — 互動式教學簡報系統 v2.3</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+        import { getCourseConfig } from './scripts/courseConfig.js';
+
+        let project = null;
+        let currentUser = null;
+        let sessionData = null; // full session row
+
+        const params = new URLSearchParams(location.search);
+        const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+        const code = params.get('code') || params.get('joinCode') || hashParams.get('code') || hashParams.get('joinCode');
+        const sessionParam = params.get('session') || params.get('s') || hashParams.get('session') || hashParams.get('s') || '';
+
+        // ── INIT ──
+        async function init() {
+            if (!code) { showError(); return; }
+
+            try {
+                const { data, error } = await db.select('projects', {
+                    filter: { join_code: `eq.${code}` }, limit: 1
+                });
+                if (error || !data || data.length === 0) { showError(); return; }
+                project = data[0];
+            } catch { showError(); return; }
+
+            // Load session data
+            if (sessionParam) {
+                try {
+                    const { data: sData } = await db.select('project_sessions', {
+                        filter: { session_code: `eq.${sessionParam}` }, limit: 1
+                    });
+                    if (sData && sData.length > 0) {
+                        sessionData = sData[0];
+                        project._sessionPhase = sData[0].current_phase || 'pre-class';
+                        if (sData[0].hero_image_url) project._heroImageUrl = sData[0].hero_image_url;
+                    }
+                } catch (e) { console.warn('[portal] Session fetch failed:', e); }
+            }
+
+            // Restore user session
+            const saved = localStorage.getItem('student_session');
+            const portalSaved = sessionStorage.getItem(`portal_user_${code}`);
+            if (saved) {
+                try { currentUser = JSON.parse(saved); } catch { }
+            } else if (portalSaved) {
+                try { currentUser = JSON.parse(portalSaved); } catch { }
+            }
+
+            if (!currentUser) { showLogin(); return; }
+            showMain();
+        }
+
+        function showError() {
+            document.getElementById('errorScreen').classList.add('show');
+        }
+
+        function showLogin() {
+            document.getElementById('loginCourseBadge').textContent = project.name;
+            document.getElementById('loginCourseName').textContent = project.name;
+            if (project._heroImageUrl) {
+                const heroImg = document.getElementById('loginHeroImg');
+                heroImg.src = project._heroImageUrl;
+                heroImg.onload = () => { document.getElementById('loginHeroImage').style.display = ''; };
+            } else {
+                document.getElementById('loginLeftPanel').classList.add('login-left-no-image');
+            }
+            document.getElementById('loginOverlay').classList.remove('hidden');
+        }
+
+        function showMain() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+
+            // UI bindings
+            document.getElementById('topbarCourseName').textContent = project.name;
+            document.getElementById('heroTitle').textContent = project.name;
+            document.getElementById('topbarAvatar').textContent = (currentUser.name || '?')[0];
+            document.getElementById('topbarUserName').textContent = currentUser.name;
+
+            // Hero image
+            if (project._heroImageUrl) {
+                const img = document.getElementById('mainHeroImg');
+                img.src = project._heroImageUrl;
+                img.onload = () => { document.getElementById('mainHeroImage').style.display = ''; };
+            }
+
+            // Phase-based button controls (always from session, not project)
+            const phase = (sessionData && sessionData.current_phase) ? sessionData.current_phase : 'pre-class';
+            updatePhaseButtons(phase);
+
+            // Load course config
+            loadCourseConfig();
+
+            // Load content
+            loadChecklist();
+            loadSurvey();
+        }
+
+        // ── PHASE BUTTONS ──
+        function updatePhaseButtons(phase) {
+            const phaseLabels = { 'pre-class': '課前準備', 'in-class': '課程進行中', 'post-class': '課後回顧' };
+            const badge = document.getElementById('topbarPhaseBadge');
+            badge.className = `topbar-phase-badge ${phase}`;
+            badge.innerHTML = `<span class="material-symbols-outlined icon-xs">radio_button_checked</span> ${phaseLabels[phase]}`;
+
+            // Hide homework & summary for external slide mode
+            const isExternal = project.slide_mode === 'external';
+            if (isExternal) {
+                const duo = document.querySelector('.res-duo');
+                if (duo) duo.style.display = 'none';
+                const heroDesc = document.querySelector('.res-hero-desc');
+                if (heroDesc) heroDesc.textContent = '點擊前往外部課程講義';
+            }
+
+            const slides = document.getElementById('btnSlides');
+            if (phase === 'in-class' || phase === 'post-class') {
+                slides.classList.remove('locked');
+                slides.classList.add('unlocked');
+                slides.removeAttribute('aria-disabled');
+                if (isExternal && project.course_link) {
+                    slides.href = project.course_link;
+                    slides.setAttribute('target', '_blank');
+                } else {
+                    const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+                    slides.href = `student.html?code=${code}&joinCode=${code}${sessionQ}&autoJoin=1`;
+                }
+                const ss = document.getElementById('slidesStatus');
+                if (phase === 'in-class') {
+                    slides.classList.add('active');
+                    if (ss) { ss.innerHTML = '<span class="material-symbols-outlined">arrow_forward</span><span>點擊進入課程</span>'; ss.classList.add('open'); }
+                } else {
+                    if (ss) { ss.innerHTML = '<span class="material-symbols-outlined">arrow_forward</span><span>點擊進入</span>'; ss.classList.add('open'); }
+                }
+            }
+            if (phase === 'in-class' || phase === 'post-class') {
+                // 作業：上課即開放
+                document.getElementById('btnHomework').disabled = false;
+                document.getElementById('btnHomework').classList.add('unlocked');
+                const ss3 = document.getElementById('homeworkStatus');
+                if (ss3) { ss3.innerHTML = '<span class="material-symbols-outlined">arrow_forward</span><span>點擊查看</span>'; ss3.classList.add('open'); }
+            }
+            if (phase === 'post-class') {
+                document.getElementById('btnSummary').disabled = false;
+                document.getElementById('btnSummary').classList.add('unlocked');
+                const ss2 = document.getElementById('summaryStatus');
+                if (ss2) { ss2.innerHTML = '<span class="material-symbols-outlined">arrow_forward</span><span>點擊查看</span>'; ss2.classList.add('open'); }
+            }
+        }
+
+        // ── PROMOTE RESOURCES (when pre-class tasks done) ──
+        function checkAndPromoteResources() {
+            const clTotal = checklistItems.length;
+            const clDone = checklistItems.filter(i => checklistProgress[i.id]).length;
+            const checklistComplete = clTotal > 0 && clDone === clTotal;
+            const surveyComplete = surveySubmitted || surveyQuestions.length === 0;
+
+            if (checklistComplete && surveyComplete) {
+                const container = document.querySelector('.portal-container');
+                const resSection = document.querySelector('.res-section');
+                if (!container || !resSection || resSection.classList.contains('promoted')) return;
+
+                // ── FLIP Animation ──
+                // 1. Record all section positions BEFORE move
+                const allCards = [...container.querySelectorAll('.section-card, .res-section')];
+                const firstRects = new Map();
+                allCards.forEach(el => firstRects.set(el, el.getBoundingClientRect()));
+
+                // 2. Perform DOM moves
+                resSection.classList.add('promoted');
+                container.insertBefore(resSection, container.firstChild);
+                ['remindersSection', 'groupSection'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.style.display !== 'none') {
+                        resSection.after(el);
+                    }
+                });
+
+                // 3. Calculate deltas and animate (FLIP)
+                requestAnimationFrame(() => {
+                    allCards.forEach(el => {
+                        const first = firstRects.get(el);
+                        if (!first) return;
+                        const last = el.getBoundingClientRect();
+                        const dx = first.left - last.left;
+                        const dy = first.top - last.top;
+                        if (Math.abs(dy) < 2 && Math.abs(dx) < 2) return;
+
+                        el.style.transition = 'none';
+                        el.style.transform = `translate(${dx}px, ${dy}px)`;
+                        if (el === resSection) {
+                            el.style.opacity = '0';
+                            el.style.transform += ' scale(0.95)';
+                        }
+
+                        requestAnimationFrame(() => {
+                            el.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease';
+                            el.style.transform = '';
+                            el.style.opacity = '';
+                            el.addEventListener('transitionend', function cleanup(e) {
+                                if (e.propertyName === 'transform') {
+                                    el.style.transition = '';
+                                    el.style.transform = '';
+                                    el.removeEventListener('transitionend', cleanup);
+                                }
+                            });
+                        });
+                    });
+                });
+            }
+        }
+
+        // ── COURSE CONFIG (from courseConfig.js) ──
+        async function loadCourseConfig() {
+            const config = await getCourseConfig(code, db, sessionParam);
+            if (config.date) document.getElementById('infoDate').textContent = config.date;
+            if (config.time) document.getElementById('infoTime').textContent = config.time;
+            if (config.venue) document.getElementById('infoVenue').textContent = config.venue;
+            if (config.instructor) document.getElementById('infoInstructor').textContent = config.instructor;
+
+            // Transport + Map
+            if (config.transportInfo || config.venueAddress || config.venue) {
+                document.getElementById('transportArea').style.display = '';
+                if (config.transportInfo) {
+                    document.getElementById('transportContent').textContent = config.transportInfo;
+                }
+                // Google Maps embed
+                const mapQuery = config.venueAddress || config.venue || '';
+                if (mapQuery && mapQuery !== '待定') {
+                    const encoded = encodeURIComponent(mapQuery);
+                    document.getElementById('transportMap').src = `https://www.google.com/maps?q=${encoded}&output=embed`;
+                    document.getElementById('transportMapWrap').style.display = '';
+                    document.getElementById('transportMapLink').href = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+                }
+            }
+            // Reminders
+            if (config.reminders) {
+                document.getElementById('remindersSection').style.display = '';
+                document.getElementById('remindersContent').textContent = config.reminders;
+            }
+            // Group link
+            if (config.groupLinkUrl) {
+                document.getElementById('groupSection').style.display = '';
+                const btn = document.getElementById('btnGroup');
+                btn.href = config.groupLinkUrl;
+                if (config.groupLinkLabel) document.getElementById('groupLabel').textContent = config.groupLinkLabel;
+            }
+        }
+
+        // ── CHECKLIST ──
+        let checklistItems = [];
+        let checklistProgress = {};
+
+        async function loadChecklist() {
+            const container = document.getElementById('checklistContainer');
+            try {
+                const filter = sessionParam ? { session_code: `eq.${sessionParam}` } : {};
+                const { data: items } = await db.select('checklist_items', { order: 'sort_order.asc', filter });
+                checklistItems = items || [];
+
+                if (currentUser.email) {
+                    const { data: progress } = await db.select('checklist_progress', {
+                        filter: { student_email: `eq.${currentUser.email}` }
+                    });
+                    (progress || []).forEach(p => { checklistProgress[p.checklist_item_id] = p.completed; });
+                }
+                renderChecklist();
+            } catch (err) {
+                container.innerHTML = `<li style="color:#f87171;">載入失敗：${err.message}</li>`;
+            }
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistContainer');
+            if (checklistItems.length === 0) {
+                container.innerHTML = '<li class="empty-msg">目前沒有準備項目</li>';
+                return;
+            }
+            container.innerHTML = checklistItems.map(item => {
+                const done = checklistProgress[item.id] || false;
+                return `<li>
+                    <span class="check-icon ${done ? 'checked' : ''}" data-item-id="${item.id}" onclick="window.__toggleCheck(this)">✓</span>
+                    <div class="item-content">
+                        <strong>${item.title}</strong>
+                        ${item.description ? `<span class="desc">${item.description}</span>` : ''}
+                    </div>
+                </li>`;
+            }).join('');
+            updateProgress();
+        }
+
+        window.__toggleCheck = async function (el) {
+            const itemId = el.dataset.itemId;
+            const newState = !el.classList.contains('checked');
+            el.classList.add('saving');
+            try {
+                const { error } = await db.insert('checklist_progress', {
+                    student_email: currentUser.email, checklist_item_id: itemId,
+                    completed: newState, completed_at: newState ? new Date().toISOString() : null
+                }, { onConflict: 'student_email,checklist_item_id' });
+                if (error) { console.error('Checklist upsert error:', error); return; }
+                checklistProgress[itemId] = newState;
+                el.classList.toggle('checked', newState);
+                updateProgress();
+            } catch (err) { console.error('Toggle failed:', err); }
+            finally { el.classList.remove('saving'); }
+        };
+
+        function updateProgress() {
+            const total = checklistItems.length;
+            const done = checklistItems.filter(i => checklistProgress[i.id]).length;
+            document.getElementById('progressCount').textContent = `${done} / ${total}`;
+            document.getElementById('progressFill').style.width = `${total > 0 ? (done / total * 100) : 0}%`;
+
+            // Update guide tag
+            const tag = document.getElementById('checklistGuide');
+            if (tag && total > 0) {
+                if (done === total) {
+                    tag.textContent = '已完成';
+                    tag.className = 'guide-tag done';
+                    // auto collapse after brief delay
+                    setTimeout(() => {
+                        const section = document.getElementById('checklistSection');
+                        if (section && !section.classList.contains('collapsed')) {
+                            section.classList.add('collapsed');
+                        }
+                    }, 800);
+                } else {
+                    tag.textContent = `${done}/${total} 已完成`;
+                    tag.className = 'guide-tag pending';
+                }
+            }
+            checkAndPromoteResources();
+        }
+
+        // ── SURVEY ──
+        let surveyQuestions = [];
+        let surveyAnswers = {};
+        let surveySubmitted = false;
+
+        async function loadSurvey() {
+            const container = document.getElementById('surveyContainer');
+            try {
+                const filter = sessionParam ? { session_code: `eq.${sessionParam}` } : {};
+                const { data: questions } = await db.select('survey_questions', { order: 'sort_order.asc', filter });
+                surveyQuestions = questions || [];
+
+                if (currentUser.email) {
+                    const { data: responses } = await db.select('survey_responses', {
+                        filter: { student_email: `eq.${currentUser.email}` }
+                    });
+                    if (responses && responses.length > 0) {
+                        surveySubmitted = true;
+                        responses.forEach(r => { surveyAnswers[r.question_id] = r.answer; });
+                    }
+                }
+                renderSurvey();
+            } catch (err) {
+                container.innerHTML = `<div style="color:#f87171;padding:16px;">載入失敗：${err.message}</div>`;
+            }
+        }
+
+        function renderSurvey() {
+            const container = document.getElementById('surveyContainer');
+            if (surveyQuestions.length === 0) {
+                document.getElementById('surveySection').style.display = 'none';
+                return;
+            }
+            let html = surveyQuestions.map((q, i) => {
+                const answered = surveyAnswers[q.id] || '';
+                let optionsHtml = '';
+                if (q.question_type === 'fillblank') {
+                    optionsHtml = `<textarea class="sq-textarea" data-qid="${q.id}" placeholder="請輸入您的回答…" ${surveySubmitted ? 'disabled' : ''} onchange="window.__surveyAnswer('${q.id}', this.value)">${answered}</textarea>`;
+                } else {
+                    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                    optionsHtml = '<div class="sq-options">' + opts.map(opt => `
+                        <div class="sq-option ${answered === opt ? 'selected' : ''}" data-qid="${q.id}" data-value="${opt}" ${surveySubmitted ? '' : `onclick="window.__selectOption(this)"`}>
+                            <span class="radio"></span> ${opt}
+                        </div>
+                    `).join('') + '</div>';
+                }
+                return `<div class="survey-question"><div class="sq-text"><span class="sq-num">${i + 1}.</span> <span>${q.question_text}</span></div>${optionsHtml}</div>`;
+            }).join('');
+
+            if (surveySubmitted) {
+                html += '<div class="survey-submit-row"><div class="survey-done"><span class="material-symbols-outlined">check_circle</span> 問卷已完成，感謝您的填寫！</div></div>';
+            } else {
+                const answered = surveyQuestions.filter(q => surveyAnswers[q.id] && surveyAnswers[q.id].trim()).length;
+                html += `<div class="survey-progress-row"><span class="survey-progress-text">${answered} / ${surveyQuestions.length} 題已填答</span></div>`;
+                html += '<div class="survey-submit-row"><button class="survey-submit-btn" id="surveySubmitBtn" onclick="window.__submitSurvey()">提交問卷</button><span class="survey-status" id="surveyStatus"></span></div>';
+            }
+            container.innerHTML = html;
+
+            // Update guide tag
+            const tag = document.getElementById('surveyGuide');
+            if (tag && surveyQuestions.length > 0) {
+                if (surveySubmitted) {
+                    tag.textContent = '已完成';
+                    tag.className = 'guide-tag done';
+                    setTimeout(() => {
+                        const section = document.getElementById('surveySection');
+                        if (section && !section.classList.contains('collapsed')) {
+                            section.classList.add('collapsed');
+                        }
+                    }, 800);
+                } else {
+                    const answered = surveyQuestions.filter(q => surveyAnswers[q.id] && surveyAnswers[q.id].trim()).length;
+                    tag.textContent = answered > 0 ? `${answered}/${surveyQuestions.length} 已填答` : '待填寫';
+                    tag.className = answered > 0 ? 'guide-tag in-progress' : 'guide-tag pending';
+                }
+            }
+            checkAndPromoteResources();
+        }
+
+        window.__selectOption = function (el) {
+            if (surveySubmitted) return;
+            const qid = el.dataset.qid, value = el.dataset.value;
+            surveyAnswers[qid] = value;
+            el.closest('.sq-options').querySelectorAll('.sq-option').forEach(o => {
+                o.classList.toggle('selected', o.dataset.value === value);
+            });
+            updateSurveyProgress();
+        };
+        window.__surveyAnswer = function (qid, value) {
+            if (!surveySubmitted) {
+                surveyAnswers[qid] = value;
+                updateSurveyProgress();
+            }
+        };
+
+        function updateSurveyProgress() {
+            const total = surveyQuestions.length;
+            const answered = surveyQuestions.filter(q => surveyAnswers[q.id] && surveyAnswers[q.id].trim()).length;
+            // Update progress row
+            const progressText = document.querySelector('.survey-progress-text');
+            if (progressText) progressText.textContent = `${answered} / ${total} 題已填答`;
+            // Update guide tag
+            const tag = document.getElementById('surveyGuide');
+            if (tag && !surveySubmitted) {
+                tag.textContent = answered > 0 ? `${answered}/${total} 已填答` : '待填寫';
+                tag.className = answered > 0 ? 'guide-tag in-progress' : 'guide-tag pending';
+            }
+        }
+
+        window.__submitSurvey = async function () {
+            const unanswered = surveyQuestions.filter(q => !surveyAnswers[q.id] || !surveyAnswers[q.id].trim());
+            if (unanswered.length > 0) {
+                document.getElementById('surveyStatus').textContent = `還有 ${unanswered.length} 題未回答`;
+                return;
+            }
+            const btn = document.getElementById('surveySubmitBtn');
+            btn.disabled = true; btn.textContent = '提交中…';
+            try {
+                let hasError = false;
+                for (const q of surveyQuestions) {
+                    const { error } = await db.insert('survey_responses', {
+                        student_email: currentUser.email, question_id: q.id,
+                        answer: surveyAnswers[q.id], submitted_at: new Date().toISOString()
+                    }, { onConflict: 'student_email,question_id' });
+                    if (error) { console.error('Survey upsert error:', error); hasError = true; }
+                }
+                if (hasError) {
+                    document.getElementById('surveyStatus').textContent = '部分題目儲存失敗，請重試';
+                    btn.disabled = false; btn.textContent = '提交問卷';
+                    return;
+                }
+                surveySubmitted = true;
+                renderSurvey();
+            } catch (err) {
+                document.getElementById('surveyStatus').textContent = '提交失敗：' + err.message;
+                btn.disabled = false; btn.textContent = '提交問卷';
+            }
+        };
+
+        // ── COLLAPSE TOGGLE ──
+        window.__toggleCollapse = function (sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) section.classList.toggle('collapsed');
+        };
+
+        // ── EDIT NAME ──
+        window.__editName = async function () {
+            const newName = prompt('請輸入新的姓名：', currentUser.name || '');
+            if (!newName || newName.trim() === '' || newName.trim() === currentUser.name) return;
+            const trimmed = newName.trim();
+            currentUser.name = trimmed;
+            // Update UI
+            document.getElementById('topbarUserName').textContent = trimmed;
+            document.getElementById('topbarAvatar').textContent = trimmed.charAt(0);
+            // Persist to storage
+            sessionStorage.setItem(`portal_user_${code}`, JSON.stringify(currentUser));
+            const ss = JSON.parse(localStorage.getItem('student_session') || '{}');
+            ss.name = trimmed;
+            localStorage.setItem('student_session', JSON.stringify(ss));
+            // Update DB
+            try {
+                await db.update('students', { name: trimmed }, {
+                    email: `eq.${currentUser.email}`, session_code: `eq.${sessionParam}`
+                });
+            } catch (e) { console.warn('Name update failed:', e); }
+        };
+
+        // ── NAVIGATION ──
+        window.goToSlides = function () {
+            if (!code) return;
+            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            location.href = `student.html?code=${code}${sessionQ}`;
+        };
+        window.goToSummary = function () {
+            if (!code) return;
+            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            location.href = `post-class.html?code=${code}${sessionQ}`;
+        };
+        window.goToHomework = function () {
+            if (!code) return;
+            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            location.href = `homework.html?code=${code}${sessionQ}`;
+        };
+        window.logout = function () {
+            localStorage.removeItem('student_session');
+            sessionStorage.removeItem(`portal_user_${code}`);
+            location.reload();
+        };
+
+        // ── PRE-FILL & ENTER KEY ──
+        if (sessionParam) document.getElementById('loginSessionCode').value = sessionParam;
+
+        // ── LOGIN ──
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const name = document.getElementById('loginName').value.trim();
+            const sessionCode = document.getElementById('loginSessionCode').value.trim().toUpperCase();
+            const errEl = document.getElementById('loginError');
+            errEl.style.display = 'none';
+
+            if (!email || !email.includes('@')) { errEl.textContent = '請輸入有效的 Email'; errEl.style.display = 'block'; return; }
+            if (!name) { errEl.textContent = '請輸入姓名'; errEl.style.display = 'block'; return; }
+            if (!sessionCode) { errEl.textContent = '請輸入場次代碼'; errEl.style.display = 'block'; return; }
+
+            try {
+                const { data: sessions } = await db.select('project_sessions', {
+                    filter: { session_code: `eq.${sessionCode}` }, limit: 1
+                });
+                if (!sessions || sessions.length === 0) { errEl.textContent = '找不到此場次代碼'; errEl.style.display = 'block'; return; }
+
+                const sess = sessions[0];
+                let joinCodeVal = code || '';
+                try {
+                    const { data: projRows } = await db.select('projects', { filter: { id: `eq.${sess.project_id}` }, limit: 1 });
+                    if (projRows?.[0]) joinCodeVal = projRows[0].join_code;
+                } catch { }
+
+                // Upsert student
+                const { data: existing } = await db.select('students', {
+                    filter: { email: `eq.${email}`, session_code: `eq.${sessionCode}` }, limit: 1
+                });
+                if (!existing || existing.length === 0) {
+                    await db.insert('students', { email, name, project_id: sess.project_id, session_code: sessionCode });
+                }
+
+                currentUser = { email, name };
+                sessionData = sess;
+                project._sessionPhase = sess.current_phase || 'pre-class';
+                if (sess.hero_image_url) project._heroImageUrl = sess.hero_image_url;
+
+                sessionStorage.setItem(`portal_user_${joinCodeVal}`, JSON.stringify(currentUser));
+                localStorage.setItem('student_session', JSON.stringify({ email, name, sessionCode, joinCode: joinCodeVal, projectId: sess.project_id }));
+
+                // Update URL
+                const url = new URL(location.href);
+                url.searchParams.set('session', sessionCode);
+                if (joinCodeVal) url.searchParams.set('code', joinCodeVal);
+                history.replaceState(null, '', url);
+
+                // Reload to get fresh data
+                location.reload();
+            } catch (e) { errEl.textContent = '登入失敗：' + e.message; errEl.style.display = 'block'; }
+        });
+
+        // Enter key → only trigger on last input
+        document.querySelectorAll('#loginOverlay input').forEach(input => {
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') document.getElementById('loginBtn').click();
+            });
+        });
+
+        init();
+    </script>
+    <!-- Line 官方客服懸浮按鈕 -->
+    <a class="line-fab" href="https://line.me/R/" target="_blank" id="lineFab" title="Line 官方客服">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#fff">
+            <path
+                d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+        </svg>
+    </a>
+
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

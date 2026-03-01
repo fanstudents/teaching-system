@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員管理 — 教學系統</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <style>
+        .container {
+            padding: 24px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 140px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 16px 20px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            transition: all .15s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #475569;
+            border: 1.5px solid #e2e8f0;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .table-wrap {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        tr:hover td {
+            background: #fafbfc;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-refunded {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .badge-pending {
+            background: #fefce8;
+            color: #854d0e;
+        }
+
+        .empty-row td {
+            text-align: center;
+            color: #94a3b8;
+            padding: 40px;
+        }
+
+        /* Import Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .4);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 560px;
+            max-width: 95vw;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            background: #fafbfc;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .drop-zone-icon {
+            font-size: 48px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone-text {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .drop-zone-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .preview-table {
+            margin-top: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .preview-table table {
+            font-size: 13px;
+        }
+
+        .preview-table th {
+            font-size: 11px;
+            padding: 8px 10px;
+        }
+
+        .preview-table td {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .import-status {
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .template-link {
+            font-size: 12px;
+            color: #2563eb;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* Detail Modal */
+        .modal-wide {
+            width: 720px;
+        }
+
+        .detail-header {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 20px;
+        }
+
+        .detail-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .detail-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .detail-email {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .detail-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .detail-meta-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .detail-meta-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .detail-meta-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .detail-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .detail-tab {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            background: #f1f5f9;
+            color: #64748b;
+            font-family: inherit;
+            transition: all .15s;
+        }
+
+        .detail-tab.active {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .detail-section {
+            display: none;
+        }
+
+        .detail-section.active {
+            display: block;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .detail-table th {
+            padding: 8px 12px;
+            font-size: 11px;
+            text-align: left;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        .detail-table td {
+            padding: 8px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .detail-empty {
+            text-align: center;
+            color: #94a3b8;
+            padding: 32px;
+            font-size: 14px;
+        }
+
+        .clickable {
+            cursor: pointer;
+            color: #2563eb;
+        }
+
+        .clickable:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">會員管理</div>
+        </div>
+
+        <div class="container">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">購買人數</div>
+                    <div class="stat-value" id="statTotal">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">已付款</div>
+                    <div class="stat-value" id="statPaid">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">已退款</div>
+                    <div class="stat-value" id="statRefunded">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">總營收</div>
+                    <div class="stat-value" id="statRevenue">-</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <input class="search-input" type="text" id="searchInput" placeholder="搜尋姓名、Email、訂單...">
+                <select class="search-input" style="flex:0 0 140px;" id="statusFilter">
+                    <option value="">所有狀態</option>
+                    <option value="paid">已付款</option>
+                    <option value="refunded">已退款</option>
+                </select>
+                <select class="search-input" style="flex:0 0 180px;" id="courseFilter">
+                    <option value="">所有課程</option>
+                </select>
+                <button class="btn btn-success" onclick="openImportModal()">
+                    <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span> 匯入
+                </button>
+                <button class="btn btn-outline" onclick="exportCSV()">
+                    <span class="material-symbols-outlined" style="font-size:18px;">download</span> 匯出
+                </button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>Email</th>
+                            <th>電話</th>
+                            <th>課程</th>
+                            <th>金額</th>
+                            <th>狀態</th>
+                            <th>訂單編號</th>
+                            <th>購買日期</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberTableBody">
+                        <tr>
+                            <td colspan="8" class="empty-row">載入中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 匯入 Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>
+                    <span class="material-symbols-outlined" style="color:#059669;">upload_file</span>
+                    匯入會員資料
+                </h3>
+                <button class="modal-close" onclick="closeImportModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="drop-zone-icon">
+                        <span class="material-symbols-outlined" style="font-size:48px;">cloud_upload</span>
+                    </div>
+                    <div class="drop-zone-text">拖放 CSV 檔案到這裡，或點擊選擇</div>
+                    <div class="drop-zone-hint">支援 .csv 格式，UTF-8 編碼</div>
+                </div>
+                <input type="file" id="fileInput" accept=".csv" style="display:none;"
+                    onchange="handleFile(this.files[0])">
+
+                <div style="margin-top:12px;">
+                    <span class="template-link" onclick="downloadTemplate()">📄 下載範本 CSV</span>
+                </div>
+
+                <div id="previewArea" style="display:none;">
+                    <div style="margin-top:16px;font-size:13px;font-weight:600;color:#1e293b;">
+                        預覽 (<span id="previewCount">0</span> 筆)
+                    </div>
+                    <div class="preview-table" id="previewTable"></div>
+                    <div class="import-status" id="importStatus"></div>
+                </div>
+            </div>
+            <div class="modal-footer" id="importFooter" style="display:none;">
+                <button class="btn btn-outline" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-success" id="btnImport" onclick="doImport()">
+                    <span class="material-symbols-outlined" style="font-size:18px;">upload</span> 確認匯入
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 會員詳細 Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h3>
+                    <span class="material-symbols-outlined" style="color:#6366f1;">person</span>
+                    會員詳細資料
+                </h3>
+                <button class="modal-close" onclick="document.getElementById('detailModal').classList.remove('show')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detailBody">
+                <div class="detail-empty">載入中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        let purchases = [];
+        let projects = [];
+        let pendingImport = [];
+
+        window._db = db;
+
+        async function init() {
+            const [pRes, prRes] = await Promise.all([
+                db.select('purchases', { order: 'created_at.desc' }),
+                db.select('projects', { select: 'id,name,course_id' })
+            ]);
+            purchases = pRes.data || [];
+            projects = prRes.data || [];
+            populateCourseFilter();
+            updateStats();
+            renderTable();
+        }
+
+        function populateCourseFilter() {
+            const sel = document.getElementById('courseFilter');
+            const courseIds = [...new Set(purchases.map(p => p.course_id).filter(Boolean))];
+            courseIds.forEach(cid => {
+                const proj = projects.find(p => p.course_id === cid);
+                const label = proj?.name || cid;
+                sel.innerHTML += `<option value="${cid}">${label}</option>`;
+            });
+        }
+
+        function updateStats() {
+            const paid = purchases.filter(p => p.payment_state === 'paid');
+            const refunded = purchases.filter(p => p.payment_state === 'refunded');
+            const revenue = paid.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+            document.getElementById('statTotal').textContent = purchases.length;
+            document.getElementById('statPaid').textContent = paid.length;
+            document.getElementById('statRefunded').textContent = refunded.length;
+            document.getElementById('statRevenue').textContent = 'NT$' + revenue.toLocaleString();
+        }
+
+        function renderTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const course = document.getElementById('courseFilter').value;
+            const tbody = document.getElementById('memberTableBody');
+
+            let filtered = purchases;
+            if (search) {
+                filtered = filtered.filter(p =>
+                    (p.name || '').toLowerCase().includes(search) ||
+                    (p.email || '').toLowerCase().includes(search) ||
+                    (p.order_id || '').toLowerCase().includes(search) ||
+                    (p.product_name || '').toLowerCase().includes(search)
+                );
+            }
+            if (status) filtered = filtered.filter(p => p.payment_state === status);
+            if (course) filtered = filtered.filter(p => p.course_id === course);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-row">沒有符合的結果</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => {
+                const proj = projects.find(pr => pr.course_id === p.course_id);
+                const badgeClass = p.payment_state === 'refunded' ? 'badge-refunded' : p.payment_state === 'paid' ? 'badge-paid' : 'badge-pending';
+                const statusLabel = p.payment_state === 'refunded' ? '已退款' : p.payment_state === 'paid' ? '已付款' : p.payment_state || '-';
+                const date = p.paid_at || p.created_at;
+                const dateStr = date ? new Date(date).toLocaleDateString('zh-TW') : '-';
+                const safeEmail = (p.email || '').replace(/'/g, "\\'");
+                return `<tr>
+                    <td><b class="clickable" onclick="openMemberDetail('${safeEmail}')">${p.name || p.buyer_name || '-'}</b></td>
+                    <td><span class="clickable" onclick="openMemberDetail('${safeEmail}')">${p.email || '-'}</span></td>
+                    <td>${p.phone || '-'}</td>
+                    <td>${p.product_name || proj?.name || p.course_id || '-'}</td>
+                    <td>NT$${(parseFloat(p.amount) || 0).toLocaleString()}</td>
+                    <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
+                    <td style="font-size:12px;color:#64748b;">${p.order_id || '-'}</td>
+                    <td style="font-size:12px;color:#64748b;">${dateStr}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Filters
+        document.getElementById('searchInput').addEventListener('input', renderTable);
+        document.getElementById('statusFilter').addEventListener('change', renderTable);
+        document.getElementById('courseFilter').addEventListener('change', renderTable);
+
+        // Import
+        window.openImportModal = () => {
+            document.getElementById('importModal').classList.add('show');
+            document.getElementById('previewArea').style.display = 'none';
+            document.getElementById('importFooter').style.display = 'none';
+            document.getElementById('importStatus').textContent = '';
+            pendingImport = [];
+        };
+        window.closeImportModal = () => {
+            document.getElementById('importModal').classList.remove('show');
+        };
+
+        // Drag & Drop
+        const dz = document.getElementById('dropZone');
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('drop', e => {
+            e.preventDefault();
+            dz.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        window.handleFile = function (file) {
+            if (!file || !file.name.endsWith('.csv')) {
+                alert('請上傳 .csv 檔案');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                parseCSV(e.target.result);
+            };
+            reader.readAsText(file, 'UTF-8');
+        };
+
+        function parseCSV(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+            if (lines.length < 2) { alert('CSV 至少需要標題行 + 一筆資料'); return; }
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const vals = lines[i].split(',').map(v => v.trim());
+                const row = {};
+                headers.forEach((h, idx) => { row[h] = vals[idx] || ''; });
+                rows.push(row);
+            }
+
+            // Map to purchase fields
+            pendingImport = rows.map(r => ({
+                email: r.email || r['email'] || '',
+                name: r.name || r['姓名'] || r['name'] || '',
+                phone: r.phone || r['電話'] || r['phone'] || '',
+                course_id: r.course_id || r['課程id'] || r['course_id'] || '',
+                order_id: r.order_id || r['訂單編號'] || r['order_id'] || `import-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+                amount: parseFloat(r.amount || r['金額'] || r['amount'] || 0),
+                payment_state: r.payment_state || r['狀態'] || 'paid',
+                company: r.company || r['公司'] || r['company'] || '',
+                product_name: r.product_name || r['課程名稱'] || r['product_name'] || '',
+                note: r.note || r['備註'] || r['note'] || '',
+            })).filter(r => r.email);
+
+            // Show preview
+            document.getElementById('previewCount').textContent = pendingImport.length;
+            document.getElementById('previewArea').style.display = 'block';
+            document.getElementById('importFooter').style.display = 'flex';
+
+            const ptable = document.getElementById('previewTable');
+            ptable.innerHTML = `<table>
+                <thead><tr><th>姓名</th><th>Email</th><th>電話</th><th>課程</th><th>金額</th></tr></thead>
+                <tbody>${pendingImport.slice(0, 20).map(r => `
+                    <tr>
+                        <td>${r.name}</td>
+                        <td>${r.email}</td>
+                        <td>${r.phone}</td>
+                        <td>${r.product_name || r.course_id}</td>
+                        <td>${r.amount}</td>
+                    </tr>
+                `).join('')}
+                ${pendingImport.length > 20 ? `<tr><td colspan="5" style="text-align:center;color:#94a3b8;">... 還有 ${pendingImport.length - 20} 筆</td></tr>` : ''}
+                </tbody></table>`;
+        }
+
+        window.doImport = async function () {
+            if (pendingImport.length === 0) return;
+            const btn = document.getElementById('btnImport');
+            const status = document.getElementById('importStatus');
+            btn.disabled = true;
+            status.textContent = '⏳ 匯入中...';
+            status.style.color = '#d97706';
+
+            let success = 0, errors = 0;
+            for (const row of pendingImport) {
+                try {
+                    const { error } = await db.insert('purchases', row);
+                    if (error) {
+                        if (error.message?.includes('duplicate')) { errors++; continue; }
+                        throw error;
+                    }
+                    success++;
+                } catch (e) {
+                    errors++;
+                    console.warn('Import row failed:', e);
+                }
+            }
+
+            status.textContent = `✅ 成功匯入 ${success} 筆${errors > 0 ? `，${errors} 筆跳過（重複或錯誤）` : ''}`;
+            status.style.color = '#16a34a';
+            btn.disabled = false;
+
+            // Reload
+            setTimeout(async () => {
+                closeImportModal();
+                const { data } = await db.select('purchases', { order: 'created_at.desc' });
+                purchases = data || [];
+                updateStats();
+                renderTable();
+            }, 1000);
+        };
+
+        window.downloadTemplate = function () {
+            const csv = 'name,email,phone,course_id,amount,payment_state,company,product_name,note\n張三,test@example.com,0912345678,course-001,3500,paid,ABC公司,AI實戰課,';
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'members_template.csv';
+            a.click(); URL.revokeObjectURL(url);
+        };
+
+        window.exportCSV = function () {
+            if (purchases.length === 0) { alert('沒有資料可匯出'); return; }
+            const headers = ['name', 'email', 'phone', 'course_id', 'product_name', 'amount', 'payment_state', 'order_id', 'company', 'created_at'];
+            const csv = [headers.join(','), ...purchases.map(p =>
+                headers.map(h => `"${(p[h] || '').toString().replace(/"/g, '""')}"`).join(',')
+            )].join('\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `members_export_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+        };
+
+        // ── Member Detail ──
+        window.openMemberDetail = async function (email) {
+            if (!email) return;
+            document.getElementById('detailModal').classList.add('show');
+            const body = document.getElementById('detailBody');
+            body.innerHTML = '<div class="detail-empty">⏳ 載入中...</div>';
+
+            // 此會員的購買紀錄
+            const memberPurchases = purchases.filter(p => p.email === email);
+            const mp = memberPurchases[0] || {};
+            const name = mp.name || mp.buyer_name || email;
+            const initials = name.slice(0, 1);
+
+            // DB 查詢：學員紀錄、作業、場次
+            const [studRes, subRes, sessRes] = await Promise.all([
+                db.select('students', { filter: { email: `eq.${email}` } }),
+                db.select('submissions', { filter: { student_email: `eq.${email}` }, order: 'created_at.desc' }),
+                db.select('project_sessions', { order: 'date.desc' })
+            ]);
+            const studentRecords = studRes.data || [];
+            const submissionRecords = subRes.data || [];
+            const allSessions = sessRes.data || [];
+
+            // 購買摘要
+            const totalSpent = memberPurchases.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
+            const firstPurchase = memberPurchases.length > 0 ? memberPurchases[memberPurchases.length - 1] : null;
+            const firstDate = firstPurchase?.created_at ? new Date(firstPurchase.created_at).toLocaleDateString('zh-TW') : '-';
+
+            // 場次 tab：合併 student records + session info
+            const sessionsHtml = studentRecords.length === 0
+                ? '<div class="detail-empty">尚未參加任何場次</div>'
+                : `<table class="detail-table"><thead><tr><th>場次日期</th><th>地點</th><th>課程</th><th>狀態</th><th>報名時間</th></tr></thead><tbody>${studentRecords.map(s => {
+                    const sess = allSessions.find(ss => ss.id === s.session_id);
+                    const proj = projects.find(p => p.id === (sess?.project_id || s.project_id));
+                    const stLabel = { purchased: '已購買', registered: '已報名', attended: '已出席' };
+                    const stClass = { purchased: 'badge-pending', registered: 'badge-paid', attended: 'badge-paid' };
+                    return `<tr>
+                        <td>${sess?.date || '-'}</td>
+                        <td>${sess?.venue || '-'}</td>
+                        <td>${proj?.name || '-'}</td>
+                        <td><span class="badge ${stClass[s.registration_status] || 'badge-pending'}">${stLabel[s.registration_status] || s.registration_status}</span></td>
+                        <td style="font-size:12px;color:#64748b;">${s.registered_at ? new Date(s.registered_at).toLocaleDateString('zh-TW') : '-'}</td>
+                    </tr>`;
+                }).join('')}</tbody></table>`;
+
+            // 作業 tab
+            const assignmentsHtml = submissionRecords.length === 0
+                ? '<div class="detail-empty">尚未繳交任何作業</div>'
+                : `<table class="detail-table"><thead><tr><th>作業</th><th>類型</th><th>內容</th><th>分數</th><th>繳交時間</th></tr></thead><tbody>${submissionRecords.map(s => {
+                    const content = s.type === 'file' ? `<a href="${s.file_url}" target="_blank" style="color:#2563eb;">📎 檔案</a>` : (s.content || '-').slice(0, 60);
+                    return `<tr>
+                        <td><b>${s.assignment_title || '-'}</b></td>
+                        <td>${s.type || '-'}</td>
+                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${content}</td>
+                        <td>${s.score || '-'}</td>
+                        <td style="font-size:12px;color:#64748b;">${s.submitted_at ? new Date(s.submitted_at).toLocaleDateString('zh-TW') : '-'}</td>
+                    </tr>`;
+                }).join('')}</tbody></table>`;
+
+            // 購買紀錄 tab
+            const purchasesHtml = memberPurchases.length === 0
+                ? '<div class="detail-empty">沒有購買紀錄</div>'
+                : `<table class="detail-table"><thead><tr><th>課程</th><th>金額</th><th>狀態</th><th>訂單編號</th><th>日期</th></tr></thead><tbody>${memberPurchases.map(p => {
+                    const proj = projects.find(pr => pr.course_id === p.course_id);
+                    const st = p.payment_state === 'paid' ? '已付款' : p.payment_state === 'refunded' ? '已退款' : p.payment_state;
+                    const cls = p.payment_state === 'paid' ? 'badge-paid' : 'badge-refunded';
+                    return `<tr>
+                        <td>${p.product_name || proj?.name || p.course_id || '-'}</td>
+                        <td>NT$${(parseFloat(p.amount) || 0).toLocaleString()}</td>
+                        <td><span class="badge ${cls}">${st}</span></td>
+                        <td style="font-size:12px;">${p.order_id || '-'}</td>
+                        <td style="font-size:12px;">${p.created_at ? new Date(p.created_at).toLocaleDateString('zh-TW') : '-'}</td>
+                    </tr>`;
+                }).join('')}</tbody></table>`;
+
+            body.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-avatar">${initials}</div>
+                    <div>
+                        <div class="detail-name">${name}</div>
+                        <div class="detail-email">${email}${mp.phone ? ' · ' + mp.phone : ''}${mp.company ? ' · ' + mp.company : ''}</div>
+                    </div>
+                </div>
+                <div class="detail-meta">
+                    <div class="detail-meta-item"><div class="detail-meta-label">累計消費</div><div class="detail-meta-value">NT$${totalSpent.toLocaleString()}</div></div>
+                    <div class="detail-meta-item"><div class="detail-meta-label">首次購買</div><div class="detail-meta-value">${firstDate}</div></div>
+                    <div class="detail-meta-item"><div class="detail-meta-label">參加場次</div><div class="detail-meta-value">${studentRecords.length} 場</div></div>
+                    <div class="detail-meta-item"><div class="detail-meta-label">繳交作業</div><div class="detail-meta-value">${submissionRecords.length} 份</div></div>
+                </div>
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="switchDetailTab(this,'sessions')">📅 參加場次 (${studentRecords.length})</button>
+                    <button class="detail-tab" onclick="switchDetailTab(this,'assignments')">📝 課程作業 (${submissionRecords.length})</button>
+                    <button class="detail-tab" onclick="switchDetailTab(this,'purchases')">💳 購買紀錄 (${memberPurchases.length})</button>
+                </div>
+                <div class="detail-section active" id="detailSessions">${sessionsHtml}</div>
+                <div class="detail-section" id="detailAssignments">${assignmentsHtml}</div>
+                <div class="detail-section" id="detailPurchases">${purchasesHtml}</div>
+            `;
+        };
+
+        window.switchDetailTab = function (btn, tab) {
+            btn.parentElement.querySelectorAll('.detail-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.detail-section').forEach(s => s.classList.remove('active'));
+            const map = { sessions: 'detailSessions', assignments: 'detailAssignments', purchases: 'detailPurchases' };
+            document.getElementById(map[tab])?.classList.add('active');
+        };
+
+        // Close detail on overlay click
+        document.getElementById('detailModal')?.addEventListener('click', e => {
+            if (e.target.id === 'detailModal') e.target.classList.remove('show');
+        });
+
+        init();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

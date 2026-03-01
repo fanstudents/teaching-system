@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專案管理 — 教學系統</title>
+    <meta name="description" content="專案管理介面，管理專案、場次與學員">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/manage-page.css">
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">專案管理</div>
+        </div>
+
+        <div class="container">
+            <!-- Stats -->
+            <div class="stats-bar" id="statsBar">
+                <div class="stat-card">
+                    <div class="stat-label">專案</div>
+                    <div class="stat-value" id="statProjects">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">場次</div>
+                    <div class="stat-value" id="statSessions">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">學員</div>
+                    <div class="stat-value" id="statStudents">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">訂單</div>
+                    <div class="stat-value" id="statPurchases">-</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="main-tabs">
+                <button class="main-tab active" data-tab="projects">
+                    <span class="material-symbols-outlined">folder</span> 專案
+                </button>
+                <button class="main-tab" data-tab="sessions">
+                    <span class="material-symbols-outlined">event</span> 場次
+                </button>
+                <button class="main-tab" data-tab="students">
+                    <span class="material-symbols-outlined">group</span> 學員
+                </button>
+                <button class="main-tab" data-tab="assignments">
+                    <span class="material-symbols-outlined">assignment</span> 作業
+                </button>
+                <button class="main-tab" data-tab="purchases">
+                    <span class="material-symbols-outlined">receipt_long</span> 訂單
+                </button>
+            </div>
+
+            <!-- Tab: 專案 -->
+            <div class="tab-panel active" id="tab-projects">
+                <div class="filter-bar">
+                    <input type="text" id="projectSearch" placeholder="搜尋專案名稱…">
+                    <select id="projectCategoryFilter" class="filter-select">
+                        <option value="">全部分類</option>
+                        <option value="course">公開課程</option>
+                        <option value="corporate">企業內訓</option>
+                    </select>
+                    <button class="btn btn-dark" id="btnCreateProject">
+                        <span class="material-symbols-outlined">add</span> 建立專案
+                    </button>
+                    <button class="btn btn-dark" id="btnRefreshProjects">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="card-grid" id="projectGrid">
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: 場次 -->
+            <div class="tab-panel" id="tab-sessions">
+                <div class="filter-bar">
+                    <input type="text" id="sessionSearch" placeholder="搜尋場次代碼或地點…">
+                    <button class="btn btn-dark" id="btnAddSession">
+                        <span class="material-symbols-outlined">add</span> 新增場次
+                    </button>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="sessionTable">
+                        <thead>
+                            <tr>
+                                <th>專案</th>
+                                <th>場次代碼</th>
+                                <th>日期</th>
+                                <th>時間</th>
+                                <th>地點</th>
+                                <th>階段</th>
+                                <th>容量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessionTableBody">
+                            <tr>
+                                <td colspan="8" class="td-empty">載入中…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: 學員 -->
+            <div class="tab-panel" id="tab-students">
+                <div class="filter-bar">
+                    <input type="text" id="studentSearch" placeholder="搜尋姓名或 Email…">
+                    <select id="studentSessionFilter">
+                        <option value="">所有場次</option>
+                    </select>
+                    <select id="studentStatusFilter">
+                        <option value="">所有狀態</option>
+                        <option value="purchased">已購買</option>
+                        <option value="registered">已報名</option>
+                        <option value="attended">已出席</option>
+                    </select>
+                    <button class="btn" id="btnAddStudent">
+                        <span class="material-symbols-outlined">person_add</span> 新增學員
+                    </button>
+                    <button class="btn" id="btnRefreshStudents">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="studentTable">
+                        <thead>
+                            <tr>
+                                <th>學員</th>
+                                <th>Email</th>
+                                <th>場次</th>
+                                <th>公司</th>
+                                <th>組別</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <tr>
+                                <td colspan="7" class="td-empty">載入中…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: 作業 -->
+            <div class="tab-panel" id="tab-assignments">
+                <div class="filter-bar">
+                    <select id="assignmentSessionFilter">
+                        <option value="">所有場次</option>
+                    </select>
+                    <input type="text" id="assignmentSearch" placeholder="搜尋作業標題…">
+                    <button class="btn btn-dark" id="btnAddAssignment">
+                        <span class="material-symbols-outlined">add</span> 新增作業
+                    </button>
+                    <button class="btn" id="btnRefreshAssignments">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="assignment-cards" id="assignmentGrid">
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: 訂單 -->
+            <div class="tab-panel" id="tab-purchases">
+                <div class="filter-bar">
+                    <input type="text" id="purchaseSearch" placeholder="搜尋 Email 或訂單編號…">
+                    <button class="btn" id="btnRefreshPurchases">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="purchaseTable">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>姓名</th>
+                                <th>訂單編號</th>
+                                <th>金額</th>
+                                <th>狀態</th>
+                                <th>退款金額</th>
+                                <th>已配對</th>
+                                <th>時間</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchaseTableBody">
+                            <tr>
+                                <td colspan="8" class="td-empty">載入中…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div><!-- /admin-main -->
+
+    <!-- Edit Project Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>編輯課程</h3>
+                <button class="modal-close" onclick="closeModal('editModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>課程名稱</label>
+                    <input type="text" id="editName" placeholder="例：AI 職場應用工作坊">
+                </div>
+                <div class="form-group">
+                    <label>說明</label>
+                    <textarea id="editDesc" placeholder="選填"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>課程類型</label>
+                    <select id="editType">
+                        <option value="ai-workplace">AI 職場應用</option>
+                        <option value="ai-basics">AI 基礎</option>
+                        <option value="ai-advanced">AI 進階</option>
+                        <option value="workshop">實戰工作坊</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>簡報模式</label>
+                    <div style="display:flex;gap:12px;margin-top:4px;">
+                        <label
+                            style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="editSlideMode" value="internal" checked> 互動式簡報系統
+                        </label>
+                        <label
+                            style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="editSlideMode" value="external"> 外部連結
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="editExternalUrlGroup" style="display:none;">
+                    <label>簡報網址</label>
+                    <input type="url" id="editCourseLink" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Teachify Course ID</label>
+                    <input type="text" id="editCourseId" placeholder="自動帶入或手動填寫">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="editDelete">刪除課程</button>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('editModal')">取消</button>
+                    <button class="btn btn-dark" id="editSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Session Modal -->
+    <div class="modal-overlay" id="sessionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="sessionModalTitle">新增場次</h3>
+                <button class="modal-close" onclick="closeModal('sessionModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                <input type="hidden" id="sessionEditId">
+                <div class="form-group">
+                    <label>所屬專案</label>
+                    <select id="sessionProjectId"></select>
+                </div>
+                <div class="form-group">
+                    <label>課程形式</label>
+                    <div style="display:flex;gap:12px;margin-top:4px;">
+                        <label
+                            style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="sessionFormat" value="onsite" checked> 實體課程
+                        </label>
+                        <label
+                            style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="sessionFormat" value="online"> 線上直播
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>日期</label>
+                    <input type="date" id="sessionDate">
+                </div>
+                <div class="form-group">
+                    <label>時間</label>
+                    <input type="text" id="sessionTime" placeholder="例：14:00 - 17:00">
+                </div>
+                <div class="form-group" id="sessionVenueGroup">
+                    <label>地點</label>
+                    <input type="text" id="sessionVenue" placeholder="例：台北市信義區某大樓 3F">
+                </div>
+                <div class="form-group" id="sessionAddressGroup">
+                    <label>地址</label>
+                    <input type="text" id="sessionAddress" placeholder="完整地址（選填）">
+                </div>
+                <div class="form-group" id="sessionStreamGroup" style="display:none;">
+                    <label>直播連結</label>
+                    <input type="url" id="sessionStreamUrl" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>交通資訊 <span style="color:#94a3b8;font-weight:400;font-size:0.78rem;">（顯示於課前須知頁）</span></label>
+                    <textarea id="sessionTransport" rows="3" placeholder="輸入交通方式，每行一項&#10;例如：捷運至中山站4號出口，步行5分鐘"
+                        style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>溫馨提醒 <span style="color:#94a3b8;font-weight:400;font-size:0.78rem;">（顯示於課前須知頁）</span></label>
+                    <textarea id="sessionReminders" rows="3" placeholder="每行一項提醒&#10;例如：請攜帶筆電與充電器"
+                        style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea>
+                </div>
+                <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div>
+                        <label>群組連結 URL</label>
+                        <input type="url" id="sessionGroupUrl" placeholder="https://lin.ee/...">
+                    </div>
+                    <div>
+                        <label>群組按鈕文字</label>
+                        <input type="text" id="sessionGroupLabel" placeholder="例如：加入 LINE 群組">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>人數上限</label>
+                    <input type="number" id="sessionCapacity" value="30" min="1">
+                </div>
+                <div class="form-group">
+                    <label>課程狀態</label>
+                    <select id="sessionPhase">
+                        <option value="pre-class">課前</option>
+                        <option value="in-class">進行中</option>
+                        <option value="post-class">已結束</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id="sessionDeleteWrap" class="hidden" style="display:inline-flex;gap:6px;align-items:center;">
+                    <button class="btn btn-danger" id="sessionDelete" style="font-size:0.82rem;">刪除場次</button>
+                    <button class="btn btn-danger" id="sessionDeleteConfirm"
+                        style="display:none;font-size:0.82rem;background:#dc2626;">確定刪除</button>
+                    <button class="btn" id="sessionDeleteCancel" style="display:none;font-size:0.82rem;">取消</button>
+                </span>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('sessionModal')">取消</button>
+                    <button class="btn btn-dark" id="sessionSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal-overlay" id="addStudentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>新增學員</h3>
+                <button class="modal-close" onclick="closeModal('addStudentModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" id="addStudentName" placeholder="學員姓名">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="addStudentEmail" placeholder="example@email.com">
+                </div>
+                <div class="form-group">
+                    <label>公司</label>
+                    <input type="text" id="addStudentCompany" placeholder="選填">
+                </div>
+                <div class="form-group">
+                    <label>分配場次</label>
+                    <select id="addStudentSession"></select>
+                </div>
+                <div class="form-group">
+                    <label>初始狀態</label>
+                    <select id="addStudentStatus">
+                        <option value="purchased">已購買</option>
+                        <option value="registered" selected>已報名</option>
+                        <option value="attended">已出席</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div></div>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('addStudentModal')">取消</button>
+                    <button class="btn btn-dark" id="addStudentSave">新增</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Modal -->
+    <div class="modal-overlay" id="assignmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="assignmentModalTitle">新增作業</h3>
+                <button class="modal-close" onclick="closeModal('assignmentModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="assignmentEditId">
+                <div class="form-group">
+                    <label>所屬場次</label>
+                    <select id="assignmentSessionId"></select>
+                </div>
+                <div class="form-group">
+                    <label>作業標題</label>
+                    <input type="text" id="assignmentTitle" placeholder="例：AI 工具實作報告">
+                </div>
+                <div class="form-group">
+                    <label>說明</label>
+                    <textarea id="assignmentDesc" placeholder="選填，作業說明或要求"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>類型</label>
+                    <select id="assignmentType">
+                        <option value="text">文字</option>
+                        <option value="file">檔案上傳</option>
+                        <option value="url">連結</option>
+                        <option value="mixed">混合</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>繳交期限</label>
+                    <input type="datetime-local" id="assignmentDueDate">
+                </div>
+                <div class="form-group">
+                    <label>排序</label>
+                    <input type="number" id="assignmentSortOrder" value="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger hidden" id="assignmentDelete">刪除作業</button>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('assignmentModal')">取消</button>
+                    <button class="btn btn-dark" id="assignmentSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submissions Detail Modal -->
+    <div class="modal-overlay" id="submissionsModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h3 id="submissionsModalTitle">繳交情況</h3>
+                <button class="modal-close" onclick="closeModal('submissionsModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body modal-body-scroll" id="submissionsModalBody">
+                載入中…
+            </div>
+            <div class="modal-footer">
+                <div></div>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('submissionsModal')">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Project Modal -->
+    <div class="modal-overlay" id="createProjectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>建立專案</h3>
+                <button class="modal-close" onclick="closeModal('createProjectModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>專案分類 <span style="color:#dc2626">*</span></label>
+                    <select id="createProjectCategory">
+                        <option value="course">公開課程</option>
+                        <option value="corporate">企業內訓</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>課程名稱 <span style="color:#dc2626">*</span></label>
+                    <input type="text" id="createName" placeholder="例：AI 職場應用工作坊">
+                </div>
+                <div class="form-group">
+                    <label>說明</label>
+                    <textarea id="createDesc" placeholder="選填"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>課程類型</label>
+                    <select id="createType">
+                        <option value="ai-workplace">AI 職場應用</option>
+                        <option value="ai-basics">AI 基礎</option>
+                        <option value="ai-advanced">AI 進階</option>
+                        <option value="workshop">實戰工作坊</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>簡報模式</label>
+                    <div style="display:flex;gap:12px;margin-top:4px;">
+                        <label
+                            style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="createSlideMode" value="internal" checked> 互動式簡報系統
+                        </label>
+                        <label
+                            style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="createSlideMode" value="external"> 外部連結
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="createExternalUrlGroup" style="display:none;">
+                    <label>簡報網址</label>
+                    <input type="url" id="createCourseLink" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>講師</label>
+                    <input type="text" id="createInstructor" placeholder="選填">
+                </div>
+                <div class="form-group">
+                    <label>Teachify Course ID</label>
+                    <input type="text" id="createCourseId" placeholder="選填">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div></div>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('createProjectModal')">取消</button>
+                    <button class="btn btn-dark" id="createProjectSave">建立</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        // Category filter (no more URL-based type separation)
+        let selectedCategory = '';
+
+        let projects = [];
+        let sessions = [];
+        let students = [];
+        let purchases = [];
+        let assignments = [];
+
+
+        // ── Init ──
+        async function init() {
+            bindTabs();
+            bindModals();
+
+            // 先嘗試載入，如果全部失敗就重試一次
+            let retries = 0;
+            const maxRetries = 2;
+
+            async function loadAll() {
+                await Promise.allSettled([
+                    loadProjects(),
+                    loadSessions(),
+                    loadStudents(),
+                    loadPurchases(),
+                    loadAssignments()
+                ]);
+            }
+
+            await loadAll();
+
+            // 如果所有都是空的，可能是網路延遲，重試一次
+            if (projects.length === 0 && sessions.length === 0 && students.length === 0) {
+                retries++;
+                if (retries <= maxRetries) {
+                    await new Promise(r => setTimeout(r, 800));
+                    await loadAll();
+                }
+            }
+
+            renderProjects();
+            renderSessionTable();
+            renderStudentTable();
+            renderPurchaseTable();
+            renderAssignmentTable();
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('statProjects').textContent = projects.length;
+            document.getElementById('statSessions').textContent = sessions.length;
+            document.getElementById('statStudents').textContent = students.length;
+            document.getElementById('statPurchases').textContent = purchases.length;
+        }
+
+        // ── Tabs ──
+        function bindTabs() {
+            document.querySelectorAll('.main-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                });
+            });
+        }
+
+        // ── Projects ──
+        async function loadProjects() {
+            try {
+                const { data, error } = await db.select('projects', {
+                    order: 'created_at.desc'
+                });
+                if (error) throw error;
+                projects = data || [];
+            } catch (e) {
+                console.error('loadProjects error:', e);
+                projects = [];
+            }
+        }
+
+        function renderProjects(filter = '') {
+            const grid = document.getElementById('projectGrid');
+            const catFilter = document.getElementById('projectCategoryFilter')?.value || '';
+            let filtered = projects;
+            if (catFilter) filtered = filtered.filter(p => (p.type || 'course') === catFilter);
+            if (filter) filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(filter.toLowerCase()));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">folder_off</span>${filter || catFilter ? '沒有符合的結果' : '尚無課程'}</div>`;
+                return;
+            }
+
+            const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
+            const catLabel = { 'course': '公開課程', 'corporate': '企業內訓' };
+
+            grid.className = 'project-tree';
+            grid.innerHTML = filtered.map(p => {
+                const projectSessions = sessions.filter(s => s.project_id === p.id);
+                // Phase 由場次推算：有任何 in-class → 進行中；全部 post-class → 已結束；否則課前
+                const sessionPhases = projectSessions.map(s => s.current_phase || 'pre-class');
+                const phase = sessionPhases.includes('in-class') ? 'in-class'
+                    : (sessionPhases.length > 0 && sessionPhases.every(ph => ph === 'post-class')) ? 'post-class'
+                        : 'pre-class';
+                const pType = p.type || 'course';
+                const date = p.created_at ? new Date(p.created_at).toLocaleDateString('zh-TW') : '';
+                const onlineCount = projectSessions.filter(s => s.session_format === 'online').length;
+                const offlineCount = projectSessions.length - onlineCount;
+                const sessionSummary = projectSessions.length > 0
+                    ? [offlineCount > 0 ? `實體 ${offlineCount}` : '', onlineCount > 0 ? `直播 ${onlineCount}` : ''].filter(Boolean).join(' · ')
+                    : '尚無場次';
+
+                // Session sub-rows
+                const sessionRows = projectSessions.length > 0
+                    ? projectSessions.map(s => {
+                        const isOnline = s.session_format === 'online';
+                        const fmtTag = isOnline
+                            ? '<span class="fmt-tag fmt-online">直播</span>'
+                            : '<span class="fmt-tag fmt-offline">實體</span>';
+                        const loc = isOnline
+                            ? (s.stream_url ? `<a href="${s.stream_url}" target="_blank" class="stream-link">直播連結</a>` : '—')
+                            : (s.venue || '—');
+                        return `<div class="tree-session">
+                            <span class="session-dot ${s.current_phase || 'pre-class'}"></span>
+                            ${fmtTag}
+                            <span class="tree-session-date">${s.date || '未設定'} ${s.time || ''}</span>
+                            <span class="tree-session-loc">${loc}</span>
+                            <span class="tree-session-code">${s.session_code || ''}</span>
+                            <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}&session=${s.session_code}" title="管理">
+                                <span class="material-symbols-outlined">settings</span>
+                            </a>
+                        </div>`;
+                    }).join('')
+                    : '<div class="tree-session tree-empty">尚無場次</div>';
+
+                return `
+                <div class="tree-project" data-id="${p.id}">
+                    <div class="tree-row">
+                        <button class="tree-toggle" data-target="children-${p.id}" title="展開場次">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                        <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
+                        <span class="tree-name">${p.name || '未命名'}</span>
+                        <span class="card-phase ${phase}"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
+                        <span class="tree-meta">${sessionSummary}</span>
+                        <span class="card-code" data-code="${p.join_code}" title="點擊複製入口連結">${p.join_code}</span>
+                        <span class="tree-date">${date}</span>
+                        <div class="tree-actions">
+                            <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}" title="課前管理"><span class="material-symbols-outlined">assignment</span></a>
+                            <a class="btn btn-sm" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')" title="學習追蹤"><span class="material-symbols-outlined">mail</span></a>
+                            ${p.slide_mode === 'external' && p.course_link
+                        ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank" title="簡報"><span class="material-symbols-outlined">open_in_new</span></a>`
+                        : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="localStorage.setItem('current_project_id','${p.id}')" title="簡報"><span class="material-symbols-outlined">slideshow</span></a>`
+                    }
+                            <button class="btn btn-sm" data-edit="${p.id}" title="設定"><span class="material-symbols-outlined">edit</span></button>
+                            <button class="btn btn-sm" data-copy="${p.id}" title="複製專案"><span class="material-symbols-outlined">content_copy</span></button>
+                            <button class="btn btn-sm" onclick="openAddSession('${p.id}')" title="新增場次"><span class="material-symbols-outlined">add</span></button>
+                        </div>
+                    </div>
+                    <div class="tree-children" id="children-${p.id}">
+                        ${sessionRows}
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Bind tree toggle
+            grid.querySelectorAll('.tree-toggle').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = document.getElementById(btn.dataset.target);
+                    const isOpen = target.classList.toggle('open');
+                    btn.classList.toggle('open', isOpen);
+                });
+            });
+
+            // Auto-expand first 3 projects
+            const toggleBtns = grid.querySelectorAll('.tree-toggle');
+            for (let i = 0; i < Math.min(3, toggleBtns.length); i++) {
+                const btn = toggleBtns[i];
+                const target = document.getElementById(btn.dataset.target);
+                if (target) {
+                    target.classList.add('open');
+                    btn.classList.add('open');
+                }
+            }
+
+            // Bind card-code copy
+            grid.querySelectorAll('.card-code').forEach(el => {
+                el.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const code = el.dataset.code;
+                    const url = `${location.origin}/portal.html?code=${code}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                        el.classList.add('copied');
+                        const orig = el.textContent;
+                        el.textContent = '已複製';
+                        showToast('入口連結已複製');
+                        setTimeout(() => { el.classList.remove('copied'); el.textContent = orig; }, 1500);
+                    });
+                });
+            });
+
+            // Bind edit buttons
+            grid.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', () => openEdit(btn.dataset.edit));
+            });
+
+            // Bind copy button
+            grid.querySelectorAll('[data-copy]').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const id = btn.dataset.copy;
+                    const proj = projects.find(p => p.id === id);
+                    if (!proj) return;
+
+                    if (!confirm(`確定要複製專案「${proj.name}」嗎？\n(將會複製專案設定與簡報內容，場次與學員不會被複製)`)) return;
+
+                    try {
+                        // Create a clone excluding db-generated fields
+                        const { id: _id, created_at, updated_at, ...cloneData } = proj;
+                        cloneData.name = `[複製] ${proj.name}`;
+                        cloneData.join_code = generateCode(6);
+
+                        // Handle potential unique constraint errors on join_code? Let DB handle or trust random
+                        await db.insert('projects', cloneData);
+                        await loadProjects();
+                        renderProjects();
+                        updateStats();
+                        showToast('專案已複製');
+                    } catch (e) {
+                        showToast('複製失敗：' + e.message);
+                    }
+                });
+            });
+        }
+
+        // ── Sessions ──
+        async function loadSessions() {
+            try {
+                const { data, error } = await db.select('project_sessions', { order: 'date.desc' });
+                if (error) throw error;
+                sessions = data || [];
+            } catch (e) {
+                document.getElementById('sessionTableBody').innerHTML =
+                    `<tr><td colspan="8" class="td-error">${e.message}</td></tr>`;
+            }
+        }
+
+        function renderSessionTable(filter = '') {
+            const tbody = document.getElementById('sessionTableBody');
+            let filtered = sessions;
+            if (filter) {
+                const q = filter.toLowerCase();
+                filtered = sessions.filter(s =>
+                    (s.session_code || '').toLowerCase().includes(q) ||
+                    (s.venue || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="td-empty">${filter ? '沒有符合的結果' : '尚無場次'}</td></tr>`;
+                return;
+            }
+
+            const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
+
+            tbody.innerHTML = filtered.map(s => {
+                const proj = projects.find(p => p.id === s.project_id);
+                const phase = s.current_phase || 'pre-class';
+                return `<tr>
+                    <td>${proj?.name || '-'}</td>
+                    <td><span class="session-code">${s.session_code || '-'}</span></td>
+                    <td>${s.date || '-'}</td>
+                    <td>${s.time || '-'}</td>
+                    <td>${s.venue || '-'}</td>
+                    <td><span class="status-badge ${phase === 'in-class' ? 'paid' : ''}">${phaseLabel[phase]}</span></td>
+                    <td>${s.max_capacity || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="editSession('${s.id}')">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Students ──
+        async function loadStudents() {
+            try {
+                const { data, error } = await db.select('students', { order: 'created_at.desc' });
+                if (error) throw error;
+                students = data || [];
+
+                // 合併未同步的購買紀錄（purchased + 尚未建立 student 的）
+                const courseIds = [...new Set(projects.map(p => p.course_id).filter(Boolean))];
+                if (courseIds.length > 0) {
+                    const { data: purchases } = await db.select('purchases', {
+                        filter: { synced_to_session: 'eq.false' },
+                        order: 'created_at.desc'
+                    });
+                    if (purchases?.length > 0) {
+                        const existingEmails = new Set(students.map(s => s.email?.toLowerCase()));
+                        for (const p of purchases) {
+                            // 只合併 course_id 匹配且 email 不重複的
+                            if (courseIds.includes(p.course_id) && !existingEmails.has(p.email?.toLowerCase())) {
+                                students.push({
+                                    id: p.id,
+                                    email: p.email,
+                                    name: p.name || p.buyer_name || '',
+                                    company: p.company || '',
+                                    registration_status: 'purchased',
+                                    created_at: p.created_at,
+                                    order_id: p.order_id,
+                                    purchase_id: p.id,
+                                    session_id: null,
+                                    session_code: '',
+                                    _fromPurchase: true // 標記來源
+                                });
+                                existingEmails.add(p.email?.toLowerCase());
+                            }
+                        }
+                    }
+                }
+
+                populateStudentSessionFilter();
+            } catch (e) {
+                document.getElementById('studentTableBody').innerHTML =
+                    `<tr><td colspan="7" class="td-error">${e.message}</td></tr>`;
+            }
+        }
+
+        function populateStudentSessionFilter() {
+            const sel = document.getElementById('studentSessionFilter');
+            sel.innerHTML = '<option value="">所有場次</option>';
+            sessions.forEach(s => {
+                const proj = projects.find(p => p.id === s.project_id);
+                const label = `${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})`;
+                sel.innerHTML += `<option value="${s.id}">${label}</option>`;
+            });
+        }
+
+        function getSessionLabel(student) {
+            // Try session_id FK first, fallback to session_code
+            if (student.session_id) {
+                const sess = sessions.find(s => s.id === student.session_id);
+                if (sess) {
+                    const proj = projects.find(p => p.id === sess.project_id);
+                    return `${sess.date || ''} ${sess.venue || ''}`;
+                }
+            }
+            return student.session_code || '-';
+        }
+
+        function renderStudentTable() {
+            const tbody = document.getElementById('studentTableBody');
+            const searchVal = document.getElementById('studentSearch').value.toLowerCase();
+            const sessionFilter = document.getElementById('studentSessionFilter').value;
+            const statusFilter = document.getElementById('studentStatusFilter').value;
+
+            let filtered = students;
+
+            if (searchVal) {
+                filtered = filtered.filter(s =>
+                    (s.name || '').toLowerCase().includes(searchVal) ||
+                    (s.email || '').toLowerCase().includes(searchVal) ||
+                    (s.company || '').toLowerCase().includes(searchVal)
+                );
+            }
+            if (sessionFilter) {
+                filtered = filtered.filter(s => s.session_id === sessionFilter);
+            }
+            if (statusFilter) {
+                filtered = filtered.filter(s => (s.registration_status || 'registered') === statusFilter);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="td-empty">${searchVal || sessionFilter || statusFilter ? '沒有符合的結果' : '尚無學員'}</td></tr>`;
+                return;
+            }
+
+            const statusLabel = { purchased: '已購買', registered: '已報名', attended: '已出席' };
+            const nextStatus = { purchased: 'registered', registered: 'attended', attended: 'attended' };
+            const nextAction = { purchased: '標記報名', registered: '標記出席', attended: null };
+
+            tbody.innerHTML = filtered.map(s => {
+                const status = s.registration_status || 'registered';
+                const initial = (s.name || '?')[0];
+                const sessLabel = getSessionLabel(s);
+                const actionBtn = nextAction[status]
+                    ? `<button class="status-toggle" onclick="advanceStatus('${s.id}', '${nextStatus[status]}')">
+                        <span class="material-symbols-outlined">arrow_forward</span> ${nextAction[status]}
+                       </button>`
+                    : `<span style="color:#10b981;font-size:0.7rem;">✓ 完成</span>`;
+
+                return `<tr>
+                    <td>
+                        <div class="student-detail">
+                            <div class="student-avatar">${initial}</div>
+                            <div class="student-name-col">
+                                <div>${s.name || '-'}</div>
+                                ${s.order_id ? `<small>訂單 ${s.order_id}</small>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>${s.email || '-'}</td>
+                    <td>${sessLabel}</td>
+                    <td>${s.company || '-'}</td>
+                    <td>${s.group_name || '-'}</td>
+                    <td><span class="status-badge ${status}">${statusLabel[status] || status}</span></td>
+                    <td>${actionBtn}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Advance student registration status
+        window.advanceStatus = async function (studentId, newStatus) {
+            try {
+                const updateData = { registration_status: newStatus };
+                if (newStatus === 'registered') updateData.registered_at = new Date().toISOString();
+                if (newStatus === 'attended') updateData.attended_at = new Date().toISOString();
+
+                await db.update('students', updateData, { id: `eq.${studentId}` });
+                const s = students.find(x => x.id === studentId);
+                if (s) Object.assign(s, updateData);
+                renderStudentTable();
+                updateStats();
+                showToast(`已更新為${newStatus === 'registered' ? '已報名' : '已出席'}`);
+            } catch (e) {
+                showToast('操作失敗：' + e.message);
+            }
+        };
+
+        // ── Purchases ──
+        async function loadPurchases() {
+            try {
+                const { data, error } = await db.select('purchases', { order: 'created_at.desc' });
+                if (error) throw error;
+                purchases = data || [];
+            } catch (e) {
+                document.getElementById('purchaseTableBody').innerHTML =
+                    `<tr><td colspan="8" class="td-error">${e.message}</td></tr>`;
+            }
+        }
+
+        function renderPurchaseTable(filter = '') {
+            const tbody = document.getElementById('purchaseTableBody');
+            let filtered = purchases;
+            if (filter) {
+                const q = filter.toLowerCase();
+                filtered = purchases.filter(p =>
+                    (p.email || '').toLowerCase().includes(q) ||
+                    (p.order_id || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="td-empty">${filter ? '沒有符合的結果' : '尚無訂單'}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => {
+                const state = p.payment_state || 'paid';
+                return `<tr>
+                    <td>${p.email || '-'}</td>
+                    <td>${p.name || '-'}</td>
+                    <td style="font-family:monospace;font-size:0.72rem;">${p.order_id || '-'}</td>
+                    <td>$${Number(p.amount || 0).toLocaleString()}</td>
+                    <td><span class="status-badge ${state}">${state === 'refunded' ? '已退款' : '已付款'}</span></td>
+                    <td>${Number(p.refunded_amount || 0) > 0 ? `$${Number(p.refunded_amount).toLocaleString()}` : '-'}</td>
+                    <td>${p.synced_to_session ? '✓' : '-'}</td>
+                    <td>${p.created_at ? new Date(p.created_at).toLocaleDateString('zh-TW') : '-'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Search binding ──
+
+        document.getElementById('projectSearch').addEventListener('input', e => renderProjects(e.target.value));
+        document.getElementById('projectCategoryFilter').addEventListener('change', () => renderProjects(document.getElementById('projectSearch').value));
+        document.getElementById('sessionSearch').addEventListener('input', e => renderSessionTable(e.target.value));
+        document.getElementById('studentSearch').addEventListener('input', () => renderStudentTable());
+        document.getElementById('studentSessionFilter').addEventListener('change', () => renderStudentTable());
+        document.getElementById('studentStatusFilter').addEventListener('change', () => renderStudentTable());
+        document.getElementById('purchaseSearch').addEventListener('input', e => renderPurchaseTable(e.target.value));
+        document.getElementById('assignmentSearch').addEventListener('input', () => renderAssignments());
+        document.getElementById('assignmentSessionFilter').addEventListener('change', () => renderAssignments());
+
+        // Create Project
+        document.getElementById('btnCreateProject').addEventListener('click', () => {
+            document.getElementById('createName').value = '';
+            document.getElementById('createDesc').value = '';
+            document.getElementById('createType').value = 'ai-workplace';
+            document.getElementById('createInstructor').value = '';
+            document.getElementById('createCourseId').value = '';
+            // Pre-select category from current filter
+            const catFilter = document.getElementById('projectCategoryFilter')?.value;
+            if (catFilter) document.getElementById('createProjectCategory').value = catFilter;
+            // Show/hide course_id based on category
+            const catSel = document.getElementById('createProjectCategory');
+            const courseIdGroup = document.getElementById('createCourseId')?.closest('.form-group');
+            const updateCourseIdVis = () => { if (courseIdGroup) courseIdGroup.style.display = catSel.value === 'corporate' ? 'none' : ''; };
+            catSel.onchange = updateCourseIdVis;
+            updateCourseIdVis();
+            document.getElementById('createProjectModal').classList.add('active');
+        });
+
+        document.getElementById('createProjectSave').addEventListener('click', async () => {
+            const name = document.getElementById('createName').value.trim();
+            if (!name) { showToast('請輸入課程名稱'); return; }
+            const description = document.getElementById('createDesc').value.trim();
+            const course_type = document.getElementById('createType').value;
+            const instructor = document.getElementById('createInstructor').value.trim();
+            const course_id = document.getElementById('createCourseId').value.trim();
+            const slide_mode = document.querySelector('input[name="createSlideMode"]:checked')?.value || 'internal';
+            const course_link = document.getElementById('createCourseLink').value.trim();
+            const join_code = generateCode(6);
+            try {
+                const projectCategory = document.getElementById('createProjectCategory').value;
+                await db.insert('projects', { name, description, course_type, instructor, course_id: projectCategory === 'corporate' ? '' : course_id, slide_mode, course_link, join_code, current_phase: 'pre-class', type: projectCategory });
+                await Promise.all([loadProjects(), loadSessions()]);
+                updateStats();
+                closeModal('createProjectModal');
+                showToast('專案已建立');
+            } catch (e) {
+                showToast('建立失敗：' + e.message);
+            }
+        });
+
+        document.getElementById('btnRefreshProjects').addEventListener('click', async () => {
+            await Promise.all([loadProjects(), loadSessions()]);
+            updateStats();
+            showToast('已重新整理');
+        });
+        document.getElementById('btnRefreshStudents').addEventListener('click', async () => {
+            await loadStudents();
+            updateStats();
+            showToast('已重新整理');
+        });
+
+        // Add Student
+        document.getElementById('btnAddStudent').addEventListener('click', () => {
+            document.getElementById('addStudentName').value = '';
+            document.getElementById('addStudentEmail').value = '';
+            document.getElementById('addStudentCompany').value = '';
+            const sel = document.getElementById('addStudentSession');
+            sel.innerHTML = '<option value="">不分配場次</option>';
+            sessions.forEach(s => {
+                const proj = projects.find(p => p.id === s.project_id);
+                sel.innerHTML += `<option value="${s.id}">${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})</option>`;
+            });
+            document.getElementById('addStudentModal').classList.add('active');
+        });
+
+        document.getElementById('addStudentSave').addEventListener('click', async () => {
+            const name = document.getElementById('addStudentName').value.trim();
+            const email = document.getElementById('addStudentEmail').value.trim();
+            const company = document.getElementById('addStudentCompany').value.trim();
+            const session_id = document.getElementById('addStudentSession').value || null;
+            const registration_status = document.getElementById('addStudentStatus').value;
+            if (!name || !email) { showToast('請填入姓名和 Email'); return; }
+
+            // Determine session_code from session_id for backward compat
+            let session_code = '';
+            if (session_id) {
+                const sess = sessions.find(s => s.id === session_id);
+                session_code = sess?.session_code || '';
+            }
+
+            try {
+                await db.insert('students', {
+                    name, email, company, session_id, session_code,
+                    registration_status,
+                    registered_at: registration_status !== 'purchased' ? new Date().toISOString() : null,
+                    attended_at: registration_status === 'attended' ? new Date().toISOString() : null
+                });
+                await loadStudents();
+                updateStats();
+                closeModal('addStudentModal');
+                showToast('學員已新增');
+            } catch (e) {
+                showToast('新增失敗：' + e.message);
+            }
+        });
+        document.getElementById('btnRefreshPurchases').addEventListener('click', async () => {
+            await loadPurchases();
+            updateStats();
+            showToast('已重新整理');
+        });
+        document.getElementById('btnRefreshAssignments').addEventListener('click', async () => {
+            await loadAssignments();
+            showToast('已重新整理');
+        });
+
+        // ── Assignments ──
+        async function loadAssignments() {
+            try {
+                const { data, error } = await db.select('session_assignments', { order: 'sort_order.asc,created_at.desc' });
+                if (error) throw error;
+                assignments = data || [];
+                populateAssignmentSessionFilter();
+                renderAssignments();
+            } catch (e) {
+                document.getElementById('assignmentGrid').innerHTML =
+                    `<div class="empty-state"><span class="material-symbols-outlined">error</span>${e.message}</div>`;
+            }
+        }
+
+        function populateAssignmentSessionFilter() {
+            const sel = document.getElementById('assignmentSessionFilter');
+            sel.innerHTML = '<option value="">所有場次</option>';
+            sessions.forEach(s => {
+                const proj = projects.find(p => p.id === s.project_id);
+                const label = `${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})`;
+                sel.innerHTML += `<option value="${s.id}">${label}</option>`;
+            });
+        }
+
+        function renderAssignments() {
+            const grid = document.getElementById('assignmentGrid');
+            const searchVal = (document.getElementById('assignmentSearch').value || '').toLowerCase();
+            const sessionFilter = document.getElementById('assignmentSessionFilter').value;
+
+            let filtered = assignments;
+            if (searchVal) {
+                filtered = filtered.filter(a => (a.title || '').toLowerCase().includes(searchVal));
+            }
+            if (sessionFilter) {
+                filtered = filtered.filter(a => a.session_id === sessionFilter);
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">assignment</span>${searchVal || sessionFilter ? '沒有符合的結果' : '尚無作業，點擊「新增作業」開始'}</div>`;
+                return;
+            }
+
+            const typeLabel = { text: '文字', file: '檔案', url: '連結', mixed: '混合' };
+
+            grid.innerHTML = filtered.map(a => {
+                const sess = sessions.find(s => s.id === a.session_id);
+                const proj = sess ? projects.find(p => p.id === sess.project_id) : null;
+                const sessLabel = sess ? `${sess.date || '未定'} ${sess.venue || ''}` : '未知場次';
+                const projName = proj?.name || '';
+                const dueStr = a.due_date ? new Date(a.due_date).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '無期限';
+
+                // Count submissions for this assignment title + session
+                const sessionCode = sess?.session_code || '';
+                const sessionStudents = students.filter(st => st.session_id === a.session_id);
+                const totalStudents = sessionStudents.length;
+
+                return `
+                <div class="assignment-card" data-assignment-id="${a.id}">
+                    <div class="assignment-card-body">
+                        <div class="assignment-card-title">
+                            ${a.title || '未命名作業'}
+                            <span class="assignment-type-tag">${typeLabel[a.type] || a.type}</span>
+                        </div>
+                        ${a.description ? `<div style="font-size:0.75rem;color:#888;margin-top:2px;">${a.description}</div>` : ''}
+                        <div class="assignment-card-meta">
+                            <span><span class="material-symbols-outlined">folder</span> ${projName}</span>
+                            <span><span class="material-symbols-outlined">event</span> ${sessLabel}</span>
+                            <span><span class="material-symbols-outlined">schedule</span> 繳交期限：${dueStr}</span>
+                        </div>
+                        <div class="assignment-stat">
+                            <div class="assignment-stat-item">
+                                <span class="material-symbols-outlined" style="font-size:0.9rem;">group</span>
+                                學員：<strong>${totalStudents}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="assignment-card-footer">
+                        <button class="card-action" onclick="viewSubmissions('${a.id}')">
+                            <span class="material-symbols-outlined">visibility</span> 繳交情況
+                        </button>
+                        <button class="card-action" onclick="editAssignment('${a.id}')">
+                            <span class="material-symbols-outlined">edit</span> 編輯
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Add Assignment
+        document.getElementById('btnAddAssignment').addEventListener('click', () => {
+            document.getElementById('assignmentModalTitle').textContent = '新增作業';
+            document.getElementById('assignmentEditId').value = '';
+            document.getElementById('assignmentTitle').value = '';
+            document.getElementById('assignmentDesc').value = '';
+            document.getElementById('assignmentType').value = 'text';
+            document.getElementById('assignmentDueDate').value = '';
+            document.getElementById('assignmentSortOrder').value = '0';
+            document.getElementById('assignmentDelete').classList.add('hidden');
+
+            const sel = document.getElementById('assignmentSessionId');
+            sel.innerHTML = sessions.map(s => {
+                const proj = projects.find(p => p.id === s.project_id);
+                return `<option value="${s.id}">${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})</option>`;
+            }).join('');
+
+            // Pre-select if filtered
+            const currentFilter = document.getElementById('assignmentSessionFilter').value;
+            if (currentFilter) sel.value = currentFilter;
+
+            document.getElementById('assignmentModal').classList.add('active');
+        });
+
+        window.editAssignment = function (id) {
+            const a = assignments.find(x => x.id === id);
+            if (!a) return;
+            document.getElementById('assignmentModalTitle').textContent = '編輯作業';
+            document.getElementById('assignmentEditId').value = id;
+            document.getElementById('assignmentTitle').value = a.title || '';
+            document.getElementById('assignmentDesc').value = a.description || '';
+            document.getElementById('assignmentType').value = a.type || 'text';
+            document.getElementById('assignmentSortOrder').value = a.sort_order || 0;
+            document.getElementById('assignmentDelete').classList.remove('hidden');
+
+            if (a.due_date) {
+                const d = new Date(a.due_date);
+                const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                document.getElementById('assignmentDueDate').value = local;
+            } else {
+                document.getElementById('assignmentDueDate').value = '';
+            }
+
+            const sel = document.getElementById('assignmentSessionId');
+            sel.innerHTML = sessions.map(s => {
+                const proj = projects.find(p => p.id === s.project_id);
+                return `<option value="${s.id}" ${s.id === a.session_id ? 'selected' : ''}>${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})</option>`;
+            }).join('');
+
+            document.getElementById('assignmentModal').classList.add('active');
+        };
+
+        window.viewSubmissions = async function (assignmentId) {
+            const a = assignments.find(x => x.id === assignmentId);
+            if (!a) return;
+            const sess = sessions.find(s => s.id === a.session_id);
+
+            document.getElementById('submissionsModalTitle').textContent = `${a.title} — 繳交情況`;
+            document.getElementById('submissionsModalBody').innerHTML = '載入中…';
+            document.getElementById('submissionsModal').classList.add('active');
+
+            try {
+                // Fetch submissions matching assignment_title + session
+                const sessionCode = sess?.session_code || '';
+                const { data: subs, error } = await db.select('submissions', {
+                    filter: { assignment_title: `eq.${a.title}`, session_id: `eq.${sessionCode}` },
+                    order: 'created_at.desc'
+                });
+                if (error) throw error;
+
+                const body = document.getElementById('submissionsModalBody');
+                if (!subs || subs.length === 0) {
+                    body.innerHTML = '<div class="empty-state" style="padding:30px;"><span class="material-symbols-outlined">inbox</span>尚無繳交紀錄</div>';
+                    return;
+                }
+
+                body.innerHTML = `
+                    <div style="margin-bottom:8px;font-size:0.78rem;color:#888;">共 ${subs.length} 筆繳交</div>
+                    <table class="sub-detail-table">
+                        <thead><tr><th>學員</th><th>類型</th><th>內容</th><th>時間</th></tr></thead>
+                        <tbody>
+                            ${subs.map(sub => {
+                    let content = sub.content || '';
+                    if (sub.file_url) {
+                        content = `<a href="${sub.file_url}" target="_blank" style="color:#0369a1;">查看檔案</a>`;
+                    } else if (content.length > 60) {
+                        content = content.substring(0, 60) + '…';
+                    }
+                    const time = sub.submitted_at || sub.created_at;
+                    const timeStr = time ? new Date(time).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+                    return `<tr>
+                                    <td>${sub.student_name || '-'}</td>
+                                    <td><span class="assignment-type-tag">${sub.type || '-'}</span></td>
+                                    <td>${content || '-'}</td>
+                                    <td>${timeStr}</td>
+                                </tr>`;
+                }).join('')}
+                        </tbody>
+                    </table>`;
+            } catch (e) {
+                document.getElementById('submissionsModalBody').innerHTML = `<div style="color:#dc2626;">${e.message}</div>`;
+            }
+        };
+
+        // ── Edit Project ──
+        function openEdit(id) {
+            const p = projects.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = p.name || '';
+            document.getElementById('editDesc').value = p.description || '';
+            document.getElementById('editType').value = p.course_type || 'ai-workplace';
+            document.getElementById('editCourseId').value = p.course_id || '';
+            // Hide course_id for corporate mode
+            const editCourseGroup = document.getElementById('editCourseId')?.closest('.form-group');
+            if (editCourseGroup) editCourseGroup.style.display = (p.type === 'corporate') ? 'none' : '';
+
+            // Slide mode
+            const mode = p.slide_mode || 'internal';
+            document.querySelector(`input[name="editSlideMode"][value="${mode}"]`).checked = true;
+            document.getElementById('editCourseLink').value = p.course_link || '';
+            document.getElementById('editExternalUrlGroup').style.display = mode === 'external' ? '' : 'none';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        // ── Session Modal ──
+        window.openAddSession = function (projectId) {
+            document.getElementById('sessionModalTitle').textContent = '新增場次';
+            document.getElementById('sessionEditId').value = '';
+            document.getElementById('sessionDate').value = '';
+            document.getElementById('sessionTime').value = '';
+            document.getElementById('sessionVenue').value = '';
+            document.getElementById('sessionAddress').value = '';
+            document.getElementById('sessionStreamUrl').value = '';
+            document.getElementById('sessionTransport').value = '';
+            document.getElementById('sessionReminders').value = '';
+            document.getElementById('sessionGroupUrl').value = '';
+            document.getElementById('sessionGroupLabel').value = '';
+            document.getElementById('sessionCapacity').value = '30';
+            document.getElementById('sessionPhase').value = 'pre-class';
+            document.getElementById('sessionDeleteWrap').classList.add('hidden');
+
+            // Default to onsite
+            document.querySelector('input[name="sessionFormat"][value="onsite"]').checked = true;
+            toggleSessionFormat('onsite');
+
+            // Populate project dropdown
+            const sel = document.getElementById('sessionProjectId');
+            sel.innerHTML = projects.map(p =>
+                `<option value="${p.id}" ${p.id === projectId ? 'selected' : ''}>${p.name || '未命名'}</option>`
+            ).join('');
+
+            document.getElementById('sessionModal').classList.add('active');
+        };
+
+        window.editSession = function (id) {
+            const s = sessions.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('sessionModalTitle').textContent = '編輯場次';
+            document.getElementById('sessionEditId').value = id;
+            document.getElementById('sessionDate').value = s.date || '';
+            document.getElementById('sessionTime').value = s.time || '';
+            document.getElementById('sessionVenue').value = s.venue || '';
+            document.getElementById('sessionAddress').value = s.venue_address || '';
+            document.getElementById('sessionStreamUrl').value = s.stream_url || '';
+            document.getElementById('sessionTransport').value = s.transport_info || '';
+            document.getElementById('sessionReminders').value = s.reminders || '';
+            document.getElementById('sessionGroupUrl').value = s.group_link_url || '';
+            document.getElementById('sessionGroupLabel').value = s.group_link_label || '';
+            document.getElementById('sessionCapacity').value = s.max_capacity || 30;
+            document.getElementById('sessionPhase').value = s.current_phase || 'pre-class';
+            document.getElementById('sessionDeleteWrap').classList.remove('hidden');
+            // 重設兩段式確認狀態
+            document.getElementById('sessionDelete').style.display = '';
+            document.getElementById('sessionDeleteConfirm').style.display = 'none';
+            document.getElementById('sessionDeleteCancel').style.display = 'none';
+
+            // Session format
+            const fmt = s.session_format || 'onsite';
+            document.querySelector(`input[name="sessionFormat"][value="${fmt}"]`).checked = true;
+            toggleSessionFormat(fmt);
+
+            const sel = document.getElementById('sessionProjectId');
+            sel.innerHTML = projects.map(p =>
+                `<option value="${p.id}" ${p.id === s.project_id ? 'selected' : ''}>${p.name || '未命名'}</option>`
+            ).join('');
+
+            document.getElementById('sessionModal').classList.add('active');
+        };
+
+        // ── Toggle helpers ──
+        function toggleSessionFormat(fmt) {
+            const isOnline = fmt === 'online';
+            document.getElementById('sessionVenueGroup').style.display = isOnline ? 'none' : '';
+            document.getElementById('sessionAddressGroup').style.display = isOnline ? 'none' : '';
+            document.getElementById('sessionStreamGroup').style.display = isOnline ? '' : 'none';
+        }
+
+        // Radio change listeners — slide mode
+        document.querySelectorAll('input[name="createSlideMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('createExternalUrlGroup').style.display = r.value === 'external' ? '' : 'none';
+            });
+        });
+        document.querySelectorAll('input[name="editSlideMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('editExternalUrlGroup').style.display = r.value === 'external' ? '' : 'none';
+            });
+        });
+
+        // Radio change listeners — session format
+        document.querySelectorAll('input[name="sessionFormat"]').forEach(r => {
+            r.addEventListener('change', () => toggleSessionFormat(r.value));
+        });
+
+        function generateCode(len) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let r = '';
+            for (let i = 0; i < len; i++) r += chars[Math.floor(Math.random() * chars.length)];
+            return r;
+        }
+
+        // ── Modal bindings ──
+        function bindModals() {
+            // Edit project
+            document.getElementById('editSave').addEventListener('click', async () => {
+                const id = document.getElementById('editId').value;
+                const name = document.getElementById('editName').value.trim();
+                const description = document.getElementById('editDesc').value.trim();
+                const course_type = document.getElementById('editType').value;
+                const course_id = document.getElementById('editCourseId').value.trim();
+                const slide_mode = document.querySelector('input[name="editSlideMode"]:checked')?.value || 'internal';
+                const course_link = document.getElementById('editCourseLink').value.trim();
+                if (!name) { showToast('請輸入名稱'); return; }
+                try {
+                    await db.update('projects', { name, description, course_type, course_id, slide_mode, course_link }, { id: `eq.${id}` });
+                    const p = projects.find(x => x.id === id);
+                    if (p) { Object.assign(p, { name, description, course_type, course_id, slide_mode, course_link }); }
+                    renderProjects();
+                    closeModal('editModal');
+                    showToast('已儲存');
+                } catch (e) { showToast('儲存失敗'); }
+            });
+
+            document.getElementById('editDelete').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = document.getElementById('editId').value;
+                const p = projects.find(x => x.id === id);
+                if (!confirm(`確定刪除「${p?.name || '此課程'}」？\n所有場次和學員也會一同刪除。`)) return;
+                try {
+                    await db.delete('projects', { id: `eq.${id}` });
+                    projects = projects.filter(x => x.id !== id);
+                    renderProjects();
+                    updateStats();
+                    closeModal('editModal');
+                    showToast('已刪除');
+                } catch (e) { showToast('刪除失敗'); }
+            });
+
+            // Session save
+            document.getElementById('sessionSave').addEventListener('click', async () => {
+                const editId = document.getElementById('sessionEditId').value;
+                const projectId = document.getElementById('sessionProjectId').value;
+                const date = document.getElementById('sessionDate').value;
+                const time = document.getElementById('sessionTime').value.trim();
+                const venue = document.getElementById('sessionVenue').value.trim();
+                const venue_address = document.getElementById('sessionAddress').value.trim();
+                const max_capacity = parseInt(document.getElementById('sessionCapacity').value) || 30;
+                const session_format = document.querySelector('input[name="sessionFormat"]:checked')?.value || 'onsite';
+                const stream_url = document.getElementById('sessionStreamUrl').value.trim();
+                const transport_info = document.getElementById('sessionTransport').value.trim();
+                const reminders_val = document.getElementById('sessionReminders').value.trim();
+                const group_link_url = document.getElementById('sessionGroupUrl').value.trim();
+                const group_link_label = document.getElementById('sessionGroupLabel').value.trim();
+                const current_phase = document.getElementById('sessionPhase').value;
+
+                if (!projectId) { showToast('請選擇專案'); return; }
+
+                const sessionData = {
+                    project_id: projectId,
+                    date, time, venue, venue_address, max_capacity,
+                    session_format, stream_url,
+                    current_phase,
+                    transport_info,
+                    reminders: reminders_val,
+                    group_link_url,
+                    group_link_label
+                };
+
+                // Clear irrelevant fields
+                if (session_format === 'online') {
+                    sessionData.venue = '';
+                    sessionData.venue_address = '';
+                } else {
+                    sessionData.stream_url = '';
+                }
+
+                try {
+                    if (editId) {
+                        // Update
+                        await db.update('project_sessions', sessionData, { id: `eq.${editId}` });
+                        showToast('場次已更新');
+                    } else {
+                        // Create
+                        const proj = projects.find(p => p.id === projectId);
+                        sessionData.session_code = generateCode(6);
+                        sessionData.join_code = proj?.join_code || generateCode(6);
+                        await db.insert('project_sessions', sessionData);
+                        showToast('場次已建立');
+                    }
+                    await loadSessions();
+                    renderProjects();
+                    updateStats();
+                    closeModal('sessionModal');
+                } catch (e) {
+                    showToast('儲存失敗：' + e.message);
+                }
+            });
+
+            // 刪除場次 — 兩段式確認
+            const delBtn = document.getElementById('sessionDelete');
+            const delConfirmBtn = document.getElementById('sessionDeleteConfirm');
+            const delCancelBtn = document.getElementById('sessionDeleteCancel');
+
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                delBtn.style.display = 'none';
+                delConfirmBtn.style.display = '';
+                delCancelBtn.style.display = '';
+            });
+
+            delCancelBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                delBtn.style.display = '';
+                delConfirmBtn.style.display = 'none';
+                delCancelBtn.style.display = 'none';
+            });
+
+            delConfirmBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = document.getElementById('sessionEditId').value;
+                try {
+                    await db.delete('project_sessions', { id: `eq.${id}` });
+                    await loadSessions();
+                    renderProjects();
+                    updateStats();
+                    closeModal('sessionModal');
+                    showToast('場次已刪除');
+                } catch (err) { showToast('刪除失敗'); }
+            });
+
+            document.getElementById('btnAddSession').addEventListener('click', () => {
+                window.openAddSession(projects[0]?.id || '');
+            });
+
+            // Assignment save
+            document.getElementById('assignmentSave').addEventListener('click', async () => {
+                const editId = document.getElementById('assignmentEditId').value;
+                const session_id = document.getElementById('assignmentSessionId').value;
+                const title = document.getElementById('assignmentTitle').value.trim();
+                const description = document.getElementById('assignmentDesc').value.trim();
+                const type = document.getElementById('assignmentType').value;
+                const due_date = document.getElementById('assignmentDueDate').value || null;
+                const sort_order = parseInt(document.getElementById('assignmentSortOrder').value) || 0;
+
+                if (!session_id) { showToast('請選擇場次'); return; }
+                if (!title) { showToast('請輸入作業標題'); return; }
+
+                const assignData = { session_id, title, description, type, due_date, sort_order };
+
+                try {
+                    if (editId) {
+                        await db.update('session_assignments', assignData, { id: `eq.${editId}` });
+                        showToast('作業已更新');
+                    } else {
+                        await db.insert('session_assignments', assignData);
+                        showToast('作業已建立');
+                    }
+                    await loadAssignments();
+                    closeModal('assignmentModal');
+                } catch (e) {
+                    showToast('儲存失敗：' + e.message);
+                }
+            });
+
+            document.getElementById('assignmentDelete').addEventListener('click', async () => {
+                const id = document.getElementById('assignmentEditId').value;
+                if (!confirm('確定刪除此作業？相關繳交紀錄不會受影響。')) return;
+                try {
+                    await db.delete('session_assignments', { id: `eq.${id}` });
+                    await loadAssignments();
+                    closeModal('assignmentModal');
+                    showToast('作業已刪除');
+                } catch (e) { showToast('刪除失敗：' + e.message); }
+            });
+
+            // Close modals on overlay click (skip if native confirm is active)
+            let _confirmActive = false;
+            ['editModal', 'sessionModal', 'addStudentModal', 'assignmentModal', 'submissionsModal', 'createProjectModal'].forEach(id => {
+                document.getElementById(id).addEventListener('click', e => {
+                    if (!_confirmActive && e.target === e.currentTarget) closeModal(id);
+                });
+            });
+
+            // Patch confirm() to set flag
+            const _origConfirm = window.confirm;
+            window.confirm = function (msg) {
+                _confirmActive = true;
+                const result = _origConfirm.call(window, msg);
+                setTimeout(() => { _confirmActive = false; }, 100);
+                return result;
+            };
+        }
+
+        // ── Helpers ──
+        window.closeModal = function (id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        init();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

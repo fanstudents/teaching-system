@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程回顧 — 教學系統</title>
+    <meta name="description" content="課後回顧頁面，完成測驗與滿意度調查">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/post-class-page.css">
+</head>
+
+<body>
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <span class="material-symbols-outlined topbar-icon">school</span>
+            <span class="topbar-title" id="topbarTitle">課程回顧</span>
+        </div>
+        <div class="topbar-right">
+            <div class="topbar-user">
+                <div class="topbar-avatar" id="topbarAvatar">?</div>
+                <span class="topbar-name" id="topbarName">—</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-bar">
+        <div class="step-item active" data-step="0">
+            <div class="step-circle">1</div>
+            <div class="step-label">專業考試</div>
+        </div>
+        <div class="step-item" data-step="1">
+            <div class="step-circle">2</div>
+            <div class="step-label">滿意度問卷</div>
+        </div>
+        <div class="step-item" data-step="2">
+            <div class="step-circle">3</div>
+            <div class="step-label">課程結束</div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-area">
+        <!-- ============================== -->
+        <!--   Section 1: 專業考試           -->
+        <!-- ============================== -->
+        <div class="section active" id="sectionExam">
+            <div class="section-header">
+                <div class="section-badge exam">
+                    <span class="material-symbols-outlined icon-xs">quiz</span>
+                    專業能力測驗
+                </div>
+                <h2>專業知識考試</h2>
+                <p>共 10 題選擇題，測驗您在本次課程中學到的知識</p>
+            </div>
+
+            <div id="examQuestions"></div>
+
+            <div class="submit-bar">
+                <button class="submit-btn" id="submitExam" disabled>送出考試</button>
+                <div class="submit-hint">請回答所有題目後送出</div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!--   Section 2: 滿意度問卷         -->
+        <!-- ============================== -->
+        <div class="section" id="sectionSurvey">
+            <div class="section-header">
+                <div class="section-badge survey">
+                    <span class="material-symbols-outlined icon-xs">rate_review</span>
+                    課程回饋
+                </div>
+                <h2>滿意度問卷</h2>
+                <p>您的回饋將幫助我們持續改善課程品質</p>
+            </div>
+
+            <div id="surveyQuestions"></div>
+
+            <div class="submit-bar">
+                <button class="submit-btn" id="submitSurvey" disabled>送出問卷</button>
+                <div class="submit-hint">請回答所有題目後送出</div>
+            </div>
+        </div>
+
+        <!-- ============================== -->
+        <!--   Section 3: 完成               -->
+        <!-- ============================== -->
+        <div class="section" id="sectionComplete">
+            <div class="completion-card">
+                <div class="completion-icon">🎉</div>
+                <div class="completion-title">恭喜完成！</div>
+                <div class="completion-subtitle">您已完成所有課程評量</div>
+
+                <div class="score-card">
+                    <div>
+                        <div class="score-label">考試成績</div>
+                        <div>
+                            <span class="score-value" id="finalScore">0</span>
+                            <span class="score-total">/ 100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="completion-msg">
+                    感謝您的參與與回饋！<br>
+                    我們將在課後發送一封客製化的回顧信件至您的信箱，<br>
+                    內容將根據您的考試表現與課程回饋進行個人化整理。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-screen hidden" id="loadingScreen">
+        <span class="material-symbols-outlined"
+            style="font-size:3rem;color:#94a3b8;animation:spin 1s linear infinite;">progress_activity</span>
+        <p style="margin-top:12px;color:#94a3b8;">載入中...</p>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        // ── 題庫 ──
+
+        const EXAM_BANKS = {
+            'ai-workplace': [
+                {
+                    q: '下列哪個最適合描述生成式 AI 的核心能力？',
+                    opts: ['分析歷史數據並預測未來', '根據提示自動產出新內容', '取代所有人類工作', '自動修復軟體漏洞'],
+                    ans: 1
+                },
+                {
+                    q: '使用 ChatGPT 撰寫商業郵件時，最重要的 Prompt 技巧是？',
+                    opts: ['輸入越短越好', '提供明確角色、情境與格式要求', '使用英文撰寫', '多次重複同一指令'],
+                    ans: 1
+                },
+                {
+                    q: 'AI 摘要工具最適合應用在下列哪個場景？',
+                    opts: ['設計公司 Logo', '快速整理會議紀錄重點', '撰寫法律合約', '進行面試評分'],
+                    ans: 1
+                },
+                {
+                    q: '在 AI 工具中，「Temperature」參數的作用是？',
+                    opts: ['控制回應速度', '控制輸出的隨機性與創造力', '控制字數上限', '控制語言選擇'],
+                    ans: 1
+                },
+                {
+                    q: '下列哪個不是 AI 在職場中常見的應用？',
+                    opts: ['自動化客服回覆', '完全取代主管的決策判斷', '文件翻譯與潤稿', '數據分析與視覺化'],
+                    ans: 1
+                },
+                {
+                    q: '使用 AI 產生的內容，最重要的後續步驟是？',
+                    opts: ['直接發布不需修改', '人工審核與事實查核', '翻譯成多國語言', '備份到雲端'],
+                    ans: 1
+                },
+                {
+                    q: 'RAG（Retrieval-Augmented Generation）的主要優勢是？',
+                    opts: ['不需要網路即可運作', '讓 AI 參考企業內部資料回答問題', '自動學習新程式語言', '取代資料庫管理'],
+                    ans: 1
+                },
+                {
+                    q: '下列哪種 AI 工具最適合處理大量 Excel 數據分析？',
+                    opts: ['Midjourney', 'Code Interpreter / Advanced Data Analysis', 'Stable Diffusion', 'ElevenLabs'],
+                    ans: 1
+                },
+                {
+                    q: 'AI Agent 與一般 AI 聊天機器人的主要差異是？',
+                    opts: ['界面更美觀', '能自主規劃並執行多步驟任務', '只能用英文溝通', '需要更多硬體資源'],
+                    ans: 1
+                },
+                {
+                    q: '導入 AI 工具到團隊時，最關鍵的成功因素是？',
+                    opts: ['採購最昂貴的方案', '建立 AI 使用規範與教育訓練', '全面取代現有流程', '限制只有主管能使用'],
+                    ans: 1
+                }
+            ],
+            'ai-marketing': [
+                {
+                    q: 'GA4 中「工作階段」的預設逾時時間是？',
+                    opts: ['10 分鐘', '30 分鐘', '1 小時', '24 小時'],
+                    ans: 1
+                },
+                {
+                    q: 'UTM 參數中，utm_medium 通常用於標註？',
+                    opts: ['廣告創意內容', '流量媒介（如 email、cpc、social）', '網站頁面名稱', '使用者裝置類型'],
+                    ans: 1
+                },
+                {
+                    q: '在數位行銷中，CTR 代表？',
+                    opts: ['Cost To Revenue', 'Click-Through Rate（點擊率）', 'Customer Total Return', 'Conversion Tracking Report'],
+                    ans: 1
+                },
+                {
+                    q: 'A/B 測試中，統計顯著性通常需要達到多少信心水準？',
+                    opts: ['50%', '75%', '95%', '100%'],
+                    ans: 2
+                },
+                {
+                    q: 'ROAS（Return on Ad Spend）為 5 代表？',
+                    opts: ['花了 5 元廣告費', '每花 1 元廣告費帶回 5 元營收', '廣告成本降低 5%', '投資報酬率為 5%'],
+                    ans: 1
+                },
+                {
+                    q: '行銷漏斗中，從「認知」到「購買」的轉換率通常？',
+                    opts: ['保持不變', '逐層遞增', '逐層遞減', '隨機波動'],
+                    ans: 2
+                },
+                {
+                    q: '使用 AI 分析行銷數據的最大優勢是？',
+                    opts: ['完全不需要人工介入', '快速發現數據中的異常模式與趨勢', '保證 100% 準確率', '降低網路流量費用'],
+                    ans: 1
+                },
+                {
+                    q: 'Lookalike Audience（相似受眾）的建立基礎是？',
+                    opts: ['隨機抽樣的網路使用者', '現有高價值客戶的特徵數據', '競爭對手的客戶名單', '搜尋引擎關鍵字'],
+                    ans: 1
+                },
+                {
+                    q: '下列哪個指標最能衡量內容行銷的長期效果？',
+                    opts: ['單日頁面瀏覽量', '自然搜尋流量成長率', '社群按讚數', '廣告點擊率'],
+                    ans: 1
+                },
+                {
+                    q: 'CDP（Customer Data Platform）與 DMP 的核心差異？',
+                    opts: ['CDP 只處理線下數據', 'CDP 以第一方數據為主，DMP 以第三方數據為主', 'DMP 較新的技術', '兩者完全相同'],
+                    ans: 1
+                }
+            ]
+        };
+
+        // 打亂選項順序（同時調整正確答案位置）
+        function shuffleExam(bank) {
+            return bank.map(q => {
+                const correctOpt = q.opts[q.ans];
+                const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
+                return {
+                    q: q.q,
+                    opts: shuffled,
+                    ans: shuffled.indexOf(correctOpt)
+                };
+            });
+        }
+
+        const SURVEY_QUESTIONS = [
+            { q: '整體來說，您對本次課程的滿意程度？', type: 'star' },
+            { q: '課程內容對您的工作／生活實用性如何？', type: 'star' },
+            { q: '講師的教學方式是否清晰易懂？', type: 'star' },
+            { q: '教材設計（簡報、互動元件）的品質如何？', type: 'star' },
+            { q: '課程的難易程度是否適中？', type: 'scale', labels: ['太簡單', '偏簡單', '剛剛好', '偏困難', '太困難'] },
+            { q: '課程節奏與時間安排是否恰當？', type: 'star' },
+            { q: '互動練習環節是否有助於理解？', type: 'star' },
+            { q: '您最喜歡課程的哪個部分？', type: 'text' },
+            { q: '您認為課程可以改善的地方？', type: 'text' },
+            { q: '您是否願意推薦此課程給同事／朋友？', type: 'nps' }
+        ];
+
+        // ── State ──
+        const code = new URLSearchParams(location.search).get('code');
+        let project = null;
+        let currentUser = null;
+        let currentStep = 0;
+        let examQuestions = [];
+        let examAnswers = {};
+        let surveyAnswers = {};
+
+        // ── Init ──
+        async function init() {
+            if (!code) {
+                alert('缺少課程代碼');
+                return;
+            }
+
+            // 讀取 user
+            const saved = sessionStorage.getItem(`portal_user_${code}`);
+            if (saved) {
+                currentUser = JSON.parse(saved);
+            } else {
+                currentUser = { name: '訪客', email: 'guest@test.local' };
+            }
+            document.getElementById('topbarAvatar').textContent = currentUser.name[0];
+            document.getElementById('topbarName').textContent = currentUser.name;
+
+            // 讀取 project
+            try {
+                const { data } = await db.select('projects', {
+                    filter: { join_code: `eq.${code}` }, limit: 1
+                });
+                if (data && data.length > 0) {
+                    project = data[0];
+                    document.getElementById('topbarTitle').textContent = project.name + ' — 課程回顧';
+                }
+            } catch (e) {
+                console.warn('project load error:', e);
+            }
+
+            // 決定題庫
+            const courseType = project?.course_type || 'ai-workplace';
+            examQuestions = shuffleExam(EXAM_BANKS[courseType] || EXAM_BANKS['ai-workplace']);
+
+            renderExam();
+            renderSurvey();
+        }
+
+        // ── Render Exam ──
+        function renderExam() {
+            const container = document.getElementById('examQuestions');
+            container.innerHTML = examQuestions.map((q, qi) => `
+                <div class="q-card" id="examQ${qi}">
+                    <div class="q-number">第 ${qi + 1} 題 / 共 ${examQuestions.length} 題</div>
+                    <div class="q-text">${q.q}</div>
+                    <div class="q-options">
+                        ${q.opts.map((opt, oi) => `
+                            <div class="q-option" data-qi="${qi}" data-oi="${oi}">
+                                <div class="q-option-dot"></div>
+                                <span>${opt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // 選項點擊
+            container.querySelectorAll('.q-option').forEach(el => {
+                el.addEventListener('click', () => {
+                    const qi = parseInt(el.dataset.qi);
+                    const oi = parseInt(el.dataset.oi);
+                    examAnswers[qi] = oi;
+
+                    // 更新 UI
+                    const card = document.getElementById(`examQ${qi}`);
+                    card.querySelectorAll('.q-option').forEach(o => o.classList.remove('selected'));
+                    el.classList.add('selected');
+                    card.classList.add('answered');
+
+                    checkExamComplete();
+                });
+            });
+        }
+
+        function checkExamComplete() {
+            const allDone = Object.keys(examAnswers).length === examQuestions.length;
+            document.getElementById('submitExam').disabled = !allDone;
+        }
+
+        // ── Render Survey ──
+        function renderSurvey() {
+            const container = document.getElementById('surveyQuestions');
+            container.innerHTML = SURVEY_QUESTIONS.map((q, qi) => {
+                let inputHTML = '';
+
+                if (q.type === 'star') {
+                    inputHTML = `<div class="star-rating" data-qi="${qi}">
+                        ${[1, 2, 3, 4, 5].map(s => `<span class="star" data-val="${s}">★</span>`).join('')}
+                    </div>`;
+                } else if (q.type === 'scale') {
+                    inputHTML = `<div class="scale-row" data-qi="${qi}">
+                        ${q.labels.map((l, i) => `<div class="scale-item" data-val="${i + 1}">${l}</div>`).join('')}
+                    </div>`;
+                } else if (q.type === 'nps') {
+                    inputHTML = `
+                        <div class="nps-row" data-qi="${qi}">
+                            ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<div class="nps-item" data-val="${n}">${n}</div>`).join('')}
+                        </div>
+                        <div class="nps-labels"><span>完全不願意</span><span>非常願意</span></div>
+                    `;
+                } else if (q.type === 'text') {
+                    inputHTML = `<textarea class="q-textarea" data-qi="${qi}" placeholder="請輸入您的想法..."></textarea>`;
+                }
+
+                return `
+                    <div class="q-card" id="surveyQ${qi}">
+                        <div class="q-number">第 ${qi + 1} 題 / 共 ${SURVEY_QUESTIONS.length} 題</div>
+                        <div class="q-text">${q.q}</div>
+                        ${inputHTML}
+                    </div>
+                `;
+            }).join('');
+
+            // 星等
+            container.querySelectorAll('.star-rating .star').forEach(star => {
+                star.addEventListener('click', () => {
+                    const qi = parseInt(star.parentElement.dataset.qi);
+                    const val = parseInt(star.dataset.val);
+                    surveyAnswers[qi] = val;
+                    star.parentElement.querySelectorAll('.star').forEach((s, i) => {
+                        s.classList.toggle('active', i < val);
+                    });
+                    document.getElementById(`surveyQ${qi}`).classList.add('answered');
+                    checkSurveyComplete();
+                });
+            });
+
+            // 量表
+            container.querySelectorAll('.scale-row .scale-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const qi = parseInt(item.parentElement.dataset.qi);
+                    const val = parseInt(item.dataset.val);
+                    surveyAnswers[qi] = val;
+                    item.parentElement.querySelectorAll('.scale-item').forEach(s => s.classList.remove('selected'));
+                    item.classList.add('selected');
+                    document.getElementById(`surveyQ${qi}`).classList.add('answered');
+                    checkSurveyComplete();
+                });
+            });
+
+            // NPS
+            container.querySelectorAll('.nps-row .nps-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const qi = parseInt(item.parentElement.dataset.qi);
+                    const val = parseInt(item.dataset.val);
+                    surveyAnswers[qi] = val;
+                    item.parentElement.querySelectorAll('.nps-item').forEach(s => s.classList.remove('selected'));
+                    item.classList.add('selected');
+                    document.getElementById(`surveyQ${qi}`).classList.add('answered');
+                    checkSurveyComplete();
+                });
+            });
+
+            // 文字
+            container.querySelectorAll('.q-textarea').forEach(ta => {
+                ta.addEventListener('input', () => {
+                    const qi = parseInt(ta.dataset.qi);
+                    surveyAnswers[qi] = ta.value.trim();
+                    if (ta.value.trim()) {
+                        document.getElementById(`surveyQ${qi}`).classList.add('answered');
+                    }
+                    checkSurveyComplete();
+                });
+            });
+        }
+
+        function checkSurveyComplete() {
+            // 星等 + 量表 + NPS 必填，文字選填
+            const required = SURVEY_QUESTIONS
+                .map((q, i) => ({ ...q, i }))
+                .filter(q => q.type !== 'text');
+            const allDone = required.every(q => surveyAnswers[q.i] !== undefined);
+            document.getElementById('submitSurvey').disabled = !allDone;
+        }
+
+        // ── Step Navigation ──
+        function goToStep(step) {
+            currentStep = step;
+            const sections = ['sectionExam', 'sectionSurvey', 'sectionComplete'];
+            sections.forEach((id, i) => {
+                document.getElementById(id).classList.toggle('active', i === step);
+            });
+
+            document.querySelectorAll('.step-item').forEach((el, i) => {
+                el.classList.remove('active', 'done');
+                if (i < step) el.classList.add('done');
+                if (i === step) el.classList.add('active');
+            });
+
+            // 滾到頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── Submit Exam ──
+        document.getElementById('submitExam').addEventListener('click', async () => {
+            // 計算成績
+            let correct = 0;
+            examQuestions.forEach((q, i) => {
+                if (examAnswers[i] === q.ans) correct++;
+            });
+            const score = Math.round((correct / examQuestions.length) * 100);
+
+            // 寫入 DB
+            try {
+                await db.insert('exam_responses', {
+                    project_id: code,
+                    student_email: currentUser.email,
+                    student_name: currentUser.name,
+                    course_type: project?.course_type || 'ai-workplace',
+                    answers: JSON.stringify(examAnswers),
+                    score: String(score)
+                });
+                console.log('✅ 考試成績已儲存:', score);
+            } catch (e) {
+                console.warn('exam save error:', e);
+            }
+
+            // 暫存 score 到完成頁
+            document.getElementById('finalScore').textContent = score;
+
+            // 進入問卷
+            goToStep(1);
+        });
+
+        // ── Submit Survey ──
+        document.getElementById('submitSurvey').addEventListener('click', async () => {
+            // 計算 avg rating (星等題)
+            const starQs = SURVEY_QUESTIONS
+                .map((q, i) => ({ ...q, i }))
+                .filter(q => q.type === 'star');
+            const avgRating = starQs.reduce((sum, q) => sum + (surveyAnswers[q.i] || 0), 0) / starQs.length;
+
+            // NPS
+            const npsQ = SURVEY_QUESTIONS.findIndex(q => q.type === 'nps');
+            const npsScore = surveyAnswers[npsQ] ?? 0;
+
+            // 寫入 DB
+            try {
+                await db.insert('satisfaction_responses', {
+                    project_id: code,
+                    student_email: currentUser.email,
+                    student_name: currentUser.name,
+                    responses: JSON.stringify(surveyAnswers),
+                    nps_score: String(npsScore),
+                    avg_rating: String(avgRating.toFixed(2))
+                });
+                console.log('✅ 問卷已儲存');
+            } catch (e) {
+                console.warn('survey save error:', e);
+            }
+
+            // 進入完成頁
+            goToStep(2);
+        });
+
+        init();
+    </script>
+
+</body>
+
+</html>

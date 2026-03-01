@@ -1,0 +1,440 @@
+/* ========================================
+   admin-preclass.html — 課前設定頁面
+   ======================================== */
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* ── Header: uses admin-layout.css .admin-header ── */
+
+/* ── Container ── */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 32px;
+}
+
+/* ── Tabs ── */
+.tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--bg-secondary);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.tab {
+    flex: 1;
+    padding: 10px 16px;
+    text-align: center;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    background: var(--bg-tertiary);
+}
+
+.tab.active {
+    background: var(--color-dark);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+/* ── Cards ── */
+.panel-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.panel-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-title .material-symbols-rounded {
+    font-size: 1.2rem;
+    color: var(--accent-primary);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-primary {
+    background: var(--color-dark);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--color-dark-soft);
+}
+
+.btn-outline {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+
+.btn-danger {
+    color: var(--accent-danger);
+}
+
+/* ── List Items ── */
+.manage-list {
+    list-style: none;
+}
+
+.manage-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.manage-item:last-child {
+    border-bottom: none;
+}
+
+.item-order {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-title {
+    font-weight: 500;
+    font-size: 0.92rem;
+}
+
+.item-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.item-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.badge-choice {
+    background: var(--accent-primary-light);
+    color: var(--accent-primary);
+}
+
+.badge-truefalse {
+    background: var(--accent-danger-bg);
+    color: var(--accent-danger);
+}
+
+.badge-fillblank {
+    background: var(--accent-success-bg);
+    color: #1e8e3e;
+}
+
+.item-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.icon-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.icon-btn.danger:hover {
+    color: var(--accent-danger);
+}
+
+.icon-btn .material-symbols-rounded {
+    font-size: 18px;
+}
+
+/* ── Student Progress Table ── */
+.progress-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.progress-table th,
+.progress-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+.progress-table th {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg-tertiary);
+}
+
+.progress-table td {
+    font-size: 0.88rem;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.status-done {
+    background: var(--accent-success);
+}
+
+.status-pending {
+    background: var(--text-muted);
+}
+
+.completion-bar {
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+    width: 80px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.completion-fill {
+    height: 100%;
+    background: var(--accent-success);
+    border-radius: 3px;
+}
+
+.empty-msg {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ── Modal overrides ── */
+.modal {
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal h3 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+}
+
+.form-field {
+    margin-bottom: 14px;
+}
+
+.form-field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.form-field textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.options-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.option-row {
+    display: flex;
+    gap: 6px;
+}
+
+.option-row input {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+}
+
+/* ── Share Link Bar ── */
+.share-link-bar {
+    background: var(--accent-primary-light);
+    border-bottom: 1px solid #d2e3fc;
+    padding: 10px 32px;
+}
+
+.share-link-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.share-link-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent-primary);
+    white-space: nowrap;
+}
+
+.share-link-input {
+    flex: 1;
+    padding: 7px 12px;
+    border: 1px solid #d2e3fc;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-family: 'Menlo', 'Consolas', monospace;
+    color: #333;
+    background: #fff;
+}
+
+.share-link-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.share-link-copy {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-dark);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.share-link-copy:hover {
+    background: var(--color-dark-soft);
+}

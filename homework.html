@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的作業 — 教學簡報系統</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .hw-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .hw-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hw-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #6366f1;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .hw-back-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .hw-back-btn .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+        .hw-topbar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .hw-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hw-user-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .hw-user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ── Summary ── */
+        .hw-summary {
+            max-width: 720px;
+            margin: 24px auto 0;
+            padding: 0 20px;
+        }
+
+        .hw-summary-card {
+            display: flex;
+            gap: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .hw-stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hw-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .hw-stat-value.done {
+            color: #10b981;
+        }
+
+        .hw-stat-value.pending {
+            color: #f59e0b;
+        }
+
+        .hw-stat-value.overdue {
+            color: #ef4444;
+        }
+
+        .hw-stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* ── Assignment List ── */
+        .hw-list {
+            max-width: 720px;
+            margin: 20px auto;
+            padding: 0 20px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hw-section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+        }
+
+        .hw-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 18px 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .hw-card:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 2px 12px rgba(99, 102, 241, 0.08);
+        }
+
+        .hw-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .hw-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .hw-card-badge {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .hw-card-badge .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        .hw-card-badge.submitted {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .hw-card-badge.not-submitted {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .hw-card-badge.overdue {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .hw-card-desc {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .hw-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .hw-card-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .hw-card-meta-item .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        /* ── Submission Detail ── */
+        .hw-submission-preview {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .hw-submission-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .hw-submission-content {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .hw-submission-content img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 6px;
+        }
+
+        .hw-submission-time {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        /* ── Submit Button ── */
+        .hw-submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hw-submit-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .hw-submit-btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .hw-submit-btn.resubmit {
+            background: transparent;
+            color: #6366f1;
+            border: 1px solid #c7d2fe;
+        }
+
+        /* ── Empty State ── */
+        .hw-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .hw-empty .material-symbols-outlined {
+            font-size: 48px;
+            opacity: 0.3;
+        }
+
+        .hw-empty-text {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        /* ── Loading ── */
+        .hw-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .hw-loading .material-symbols-outlined {
+            font-size: 32px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── 手機 ── */
+        @media (max-width: 640px) {
+            .hw-summary-card {
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .hw-stat-value {
+                font-size: 22px;
+            }
+
+            .hw-card {
+                padding: 14px 16px;
+            }
+
+            .hw-card-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hw-topbar">
+        <div class="hw-topbar-left">
+            <button class="hw-back-btn" id="backBtn">
+                <span class="material-symbols-outlined">arrow_back</span>
+                返回
+            </button>
+            <span class="hw-topbar-title">我的作業</span>
+        </div>
+        <div class="hw-topbar-right">
+            <div class="hw-user-badge">
+                <div class="hw-user-avatar" id="userAvatar">?</div>
+                <span id="userName">學員</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-summary" id="summaryWrap">
+        <div class="hw-summary-card">
+            <div class="hw-stat">
+                <div class="hw-stat-value" id="statTotal">—</div>
+                <div class="hw-stat-label">項作業</div>
+            </div>
+            <div class="hw-stat">
+                <div class="hw-stat-value done" id="statDone">—</div>
+                <div class="hw-stat-label">已繳交</div>
+            </div>
+            <div class="hw-stat">
+                <div class="hw-stat-value pending" id="statPending">—</div>
+                <div class="hw-stat-label">待繳交</div>
+            </div>
+            <div class="hw-stat">
+                <div class="hw-stat-value overdue" id="statOverdue">—</div>
+                <div class="hw-stat-label">已逾期</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-list" id="hwList">
+        <div class="hw-loading">
+            <span class="material-symbols-outlined">progress_activity</span>
+            <div style="margin-top:8px;">載入作業中…</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+        import { HomeworkSubmission } from './scripts/homework.js';
+
+        const homework = new HomeworkSubmission();
+        const params = new URLSearchParams(location.search);
+        const hashParams = new URLSearchParams(location.hash.replace(/^#/, ''));
+        const code = params.get('code') || hashParams.get('code') || '';
+        const sessionParam = params.get('session') || params.get('s') || hashParams.get('session') || '';
+
+        // 還原使用者
+        let currentUser = null;
+        const saved = localStorage.getItem('student_session');
+        const portalSaved = sessionStorage.getItem(`portal_user_${code}`);
+        if (saved) { try { currentUser = JSON.parse(saved); } catch { } }
+        else if (portalSaved) { try { currentUser = JSON.parse(portalSaved); } catch { } }
+
+        if (currentUser) {
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = (currentUser.name || '?')[0];
+        }
+
+        // 返回
+        document.getElementById('backBtn').addEventListener('click', () => {
+            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            location.href = `portal.html?code=${code}${sessionQ}`;
+        });
+
+        // ── 主邏輯 ──
+        async function loadHomework() {
+            const list = document.getElementById('hwList');
+            try {
+                // 取得場次 session_id
+                let sessionId = null;
+                if (sessionParam) {
+                    const { data: sess } = await db.select('project_sessions', {
+                        filter: { session_code: `eq.${sessionParam}` },
+                        select: 'id', limit: 1
+                    });
+                    if (sess?.[0]) sessionId = sess[0].id;
+                }
+
+                // 取得作業列表
+                let assignments = [];
+                if (sessionId) {
+                    const { data } = await db.select('session_assignments', {
+                        filter: { session_id: `eq.${sessionId}` },
+                        order: 'sort_order.asc'
+                    });
+                    assignments = data || [];
+                }
+
+                // 取得我的提交紀錄
+                let mySubmissions = [];
+                const email = currentUser?.email || '';
+                if (email) {
+                    const filter = { student_email: `eq.${email}` };
+                    if (sessionParam) filter.session_id = `eq.${sessionParam}`;
+                    const { data } = await db.select('submissions', { filter });
+                    mySubmissions = data || [];
+                }
+
+                // 如果 DB 沒有 assignments，fallback 到 localStorage submissions
+                if (assignments.length === 0) {
+                    const localSubs = homework.getAllSubmissions();
+                    if (localSubs.length > 0) {
+                        // 從本地提交推導作業列表
+                        const seen = new Set();
+                        localSubs.forEach(s => {
+                            if (!seen.has(s.assignmentTitle)) {
+                                seen.add(s.assignmentTitle);
+                                assignments.push({
+                                    id: s.assignmentId || s.id,
+                                    title: s.assignmentTitle,
+                                    description: '',
+                                    type: s.type || 'text',
+                                    due_date: null
+                                });
+                            }
+                        });
+                        mySubmissions = localSubs.map(s => ({
+                            assignment_title: s.assignmentTitle,
+                            type: s.type,
+                            content: s.content,
+                            file_url: s.fileUrl,
+                            submitted_at: s.submittedAt,
+                            student_email: email
+                        }));
+                    }
+                }
+
+                // ── 如果還是 0：插入模擬資料
+                if (assignments.length === 0) {
+                    assignments = [
+                        { id: 'demo1', title: 'AI 圖片生成練習', description: '使用課堂教的 AI 圖片生成工具，創建一張與工作相關的圖片，並附上你使用的提示詞。', type: 'image_prompt', due_date: '2026-03-05T23:59:00Z' },
+                        { id: 'demo2', title: 'ChatGPT 對話紀錄', description: '用 ChatGPT 完成一個工作場景的對話（例如：撰寫 Email、數據分析、會議紀錄整理），截圖或複製對話紀錄上傳。', type: 'text', due_date: '2026-03-05T23:59:00Z' },
+                        { id: 'demo3', title: '課後心得', description: '請用 200 字以上分享你在本次課程中學到最有價值的內容，以及你計畫如何應用在工作中。', type: 'text', due_date: '2026-03-07T23:59:00Z' },
+                        { id: 'demo4', title: 'AI 工具比較表', description: '選擇 3 個 AI 工具進行比較（功能、適用場景、費用），整理成表格上傳。', type: 'text', due_date: null }
+                    ];
+                    // 模擬提交資料
+                    mySubmissions = [
+                        { assignment_title: 'AI 圖片生成練習', type: 'image', content: '', file_url: 'https://picsum.photos/seed/ai-gen/600/400', submitted_at: '2026-02-27T14:32:00Z', student_email: email },
+                        { assignment_title: 'ChatGPT 對話紀錄', type: 'text', content: '我使用 ChatGPT 協助撰寫一封客戶回覆信件，從原本需要 20 分鐘縮短到 3 分鐘。以下是對話紀錄摘要…\n\n提示詞：「請幫我用專業但友善的語氣回覆以下客戶詢問…」\n\nChatGPT 回應非常準確，但我調整了稱呼和簽名部分。', file_url: '', submitted_at: '2026-02-28T09:15:00Z', student_email: email }
+                    ];
+                }
+
+                renderHomework(assignments, mySubmissions);
+            } catch (e) {
+                list.innerHTML = `<div class="hw-empty"><span class="material-symbols-outlined">error</span><div class="hw-empty-text">載入失敗：${e.message}</div></div>`;
+            }
+        }
+
+        function renderHomework(assignments, submissions) {
+            const list = document.getElementById('hwList');
+            const now = new Date();
+
+            // 建立提交 map
+            const subMap = {};
+            submissions.forEach(s => {
+                if (!subMap[s.assignment_title]) subMap[s.assignment_title] = [];
+                subMap[s.assignment_title].push(s);
+            });
+
+            // 統計
+            let done = 0, pending = 0, overdue = 0;
+            assignments.forEach(a => {
+                const subs = subMap[a.title];
+                if (subs && subs.length > 0) { done++; }
+                else if (a.due_date && new Date(a.due_date) < now) { overdue++; }
+                else { pending++; }
+            });
+
+            document.getElementById('statTotal').textContent = assignments.length;
+            document.getElementById('statDone').textContent = done;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statOverdue').textContent = overdue;
+
+            if (assignments.length === 0) {
+                list.innerHTML = `<div class="hw-empty"><span class="material-symbols-outlined">assignment</span><div class="hw-empty-text">目前沒有指定作業</div></div>`;
+                return;
+            }
+
+            // 分組
+            const submitted = [], notSubmitted = [];
+            assignments.forEach(a => {
+                const subs = subMap[a.title];
+                if (subs && subs.length > 0) submitted.push({ ...a, submissions: subs });
+                else notSubmitted.push(a);
+            });
+
+            let html = '';
+
+            if (notSubmitted.length > 0) {
+                html += `<div class="hw-section-label">待繳交 (${notSubmitted.length})</div>`;
+                notSubmitted.forEach(a => {
+                    const isOverdue = a.due_date && new Date(a.due_date) < now;
+                    const badgeClass = isOverdue ? 'overdue' : 'not-submitted';
+                    const badgeText = isOverdue ? '已逾期' : '待繳交';
+                    const badgeIcon = isOverdue ? 'warning' : 'schedule';
+                    const typeIcons = { text: 'edit_note', image_only: 'image', image_prompt: 'photo_camera', link: 'link' };
+                    const typeLabels = { text: '文字', image_only: '圖片', image_prompt: '圖片+提示詞', link: '連結' };
+
+                    html += `
+                        <div class="hw-card">
+                            <div class="hw-card-header">
+                                <div class="hw-card-title">${a.title}</div>
+                                <div class="hw-card-badge ${badgeClass}">
+                                    <span class="material-symbols-outlined">${badgeIcon}</span>
+                                    ${badgeText}
+                                </div>
+                            </div>
+                            ${a.description ? `<div class="hw-card-desc">${a.description}</div>` : ''}
+                            <div class="hw-card-meta">
+                                <div class="hw-card-meta-item">
+                                    <span class="material-symbols-outlined">${typeIcons[a.type] || 'description'}</span>
+                                    ${typeLabels[a.type] || '一般'}
+                                </div>
+                                ${a.due_date ? `<div class="hw-card-meta-item">
+                                    <span class="material-symbols-outlined">event</span>
+                                    截止：${formatDate(a.due_date)}
+                                </div>` : '<div class="hw-card-meta-item"><span class="material-symbols-outlined">all_inclusive</span> 無期限</div>'}
+                            </div>
+                            <button class="hw-submit-btn" onclick="openSubmit('${a.title}', '${a.type}', '${a.id}')">
+                                <span class="material-symbols-outlined">upload</span>
+                                繳交作業
+                            </button>
+                        </div>`;
+                });
+            }
+
+            if (submitted.length > 0) {
+                html += `<div class="hw-section-label">已繳交 (${submitted.length})</div>`;
+                submitted.forEach(a => {
+                    const subs = a.submissions.sort((a, b) => new Date(b.submitted_at || b.created_at) - new Date(a.submitted_at || a.created_at));
+                    const latest = subs[0];
+                    const hasMultiple = subs.length > 1;
+
+                    let versionsHtml = '';
+                    subs.forEach((sub, i) => {
+                        const versionNum = subs.length - i;
+                        const isLatest = i === 0;
+                        versionsHtml += `
+                            <div class="hw-submission-preview" style="${!isLatest ? 'opacity:0.7;' : ''}">
+                                <div style="display:flex;align-items:center;justify-content:space-between;">
+                                    <div class="hw-submission-label">
+                                        ${isLatest ? '最新版本' : `第 ${versionNum} 版`}
+                                    </div>
+                                    <div class="hw-submission-time">${formatDate(sub.submitted_at || sub.created_at)}</div>
+                                </div>
+                                <div class="hw-submission-content">
+                                    ${renderSubmissionContent(sub)}
+                                </div>
+                            </div>`;
+                    });
+
+                    html += `
+                        <div class="hw-card">
+                            <div class="hw-card-header">
+                                <div class="hw-card-title">${a.title}</div>
+                                <div class="hw-card-badge submitted">
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                    已繳交${hasMultiple ? ` (${subs.length} 版)` : ''}
+                                </div>
+                            </div>
+                            ${a.description ? `<div class="hw-card-desc">${a.description}</div>` : ''}
+                            ${versionsHtml}
+                            <button class="hw-submit-btn resubmit" onclick="openSubmit('${a.title}', '${a.type}', '${a.id}')">
+                                <span class="material-symbols-outlined">refresh</span>
+                                重新繳交
+                            </button>
+                        </div>`;
+                });
+            }
+
+            list.innerHTML = html;
+        }
+
+        function renderSubmissionContent(sub) {
+            // 嘗試解析 JSON 內容（image_prompt 格式）
+            let parsed = null;
+            try { parsed = JSON.parse(sub.content); } catch { }
+
+            if (parsed && parsed.image) {
+                const imgSrc = parsed.image.data || parsed.image;
+                let html = `<img src="${imgSrc}" alt="作業圖片" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:8px;">`;
+                if (parsed.prompt) {
+                    html += `<div style="margin-top:6px;padding:6px 8px;background:#f0f4ff;border-radius:4px;border:1px solid #e0e7ff;font-size:12px;color:#334155;line-height:1.4;white-space:pre-wrap;"><span style="font-size:10px;color:#6366f1;font-weight:600;">Prompt</span><br>${parsed.prompt.replace(/</g, '&lt;')}</div>`;
+                }
+                return html;
+            }
+
+            if (sub.file_url) {
+                if (sub.type === 'image') {
+                    let extra = '';
+                    if (parsed && parsed.prompt) extra = `<div style="margin-top:6px;font-size:12px;color:#64748b;">提示詞：${parsed.prompt}</div>`;
+                    return `<img src="${sub.file_url}" alt="作業圖片">${extra}`;
+                }
+                return `<a href="${sub.file_url}" target="_blank" style="color:#6366f1;">查看檔案</a>`;
+            }
+            if (sub.content) {
+                return `<div style="white-space:pre-wrap;max-height:200px;overflow-y:auto;">${sub.content.replace(/</g, '&lt;')}</div>`;
+            }
+            return '<span style="color:#94a3b8;">（無內容）</span>';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            const d = new Date(dateStr);
+            const month = d.getMonth() + 1;
+            const day = d.getDate();
+            const hour = d.getHours().toString().padStart(2, '0');
+            const min = d.getMinutes().toString().padStart(2, '0');
+            return `${month}/${day} ${hour}:${min}`;
+        }
+
+        // 繳交作業
+        window.openSubmit = function (title, type, assignmentId) {
+            homework.showSubmitDialog({ title }, type === 'text' ? 'text_only' : type);
+        };
+
+        loadHomework();
+    </script>
+</body>
+
+</html>

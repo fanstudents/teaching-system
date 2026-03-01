@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夥伴後台 — 數位簡報室</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/affiliate-dashboard.css">
+</head>
+
+<body>
+    <!-- Loading -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="spinner"></div>
+        驗證中…
+    </div>
+
+    <!-- Auth Error -->
+    <div class="auth-screen" id="authError" style="display:none;">
+        <div class="auth-card">
+            <span class="material-symbols-outlined">lock</span>
+            <h2>無法驗證身份</h2>
+            <p>此連結無效或已過期。<br>如有疑問請聯繫 <a href="mailto:service@tbr.digital">service@tbr.digital</a></p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dash-wrapper" id="dashboard" style="display:none;">
+        <!-- Header -->
+        <div class="dash-header">
+            <div class="dash-brand">
+                <div class="dash-brand-icon">
+                    <span class="material-symbols-outlined">cell_tower</span>
+                </div>
+                <div>
+                    <h1>數位簡報室 — 夥伴後台</h1>
+                    <p>聯盟行銷管理儀表板</p>
+                </div>
+            </div>
+            <div class="dash-user">
+                <strong id="userName"></strong>
+                <span id="userEmail"></span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-grid">
+            <div class="dash-stat stat-sales">
+                <div class="dash-stat-icon">
+                    <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div class="dash-stat-label">總銷售額</div>
+                <div class="dash-stat-value" id="statSales">$0</div>
+            </div>
+            <div class="dash-stat stat-commission">
+                <div class="dash-stat-icon">
+                    <span class="material-symbols-outlined">payments</span>
+                </div>
+                <div class="dash-stat-label">佣金總額</div>
+                <div class="dash-stat-value" id="statCommission">$0</div>
+            </div>
+            <div class="dash-stat stat-orders">
+                <div class="dash-stat-icon">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                </div>
+                <div class="dash-stat-label">轉介訂單</div>
+                <div class="dash-stat-value" id="statOrders">0</div>
+            </div>
+            <div class="dash-stat stat-code">
+                <div class="dash-stat-icon">
+                    <span class="material-symbols-outlined">local_offer</span>
+                </div>
+                <div class="dash-stat-label">佣金比例</div>
+                <div class="dash-stat-value" id="statRate">10%</div>
+            </div>
+        </div>
+
+        <!-- Coupon Code -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="material-symbols-outlined">confirmation_number</span>
+                折扣碼資訊
+            </div>
+            <div class="coupon-card">
+                <div class="coupon-code-display" id="couponDisplay" title="點擊複製"></div>
+                <div class="coupon-meta">
+                    <p>這是你的專屬折扣碼，透過此碼購買的訂單將自動計入你的銷售。</p>
+                    <p>佣金比例：<strong id="commissionRateText">10%</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Detail -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="material-symbols-outlined">bar_chart</span>
+                銷售明細
+            </div>
+            <div id="salesContent">
+                <div class="sales-empty">
+                    <span class="material-symbols-outlined">inbox</span>
+                    尚無銷售記錄
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Info -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="material-symbols-outlined">account_balance</span>
+                銀行匯款資訊
+            </div>
+            <form class="bank-form" id="bankForm">
+                <div class="form-group">
+                    <label>銀行名稱</label>
+                    <input type="text" id="bankName" placeholder="例：中國信託">
+                </div>
+                <div class="form-group">
+                    <label>戶名</label>
+                    <input type="text" id="accountHolder" placeholder="帳戶持有人姓名">
+                </div>
+                <div class="form-group full-width">
+                    <label>銀行帳號</label>
+                    <input type="text" id="bankAccount" placeholder="請輸入完整帳號">
+                </div>
+                <div class="bank-actions">
+                    <div class="bank-saved-msg" id="bankSavedMsg">
+                        <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+                        已儲存
+                    </div>
+                    <button type="submit" class="btn-save" id="btnSaveBank">
+                        <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+                        儲存資訊
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Promote Links -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <span class="material-symbols-outlined">share</span>
+                推廣連結
+            </div>
+            <div class="promote-links">
+                <a class="promote-link-item" href="https://tbr.digital" target="_blank">
+                    <span class="material-symbols-outlined">language</span>
+                    數位簡報室
+                    <span>tbr.digital</span>
+                </a>
+                <a class="promote-link-item" href="https://hahow.in" target="_blank">
+                    <span class="material-symbols-outlined">school</span>
+                    Hahow 好學校（合作課程）
+                    <span>hahow.in</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="dash-footer">
+            如有任何疑問，請聯繫 <a href="mailto:service@tbr.digital">service@tbr.digital</a> 或 LINE 官方客服
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        const token = new URLSearchParams(location.search).get('token');
+
+        if (!token) {
+            showAuthError();
+        } else {
+            init(token);
+        }
+
+        async function init(token) {
+            // 1. Verify token
+            const { data: affiliates, error } = await db.select('affiliates', {
+                filter: { login_token: `eq.${token}`, status: 'eq.approved' },
+                limit: 1
+            });
+
+            if (error || !affiliates || affiliates.length === 0) {
+                showAuthError();
+                return;
+            }
+
+            const affiliate = affiliates[0];
+
+            // 2. Populate header
+            document.getElementById('userName').textContent = affiliate.name || '夥伴';
+            document.getElementById('userEmail').textContent = affiliate.email;
+
+            // 3. Populate coupon
+            document.getElementById('couponDisplay').textContent = affiliate.coupon_code;
+            const rate = Math.round((affiliate.commission_rate || 0.10) * 100);
+            document.getElementById('statRate').textContent = rate + '%';
+            document.getElementById('commissionRateText').textContent = rate + '%';
+
+            // 4. Populate bank info
+            document.getElementById('bankName').value = affiliate.bank_name || '';
+            document.getElementById('accountHolder').value = affiliate.account_holder || '';
+            document.getElementById('bankAccount').value = affiliate.bank_account || '';
+
+            // 5. Load sales data
+            await loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.10);
+
+            // 6. Show dashboard
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+
+            // 7. Setup events
+            setupCouponCopy(affiliate.coupon_code);
+            setupBankForm(affiliate.id);
+        }
+
+        async function loadSales(couponCode, commissionRate) {
+            const { data: purchases, error } = await db.select('purchases', {
+                filter: { coupon_name: `eq.${couponCode}`, payment_state: 'eq.paid' },
+                order: 'created_at.desc'
+            });
+
+            if (error || !purchases || purchases.length === 0) {
+                document.getElementById('statSales').textContent = '$0';
+                document.getElementById('statCommission').textContent = '$0';
+                document.getElementById('statOrders').textContent = '0';
+                return;
+            }
+
+            const totalSales = purchases.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+            const totalCommission = Math.round(totalSales * commissionRate);
+
+            document.getElementById('statSales').textContent = '$' + totalSales.toLocaleString();
+            document.getElementById('statCommission').textContent = '$' + totalCommission.toLocaleString();
+            document.getElementById('statOrders').textContent = purchases.length;
+
+            // Build table
+            let html = `<table class="sales-table">
+                <thead><tr>
+                    <th>訂單編號</th>
+                    <th>購買者</th>
+                    <th>金額</th>
+                    <th>佣金</th>
+                    <th>日期</th>
+                </tr></thead><tbody>`;
+
+            for (const p of purchases) {
+                const amount = Number(p.amount) || 0;
+                const commission = Math.round(amount * commissionRate);
+                const date = p.paid_at ? new Date(p.paid_at).toLocaleDateString('zh-TW') : '-';
+                html += `<tr>
+                    <td>${p.order_id || '-'}</td>
+                    <td>${p.name || p.email}</td>
+                    <td class="amount">$${amount.toLocaleString()}</td>
+                    <td class="commission">$${commission.toLocaleString()}</td>
+                    <td>${date}</td>
+                </tr>`;
+            }
+
+            html += '</tbody></table>';
+            document.getElementById('salesContent').innerHTML = html;
+        }
+
+        function setupCouponCopy(code) {
+            const el = document.getElementById('couponDisplay');
+            el.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(code);
+                el.textContent = '已複製！';
+                setTimeout(() => { el.textContent = code; }, 1500);
+            });
+        }
+
+        function setupBankForm(affiliateId) {
+            document.getElementById('bankForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btnSaveBank');
+                const msg = document.getElementById('bankSavedMsg');
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_empty</span> 儲存中…';
+
+                const { error } = await db.update('affiliates', {
+                    bank_name: document.getElementById('bankName').value.trim(),
+                    bank_account: document.getElementById('bankAccount').value.trim(),
+                    account_holder: document.getElementById('accountHolder').value.trim()
+                }, { id: `eq.${affiliateId}` });
+
+                if (!error) {
+                    msg.classList.add('show');
+                    setTimeout(() => msg.classList.remove('show'), 3000);
+                } else {
+                    alert('儲存失敗：' + (error.message || '未知錯誤'));
+                }
+
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> 儲存資訊';
+            });
+        }
+
+        function showAuthError() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('authError').style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>

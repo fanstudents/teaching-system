@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡報編輯器 — 教學系統</title>
+    <meta name="description" content="互動式教學簡報編輯器，支援即時互動、測驗、作業管理等功能">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css?v=20260224">
+    <link rel="stylesheet" href="styles/admin-layout.css?v=20260224">
+    <link rel="stylesheet" href="styles/main.css?v=20260224">
+    <link rel="stylesheet" href="styles/editor.css?v=20260224">
+    <link rel="stylesheet" href="styles/interactive.css?v=20260224">
+    <link rel="stylesheet" href="styles/interactive-theme.css?v=20260228">
+    <link rel="stylesheet" href="styles/homework.css?v=20260224">
+    <link rel="stylesheet" href="styles/editor-page.css?v=20260224">
+</head>
+
+<body>
+    <div class="admin-main">
+        <!-- 頂部 Header -->
+        <div class="admin-header">
+            <div class="admin-header-title">
+                <a href="manage.html" class="btn btn-ghost btn-sm" id="backToManage" style="gap:4px;">
+                    <span class="material-symbols-outlined icon-sm">arrow_back</span> 返回管理
+                </a>
+                <span class="admin-header-divider"
+                    style="width:1px;height:20px;background:var(--border-color);margin:0 8px;"></span>
+                <span class="material-symbols-outlined icon-md" style="color:var(--accent-primary);">slideshow</span>
+                <span id="projectName" style="font-weight:600;"></span>
+            </div>
+            <div class="admin-header-actions">
+                <div class="file-name" contenteditable="true" spellcheck="false"></div>
+                <button class="btn btn-ghost btn-sm" id="saveBtn" title="儲存專案">
+                    <span class="material-symbols-outlined icon-sm">save</span> 儲存
+                </button>
+                <button class="btn btn-ghost btn-sm" id="shareEntryLinkBtn" title="生成入口連結">
+                    <span class="material-symbols-outlined icon-sm">link</span> 分享
+                </button>
+                <button class="btn btn-ghost btn-sm" id="exportModalBtn" title="匯出簡報內容">
+                    <span class="material-symbols-outlined icon-sm">download</span> 匯出
+                </button>
+                <button class="btn btn-primary btn-sm" id="playBtn" title="播放簡報（F5）">
+                    <span class="material-symbols-outlined icon-sm">play_arrow</span> 播放
+                </button>
+            </div>
+        </div>
+
+        <div class="app-container">
+
+            <!-- Ribbon 工具列 -->
+            <div class="ribbon">
+                <!-- Ribbon 頁籤 -->
+                <div class="ribbon-tabs">
+                    <button class="ribbon-tab active" data-tab="home">首頁</button>
+                    <button class="ribbon-tab" data-tab="insert">插入</button>
+                    <button class="ribbon-tab" data-tab="design">設計</button>
+                </div>
+
+                <!-- 首頁面板 -->
+                <div class="ribbon-panel active" id="ribbon-home">
+                    <!-- 剪貼簿 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="undoBtn" title="復原 (Ctrl+Z)">
+                                <span class="material-symbols-outlined">undo</span>
+                                <span class="ribbon-btn-label">復原</span>
+                            </button>
+                            <button class="ribbon-btn" id="redoBtn" title="重做 (Ctrl+Y)">
+                                <span class="material-symbols-outlined">redo</span>
+                                <span class="ribbon-btn-label">重做</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">歷史</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 文字格式 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <div class="ribbon-row">
+                                <select class="ribbon-select font-family" id="fontFamily">
+                                    <option value="Noto Sans TC">Noto Sans TC</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Courier New">Courier New</option>
+                                </select>
+                                <select class="ribbon-select font-size" id="fontSize">
+                                    <option value="12">12</option>
+                                    <option value="14">14</option>
+                                    <option value="16">16</option>
+                                    <option value="18" selected>18</option>
+                                    <option value="20">20</option>
+                                    <option value="24">24</option>
+                                    <option value="28">28</option>
+                                    <option value="32">32</option>
+                                    <option value="36">36</option>
+                                    <option value="42">42</option>
+                                    <option value="48">48</option>
+                                    <option value="56">56</option>
+                                    <option value="72">72</option>
+                                </select>
+                            </div>
+                            <div class="ribbon-row">
+                                <button class="ribbon-btn mini" id="boldBtn" title="粗體">
+                                    <span class="material-symbols-outlined">format_bold</span>
+                                </button>
+                                <button class="ribbon-btn mini" id="italicBtn" title="斜體">
+                                    <span class="material-symbols-outlined">format_italic</span>
+                                </button>
+                                <button class="ribbon-btn mini" id="underlineBtn" title="底線">
+                                    <span class="material-symbols-outlined">format_underlined</span>
+                                </button>
+                                <div class="ribbon-mini-divider"></div>
+                                <button class="ribbon-btn mini" id="alignLeftBtn" title="靠左對齊">
+                                    <span class="material-symbols-outlined">format_align_left</span>
+                                </button>
+                                <button class="ribbon-btn mini" id="alignCenterBtn" title="置中對齊">
+                                    <span class="material-symbols-outlined">format_align_center</span>
+                                </button>
+                                <button class="ribbon-btn mini" id="alignRightBtn" title="靠右對齊">
+                                    <span class="material-symbols-outlined">format_align_right</span>
+                                </button>
+                                <div class="ribbon-mini-divider"></div>
+                                <label class="ribbon-btn mini color-btn" title="文字顏色">
+                                    <span class="material-symbols-outlined">format_color_text</span>
+                                    <input type="color" id="fontColorPicker" value="#202124" class="hidden-color-input">
+                                    <span class="color-indicator" id="fontColorIndicator"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">字型</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 段落 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="addListBtn" title="項目符號">
+                                <span class="material-symbols-outlined">format_list_bulleted</span>
+                                <span class="ribbon-btn-label">項目</span>
+                            </button>
+                            <button class="ribbon-btn" id="addNumberListBtn" title="編號清單">
+                                <span class="material-symbols-outlined">format_list_numbered</span>
+                                <span class="ribbon-btn-label">編號</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">段落</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 元素操作 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="duplicateBtn" title="複製元素">
+                                <span class="material-symbols-outlined">content_copy</span>
+                                <span class="ribbon-btn-label">複製</span>
+                            </button>
+                            <button class="ribbon-btn" id="deleteBtn" title="刪除元素">
+                                <span class="material-symbols-outlined">delete</span>
+                                <span class="ribbon-btn-label">刪除</span>
+                            </button>
+                            <button class="ribbon-btn" id="layerUpBtn" title="上移一層">
+                                <span class="material-symbols-outlined">flip_to_front</span>
+                                <span class="ribbon-btn-label">上層</span>
+                            </button>
+                            <button class="ribbon-btn" id="layerDownBtn" title="下移一層">
+                                <span class="material-symbols-outlined">flip_to_back</span>
+                                <span class="ribbon-btn-label">下層</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">排列</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 簡報操作 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn accent" id="presentBtn" title="開始播放簡報">
+                                <span class="material-symbols-outlined">play_circle</span>
+                                <span class="ribbon-btn-label">播放</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">簡報</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 廣播 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="broadcastBtn" title="開始廣播 — 學員同步觀看">
+                                <span class="material-symbols-outlined" id="broadcastBtnIcon">cell_tower</span>
+                                <span class="ribbon-btn-label" id="broadcastBtnLabel">廣播</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">廣播</div>
+                    </div>
+                </div>
+
+                <!-- 插入面板 -->
+                <div class="ribbon-panel" id="ribbon-insert">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="addTextBtn" title="新增文字方塊">
+                                <span class="material-symbols-outlined">text_fields</span>
+                                <span class="ribbon-btn-label">文字</span>
+                            </button>
+                            <button class="ribbon-btn" id="addShapeBtn" title="插入圖形">
+                                <span class="material-symbols-outlined">shapes</span>
+                                <span class="ribbon-btn-label">圖形</span>
+                            </button>
+                            <button class="ribbon-btn" id="uploadImageBtn" title="上傳圖片">
+                                <span class="material-symbols-outlined">image</span>
+                                <span class="ribbon-btn-label">圖片</span>
+                            </button>
+                            <button class="ribbon-btn" id="openIconLibBtn" title="插入 Icon">
+                                <span class="material-symbols-outlined">emoji_symbols</span>
+                                <span class="ribbon-btn-label">Icon</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">基本元素</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="addVideoBtn" title="嵌入影片">
+                                <span class="material-symbols-outlined">smart_display</span>
+                                <span class="ribbon-btn-label">影片</span>
+                            </button>
+                            <button class="ribbon-btn" id="addAudioBtn" title="加入音檔">
+                                <span class="material-symbols-outlined">audio_file</span>
+                                <span class="ribbon-btn-label">音檔</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">媒體</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn interactive-btn" id="addMatchingBtn" title="連連看互動">
+                                <span class="material-symbols-outlined">drag_indicator</span>
+                                <span class="ribbon-btn-label">連連看</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addFillBlankBtn" title="填空題">
+                                <span class="material-symbols-outlined">edit_note</span>
+                                <span class="ribbon-btn-label">填空題</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addOrderingBtn" title="排列順序">
+                                <span class="material-symbols-outlined">format_list_numbered</span>
+                                <span class="ribbon-btn-label">排序</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addQuizBtn" title="選擇題">
+                                <span class="material-symbols-outlined">quiz</span>
+                                <span class="ribbon-btn-label">選擇題</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addPollBtn" title="投票">
+                                <span class="material-symbols-outlined">how_to_vote</span>
+                                <span class="ribbon-btn-label">投票</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addTrueFalseBtn" title="是非題">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                <span class="ribbon-btn-label">是非題</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addOpenTextBtn" title="開放問答">
+                                <span class="material-symbols-outlined">chat</span>
+                                <span class="ribbon-btn-label">問答</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addScaleBtn" title="量表評分">
+                                <span class="material-symbols-outlined">linear_scale</span>
+                                <span class="ribbon-btn-label">量表</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addBuzzerBtn" title="搶答">
+                                <span class="material-symbols-outlined">notifications_active</span>
+                                <span class="ribbon-btn-label">搶答</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addWordCloudBtn" title="文字雲">
+                                <span class="material-symbols-outlined">cloud</span>
+                                <span class="ribbon-btn-label">文字雲</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addHotspotBtn" title="圖片標註">
+                                <span class="material-symbols-outlined">my_location</span>
+                                <span class="ribbon-btn-label">標註</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="aiQuizBtn" title="AI 出題"
+                                style="position:relative;">
+                                <span class="material-symbols-outlined">auto_awesome</span>
+                                <span class="ribbon-btn-label">AI出題</span>
+                            </button>
+                            <button class="ribbon-btn" id="bgmSettingBtn" title="設定背景音樂">
+                                <span class="material-symbols-outlined">music_note</span>
+                                <span class="ribbon-btn-label">音樂</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="aiGenerateBtn" title="AI 生成簡報"
+                                style="position:relative;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:8px;">
+                                <span class="material-symbols-outlined">magic_button</span>
+                                <span class="ribbon-btn-label">AI簡報</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="copyCardBtn" title="可複製文字卡片">
+                                <span class="material-symbols-outlined">content_paste</span>
+                                <span class="ribbon-btn-label">複製卡</span>
+                            </button>
+                            <button class="ribbon-btn" id="addBarChartBtn" title="長條圖">
+                                <span class="material-symbols-outlined">bar_chart</span>
+                                <span class="ribbon-btn-label">長條圖</span>
+                            </button>
+                            <button class="ribbon-btn" id="addHBarChartBtn" title="橫條圖">
+                                <span class="material-symbols-outlined">align_horizontal_left</span>
+                                <span class="ribbon-btn-label">橫條圖</span>
+                            </button>
+                            <button class="ribbon-btn" id="addDonutChartBtn" title="環形圖">
+                                <span class="material-symbols-outlined">donut_large</span>
+                                <span class="ribbon-btn-label">環形圖</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">互動教學</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn homework-btn" id="addHomeworkBtn" title="新增作業題目">
+                                <span class="material-symbols-outlined">assignment</span>
+                                <span class="ribbon-btn-label">作業</span>
+                            </button>
+                            <button class="ribbon-btn" id="addShowcaseBtn" title="插入作品展示牆">
+                                <span class="material-symbols-outlined">gallery_thumbnail</span>
+                                <span class="ribbon-btn-label">展示牆</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">作業</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="importPdfBtn" title="匯入 PDF 簡報" style="color:#e65100;">
+                                <span class="material-symbols-outlined">picture_as_pdf</span>
+                                <span class="ribbon-btn-label">匯入 PDF</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">匯入</div>
+                    </div>
+                </div>
+
+                <!-- 設計面板 -->
+                <div class="ribbon-panel" id="ribbon-design">
+                    <div class="ribbon-group" style="min-width:420px;">
+                        <div class="ribbon-group-content" style="flex-direction:column;gap:4px;">
+                            <!-- 純色 -->
+                            <div class="theme-swatches">
+                                <button class="theme-swatch active" data-bg="#ffffff" title="白色"
+                                    style="background:#ffffff;"></button>
+                                <button class="theme-swatch" data-bg="#f8f9fa" title="灰白"
+                                    style="background:#f8f9fa;"></button>
+                                <button class="theme-swatch" data-bg="#e8f0fe" title="淺藍"
+                                    style="background:#e8f0fe;"></button>
+                                <button class="theme-swatch" data-bg="#e6f4ea" title="淺綠"
+                                    style="background:#e6f4ea;"></button>
+                                <button class="theme-swatch" data-bg="#fef7e0" title="淺黃"
+                                    style="background:#fef7e0;"></button>
+                                <button class="theme-swatch" data-bg="#fce8e6" title="淺紅"
+                                    style="background:#fce8e6;"></button>
+                                <button class="theme-swatch" data-bg="#f3e8fd" title="淺紫"
+                                    style="background:#f3e8fd;"></button>
+                                <button class="theme-swatch" data-bg="#fafafa" title="米白"
+                                    style="background:#fafafa;"></button>
+                            </div>
+                            <!-- 深色 -->
+                            <div class="theme-swatches">
+                                <button class="theme-swatch" data-bg="#0f172a" title="深海藍"
+                                    style="background:#0f172a;"></button>
+                                <button class="theme-swatch" data-bg="#1a1a2e" title="暗夜藍"
+                                    style="background:#1a1a2e;"></button>
+                                <button class="theme-swatch" data-bg="#1e293b" title="石墨灰"
+                                    style="background:#1e293b;"></button>
+                                <button class="theme-swatch" data-bg="#18181b" title="炭黑"
+                                    style="background:#18181b;"></button>
+                                <button class="theme-swatch" data-bg="#1e1b4b" title="靛青"
+                                    style="background:#1e1b4b;"></button>
+                                <button class="theme-swatch" data-bg="#1c1917" title="深咖"
+                                    style="background:#1c1917;"></button>
+                                <button class="theme-swatch" data-bg="#022c22" title="深森"
+                                    style="background:#022c22;"></button>
+                                <button class="theme-swatch" data-bg="#2d1b69" title="皇家紫"
+                                    style="background:#2d1b69;"></button>
+                            </div>
+                            <!-- 淺色漸層 -->
+                            <div class="theme-swatches">
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #e8f0fe, #f3e8fd)"
+                                    title="藍紫" style="background:linear-gradient(135deg, #e8f0fe, #f3e8fd);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #dbeafe, #e0f2fe)"
+                                    title="天空" style="background:linear-gradient(135deg, #dbeafe, #e0f2fe);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #fce7f3, #fdf2f8)"
+                                    title="粉霞" style="background:linear-gradient(135deg, #fce7f3, #fdf2f8);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #ecfdf5, #f0fdf4)"
+                                    title="薄荷" style="background:linear-gradient(135deg, #ecfdf5, #f0fdf4);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #fefce8, #fff7ed)"
+                                    title="暖陽" style="background:linear-gradient(135deg, #fefce8, #fff7ed);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #f8fafc, #e2e8f0)"
+                                    title="銀霧" style="background:linear-gradient(135deg, #f8fafc, #e2e8f0);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(160deg, #fdfcfb, #e2d1c3)"
+                                    title="奶茶" style="background:linear-gradient(160deg, #fdfcfb, #e2d1c3);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #e0e7ff, #c7d2fe)"
+                                    title="薰衣草" style="background:linear-gradient(135deg, #e0e7ff, #c7d2fe);"></button>
+                            </div>
+                            <!-- 深色漸層 -->
+                            <div class="theme-swatches">
+                                <button class="theme-swatch"
+                                    data-bg="linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)" title="深海"
+                                    style="background:linear-gradient(135deg, #1a1a2e, #0f3460);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #667eea, #764ba2)"
+                                    title="極光紫" style="background:linear-gradient(135deg, #667eea, #764ba2);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #0f172a, #1e40af)"
+                                    title="午夜藍" style="background:linear-gradient(135deg, #0f172a, #1e40af);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #134e4a, #0f766e)"
+                                    title="深翡翠" style="background:linear-gradient(135deg, #134e4a, #0f766e);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #831843, #be185d)"
+                                    title="玫瑰夜" style="background:linear-gradient(135deg, #831843, #be185d);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #1e1b4b, #312e81)"
+                                    title="深靛" style="background:linear-gradient(135deg, #1e1b4b, #312e81);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #ea580c, #dc2626)"
+                                    title="烈焰" style="background:linear-gradient(135deg, #ea580c, #dc2626);"></button>
+                                <button class="theme-swatch" data-bg="linear-gradient(135deg, #0ea5e9, #6366f1)"
+                                    title="科技藍" style="background:linear-gradient(135deg, #0ea5e9, #6366f1);"></button>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">投影片背景</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <label class="ribbon-btn" title="自訂背景顏色">
+                                <span class="material-symbols-outlined">palette</span>
+                                <span class="ribbon-btn-label">顏色</span>
+                                <input type="color" id="bgColorPicker" value="#ffffff" class="hidden-color-input">
+                            </label>
+                            <button class="ribbon-btn" id="resetBgBtn" title="重設為白色背景">
+                                <span class="material-symbols-outlined">restart_alt</span>
+                                <span class="ribbon-btn-label">重設</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">自訂</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 過場動畫 -->
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn transition-btn active" data-transition="fade" title="淡入">
+                                <span class="material-symbols-outlined">blur_on</span>
+                                <span class="ribbon-btn-label">淡入</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn" data-transition="slide-left" title="左滑">
+                                <span class="material-symbols-outlined">swipe_left</span>
+                                <span class="ribbon-btn-label">左滑</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn" data-transition="zoom" title="縮放">
+                                <span class="material-symbols-outlined">zoom_in</span>
+                                <span class="ribbon-btn-label">縮放</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">過場動畫</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <select class="ribbon-select slide-size" id="slideSize">
+                                <option value="16:9" selected>16:9 寬螢幕</option>
+                                <option value="4:3">4:3 標準</option>
+                            </select>
+                        </div>
+                        <div class="ribbon-group-title">投影片大小</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要內容區 -->
+            <main class="main-content">
+                <!-- 左側投影片面板 -->
+                <aside class="slide-panel" id="slidePanel">
+                    <div class="panel-header">
+                        <span>投影片</span>
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <button class="add-slide-btn" id="addSlideBtn" title="新增投影片">
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                            <button class="panel-collapse-btn" id="panelCollapseBtn" title="收合面板">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slide-list" id="slideList">
+                        <!-- 投影片縮略圖動態載入 -->
+                    </div>
+                </aside>
+
+                <!-- 中央畫布區 -->
+                <button class="panel-expand-btn" id="panelExpandBtn" title="展開投影片面板">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+                <section class="canvas-container">
+                    <div class="canvas-wrapper">
+                        <div class="slide-canvas" id="slideCanvas">
+                            <!-- 可編輯內容區 -->
+                            <div class="canvas-content" id="canvasContent">
+                                <p class="placeholder-text">點擊上方工具列新增內容</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 投影片導航 -->
+                    <div class="slide-nav">
+                        <button class="nav-btn" id="prevSlideBtn" title="上一張">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <span class="slide-counter"><span id="currentSlide">1</span> / <span
+                                id="totalSlides">1</span></span>
+                        <button class="nav-btn" id="nextSlideBtn" title="下一張">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                    <!-- 講師備註 -->
+                    <div class="speaker-notes-panel" id="speakerNotesPanel">
+                        <div class="speaker-notes-header" id="speakerNotesToggle">
+                            <span class="material-symbols-outlined" style="font-size:16px;">sticky_note_2</span>
+                            講師備註
+                            <span class="material-symbols-outlined speaker-notes-chevron"
+                                id="notesChevron">expand_more</span>
+                        </div>
+                        <textarea class="speaker-notes-textarea" id="speakerNotesText" placeholder="在此輸入備註（學生看不到）…"
+                            style="display:none;"></textarea>
+                    </div>
+                </section>
+
+                <!-- 右側屬性面板 -->
+                <aside class="property-panel" id="propertyPanel">
+                    <div class="panel-header">
+                        <span>屬性</span>
+                    </div>
+                    <div class="property-content" id="propertyContent">
+                        <!-- 動態屬性內容 -->
+                    </div>
+                </aside>
+            </main>
+        </div>
+        <!-- 廣播狀態列 -->
+        <div class="broadcast-bar" id="broadcastBar">
+            <div class="broadcast-bar-left">
+                <span class="broadcast-bar-dot"></span>
+                <span class="broadcast-bar-label">廣播中</span>
+                <span class="broadcast-bar-divider"></span>
+                <span class="material-symbols-outlined" style="font-size:16px;">tag</span>
+                <span class="broadcast-bar-code" id="broadcastBarCode"></span>
+            </div>
+            <div class="broadcast-bar-center">
+                <span class="material-symbols-outlined" style="font-size:16px;">group</span>
+                <span id="broadcastBarViewers">0 人在線</span>
+            </div>
+            <div class="broadcast-bar-right">
+                <button class="broadcast-bar-copy" id="broadcastBarDashboard" title="開啟即時儀表板">
+                    <span class="material-symbols-outlined" style="font-size:16px;">monitoring</span>
+                    儀表板
+                </button>
+                <button class="broadcast-bar-copy" id="broadcastBarCopy" title="複製課堂代碼">
+                    <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+                    複製代碼
+                </button>
+                <button class="broadcast-bar-copy" id="broadcastBarAudience" title="複製觀眾互動連結"
+                    style="background:rgba(255,255,255,0.3);color:#fff;font-weight:700;">
+                    <span class="material-symbols-outlined" style="font-size:16px;">share</span>
+                    互動連結
+                </button>
+                <button class="broadcast-bar-stop" id="broadcastBarStop" title="停止廣播">
+                    <span class="material-symbols-outlined" style="font-size:16px;">stop_circle</span>
+                    停止廣播
+                </button>
+            </div>
+        </div>
+    </div><!-- /admin-main -->
+
+    <!-- 隱藏的檔案上傳 input -->
+    <input type="file" id="imageUpload" accept="image/*" hidden>
+    <input type="file" id="audioUpload" accept="audio/*" hidden>
+    <input type="file" id="pdfUpload" accept="application/pdf" hidden>
+
+    <!-- Icon 搜尋 Modal -->
+    <div class="icon-lib-overlay" id="iconLibOverlay">
+        <div class="icon-lib-modal">
+            <div class="icon-lib-header">
+                <h3><span class="material-symbols-outlined">emoji_symbols</span> Icon 圖庫</h3>
+                <button class="icon-lib-close" id="iconLibClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="icon-lib-toolbar">
+                <div class="icon-lib-search">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;">search</span>
+                    <input type="text" id="iconSearchInput" placeholder="搜尋 icon（英文）…例如：home, chart, arrow">
+                </div>
+                <select id="iconSetFilter" class="icon-lib-select">
+                    <option value="">全部圖庫</option>
+                    <option value="mdi">Material Design</option>
+                    <option value="ph">Phosphor</option>
+                    <option value="lucide">Lucide</option>
+                    <option value="tabler">Tabler</option>
+                    <option value="heroicons">Heroicons</option>
+                    <option value="carbon">Carbon</option>
+                </select>
+                <div class="icon-lib-options">
+                    <input type="color" id="iconColorPicker" value="#1e293b" title="Icon 顏色">
+                    <select id="iconSizeSelect" class="icon-lib-select" style="width:70px;">
+                        <option value="48">小</option>
+                        <option value="80" selected>中</option>
+                        <option value="120">大</option>
+                        <option value="160">特大</option>
+                    </select>
+                </div>
+            </div>
+            <div class="icon-lib-body" id="iconLibBody">
+                <div class="icon-lib-empty">
+                    <span class="material-symbols-outlined" style="font-size:48px;color:#d1d5db;">search</span>
+                    <p>輸入關鍵字搜尋免費 Icon</p>
+                    <p style="font-size:0.75rem;color:#94a3b8;">支援 Material Design、Phosphor、Lucide 等 200+ 套圖庫</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF 匯入 Modal -->
+    <div class="pdf-import-overlay" id="pdfImportOverlay">
+        <div class="pdf-import-modal">
+            <div class="pdf-import-header">
+                <h3><span class="material-symbols-outlined">picture_as_pdf</span> 匯入 PDF 簡報</h3>
+                <button class="pdf-import-close" id="pdfImportClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="pdf-import-body">
+                <div class="pdf-drop-zone" id="pdfDropZone">
+                    <span class="material-symbols-outlined" style="font-size:48px;color:#e65100;">upload_file</span>
+                    <p>拖拽 PDF 檔案到此處，或點擊選擇</p>
+                    <span class="pdf-drop-hint">支援 .pdf 格式</span>
+                </div>
+                <div class="pdf-import-options">
+                    <label class="pdf-option">
+                        <input type="radio" name="pdfMode" value="image" checked>
+                        <div class="pdf-option-info">
+                            <strong>截圖模式</strong>
+                            <span>每頁 PDF 渲染為圖片，快速且保持原始排版</span>
+                        </div>
+                    </label>
+                    <label class="pdf-option">
+                        <input type="radio" name="pdfMode" value="text">
+                        <div class="pdf-option-info">
+                            <strong>文字擷取模式</strong>
+                            <span>擷取文字內容為可編輯的文字方塊</span>
+                        </div>
+                    </label>
+                    <label class="pdf-option">
+                        <input type="radio" name="pdfMode" value="ai">
+                        <div class="pdf-option-info">
+                            <strong>AI 智慧整理</strong>
+                            <span>用 AI 重新組織內容並優化排版（需要較長時間）</span>
+                        </div>
+                    </label>
+                </div>
+                <div class="pdf-import-progress" id="pdfImportProgress">
+                    <div class="pdf-progress-text" id="pdfProgressText">準備中...</div>
+                    <div class="pdf-progress-bar">
+                        <div class="pdf-progress-fill" id="pdfProgressFill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pdf-import-footer">
+                <button class="btn btn-secondary" id="pdfImportCancel">取消</button>
+                <button class="btn btn-primary" id="pdfImportConfirm" disabled>開始匯入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 匯出設定與進度 Modal -->
+    <div class="pdf-import-overlay" id="exportOverlay">
+        <div class="pdf-import-modal" style="width:440px;">
+            <div class="pdf-import-header">
+                <h3><span class="material-symbols-outlined">download</span> 匯出簡報</h3>
+                <button class="pdf-import-close" id="exportOverlayClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="pdf-import-body" style="padding:24px 28px;">
+                <!-- 設定區塊 -->
+                <div id="exportConfigArea">
+                    <div style="margin-bottom:20px;">
+                        <label
+                            style="display:block;margin-bottom:6px;font-size:0.82rem;font-weight:600;color:#334155;">匯出格式</label>
+                        <select id="exportFormatSelect"
+                            style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.88rem;font-family:inherit;color:#0f172a;background:#fff;outline:none;cursor:pointer;appearance:auto;">
+                            <option value="exportPDF">PDF 文件 (.pdf)</option>
+                            <option value="exportPPTX">PowerPoint 簡報 (.pptx)</option>
+                            <option value="exportImages">圖片壓縮包 (.zip)</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:8px;">
+                        <label
+                            style="display:block;margin-bottom:8px;font-size:0.82rem;font-weight:600;color:#334155;">匯出範圍</label>
+                        <div style="display:flex;flex-direction:column;gap:10px;">
+                            <label
+                                style="display:flex;align-items:center;gap:8px;font-size:0.88rem;color:#334155;cursor:pointer;margin:0;">
+                                <input type="radio" name="exportRange" value="all" checked
+                                    style="margin:0;width:16px;height:16px;accent-color:#6366f1;">
+                                <span>全部投影片</span>
+                            </label>
+                            <label
+                                style="display:flex;align-items:center;gap:8px;font-size:0.88rem;color:#334155;cursor:pointer;margin:0;">
+                                <input type="radio" name="exportRange" value="current"
+                                    style="margin:0;width:16px;height:16px;accent-color:#6366f1;">
+                                <span>僅目前投影片</span>
+                            </label>
+                            <label
+                                style="display:flex;align-items:center;gap:8px;font-size:0.88rem;color:#334155;cursor:pointer;margin:0;flex-wrap:nowrap;">
+                                <input type="radio" name="exportRange" value="custom"
+                                    style="margin:0;width:16px;height:16px;flex-shrink:0;accent-color:#6366f1;">
+                                <span style="white-space:nowrap;">自訂範圍</span>
+                                <input type="text" id="exportRangeInput"
+                                    style="flex:1;min-width:0;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.82rem;font-family:inherit;color:#0f172a;outline:none;"
+                                    placeholder="例如: 1-5, 8, 11-13" disabled>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 進度區塊 (匯出中顯示) -->
+                <div id="exportProgressArea" style="display:none;padding:16px 0;">
+                    <div id="exportStatusText"
+                        style="text-align:center;font-size:0.92rem;color:#334155;margin-bottom:16px;">準備中...</div>
+                    <div class="pdf-progress-bar">
+                        <div class="pdf-progress-fill" id="exportProgressFill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pdf-import-footer" id="exportFooter">
+                <button class="btn btn-secondary" id="exportCancelBtn">取消</button>
+                <button class="btn btn-primary" id="exportConfirmBtn">開始匯出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模態對話框 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">標題</h3>
+                <button class="modal-close" id="modalClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- 動態內容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">取消</button>
+                <button class="btn btn-primary" id="modalConfirm">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 簡報模式 -->
+    <div class="presentation-mode" id="presentationMode">
+        <div class="presentation-slide" id="presentationSlide"></div>
+
+        <!-- 頂部統一資訊列 -->
+        <div id="presTopBar" style="
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: 40px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #fff;
+            font-family: 'Noto Sans TC', sans-serif;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        ">
+            <!-- 左：狀態 · 課程 -->
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;min-width:0;">
+                <span id="presInstructorBadge" style="
+                    display: none;
+                    align-items: center;
+                    gap: 4px;
+                    color: #86efac;
+                    font-size: 11px;
+                    font-weight: 600;
+                    white-space: nowrap;
+                ">
+                    <span
+                        style="width:6px;height:6px;background:#86efac;border-radius:50%;animation:broadcastPulse 1.2s ease-in-out infinite;"></span>
+                    廣播中
+                </span>
+                <span id="presBroadcastCode" style="
+                    display: none;
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                    font-weight: 700;
+                    background: rgba(255,255,255,0.15);
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    letter-spacing: 1px;
+                "></span>
+                <span id="presBroadcastViewers" style="
+                    display: none;
+                    font-size: 11px;
+                    opacity: 0.7;
+                "></span>
+                <span id="presInfoText"
+                    style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0.7;font-size:12px;"></span>
+            </div>
+
+            <!-- 中：追隨 / 自主 切換 -->
+            <div id="presFollowToggle" style="
+                display: flex;
+                background: rgba(255,255,255,0.12);
+                border-radius: 6px;
+                padding: 2px;
+                pointer-events: auto;
+            ">
+                <button id="presFollowBtn" class="pres-follow-btn active" onclick="window._setPresMode('follow')" style="
+                    padding: 3px 12px;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    gap: 3px;
+                    background: #fff;
+                    color: #1e293b;
+                ">
+                    <span class="material-symbols-outlined" style="font-size:13px;">sync</span>
+                    跟隨講師
+                </button>
+                <button id="presBrowseBtn" class="pres-follow-btn" onclick="window._setPresMode('browse')" style="
+                    padding: 3px 12px;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    gap: 3px;
+                    background: transparent;
+                    color: rgba(255,255,255,0.5);
+                ">
+                    <span class="material-symbols-outlined" style="font-size:13px;">explore</span>
+                    自由瀏覽
+                </button>
+            </div>
+
+            <!-- 右：儀表板 · 頁碼 · 全螢幕 · 關閉 -->
+            <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
+                <button id="presDashboardBtn" title="開啟即時儀表板" style="
+                    display: none;
+                    align-items: center;
+                    gap: 3px;
+                    background: rgba(255,255,255,0.12);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    color: rgba(255,255,255,0.85);
+                    padding: 3px 10px;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+                    white-space: nowrap;
+                ">
+                    <span class="material-symbols-outlined" style="font-size:13px;">bar_chart</span>
+                    儀表板
+                </button>
+                <button id="presCopyCodeBtn" title="複製課堂代碼" style="
+                    display: none;
+                    align-items: center;
+                    gap: 3px;
+                    background: rgba(255,255,255,0.12);
+                    border: 1px solid rgba(255,255,255,0.2);
+                    color: rgba(255,255,255,0.85);
+                    padding: 3px 10px;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+                    white-space: nowrap;
+                ">
+                    <span class="material-symbols-outlined" style="font-size:13px;">content_copy</span>
+                    複製代碼
+                </button>
+                <button id="presStopBroadcastBtn" title="停止廣播" style="
+                    display: none;
+                    align-items: center;
+                    gap: 3px;
+                    background: rgba(239,68,68,0.2);
+                    border: 1px solid rgba(239,68,68,0.4);
+                    color: #fca5a5;
+                    padding: 3px 10px;
+                    border-radius: 5px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-family: inherit;
+                    white-space: nowrap;
+                ">
+                    <span class="material-symbols-outlined" style="font-size:13px;">stop_circle</span>
+                    停止廣播
+                </button>
+                <span id="presCounterTop" style="font-size:11px;opacity:0.5;"></span>
+                <button class="pres-tool-btn" id="presFullscreenToggle" title="全螢幕"
+                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.5;padding:3px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">fullscreen</span>
+                </button>
+                <button class="pres-tool-btn" id="exitPresentation" title="離開簡報"
+                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.5;padding:3px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 底部導航 -->
+        <div class="presentation-nav">
+            <button class="pres-nav-btn" id="presPrev">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button class="pres-nav-btn" id="presNext">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 形狀選擇器 -->
+    <div class="shape-picker" id="shapePicker">
+        <button class="shape-option" data-shape="rectangle">
+            <span class="material-symbols-outlined">rectangle</span> 矩形
+        </button>
+        <button class="shape-option" data-shape="circle">
+            <span class="material-symbols-outlined">circle</span> 圓形
+        </button>
+        <button class="shape-option" data-shape="arrow">
+            <span class="material-symbols-outlined">arrow_forward</span> 箭頭
+        </button>
+        <button class="shape-option" data-shape="triangle">
+            <span class="material-symbols-outlined">change_history</span> 三角形
+        </button>
+    </div>
+    <!-- AI 出題 -->
+    <div class="template-picker-overlay" id="aiQuizOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:420px;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#f59e0b;">auto_awesome</span>
+                    AI 自動出題
+                </h3>
+                <button class="template-picker-close" id="aiQuizClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div>
+                    <label
+                        style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">主題</label>
+                    <input type="text" id="aiQuizTopic" placeholder="例如：AI 的基本概念"
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;font-family:inherit;">
+                </div>
+                <div style="display:flex;gap:12px;">
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">題數</label>
+                        <select id="aiQuizCount"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;font-family:inherit;">
+                            <option value="1">1 題</option>
+                            <option value="2">2 題</option>
+                            <option value="3" selected>3 題</option>
+                            <option value="5">5 題</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">難度</label>
+                        <select id="aiQuizDifficulty"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;font-family:inherit;">
+                            <option value="easy">簡單</option>
+                            <option value="medium" selected>中等</option>
+                            <option value="hard">困難</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="aiQuizGenerate"
+                    style="padding:12px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform 0.15s;">
+                    <span class="material-symbols-outlined"
+                        style="font-size:18px;vertical-align:middle;margin-right:4px;">auto_awesome</span>
+                    生成選擇題
+                </button>
+                <div id="aiQuizStatus" style="font-size:0.8rem;color:#64748b;text-align:center;min-height:20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 生成簡報 -->
+    <div class="template-picker-overlay" id="aiGenerateOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:520px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#8b5cf6;">magic_button</span>
+                    AI 生成簡報
+                </h3>
+                <button class="template-picker-close" id="aiGenerateClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <!-- 輸入表單 -->
+            <div id="aiGenerateForm" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div>
+                    <label
+                        style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">客戶名稱</label>
+                    <input type="text" id="aiGenClient" placeholder="例如：ABC 旅行社"
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                </div>
+                <div style="display:flex;gap:12px;">
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">程度</label>
+                        <select id="aiGenLevel"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                            <option value="初級">初級（完全新手）</option>
+                            <option value="中級" selected>中級（有基本概念）</option>
+                            <option value="進階">進階（有使用經驗）</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">頁數</label>
+                        <input type="number" id="aiGenPages" value="30" min="10" max="200"
+                            style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">上傳
+                        PDF（選填）</label>
+                    <input type="file" id="aiGenPdf" accept=".pdf,.txt"
+                        style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem;">
+                </div>
+                <div>
+                    <label style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">課程大綱
+                        / 內容描述</label>
+                    <textarea id="aiGenOutline" rows="6" placeholder="請描述課程內容、主題、天數等..."
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;resize:vertical;line-height:1.6;"></textarea>
+                </div>
+                <button id="aiGenerateStart"
+                    style="padding:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span>
+                    開始生成
+                </button>
+            </div>
+            <!-- 進度顯示 -->
+            <div id="aiGenerateProgress" style="display:none;padding:24px;">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="font-size:48px;margin-bottom:8px;" id="aiGenEmoji">🧠</div>
+                    <div style="font-size:1rem;font-weight:600;color:#1e293b;" id="aiGenPhaseTitle">AI 正在思考...</div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                        <span style="font-size:.82rem;color:#64748b;" id="aiGenStepLabel">準備中...</span>
+                        <span style="font-size:.82rem;font-weight:600;color:#6366f1;" id="aiGenPercent">0%</span>
+                    </div>
+                    <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
+                        <div id="aiGenBar"
+                            style="height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:4px;width:0%;transition:width .5s ease;">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;justify-content:center;">
+                    <div class="ai-phase-dot" id="aiPhase1"
+                        style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#94a3b8;">
+                        1</div>
+                    <div style="width:40px;height:2px;background:#e2e8f0;align-self:center;"></div>
+                    <div class="ai-phase-dot" id="aiPhase2"
+                        style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#94a3b8;">
+                        2</div>
+                    <div style="width:40px;height:2px;background:#e2e8f0;align-self:center;"></div>
+                    <div class="ai-phase-dot" id="aiPhase3"
+                        style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#94a3b8;">
+                        3</div>
+                </div>
+                <div style="display:flex;justify-content:center;gap:24px;margin-top:8px;">
+                    <span style="font-size:.72rem;color:#94a3b8;">內容規劃</span>
+                    <span style="font-size:.72rem;color:#94a3b8;">模板套用</span>
+                    <span style="font-size:.72rem;color:#94a3b8;">排版美化</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模板選擇器 -->
+    <div class="template-picker-overlay" id="templatePickerOverlay" style="display:none;">
+        <div class="template-picker-modal">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;">dashboard</span>
+                    選擇模板
+                </h3>
+                <button class="template-picker-close" id="templatePickerClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="template-picker-grid" id="templatePickerGrid">
+                <!-- 動態載入 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 匯出依賴 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+    <script src="scripts/app.js?v=20260228c" type="module"></script>
+    <script src="components/nav.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,280 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" font-family="'Noto Sans TC', 'Helvetica Neue', sans-serif">
+  <defs>
+    <!-- 背景漸層 -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <!-- 連線漸層 -->
+    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <!-- 箭頭 -->
+    <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#8b5cf6"/>
+    </marker>
+    <marker id="arrowDown" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#475569"/>
+    </marker>
+    <!-- 節點漸層 -->
+    <linearGradient id="nodeBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="nodePurple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="nodeIndigo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="nodeEmerald" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="nodeAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="nodeTeal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="nodeRose" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <!-- 光暈 -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1100" height="520" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- 標題 -->
+  <text x="550" y="42" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" letter-spacing="1">學員學習旅程</text>
+  <line x1="460" y1="52" x2="640" y2="52" stroke="#334155" stroke-width="1"/>
+
+  <!-- ════ 頂部時間軸 ════ -->
+
+  <!-- 階段標籤 -->
+  <text x="90" y="86" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">STEP 1</text>
+  <text x="245" y="86" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">STEP 2</text>
+  <text x="475" y="86" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">STEP 3</text>
+  <text x="705" y="86" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">STEP 4</text>
+  <text x="860" y="86" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">STEP 5</text>
+  <text x="1010" y="86" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">STEP 6</text>
+
+  <!-- ═══ 主流程節點 ═══ -->
+
+  <!-- 1. 報名 -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="100" width="120" height="72" rx="12" fill="url(#nodeBlue)"/>
+    <text x="90" y="130" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">報名購買</text>
+    <text x="90" y="150" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">外部金流平台</text>
+    <text x="90" y="163" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="9">Webhook 自動建帳</text>
+  </g>
+
+  <!-- 連線 1→2 -->
+  <line x1="150" y1="136" x2="180" y2="136" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 2. 課前準備 -->
+  <g filter="url(#shadow)">
+    <rect x="185" y="100" width="120" height="72" rx="12" fill="url(#nodeIndigo)"/>
+    <text x="245" y="127" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">課前準備</text>
+    <text x="245" y="147" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">背景問卷</text>
+    <text x="245" y="161" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">準備清單</text>
+  </g>
+
+  <!-- 連線 2→3 -->
+  <line x1="305" y1="136" x2="335" y2="136" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 3. 課中互動（大節點） -->
+  <g filter="url(#shadow)">
+    <rect x="340" y="94" width="270" height="84" rx="14" fill="url(#nodePurple)"/>
+    <text x="475" y="125" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">課中互動</text>
+    <!-- 子項目 -->
+    <g font-size="9" fill="rgba(255,255,255,0.75)">
+      <rect x="352" y="138" width="46" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+      <text x="375" y="152" text-anchor="middle">投票</text>
+      <rect x="403" y="138" width="46" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+      <text x="426" y="152" text-anchor="middle">測驗</text>
+      <rect x="454" y="138" width="46" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+      <text x="477" y="152" text-anchor="middle">連連看</text>
+      <rect x="505" y="138" width="46" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+      <text x="528" y="152" text-anchor="middle">填空</text>
+      <rect x="556" y="138" width="46" height="20" rx="4" fill="rgba(255,255,255,0.15)"/>
+      <text x="579" y="152" text-anchor="middle">作業</text>
+    </g>
+  </g>
+
+  <!-- 連線 3→4 -->
+  <line x1="610" y1="136" x2="640" y2="136" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 4. 課後回顧 -->
+  <g filter="url(#shadow)">
+    <rect x="645" y="100" width="120" height="72" rx="12" fill="url(#nodeEmerald)"/>
+    <text x="705" y="127" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">課後回顧</text>
+    <text x="705" y="147" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">滿意度問卷</text>
+    <text x="705" y="161" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">課後測驗</text>
+  </g>
+
+  <!-- 連線 4→5 -->
+  <line x1="765" y1="136" x2="795" y2="136" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 5. 學習摘要 -->
+  <g filter="url(#shadow)">
+    <rect x="800" y="100" width="120" height="72" rx="12" fill="url(#nodeTeal)"/>
+    <text x="860" y="127" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">學習摘要</text>
+    <text x="860" y="147" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">AI 個人化</text>
+    <text x="860" y="161" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">重點回顧</text>
+  </g>
+
+  <!-- 連線 5→6 -->
+  <line x1="920" y1="136" x2="950" y2="136" stroke="url(#lineGrad)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 6. 個人化信件 -->
+  <g filter="url(#shadow)">
+    <rect x="955" y="100" width="115" height="72" rx="12" fill="url(#nodeRose)"/>
+    <text x="1012" y="127" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">個人化信件</text>
+    <text x="1012" y="147" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">課後回饋</text>
+    <text x="1012" y="161" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">講師發送</text>
+  </g>
+
+  <!-- ════ 角色泳道 ════ -->
+
+  <!-- 分隔線 -->
+  <line x1="30" y1="210" x2="1070" y2="210" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- 學員端 -->
+  <text x="50" y="240" fill="#60a5fa" font-size="13" font-weight="700">學員端</text>
+  <text x="50" y="256" fill="#475569" font-size="9">手機瀏覽器</text>
+
+  <g font-size="10">
+    <!-- 課前 -->
+    <rect x="185" y="228" width="120" height="36" rx="8" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+    <text x="245" y="250" text-anchor="middle" fill="#93c5fd">pre-class.html</text>
+    <!-- 課中 -->
+    <rect x="380" y="228" width="120" height="36" rx="8" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+    <text x="440" y="250" text-anchor="middle" fill="#93c5fd">student.html</text>
+    <!-- 課後 -->
+    <rect x="645" y="228" width="120" height="36" rx="8" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+    <text x="705" y="250" text-anchor="middle" fill="#93c5fd">post-class.html</text>
+    <!-- 摘要 -->
+    <rect x="800" y="228" width="120" height="36" rx="8" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1"/>
+    <text x="860" y="250" text-anchor="middle" fill="#93c5fd">course-summary</text>
+  </g>
+
+  <!-- 連線：節點→頁面 -->
+  <line x1="245" y1="172" x2="245" y2="228" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowDown)"/>
+  <line x1="440" y1="178" x2="440" y2="228" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowDown)"/>
+  <line x1="705" y1="172" x2="705" y2="228" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowDown)"/>
+  <line x1="860" y1="172" x2="860" y2="228" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrowDown)"/>
+
+  <!-- 分隔線 -->
+  <line x1="30" y1="290" x2="1070" y2="290" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- 講師端 -->
+  <text x="50" y="318" fill="#c084fc" font-size="13" font-weight="700">講師端</text>
+  <text x="50" y="334" fill="#475569" font-size="9">電腦瀏覽器</text>
+
+  <g font-size="10">
+    <!-- 簡報編輯 -->
+    <rect x="340" y="306" width="130" height="36" rx="8" fill="#2d1b69" stroke="#8b5cf6" stroke-width="1"/>
+    <text x="405" y="328" text-anchor="middle" fill="#c4b5fd">editor.html</text>
+    <!-- 簡報模式 -->
+    <rect x="490" y="306" width="130" height="36" rx="8" fill="#2d1b69" stroke="#8b5cf6" stroke-width="1"/>
+    <text x="555" y="328" text-anchor="middle" fill="#c4b5fd">簡報播放模式</text>
+    <!-- 學習分析 -->
+    <rect x="800" y="306" width="120" height="36" rx="8" fill="#2d1b69" stroke="#8b5cf6" stroke-width="1"/>
+    <text x="860" y="328" text-anchor="middle" fill="#c4b5fd">report.html</text>
+    <!-- 信件 -->
+    <rect x="940" y="306" width="120" height="36" rx="8" fill="#2d1b69" stroke="#8b5cf6" stroke-width="1"/>
+    <text x="1000" y="328" text-anchor="middle" fill="#c4b5fd">信件生成 / 發送</text>
+  </g>
+
+  <!-- WebSocket 雙向箭頭 -->
+  <line x1="480" y1="264" x2="520" y2="306" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="510" y="282" fill="#a78bfa" font-size="8" text-anchor="middle">WebSocket</text>
+
+  <!-- 連線：報告→信件 -->
+  <line x1="920" y1="324" x2="940" y2="324" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 信件→學員 -->
+  <path d="M1000,306 L1000,250 L920,250" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrow)"/>
+  <text x="970" y="276" fill="#fb7185" font-size="8" text-anchor="middle">Email</text>
+
+  <!-- ════ 底部：資料層 ════ -->
+
+  <line x1="30" y1="370" x2="1070" y2="370" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <text x="50" y="398" fill="#94a3b8" font-size="13" font-weight="700">資料層</text>
+  <text x="50" y="414" fill="#475569" font-size="9">InsForge Backend</text>
+
+  <g font-size="9" fill="#94a3b8">
+    <!-- DB Tables -->
+    <rect x="150" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="192" y="404" text-anchor="middle">students</text>
+
+    <rect x="244" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="286" y="404" text-anchor="middle">survey_*</text>
+
+    <rect x="338" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="380" y="404" text-anchor="middle">checklist_*</text>
+
+    <rect x="432" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="474" y="404" text-anchor="middle">submissions</text>
+
+    <rect x="526" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="568" y="404" text-anchor="middle">satisfaction_*</text>
+
+    <rect x="620" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="662" y="404" text-anchor="middle">exam_*</text>
+
+    <rect x="714" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="756" y="404" text-anchor="middle">email_drafts</text>
+
+    <rect x="808" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="850" y="404" text-anchor="middle">projects</text>
+
+    <rect x="902" y="386" width="84" height="28" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="944" y="404" text-anchor="middle">purchases</text>
+  </g>
+
+  <!-- 外部服務 -->
+  <g font-size="9">
+    <rect x="200" y="440" width="100" height="30" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="250" y="459" text-anchor="middle" fill="#64748b">金流 Webhook</text>
+
+    <rect x="430" y="440" width="100" height="30" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="480" y="459" text-anchor="middle" fill="#64748b">AI / LLM</text>
+
+    <rect x="660" y="440" width="100" height="30" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="710" y="459" text-anchor="middle" fill="#64748b">Email 服務</text>
+
+    <rect x="880" y="440" width="100" height="30" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="930" y="459" text-anchor="middle" fill="#64748b">Storage</text>
+  </g>
+
+  <!-- 底部說明 -->
+  <g font-size="9" fill="#475569">
+    <rect x="30" y="492" width="10" height="10" rx="2" fill="#3b82f6"/>
+    <text x="46" y="501">學員端</text>
+    <rect x="100" y="492" width="10" height="10" rx="2" fill="#8b5cf6"/>
+    <text x="116" y="501">講師端</text>
+    <rect x="170" y="492" width="10" height="10" rx="2" fill="#334155"/>
+    <text x="186" y="501">資料層</text>
+    <line x1="240" y1="497" x2="270" y2="497" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="278" y="501">資料流</text>
+    <line x1="330" y1="497" x2="360" y2="497" stroke="#475569" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="368" y="501">對應關係</text>
+  </g>
+</svg>

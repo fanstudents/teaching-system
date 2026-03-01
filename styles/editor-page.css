@@ -1,0 +1,149 @@
+/* ========================================
+   editor.html — 簡報編輯器頁面（補充樣式）
+   main.css + editor.css 已涵蓋大部分樣式
+   此檔案僅包含 Template Picker 專屬樣式
+   ======================================== */
+
+/* ── Template Picker ── */
+.template-picker-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+}
+
+.template-picker-modal {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    width: 780px;
+    max-height: 85vh;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    animation: tpl-in 0.2s ease;
+}
+
+@keyframes tpl-in {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+.template-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.template-picker-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.template-picker-close:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.template-picker-grid {
+    padding: 0;
+    overflow-y: auto;
+    max-height: calc(85vh - 60px);
+}
+
+/* Category tabs */
+.tpl-category-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    background: var(--bg-elevated);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.tpl-tab {
+    padding: 5px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.tpl-tab:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.tpl-tab.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+}
+
+/* Template cards grid */
+.tpl-grid-inner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 16px 20px;
+}
+
+.template-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg-elevated);
+}
+
+.template-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 122, 232, 0.15);
+}
+
+.tpl-preview {
+    width: 100%;
+    height: 90px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tpl-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tpl-info .material-symbols-outlined {
+    color: var(--accent-primary);
+}

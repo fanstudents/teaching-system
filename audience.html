@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>互動模式 — 教學簡報系統</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+    <link rel="stylesheet" href="styles/interactive.css?v=20260228">
+    <link rel="stylesheet" href="styles/interactive-theme.css?v=20260228">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100dvh;
+            overflow: hidden;
+        }
+
+        /* ── 加入畫面 ── */
+        .aud-join {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+            padding: 24px;
+        }
+
+        .aud-join-card {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 36px 28px;
+        }
+
+        .aud-join-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+        }
+
+        .aud-join-icon .material-symbols-outlined {
+            font-size: 28px;
+            color: white;
+        }
+
+        .aud-join-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .aud-join-sub {
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+
+        .aud-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .aud-input:focus {
+            border-color: #6366f1;
+        }
+
+        .aud-input::placeholder {
+            color: #64748b;
+        }
+
+        .aud-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 4px;
+        }
+
+        .aud-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .aud-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+            transform: none;
+        }
+
+        .aud-error {
+            color: #f87171;
+            font-size: 13px;
+            margin-top: 8px;
+            text-align: center;
+            min-height: 18px;
+        }
+
+        /* ── 互動主畫面 ── */
+        .aud-main {
+            display: none;
+            flex-direction: column;
+            min-height: 100dvh;
+            width: 100%;
+        }
+
+        .aud-main.active {
+            display: flex;
+        }
+
+        .aud-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .aud-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .aud-live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: aud-pulse 2s infinite;
+        }
+
+        @keyframes aud-pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .aud-topbar-title {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .aud-topbar-page {
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .aud-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .aud-name-badge {
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .aud-close-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .aud-close-btn .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        /* ── 互動內容區 ── */
+        .aud-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        /* 等待狀態 */
+        .aud-waiting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            text-align: center;
+        }
+
+        .aud-waiting-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .aud-waiting-icon .material-symbols-outlined {
+            font-size: 26px;
+            color: #6366f1;
+            animation: aud-float 3s ease-in-out infinite;
+        }
+
+        @keyframes aud-float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .aud-waiting-text {
+            font-size: 15px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .aud-waiting-sub {
+            font-size: 12px;
+            color: #475569;
+        }
+
+        /* 互動元素容器 — 覆蓋主題色以適應深色背景 */
+        .aud-interaction-wrap {
+            width: 100%;
+            max-width: 520px;
+        }
+
+        /* 深色模式覆蓋 */
+        .aud-interaction-wrap .truefalse-container,
+        .aud-interaction-wrap .opentext-container,
+        .aud-interaction-wrap .scale-container,
+        .aud-interaction-wrap .buzzer-container,
+        .aud-interaction-wrap .wordcloud-container,
+        .aud-interaction-wrap .hotspot-container,
+        .aud-interaction-wrap .quiz-container,
+        .aud-interaction-wrap .poll-container,
+        .aud-interaction-wrap .matching-container,
+        .aud-interaction-wrap .fill-blank-container,
+        .aud-interaction-wrap .ordering-container {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+        }
+
+        .aud-interaction-wrap .quiz-question,
+        .aud-interaction-wrap .poll-question,
+        .aud-interaction-wrap .hotspot-question,
+        .aud-interaction-wrap .tf-question,
+        .aud-interaction-wrap .opentext-question,
+        .aud-interaction-wrap .scale-question,
+        .aud-interaction-wrap .buzzer-question,
+        .aud-interaction-wrap .wordcloud-question {
+            color: #f1f5f9;
+        }
+
+        /* 選項深色覆蓋 */
+        .aud-interaction-wrap .quiz-option,
+        .aud-interaction-wrap .poll-option {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .aud-interaction-wrap .quiz-option:hover,
+        .aud-interaction-wrap .poll-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .aud-interaction-wrap input[type="text"],
+        .aud-interaction-wrap textarea {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+        }
+
+        /* 斷線 */
+        .aud-disconnected {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .aud-disconnected.active {
+            display: flex;
+        }
+
+        .aud-disconnected .material-symbols-outlined {
+            font-size: 40px;
+            color: #64748b;
+        }
+
+        .aud-disconnected p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* ── Reaction Bar ── */
+        .aud-reaction-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 20;
+        }
+
+        .aud-reaction-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .aud-reaction-btn:active {
+            transform: scale(1.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .aud-qa-float-btn {
+            position: fixed;
+            bottom: 72px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 21;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .aud-qa-float-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* ── Q&A Panel ── */
+        .aud-qa-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 70vh;
+            background: #1e293b;
+            border-radius: 16px 16px 0 0;
+            z-index: 30;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .aud-qa-panel.open {
+            transform: translateY(0);
+        }
+
+        .aud-qa-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .aud-qa-header span {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .aud-qa-close {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .aud-qa-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            max-height: 50vh;
+        }
+
+        .aud-qa-input-row {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .aud-qa-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .aud-qa-input::placeholder {
+            color: #64748b;
+        }
+
+        .aud-qa-send {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .aud-qa-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 8px;
+        }
+
+        .aud-qa-item-text {
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .aud-qa-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .aud-qa-item-author {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .aud-qa-upvote {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 4px 10px;
+            color: #94a3b8;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .aud-qa-upvote:hover {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+        }
+
+        .aud-qa-upvote.voted {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border-color: #6366f1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 加入畫面 -->
+    <div class="aud-join" id="audJoin">
+        <div class="aud-join-card">
+            <div class="aud-join-icon">
+                <span class="material-symbols-outlined">interactive_space</span>
+            </div>
+            <div class="aud-join-title">加入互動</div>
+            <div class="aud-join-sub">輸入課堂代碼，即時參與互動</div>
+            <input class="aud-input" id="audCode" placeholder="六位數課堂代碼" maxlength="6" autocomplete="off">
+            <input class="aud-input" id="audName" placeholder="你的名字（必填）" autocomplete="off" required>
+            <button class="aud-btn" id="audJoinBtn">加入</button>
+            <div class="aud-error" id="audError"></div>
+        </div>
+    </div>
+
+    <!-- 互動主畫面 -->
+    <div class="aud-main" id="audMain">
+        <div class="aud-topbar">
+            <div class="aud-topbar-left">
+                <div class="aud-live-dot"></div>
+                <span class="aud-topbar-title" id="audTitle">課堂互動</span>
+                <span class="aud-topbar-page" id="audPage"></span>
+            </div>
+            <div class="aud-topbar-right">
+                <span class="aud-name-badge" id="audNameBadge"></span>
+                <button class="aud-close-btn" id="audCloseBtn" title="離開">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+        <div class="aud-content" id="audContent">
+            <div class="aud-waiting" id="audWaiting">
+                <div class="aud-waiting-icon">
+                    <span class="material-symbols-outlined">radio_button_checked</span>
+                </div>
+                <div class="aud-waiting-text">等待講師開啟互動</div>
+                <div class="aud-waiting-sub">在有互動元素的投影片上，這裡會自動顯示</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 斷線 -->
+    <div class="aud-disconnected" id="audDisconnected">
+        <span class="material-symbols-outlined">wifi_off</span>
+        <p>課堂已結束或連線中斷</p>
+        <button class="aud-btn" style="max-width:200px;" onclick="location.reload()">重新加入</button>
+    </div>
+
+    <!-- Emoji Reaction Bar -->
+    <div class="aud-reaction-bar" id="audReactionBar" style="display:none;">
+        <button class="aud-reaction-btn" data-emoji="👍">👍</button>
+        <button class="aud-reaction-btn" data-emoji="❤️">❤️</button>
+        <button class="aud-reaction-btn" data-emoji="😂">😂</button>
+        <button class="aud-reaction-btn" data-emoji="😮">😮</button>
+        <button class="aud-reaction-btn" data-emoji="👏">👏</button>
+    </div>
+
+    <!-- Q&A Float Button -->
+    <button class="aud-qa-float-btn" id="audQABtn" style="display:none;" title="提問">❓</button>
+
+    <!-- Q&A Panel -->
+    <div class="aud-qa-panel" id="audQAPanel">
+        <div class="aud-qa-header">
+            <span>💬 提問區</span>
+            <button class="aud-qa-close" id="audQAClose">✕</button>
+        </div>
+        <div class="aud-qa-body" id="audQABody">
+            <div style="text-align:center;padding:20px;color:#64748b;font-size:13px;">還沒有人提問，你來第一個！</div>
+        </div>
+        <div class="aud-qa-input-row">
+            <input class="aud-qa-input" id="audQAInput" placeholder="輸入你的問題…">
+            <button class="aud-qa-send" id="audQASend">送出</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, realtime } from './scripts/supabase.js';
+        import { MatchingGame } from './scripts/interactive/matching.js';
+        import { FillBlank } from './scripts/interactive/fillBlank.js';
+        import { OrderingGame } from './scripts/interactive/ordering.js';
+        import { QuizGame } from './scripts/interactive/quiz.js';
+        import { PollGame } from './scripts/interactive/poll.js';
+        import { TrueFalseGame } from './scripts/interactive/truefalse.js';
+        import { OpenTextGame } from './scripts/interactive/opentext.js';
+        import { ScaleGame } from './scripts/interactive/scale.js';
+        import { BuzzerGame } from './scripts/interactive/buzzer.js';
+        import { WordCloudGame } from './scripts/interactive/wordcloud.js';
+        import { HotspotGame } from './scripts/interactive/hotspot.js';
+
+        // 互動類型清單
+        const interactiveTypes = [
+            'matching', 'fillblank', 'ordering', 'quiz', 'poll',
+            'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot'
+        ];
+
+        // 初始化互動遊戲模組
+        const matchingGame = new MatchingGame();
+        const fillBlank = new FillBlank();
+        const orderingGame = new OrderingGame();
+        const quizGame = new QuizGame();
+        const pollGame = new PollGame();
+        const trueFalse = new TrueFalseGame();
+        const openText = new OpenTextGame();
+        const scale = new ScaleGame();
+        const buzzer = new BuzzerGame();
+        const wordCloud = new WordCloudGame();
+        const hotspot = new HotspotGame();
+
+        let sessionCode = '';
+        let studentId = '';
+        let studentName = '';
+        let heartbeatTimer = null;
+
+        // ── URL params auto-fill ──
+        const urlParams = new URLSearchParams(location.search);
+        const autoCode = urlParams.get('code');
+        if (autoCode) document.getElementById('audCode').value = autoCode;
+        const autoName = urlParams.get('name');
+        if (autoName) document.getElementById('audName').value = autoName;
+
+        // ── Events ──
+        document.getElementById('audJoinBtn').addEventListener('click', joinSession);
+        document.getElementById('audCode').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('audName').focus();
+        });
+        document.getElementById('audName').addEventListener('keydown', e => {
+            if (e.key === 'Enter') joinSession();
+        });
+        document.getElementById('audCloseBtn').addEventListener('click', () => {
+            if (confirm('確定要離開互動？')) location.reload();
+        });
+
+        // Auto-join
+        if (autoCode && autoName) joinSession();
+
+        async function joinSession() {
+            const code = document.getElementById('audCode').value.trim().toUpperCase();
+            const name = document.getElementById('audName').value.trim();
+            const errorEl = document.getElementById('audError');
+            errorEl.textContent = '';
+
+            if (!code) { errorEl.textContent = '請輸入課堂代碼'; return; }
+            if (!name) { errorEl.textContent = '請輸入你的名字'; document.getElementById('audName').focus(); return; }
+
+            const btn = document.getElementById('audJoinBtn');
+            btn.disabled = true;
+            btn.textContent = '連線中…';
+
+            try {
+                const { data } = await db.select('sessions', {
+                    filter: { session_code: `eq.${code}`, is_broadcasting: 'eq.true' },
+                    limit: 1
+                });
+                if (!data || !data.length) {
+                    errorEl.textContent = '找不到此課堂或尚未開始廣播';
+                    btn.disabled = false; btn.textContent = '加入';
+                    return;
+                }
+
+                const session = data[0];
+                sessionCode = code;
+                studentName = name;
+                studentId = `aud_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+                // 訂閱 realtime
+                await realtime.subscribe(`session:${sessionCode}`);
+
+                // 通知上線
+                realtime.publish(`session:${sessionCode}`, 'student_join', {
+                    studentId, studentName
+                });
+
+                // 心跳
+                heartbeatTimer = setInterval(() => {
+                    realtime.publish(`session:${sessionCode}`, 'student_heartbeat', {
+                        studentId, studentName
+                    });
+                }, 15000);
+
+                // 監聽投影片變化
+                realtime.on('slide_change', (msg) => {
+                    const payload = msg.payload || msg;
+                    const slide = payload.slide;
+                    const idx = payload.slideIndex;
+                    const total = payload.totalSlides;
+                    renderInteraction(slide, idx, total);
+                });
+
+                realtime.on('session_end', () => {
+                    if (heartbeatTimer) clearInterval(heartbeatTimer);
+                    document.getElementById('audDisconnected').classList.add('active');
+                });
+
+                window.addEventListener('beforeunload', () => {
+                    realtime.publish(`session:${sessionCode}`, 'student_leave', {
+                        studentId, studentName
+                    });
+                    if (heartbeatTimer) clearInterval(heartbeatTimer);
+                });
+
+                // UI 切換
+                document.getElementById('audJoin').style.display = 'none';
+                document.getElementById('audMain').classList.add('active');
+                document.getElementById('audTitle').textContent = session.title || '課堂互動';
+                document.getElementById('audNameBadge').textContent = name;
+
+                // 嘗試載入當前頁面
+                const currentSlide = parseInt(session.current_slide || '0');
+                try {
+                    const projectId = session.project_id;
+                    if (projectId) {
+                        const { data: project } = await db.select('projects', {
+                            filter: { id: `eq.${projectId}` },
+                            select: 'slides_data', limit: 1
+                        });
+                        if (project?.[0]?.slides_data) {
+                            const slides = JSON.parse(project[0].slides_data);
+                            if (slides[currentSlide]) {
+                                renderInteraction(slides[currentSlide], currentSlide, slides.length);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Load initial slide failed:', e);
+                }
+
+            } catch (e) {
+                errorEl.textContent = '連線失敗：' + (e.message || e);
+                btn.disabled = false; btn.textContent = '加入';
+            }
+        }
+
+        function renderInteraction(slide, index, total) {
+            if (!slide) return;
+            const content = document.getElementById('audContent');
+            const page = document.getElementById('audPage');
+            page.textContent = `${index + 1}/${total}`;
+
+            // 篩選互動元素
+            const interactiveEls = (slide.elements || []).filter(el =>
+                interactiveTypes.includes(el.type)
+            );
+
+            if (interactiveEls.length === 0) {
+                // 沒有互動 — 顯示等待
+                content.innerHTML = '';
+                const waiting = document.createElement('div');
+                waiting.className = 'aud-waiting';
+                waiting.innerHTML = `
+                    <div class="aud-waiting-icon">
+                        <span class="material-symbols-outlined">radio_button_checked</span>
+                    </div>
+                    <div class="aud-waiting-text">等待講師開啟互動</div>
+                    <div class="aud-waiting-sub">第 ${index + 1} 頁 — 沒有互動元素</div>
+                `;
+                content.appendChild(waiting);
+                return;
+            }
+
+            // 渲染互動元素
+            content.innerHTML = '';
+            interactiveEls.forEach(element => {
+                const wrap = document.createElement('div');
+                wrap.className = 'aud-interaction-wrap';
+
+                const el = createInteractiveElement(element);
+                if (el) {
+                    wrap.appendChild(el);
+                    content.appendChild(wrap);
+                }
+            });
+
+            // 初始化互動模組
+            setTimeout(() => {
+                window.dispatchEvent(new Event('slideRendered'));
+                matchingGame.init();
+                fillBlank.init();
+                orderingGame.init();
+                quizGame.init();
+                pollGame.init();
+            }, 100);
+        }
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function createInteractiveElement(element) {
+            const el = document.createElement('div');
+            el.className = `editable-element ${element.type}-element interactive-element`;
+            el.dataset.id = element.id;
+            el.dataset.type = element.type;
+            el.id = element.id;
+            // 觀眾模式：不用絕對定位，用流式佈局
+            el.style.position = 'relative';
+            el.style.width = '100%';
+            el.style.height = 'auto';
+            el.style.minHeight = '0';
+
+            switch (element.type) {
+                case 'matching': {
+                    const pairs = element.pairs || [];
+                    const shuffledPairs = shuffleArray(pairs);
+                    el.innerHTML = `
+                        <div class="matching-container">
+                            <svg class="matching-lines"></svg>
+                            <div class="matching-column left-column">
+                                ${pairs.map((pair, i) => `
+                                    <div class="matching-item" data-index="${i}" data-side="left">
+                                        ${pair.left}
+                                        <div class="matching-dot left"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="matching-column right-column">
+                                ${shuffledPairs.map(pair => `
+                                    <div class="matching-item" data-answer="${pair.left}" data-side="right">
+                                        ${pair.right}
+                                        <div class="matching-dot right"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'fillblank': {
+                    let contentHtml = element.content || '';
+                    (element.blanks || []).forEach((blank, i) => {
+                        contentHtml = contentHtml.replace(
+                            `___${i + 1}___`,
+                            `<input type="text" class="fill-blank-input" data-index="${i}" data-answer="${blank.answer}" placeholder="?">`
+                        );
+                    });
+                    el.innerHTML = `
+                        <div class="fill-blank-container">
+                            <div class="fill-blank-title">${element.title || '填空練習'}</div>
+                            <div class="fill-blank-content">${contentHtml}</div>
+                            <button class="fill-blank-check-btn">檢查答案</button>
+                            <div class="fill-blank-result"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'ordering': {
+                    const steps = element.steps || [];
+                    const shuffledSteps = shuffleArray([...steps]);
+                    el.innerHTML = `
+                        <div class="ordering-container">
+                            <div class="ordering-source">
+                                <div class="ordering-source-title">拖曳選項</div>
+                                ${shuffledSteps.map((text, i) => `
+                                    <div class="ordering-chip" draggable="true" data-value="${text}">
+                                        <span class="chip-icon">${String.fromCharCode(65 + i)}</span>
+                                        ${text}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="ordering-slots">
+                                <div class="ordering-slots-title">正確順序</div>
+                                ${steps.map((text, i) => `
+                                    <div class="ordering-slot" data-correct-order="${text}">
+                                        <span class="slot-number">${i + 1}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'quiz': {
+                    const markers = 'ABCDEFGHIJ';
+                    const isMultiple = element.multiple || false;
+                    const options = element.options || [];
+                    el.innerHTML = `
+                        <div class="quiz-container" data-multiple="${isMultiple}">
+                            <div class="quiz-question">${element.question || '請選擇正確答案'}</div>
+                            <div class="quiz-options">
+                                ${options.map((opt, i) => `
+                                    <div class="quiz-option" data-correct="${opt.correct ? 'true' : 'false'}">
+                                        <span class="option-marker">${markers[i] || String(i + 1)}</span>
+                                        <span>${opt.text}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="quiz-footer">
+                                <span class="quiz-result"></span>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <button class="quiz-retry">重試</button>
+                                    ${isMultiple ? '<button class="quiz-submit">提交</button>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'poll': {
+                    const pollMarkers = 'ABCDEFGHIJ';
+                    const pollOptions = element.options || [];
+                    el.innerHTML = `
+                        <div class="poll-container" data-element-id="${element.id}">
+                            <div class="poll-question">${element.question || '請投票'}</div>
+                            <div class="poll-options">
+                                ${pollOptions.map((opt, i) => `
+                                    <div class="poll-option" data-index="${i}">
+                                        <span class="option-marker">${pollMarkers[i] || String(i + 1)}</span>
+                                        <span>${opt.text}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="poll-footer">
+                                <span class="poll-total"></span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'truefalse': {
+                    const answer = element.answer === true || element.answer === 'true';
+                    el.innerHTML = `
+                        <div class="truefalse-container" data-element-id="${element.id}">
+                            <div class="tf-question">${element.question || '是非題'}</div>
+                            <div class="tf-options">
+                                <button class="tf-btn correct" data-value="true" data-answer="${answer}">
+                                    <span class="material-symbols-outlined">check_circle</span> 正確
+                                </button>
+                                <button class="tf-btn wrong" data-value="false" data-answer="${!answer}">
+                                    <span class="material-symbols-outlined">cancel</span> 錯誤
+                                </button>
+                            </div>
+                            <div class="tf-result"></div>
+                            <div class="tf-stats"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'opentext': {
+                    el.innerHTML = `
+                        <div class="opentext-container" data-element-id="${element.id}">
+                            <div class="opentext-question">${element.question || '開放作答'}</div>
+                            <textarea class="opentext-textarea" rows="4" placeholder="請輸入你的答案…"></textarea>
+                            <button class="opentext-submit">送出</button>
+                            <div class="opentext-result"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'scale': {
+                    const min = element.min || 1;
+                    const max = element.max || 10;
+                    const mid = Math.round((min + max) / 2);
+                    el.innerHTML = `
+                        <div class="scale-container" data-element-id="${element.id}">
+                            <div class="scale-question">${element.question || '請評分'}</div>
+                            <div class="scale-value">${mid}</div>
+                            <input type="range" class="scale-range" min="${min}" max="${max}" value="${mid}">
+                            <div class="scale-labels">
+                                <span>${element.minLabel || min}</span>
+                                <span>${element.maxLabel || max}</span>
+                            </div>
+                            <button class="scale-submit">送出</button>
+                            <div class="scale-result"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'buzzer': {
+                    el.innerHTML = `
+                        <div class="buzzer-container" data-element-id="${element.id}">
+                            <div class="buzzer-question">${element.question || '搶答'}</div>
+                            <div class="buzzer-input-row">
+                                <input class="buzzer-text-input" type="text" placeholder="輸入你的答案…">
+                                <button class="buzzer-submit-btn">
+                                    <span class="material-symbols-outlined">campaign</span> 搶答
+                                </button>
+                            </div>
+                            <div class="buzzer-status"></div>
+                            <div class="buzzer-result"></div>
+                            <div class="buzzer-ranking"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'wordcloud': {
+                    const maxWords = element.maxWords || 3;
+                    let inputsHtml = '';
+                    for (let i = 0; i < maxWords; i++) {
+                        inputsHtml += `<input class="wordcloud-input" type="text" placeholder="詞彙 ${i + 1}" maxlength="20">`;
+                    }
+                    el.innerHTML = `
+                        <div class="wordcloud-container" data-element-id="${element.id}">
+                            <div class="wordcloud-question">${element.question || '文字雲'}</div>
+                            <div class="wc-inputs">${inputsHtml}</div>
+                            <div class="wc-footer">
+                                <span class="wc-count">最多 ${maxWords} 個詞</span>
+                                <button class="wordcloud-submit">提交</button>
+                            </div>
+                            <div class="wordcloud-result"></div>
+                            <div class="wordcloud-cloud"><div class="wordcloud-empty">等待學員提交…</div></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'hotspot': {
+                    const src = element.image || element.src || '';
+                    const nodes = element.nodes || [];
+                    const nodesJson = JSON.stringify(nodes).replace(/"/g, '&quot;');
+                    const nodesHtml = nodes.map(n =>
+                        `<div class="hs-node" data-id="${n.id}" style="left:${n.x}%;top:${n.y}%;">${n.label}</div>`
+                    ).join('');
+                    el.innerHTML = `
+                        <div class="hotspot-container" data-nodes="${nodesJson}">
+                            <div class="hotspot-question">${element.question || '圈出你認為有問題的地方'}</div>
+                            <div class="hotspot-image-wrap" style="position:relative;">
+                                ${src ? '<img src="' + src + '" class="hotspot-image" draggable="false" />' : '<div class="hotspot-placeholder">（未設定圖片）</div>'}
+                                ${nodesHtml}
+                            </div>
+                            <div class="hotspot-actions">
+                                <button class="hs-submit-btn" disabled>確認送出</button>
+                            </div>
+                            <div class="hotspot-result"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                default:
+                    return null;
+            }
+
+            // 倒數計時器
+            if (element.timeLimit && element.timeLimit > 0) {
+                el.dataset.timeLimit = element.timeLimit;
+            }
+
+            return el;
+        }
+
+        // ═══════════ Emoji Reactions ═══════════
+        const reactionBar = document.getElementById('audReactionBar');
+        const qaBtn = document.getElementById('audQABtn');
+        const qaPanel = document.getElementById('audQAPanel');
+        let qaQuestions = [];
+        let votedIds = new Set();
+
+        function showReactionBar() {
+            reactionBar.style.display = 'flex';
+            qaBtn.style.display = 'flex';
+        }
+
+        reactionBar.querySelectorAll('.aud-reaction-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const emoji = btn.dataset.emoji;
+                if (!sessionCode) return;
+                realtime.publish(`session:${sessionCode}`, 'reaction', { emoji });
+                // Local visual feedback
+                btn.style.transform = 'scale(1.4)';
+                setTimeout(() => btn.style.transform = '', 200);
+            });
+        });
+
+        // ═══════════ Q&A ═══════════
+        qaBtn.addEventListener('click', () => {
+            qaPanel.classList.toggle('open');
+        });
+        document.getElementById('audQAClose').addEventListener('click', () => {
+            qaPanel.classList.remove('open');
+        });
+
+        document.getElementById('audQASend').addEventListener('click', sendQuestion);
+        document.getElementById('audQAInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') sendQuestion();
+        });
+
+        function sendQuestion() {
+            const input = document.getElementById('audQAInput');
+            const text = input.value.trim();
+            if (!text || !sessionCode) return;
+
+            const qid = `q_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+            realtime.publish(`session:${sessionCode}`, 'qa', {
+                type: 'question', id: qid, text, author: studentName
+            });
+
+            // 加入本地列表
+            qaQuestions.push({ id: qid, text, author: studentName, votes: 1, mine: true });
+            votedIds.add(qid);
+            renderQAQuestions();
+            input.value = '';
+        }
+
+        function upvoteQuestion(qid) {
+            if (votedIds.has(qid)) return;
+            votedIds.add(qid);
+            const q = qaQuestions.find(q => q.id === qid);
+            if (q) q.votes = (q.votes || 0) + 1;
+            realtime.publish(`session:${sessionCode}`, 'qa', {
+                type: 'upvote', questionId: qid
+            });
+            renderQAQuestions();
+        }
+        window.__audUpvote = upvoteQuestion;
+
+        function renderQAQuestions() {
+            const body = document.getElementById('audQABody');
+            const sorted = [...qaQuestions].sort((a, b) => b.votes - a.votes);
+            if (sorted.length === 0) {
+                body.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b;font-size:13px;">還沒有人提問，你來第一個！</div>';
+                return;
+            }
+            body.innerHTML = sorted.map(q => `
+                <div class="aud-qa-item">
+                    <div class="aud-qa-item-text">${q.text}</div>
+                    <div class="aud-qa-item-meta">
+                        <span class="aud-qa-item-author">${q.author || '匿名'}</span>
+                        <button class="aud-qa-upvote ${votedIds.has(q.id) ? 'voted' : ''}" onclick="window.__audUpvote('${q.id}')">
+                            👍 ${q.votes}
+                        </button>
+                    </div>
+                </div>`).join('');
+        }
+
+        // 監聽其他人的 Q&A
+        realtime.on('qa', (msg) => {
+            const data = msg.payload || msg;
+            if (!data) return;
+            if (data.type === 'question') {
+                const existing = qaQuestions.find(q => q.id === data.id);
+                if (!existing) {
+                    qaQuestions.push({ id: data.id, text: data.text, author: data.author, votes: 1 });
+                    renderQAQuestions();
+                }
+            } else if (data.type === 'upvote') {
+                const q = qaQuestions.find(q => q.id === data.questionId);
+                if (q) { q.votes = (q.votes || 0) + 1; renderQAQuestions(); }
+            }
+        });
+
+        // 加入成功後顯示 reaction bar
+        const origJoinDone = document.getElementById('audMain');
+        const observer = new MutationObserver(() => {
+            if (origJoinDone.classList.contains('active')) showReactionBar();
+        });
+        observer.observe(origJoinDone, { attributes: true });
+    </script>
+</body>
+
+</html>

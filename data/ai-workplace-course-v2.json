@@ -1,0 +1,4970 @@
+{
+  "slides": [
+    {
+      "id": "el_mm4bk3ep0ys0",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_mm4bk3ep1twr",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"
+        },
+        {
+          "id": "el_mm4bk3ep2656",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 60,
+          "width": 4,
+          "height": 120,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_mm4bk3ep392p",
+          "type": "text",
+          "x": 80,
+          "y": 55,
+          "width": 800,
+          "height": 80,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;letter-spacing:1px\">AI 職場全方位應用</b>",
+          "fontSize": 40
+        },
+        {
+          "id": "el_mm4bk3ep44g7",
+          "type": "text",
+          "x": 80,
+          "y": 145,
+          "width": 800,
+          "height": 45,
+          "content": "<span style=\"font-size:18px;color:#94a3b8\">ChatGPT × Gemini × NotebookLM — 從零開始的 AI 實戰指南</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_mm4bk3ep5q2r",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 200,
+          "width": 60,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_mm4bk3ep6z8c",
+          "type": "text",
+          "x": 80,
+          "y": 440,
+          "width": 500,
+          "height": 25,
+          "content": "<span style=\"font-size:15px;color:#64748b\">講師：樊松蒲</span>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3ep7o7f",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3ep8itz",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📊 課前調查</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3ep9f0j",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3epal2y",
+          "type": "poll",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "question": "你目前使用過哪些 AI 工具？（可多選）",
+          "options": [
+            {
+              "text": "ChatGPT"
+            },
+            {
+              "text": "Gemini"
+            },
+            {
+              "text": "NotebookLM"
+            },
+            {
+              "text": "Copilot / Claude / 其他"
+            },
+            {
+              "text": "都還沒用過"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqmsro",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3epbh5y",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📖 課程四大章節</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3epc3n4",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqdils",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eqe2nf",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">🔥 Ch1：為什麼學 AI</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqftjg",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• 職場四大痛點分析<br>• 全球 + 台灣數據佐證<br>• AI 前後效率對比<br><br>⏱ 約 25 分鐘</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqgaet",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eqh8tm",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">⚡ Ch2：為什麼是現在</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqi3z3",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• 2025-2026 趨勢解析<br>• AI Agent 崛起<br>• 先學先贏的紅利期<br><br>⏱ 約 15 分鐘</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqjgzm",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eqk5h1",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">🛠 Ch3+4：工具實戰 + 策略</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eql5sl",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• ChatGPT / Gemini / NotebookLM<br>• 逐一功能操作引導<br>• 安全守則 + 未來策略<br><br>⏱ 約 100 分鐘</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqnaei",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqop2b",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eqpj8v",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">CHAPTER 01</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqq0um",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">為什麼職場上非學 AI 不可？</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eqrkm6",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq1355f",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqsusu",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">職場上的三大痛點</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqtbql",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3equs82",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eqvaeq",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">😰 重複性工作</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqwsrp",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">每天花 2-3 小時在：<br>• Email 回覆<br>• 會議紀錄整理<br>• 報告格式調整<br><br>→ 佔掉 30% 工作時間</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqx4ir",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eqysot",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">😰 資訊爆炸</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqz364",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">10 頁報告只要 3 個數字<br>但你必須全部看完：<br>• 跨部門文件<br>• 產業報告<br>• 客戶需求信<br><br>→ 找重點像大海撈針</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq10vyv",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq11mtl",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">😰 跨語言障礙</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq12078",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">一封英文信來回修改<br>就花了半小時：<br>• 專業術語翻譯<br>• 語氣拿捏<br>• 格式慣例<br><br>→ 溝通效率低</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq1i98z",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq145pi",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">有 AI vs 沒 AI 的效率差異</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq153jj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq16h9l",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq17b6l",
+          "type": "text",
+          "x": 52,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#0284c7\">30→3 分</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq185ve",
+          "type": "text",
+          "x": 52,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">📧 Email 回覆<br>AI 自動生成草稿</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq193lt",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 255,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq1axxe",
+          "type": "text",
+          "x": 267,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#7c3aed\">2hr→30 秒</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1bdnc",
+          "type": "text",
+          "x": 267,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">📊 報告摘要<br>上傳 PDF 直接抓重點</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq1cyrz",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 470,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq1d05j",
+          "type": "text",
+          "x": 482,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#16a34a\">20→1 分</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1emj9",
+          "type": "text",
+          "x": 482,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">🌍 翻譯潤稿<br>指定語氣和專業領域</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq1f2qa",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 685,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_mm4bk3eq1gd90",
+          "type": "text",
+          "x": 697,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#d97706\">30→0 分</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1hamt",
+          "type": "text",
+          "x": 697,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">💻 Excel 公式<br>用中文描述需求即可</div>",
+          "fontSize": 12
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq1yaud",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq1jzjt",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">全球 AI 採用現況（2025-2026）</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq1k3fy",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq1lebp",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq1mkug",
+          "type": "text",
+          "x": 52,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#0284c7\">72%</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1n1vy",
+          "type": "text",
+          "x": 52,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">全球企業已使用<br>生成式 AI</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq1oaxn",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 255,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq1pjhz",
+          "type": "text",
+          "x": 267,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#7c3aed\">92%</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1qoon",
+          "type": "text",
+          "x": 267,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">高管計畫增加<br>AI 投資</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq1rlwa",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 470,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq1s69x",
+          "type": "text",
+          "x": 482,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#16a34a\">67%</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1t1oq",
+          "type": "text",
+          "x": 482,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">企業員工已使用<br>ChatGPT/Gemini</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq1ui3q",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 685,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_mm4bk3eq1vmaq",
+          "type": "text",
+          "x": 697,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#d97706\">40%</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq1wgf2",
+          "type": "text",
+          "x": 697,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">2026 企業應用<br>將內建 AI Agent</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq1x5ju",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— McKinsey Global AI Survey (2025) / Gartner Q4 2025<br>https://mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq2ej08",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq1z6qv",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">台灣 AI 應用現況</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq20lv1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq21axm",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq2210y",
+          "type": "text",
+          "x": 52,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#0284c7\">88%</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq23gwe",
+          "type": "text",
+          "x": 52,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">台灣員工願意<br>與 AI 協作</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq249km",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 255,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq25rx7",
+          "type": "text",
+          "x": 267,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#7c3aed\">37.6</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq2676l",
+          "type": "text",
+          "x": 267,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">AI 化指數（滿分 100）<br>仍有實踐落差</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq27eo9",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 470,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq28gfw",
+          "type": "text",
+          "x": 482,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#16a34a\">3-4K</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq29ga9",
+          "type": "text",
+          "x": 482,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">每年新增 AI<br>專業人才需求</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq2aysn",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 685,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_mm4bk3eq2b8kx",
+          "type": "text",
+          "x": 697,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#d97706\">43%</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eq2cvfm",
+          "type": "text",
+          "x": 697,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">企業期望 AI<br>降低人力成本</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eq2dph5",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— Microsoft 2025 Work Trend Index / KPMG 臺灣企業調查 / 國發會<br>https://kpmg.com/tw</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq2faii",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq2gvds",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📝 小測驗：AI 趨勢</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq2hqv5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3eq2i5jp",
+          "type": "quiz",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "question": "根據 McKinsey 2025 報告，全球多少比例的企業已使用生成式 AI？",
+          "multiple": false,
+          "options": [
+            {
+              "text": "35%",
+              "correct": false
+            },
+            {
+              "text": "52%",
+              "correct": false
+            },
+            {
+              "text": "72%",
+              "correct": true
+            },
+            {
+              "text": "90%",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq2juid",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq2knyj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eq2l5gt",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">CHAPTER 02</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq2mbhf",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">為什麼是「現在」？</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eq2nxw2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq30nal",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq2o09c",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">三個「現在就要學」的理由</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq2pjhq",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq2qn16",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq2rldv",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">⏰ 技術成熟</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq2s9u8",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">2025 的 AI 工具已從<br>「實驗品」→「生產力工具」<br><br>不需要寫程式<br>用中文就能操作</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq2tme8",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq2uojv",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">🚀 企業加速</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq2vzht",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">92% 高管計畫增加 AI 投資<br><br>你的公司可能明年<br>就會要求你用 AI<br><br>現在學 = 提前準備</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq2w4ui",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq2xng3",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">💰 紅利期</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq2y6fo",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">現在會用 AI 的人還是少數<br><br>台灣每年新增 3-4K AI 職缺<br>「會用 AI」vs「不會」<br>薪資差距正在拉大</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq2z8cp",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— 國發會 AI 人才需求預估 / McKinsey 2025</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq3a9o5",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq31xqv",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">2026 趨勢：AI Agent（代理型 AI）</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq32h9q",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq33y2x",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq345iz",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">🤖 傳統 AI 助手</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq354hc",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 你問一個問題<br>• AI 給一個回答<br>• 你再問下一個<br>• AI 再回答一次<br><br>→ 一問一答模式<br>→ 你要自己串步驟</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq36zub",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq37uw3",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">🚀 AI Agent（2026）</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq384xf",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 你說出大目標<br>• AI 自動拆解步驟<br>• AI 自動執行每步<br>• AI 回報最終結果<br><br>→ 自主規劃 + 執行<br>→ 你只需審核結果</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq39nz9",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— Gartner: 2026 年底 40% 企業應用將內建 AI Agent</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq3bvis",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq3c1jm",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">🔢 排列順序：AI 能力演進</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq3dl1k",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#d97706"
+        },
+        {
+          "id": "el_mm4bk3eq3ex2n",
+          "type": "ordering",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "steps": [
+            "規則式 AI（if-else 判斷）",
+            "機器學習（從數據學習模式）",
+            "生成式 AI（ChatGPT/Gemini，創造內容）",
+            "AI Agent（自主規劃 + 執行多步驟任務）"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq3ffzt",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq3gxdk",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eq3hv4z",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">CHAPTER 03</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq3ifun",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">三大工具實戰教學</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eq3jssq",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq3v8x2",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq3kkjf",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">三大 AI 工具總覽</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq3liyj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq3mp8i",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq3nwiy",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">🤖 ChatGPT</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq3ozjx",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">開發：OpenAI<br>強項：寫作、推理、程式<br>特色：Deep Research、GPTs<br>適合：文案、創意、分析</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq3pnup",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq3qgil",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">✨ Gemini</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq3rqob",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">開發：Google<br>強項：Google 生態整合<br>特色：Gmail/Docs/Sheets<br>適合：搜尋、文件、多模態</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq3s29s",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq3tslh",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">📓 NotebookLM</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq3u1az",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">開發：Google<br>強項：資料研究 + 消化<br>特色：音頻摘要、來源引用<br>適合：報告、學習、整理</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq4akct",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq3wux9",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">ChatGPT：開始使用（操作步驟）</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq3xcwt",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq3ybv3",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 78,
+          "width": 860,
+          "height": 85,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq3zlry",
+          "type": "text",
+          "x": 65,
+          "y": 83,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">1</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq40y3z",
+          "type": "text",
+          "x": 110,
+          "y": 83,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>前往 chat.openai.com</b> → 用 Google / Apple / Email 註冊帳號</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq41ovy",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 171,
+          "width": 860,
+          "height": 85,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq422lu",
+          "type": "text",
+          "x": 65,
+          "y": 176,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">2</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq43z57",
+          "type": "text",
+          "x": 110,
+          "y": 176,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>選擇模型</b> → 免費版用 GPT-4o mini / 付費版用 GPT-4o 或 o3</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq44x50",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 264,
+          "width": 860,
+          "height": 85,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq45get",
+          "type": "text",
+          "x": 65,
+          "y": 269,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">3</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq460bs",
+          "type": "text",
+          "x": 110,
+          "y": 269,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>輸入你的第一個問題</b> → 在對話框直接打字、貼圖片、或上傳檔案</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq470vc",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 357,
+          "width": 860,
+          "height": 85,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq48qhl",
+          "type": "text",
+          "x": 65,
+          "y": 362,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">4</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq49qi7",
+          "type": "text",
+          "x": 110,
+          "y": 362,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>持續追問</b> → 對同一主題可以連續提問，AI 會記住上下文</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq4mh16",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq4bio3",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">ChatGPT：Prompt 三要素</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq4cwda",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq4dxl9",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq4eggx",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">👤 角色 (Role)</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq4fqw7",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">告訴 AI 它的身份：<br><br>「你是資深行銷經理」<br>「請以國中老師角度」<br>「你是 Excel 專家」<br><br>→ 決定回答的專業度</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq4gfod",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq4he3b",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">📋 任務 (Task)</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq4iz2p",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">明確說出要什麼：<br><br>「寫 200 字產品介紹」<br>「分析前三大趨勢」<br>「整理會議重點」<br><br>→ 給具體的動詞指令</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq4j7fc",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq4kkg2",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">📐 格式 (Format)</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq4l4nd",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">指定輸出形式：<br><br>「用表格呈現」<br>「條列式、每點 20 字」<br>「Markdown 格式」<br><br>→ 控制回答的樣式</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq4nky2",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq4o7bp",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📋 ChatGPT 萬用 Prompt 範本</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq4pa1h",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#d97706"
+        },
+        {
+          "id": "el_mm4bk3eq4qixu",
+          "type": "copycard",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "title": "ChatGPT 萬用 Prompt",
+          "content": "你是一位 [角色]。\n\n請幫我 [任務描述]。\n\n要求：\n- 語氣：[正式/輕鬆/專業]\n- 格式：[表格/條列/段落]\n- 字數：[字數範圍]\n- 語言：繁體中文\n\n背景資訊：\n[貼上相關資料]"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq4zshg",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq4rzje",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">ChatGPT 職場 Prompt 範本（上）</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq4s0lw",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq4t8l4",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq4u4ja",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📧 Email 回覆</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq4vjp1",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">「以下是客戶來信，<br>請幫我草擬專業但溫和的回覆，<br>200 字以內」<br><br>[貼上客戶原文]</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq4wty5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq4x0s8",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">📊 會議紀錄整理</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq4yg7u",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">「以下是會議逐字稿，<br>請整理成：<br>1. 會議重點（3-5 點）<br>2. 待辦事項 + 負責人<br>3. 下次議題」</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq58ffh",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq50hdl",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">ChatGPT 職場 Prompt 範本（下）</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq51jlw",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq52qlf",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq53s0a",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📝 簡報大綱</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq54z11",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">「規劃 30 分鐘的<br>部門月會簡報大綱，<br>主題：本月業績回顧<br>與下月目標」</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq552kg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq56efj",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">🔢 Excel 公式</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq57elj",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">「我想在 Excel 中<br>根據 A 欄日期<br>判斷是否為週末，<br>請給我公式 + 範例」</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq5dofc",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq59xle",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">ChatGPT：Deep Research 功能</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eq5ax4y",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq5bsrg",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\"><b>什麼是 Deep Research？</b><br>ChatGPT 的「深度研究」模式 — 自動幫你做 10-30 分鐘的完整調查<br><br>🔍 <b>核心能力</b><br>• 使用 o3 模型，具備進階推理能力<br>• 自動瀏覽數十個網頁，交叉比對資訊<br>• 產出附有引用的結構化研究報告<br><br>📋 <b>適合的任務</b><br>• 市場調查、競品分析<br>• 學術文獻蒐集<br>• 技術方案比較</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_mm4bk3eq5c0ub",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— OpenAI Deep Research (2025)<br>https://openai.com/index/introducing-deep-research</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq5mba9",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq5ekxj",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">Deep Research vs 一般模式</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq5fr0p",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq5g8fw",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq5h6qz",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">💬 一般模式</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq5irin",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 即時回應（秒級）<br>• 單次對話回答<br>• 不主動搜尋網路<br>• 適合快問快答<br>• 答案較簡短</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq5jnb6",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq5kimg",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">🔬 Deep Research</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq5l95u",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 需等 10-30 分鐘<br>• 自動規劃研究計畫<br>• 瀏覽 30+ 網頁比對<br>• 產出完整報告 + 引用<br>• 可中途調整方向</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq64ivo",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq5nb5f",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">Deep Research：操作步驟</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq5o5l6",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq5pw0a",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 78,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq5q6bi",
+          "type": "text",
+          "x": 65,
+          "y": 83,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">1</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq5rpsz",
+          "type": "text",
+          "x": 110,
+          "y": 83,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>點擊模型選擇器</b> → 切換至「Deep Research」模式</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq5sk25",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 162,
+          "width": 860,
+          "height": 76,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq5tpnj",
+          "type": "text",
+          "x": 65,
+          "y": 167,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">2</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq5uxrz",
+          "type": "text",
+          "x": 110,
+          "y": 167,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>輸入研究問題</b> → 例：「比較台灣 2025 年前三大 CRM 系統的功能和價格」</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq5vkz2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 246,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq5woen",
+          "type": "text",
+          "x": 65,
+          "y": 251,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">3</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq5x4ew",
+          "type": "text",
+          "x": 110,
+          "y": 251,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>審閱研究計畫</b> → AI 會先列出計畫，你可以修改方向或指定來源</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq5ygid",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 330,
+          "width": 860,
+          "height": 76,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq5zmml",
+          "type": "text",
+          "x": 65,
+          "y": 335,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">4</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq60b2y",
+          "type": "text",
+          "x": 110,
+          "y": 335,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>等待 10-30 分鐘</b> → AI 自動搜尋、閱讀、交叉比對</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq61hve",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 414,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq62o15",
+          "type": "text",
+          "x": 65,
+          "y": 419,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">5</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq63ftv",
+          "type": "text",
+          "x": 110,
+          "y": 419,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>收到結構化報告</b> → 包含摘要、比較表格、引用連結</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq6gzk4",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq659pt",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">ChatGPT：三大進階功能</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq664qc",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq67lc5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq68med",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">🧩 GPTs 商店</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq69s2l",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">客製化 AI 助手：<br><br>• Canva → 對話中設計圖片<br>• Data Analyst → CSV 分析<br>• Consensus → 學術論文搜尋<br><br>免費/付費版皆可使用</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq6at4x",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq6bmyf",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">🎨 DALL-E 圖片</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq6cmpg",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">文字 → 圖片生成：<br><br>「畫一張現代辦公室插畫」<br>• 可指定風格<br>• 可指定比例<br>• 可指定色調<br><br>適合簡報、社群素材</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq6dh92",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq6ewes",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">📎 檔案分析</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq6fgwr",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">上傳即分析：<br><br>• PDF → 摘要 + 問答<br>• Excel → 自動畫圖表<br>• 圖片 → 辨識內容<br><br>不需手動整理資料</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq6htjz",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq6iokw",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📝 小測驗：ChatGPT</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq6jjfo",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3eq6k9om",
+          "type": "quiz",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "question": "寫出好 Prompt 的三要素是什麼？",
+          "multiple": false,
+          "options": [
+            {
+              "text": "速度 + 準度 + 長度",
+              "correct": false
+            },
+            {
+              "text": "角色 + 任務 + 格式",
+              "correct": true
+            },
+            {
+              "text": "標題 + 內文 + 結論",
+              "correct": false
+            },
+            {
+              "text": "中文 + 英文 + 日文",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq6z8id",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq6ln8m",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">Gemini：開始使用（操作步驟）</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq6m3e8",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq6niaj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 78,
+          "width": 860,
+          "height": 85,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq6o6bs",
+          "type": "text",
+          "x": 65,
+          "y": 83,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">1</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq6pn2p",
+          "type": "text",
+          "x": 110,
+          "y": 83,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>前往 gemini.google.com</b> → 用 Google 帳號登入</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq6qy31",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 171,
+          "width": 860,
+          "height": 85,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq6rshg",
+          "type": "text",
+          "x": 65,
+          "y": 176,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">2</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq6saau",
+          "type": "text",
+          "x": 110,
+          "y": 176,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>選擇模型</b> → 1.5 Flash（免費）或 2.0 Pro（付費）</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq6tt7h",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 264,
+          "width": 860,
+          "height": 85,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq6usve",
+          "type": "text",
+          "x": 65,
+          "y": 269,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">3</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq6vz3g",
+          "type": "text",
+          "x": 110,
+          "y": 269,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>試試圖片分析</b> → 上傳圖片或截圖，問 AI「這是什麼？」</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq6wnfu",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 357,
+          "width": 860,
+          "height": 85,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq6xiwn",
+          "type": "text",
+          "x": 65,
+          "y": 362,
+          "width": 40,
+          "height": 75,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">4</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq6yb58",
+          "type": "text",
+          "x": 110,
+          "y": 362,
+          "width": 780,
+          "height": 75,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>連接 Google 工具</b> → 對話中輸入 @Gmail、@Docs、@Maps 啟動整合功能</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq7b40v",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq70bld",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">Gemini：Google 生態整合</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq71868",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq72jy5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq73zit",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📧 Gmail 整合</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq74h55",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• 搜尋特定寄件者的信<br>• 摘要 Email 重點<br>• 自動生成回覆草稿<br><br>操作：輸入 @Gmail<br>再描述你的需求</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq75mb8",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq76shq",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">📄 Docs / Sheets</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq77t30",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• Docs 側邊欄叫 Gemini<br>• 直接潤稿、翻譯、摘要<br>• Sheets 側邊欄寫公式<br><br>操作：右側面板<br>點擊 Gemini 圖示</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq788ra",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq79ec8",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">🗺️ Maps / Flights</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq7ao8p",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• 規劃旅遊行程<br>• 附上地圖和航班資訊<br><br>操作：輸入 @Maps<br>「規劃 3 天東京行程<br>預算 3 萬」</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq7kkm5",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq7c7gn",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">Gemini：多模態能力</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq7deci",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq7e99b",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq7fb9i",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📷 圖片分析</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq7gs64",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 截圖 →「錯誤訊息意思？」<br>• 拍菜單 →「翻譯日文菜單」<br>• 拍白板 →「整理成文字」<br>• 圖表 →「說明趨勢」<br><br>→ 拍照就能問 AI</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq7hfnq",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq7im68",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">🎥 YouTube 整合</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq7js9e",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 貼 YouTube 連結<br>• 自動摘要影片重點<br>• 可以針對影片提問<br>• 不用看完整支影片<br><br>→ 通勤時「讀」影片</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq7t787",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq7l8xf",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">ChatGPT vs Gemini 怎麼選？</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq7m7vj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq7nwhy",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq7ooi4",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">🤖 選 ChatGPT</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq7pkys",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">✓ 需要高品質長文寫作<br>✓ 需要程式碼撰寫 + debug<br>✓ 想用 GPTs 商店<br>✓ 需要 DALL-E 生成圖片<br>✓ 需要 Deep Research<br><br>→ 創意 + 深度分析導向</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq7q03e",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq7ro3w",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">✨ 選 Gemini</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq7sec8",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">✓ 重度 Google 工具用戶<br>✓ 需要即時搜尋最新資訊<br>✓ 要分析圖片/影片內容<br>✓ Google Maps 規劃行程<br>✓ Gmail/Docs 整合操作<br><br>→ 生態整合 + 效率導向</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq7uu7x",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq7vqsg",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">🔗 配對練習：工具 vs 最佳使用場景</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq7wkun",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3eq7xx0j",
+          "type": "matching",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "pairs": [
+            {
+              "left": "用 AI 寫 3 種版本文案",
+              "right": "ChatGPT"
+            },
+            {
+              "left": "搜尋 Gmail 信件並摘要",
+              "right": "Gemini"
+            },
+            {
+              "left": "30 分鐘完整競品研究報告",
+              "right": "ChatGPT Deep Research"
+            },
+            {
+              "left": "Google Sheets 寫公式",
+              "right": "Gemini"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq82kln",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq7yheb",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">NotebookLM：你的 AI 研究夥伴</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eq7z5k5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq80zfq",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\"><b>Google 專為「知識消化」設計的 AI 工具</b><br><br>📌 傳統 AI：回答時可能混入非你提供的資訊<br>📌 NotebookLM：<b>只根據你上傳的資料回答</b>，不會「幻覺」<br><br>✅ 上傳 PDF / Google Docs / 網頁 / YouTube → 建立知識庫<br>✅ 針對你的資料提問，AI 在回答中<b>標注引用來源</b><br>✅ 一鍵生成「音頻摘要」— 兩個 AI 用對話方式說明你的資料</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_mm4bk3eq812tj",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— Google NotebookLM (2025)<br>https://notebooklm.google</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq8klt1",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq83pyk",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">NotebookLM：操作步驟</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq84rln",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq85s78",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 78,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq86vbj",
+          "type": "text",
+          "x": 65,
+          "y": 83,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">1</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq87p0c",
+          "type": "text",
+          "x": 110,
+          "y": 83,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>前往 notebooklm.google</b> → 用 Google 帳號登入</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq88v2a",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 162,
+          "width": 860,
+          "height": 76,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq89t69",
+          "type": "text",
+          "x": 65,
+          "y": 167,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">2</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq8aa7x",
+          "type": "text",
+          "x": 110,
+          "y": 167,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>建立新 Notebook</b> → 點「+ New Notebook」建立專案</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq8bt81",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 246,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq8c243",
+          "type": "text",
+          "x": 65,
+          "y": 251,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">3</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq8dx2t",
+          "type": "text",
+          "x": 110,
+          "y": 251,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>新增來源</b> → 上傳 PDF / 貼入網址 / 連結 Google Docs / YouTube</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq8eqsg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 330,
+          "width": 860,
+          "height": 76,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq8faot",
+          "type": "text",
+          "x": 65,
+          "y": 335,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">4</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq8g5p4",
+          "type": "text",
+          "x": 110,
+          "y": 335,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>開始提問</b> → 在聊天框針對你的資料提問，AI 會附上引用</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq8hev3",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 414,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eq8isaf",
+          "type": "text",
+          "x": 65,
+          "y": 419,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">5</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eq8j246",
+          "type": "text",
+          "x": 110,
+          "y": 419,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>生成摘要</b> → 點「Notebook Guide」→ 選擇 Audio Overview / FAQ / Study Guide</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq8tr2j",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq8ll4m",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">NotebookLM：支援的來源類型</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq8m0o0",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq8nmu5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq8oxtb",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📄 文件類</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq8pbsq",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• PDF 文件<br>• Google Docs<br>• Google Slides<br>• 複製貼上純文字<br><br>→ 報告、企劃、文件</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq8qfrn",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq8rm5y",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">🌐 網路類</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq8sz04",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 網頁 URL（自動擷取）<br>• YouTube 影片<br>• 公開的網頁內容<br><br>最多可加入 50 個來源<br>→ 研究、學習、分析</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq963jm",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq8uldy",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">NotebookLM：三大核心功能</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq8v1g3",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq8wzgx",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq8xt5j",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">💬 來源引用問答</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq8y4b4",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">針對資料提問<br>AI 回答附上引用來源<br><br>點引用 → 直接跳到原文<br>確保回答有憑有據<br><br>「這份報告的結論是？」</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq8z9gm",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq90066",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">🎙 音頻摘要</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq91b8o",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">一鍵產生 5-10 分鐘<br>「兩人 Podcast 對話」<br><br>用聊天方式講解你的<br>複雜文件和報告<br><br>通勤時用「聽」的學習</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq923qb",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq93mhz",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">📋 自動化輸出</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq944bx",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">一鍵生成：<br>• FAQ 常見問題<br>• Study Guide 學習指南<br>• Timeline 時間線<br>• Briefing 簡報摘要<br><br>不需手動整理筆記</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq95bfy",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— Google NotebookLM (2025)<br>https://notebooklm.google</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq9bu8p",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq97e2c",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">NotebookLM：音頻摘要功能深入</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eq98rg7",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq99las",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\">🎙️ <b>Audio Overview</b> — NotebookLM 最獨特的功能<br><br>📌 <b>原理</b>：AI 將你的資料轉成兩個虛擬主持人的 Podcast 對話<br><br>• 對話時間約 5-10 分鐘<br>• 講解邏輯清晰，從背景 → 重點 → 洞察<br>• 可設定偏好：語氣、針對面向、程度<br><br>📌 <b>最佳用途</b><br>• 長篇報告（PDF > 20 頁）→ 通勤時用聽的<br>• 研究論文 → 快速掌握核心論點<br>• 會議紀錄 → 3 分鐘聽完 1 小時的會議</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_mm4bk3eq9ao4s",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 35,
+          "content": "<span style=\"font-size:11px;color:#94a3b8\">— Google NotebookLM Audio Overview<br>https://notebooklm.google</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq9kfzg",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq9c160",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">上傳文件比較：NotebookLM vs ChatGPT</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq9dx1x",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq9e99q",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eq9fyg9",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📓 NotebookLM</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq9glxf",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">✅ <b>只根據你的資料回答</b><br>✅ 引用來源可追溯原文<br>✅ 最多 50 個來源<br>✅ 能產生音頻摘要<br><br>❌ 不能上網搜尋<br>❌ 不能生成圖片</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eq9hh33",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eq9iq26",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">🤖 ChatGPT</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq9jgle",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">✅ 可結合網路搜尋<br>✅ 可生成圖片/程式碼<br>✅ Deep Research 報告<br><br>❌ 可能混入非你的資訊<br>❌ 引用來源不夠精確<br>❌ 沒有音頻摘要功能</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq9w2sm",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq9lli4",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">NotebookLM 職場應用場景</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq9mdsp",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eq9ncxy",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eq9o06p",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">📊 專案報告研究</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq9puok",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">上傳 5-10 份 PDF 報告<br><br>• 問：「這些報告的共同結論？」<br>• 問：「矛盾的觀點有哪些？」<br>• 生成 Study Guide 統整</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq9qkyj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eq9rvew",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">📚 學習新領域</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq9s38f",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">上傳專業教材或論文<br><br>• 用 Audio Overview 理解<br>• 針對不懂的部分提問<br>• 自動生成 FAQ<br>• 加速學習效率</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eq9tfrg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eq9um6e",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">🏢 跨部門會議</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eq9v34r",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">上傳多份會議紀錄<br><br>• 問：「過去三次會議的<br>待辦總結」<br>• 問：「哪些議題還沒解決？」<br>• 生成 Briefing 摘要</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eq9xzp1",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eq9yqst",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📝 小測驗：NotebookLM</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eq9zdwn",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3eqa0zb2",
+          "type": "quiz",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "question": "NotebookLM 的最大特色是什麼？",
+          "multiple": false,
+          "options": [
+            {
+              "text": "可以上網搜尋即時資訊",
+              "correct": false
+            },
+            {
+              "text": "只根據你上傳的資料回答，附上引用來源",
+              "correct": true
+            },
+            {
+              "text": "可以生成圖片和程式碼",
+              "correct": false
+            },
+            {
+              "text": "內建即時翻譯功能",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqa1ugh",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqa2624",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">🔗 配對練習：三大工具最佳用途</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqa3vzq",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3eqa4e76",
+          "type": "matching",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "pairs": [
+            {
+              "left": "上傳 30 頁 PDF 報告，5 分鐘聽完摘要",
+              "right": "NotebookLM"
+            },
+            {
+              "left": "撰寫 3 種版本行銷文案",
+              "right": "ChatGPT"
+            },
+            {
+              "left": "在 Gmail 中搜尋並摘要信件",
+              "right": "Gemini"
+            },
+            {
+              "left": "完整競品分析研究報告",
+              "right": "ChatGPT Deep Research"
+            },
+            {
+              "left": "多份研究報告交叉比對",
+              "right": "NotebookLM"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqa5dcx",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqa6snu",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eqa7ifc",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">CHAPTER 04</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqa8o7o",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">使用注意事項 + 安全守則</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eqa9mhv",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqaltza",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqaadc3",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">⚠️ AI 使用三大安全原則</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqabab5",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqacheb",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eqadeyx",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">🔐 機密不上傳</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqaet3c",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">公司財務報表<br>客戶個資<br>未公開的商業策略<br><br>❌ 不要貼到 ChatGPT<br>✅ 用公司自建 AI 或<br>脫敏後再使用</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqafrch",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eqag90s",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">🔍 結果要驗證</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqahe6b",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">AI 會產生<br>「聽起來很對但錯的」回答<br><br>• 數字 → 回查原始資料<br>• 法規 → 確認官方條文<br>• 翻譯 → 別一次翻長文<br><br>→ AI 是助手不是裁判</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqai665",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eqaj2h8",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">⚖️ 版權要注意</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqakci1",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">AI 生成的內容：<br><br>• 文字 → 可使用但要潤稿<br>• 圖片 → 避免商業用途<br>• 程式 → 商標/專利要留意<br><br>→ AI 是草稿，人是定稿</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqautx9",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqamzg1",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">常見錯誤 vs 正確做法</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqana2o",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqao3xx",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eqapswj",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">❌ 常見錯誤</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqaqkwz",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 直接貼公司財報給 AI<br>• AI 回的數字不驗證就用<br>• 一次丟一大段不明確問題<br>• AI 回覆完全不修改就送<br>• 以為 AI 不會犯錯</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eqarvig",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eqasvqa",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">✅ 正確做法</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqat1vl",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 脫敏後再用或用企業版<br>• 交叉比對原始數據<br>• 分段提問、給明確指令<br>• 加入個人判斷和風格<br>• 永遠 double check 再送出</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqav5dg",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqawhue",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">✏️ 安全守則填空</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqaxkq2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_mm4bk3eqayj01",
+          "type": "fillblank",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "title": "AI 使用安全守則",
+          "content": "使用 AI 工具時，___不能上傳；AI 回應的數字需要回查___；AI 生成的內容在版權方面，___是草稿不是定稿。",
+          "blanks": [
+            {
+              "answer": "機密資料"
+            },
+            {
+              "answer": "原始資料"
+            },
+            {
+              "answer": "AI"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqazh3w",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqb03ki",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eqb1ups",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">CHAPTER 05</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqb2u2m",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">未來在職場該如何應用 AI</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eqb3c1g",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqbly9b",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqb4thc",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">職場 AI 導入五步法</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqb593z",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqb63bk",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 78,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eqb7wi4",
+          "type": "text",
+          "x": 65,
+          "y": 83,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">1</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eqb80ke",
+          "type": "text",
+          "x": 110,
+          "y": 83,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>盤點重複性工作</b> → 列出每週花最多時間的 5 個任務</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eqb9r9k",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 162,
+          "width": 860,
+          "height": 76,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eqba0r5",
+          "type": "text",
+          "x": 65,
+          "y": 167,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">2</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eqbbbe8",
+          "type": "text",
+          "x": 110,
+          "y": 167,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>挑一個先試</b> → 用 ChatGPT 或 Gemini 處理其中一個任務</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eqbcjlj",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 246,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eqbd0wt",
+          "type": "text",
+          "x": 65,
+          "y": 251,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">3</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eqbeqm0",
+          "type": "text",
+          "x": 110,
+          "y": 251,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>建立 Prompt 範本</b> → 把好用的 Prompt 存下來，反覆使用</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eqbfxms",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 330,
+          "width": 860,
+          "height": 76,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eqbgl0h",
+          "type": "text",
+          "x": 65,
+          "y": 335,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">4</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eqbh7y5",
+          "type": "text",
+          "x": 110,
+          "y": 335,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>分享給團隊</b> → 把你的成功案例和範本分享給同事</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eqbi04s",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 50,
+          "y": 414,
+          "width": 860,
+          "height": 76,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_mm4bk3eqbj66g",
+          "type": "text",
+          "x": 65,
+          "y": 419,
+          "width": 40,
+          "height": 66,
+          "content": "<b style=\"font-size:22px;color:#2563eb\">5</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_mm4bk3eqbkkut",
+          "type": "text",
+          "x": 110,
+          "y": 419,
+          "width": 780,
+          "height": 66,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:1.7\"><b>逐步擴大</b> → 從一個任務 → 多個任務 → 團隊 SOP</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqbp6cs",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqbmwmv",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">AI 工具選擇決策表</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eqbnn7p",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqbofix",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\"><div style=\"font-size:14px;line-height:2.2;color:#334155\"><b style=\"color:#1d4ed8\">📧 Email / 文案寫作</b> → ChatGPT（Prompt 三要素）<br><b style=\"color:#1d4ed8\">📊 搜尋 + Google 整合</b> → Gemini（@Gmail/@Docs）<br><b style=\"color:#1d4ed8\">📄 多份文件研究</b> → NotebookLM（來源引用）<br><b style=\"color:#1d4ed8\">🔬 深度市場調查</b> → ChatGPT Deep Research<br><b style=\"color:#1d4ed8\">🎙 長報告快速消化</b> → NotebookLM 音頻摘要<br><b style=\"color:#1d4ed8\">🖼 圖片分析/截圖</b> → Gemini 多模態<br><b style=\"color:#1d4ed8\">🤖 日常快問快答</b> → ChatGPT 或 Gemini 皆可</div></div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqc18bo",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqbqrfo",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">打造你的 AI 工作流</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqbrkze",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqbsv77",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 30,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_mm4bk3eqbte60",
+          "type": "text",
+          "x": 45,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">☀️ 早上</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqbulyk",
+          "type": "text",
+          "x": 45,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• Gemini 整理 Gmail 未讀<br>• ChatGPT 規劃當日重點<br>• NotebookLM 音頻摘要<br>學習昨天未看完的報告</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqbvl7y",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eqbwaha",
+          "type": "text",
+          "x": 355,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#15803d\">🌞 工作中</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqbxw7k",
+          "type": "text",
+          "x": 355,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• ChatGPT 草擬文案/信件<br>• Gemini Sheets 寫公式<br>• NotebookLM 研究比對<br>複雜專案的多份資料</div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqby003",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 650,
+          "y": 78,
+          "width": 290,
+          "height": 390,
+          "background": "#fefce8"
+        },
+        {
+          "id": "el_mm4bk3eqbztwu",
+          "type": "text",
+          "x": 665,
+          "y": 88,
+          "width": 260,
+          "height": 35,
+          "content": "<b style=\"font-size:17px;color:#a16207\">🌙 下班前</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqc0zeh",
+          "type": "text",
+          "x": 665,
+          "y": 125,
+          "width": 260,
+          "height": 330,
+          "content": "<div style=\"font-size:13px;color:#475569;line-height:1.9\">• ChatGPT 整理會議紀錄<br>• Gemini 安排明日行程<br>• Deep Research 做深度<br>調查備用（隔天看結果）</div>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqc2sr5",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqc3kzf",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">🔢 排列順序：AI 導入步驟</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqc4rur",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#d97706"
+        },
+        {
+          "id": "el_mm4bk3eqc51x5",
+          "type": "ordering",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "steps": [
+            "盤點每週最耗時的重複性工作",
+            "選一件工作用 AI 嘗試處理",
+            "建立個人 Prompt 範本",
+            "分享結果給團隊使用",
+            "將 AI 流程正式寫入團隊 SOP"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqcklwr",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqc6nrh",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">課程回顧</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqc71re",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqc8mw9",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eqc9kjp",
+          "type": "text",
+          "x": 52,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#0284c7\">3 工具</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eqcadzx",
+          "type": "text",
+          "x": 52,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">ChatGPT + Gemini<br>+ NotebookLM</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eqcbnrl",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 255,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eqcc3mw",
+          "type": "text",
+          "x": 267,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#7c3aed\">5 步法</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eqcdht2",
+          "type": "text",
+          "x": 267,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">盤點 → 嘗試 → 範本<br>→ 分享 → SOP</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eqced9p",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 470,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_mm4bk3eqcfspj",
+          "type": "text",
+          "x": 482,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#16a34a\">3 守則</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eqcgsqb",
+          "type": "text",
+          "x": 482,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">不洩密 / 要驗證<br>/ 重版權</div>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_mm4bk3eqchz98",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 685,
+          "y": 80,
+          "width": 203,
+          "height": 150,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_mm4bk3eqci0su",
+          "type": "text",
+          "x": 697,
+          "y": 90,
+          "width": 179,
+          "height": 50,
+          "content": "<b style=\"font-size:34px;color:#d97706\">∞ 可能</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_mm4bk3eqcj9oi",
+          "type": "text",
+          "x": 697,
+          "y": 145,
+          "width": 179,
+          "height": 75,
+          "content": "<div style=\"font-size:12px;color:#64748b;line-height:1.6\">從今天開始<br>一天一個 AI 嘗試</div>",
+          "fontSize": 12
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqclh07",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqcmycd",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">🎯 課後作業：我的第一個 AI 工作流</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqcn8qx",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#dc2626"
+        },
+        {
+          "id": "el_mm4bk3eqcothy",
+          "type": "homework",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "title": "課後作業：我的第一個 AI 工作流",
+          "description": "請完成以下三個步驟：\n\n1. 列出你每週最耗時的 3 個重複性工作\n2. 選擇其中 1 個，用 ChatGPT 或 Gemini 嘗試處理\n3. 記錄：\n   - 使用了哪個工具？\n   - 用了什麼 Prompt？\n   - 花了多少時間？\n   - 品質如何（1-10 分）？\n   - 跟以前的做法比起來如何？",
+          "submissionMode": "text_only",
+          "example": "範例：\n工作：整理會議紀錄\n工具：ChatGPT\nPrompt：「以下是會議逐字稿，請整理成 1. 決議事項 2. 待辦事項 + 負責人...」\n時間：2 分鐘（原本 30 分鐘）\n品質：8/10"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqcp9mr",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqcqv24",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eqcrehl",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">BONUS</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqcsvq8",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">Prompt 進階技巧</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eqctydp",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqcx2bl",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqcuwal",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">進階技巧 1：Chain of Thought（思維鏈）</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eqcvbx9",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqcwvpd",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\">讓 AI「一步一步想」— 提升複雜問題的回答品質<br><br>❌ <b>直接問</b>：「台灣跟日本的 AI 發展哪個好？」<br>→ AI 直接給結論，可能遺漏面向<br><br>✅ <b>思維鏈</b>：<br>「請分析台灣和日本的 AI 發展，<b>請一步一步想</b>：<br>1. 先比較政策面<br>2. 再比較產業面<br>3. 再比較人才面<br>4. 最後給出整體結論」</div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqd16j0",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqcyq2q",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">進階技巧 2：Few-Shot Prompting（範例引導）</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eqczbs7",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqd0ihr",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\">給 AI 1-3 個範例 → AI 就會「學你的風格」<br><br>📌 <b>範例</b>：<br>「我要你幫我寫產品介紹，風格參考以下範例：<br><br>範例 1：〈智慧手錶〉<br>「這不只是一支錶——它是你手腕上的健康教練」<br><br>範例 2：〈降噪耳機〉<br>「關上世界的噪音，打開你的專注模式」<br><br>→ 現在請幫我寫〈AI 翻譯筆〉的產品介紹」</div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqda7jv",
+      "background": "#fff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqd2lxo",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 840,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">Prompt 常見 NG vs OK</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqd3p97",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqd45pi",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_mm4bk3eqd5tpk",
+          "type": "text",
+          "x": 55,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#1d4ed8\">❌ NG 做法</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqd6y8a",
+          "type": "text",
+          "x": 55,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 「幫我寫東西」<br>→ 太模糊，AI 不知道要什麼<br><br>• 「寫一篇完美的報告」<br>→ 沒有明確的需求定義<br><br>• 一次丟 2000 字問 AI<br>→ 重點被淹沒</div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_mm4bk3eqd7h1q",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 78,
+          "width": 430,
+          "height": 390,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_mm4bk3eqd8ktg",
+          "type": "text",
+          "x": 505,
+          "y": 88,
+          "width": 400,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed\">✅ OK 做法</b>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_mm4bk3eqd9xcq",
+          "type": "text",
+          "x": 505,
+          "y": 120,
+          "width": 400,
+          "height": 340,
+          "content": "<div style=\"font-size:14px;color:#334155;line-height:2\">• 「以行銷經理角色，寫 200 字<br>產品介紹，條列式」<br><br>• 「分析以下數據，輸出<br>表格 + 3 點結論」<br><br>• 拆成 3 次提問，每次專注<br>一個面向</div>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqdbuwk",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqdcx2t",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📋 Prompt 進階框架：R.O.T.E.</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqddkao",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#d97706"
+        },
+        {
+          "id": "el_mm4bk3eqde26v",
+          "type": "copycard",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "title": "R.O.T.E. 進階 Prompt 框架",
+          "content": "【R — Role 角色】\n你是一位 [專業角色]，擁有 [年資] 經驗。\n\n【O — Objective 目標】\n我的目標是 [具體成果]。\n\n【T — Tone 語氣】\n請用 [正式/輕鬆/幽默/激勵] 語氣。\n\n【E — Example 範例】\n風格參考以下範例：\n[貼上範例]\n\n現在請幫我 [具體任務]。"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqdf2jm",
+      "background": "#1a1a2e",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqdgzne",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #1a1a2e, #16213e)"
+        },
+        {
+          "id": "el_mm4bk3eqdhhjz",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 800,
+          "height": 25,
+          "content": "<span style=\"font-size:13px;color:rgba(255,255,255,.4);letter-spacing:4px\">PRACTICE</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_mm4bk3eqdixu6",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:38px;color:#fff\">實際場景演練</b>",
+          "fontSize": 38
+        },
+        {
+          "id": "el_mm4bk3eqdjsvq",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 290,
+          "width": 100,
+          "height": 3,
+          "background": "#60a5fa"
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqdnx5i",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqdkcnf",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">場景演練 1：行銷活動規劃</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eqdlf0m",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqdmg88",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\"><b>情境</b>：你是行銷人員，需要規劃公司的 AI 工具推廣活動<br><br>🤖 <b>ChatGPT</b> → 撰寫三種版本的活動文案（社群/EDM/海報）<br>✨ <b>Gemini</b> → 搜尋競品活動案例 + Google Docs 整理企劃<br>📓 <b>NotebookLM</b> → 上傳過去 3 次活動報告，分析成效趨勢<br>🔬 <b>Deep Research</b> → 調查「2025 台灣 AI 工具行銷趨勢」完整報告</div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqdr92w",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqdo1rc",
+          "type": "text",
+          "x": 60,
+          "y": 25,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#1e293b\">場景演練 2：部門會議準備</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_mm4bk3eqdp5xy",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 72,
+          "width": 50,
+          "height": 3,
+          "background": "#2563eb"
+        },
+        {
+          "id": "el_mm4bk3eqdqivm",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 380,
+          "content": "<div style=\"font-size:16px;color:#334155;line-height:2\"><b>情境</b>：你要準備一場跨部門月會簡報<br><br>📓 <b>NotebookLM</b> → 上傳過去 3 場會議紀錄，問「過去三次的待辦進度」<br>🤖 <b>ChatGPT</b> → 「以下是分析結果，幫我整理成 10 頁簡報大綱」<br>✨ <b>Gemini</b> → 在 Google Slides 側邊欄直接生成投影片草稿<br>📧 <b>Gemini</b> → @Gmail 搜尋相關通知信件補充資料</div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqds2x8",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqdti8e",
+          "type": "text",
+          "x": 60,
+          "y": 20,
+          "width": 700,
+          "height": 40,
+          "content": "<b style=\"font-size:24px;color:#1e293b\">📊 分組討論</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_mm4bk3eqdu3nt",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 62,
+          "width": 45,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_mm4bk3eqdv1cz",
+          "type": "poll",
+          "x": 50,
+          "y": 80,
+          "width": 860,
+          "height": 420,
+          "question": "你最想先用 AI 解決哪個工作？",
+          "options": [
+            {
+              "text": "Email 回覆 + 文案撰寫"
+            },
+            {
+              "text": "會議紀錄 + 報告整理"
+            },
+            {
+              "text": "資料搜尋 + 研究分析"
+            },
+            {
+              "text": "Excel / 試算表操作"
+            },
+            {
+              "text": "行程規劃 + 日常問答"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_mm4bk3eqdwthq",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_mm4bk3eqdxv6y",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(135deg, #0f172a, #1e40af)"
+        },
+        {
+          "id": "el_mm4bk3eqdys27",
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "width": 800,
+          "height": 70,
+          "content": "<b style=\"font-size:46px;color:#fff;text-align:center;display:block\">Thank You 🎉</b>",
+          "fontSize": 46
+        },
+        {
+          "id": "el_mm4bk3eqdzp2i",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 380,
+          "y": 235,
+          "width": 200,
+          "height": 3,
+          "background": "#60a5fa"
+        },
+        {
+          "id": "el_mm4bk3eqe02p3",
+          "type": "text",
+          "x": 80,
+          "y": 260,
+          "width": 800,
+          "height": 35,
+          "content": "<span style=\"font-size:20px;color:rgba(255,255,255,.7);text-align:center;display:block\">AI 是最強的副駕駛，但方向盤永遠在你手上 🚗</span>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_mm4bk3eqe1xhz",
+          "type": "text",
+          "x": 80,
+          "y": 310,
+          "width": 800,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:rgba(255,255,255,.5);text-align:center;display:block\">開始你的 AI 之旅吧！</span>",
+          "fontSize": 15
+        }
+      ]
+    }
+  ],
+  "currentIndex": 0,
+  "savedAt": "2026-02-27T03:14:59.522Z"
+}

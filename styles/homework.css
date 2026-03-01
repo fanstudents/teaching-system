@@ -1,0 +1,871 @@
+/* ========================================
+   作業提交系統樣式
+   ======================================== */
+
+/* ========================================
+   登入對話框（保留備用，目前不使用）
+   ======================================== */
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.login-overlay.active {
+    display: flex;
+}
+
+.login-modal {
+    background: #fff;
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #202124;
+}
+
+.login-header p {
+    color: #5f6368;
+    font-size: 0.9rem;
+}
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+.login-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #202124;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #dadce0;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #202124;
+    background: #f8f9fa;
+    transition: border-color 0.2s ease;
+}
+
+.login-field input:focus {
+    outline: none;
+    border-color: #4285f4;
+    background: white;
+}
+
+.login-submit-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #4285f4, #667eea);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.login-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(66, 133, 244, 0.3);
+}
+
+.login-note {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #9aa0a6;
+}
+
+/* 歡迎 toast */
+.welcome-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    border-radius: 30px;
+    font-size: 1rem;
+    box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 3000;
+}
+
+.welcome-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ========================================
+   作業提交對話框
+   ======================================== */
+.homework-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2500;
+}
+
+.homework-overlay.active {
+    display: flex;
+}
+
+.homework-modal {
+    background: #ffffff;
+    border-radius: 24px;
+    max-width: 560px;
+    width: 92%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.homework-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #202124;
+}
+
+.homework-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f3f4;
+    color: #5f6368;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.homework-close:hover {
+    background: #fce8e6;
+    color: #d93025;
+}
+
+.homework-body {
+    flex: 1;
+    padding: 24px 28px;
+    overflow-y: auto;
+}
+
+/* ── 內建姓名輸入 ── */
+.homework-name-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e8eaed;
+}
+
+.homework-name-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #202124;
+}
+
+.homework-name-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #dadce0;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #202124;
+    background: #f8f9fa;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.homework-name-input:focus {
+    outline: none;
+    border-color: #4285f4;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+}
+
+.homework-name-input.shake {
+    animation: shakeInput 0.4s ease;
+    border-color: #d93025;
+}
+
+@keyframes shakeInput {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20%,
+    60% {
+        transform: translateX(-6px);
+    }
+
+    40%,
+    80% {
+        transform: translateX(6px);
+    }
+}
+
+/* ── 已識別使用者 badge ── */
+.homework-user-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #e8f0fe;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    color: #1a73e8;
+}
+
+.homework-user-badge .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1a73e8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.change-user-btn {
+    margin-left: auto;
+    padding: 4px 12px;
+    border: 1px solid #1a73e8;
+    border-radius: 8px;
+    background: transparent;
+    color: #1a73e8;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.change-user-btn:hover {
+    background: #1a73e8;
+    color: white;
+}
+
+/* ── 提交類型 Tabs ── */
+.homework-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.homework-tab {
+    padding: 10px 16px;
+    border: 1px solid #dadce0;
+    border-radius: 10px;
+    background: transparent;
+    color: #5f6368;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.homework-tab:hover {
+    border-color: #4285f4;
+    color: #4285f4;
+}
+
+.homework-tab.active {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+    color: #1a73e8;
+    font-weight: 600;
+}
+
+/* ── 提交面板 ── */
+.homework-panel {
+    display: none;
+}
+
+.homework-panel.active {
+    display: block;
+}
+
+.homework-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 16px;
+    border: 2px solid #dadce0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #202124;
+    background: #f8f9fa;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.homework-textarea:focus {
+    outline: none;
+    border-color: #4285f4;
+    background: white;
+}
+
+.homework-textarea::placeholder {
+    color: #9aa0a6;
+}
+
+/* ── 上傳區域 ── */
+.homework-upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    border: 2px dashed #dadce0;
+    border-radius: 16px;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 8px;
+}
+
+.homework-upload-area:hover {
+    border-color: #4285f4;
+    background: #e8f0fe;
+}
+
+.homework-upload-area.drag-over {
+    border-color: #1a73e8;
+    background: #d2e3fc;
+}
+
+.homework-upload-area .upload-icon {
+    font-size: 2.5rem;
+}
+
+.homework-upload-area p {
+    color: #5f6368;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.homework-upload-area .upload-hint {
+    color: #9aa0a6;
+    font-size: 0.8rem;
+}
+
+/* ── 預覽 ── */
+.homework-preview {
+    text-align: center;
+    padding: 16px 0;
+}
+
+.homework-preview img {
+    max-width: 100%;
+    max-height: 240px;
+    border-radius: 12px;
+}
+
+.audio-preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: #e8f0fe;
+    border-radius: 12px;
+}
+
+.audio-preview-item .audio-icon {
+    font-size: 2rem;
+}
+
+.change-file-btn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    background: transparent;
+    color: #5f6368;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.change-file-btn:hover {
+    border-color: #4285f4;
+    color: #4285f4;
+}
+
+/* ── 連結輸入 ── */
+.homework-link-input {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #dadce0;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #202124;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.homework-link-input:focus {
+    outline: none;
+    border-color: #4285f4;
+    background: white;
+}
+
+.homework-link-hint {
+    color: #9aa0a6;
+    font-size: 0.8rem;
+    margin-top: 8px;
+}
+
+/* ── Footer ── */
+.homework-footer {
+    padding: 16px 28px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-top: 1px solid #e8eaed;
+}
+
+.homework-submit-btn {
+    padding: 12px 32px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a73e8, #4285f4);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.homework-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 115, 232, 0.35);
+}
+
+/* ── 成功 Toast ── */
+.homework-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    z-index: 3000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.homework-toast.success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+}
+
+.homework-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── 提交計數徽章 ── */
+.submission-badge {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #1a73e8, #4285f4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* ========================================
+   Inline 作業卡片（投影片內嵌表單）
+   ======================================== */
+.hw-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px 24px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #475569;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.hw-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.hw-card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.hw-card-icon .material-symbols-outlined {
+    font-size: 22px;
+    color: #475569;
+}
+
+.hw-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+.hw-card-mode {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.hw-card-desc {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.55;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* 範例區塊 */
+.hw-example-block {
+    margin-bottom: 12px;
+}
+
+.hw-example-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #fafafa;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.hw-example-toggle:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #334155;
+}
+
+.hw-example-content {
+    display: none;
+    margin-top: 8px;
+    padding: 12px 16px;
+    background: #fafaf9;
+    border: 1px solid #e7e5e4;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #44403c;
+    line-height: 1.6;
+}
+
+.hw-example-content.open {
+    display: block;
+}
+
+/* 姓名輸入列 */
+.hw-name-row {
+    margin-bottom: 10px;
+    animation: hwFadeIn 0.25s ease;
+}
+
+.hw-name-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #1e293b;
+    background: #fafafa;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.hw-name-input:focus {
+    outline: none;
+    border-color: #475569;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.08);
+}
+
+/* 開始繳交按鈕 */
+.hw-start-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 14px auto 0;
+    padding: 10px 28px;
+    background: #334155;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.hw-start-btn:hover {
+    background: #1e293b;
+    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+}
+
+/* Inline 表單 */
+.hw-inline-form {
+    margin-top: 10px;
+    animation: hwFadeIn 0.25s ease;
+}
+
+@keyframes hwFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hw-inline-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: #1e293b;
+    background: #fafafa;
+    line-height: 1.5;
+    resize: vertical;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+}
+
+.hw-inline-textarea:focus {
+    outline: none;
+    border-color: #475569;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.08);
+}
+
+/* 圖片上傳區 */
+.hw-upload-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    background: #fafafa;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #64748b;
+    transition: all 0.15s;
+    margin-bottom: 8px;
+}
+
+.hw-upload-zone:hover,
+.hw-upload-zone.dragover {
+    border-color: #475569;
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.hw-preview {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* 全功能 tabs */
+.hw-full-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.hw-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    color: #64748b;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.hw-tab:hover {
+    border-color: #94a3b8;
+    color: #334155;
+}
+
+.hw-tab.active {
+    background: #f1f5f9;
+    border-color: #475569;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.hw-full-panel {
+    display: none;
+}
+
+.hw-full-panel.active {
+    display: block;
+}
+
+/* 錯誤訊息（取代 alert） */
+.hw-error-msg {
+    padding: 8px 14px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: #991b1b;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    animation: hwFadeIn 0.2s ease;
+}
+
+/* 提交按鈕 */
+.hw-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #334155;
+    color: white;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+}
+
+.hw-submit-btn:hover {
+    background: #1e293b;
+    box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+}
+
+/* 成功勳章 */
+.hw-submitted-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #334155;
+    animation: hwBadgeIn 0.3s ease;
+}
+
+.hw-submitted-badge .material-symbols-outlined {
+    font-size: 24px;
+    color: #334155;
+}
+
+@keyframes hwBadgeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

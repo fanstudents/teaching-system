@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程重點摘要 — 教學系統</title>
+    <meta name="description" content="個人化課後重點摘要，包含互動結果回顧與學習建議">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/course-summary-page.css">
+</head>
+
+<body>
+    <!-- ── Top Bar ── -->
+    <header class="summary-topbar">
+        <div class="summary-topbar-left">
+            <div class="summary-topbar-icon">
+                <span class="material-symbols-outlined">auto_stories</span>
+            </div>
+            <div class="summary-topbar-title">
+                課程重點摘要
+                <span>— 個人化學習回顧</span>
+            </div>
+        </div>
+        <div class="summary-topbar-right">
+            <div class="summary-topbar-badge" id="topbarBadge">
+                <span class="material-symbols-outlined" style="font-size:0.85rem">verified</span>
+                已完成課程
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Loading State ── -->
+    <div id="summaryLoading" class="summary-loading">
+        <div class="summary-loading-spinner"></div>
+        <p>正在載入你的課程摘要...</p>
+    </div>
+
+    <!-- ── Main Content (hidden until loaded) ── -->
+    <div id="summaryMainContent" style="display:none">
+        <!-- ── Hero Banner ── -->
+        <section class="summary-hero" id="summaryHero">
+            <div class="summary-hero-content">
+                <div class="summary-hero-badge">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem">school</span>
+                    課程摘要
+                </div>
+                <h1 class="summary-hero-title">載入中...</h1>
+                <p class="summary-hero-subtitle">正在準備你的個人化摘要</p>
+            </div>
+        </section>
+
+        <!-- ── Layout: Sidebar + Content ── -->
+        <div class="summary-layout">
+            <!-- Sidebar TOC -->
+            <aside class="summary-sidebar">
+                <div class="summary-sidebar-title">章節目錄</div>
+                <ul class="summary-toc" id="summaryTOC">
+                    <!-- Dynamically generated -->
+                </ul>
+                <!-- Reading progress -->
+                <div class="summary-progress" style="margin-top:auto">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem">menu_book</span>
+                    閱讀進度
+                    <div class="summary-progress-bar">
+                        <div class="summary-progress-fill" id="progressFill" style="width:0%"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="summary-content">
+                <!-- ── Admin Transcript Panel (hidden, shown with ?admin=1) ── -->
+                <div id="adminTranscriptPanel" style="display:none" class="admin-transcript-panel">
+                    <div class="admin-transcript-header">
+                        <span class="material-symbols-outlined">upload_file</span>
+                        <div>
+                            <strong>逐字稿管理</strong>
+                            <small>上傳課程逐字稿，系統將結合簡報內容產生更完整的摘要</small>
+                        </div>
+                    </div>
+                    <textarea id="transcriptInput" placeholder="在此貼上課程逐字稿內容...&#10;&#10;系統會根據逐字稿與簡報投影片的內容，自動生成更豐富的課程摘要。"
+                        rows="8"></textarea>
+                    <div class="admin-transcript-footer">
+                        <span id="transcriptWordCount" class="transcript-word-count">0 字</span>
+                        <button id="saveTranscriptBtn" class="transcript-save-btn">儲存逐字稿</button>
+                    </div>
+                </div>
+
+                <!-- Overview Cards -->
+                <div id="summaryOverview" class="summary-overview-section"></div>
+
+                <!-- Dynamic Sections -->
+                <div id="summarySections"></div>
+
+                <!-- Instructor Social Links -->
+                <div class="summary-social">
+                    <div class="summary-social-avatar">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <h3>歡迎追蹤本課程講師 <strong>樊松蒲</strong></h3>
+                    <p>在社群上與講師互動，分享你的課後心得！</p>
+                    <div class="summary-social-links">
+                        <a href="https://www.instagram.com/jrtingfan/" target="_blank" rel="noopener"
+                            class="social-link ig">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                            </svg>
+                            Instagram
+                        </a>
+                        <a href="https://www.threads.net/@jrtingfan" target="_blank" rel="noopener"
+                            class="social-link threads">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path
+                                    d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.083.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.187.408-2.136 1.37-2.747.836-.533 1.965-.838 3.27-.882.93-.032 1.79.04 2.573.2-.065-.6-.217-1.109-.453-1.512-.39-.664-1.03-1.01-1.907-1.027-1.445-.03-2.27.61-2.58 1.132l-1.792-.98c.6-1.005 1.9-2.19 4.399-2.145 1.38.022 2.473.56 3.248 1.598.652.875 1.009 2.01 1.063 3.372.567.267 1.07.592 1.504.97 1.017.884 1.725 2.078 2.053 3.462.49 2.07.107 4.508-1.797 6.415-1.87 1.872-4.133 2.666-7.245 2.694zM9.89 14.008c-.06 0-.12.002-.18.005-.91.05-1.601.29-2.003.698-.315.32-.467.725-.44 1.168.04.65.36 1.14.94 1.515.597.387 1.358.535 2.14.49 1.113-.06 1.96-.465 2.516-1.156.418-.52.684-1.2.8-2.034a8.94 8.94 0 00-3.773-.686z" />
+                            </svg>
+                            Threads
+                        </a>
+                    </div>
+                    <p class="summary-social-cta">也歡迎你在社群上發表這次課後的心得 ✨</p>
+                </div>
+
+                <!-- CTA -->
+                <div class="summary-cta">
+                    <div class="summary-cta-icon"><span class="material-symbols-outlined">school</span></div>
+                    <h2>恭喜完成課程！</h2>
+                    <p>你已閱覽完整的課程重點摘要。持續複習能讓你對課程內容更加熟練。</p>
+                    <div class="summary-cta-actions">
+                        <button class="summary-cta-btn primary" onclick="window.print()">
+                            <span class="material-symbols-outlined">download</span>
+                            儲存為 PDF
+                        </button>
+                        <button class="summary-cta-btn secondary" onclick="history.back()">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            返回課程
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Mobile TOC Toggle -->
+        <button class="mobile-toc-toggle" id="mobileTocToggle" aria-label="章節目錄">
+            <span class="material-symbols-outlined">menu_book</span>
+        </button>
+        <div class="mobile-toc-drawer" id="mobileTocDrawer">
+            <div class="summary-sidebar-title">章節目錄</div>
+            <ul class="summary-toc" id="mobileTOC"></ul>
+        </div>
+
+        <!-- Footer -->
+        <footer class="summary-footer">
+            由 AI 教學系統自動產生 · 內容依據課程互動紀錄
+        </footer>
+    </div>
+
+    <script type="module" src="scripts/courseSummary.js"></script>
+</body>
+
+</html>

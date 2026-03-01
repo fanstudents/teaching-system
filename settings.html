@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統設置 — 教學系統</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <style>
+        .settings-container {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            height: calc(100vh - 80px);
+        }
+
+        .prompt-list {
+            width: 280px;
+            flex-shrink: 0;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        .prompt-list-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #1e293b;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prompt-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background .15s;
+        }
+
+        .prompt-item:hover {
+            background: #f8fafc;
+        }
+
+        .prompt-item.active {
+            background: #eff6ff;
+            border-left: 3px solid #2563eb;
+        }
+
+        .prompt-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .prompt-item-desc {
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .prompt-editor {
+            flex: 1;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prompt-editor-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompt-editor-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .prompt-editor-desc {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .prompt-editor-body {
+            flex: 1;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prompt-editor-body label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .prompt-textarea {
+            flex: 1;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Noto Sans TC', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #1e293b;
+            resize: none;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .prompt-textarea:focus {
+            border-color: #2563eb;
+        }
+
+        .prompt-editor-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-status {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .save-status.saved {
+            color: #16a34a;
+        }
+
+        .save-status.saving {
+            color: #d97706;
+        }
+
+        .btn-save {
+            padding: 8px 24px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .btn-save:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-save:disabled {
+            opacity: .5;
+            cursor: default;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 15px;
+        }
+
+        .variable-hint {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.8;
+        }
+
+        .variable-hint code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <a href="manage.html" style="color:#64748b;text-decoration:none;display:flex;align-items:center;">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+                <div class="admin-header-title">系統設置</div>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <div class="prompt-list">
+                <div class="prompt-list-header">
+                    <span class="material-symbols-outlined" style="font-size:18px;">psychology</span>
+                    AI 提示詞管理
+                </div>
+                <div id="promptListItems"></div>
+            </div>
+
+            <div class="prompt-editor" id="promptEditor">
+                <div class="empty-state" id="emptyState">
+                    <div style="text-align:center;">
+                        <span class="material-symbols-outlined" style="font-size:48px;color:#cbd5e1;">edit_note</span>
+                        <p>選擇左側的提示詞來編輯</p>
+                    </div>
+                </div>
+                <div id="editorContent" style="display:none;flex-direction:column;flex:1;">
+                    <div class="prompt-editor-header">
+                        <div>
+                            <div class="prompt-editor-title" id="editorTitle"></div>
+                            <div class="prompt-editor-desc" id="editorDesc"></div>
+                        </div>
+                    </div>
+                    <div class="prompt-editor-body">
+                        <label>提示詞內容</label>
+                        <textarea class="prompt-textarea" id="promptText"></textarea>
+                        <div class="variable-hint">
+                            <b>可用變數：</b>使用 <code>{{variableName}}</code> 格式插入動態變數。
+                            系統會在實際使用時自動替換。
+                        </div>
+                    </div>
+                    <div class="prompt-editor-footer">
+                        <span class="save-status" id="saveStatus"></span>
+                        <button class="btn-save" id="btnSave" onclick="savePrompt()">儲存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        let prompts = [];
+        let currentPromptId = null;
+
+        async function loadPrompts() {
+            try {
+                const { data, error } = await db.select('system_prompts', { order: 'id.asc' });
+                if (error) throw new Error(error.message || 'Load failed');
+                prompts = data || [];
+                renderList();
+            } catch (e) {
+                console.error('Failed to load prompts:', e);
+            }
+        }
+
+        function renderList() {
+            const container = document.getElementById('promptListItems');
+            container.innerHTML = prompts.map(p => `
+                <div class="prompt-item ${p.id === currentPromptId ? 'active' : ''}"
+                     data-id="${p.id}" onclick="window._selectPrompt('${p.id}')">
+                    <div class="prompt-item-name">${p.name}</div>
+                    <div class="prompt-item-desc">${p.description || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        window._selectPrompt = function (id) {
+            currentPromptId = id;
+            const p = prompts.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('emptyState').style.display = 'none';
+            const editor = document.getElementById('editorContent');
+            editor.style.display = 'flex';
+            document.getElementById('editorTitle').textContent = p.name;
+            document.getElementById('editorDesc').textContent = p.description || '';
+            document.getElementById('promptText').value = p.prompt_text;
+            document.getElementById('saveStatus').textContent = '';
+            renderList();
+        };
+
+        window.savePrompt = async function () {
+            if (!currentPromptId) return;
+            const text = document.getElementById('promptText').value;
+            const status = document.getElementById('saveStatus');
+            const btn = document.getElementById('btnSave');
+
+            btn.disabled = true;
+            status.textContent = '⏳ 儲存中...';
+            status.className = 'save-status saving';
+
+            try {
+                await db.update('system_prompts',
+                    { prompt_text: text, updated_at: new Date().toISOString() },
+                    { id: `eq.${currentPromptId}` }
+                );
+                status.textContent = '✅ 已儲存';
+                status.className = 'save-status saved';
+
+                // Update local cache
+                const p = prompts.find(x => x.id === currentPromptId);
+                if (p) p.prompt_text = text;
+            } catch (e) {
+                status.textContent = '❌ 儲存失敗：' + e.message;
+                status.className = 'save-status';
+            }
+            btn.disabled = false;
+        };
+
+        loadPrompts();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學員課堂 — 教學簡報系統</title>
+    <meta name="description" content="學員課堂互動頁面，即時參與教學簡報與互動活動">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css?v=20260224">
+    <link rel="stylesheet" href="styles/student-page.css?v=20260224">
+    <link rel="stylesheet" href="styles/interactive.css?v=20260224">
+    <link rel="stylesheet" href="styles/homework.css?v=20260224">
+</head>
+
+<body>
+    <!-- 加入畫面 -->
+    <div class="join-screen" id="joinScreen">
+        <div class="join-logo">
+            <span class="material-symbols-outlined">cast_for_education</span>
+        </div>
+        <h1 class="join-title">加入課堂</h1>
+        <p class="join-subtitle">輸入講師提供的課堂代碼即可同步觀看簡報</p>
+
+        <div class="join-card">
+            <div class="join-field">
+                <label for="sessionCode">課堂代碼</label>
+                <input type="text" id="sessionCode" placeholder="例如 A3K9X2" maxlength="6" autocomplete="off"
+                    spellcheck="false" autofocus>
+            </div>
+            <div class="join-field">
+                <label for="studentEmail">Email</label>
+                <input type="email" id="studentEmail" placeholder="your@email.com">
+            </div>
+            <div class="join-field">
+                <label for="studentName">姓名</label>
+                <input type="text" id="studentName" placeholder="請輸入姓名">
+            </div>
+            <div id="extraJoinFields"></div>
+            <button class="join-btn" id="joinBtn">加入課堂</button>
+            <div class="join-error" id="joinError"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="join-loading-overlay" id="joinLoadingOverlay">
+        <div class="join-loading-spinner"></div>
+        <div class="join-loading-text" id="joinLoadingText">驗證課堂代碼…</div>
+        <div class="join-loading-sub">請稍候，正在為您準備課堂</div>
+    </div>
+
+    <!-- 簡報觀看畫面 -->
+    <div class="student-presentation" id="studentPresentation">
+        <div class="student-header">
+            <div class="student-header-left">
+                <div class="student-header-menu" id="studentMenuMount"></div>
+                <div class="student-session-badge">
+                    <span class="live-dot"></span>
+                    <span>LIVE</span>
+                </div>
+                <div class="student-header-info">
+                    <span class="student-title" id="displayTitle"></span>
+                    <span class="student-session-detail" id="displaySessionInfo"></span>
+                </div>
+            </div>
+            <div class="student-header-center">
+                <div class="mode-toggle" id="modeToggle">
+                    <button class="mode-btn active" id="followModeBtn" data-mode="follow">
+                        <span class="material-symbols-outlined">sync</span>
+                        跟隨講師
+                    </button>
+                    <button class="mode-btn" id="freeModeBtn" data-mode="free">
+                        <span class="material-symbols-outlined">swipe</span>
+                        自行瀏覽
+                    </button>
+                </div>
+                <div class="student-counter" id="slideCounter">— / —</div>
+            </div>
+            <div class="student-header-right">
+                <div class="student-name-badge">
+                    <div class="student-avatar" id="displayAvatar"></div>
+                    <span id="displayName"></span>
+                </div>
+                <button class="student-close-btn" id="studentCloseBtn" title="離開課堂">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+        <div class="student-slide-wrapper" id="slideWrapper">
+            <button class="slide-nav-arrow prev" id="prevSlideBtn">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <div class="student-slide" id="studentSlide">
+                <div class="student-status">
+                    <span class="material-symbols-outlined">hourglass_top</span>
+                    <p>等待講師開始簡報…</p>
+                </div>
+            </div>
+            <button class="slide-nav-arrow next" id="nextSlideBtn">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+            <div class="follow-banner" id="followBanner">📡 講師已切換到新頁面，點此跟隨</div>
+        </div>
+    </div>
+
+    <!-- 斷線提示 -->
+    <div class="disconnected-overlay" id="disconnectedOverlay">
+        <span class="material-symbols-outlined">wifi_off</span>
+        <p>課堂已結束或連線中斷</p>
+        <button class="join-btn" style="max-width:200px;" onclick="location.reload()">重新加入</button>
+    </div>
+
+    <script type="module">
+        import { db, realtime } from './scripts/supabase.js';
+        import { MatchingGame } from './scripts/interactive/matching.js';
+        import { FillBlank } from './scripts/interactive/fillBlank.js';
+        import { OrderingGame } from './scripts/interactive/ordering.js';
+        import { QuizGame } from './scripts/interactive/quiz.js';
+        import { PollGame } from './scripts/interactive/poll.js';
+        import { CountdownTimer } from './scripts/interactive/countdown.js';
+        import { Showcase } from './scripts/interactive/showcase.js';
+        import { HomeworkSubmission } from './scripts/homework.js';
+
+        const matchingGame = new MatchingGame();
+        const fillBlank = new FillBlank();
+        const orderingGame = new OrderingGame();
+        const quizGame = new QuizGame();
+        const pollGame = new PollGame();
+        const countdown = new CountdownTimer();
+        const showcase = new Showcase();
+        const homework = new HomeworkSubmission();
+
+        let sessionCode = '';
+        let studentName = '';
+        let studentId = '';
+        const slideEl = document.getElementById('studentSlide');
+
+        // ── 廣播模式狀態 ──
+        let mode = 'follow'; // 'follow' | 'free'
+        let slidesCache = []; // 儲存所有收到的投影片
+        let currentIndex = 0;
+        let totalSlides = 0;
+        let instructorIndex = 0; // 講師目前頁碼
+        let heartbeatTimer = null;
+        let sessionAssignments = []; // 該場次的作業列表
+
+        // ── URL params auto-fill ──
+        const urlParams = new URLSearchParams(location.search);
+        const autoCode = urlParams.get('code');
+        if (autoCode) {
+            document.getElementById('sessionCode').value = autoCode.toUpperCase();
+        }
+        // Pre-fill email/name from student_session (set in pre-class login)
+        try {
+            const ss = JSON.parse(localStorage.getItem('student_session') || '{}');
+            if (ss.email) document.getElementById('studentEmail').value = ss.email;
+            if (ss.name) document.getElementById('studentName').value = ss.name;
+        } catch { /* ignore */ }
+
+        // ── 自動大寫 session code ──
+        document.getElementById('sessionCode').addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        // ── Join ──
+        document.getElementById('joinBtn').addEventListener('click', joinSession);
+        document.getElementById('sessionCode').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('studentName').focus();
+        });
+        document.getElementById('studentName').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') joinSession();
+        });
+
+        // ── Auto-join (from portal link) ──
+        if (urlParams.get('autoJoin') === '1') {
+            const codeVal = document.getElementById('sessionCode').value.trim();
+            const emailVal = document.getElementById('studentEmail').value.trim();
+            const nameVal = document.getElementById('studentName').value.trim();
+            if (codeVal && emailVal && nameVal) {
+                setTimeout(() => joinSession(), 200);
+            }
+        }
+
+        // ── Mode Toggle ──
+        document.getElementById('followModeBtn').addEventListener('click', () => setMode('follow'));
+        document.getElementById('freeModeBtn').addEventListener('click', () => setMode('free'));
+
+        // ── Close Button ──
+        document.getElementById('studentCloseBtn').addEventListener('click', () => {
+            realtime.publish(`session:${sessionCode}`, 'student_leave', { studentId, studentName });
+            if (heartbeatTimer) clearInterval(heartbeatTimer);
+            const joinCode = new URLSearchParams(location.search).get('joinCode') || new URLSearchParams(location.search).get('code') || '';
+            const sessionParam = new URLSearchParams(location.search).get('session') || '';
+            if (joinCode) {
+                location.href = `portal.html?joinCode=${joinCode}&session=${sessionParam}`;
+            } else {
+                location.href = 'portal.html';
+            }
+        });
+
+        // ── Nav Arrows ──
+        document.getElementById('prevSlideBtn').addEventListener('click', () => navigateSlide(-1));
+        document.getElementById('nextSlideBtn').addEventListener('click', () => navigateSlide(1));
+
+        // ── Follow Banner ──
+        document.getElementById('followBanner').addEventListener('click', () => {
+            setMode('follow');
+            goToSlide(instructorIndex);
+        });
+
+        // ── 鍵盤導航 ──
+        document.addEventListener('keydown', (e) => {
+            // Esc 離開課堂
+            if (e.key === 'Escape') {
+                document.getElementById('studentCloseBtn')?.click();
+                return;
+            }
+            if (mode !== 'free') return;
+            if (e.key === 'ArrowLeft') navigateSlide(-1);
+            if (e.key === 'ArrowRight') navigateSlide(1);
+        });
+
+        function setMode(newMode) {
+            mode = newMode;
+            const wrapper = document.getElementById('slideWrapper');
+            const followBtn = document.getElementById('followModeBtn');
+            const freeBtn = document.getElementById('freeModeBtn');
+            const banner = document.getElementById('followBanner');
+
+            if (mode === 'follow') {
+                followBtn.classList.add('active');
+                freeBtn.classList.remove('active');
+                wrapper.classList.remove('free-mode');
+                banner.classList.remove('has-new');
+                // 跟回講師頁面
+                goToSlide(instructorIndex);
+            } else {
+                freeBtn.classList.add('active');
+                followBtn.classList.remove('active');
+                wrapper.classList.add('free-mode');
+            }
+            updateNavButtons();
+        }
+
+        function navigateSlide(dir) {
+            const newIdx = currentIndex + dir;
+            if (newIdx < 0 || newIdx >= totalSlides) return;
+            goToSlide(newIdx);
+        }
+
+        function goToSlide(index) {
+            if (index < 0 || index >= slidesCache.length) return;
+            currentIndex = index;
+            renderSlide(slidesCache[index], index, totalSlides);
+            updateNavButtons();
+
+            // 清除跟隨提示
+            if (index === instructorIndex) {
+                document.getElementById('followBanner').classList.remove('has-new');
+            }
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevSlideBtn');
+            const nextBtn = document.getElementById('nextSlideBtn');
+            prevBtn.disabled = currentIndex <= 0;
+            nextBtn.disabled = currentIndex >= totalSlides - 1;
+        }
+
+        async function joinSession() {
+            const codeInput = document.getElementById('sessionCode');
+            const emailInput = document.getElementById('studentEmail');
+            const nameInput = document.getElementById('studentName');
+            const errorEl = document.getElementById('joinError');
+            const btn = document.getElementById('joinBtn');
+
+            sessionCode = codeInput.value.trim().toUpperCase();
+            const studentEmail = emailInput.value.trim();
+            studentName = nameInput.value.trim();
+
+            if (!sessionCode || sessionCode.length < 4) {
+                errorEl.textContent = '請輸入有效的課堂代碼';
+                errorEl.style.display = 'block';
+                return;
+            }
+            if (!studentEmail || !studentEmail.includes('@')) {
+                errorEl.textContent = '請輸入有效的 Email';
+                errorEl.style.display = 'block';
+                return;
+            }
+            if (!studentName) {
+                errorEl.textContent = '請輸入你的姓名';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '連線中…';
+            errorEl.style.display = 'none';
+
+            // Show loading overlay with phased text
+            const loadOverlay = document.getElementById('joinLoadingOverlay');
+            const loadText = document.getElementById('joinLoadingText');
+            loadOverlay.classList.add('active');
+            loadText.textContent = '驗證課堂代碼…';
+            const phaseTexts = ['連線教室中…', '即將進入…'];
+            const textTimers = phaseTexts.map((t, i) => setTimeout(() => { loadText.textContent = t; }, (i + 1) * 1200));
+
+            function hideLoading() {
+                textTimers.forEach(clearTimeout);
+                loadOverlay.classList.remove('active');
+            }
+
+            // 產生唯一學員 ID
+            studentId = `${studentName}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+
+            try {
+                // 先查 projects 表確認 join code 有效
+                let project = null;
+                try {
+                    const { data: projData } = await db.select('projects', {
+                        filter: { join_code: `eq.${sessionCode}` }, limit: 1
+                    });
+                    if (projData && projData.length > 0) project = projData[0];
+                } catch (e2) { /* ignore */ }
+
+                // 驗證 session 是否存在（講師正在廣播）
+                let session = null;
+                try {
+                    const { data } = await db.select('sessions', {
+                        filter: { session_code: `eq.${sessionCode}` }
+                    });
+                    if (data && data.length > 0) session = data[0];
+                } catch (e2) { /* ignore */ }
+
+                // 都找不到 → 錯誤
+                if (!session && !project) {
+                    hideLoading();
+                    errorEl.textContent = '找不到此課堂代碼，請確認後重試';
+                    errorEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = '加入課堂';
+                    return;
+                }
+
+                // 儲存學員資訊到 sessionStorage
+                sessionStorage.setItem('homework_user', JSON.stringify({
+                    name: studentName,
+                    email: studentEmail,
+                    joinedAt: new Date().toISOString()
+                }));
+
+                // 連線 Realtime（不阻塞主流程）
+                try {
+                    await Promise.race([
+                        (async () => {
+                            await realtime.connect();
+                            await realtime.subscribe(`session:${sessionCode}`);
+                        })(),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                    ]);
+                } catch (rtErr) {
+                    console.warn('[Student] realtime connect failed (non-fatal):', rtErr);
+                }
+
+                // 通知講師上線
+                realtime.publish(`session:${sessionCode}`, 'student_join', {
+                    studentId,
+                    studentName
+                });
+
+                // 啟動心跳（每 15 秒）
+                heartbeatTimer = setInterval(() => {
+                    realtime.publish(`session:${sessionCode}`, 'student_heartbeat', {
+                        studentId,
+                        studentName
+                    });
+                }, 15000);
+
+                // 監聽 slide_change 事件
+                realtime.on('slide_change', (msg) => {
+                    console.log('[Student] slide_change:', msg);
+                    const payload = msg.payload || msg;
+                    const slide = payload.slide;
+                    const idx = payload.slideIndex;
+                    const total = payload.totalSlides;
+
+                    totalSlides = total;
+                    instructorIndex = idx;
+                    while (slidesCache.length < total) slidesCache.push(null);
+                    slidesCache[idx] = slide;
+
+                    if (mode === 'follow') {
+                        currentIndex = idx;
+                        renderSlide(slide, idx, total);
+                        updateNavButtons();
+                    } else {
+                        if (idx !== currentIndex) {
+                            const banner = document.getElementById('followBanner');
+                            banner.classList.add('has-new');
+                            banner.textContent = `📡 講師已切到第 ${idx + 1} 頁，點此跟隨`;
+                        }
+                        document.getElementById('slideCounter').textContent =
+                            `${currentIndex + 1} / ${total}`;
+                    }
+                });
+
+                // 監聽 session_end 事件
+                realtime.on('session_end', () => {
+                    if (heartbeatTimer) clearInterval(heartbeatTimer);
+                    document.getElementById('disconnectedOverlay').classList.add('active');
+                });
+
+                // 頁面關閉時通知離線
+                window.addEventListener('beforeunload', () => {
+                    realtime.publish(`session:${sessionCode}`, 'student_leave', {
+                        studentId,
+                        studentName
+                    });
+                    if (heartbeatTimer) clearInterval(heartbeatTimer);
+                });
+
+                // 切換到簡報畫面
+                hideLoading();
+                document.getElementById('joinScreen').style.display = 'none';
+                const pres = document.getElementById('studentPresentation');
+                pres.classList.add('active');
+
+                const title = session?.title || project?.name || '教學簡報';
+                document.getElementById('displayTitle').textContent = title;
+                document.getElementById('displayName').textContent = studentName;
+                document.getElementById('displayAvatar').textContent = studentName.charAt(0);
+
+                // 顯示場次資訊（日期 · 時段）取代六位數代碼
+                const sessionInfoEl = document.getElementById('displaySessionInfo');
+                if (sessionInfoEl && project) {
+                    try {
+                        // 從 URL 取得 session code（portal 帶過來的）
+                        const urlSession = new URLSearchParams(location.search).get('session') || '';
+                        if (urlSession) {
+                            const { data: sessRows } = await db.select('project_sessions', {
+                                filter: { session_code: `eq.${urlSession}`, project_id: `eq.${project.id}` },
+                                limit: 1
+                            });
+                            if (sessRows?.[0]) {
+                                const ps = sessRows[0];
+                                const parts = [];
+                                if (ps.date) parts.push(ps.date);
+                                if (ps.time) parts.push(ps.time);
+                                sessionInfoEl.textContent = parts.join(' · ');
+                            }
+                        }
+                    } catch { /* non-critical */ }
+                }
+
+                scaleSlide();
+                window.addEventListener('resize', scaleSlide);
+
+                // 載入投影片資料
+                const slidesSource = project?.slides_data || null;
+                if (slidesSource) {
+                    try {
+                        const slidesData = typeof slidesSource === 'string'
+                            ? JSON.parse(slidesSource)
+                            : slidesSource;
+                        const slides = slidesData.slides || [];
+                        if (slides.length > 0) {
+                            totalSlides = slides.length;
+                            slidesCache = slides;
+
+                            if (session) {
+                                // 有廣播 session → 跟隨模式，跳到講師目前頁面
+                                const startIdx = parseInt(session.current_slide || '0', 10);
+                                currentIndex = startIdx;
+                                instructorIndex = startIdx;
+                                setMode('follow');
+                                renderSlide(slides[startIdx] || slides[0], startIdx, totalSlides);
+                            } else {
+                                // 無廣播 session → 自行瀏覽模式
+                                currentIndex = 0;
+                                setMode('free');
+                                renderSlide(slides[0], 0, totalSlides);
+                            }
+                            updateNavButtons();
+                        }
+                    } catch (e) {
+                        console.warn('解析 slides_data 失敗:', e);
+                    }
+                }
+
+                // 載入該場次的作業列表 (session_assignments)
+                try {
+                    // 先找到對應的 project_session
+                    const urlSess = new URLSearchParams(location.search).get('session') || sessionCode;
+                    const { data: sessRows } = await db.select('project_sessions', {
+                        filter: { session_code: `eq.${urlSess}` },
+                        limit: 1
+                    });
+                    const ps = sessRows?.[0];
+                    if (ps) {
+                        const { data: asgns } = await db.select('session_assignments', {
+                            filter: { session_id: `eq.${ps.id}` },
+                            order: 'sort_order.asc'
+                        });
+                        sessionAssignments = asgns || [];
+                        sessionStorage.setItem('session_assignments', JSON.stringify(sessionAssignments));
+                    }
+                } catch { /* non-critical */ }
+
+            } catch (err) {
+                hideLoading();
+                console.error('[Student] join error:', err);
+                errorEl.textContent = '連線失敗：' + err.message;
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = '加入課堂';
+            }
+        }
+
+        // ── Render slide ──
+        function renderSlide(slide, index, total) {
+            if (!slide) return;
+            slideEl.innerHTML = '';
+
+            // 背景
+            if (slide.background && slide.background !== '#ffffff') {
+                slideEl.style.background = slide.background;
+            } else {
+                slideEl.style.background = 'white';
+            }
+
+            // 元素
+            (slide.elements || []).forEach(element => {
+                const el = createElementNode(element);
+                if (el) {
+                    el.classList.add('presentation-element');
+                    slideEl.appendChild(el);
+                }
+            });
+
+            // 計數器
+            document.getElementById('slideCounter').textContent =
+                `${(index || 0) + 1} / ${total || '—'}`;
+
+            // 初始化互動元件
+            setTimeout(() => {
+                matchingGame.init();
+                fillBlank.init();
+                orderingGame.init();
+                showcase.init();
+                quizGame.init();
+                pollGame.init();
+                countdown.observeNewElements();
+            }, 100);
+        }
+
+        // ── 工具函式：打亂陣列 ──
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // ── 建立元素 DOM（與 slideManager.js 完全對齊） ──
+        function createElementNode(element) {
+            const el = document.createElement('div');
+            // 使用與編輯器相同的 class 結構
+            el.className = `editable-element ${element.type}-element`;
+            el.dataset.id = element.id;
+            el.dataset.type = element.type;
+            el.id = element.id;
+
+            el.style.left = `${element.x}px`;
+            el.style.top = `${element.y}px`;
+            el.style.width = `${element.width}px`;
+            el.style.height = `${element.height}px`;
+            if (element.rotation) el.style.transform = `rotate(${element.rotation}deg)`;
+            if (element.zIndex) el.style.zIndex = element.zIndex;
+
+            switch (element.type) {
+                case 'text':
+                    el.innerHTML = element.content || '';
+                    el.style.fontSize = `${element.fontSize || 18}px`;
+                    el.style.color = element.color || '#2d3748';
+                    el.style.fontWeight = element.bold ? 'bold' : 'normal';
+                    el.style.fontStyle = element.italic ? 'italic' : 'normal';
+                    el.style.textDecoration = element.underline ? 'underline' : 'none';
+                    if (element.textAlign) el.style.textAlign = element.textAlign;
+                    if (element.fontFamily) el.style.fontFamily = element.fontFamily;
+                    break;
+
+                case 'shape':
+                    el.classList.add(element.shapeType || 'rectangle');
+                    el.style.background = element.background || '';
+                    break;
+
+                case 'image':
+                    el.innerHTML = `<img src="${element.src}" alt="" style="width:100%;height:100%;object-fit:${element.objectFit || 'contain'}" draggable="false">`;
+                    break;
+
+                case 'video':
+                    if (element.embedUrl) {
+                        el.innerHTML = `<iframe src="${element.embedUrl}" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+                    } else if (element.src) {
+                        el.innerHTML = `<video src="${element.src}" controls style="width:100%;height:100%;"></video>`;
+                    }
+                    break;
+
+                case 'audio':
+                    el.innerHTML = `
+                        <div class="audio-icon">♪</div>
+                        <audio src="${element.src}" controls></audio>
+                    `;
+                    break;
+
+                case 'matching': {
+                    el.classList.add('interactive-element');
+                    const pairs = element.pairs || [];
+                    const shuffledPairs = shuffleArray(pairs);
+                    el.innerHTML = `
+                        <div class="matching-container">
+                            <svg class="matching-lines"></svg>
+                            <div class="matching-column left-column">
+                                ${pairs.map((pair, i) => `
+                                    <div class="matching-item" data-index="${i}" data-side="left">
+                                        ${pair.left}
+                                        <div class="matching-dot left"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="matching-column right-column">
+                                ${shuffledPairs.map((pair) => {
+                        const origIdx = pairs.indexOf(pair);
+                        return `
+                                        <div class="matching-item" data-answer="${pair.left}" data-side="right">
+                                            ${pair.right}
+                                            <div class="matching-dot right"></div>
+                                        </div>
+                                    `;
+                    }).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+
+                case 'fillblank': {
+                    el.classList.add('interactive-element');
+                    let contentHtml = element.content || '';
+                    (element.blanks || []).forEach((blank, i) => {
+                        contentHtml = contentHtml.replace(
+                            `___${i + 1}___`,
+                            `<input type="text" class="fill-blank-input" data-index="${i}" data-answer="${blank.answer}" placeholder="?">`
+                        );
+                    });
+                    el.innerHTML = `
+                        <div class="fill-blank-container">
+                            <div class="fill-blank-title">${element.title || '填空練習'}</div>
+                            <div class="fill-blank-content">${contentHtml}</div>
+                            <button class="fill-blank-check-btn">檢查答案</button>
+                            <div class="fill-blank-result"></div>
+                        </div>
+                    `;
+                    break;
+                }
+
+                case 'ordering': {
+                    el.classList.add('interactive-element');
+                    const steps = element.steps || ['步驟一', '步驟二', '步驟三'];
+                    const shuffledSteps = shuffleArray([...steps]);
+                    el.innerHTML = `
+                        <div class="ordering-container">
+                            <div class="ordering-source">
+                                <div class="ordering-source-title">拖曳選項</div>
+                                ${shuffledSteps.map((text, i) => `
+                                    <div class="ordering-chip" draggable="true" data-value="${text}">
+                                        <span class="chip-icon">${String.fromCharCode(65 + i)}</span>
+                                        ${text}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="ordering-slots">
+                                <div class="ordering-slots-title">正確順序</div>
+                                ${steps.map((text, i) => `
+                                    <div class="ordering-slot" data-correct-order="${text}">
+                                        <span class="slot-number">${i + 1}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+
+                case 'quiz': {
+                    el.classList.add('interactive-element');
+                    const markers = 'ABCDEFGHIJ';
+                    const isMultiple = element.multiple || false;
+                    const options = element.options || [];
+                    el.innerHTML = `
+                        <div class="quiz-container" data-multiple="${isMultiple}">
+                            <div class="quiz-question">${element.question || '請選擇正確答案'}</div>
+                            <div class="quiz-options">
+                                ${options.map((opt, i) => `
+                                    <div class="quiz-option" data-correct="${opt.correct ? 'true' : 'false'}">
+                                        <span class="option-marker">${markers[i] || String(i + 1)}</span>
+                                        <span>${opt.text}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="quiz-footer">
+                                <span class="quiz-result"></span>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <button class="quiz-retry">重試</button>
+                                    ${isMultiple ? '<button class="quiz-submit">提交</button>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+
+                case 'poll': {
+                    el.classList.add('interactive-element');
+                    const pollMarkers = 'ABCDEFGHIJ';
+                    const pollOptions = element.options || [];
+                    el.innerHTML = `
+                        <div class="poll-container" data-element-id="${element.id}">
+                            <div class="poll-question">${element.question || '請投票'}</div>
+                            <div class="poll-options">
+                                ${pollOptions.map((opt, i) => `
+                                    <div class="poll-option" data-index="${i}">
+                                        <span class="option-marker">${pollMarkers[i] || String(i + 1)}</span>
+                                        <span>${opt.text}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="poll-footer">
+                                <span class="poll-total"></span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                }
+
+                case 'copycard': {
+                    el.classList.add('interactive-element');
+                    el.innerHTML = `
+                        <div class="copy-card-container">
+                            <div class="copy-card-title">${element.title || '點擊複製'}</div>
+                            <div class="copy-card-content" data-copy-text="${element.content || ''}">${element.content || ''}</div>
+                            <button class="copy-card-btn">
+                                <span class="copy-icon">⧉</span>
+                                <span class="copy-text">點擊複製</span>
+                            </button>
+                            <div class="copy-card-feedback"></div>
+                        </div>
+                    `;
+                    // 綁定複製事件
+                    const copyBtn = el.querySelector('.copy-card-btn');
+                    const contentEl = el.querySelector('.copy-card-content');
+                    const feedbackEl = el.querySelector('.copy-card-feedback');
+                    copyBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        try {
+                            await navigator.clipboard.writeText(contentEl.textContent);
+                            feedbackEl.textContent = '✓ 已複製到剪貼簿！';
+                            feedbackEl.classList.add('success');
+                            copyBtn.classList.add('copied');
+                            setTimeout(() => {
+                                feedbackEl.textContent = '';
+                                feedbackEl.classList.remove('success');
+                                copyBtn.classList.remove('copied');
+                            }, 2000);
+                        } catch (err) {
+                            feedbackEl.textContent = '複製失敗，請手動選取文字';
+                            feedbackEl.classList.add('error');
+                        }
+                    });
+                    break;
+                }
+
+                case 'homework': {
+                    el.classList.add('interactive-element', 'homework-element');
+                    const hwMode = element.submissionMode || '';
+                    const modeNames = { image_only: '圖片上傳', image_prompt: '圖片 + 提示詞', text_only: '文字繳交' };
+                    const modeIcons = { image_only: 'image', image_prompt: 'photo_camera', text_only: 'edit_note' };
+                    const modeName = modeNames[hwMode] || '全功能';
+                    const modeIconName = modeIcons[hwMode] || 'upload_file';
+                    const exampleHtml = element.example ? `
+                        <div class="hw-example-block">
+                            <button class="hw-example-toggle" type="button">
+                                <span class="material-symbols-outlined" style="font-size:16px;">lightbulb</span>
+                                查看範例
+                                <span class="material-symbols-outlined hw-example-arrow" style="font-size:14px;">expand_more</span>
+                            </button>
+                            <div class="hw-example-content">${element.example.replace(/\n/g, '<br>')}</div>
+                        </div>` : '';
+
+                    const uploadBlock = (id) => `
+                        <div class="hw-upload-zone" id="hwUpload_${id}">
+                            <span class="material-symbols-outlined" style="font-size:24px;color:#64748b;">cloud_upload</span>
+                            <span>點擊或拖曳圖片至此</span>
+                            <input type="file" accept="image/*" class="hw-file-input" hidden>
+                        </div>
+                        <div class="hw-preview" id="hwPreview_${id}"></div>`;
+
+                    let inlineFormHtml = '';
+                    if (hwMode === 'image_only') {
+                        inlineFormHtml = uploadBlock(element.id);
+                    } else if (hwMode === 'image_prompt') {
+                        inlineFormHtml = `${uploadBlock(element.id)}
+                            <textarea class="hw-inline-textarea" id="hwPrompt_${element.id}" placeholder="請貼上你使用的 Prompt..." rows="2"></textarea>`;
+                    } else if (hwMode === 'text_only') {
+                        inlineFormHtml = `
+                            <textarea class="hw-inline-textarea" id="hwText_${element.id}" placeholder="在這裡輸入你的作業內容..." rows="3"></textarea>`;
+                    } else {
+                        inlineFormHtml = `
+                            <div class="hw-full-tabs">
+                                <button class="hw-tab active" data-type="text"><span class="material-symbols-outlined" style="font-size:14px;">edit_note</span> 文字</button>
+                                <button class="hw-tab" data-type="image"><span class="material-symbols-outlined" style="font-size:14px;">image</span> 圖片</button>
+                                <button class="hw-tab" data-type="link"><span class="material-symbols-outlined" style="font-size:14px;">link</span> 連結</button>
+                            </div>
+                            <div class="hw-full-panel active" data-panel="text">
+                                <textarea class="hw-inline-textarea" id="hwText_${element.id}" placeholder="在這裡輸入你的作業內容..." rows="3"></textarea>
+                            </div>
+                            <div class="hw-full-panel" data-panel="image">
+                                ${uploadBlock(element.id)}
+                            </div>
+                            <div class="hw-full-panel" data-panel="link">
+                                <input type="url" class="hw-inline-textarea" id="hwLink_${element.id}" placeholder="https://..." style="padding:10px;">
+                            </div>`;
+                    }
+
+                    el.innerHTML = `
+                        <div class="hw-card">
+                            <div class="hw-card-header">
+                                <div class="hw-card-icon"><span class="material-symbols-outlined">assignment</span></div>
+                                <div class="hw-card-info">
+                                    <div class="hw-card-title">${element.title || '課堂作業'}</div>
+                                    <div class="hw-card-mode"><span class="material-symbols-outlined" style="font-size:13px;">${modeIconName}</span> ${modeName}</div>
+                                </div>
+                            </div>
+                            ${element.description ? `<div class="hw-card-desc">${element.description}</div>` : ''}
+                            ${exampleHtml}
+
+                            <div class="hw-inline-form" style="display:none;">
+                                ${inlineFormHtml}
+                                <div class="hw-error-msg" style="display:none;"></div>
+                                <button class="hw-submit-btn" type="button">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">send</span> 提交作業
+                                </button>
+                            </div>
+                            <button class="hw-start-btn" type="button">
+                                <span class="material-symbols-outlined" style="font-size:18px;">edit_square</span> 開始繳交
+                            </button>
+                            <div class="hw-submitted-badge" style="display:none;">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                <span>已成功繳交</span>
+                            </div>
+                        </div>
+                    `;
+
+                    // inline error (取代 alert)
+                    const showHwError = (msg) => {
+                        const errEl = el.querySelector('.hw-error-msg');
+                        if (!errEl) return;
+                        errEl.textContent = msg;
+                        errEl.style.display = 'block';
+                        setTimeout(() => { errEl.style.display = 'none'; }, 3000);
+                    };
+
+                    // 範例展開/收合
+                    const exToggle = el.querySelector('.hw-example-toggle');
+                    if (exToggle) {
+                        exToggle.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const content = el.querySelector('.hw-example-content');
+                            const arrow = el.querySelector('.hw-example-arrow');
+                            const open = content.classList.toggle('open');
+                            arrow.textContent = open ? 'expand_less' : 'expand_more';
+                        });
+                    }
+
+                    // 開始繳交
+                    const hwStartBtn = el.querySelector('.hw-start-btn');
+                    if (hwStartBtn) {
+                        hwStartBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            hwStartBtn.style.display = 'none';
+                            el.querySelector('.hw-inline-form').style.display = 'block';
+                        });
+                    }
+
+                    // tab 切換
+                    el.querySelectorAll('.hw-tab').forEach(tab => {
+                        tab.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            el.querySelectorAll('.hw-tab').forEach(t => t.classList.remove('active'));
+                            el.querySelectorAll('.hw-full-panel').forEach(p => p.classList.remove('active'));
+                            tab.classList.add('active');
+                            el.querySelector(`[data-panel="${tab.dataset.type}"]`).classList.add('active');
+                        });
+                    });
+
+                    // 圖片上傳
+                    const hwUploadZone = el.querySelector('.hw-upload-zone');
+                    let hwUploadedData = null;
+                    if (hwUploadZone) {
+                        const fileInput = hwUploadZone.querySelector('.hw-file-input');
+                        const preview = el.querySelector('.hw-preview');
+                        hwUploadZone.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
+                        hwUploadZone.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); hwUploadZone.classList.add('dragover'); });
+                        hwUploadZone.addEventListener('dragleave', (e) => { e.stopPropagation(); hwUploadZone.classList.remove('dragover'); });
+                        hwUploadZone.addEventListener('drop', (e) => {
+                            e.preventDefault(); e.stopPropagation(); hwUploadZone.classList.remove('dragover');
+                            if (e.dataTransfer.files[0]) processStudentHwFile(e.dataTransfer.files[0]);
+                        });
+                        fileInput.addEventListener('change', (e) => { if (e.target.files[0]) processStudentHwFile(e.target.files[0]); });
+
+                        function processStudentHwFile(file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                                hwUploadedData = ev.target.result;
+                                preview.innerHTML = `<img src="${hwUploadedData}" style="max-width:100%;max-height:120px;border-radius:8px;">`;
+                                hwUploadZone.style.display = 'none';
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    }
+
+                    // 提交
+                    const hwSubmitBtn = el.querySelector('.hw-submit-btn');
+                    if (hwSubmitBtn) {
+                        hwSubmitBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            // 直接使用已登入的 studentName
+                            const currentUser = studentName || homework.getUser() || '匿名';
+                            let content = null;
+                            let type = 'text';
+                            if (hwMode === 'image_only') {
+                                if (!hwUploadedData) { showHwError('請上傳圖片'); return; }
+                                content = hwUploadedData; type = 'image';
+                            } else if (hwMode === 'image_prompt') {
+                                const promptVal = el.querySelector(`#hwPrompt_${element.id}`)?.value?.trim();
+                                if (!hwUploadedData) { showHwError('請上傳圖片'); return; }
+                                if (!promptVal) { showHwError('請輸入提示詞'); return; }
+                                content = { image: hwUploadedData, prompt: promptVal }; type = 'image';
+                            } else if (hwMode === 'text_only') {
+                                content = el.querySelector(`#hwText_${element.id}`)?.value?.trim();
+                                if (!content) { showHwError('請輸入內容'); return; }
+                            } else {
+                                const activePanel = el.querySelector('.hw-full-panel.active');
+                                const panelType = activePanel?.dataset.panel || 'text';
+                                if (panelType === 'text') {
+                                    content = el.querySelector(`#hwText_${element.id}`)?.value?.trim();
+                                    if (!content) { showHwError('請輸入內容'); return; }
+                                } else if (panelType === 'image') {
+                                    if (!hwUploadedData) { showHwError('請上傳圖片'); return; }
+                                    content = hwUploadedData; type = 'image';
+                                } else if (panelType === 'link') {
+                                    content = el.querySelector(`#hwLink_${element.id}`)?.value?.trim();
+                                    if (!content) { showHwError('請輸入連結'); return; }
+                                    type = 'link';
+                                }
+                            }
+                            const matchedAssignment = sessionAssignments.find(a => a.title === element.title);
+                            homework.submit(element.title || '課堂作業', type, content, currentUser, matchedAssignment?.id || element.id);
+                            el.querySelector('.hw-inline-form').style.display = 'none';
+                            el.querySelector('.hw-submitted-badge').style.display = 'flex';
+                            homework.showSuccessToast();
+                        });
+                    }
+                    break;
+                }
+
+                case 'showcase': {
+                    el.classList.add('interactive-element', 'showcase-container');
+                    el.dataset.assignmentTitle = element.assignmentTitle || '';
+                    break;
+                }
+
+                default:
+                    return null;
+            }
+
+            // 倒數計時器（適用所有互動元件）
+            if (element.timeLimit && element.timeLimit > 0) {
+                el.dataset.timeLimit = element.timeLimit;
+            }
+
+            return el;
+        }
+
+        // ── 縮放投影片適應視窗 ──
+        function scaleSlide() {
+            const wrapper = document.querySelector('.student-slide-wrapper');
+            if (!wrapper) return;
+            const ww = wrapper.clientWidth - 40;
+            const wh = wrapper.clientHeight - 40;
+            const scale = Math.min(ww / 960, wh / 540);
+            slideEl.style.transform = `scale(${scale})`;
+        }
+    </script>
+
+</body>
+
+</html>

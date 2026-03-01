@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聯盟行銷夥伴申請 — 數位簡報室</title>
+    <meta name="description" content="申請成為數位簡報室聯盟行銷夥伴，推廣課程獲得專屬佣金">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #e2e8f0;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 540px;
+        }
+
+        /* ── Header ── */
+        .form-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-header-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .form-header-icon .material-symbols-outlined {
+            font-size: 28px;
+            color: #fff;
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .form-header p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .brand-name {
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+
+        /* ── Card ── */
+        .form-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .form-section-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ── Form Fields ── */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+        }
+
+        .form-group label .required {
+            color: #f87171;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            color: #e2e8f0;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #64748b;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .field-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-divider {
+            margin: 24px 0;
+        }
+
+        /* ── Social media checkboxes ── */
+        .channel-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .channel-chip {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .channel-chip input[type="checkbox"] {
+            display: none;
+        }
+
+        .channel-chip:has(input:checked) {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: #6366f1;
+            color: #a5b4fc;
+        }
+
+        .channel-chip:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #cbd5e1;
+        }
+
+        /* ── Submit Button ── */
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 24px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-submit .material-symbols-outlined {
+            font-size: 1.1rem;
+        }
+
+        /* ── Success state ── */
+        .success-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 48px 28px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-card.show {
+            display: block;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .success-icon .material-symbols-outlined {
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .success-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .success-card p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* ── Cooperation Notes ── */
+        .notes-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 24px;
+        }
+
+        .notes-title {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notes-title .material-symbols-outlined {
+            font-size: 18px;
+            color: #6366f1;
+        }
+
+        .notes-list {
+            list-style: none;
+        }
+
+        .notes-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .notes-list li:last-child {
+            border-bottom: none;
+        }
+
+        .notes-list .note-icon {
+            font-size: 16px;
+            color: #6366f1;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .notes-list a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .notes-list a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Promote section ── */
+        .promote-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .promote-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .promote-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .promote-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            text-decoration: none;
+            color: #cbd5e1;
+            font-size: 0.82rem;
+            transition: all 0.15s;
+        }
+
+        .promote-link:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .promote-link .material-symbols-outlined {
+            font-size: 18px;
+            color: #6366f1;
+        }
+
+        .promote-link-url {
+            font-family: 'Menlo', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-left: auto;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 520px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-card,
+            .notes-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <div class="form-header-icon">
+                <span class="material-symbols-outlined">handshake</span>
+            </div>
+            <h1>聯盟行銷夥伴申請</h1>
+            <p>申請成為<span class="brand-name">數位簡報室</span>聯盟行銷夥伴，<br>推廣課程獲得專屬折扣碼與佣金方案。</p>
+        </div>
+
+        <form class="form-card" id="affiliateForm">
+            <div class="form-section-title">基本資料</div>
+
+            <div class="form-group">
+                <label>姓名 <span class="required">*</span></label>
+                <input type="text" id="affName" placeholder="您的姓名" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" id="affEmail" placeholder="example@email.com" required>
+                <div class="field-hint">審核通過後將以此 Email 寄送確認信與後台登入連結。</div>
+            </div>
+
+            <div class="form-divider form-section-title">推廣管道</div>
+
+            <div class="form-group">
+                <label>您的自媒體管道（可複選） <span class="required">*</span></label>
+                <div class="channel-grid">
+                    <label class="channel-chip">
+                        <input type="checkbox" value="Instagram"> Instagram
+                    </label>
+                    <label class="channel-chip">
+                        <input type="checkbox" value="Facebook"> Facebook
+                    </label>
+                    <label class="channel-chip">
+                        <input type="checkbox" value="Blog"> Blog
+                    </label>
+                    <label class="channel-chip">
+                        <input type="checkbox" value="Threads"> Threads
+                    </label>
+                    <label class="channel-chip">
+                        <input type="checkbox" value="YouTube"> YouTube
+                    </label>
+                    <label class="channel-chip">
+                        <input type="checkbox" value="電子報"> 電子報
+                    </label>
+                    <label class="channel-chip">
+                        <input type="checkbox" value="其他"> 其他
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>推廣管道連結或說明</label>
+                <textarea id="affChannelDetail" placeholder="請提供您的自媒體連結或簡述推廣方式" rows="2"></textarea>
+            </div>
+
+            <div class="form-divider form-section-title">折扣碼設定</div>
+
+            <div class="form-group">
+                <label>希望的折扣碼名稱 <span class="required">*</span></label>
+                <input type="text" id="affCoupon" placeholder="例如：JOHN20" required style="text-transform:uppercase;">
+                <div class="field-hint">我們會根據您希望的名稱做些微修改，正式的實際折扣碼請以確認信件上的內容為主。</div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span class="material-symbols-outlined">send</span> 送出申請
+            </button>
+        </form>
+
+        <div class="success-card" id="successCard">
+            <div class="success-icon">
+                <span class="material-symbols-outlined">check</span>
+            </div>
+            <h2>申請已送出！</h2>
+            <p>我們會盡快審核您的申請，<br>審核結果將以 Email 通知您。<br>通過後您將收到後台登入連結，<br>可查看銷售數據與佣金明細。</p>
+        </div>
+
+        <!-- Cooperation Notes -->
+        <div class="notes-card">
+            <div class="notes-title">
+                <span class="material-symbols-outlined">info</span>
+                合作說明與注意事項
+            </div>
+            <ul class="notes-list">
+                <li>
+                    <span class="material-symbols-outlined note-icon">schedule</span>
+                    <span>申請通過時間約 <strong>1–3 個工作天</strong>，審核結果將以 Email 通知。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">notifications_active</span>
+                    <span>透過您的專屬折扣碼購買時，您會<strong>立即收到訂單通知</strong> Email。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">calendar_month</span>
+                    <span>每月 <strong>10 日</strong>統計上個月訂單，每月 <strong>25 日</strong>撥款至您提供的帳戶。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">dashboard</span>
+                    <span>審核通過後，您將從確認信中取得<strong>專用後台</strong>登入連結，可即時查看推廣成效、佣金明細與折扣碼資訊。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">account_balance</span>
+                    <span>銀行匯款資訊請於審核通過後<strong>登入後台填寫</strong>，無需在此提供。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">support_agent</span>
+                    <span>如有任何疑問，請聯繫官方 LINE 客服或來信 <strong>service@tbr.digital</strong></span>
+                </li>
+            </ul>
+
+            <!-- Promote targets -->
+            <div class="promote-section">
+                <div class="promote-title">可推廣的課程平台</div>
+                <div class="promote-links">
+                    <a class="promote-link" href="https://tbr.digital" target="_blank">
+                        <span class="material-symbols-outlined">language</span>
+                        數位簡報室
+                        <span class="promote-link-url">tbr.digital</span>
+                    </a>
+                    <a class="promote-link" href="https://hahow.in/" target="_blank">
+                        <span class="material-symbols-outlined">school</span>
+                        Hahow 好學校（合作課程）
+                        <span class="promote-link-url">hahow.in</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        document.getElementById('affiliateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> 送出中…';
+
+            const name = document.getElementById('affName').value.trim();
+            const email = document.getElementById('affEmail').value.trim();
+            const coupon_code = document.getElementById('affCoupon').value.trim().toUpperCase();
+            const channel_detail = document.getElementById('affChannelDetail').value.trim();
+
+            // Collect selected channels
+            const channels = [...document.querySelectorAll('.channel-chip input:checked')]
+                .map(cb => cb.value);
+
+            if (!name || !email || !coupon_code) {
+                showToast('請填寫所有必填欄位');
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請';
+                return;
+            }
+
+            if (channels.length === 0) {
+                showToast('請至少選擇一個推廣管道');
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請';
+                return;
+            }
+
+            try {
+                const { error } = await db.insert('affiliates', {
+                    name, email, coupon_code,
+                    channels: channels.join(', '),
+                    channel_detail,
+                    status: 'pending'
+                });
+
+                if (error) throw new Error(error.message || '送出失敗');
+
+                document.getElementById('affiliateForm').style.display = 'none';
+                document.getElementById('successCard').classList.add('show');
+            } catch (err) {
+                showToast('送出失敗：' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請';
+            }
+        });
+    </script>
+</body>
+
+</html>

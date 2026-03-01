@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>課堂儀表板</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+
+<body>
+    <!-- 頂部列 -->
+    <header class="dash-header">
+        <div class="dash-header-top">
+            <div class="dash-title">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span id="dashProjectName">課堂儀表板</span>
+                <span class="dash-live-dot" id="dashLiveDot"></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <!-- 場次選擇 -->
+                <select id="sessionSelect" class="dash-session-select">
+                    <option value="">載入中...</option>
+                </select>
+                <button class="dash-refresh-btn" id="refreshBtn" onclick="window._dashRefresh()">
+                    <span class="material-symbols-outlined">refresh</span>
+                </button>
+            </div>
+        </div>
+        <div class="dash-meta">
+            <div class="dash-meta-item">
+                <span class="material-symbols-outlined">group</span>
+                <span id="dashStudentCount">0 人在線</span>
+            </div>
+            <div class="dash-meta-item">
+                <span class="material-symbols-outlined">schedule</span>
+                <span>更新 <span id="dashLastUpdate">--:--</span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 統計摘要 -->
+    <section class="dash-stats">
+        <div class="dash-stat-card">
+            <div class="dash-stat-value blue" id="statStudents">0</div>
+            <div class="dash-stat-label">在線學員</div>
+        </div>
+        <div class="dash-stat-card">
+            <div class="dash-stat-value" id="statInteractions" style="color:#24292f;">0</div>
+            <div class="dash-stat-label">互動題數</div>
+        </div>
+        <div class="dash-stat-card">
+            <div class="dash-stat-value green" id="statCorrectRate">0%</div>
+            <div class="dash-stat-label">正確率</div>
+        </div>
+        <div class="dash-stat-card">
+            <div class="dash-stat-value" id="statAnswered" style="color:#24292f;">0</div>
+            <div class="dash-stat-label">作答數</div>
+        </div>
+    </section>
+
+    <!-- 切換檢視 -->
+    <div class="dash-view-toggle">
+        <button class="dash-toggle-btn active" id="viewCards" onclick="window._dashSetView('cards')">
+            <span class="material-symbols-outlined">view_agenda</span>
+            題目
+        </button>
+        <button class="dash-toggle-btn" id="viewMatrix" onclick="window._dashSetView('matrix')">
+            <span class="material-symbols-outlined">grid_on</span>
+            矩陣
+        </button>
+        <button class="dash-toggle-btn" id="viewCompare" onclick="window._dashSetView('compare')">
+            <span class="material-symbols-outlined">compare_arrows</span>
+            場次比較
+        </button>
+    </div>
+
+    <!-- 矩陣檢視 -->
+    <div class="dash-matrix-wrap" id="dashMatrix" style="display:none;"></div>
+
+    <!-- 場次比較 -->
+    <div class="dash-matrix-wrap" id="dashCompare" style="display:none;"></div>
+
+    <!-- 互動卡片區 -->
+    <main class="dash-cards" id="dashCards">
+        <div class="dash-loading">
+            <div class="dash-spinner"></div>
+            <span>載入中...</span>
+        </div>
+    </main>
+
+    <!-- 回到頂端 -->
+    <button class="dash-scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <span class="material-symbols-outlined" style="font-size:18px;">arrow_upward</span>
+    </button>
+
+    <script src="scripts/dashboard.js" type="module"></script>
+</body>
+
+</html>

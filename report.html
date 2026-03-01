@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學員報告 — 教學簡報系統</title>
+    <meta name="description" content="學員學習報告，查看成績統計與學習數據">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/report-page.css">
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">
+                學習分析
+                <span id="topbarProjectName"
+                    style="font-size:0.8em;font-weight:400;color:#9aa0a6;margin-left:8px;"></span>
+            </div>
+            <div class="admin-header-actions">
+                <button class="btn" id="exportCsvBtn">
+                    <span class="material-symbols-outlined">download</span>
+                    匯出 CSV
+                </button>
+                <button class="btn btn-dark" id="generateAllBtn">
+                    <span class="material-symbols-outlined">mail</span>
+                    一鍵生成全部信件
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="stat-value" id="statStudents">—</div>
+                    <div class="stat-label">學員人數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statChecklist">—</div>
+                    <div class="stat-label">平均清單完成率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statSurvey">—</div>
+                    <div class="stat-label">問卷完成率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statSubmissions">—</div>
+                    <div class="stat-label">總繳交作業</div>
+                </div>
+            </div>
+
+            <div class="filters" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <input type="text" class="filter-input" id="searchInput" placeholder="搜尋學員姓名或 Email…"
+                    style="flex:1;min-width:200px;">
+                <select class="filter-select" id="filterGroup">
+                    <option value="">所有組別</option>
+                </select>
+                <div class="view-toggle" id="viewToggle">
+                    <button class="active" data-mode="list">
+                        <span class="material-symbols-rounded">view_list</span> 列表
+                    </button>
+                    <button data-mode="card">
+                        <span class="material-symbols-rounded">grid_view</span> 卡片
+                    </button>
+                </div>
+            </div>
+
+            <div class="batch-progress" id="batchProgress">
+                <div class="batch-progress-text" id="batchProgressText">生成中...</div>
+                <div class="batch-progress-bar">
+                    <div class="batch-progress-fill" id="batchProgressFill"></div>
+                </div>
+            </div>
+
+            <!-- Email Template Editor -->
+            <div class="template-section" id="templateSection">
+                <div class="template-toggle"
+                    onclick="document.getElementById('templateSection').classList.toggle('open')">
+                    <div class="template-toggle-left">
+                        <span class="material-symbols-rounded">edit_note</span>
+                        Email 模板設定
+                    </div>
+                    <span class="material-symbols-rounded chevron">expand_more</span>
+                </div>
+                <div class="template-body">
+                    <textarea class="template-textarea" id="emailTemplate"></textarea>
+                    <div class="template-vars" id="templateVars"></div>
+                    <div class="template-actions">
+                        <button class="topbar-btn" onclick="resetTemplate()">
+                            <span class="material-symbols-rounded">restart_alt</span>
+                            還原預設
+                        </button>
+                        <button class="topbar-btn primary" onclick="saveTemplate()">
+                            <span class="material-symbols-rounded">save</span>
+                            儲存模板
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="studentListContainer">
+                <div class="student-list-header" id="studentListHeader">
+                    <span>學員</span>
+                    <span>課前準備</span>
+                    <span>問卷</span>
+                    <span>作業</span>
+                    <span>Email 狀態</span>
+                    <span>操作</span>
+                </div>
+                <div class="student-grid list-mode" id="studentGrid">
+                    <div class="loading">載入中…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal -->
+        <div class="modal-overlay" id="detailModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modalStudentName">學員詳情</h3>
+                    <button class="close-btn" onclick="closeModal()">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="email-draft" id="emailDraft" style="display:none;">
+                    <h4 style="font-size:0.85rem;font-weight:600;color:var(--text-muted);margin-bottom:10px;">信件草稿
+                    </h4>
+                    <textarea class="email-textarea" id="emailContent"></textarea>
+                    <div class="email-actions">
+                        <button class="topbar-btn" onclick="copyEmail()">
+                            <span class="material-symbols-rounded">content_copy</span>
+                            複製
+                        </button>
+                        <button class="topbar-btn" onclick="saveEmail()">
+                            <span class="material-symbols-rounded">save</span>
+                            儲存草稿
+                        </button>
+                        <button class="topbar-btn primary" id="sendEmailBtn" onclick="sendEmail()">
+                            <span class="material-symbols-rounded">send</span>
+                            發送 Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module">
+            import { db, ai } from './scripts/supabase.js';
+            import { showToast, showConfirm } from './scripts/ui.js';
+
+            // ── 取得當前專案 (DB-first) ──
+            async function getCurrentProject() {
+                const currentId = localStorage.getItem('current_project_id');
+                if (!currentId) return null;
+                try {
+                    const rows = await db.select('projects', { id: `eq.${currentId}` });
+                    if (rows?.[0]) return { joinCode: rows[0].join_code, name: rows[0].name };
+                } catch { }
+                try {
+                    const projects = JSON.parse(localStorage.getItem('projects_index') || '[]');
+                    const proj = projects.find(p => p.id === currentId);
+                    if (proj) return { joinCode: proj.joinCode, name: proj.name };
+                } catch { }
+                return null;
+            }
+            const _proj = await getCurrentProject();
+            const joinCode = _proj?.joinCode || '';
+            const _pnEl = document.getElementById('topbarProjectName');
+            if (_pnEl) _pnEl.textContent = _proj?.name ? `— ${_proj.name}` : '';
+
+            let allStudents = [];
+            let checklistItems = [];
+            let checklistProgress = [];
+            let surveyQuestions = [];
+            let surveyResponses = [];
+            let submissions = [];
+            let emailDrafts = [];
+            let examResponses = [];
+            let satisfactionResponses = [];
+
+            async function loadAll() {
+                try {
+                    const jcFilter = joinCode ? { session_code: `eq.${joinCode}` } : {};
+                    const pidFilter = joinCode ? { project_id: `eq.${joinCode}` } : {};
+                    const sidFilter = joinCode ? { session_id: `eq.${joinCode}` } : {};
+                    const results = await Promise.all([
+                        db.select('students', { order: 'name.asc', filter: pidFilter }),
+                        db.select('checklist_items', { filter: jcFilter }),
+                        db.select('checklist_progress'),
+                        db.select('survey_questions', { filter: jcFilter }),
+                        db.select('survey_responses'),
+                        db.select('submissions', { filter: sidFilter }),
+                        db.select('email_drafts'),
+                        db.select('exam_responses', { filter: pidFilter }),
+                        db.select('satisfaction_responses', { filter: pidFilter })
+                    ]);
+
+                    allStudents = results[0].data || [];
+                    checklistItems = results[1].data || [];
+                    checklistProgress = results[2].data || [];
+                    surveyQuestions = results[3].data || [];
+                    surveyResponses = results[4].data || [];
+                    submissions = results[5].data || [];
+                    emailDrafts = results[6].data || [];
+                    examResponses = results[7].data || [];
+                    satisfactionResponses = results[8].data || [];
+
+                    updateStats();
+                    populateFilters();
+                    renderStudents();
+                    initTemplateEditor();
+                } catch (err) {
+                    document.getElementById('studentGrid').innerHTML =
+                        `<div class="empty-msg" style="color:var(--accent-danger);">載入失敗：${err.message}</div>`;
+                }
+            }
+
+            function getStudentData(email) {
+                const clDone = checklistProgress.filter(p => p.student_email === email && p.completed);
+                const srDone = surveyResponses.filter(r => r.student_email === email);
+                const subs = submissions.filter(s => s.student_email === email);
+                const draft = emailDrafts.find(d => d.student_email === email);
+
+                return {
+                    checklistDone: clDone.length,
+                    checklistTotal: checklistItems.length,
+                    surveyDone: srDone.length,
+                    surveyTotal: surveyQuestions.length,
+                    surveyResponses: srDone,
+                    submissions: subs,
+                    homework: subs.filter(s => ['text', 'image', 'link', 'video', 'audio'].includes(s.type)),
+                    matching: subs.filter(s => s.type === 'matching'),
+                    fillblank: subs.filter(s => s.type === 'fillblank'),
+                    emailDraft: draft,
+                    examResult: examResponses.find(e => e.student_email === email) || null,
+                    satisfactionResult: satisfactionResponses.find(s => s.student_email === email) || null
+                };
+            }
+
+            function updateStats() {
+                document.getElementById('statStudents').textContent = allStudents.length;
+
+                // Avg checklist completion
+                if (allStudents.length > 0 && checklistItems.length > 0) {
+                    const total = allStudents.reduce((sum, s) => {
+                        const done = checklistProgress.filter(p => p.student_email === s.email && p.completed).length;
+                        return sum + done / checklistItems.length;
+                    }, 0);
+                    document.getElementById('statChecklist').textContent = Math.round(total / allStudents.length * 100) + '%';
+                } else {
+                    document.getElementById('statChecklist').textContent = '—';
+                }
+
+                // Survey completion
+                if (allStudents.length > 0 && surveyQuestions.length > 0) {
+                    const completed = allStudents.filter(s => {
+                        return surveyResponses.filter(r => r.student_email === s.email).length >= surveyQuestions.length;
+                    }).length;
+                    document.getElementById('statSurvey').textContent = `${completed}/${allStudents.length}`;
+                } else {
+                    document.getElementById('statSurvey').textContent = '—';
+                }
+
+                document.getElementById('statSubmissions').textContent = submissions.length;
+            }
+
+            // ── CSV 匯出 ──
+            document.getElementById('exportCsvBtn')?.addEventListener('click', exportCsv);
+
+            function exportCsv() {
+                const rows = [['姓名', '信箱', '組別', '清單完成', '問卷完成', '作業數', '互動成績']];
+                for (const s of allStudents) {
+                    const d = getStudentData(s.email);
+                    const clPct = d.checklistTotal ? `${d.checklistDone}/${d.checklistTotal}` : '—';
+                    const svPct = d.surveyTotal ? `${d.surveyDone}/${d.surveyTotal}` : '—';
+                    const scores = d.submissions
+                        .filter(sub => sub.score)
+                        .map(sub => `${sub.assignment_title || sub.type}:${sub.score}`)
+                        .join('; ');
+                    rows.push([s.name, s.email, s.group_name || '', clPct, svPct, String(d.submissions.length), scores]);
+                }
+                const bom = '\uFEFF';
+                const csv = bom + rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `學員報告_${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+
+            function populateFilters() {
+                const groups = [...new Set(allStudents.map(s => s.group_name).filter(Boolean))];
+                const sel = document.getElementById('filterGroup');
+                groups.forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = g;
+                    opt.textContent = g;
+                    sel.appendChild(opt);
+                });
+            }
+
+            let currentViewMode = 'list';
+
+            function renderStudents(filter = '') {
+                const grid = document.getElementById('studentGrid');
+                const header = document.getElementById('studentListHeader');
+                const container = document.getElementById('studentListContainer');
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const group = document.getElementById('filterGroup').value;
+
+                let filtered = allStudents.filter(s => {
+                    if (search && !s.name.toLowerCase().includes(search) && !s.email.toLowerCase().includes(search)) return false;
+                    if (group && s.group_name !== group) return false;
+                    return true;
+                });
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '<div class="empty-msg">沒有符合條件的學員</div>';
+                    header.style.display = 'none';
+                    return;
+                }
+
+                if (currentViewMode === 'list') {
+                    grid.classList.add('list-mode');
+                    container.classList.add('list-mode-active');
+                    header.style.display = 'grid';
+                    grid.innerHTML = filtered.map(s => {
+                        const d = getStudentData(s.email);
+                        const clPct = d.checklistTotal > 0 ? Math.round(d.checklistDone / d.checklistTotal * 100) : 0;
+                        const surveyComplete = d.surveyTotal > 0 && d.surveyDone >= d.surveyTotal;
+                        const hasDraft = !!d.emailDraft;
+                        const clClass = clPct >= 100 ? 'done' : clPct > 0 ? 'partial' : 'none';
+                        const svClass = surveyComplete ? 'done' : d.surveyDone > 0 ? 'partial' : 'none';
+                        return `
+                        <div class="student-list-row">
+                            <div class="list-student-info">
+                                <div class="list-avatar">${s.name[0]}</div>
+                                <div>
+                                    <div class="list-name">${s.name}</div>
+                                    <div class="list-email">${s.email}${s.group_name ? ` · ${s.group_name}` : ''}</div>
+                                </div>
+                            </div>
+                            <span class="list-status-badge ${clClass}">${clPct}%</span>
+                            <span class="list-status-badge ${svClass}">${surveyComplete ? '已完成' : d.surveyDone + '/' + d.surveyTotal}</span>
+                            <span>${d.homework.length} 份</span>
+                            <span class="list-status-badge ${hasDraft ? 'generated' : 'none'}">${hasDraft ? '已生成' : '—'}</span>
+                            <div class="list-actions">
+                                <button class="list-action-btn" onclick="showDetail('${s.email}')">
+                                    <span class="material-symbols-rounded">visibility</span>
+                                </button>
+                                <button class="list-action-btn ai" onclick="generateEmail('${s.email}')">
+                                    <span class="material-symbols-rounded">edit_note</span>
+                                </button>
+                                ${hasDraft ? `<button class="list-action-btn send" onclick="sendEmailFor('${s.email}')">
+                                    <span class="material-symbols-rounded">send</span>
+                                </button>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    grid.classList.remove('list-mode');
+                    container.classList.remove('list-mode-active');
+                    header.style.display = 'none';
+                    grid.innerHTML = filtered.map(s => {
+                        const d = getStudentData(s.email);
+                        const clPct = d.checklistTotal > 0 ? Math.round(d.checklistDone / d.checklistTotal * 100) : 0;
+                        const surveyComplete = d.surveyTotal > 0 && d.surveyDone >= d.surveyTotal;
+                        const avgScore = getAvgScore(d);
+                        return `
+                        <div class="student-card">
+                            <div class="card-header">
+                                <div class="avatar">${s.name[0]}</div>
+                                <div>
+                                    <div class="card-name">${s.name}</div>
+                                    <div class="card-meta">${s.email}${s.group_name ? ` · ${s.group_name}` : ''}</div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="metric-row">
+                                    <span class="metric-label"><span class="material-symbols-rounded">task_alt</span> 課前準備</span>
+                                    <span class="metric-value"><span class="progress-mini"><span class="progress-mini-fill" style="width:${clPct}%"></span></span> ${d.checklistDone}/${d.checklistTotal}</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span class="metric-label"><span class="material-symbols-rounded">quiz</span> 課前問卷</span>
+                                    <span class="metric-value ${surveyComplete ? 'good' : 'warn'}">${surveyComplete ? '已完成' : d.surveyDone + '/' + d.surveyTotal}</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span class="metric-label"><span class="material-symbols-rounded">edit_note</span> 繳交作業</span>
+                                    <span class="metric-value">${d.homework.length} 份</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span class="metric-label"><span class="material-symbols-rounded">sports_score</span> 互動成績</span>
+                                    <span class="metric-value ${avgScore >= 80 ? 'good' : avgScore >= 50 ? 'warn' : avgScore >= 0 ? 'bad' : ''}">${avgScore >= 0 ? avgScore + ' 分' : '—'}</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="card-btn" onclick="showDetail('${s.email}')"><span class="material-symbols-rounded">visibility</span> 詳情</button>
+                                <button class="card-btn ai" onclick="generateEmail('${s.email}')"><span class="material-symbols-rounded">edit_note</span> 生成信件</button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+
+            function getAvgScore(d) {
+                const scored = [...d.matching, ...d.fillblank].filter(s => s.score != null);
+                if (scored.length === 0) return -1;
+                const sum = scored.reduce((a, s) => a + parseFloat(s.score || 0), 0);
+                return Math.round(sum / scored.length);
+            }
+
+            // ── Detail Modal ──
+            window.showDetail = function (email) {
+                const student = allStudents.find(s => s.email === email);
+                const d = getStudentData(email);
+                if (!student) return;
+
+                document.getElementById('modalStudentName').textContent = `${student.name} 的學習報告`;
+
+                const clDoneIds = new Set(checklistProgress.filter(p => p.student_email === email && p.completed).map(p => p.checklist_item_id));
+                const clDone = checklistItems.filter(i => clDoneIds.has(i.id)).length;
+                const clTotal = checklistItems.length;
+                const clPct = clTotal > 0 ? Math.round(clDone / clTotal * 100) : 0;
+                const surveyComplete = d.surveyDone >= d.surveyTotal;
+                const interactive = [...d.matching, ...d.fillblank];
+                const scored = interactive.filter(s => s.score != null);
+                const avgScore = scored.length > 0 ? Math.round(scored.reduce((a, s) => a + parseFloat(s.score || 0), 0) / scored.length) : -1;
+
+                let html = '';
+
+                // ── Stats Row ──
+                const pctColor = clPct >= 80 ? '#10b981' : clPct >= 50 ? '#f59e0b' : '#ef4444';
+                html += `<div class="dash-stats">
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" style="color:${pctColor}">${clPct}%</div>
+                        <div class="dash-stat-label">課前準備</div>
+                    </div>
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" style="color:${surveyComplete ? '#10b981' : '#f59e0b'}">${surveyComplete ? '完成' : d.surveyDone + '/' + d.surveyTotal}</div>
+                        <div class="dash-stat-label">課前問卷</div>
+                    </div>
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" style="color:#6366f1">${d.homework.length}</div>
+                        <div class="dash-stat-label">繳交作業</div>
+                    </div>
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" style="color:${avgScore >= 70 ? '#10b981' : avgScore >= 0 ? '#f59e0b' : '#9ca3af'}">${avgScore >= 0 ? avgScore + '分' : '—'}</div>
+                        <div class="dash-stat-label">互動成績</div>
+                    </div>
+                </div>`;
+
+                // ── Checklist Progress Bar ──
+                html += `<div class="dash-progress">
+                    <div class="dash-progress-header">
+                        <span>課前準備清單</span>
+                        <span>${clDone} / ${clTotal}</span>
+                    </div>
+                    <div class="dash-progress-bar">
+                        <div class="dash-progress-fill" style="width:${clPct}%; background:${pctColor}"></div>
+                    </div>`;
+                if (checklistItems.length > 0) {
+                    html += `<div class="dash-checklist">`;
+                    checklistItems.forEach(item => {
+                        const done = clDoneIds.has(item.id);
+                        html += `<div class="dash-check-item ${done ? 'done' : ''}">
+                            <span class="material-symbols-rounded" style="font-size:16px;color:${done ? '#10b981' : '#d1d5db'}">${done ? 'check_circle' : 'radio_button_unchecked'}</span>
+                            ${item.title}
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+
+                // ── Survey Responses (collapsible) ──
+                if (d.surveyResponses.length > 0) {
+                    html += `<div class="dash-section">
+                        <div class="dash-section-title">問卷回答</div>`;
+                    d.surveyResponses.forEach(r => {
+                        const q = surveyQuestions.find(q => q.id === r.question_id);
+                        html += `<div class="dash-qa">
+                            <div class="dash-q">${q ? q.question_text : '題目'}</div>
+                            <div class="dash-a">${r.answer}</div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                // ── Homework ──
+                if (d.homework.length > 0) {
+                    html += `<div class="dash-section">
+                        <div class="dash-section-title">繳交作業</div>`;
+                    d.homework.forEach(s => {
+                        html += `<div class="dash-hw">
+                            <strong>${s.assignment_title}</strong>
+                            <span style="color:#9ca3af;font-size:0.78rem;">${s.type}</span>
+                            <div style="color:#6b7280;font-size:0.82rem;margin-top:4px;word-break:break-all;">${s.content || s.file_url || '—'}</div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                // ── Interactive Scores ──
+                if (interactive.length > 0) {
+                    html += `<div class="dash-section">
+                        <div class="dash-section-title">互動成績</div>
+                        <div class="dash-scores">`;
+                    interactive.forEach(s => {
+                        const typeLabel = s.type === 'matching' ? '連連看' : '填空題';
+                        const correct = s.is_correct;
+                        html += `<div class="dash-score-item">
+                            <div class="dash-score-type">${typeLabel}</div>
+                            <div class="dash-score-title">${s.assignment_title}</div>
+                            <div class="dash-score-val" style="color:${correct ? '#10b981' : '#ef4444'}">${s.score || '—'} 分</div>
+                        </div>`;
+                    });
+                    html += `</div></div>`;
+                }
+
+                document.getElementById('modalBody').innerHTML = html;
+
+                // Show existing email draft if any
+                const emailSection = document.getElementById('emailDraft');
+                if (d.emailDraft) {
+                    emailSection.style.display = 'block';
+                    document.getElementById('emailContent').value = d.emailDraft.body;
+                } else {
+                    emailSection.style.display = 'none';
+                }
+
+                document.getElementById('detailModal').classList.add('active');
+                document.getElementById('detailModal').dataset.email = email;
+            };
+
+            window.closeModal = function () {
+                document.getElementById('detailModal').classList.remove('active');
+            };
+
+            document.getElementById('detailModal').addEventListener('click', e => {
+                if (e.target === document.getElementById('detailModal')) closeModal();
+            });
+
+            // ── Email Template System ──
+            const TEMPLATE_STORAGE_KEY = 'email_template_v1';
+            const TEMPLATE_VARS = [
+                { key: '{{name}}', desc: '學員姓名' },
+                { key: '{{company}}', desc: '公司/職級' },
+                { key: '{{course_name}}', desc: '課程名稱' },
+                { key: '{{instructor_name}}', desc: '講師署名' },
+                { key: '{{checklist_pct}}', desc: '清單完成率' },
+                { key: '{{checklist_done}}', desc: '已完成項目數' },
+                { key: '{{checklist_total}}', desc: '總項目數' },
+                { key: '{{survey_status}}', desc: '問卷完成狀態' },
+                { key: '{{homework_count}}', desc: '作業份數' },
+                { key: '{{avg_score}}', desc: '互動平均分' },
+                { key: '{{ai_scenarios}}', desc: 'AI 應用場景' },
+                { key: '{{want_learn}}', desc: '想學內容' },
+                { key: '{{year_goal}}', desc: '年度目標' },
+                { key: '{{prefer_tools}}', desc: '偏好工具' },
+            ];
+
+            const DEFAULT_TEMPLATE = `{{name}}{{company}} 您好，
+
+感謝參加「{{course_name}}」。以下是根據您的課前問卷、準備狀況與課堂表現，為您整理的學習回饋與建議。
+
+── 學習數據 ──
+
+課前準備完成率：{{checklist_pct}}%（{{checklist_done}}/{{checklist_total}}）
+課前問卷：{{survey_status}}
+課堂作業：{{homework_count}} 份
+互動成績：{{avg_score}}
+
+── 個人化建議 ──
+
+根據您提到想在「{{ai_scenarios}}」這些場景應用 AI，建議先從最常見的痛點開始，使用 ChatGPT / Claude 建立 Prompt 模板，逐步建立自己的工作流。
+
+您提到未來一年的目標方向是「{{year_goal}}」，這與 AI 工具的結合有很大的發揮空間。建議每週安排固定時間練習，將課堂技巧實際應用在工作中。
+
+您對「{{prefer_tools}}」特別感興趣，建議在課後針對這些工具，從官方文件和教學影片入手，有問題歡迎隨時在社群提問。
+
+── 下一步 ──
+
+1. 將今天學到的一個技巧，實際應用在這週的工作中
+2. 建立自己的常用 Prompt 資料庫，記錄好用的模板
+3. 在社群與其他同學交流使用心得
+
+如果這堂課對您有幫助，歡迎在社群分享您的學習心得（Instagram / LinkedIn / Facebook），tag @tbr.digital，讓我知道您的進步。
+
+如有任何問題，歡迎隨時回信。
+
+{{instructor_name}}`;
+
+            // Init template editor
+            function initTemplateEditor() {
+                const textarea = document.getElementById('emailTemplate');
+                textarea.value = localStorage.getItem(TEMPLATE_STORAGE_KEY) || DEFAULT_TEMPLATE;
+
+                // Render variable tags
+                const varsEl = document.getElementById('templateVars');
+                varsEl.innerHTML = TEMPLATE_VARS.map(v =>
+                    `<span class="template-var-tag" onclick="insertVar('${v.key}')" title="${v.desc}">${v.key}</span>`
+                ).join('');
+            }
+
+            window.insertVar = function (varKey) {
+                const ta = document.getElementById('emailTemplate');
+                const start = ta.selectionStart;
+                const end = ta.selectionEnd;
+                ta.value = ta.value.substring(0, start) + varKey + ta.value.substring(end);
+                ta.focus();
+                ta.setSelectionRange(start + varKey.length, start + varKey.length);
+            };
+
+            window.saveTemplate = function () {
+                localStorage.setItem(TEMPLATE_STORAGE_KEY, document.getElementById('emailTemplate').value);
+                showToast('模板已儲存');
+            };
+
+            window.resetTemplate = function () {
+                document.getElementById('emailTemplate').value = DEFAULT_TEMPLATE;
+                localStorage.setItem(TEMPLATE_STORAGE_KEY, DEFAULT_TEMPLATE);
+                showToast('已還原預設模板');
+            };
+
+            function getEmailTemplate() {
+                return document.getElementById('emailTemplate')?.value
+                    || localStorage.getItem(TEMPLATE_STORAGE_KEY)
+                    || DEFAULT_TEMPLATE;
+            }
+
+            // ── AI Email Generation ──
+            window.generateEmail = async function (email) {
+                const student = allStudents.find(s => s.email === email);
+                const d = getStudentData(email);
+                if (!student) return;
+
+                // Build variable values
+                const clPct = d.checklistTotal > 0 ? Math.round(d.checklistDone / d.checklistTotal * 100) : 0;
+                const avgScore = getAvgScore(d);
+
+                // Parse survey responses
+                const surveyMap = {};
+                d.surveyResponses.forEach(r => {
+                    const q = surveyQuestions.find(q => q.id === r.question_id);
+                    if (q) surveyMap[q.question_text] = r.answer;
+                });
+
+                const companyRole = Object.entries(surveyMap).find(([k]) => k.includes('公司名稱'))?.[1] || '';
+                const aiScenarios = Object.entries(surveyMap).find(([k]) => k.includes('AI 最有可能應用'))?.[1] || '';
+                const wantToLearn = Object.entries(surveyMap).find(([k]) => k.includes('最想在這堂課'))?.[1] || '';
+                const yearGoal = Object.entries(surveyMap).find(([k]) => k.includes('未來一年'))?.[1] || '';
+                const preferToolsRaw = Object.entries(surveyMap).find(([k]) => k.includes('最想深入學習'))?.[1] || '';
+                const preferTools = Array.isArray(preferToolsRaw) ? preferToolsRaw.join('、') : preferToolsRaw;
+
+                // Variable substitution map (for fallback)
+                const vars = {
+                    '{{name}}': student.name,
+                    '{{company}}': companyRole ? `（${companyRole}）` : '',
+                    '{{course_name}}': _proj?.name || '課程',
+                    '{{instructor_name}}': '樊松蒲｜數位簡報室',
+                    '{{checklist_pct}}': String(clPct),
+                    '{{checklist_done}}': String(d.checklistDone),
+                    '{{checklist_total}}': String(d.checklistTotal),
+                    '{{survey_status}}': d.surveyDone >= d.surveyTotal ? '已完成' : '未完成',
+                    '{{homework_count}}': String(d.homework.length),
+                    '{{avg_score}}': avgScore >= 0 ? avgScore + ' 分' : '尚無紀錄',
+                    '{{ai_scenarios}}': aiScenarios || '（未填寫）',
+                    '{{want_learn}}': wantToLearn || '（未填寫）',
+                    '{{year_goal}}': yearGoal || '（未填寫）',
+                    '{{prefer_tools}}': preferTools || '（未填寫）',
+                };
+
+                // Show loading state
+                showDetail(email);
+                document.getElementById('emailDraft').style.display = 'block';
+                document.getElementById('emailContent').value = '正在為這位學員撰寫個人化回饋…';
+
+                let draft = '';
+
+                // ── Try AI generation ──
+                try {
+                    const courseName = _proj?.name || '課程';
+                    const instructorName = '樊松蒲｜數位簡報室';
+
+                    const systemPrompt = `你是一位專業的企業內訓講師。請以第一人稱、溫暖但專業的口吻，撰寫一封課後回饋信件給學員。
+
+寫作要求：
+- 用「你」稱呼學員，語氣像一位認真的導師在對自己重視的學生說話
+- 不要只列數據，要用描述性的方式提及學員的表現
+- 根據學員的問卷回答，給出具體、可操作的 2-3 個建議
+- 如果某項數據是「未填寫」，就跳過那段，不要提及
+- 如果課前準備完成度高，真誠讚賞；中等以上，肯定並鼓勵；偏低，溫和提醒
+- 如果有互動成績，描述學員的表現而非只報分數
+
+段落結構（請用自然的段落銜接，不需要固定標題）：
+1. 開場問候與課前準備回饋
+2. 根據學員的應用場景和目標，給出具體建議
+3. 結合產業趨勢提供觀點（以「我觀察到」開頭）
+4. 詢問這堂課是否幫助更接近目標，邀請回信分享
+5. 社群分享邀請（Instagram / LinkedIn / Facebook，tag @tbr.digital）
+
+格式規範：
+- 純文字，不要使用 markdown 語法
+- 不要使用任何 emoji
+- 段落之間用空行分隔
+- 段落標題使用全形破折號包圍，例如「── 學習回饋 ──」
+- 署名：${instructorName}
+- 控制在 600-800 字`;
+
+                    const userPrompt = `請根據以下學員資料撰寫個人化課後回饋信件：
+
+課程名稱：${courseName}
+學員姓名：${student.name}
+公司/職級：${companyRole || '未提供'}
+
+課前準備：
+- 完成率：${clPct}%（${d.checklistDone}/${d.checklistTotal} 項）
+- 問卷：${d.surveyDone >= d.surveyTotal ? '已完成' : '未完成'}
+
+課前問卷回答：
+- AI 最可能應用的場景：${aiScenarios || '未填寫'}
+- 最想在課堂上學到的：${wantToLearn || '未填寫'}
+- 未來一年的目標：${yearGoal || '未填寫'}
+- 最想深入學習的工具：${preferTools || '未填寫'}
+
+課堂表現：
+- 繳交作業：${d.homework.length} 份
+- 互動成績：${avgScore >= 0 ? avgScore + ' 分' : '尚無紀錄'}
+
+課後考試：
+- 考試成績：${d.examResult ? d.examResult.score + ' 分' : '未參加'}
+
+滿意度問卷：
+- 平均評分：${d.satisfactionResult ? d.satisfactionResult.avg_rating + ' / 5' : '未填寫'}
+- NPS 推薦分數：${d.satisfactionResult ? d.satisfactionResult.nps_score + ' / 10' : '未填寫'}
+${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResult.responses); return `- 最喜歡的部分：${r['7'] || '未填寫'}\n- 建議改善的地方：${r['8'] || '未填寫'}`; } catch (e) { return ''; } })() : ''}
+
+注意事項：
+1. 結合學員的應用場景分享產業觀點
+2. 如果有考試成績，根據表現給予回饋
+3. 如果有滿意度數據，感謝回饋
+4. 結尾邀請回信分享想法`;
+
+                    draft = await ai.chat([
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userPrompt }
+                    ], { temperature: 0.75, maxTokens: 1500 });
+
+                    console.log('[AI Email] generated for', student.name);
+                } catch (aiErr) {
+                    console.warn('[AI Email] failed, using template fallback:', aiErr);
+                    // Fallback to template
+                    draft = getEmailTemplate();
+                    for (const [key, value] of Object.entries(vars)) {
+                        draft = draft.replaceAll(key, value);
+                    }
+                }
+
+                // Save to DB
+                try {
+                    const existing = emailDrafts.find(e => e.student_email === email);
+                    if (existing) {
+                        await db.update('email_drafts', {
+                            body: draft,
+                            subject: `[AI 工作坊] ${student.name} 的學習回饋`,
+                            generated_at: new Date().toISOString()
+                        }, { filter: { id: `eq.${existing.id}` } });
+                    } else {
+                        await db.insert('email_drafts', {
+                            student_email: email,
+                            subject: `[AI 工作坊] ${student.name} 的學習回饋`,
+                            body: draft,
+                            status: 'draft',
+                            generated_at: new Date().toISOString()
+                        });
+                    }
+
+                    // Reload drafts
+                    const { data } = await db.select('email_drafts');
+                    emailDrafts = data || [];
+
+                    // Show in modal
+                    showDetail(email);
+                    document.getElementById('emailDraft').style.display = 'block';
+                    document.getElementById('emailContent').value = draft;
+                } catch (err) {
+                    showToast('生成失敗：' + err.message, { type: 'error' });
+                }
+            };
+
+            window.copyEmail = function () {
+                const textarea = document.getElementById('emailContent');
+                textarea.select();
+                document.execCommand('copy');
+                showToast('已複製到剪貼簿');
+            };
+
+            window.saveEmail = async function () {
+                const email = document.getElementById('detailModal').dataset.email;
+                const body = document.getElementById('emailContent').value;
+
+                try {
+                    const existing = emailDrafts.find(e => e.student_email === email);
+                    if (existing) {
+                        await db.update('email_drafts', { body }, {
+                            filter: { id: `eq.${existing.id}` }
+                        });
+                    }
+                    showToast('草稿已儲存');
+                } catch (err) {
+                    showToast('儲存失敗：' + err.message, { type: 'error' });
+                }
+            };
+
+            // ── Batch Generate with Progress ──
+            document.getElementById('generateAllBtn').addEventListener('click', async () => {
+                const ok = await showConfirm(`確定要為全部 ${allStudents.length} 位學員生成信件草稿？\n（逐一生成，約需 ${allStudents.length * 5} 秒）`, { title: '一鍵生成確認', confirmText: '開始生成' });
+                if (!ok) return;
+
+                const progress = document.getElementById('batchProgress');
+                const progressText = document.getElementById('batchProgressText');
+                const progressFill = document.getElementById('batchProgressFill');
+                progress.classList.add('active');
+
+                let done = 0;
+                for (const s of allStudents) {
+                    progressText.textContent = `正在生成：${s.name}（${done + 1}/${allStudents.length}）`;
+                    progressFill.style.width = `${(done / allStudents.length) * 100}%`;
+                    await generateEmail(s.email);
+                    done++;
+                    closeModal();
+                }
+
+                progressFill.style.width = '100%';
+                progressText.textContent = `全部完成，已為 ${allStudents.length} 位學員生成信件`;
+                setTimeout(() => { progress.classList.remove('active'); }, 3000);
+                renderStudents();
+                showToast('已完成一鍵生成！');
+            });
+
+            // ── View Toggle ──
+            document.getElementById('viewToggle').addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const mode = btn.dataset.mode;
+                if (mode === currentViewMode) return;
+                currentViewMode = mode;
+                document.querySelectorAll('#viewToggle button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderStudents();
+            });
+
+            // ── Send Email (from modal) ──
+            window.sendEmail = async function () {
+                const email = document.getElementById('detailModal').dataset.email;
+                await sendEmailFor(email);
+            };
+
+            window.sendEmailFor = async function (email) {
+                const student = allStudents.find(s => s.email === email);
+                const d = getStudentData(email);
+                if (!student || !d.emailDraft) {
+                    showToast('請先生成 Email 草稿', { type: 'error' });
+                    return;
+                }
+                try {
+                    const res = await fetch(`https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/send-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': 'sb_publishable_RRbhQpB2zcqeHc6Cds8fgA_jVWyvdyF'
+                        },
+                        body: JSON.stringify({
+                            to: student.email,
+                            subject: d.emailDraft.subject || `[AI 工作坊] ${student.name} 的學習回饋`,
+                            body: d.emailDraft.body,
+                            replyTo: 'service@tbr.digital'
+                        })
+                    });
+                    if (!res.ok) throw new Error(`Send failed: ${res.status}`);
+                    showToast(`已發送至 ${student.email}`);
+                    // Update status
+                    await db.update('email_drafts', { status: 'sent', sent_at: new Date().toISOString() }, { filter: { id: `eq.${d.emailDraft.id}` } });
+                    const { data } = await db.select('email_drafts');
+                    emailDrafts = data || [];
+                    renderStudents();
+                } catch (err) {
+                    showToast('發送失敗：' + err.message + '（請確認 send-email Edge Function 已部署）', { type: 'error' });
+                }
+            };
+
+            // ── Filters ──
+            document.getElementById('searchInput').addEventListener('input', () => renderStudents());
+            document.getElementById('filterGroup').addEventListener('change', () => renderStudents());
+
+            // ── Init ──
+            loadAll();
+        </script>
+    </div><!-- /admin-main -->
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

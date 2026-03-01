@@ -1,0 +1,1656 @@
+/**
+ * 元素編輯器模組
+ * 負責新增各種元素到投影片
+ */
+
+export class Editor {
+    constructor(slideManager) {
+        this.slideManager = slideManager;
+        this.selectedElement = null;
+
+        this.canvasContentEl = document.getElementById('canvasContent');
+        this.propertyContentEl = document.getElementById('propertyContent');
+        this.imageUploadEl = document.getElementById('imageUpload');
+        this.audioUploadEl = document.getElementById('audioUpload');
+
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        // 圖片上傳
+        this.imageUploadEl.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.handleImageUpload(file);
+            }
+            e.target.value = '';
+        });
+
+        // 音檔上傳
+        this.audioUploadEl.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                this.handleAudioUpload(file);
+            }
+            e.target.value = '';
+        });
+
+        // 貼上事件：擷取剪貼簿中的圖片
+        document.addEventListener('paste', (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image/') === 0) {
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        e.preventDefault();
+                        this.handleImageUpload(file);
+                    }
+                    break;
+                }
+            }
+        });
+    }
+
+    /**
+     * 新增文字元素
+     */
+    addText() {
+        const element = {
+            type: 'text',
+            x: 100,
+            y: 100,
+            width: 300,
+            height: 50,
+            content: '雙擊編輯文字',
+            fontSize: 24,
+            color: '#1e293b',
+            bold: false,
+            italic: false,
+            underline: false
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增形狀元素
+     */
+    addShape(shapeType) {
+        const sizeMap = {
+            rectangle: { width: 200, height: 120 },
+            circle: { width: 150, height: 150 },
+            triangle: { width: 100, height: 86 },
+            arrow: { width: 150, height: 60 }
+        };
+
+        const size = sizeMap[shapeType] || { width: 150, height: 150 };
+
+        const element = {
+            type: 'shape',
+            shapeType: shapeType,
+            x: 150,
+            y: 150,
+            width: size.width,
+            height: size.height
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 處理圖片上傳
+     */
+    handleImageUpload(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                // 等比縮放圖片
+                let width = img.width;
+                let height = img.height;
+                const maxWidth = 400;
+                const maxHeight = 300;
+
+                if (width > maxWidth) {
+                    height = (height / width) * maxWidth;
+                    width = maxWidth;
+                }
+                if (height > maxHeight) {
+                    width = (width / height) * maxHeight;
+                    height = maxHeight;
+                }
+
+                const element = {
+                    type: 'image',
+                    x: 100,
+                    y: 100,
+                    width: width,
+                    height: height,
+                    src: e.target.result
+                };
+
+                this.slideManager.addElement(element);
+                this.selectElementById(element.id);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    /**
+     * 處理音檔上傳
+     */
+    handleAudioUpload(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const element = {
+                type: 'audio',
+                x: 100,
+                y: 100,
+                width: 280,
+                height: 60,
+                src: e.target.result,
+                filename: file.name
+            };
+
+            this.slideManager.addElement(element);
+            this.selectElementById(element.id);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    /**
+     * 新增影片 (顯示對話框輸入 URL)
+     */
+    addVideo(url) {
+        // 處理 YouTube URL
+        let embedUrl = url;
+        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+        if (youtubeMatch) {
+            embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+        }
+
+        const element = {
+            type: 'video',
+            x: 100,
+            y: 100,
+            width: 480,
+            height: 270,
+            embedUrl: embedUrl,
+            originalUrl: url
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增連連看互動元件
+     */
+    addMatching() {
+        const element = {
+            type: 'matching',
+            x: 50,
+            y: 50,
+            width: 600,
+            height: 400,
+            pairs: [
+                { left: '貓', right: 'Cat' },
+                { left: '狗', right: 'Dog' },
+                { left: '鳥', right: 'Bird' }
+            ]
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增填空題互動元件
+     */
+    addFillBlank() {
+        const element = {
+            type: 'fillblank',
+            x: 50,
+            y: 50,
+            width: 600,
+            height: 350,
+            title: '英文填空練習',
+            content: 'I ___1___ a student. She ___2___ a teacher.',
+            blanks: [
+                { answer: 'am' },
+                { answer: 'is' }
+            ]
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增排列順序互動元件
+     */
+    addOrdering() {
+        const element = {
+            type: 'ordering',
+            x: 50,
+            y: 50,
+            width: 600,
+            height: 400,
+            steps: [
+                '確認需求',
+                '蒐集資料',
+                '撰寫提示詞',
+                '生成結果',
+                '檢視與修改'
+            ]
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增圖表元件
+     */
+    addChart(chartType = 'bar') {
+        const element = {
+            type: 'chart',
+            x: 50,
+            y: 50,
+            width: 600,
+            height: 380,
+            chartType: chartType,
+            chartTitle: '圖表標題',
+            chartData: [
+                { label: 'Q1', value: 120, color: '#3b82f6' },
+                { label: 'Q2', value: 180, color: '#8b5cf6' },
+                { label: 'Q3', value: 240, color: '#10b981' },
+                { label: 'Q4', value: 320, color: '#f59e0b' },
+            ]
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增選擇題互動元件
+     */
+    addQuiz() {
+        const element = {
+            type: 'quiz',
+            x: 50,
+            y: 50,
+            width: 600,
+            height: 400,
+            question: 'AI 的全稱是什麼？',
+            multiple: false,
+            options: [
+                { text: 'Artificial Intelligence', correct: true },
+                { text: 'Automated Integration', correct: false },
+                { text: 'Advanced Information', correct: false },
+                { text: 'Algorithmic Inference', correct: false }
+            ]
+        };
+
+        this.slideManager.addElement(element);
+    }
+
+    addPoll() {
+        const element = {
+            type: 'poll',
+            x: 50,
+            y: 50,
+            width: 600,
+            height: 400,
+            question: '你目前最常使用的工具是？',
+            options: [
+                { text: '選項 A' },
+                { text: '選項 B' },
+                { text: '選項 C' },
+                { text: '選項 D' }
+            ]
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    addTrueFalse() {
+        const element = {
+            type: 'truefalse',
+            x: 50, y: 50,
+            width: 600, height: 350,
+            question: 'AI 可以完全取代人類的創造力？',
+            answer: false,
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    addOpenText() {
+        const element = {
+            type: 'opentext',
+            x: 50, y: 50,
+            width: 600, height: 380,
+            question: '你對這堂課最大的收穫是什麼？',
+            placeholder: '在這裡輸入你的回答...',
+            maxLength: 500,
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    addScale() {
+        const element = {
+            type: 'scale',
+            x: 50, y: 50,
+            width: 600, height: 350,
+            question: '你對這堂課的整體滿意度',
+            min: 1, max: 10, step: 1,
+            labelLeft: '不滿意',
+            labelRight: '非常滿意',
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    addBuzzer() {
+        const element = {
+            type: 'buzzer',
+            x: 50, y: 50,
+            width: 600, height: 400,
+            question: '搶答：誰先想到答案？',
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    addWordCloud() {
+        const element = {
+            type: 'wordcloud',
+            x: 50, y: 50,
+            width: 600, height: 400,
+            question: '提到 AI，你想到哪些關鍵字？',
+            maxWords: 3,
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    addHotspot() {
+        const element = {
+            type: 'hotspot',
+            x: 50, y: 50,
+            width: 600, height: 400,
+            question: '圈出你認為有問題的地方',
+            image: '',
+            nodes: [],
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+
+    /**
+     * 新增可複製文字卡片
+     */
+    addCopyCard() {
+        const element = {
+            type: 'copycard',
+            x: 100,
+            y: 100,
+            width: 500,
+            height: 150,
+            title: '點擊複製',
+            content: '請在此輸入要讓學生複製的文字內容...',
+            copied: false
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 選取元素
+     */
+    selectElement(element) {
+        // 強制讓其他正在編輯的元素 blur 以便存檔
+        document.querySelectorAll('.editable-element.editing').forEach(el => {
+            if (el !== element) el.blur();
+        });
+
+        // 取消先前選取
+        document.querySelectorAll('.editable-element.selected').forEach(el => {
+            if (el !== element) {
+                el.classList.remove('selected');
+                // 移除 resize handles
+                el.querySelectorAll('.resize-handle').forEach(h => h.remove());
+            }
+        });
+
+        this.selectedElement = element;
+
+        if (element) {
+            // 如果原本還沒 selected 才需要加上 resize-handles
+            if (!element.classList.contains('selected')) {
+                element.classList.add('selected');
+                this.addResizeHandles(element);
+            }
+            this.showPropertyPanel(element);
+        } else {
+            this.hidePropertyPanel();
+        }
+
+        window.dispatchEvent(new CustomEvent('elementSelected', {
+            detail: element ? { id: element.dataset.id, type: element.dataset.type } : null
+        }));
+    }
+
+    /**
+     * 根據 ID 選取元素
+     */
+    selectElementById(id) {
+        setTimeout(() => {
+            const el = this.canvasContentEl.querySelector(`[data-id="${id}"]`);
+            if (el) {
+                this.selectElement(el);
+            }
+        }, 10);
+    }
+
+    /**
+     * 取消選取
+     */
+    deselectAll() {
+        // 先強迫編輯中的元素失去焦點以觸發存檔
+        document.querySelectorAll('.editable-element.editing').forEach(el => el.blur());
+
+        document.querySelectorAll('.editable-element.selected').forEach(el => {
+            el.classList.remove('selected');
+            el.querySelectorAll('.resize-handle').forEach(h => h.remove());
+        });
+
+        this.selectedElement = null;
+        this.hidePropertyPanel();
+
+        window.dispatchEvent(new CustomEvent('elementSelected', { detail: null }));
+    }
+
+    /**
+     * 新增 resize handles
+     */
+    addResizeHandles(element) {
+        const positions = ['nw', 'ne', 'sw', 'se', 'n', 's', 'e', 'w'];
+        positions.forEach(pos => {
+            const handle = document.createElement('div');
+            handle.className = `resize-handle ${pos}`;
+            handle.dataset.handle = pos;
+            element.appendChild(handle);
+        });
+    }
+
+    /**
+     * 顯示屬性面板
+     */
+    showPropertyPanel(element) {
+        const type = element.dataset.type;
+        const elementId = element.dataset.id;
+        const slide = this.slideManager.getCurrentSlide();
+        const elementData = slide.elements.find(el => el.id === elementId);
+
+        if (!elementData) return;
+
+        let html = '';
+
+        // 位置與大小 (所有元素共用)
+        html += `
+            <div class="property-section">
+                <div class="property-section-title">位置與大小</div>
+                <div class="property-row">
+                    <label>X</label>
+                    <input type="number" id="propX" value="${elementData.x}">
+                </div>
+                <div class="property-row">
+                    <label>Y</label>
+                    <input type="number" id="propY" value="${elementData.y}">
+                </div>
+                <div class="property-row">
+                    <label>寬度</label>
+                    <input type="number" id="propW" value="${elementData.width}">
+                </div>
+                <div class="property-row">
+                    <label>高度</label>
+                    <input type="number" id="propH" value="${elementData.height}">
+                </div>
+            </div>
+        `;
+
+        // 圖片遮色片
+        if (type === 'image') {
+            const CLIP_MASKS = [
+                { key: 'none', label: '無', path: 'none' },
+                { key: 'circle', label: '圓形', path: 'circle(50%)' },
+                { key: 'ellipse', label: '橢圓', path: 'ellipse(50% 40% at 50% 50%)' },
+                { key: 'diagonal-lr', label: '斜切↘', path: 'polygon(0 0, 100% 0, 100% 80%, 0 100%)' },
+                { key: 'diagonal-rl', label: '斜切↙', path: 'polygon(0 0, 100% 0, 100% 100%, 0 80%)' },
+                { key: 'diamond', label: '菱形', path: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)' },
+                { key: 'hexagon', label: '六角', path: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' },
+                { key: 'star', label: '星形', path: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' },
+            ];
+            const currentClip = elementData.clipPath || 'none';
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">遮色片</div>
+                    <div class="clip-mask-grid">
+                        ${CLIP_MASKS.map(m => {
+                const isActive = currentClip === m.path ? 'active' : '';
+                return `<button class="clip-mask-btn ${isActive}" data-clip="${m.path}" title="${m.label}">
+                                <div class="clip-mask-preview" style="clip-path:${m.path};"></div>
+                                <span>${m.label}</span>
+                            </button>`;
+            }).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Icon 顏色調整（僅限從 Icon 圖庫插入的圖片）
+            if (elementData.iconName) {
+                const currentIconColor = elementData.iconColor || '#1e293b';
+                html += `
+                    <div class="property-section">
+                        <div class="property-section-title">Icon 顏色</div>
+                        <div class="property-row">
+                            <label>顏色</label>
+                            <input type="color" id="propIconColor" value="${currentIconColor}">
+                        </div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:4px;">${elementData.iconName}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 文字專屬屬性
+        if (type === 'text') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">文字樣式</div>
+                    <div class="property-row">
+                        <label>大小</label>
+                        <input type="number" id="propFontSize" value="${elementData.fontSize || 18}">
+                    </div>
+                    <div class="property-row">
+                        <label>顏色</label>
+                        <input type="color" id="propColor" value="${elementData.color || '#1e293b'}">
+                    </div>
+                    <div class="text-style-buttons">
+                        <button class="style-btn ${elementData.bold ? 'active' : ''}" id="propBold"><b>B</b></button>
+                        <button class="style-btn ${elementData.italic ? 'active' : ''}" id="propItalic"><i>I</i></button>
+                        <button class="style-btn ${elementData.underline ? 'active' : ''}" id="propUnderline"><u>U</u></button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Shape 填色
+        if (type === 'shape') {
+            const currentBg = elementData.background || '#e2e8f0';
+            const FILL_PRESETS = [
+                '#ffffff', '#f8f9fa', '#e2e8f0', '#1e293b', '#0f172a', '#18181b',
+                '#2563eb', '#7c3aed', '#dc2626', '#16a34a', '#d97706', '#0284c7',
+                'linear-gradient(135deg,#667eea,#764ba2)',
+                'linear-gradient(135deg,#0ea5e9,#6366f1)',
+                'linear-gradient(135deg,#f472b6,#7c3aed)',
+                'linear-gradient(135deg,#34d399,#059669)',
+                'linear-gradient(135deg,#fbbf24,#ea580c)',
+                'linear-gradient(135deg,#1a1a2e,#0f3460)',
+                'rgba(255,255,255,0.05)',
+                'rgba(255,255,255,0.12)',
+                'rgba(37,99,235,0.2)',
+                'rgba(147,51,234,0.2)',
+                'rgba(5,150,105,0.2)',
+                'rgba(220,38,38,0.2)',
+            ];
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">填色</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+                        ${FILL_PRESETS.map(c => `<button class="shape-fill-swatch" data-fill="${c}" style="width:24px;height:24px;border-radius:6px;border:1.5px solid ${c === currentBg ? '#4A7AE8' : '#d1d5db'};background:${c};cursor:pointer;padding:0;"></button>`).join('')}
+                    </div>
+                    <div class="property-row">
+                        <label>自訂</label>
+                        <input type="color" id="propShapeFill" value="${currentBg.startsWith('#') ? currentBg : '#e2e8f0'}">
+                    </div>
+                    <div class="property-row">
+                        <label>圓角</label>
+                        <input type="number" id="propBorderRadius" value="${elementData.borderRadius || 0}" min="0">
+                    </div>
+                    <div class="property-row">
+                        <label>透明度</label>
+                        <input type="range" id="propOpacity" value="${elementData.opacity !== undefined ? elementData.opacity * 100 : 100}" min="0" max="100" style="flex:1;">
+                    </div>
+                </div>
+            `;
+        }
+        // 圖表元件
+        if (type === 'chart') {
+            const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">圖表設定</div>
+                    <div class="property-row">
+                        <label>類型</label>
+                        <select id="chartType" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="bar" ${(elementData.chartType || 'bar') === 'bar' ? 'selected' : ''}>長條圖</option>
+                            <option value="horizontal-bar" ${elementData.chartType === 'horizontal-bar' ? 'selected' : ''}>橫條圖</option>
+                            <option value="donut" ${elementData.chartType === 'donut' ? 'selected' : ''}>環形圖</option>
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <label>標題</label>
+                        <input type="text" id="chartTitle" value="${elementData.chartTitle || ''}" placeholder="圖表標題">
+                    </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title">數據</div>
+                    <div id="chartDataList" style="display:flex;flex-direction:column;gap:4px;">
+                        ${(elementData.chartData || []).map((d, i) => `
+                            <div class="chart-data-row" data-index="${i}" style="display:flex;gap:4px;align-items:center;">
+                                <input type="color" class="cd-color" value="${d.color || CHART_COLORS[i % 8]}" style="width:24px;height:24px;border:none;padding:0;cursor:pointer;">
+                                <input type="text" class="cd-label" value="${d.label}" placeholder="標籤" style="flex:1;padding:3px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;">
+                                <input type="number" class="cd-value" value="${d.value}" style="width:60px;padding:3px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;">
+                                <button class="cd-remove" style="width:20px;height:20px;border:none;background:none;cursor:pointer;color:#ef4444;font-size:14px;padding:0;">✕</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button id="addChartData" style="margin-top:6px;width:100%;padding:5px;border:1px dashed #d1d5db;border-radius:6px;background:none;cursor:pointer;color:#2563eb;font-size:12px;font-weight:600;">+ 新增數據</button>
+                </div>
+            `;
+        }
+
+        // 互動元件專屬
+        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot'];
+        if (type === 'matching') {
+            html += this.renderMatchingProperties(elementData);
+        } else if (type === 'fillblank') {
+            html += this.renderFillBlankProperties(elementData);
+        } else if (type === 'ordering') {
+            html += this.renderOrderingProperties(elementData);
+        } else if (type === 'quiz') {
+            html += this.renderQuizProperties(elementData);
+        } else if (type === 'poll') {
+            html += this.renderPollProperties(elementData);
+        } else if (type === 'copycard') {
+            html += this.renderCopyCardProperties(elementData);
+        } else if (type === 'showcase') {
+            html += this.renderShowcaseProperties(elementData);
+        } else if (type === 'truefalse') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">是非題設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="tfQuestion" value="${elementData.question || ''}">
+                    </div>
+                    <div class="property-row">
+                        <label>正確答案</label>
+                        <select id="tfAnswer" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="true" ${elementData.answer ? 'selected' : ''}>對</option>
+                            <option value="false" ${!elementData.answer ? 'selected' : ''}>錯</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'opentext') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">開放問答設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="otQuestion" value="${elementData.question || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">提示文字</label>
+                        <input type="text" class="form-input" id="otPlaceholder" value="${elementData.placeholder || ''}">
+                    </div>
+                    <div class="property-row">
+                        <label>字數上限</label>
+                        <input type="number" id="otMaxLength" value="${elementData.maxLength || 500}" min="50" step="50">
+                    </div>
+                </div>
+            `;
+        } else if (type === 'scale') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">量表設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="scaleQuestion" value="${elementData.question || ''}">
+                    </div>
+                    <div class="property-row">
+                        <label>最小值</label>
+                        <input type="number" id="scaleMin" value="${elementData.min || 1}">
+                    </div>
+                    <div class="property-row">
+                        <label>最大值</label>
+                        <input type="number" id="scaleMax" value="${elementData.max || 10}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">左端標籤</label>
+                        <input type="text" class="form-input" id="scaleLabelLeft" value="${elementData.labelLeft || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">右端標籤</label>
+                        <input type="text" class="form-input" id="scaleLabelRight" value="${elementData.labelRight || ''}">
+                    </div>
+                </div>
+            `;
+        } else if (type === 'buzzer') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">搶答設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="buzzerQuestion" value="${elementData.question || ''}">
+                    </div>
+                </div>
+            `;
+        } else if (type === 'wordcloud') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">文字雲設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="wcQuestion" value="${elementData.question || ''}">
+                    </div>
+                    <div class="property-row">
+                        <label>每人最多字數</label>
+                        <input type="number" id="wcMaxWords" value="${elementData.maxWords || 3}" min="1" max="10">
+                    </div>
+                </div>
+            `;
+        } else if (type === 'hotspot') {
+            const nodes = elementData.nodes || [];
+            const nodesListHtml = nodes.map((n, i) => `
+                <div class="hs-node-row" data-idx="${i}">
+                    <span class="hs-node-label">${n.label}</span>
+                    <label class="hs-node-correct-label">
+                        <input type="checkbox" class="hs-node-correct" ${n.isCorrect ? 'checked' : ''}>
+                        有問題
+                    </label>
+                    <button class="hs-node-delete" title="刪除">✕</button>
+                </div>
+            `).join('');
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">圖片標註設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="hsQuestion" value="${elementData.question || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">圖片 URL</label>
+                        <input type="text" class="form-input" id="hsImage" value="${elementData.image || ''}" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">節點（點擊預覽圖新增）</label>
+                        <div class="hs-preview-wrap" id="hsPreviewWrap" style="position:relative;width:100%;aspect-ratio:3/2;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;cursor:crosshair;">
+                            ${elementData.image ? '<img src="' + elementData.image + '" style="width:100%;height:100%;object-fit:contain;">' : '<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#94a3b8;font-size:13px;">請先輸入圖片 URL</span>'}
+                            ${nodes.map(n => '<div class="hs-preview-node" style="position:absolute;left:' + n.x + '%;top:' + n.y + '%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;background:' + (n.isCorrect ? '#10b981' : '#6366f1') + ';color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">' + n.label + '</div>').join('')}
+                        </div>
+                    </div>
+                    <div class="hs-nodes-list" id="hsNodesList">${nodesListHtml}</div>
+                    ${nodes.length > 0 ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">綠色 = 正確答案（有問題的地方）</div>' : ''}
+                </div>
+            `;
+        }
+
+        // 倒數計時器（所有互動元件通用）
+        if (interactiveTypes.includes(type)) {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">倒數計時</div>
+                    <div class="property-row">
+                        <label>秒數（0=不計時）</label>
+                        <input type="number" id="propTimeLimit" value="${elementData.timeLimit || 0}" min="0" step="5">
+                    </div>
+                </div>
+            `;
+        }
+
+        // 圖層與刪除
+        html += `
+            <div class="property-section">
+                <div class="property-section-title">圖層</div>
+                <div class="layer-buttons">
+                    <button class="layer-btn" id="layerUp">↑ 上移</button>
+                    <button class="layer-btn" id="layerDown">↓ 下移</button>
+                </div>
+            </div>
+            <button class="delete-element-btn" id="deleteElement">刪除元素</button>
+        `;
+
+        this.propertyContentEl.innerHTML = html;
+        this.bindPropertyEvents(element, elementData);
+    }
+
+    /**
+     * 渲染連連看屬性
+     */
+    renderMatchingProperties(elementData) {
+        return `
+            <div class="property-section">
+                <div class="property-section-title">配對項目</div>
+                <div class="pair-list" id="pairList">
+                    ${(elementData.pairs || []).map((pair, i) => `
+                        <div class="pair-item" data-index="${i}">
+                            <input type="text" class="pair-left" value="${pair.left}" placeholder="左側">
+                            <span class="pair-arrow">↔</span>
+                            <input type="text" class="pair-right" value="${pair.right}" placeholder="右側">
+                            <button class="remove-pair">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="add-pair-btn" id="addPair">+ 新增配對</button>
+            </div>
+        `;
+    }
+
+    /**
+     * 渲染填空題屬性
+     */
+    renderFillBlankProperties(elementData) {
+        return `
+            <div class="property-section">
+                <div class="property-section-title">填空題設定</div>
+                <div class="form-group">
+                    <label class="form-label">標題</label>
+                    <input type="text" class="form-input" id="blankTitle" value="${elementData.title || ''}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">內容 (用 ___N___ 標記空格)</label>
+                    <textarea class="form-input" id="blankContent" rows="3">${elementData.content || ''}</textarea>
+                </div>
+                <div class="property-section-title">答案設定</div>
+                <div class="blank-list" id="blankList">
+                    ${(elementData.blanks || []).map((blank, i) => `
+                        <div class="blank-item" data-index="${i}">
+                            <div class="blank-number">${i + 1}</div>
+                            <input type="text" class="blank-answer" value="${blank.answer}" placeholder="正確答案">
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * 渲染複製卡片屬性
+     */
+    renderCopyCardProperties(elementData) {
+        return `
+            <div class="property-section">
+                <div class="property-section-title">複製卡片設定</div>
+                <div class="form-group">
+                    <label class="form-label">標題</label>
+                    <input type="text" class="form-input" id="copyCardTitle" value="${elementData.title || '點擊複製'}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">要複製的文字內容</label>
+                    <textarea class="form-input" id="copyCardContent" rows="4" placeholder="請輸入讓學生複製的內容...">${elementData.content || ''}</textarea>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * 綁定屬性面板事件
+     */
+    bindPropertyEvents(element, elementData) {
+        const elementId = element.dataset.id;
+
+        // 位置大小
+        ['propX', 'propY', 'propW', 'propH'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('change', () => {
+                    const updates = {
+                        x: parseInt(document.getElementById('propX').value),
+                        y: parseInt(document.getElementById('propY').value),
+                        width: parseInt(document.getElementById('propW').value),
+                        height: parseInt(document.getElementById('propH').value)
+                    };
+                    this.slideManager.updateElement(elementId, updates);
+                    element.style.left = `${updates.x}px`;
+                    element.style.top = `${updates.y}px`;
+                    element.style.width = `${updates.width}px`;
+                    element.style.height = `${updates.height}px`;
+                });
+            }
+        });
+
+        // 文字樣式
+        const fontSizeInput = document.getElementById('propFontSize');
+        if (fontSizeInput) {
+            fontSizeInput.addEventListener('change', () => {
+                const fontSize = parseInt(fontSizeInput.value);
+                this.slideManager.updateElement(elementId, { fontSize });
+                element.style.fontSize = `${fontSize}px`;
+            });
+        }
+
+        const colorInput = document.getElementById('propColor');
+        if (colorInput) {
+            colorInput.addEventListener('change', () => {
+                const color = colorInput.value;
+                this.slideManager.updateElement(elementId, { color });
+                element.style.color = color;
+            });
+        }
+
+        // 粗體/斜體/底線
+        ['propBold', 'propItalic', 'propUnderline'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    btn.classList.toggle('active');
+                    const updates = {};
+                    if (id === 'propBold') {
+                        updates.bold = btn.classList.contains('active');
+                        element.style.fontWeight = updates.bold ? 'bold' : 'normal';
+                    } else if (id === 'propItalic') {
+                        updates.italic = btn.classList.contains('active');
+                        element.style.fontStyle = updates.italic ? 'italic' : 'normal';
+                    } else if (id === 'propUnderline') {
+                        updates.underline = btn.classList.contains('active');
+                        element.style.textDecoration = updates.underline ? 'underline' : 'none';
+                    }
+                    this.slideManager.updateElement(elementId, updates);
+                });
+            }
+        });
+
+        // 圖層
+        const layerUp = document.getElementById('layerUp');
+        const layerDown = document.getElementById('layerDown');
+        if (layerUp) {
+            layerUp.addEventListener('click', () => {
+                this.slideManager.moveElementLayer(elementId, 'up');
+                this.selectElementById(elementId);
+            });
+        }
+        if (layerDown) {
+            layerDown.addEventListener('click', () => {
+                this.slideManager.moveElementLayer(elementId, 'down');
+                this.selectElementById(elementId);
+            });
+        }
+
+        // 刪除
+        const deleteBtn = document.getElementById('deleteElement');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                this.slideManager.deleteElement(elementId);
+                this.deselectAll();
+            });
+        }
+
+        // 圖表事件
+        const chartTypeSelect = document.getElementById('chartType');
+        if (chartTypeSelect) {
+            chartTypeSelect.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { chartType: chartTypeSelect.value });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+        const chartTitleInput = document.getElementById('chartTitle');
+        if (chartTitleInput) {
+            chartTitleInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { chartTitle: chartTitleInput.value });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+        document.querySelectorAll('.chart-data-row').forEach(row => {
+            const i = parseInt(row.dataset.index);
+            const update = () => {
+                const data = [...(elementData.chartData || [])];
+                data[i] = {
+                    label: row.querySelector('.cd-label').value,
+                    value: parseFloat(row.querySelector('.cd-value').value) || 0,
+                    color: row.querySelector('.cd-color').value
+                };
+                this.slideManager.updateElement(elementId, { chartData: data });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            };
+            row.querySelector('.cd-label')?.addEventListener('change', update);
+            row.querySelector('.cd-value')?.addEventListener('change', update);
+            row.querySelector('.cd-color')?.addEventListener('input', update);
+            row.querySelector('.cd-remove')?.addEventListener('click', () => {
+                const data = [...(elementData.chartData || [])];
+                data.splice(i, 1);
+                this.slideManager.updateElement(elementId, { chartData: data });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        });
+        const addChartBtn = document.getElementById('addChartData');
+        if (addChartBtn) {
+            addChartBtn.addEventListener('click', () => {
+                const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
+                const data = [...(elementData.chartData || [])];
+                data.push({ label: `項目 ${data.length + 1}`, value: 50, color: COLORS[data.length % 8] });
+                this.slideManager.updateElement(elementId, { chartData: data });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+
+        // 圖片遮色片事件
+        document.querySelectorAll('.clip-mask-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const clipPath = btn.dataset.clip;
+                this.slideManager.updateElement(elementId, { clipPath: clipPath === 'none' ? null : clipPath });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        });
+
+        // Icon 顏色變更事件
+        const iconColorInput = document.getElementById('propIconColor');
+        if (iconColorInput && elementData.iconName) {
+            iconColorInput.addEventListener('change', async () => {
+                const newColor = iconColorInput.value;
+                const iconName = elementData.iconName;
+                const size = Math.max(elementData.width, elementData.height) || 80;
+                try {
+                    const svgUrl = `https://api.iconify.design/${iconName}.svg?color=${encodeURIComponent(newColor)}&width=${size}&height=${size}`;
+                    const res = await fetch(svgUrl);
+                    const svgText = await res.text();
+                    const dataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgText)))}`;
+                    this.slideManager.updateElement(elementId, { src: dataUrl, iconColor: newColor });
+                    // 更新 DOM 中的 img
+                    const imgEl = element.querySelector('img');
+                    if (imgEl) imgEl.src = dataUrl;
+                    this.slideManager.renderThumbnails();
+                } catch (err) {
+                    console.error('[IconColor] update error:', err);
+                }
+            });
+        }
+
+        // Shape 填色事件
+        document.querySelectorAll('.shape-fill-swatch').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                const fill = swatch.dataset.fill;
+                this.slideManager.updateElement(elementId, { background: fill });
+                element.style.background = fill;
+                this.showPropertyPanel(element); // 刷新面板高亮
+            });
+        });
+        const shapeFillInput = document.getElementById('propShapeFill');
+        if (shapeFillInput) {
+            shapeFillInput.addEventListener('input', () => {
+                this.slideManager.updateElement(elementId, { background: shapeFillInput.value });
+                element.style.background = shapeFillInput.value;
+            });
+        }
+        const borderRadiusInput = document.getElementById('propBorderRadius');
+        if (borderRadiusInput) {
+            borderRadiusInput.addEventListener('change', () => {
+                const r = parseInt(borderRadiusInput.value) || 0;
+                this.slideManager.updateElement(elementId, { borderRadius: r });
+                element.style.borderRadius = `${r}px`;
+            });
+        }
+        const opacityInput = document.getElementById('propOpacity');
+        if (opacityInput) {
+            opacityInput.addEventListener('input', () => {
+                const o = parseInt(opacityInput.value) / 100;
+                this.slideManager.updateElement(elementId, { opacity: o });
+                element.style.opacity = o;
+            });
+        }
+
+        // 連連看配對事件
+        this.bindMatchingEvents(elementId, elementData);
+
+        // 填空題事件
+        this.bindFillBlankEvents(elementId, elementData);
+
+        // 排列順序事件
+        this.bindOrderingEvents(elementId, elementData);
+
+        // 複製卡片事件
+        this.bindCopyCardEvents(elementId, elementData);
+
+        // 選擇題事件
+        this.bindQuizEvents(elementId, elementData);
+
+        // 投票事件
+        this.bindPollEvents(elementId, elementData);
+
+        // 展示牆事件
+        if (elementData.type === 'showcase') {
+            this.bindShowcaseEvents(elementId, elementData, element);
+        }
+
+        // 新互動類型屬性綁定
+        const rerender = () => { this.slideManager.renderCurrentSlide(); this.selectElementById(elementId); };
+        const bindSimple = (inputId, key, parse) => {
+            const el = document.getElementById(inputId);
+            if (el) el.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { [key]: parse ? parse(el.value) : el.value });
+                rerender();
+            });
+        };
+        if (elementData.type === 'truefalse') {
+            bindSimple('tfQuestion', 'question');
+            bindSimple('tfAnswer', 'answer', v => v === 'true');
+        } else if (elementData.type === 'opentext') {
+            bindSimple('otQuestion', 'question');
+            bindSimple('otPlaceholder', 'placeholder');
+            bindSimple('otMaxLength', 'maxLength', v => parseInt(v) || 500);
+        } else if (elementData.type === 'scale') {
+            bindSimple('scaleQuestion', 'question');
+            bindSimple('scaleMin', 'min', v => parseInt(v) || 1);
+            bindSimple('scaleMax', 'max', v => parseInt(v) || 10);
+            bindSimple('scaleLabelLeft', 'labelLeft');
+            bindSimple('scaleLabelRight', 'labelRight');
+        } else if (elementData.type === 'buzzer') {
+            bindSimple('buzzerQuestion', 'question');
+        } else if (elementData.type === 'wordcloud') {
+            bindSimple('wcQuestion', 'question');
+            bindSimple('wcMaxWords', 'maxWords', v => parseInt(v) || 3);
+        } else if (elementData.type === 'hotspot') {
+            bindSimple('hsQuestion', 'question');
+            // 圖片 URL 改變時重新渲染
+            const hsImageInput = document.getElementById('hsImage');
+            if (hsImageInput) {
+                hsImageInput.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { image: hsImageInput.value });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
+            // 點擊預覽圖新增節點
+            const previewWrap = document.getElementById('hsPreviewWrap');
+            if (previewWrap) {
+                previewWrap.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('hs-preview-node')) return;
+                    const rect = previewWrap.getBoundingClientRect();
+                    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                    const nodes = [...(elementData.nodes || [])];
+                    const label = String.fromCharCode(65 + nodes.length); // A, B, C...
+                    nodes.push({ id: label, x, y, label, isCorrect: false });
+                    this.slideManager.updateElement(elementId, { nodes });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
+            // 節點正確/刪除
+            const nodesList = document.getElementById('hsNodesList');
+            if (nodesList) {
+                nodesList.addEventListener('change', (e) => {
+                    if (!e.target.classList.contains('hs-node-correct')) return;
+                    const idx = parseInt(e.target.closest('.hs-node-row').dataset.idx);
+                    const nodes = [...(elementData.nodes || [])];
+                    if (nodes[idx]) nodes[idx].isCorrect = e.target.checked;
+                    this.slideManager.updateElement(elementId, { nodes });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+                nodesList.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('hs-node-delete')) return;
+                    const idx = parseInt(e.target.closest('.hs-node-row').dataset.idx);
+                    const nodes = [...(elementData.nodes || [])];
+                    nodes.splice(idx, 1);
+                    // 重新編號
+                    nodes.forEach((n, i) => { n.label = String.fromCharCode(65 + i); n.id = n.label; });
+                    this.slideManager.updateElement(elementId, { nodes });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
+        }
+
+        // 倒數計時器
+        const timeLimitInput = document.getElementById('propTimeLimit');
+        if (timeLimitInput) {
+            timeLimitInput.addEventListener('change', () => {
+                const val = parseInt(timeLimitInput.value) || 0;
+                this.slideManager.updateElement(elementId, { timeLimit: val });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+    }
+
+    /**
+     * 綁定連連看事件
+     */
+    bindMatchingEvents(elementId, elementData) {
+        const pairList = document.getElementById('pairList');
+        const addPairBtn = document.getElementById('addPair');
+
+        if (!pairList) return;
+
+        // 更新配對
+        pairList.querySelectorAll('.pair-item').forEach(item => {
+            const index = parseInt(item.dataset.index);
+
+            item.querySelector('.pair-left').addEventListener('change', (e) => {
+                elementData.pairs[index].left = e.target.value;
+                this.slideManager.updateElement(elementId, { pairs: elementData.pairs });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+
+            item.querySelector('.pair-right').addEventListener('change', (e) => {
+                elementData.pairs[index].right = e.target.value;
+                this.slideManager.updateElement(elementId, { pairs: elementData.pairs });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+
+            item.querySelector('.remove-pair').addEventListener('click', () => {
+                elementData.pairs.splice(index, 1);
+                this.slideManager.updateElement(elementId, { pairs: elementData.pairs });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        });
+
+        if (addPairBtn) {
+            addPairBtn.addEventListener('click', () => {
+                elementData.pairs.push({ left: '新項目', right: 'New Item' });
+                this.slideManager.updateElement(elementId, { pairs: elementData.pairs });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+    }
+
+    /**
+     * 綁定填空題事件
+     */
+    bindFillBlankEvents(elementId, elementData) {
+        const titleInput = document.getElementById('blankTitle');
+        const contentInput = document.getElementById('blankContent');
+        const blankList = document.getElementById('blankList');
+
+        if (titleInput) {
+            titleInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { title: titleInput.value });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+
+        if (contentInput) {
+            contentInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { content: contentInput.value });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+
+        if (blankList) {
+            blankList.querySelectorAll('.blank-item').forEach(item => {
+                const index = parseInt(item.dataset.index);
+                item.querySelector('.blank-answer').addEventListener('change', (e) => {
+                    if (elementData.blanks[index]) {
+                        elementData.blanks[index].answer = e.target.value;
+                        this.slideManager.updateElement(elementId, { blanks: elementData.blanks });
+                    }
+                });
+            });
+        }
+    }
+
+    /**
+     * 渲染排列順序屬性
+     */
+    renderOrderingProperties(elementData) {
+        return `
+            <div class="property-section">
+                <div class="property-section-title">排列步驟（按正確順序）</div>
+                <div class="step-list" id="stepList">
+                    ${(elementData.steps || []).map((step, i) => `
+                        <div class="pair-item" data-index="${i}">
+                            <span style="min-width:20px;color:#94a3b8;font-weight:700;">${i + 1}</span>
+                            <input type="text" class="pair-left step-input" value="${step}" placeholder="步驟 ${i + 1}">
+                            <button class="remove-pair remove-step">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="add-pair-btn" id="addStep">+ 新增步驟</button>
+            </div>
+        `;
+    }
+    /**
+     * 渲染選擇題屬性
+     */
+    renderQuizProperties(elementData) {
+        const markers = 'ABCDEFGHIJ';
+        return `
+            <div class="property-section">
+                <div class="property-section-title">題目設定</div>
+                <div class="property-row">
+                    <label>題目</label>
+                    <input type="text" id="quizQuestion" value="${elementData.question || ''}" placeholder="請輸入題目">
+                </div>
+                <div class="property-row" style="margin-top:8px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="quizMultiple" ${elementData.multiple ? 'checked' : ''}>
+                        多選題
+                    </label>
+                </div>
+            </div>
+            <div class="property-section">
+                <div class="property-section-title">選項（勾選為正確答案）</div>
+                <div class="pair-list" id="quizOptionList">
+                    ${(elementData.options || []).map((opt, i) => `
+                        <div class="pair-item" data-index="${i}">
+                            <input type="checkbox" class="quiz-correct-cb" ${opt.correct ? 'checked' : ''}>
+                            <span style="min-width:18px;color:#94a3b8;font-weight:700;font-size:0.8rem;">${markers[i]}</span>
+                            <input type="text" class="pair-left quiz-opt-text" value="${opt.text}" placeholder="選項 ${markers[i]}">
+                            <button class="remove-pair remove-quiz-opt">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="add-pair-btn" id="addQuizOption">+ 新增選項</button>
+            </div>
+        `;
+    }
+
+    /**
+     * 綁定選擇題事件
+     */
+    bindQuizEvents(elementId, elementData) {
+        const questionInput = document.getElementById('quizQuestion');
+        const multipleCheckbox = document.getElementById('quizMultiple');
+        const optionList = document.getElementById('quizOptionList');
+        const addOptionBtn = document.getElementById('addQuizOption');
+
+        if (!questionInput) return;
+
+        questionInput.addEventListener('change', () => {
+            this.slideManager.updateElement(elementId, { question: questionInput.value });
+            this.slideManager.renderCurrentSlide();
+            this.selectElementById(elementId);
+        });
+
+        multipleCheckbox?.addEventListener('change', () => {
+            this.slideManager.updateElement(elementId, { multiple: multipleCheckbox.checked });
+            this.slideManager.renderCurrentSlide();
+            this.selectElementById(elementId);
+        });
+
+        if (optionList) {
+            optionList.querySelectorAll('.pair-item').forEach(item => {
+                const index = parseInt(item.dataset.index);
+
+                item.querySelector('.quiz-opt-text')?.addEventListener('change', (e) => {
+                    elementData.options[index].text = e.target.value;
+                    this.slideManager.updateElement(elementId, { options: elementData.options });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+
+                item.querySelector('.quiz-correct-cb')?.addEventListener('change', (e) => {
+                    elementData.options[index].correct = e.target.checked;
+                    this.slideManager.updateElement(elementId, { options: elementData.options });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+
+                item.querySelector('.remove-quiz-opt')?.addEventListener('click', () => {
+                    elementData.options.splice(index, 1);
+                    this.slideManager.updateElement(elementId, { options: elementData.options });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            });
+        }
+
+        addOptionBtn?.addEventListener('click', () => {
+            const markers = 'ABCDEFGHIJ';
+            const idx = elementData.options.length;
+            elementData.options.push({ text: `選項 ${markers[idx] || idx + 1}`, correct: false });
+            this.slideManager.updateElement(elementId, { options: elementData.options });
+            this.slideManager.renderCurrentSlide();
+            this.selectElementById(elementId);
+        });
+    }
+
+    /**
+     * 渲染投票屬性面板
+     */
+    renderPollProperties(elementData) {
+        const markers = 'ABCDEFGHIJ';
+        return `
+            <div class="property-section">
+                <div class="property-section-title">投票設定</div>
+                <div class="property-row">
+                    <label>題目</label>
+                    <input type="text" id="pollQuestion" value="${elementData.question || ''}" placeholder="請輸入投票題目">
+                </div>
+            </div>
+            <div class="property-section">
+                <div class="property-section-title">選項</div>
+                <div class="pair-list" id="pollOptionList">
+                    ${(elementData.options || []).map((opt, i) => `
+                        <div class="pair-item" data-index="${i}">
+                            <span style="min-width:18px;color:#94a3b8;font-weight:700;font-size:0.8rem;">${markers[i]}</span>
+                            <input type="text" class="pair-left poll-opt-text" value="${opt.text}" placeholder="選項 ${markers[i]}">
+                            <button class="remove-pair remove-poll-opt">✕</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="add-pair-btn" id="addPollOption">+ 新增選項</button>
+            </div>
+        `;
+    }
+
+    /**
+     * 渲染展示牆屬性面板
+     */
+    renderShowcaseProperties(elementData) {
+        // 收集所有投影片中的作業
+        const homeworks = [];
+        this.slideManager.slides.forEach((slide, si) => {
+            (slide.elements || []).forEach(el => {
+                if (el.type === 'homework') {
+                    homeworks.push({
+                        id: el.id,
+                        title: el.title || '課堂作業',
+                        slideIndex: si
+                    });
+                }
+            });
+        });
+
+        // 建立下拉選單選項
+        const optionsHtml = homeworks.map(hw => {
+            const isSelected = hw.id === elementData.linkedHomeworkId || hw.title === elementData.assignmentTitle;
+            return `<option value="${hw.id}" data-title="${hw.title}" ${isSelected ? 'selected' : ''}>
+                ${hw.title} (投影片 ${hw.slideIndex + 1})
+            </option>`;
+        }).join('');
+
+        return `
+            <div class="property-section">
+                <div class="property-section-title">展示牆設定</div>
+                <div class="property-row">
+                    <label>綁定作業</label>
+                    <select id="showcaseAssignment" style="flex:1;padding:6px;border:1px solid #d1d5db;border-radius:6px;font-size:0.85rem;">
+                         <option value="">-- 請選擇作業 --</option>
+                         ${optionsHtml}
+                    </select>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * 綁定展示牆事件
+     */
+    bindShowcaseEvents(elementId, elementData, elementEl) {
+        const selectEl = document.getElementById('showcaseAssignment');
+        if (!selectEl) return;
+
+        selectEl.addEventListener('change', () => {
+            const selectedOption = selectEl.options[selectEl.selectedIndex];
+            const linkedHomeworkId = selectedOption.value;
+            let assignmentTitle = '';
+
+            if (linkedHomeworkId) {
+                assignmentTitle = selectedOption.dataset.title;
+            }
+
+            // 更新元素資料
+            this.slideManager.updateElement(elementId, {
+                linkedHomeworkId: linkedHomeworkId,
+                assignmentTitle: assignmentTitle,
+                linkedHomeworkTitle: assignmentTitle
+            });
+
+            // 找到 iframe 並透過 postMessage 傳遞變更，或者重新渲染 slide
+            this.slideManager.renderCurrentSlide();
+            this.selectElementById(elementId);
+        });
+    }
+
+    /**
+     * 綁定投票事件
+     */
+    bindPollEvents(elementId, elementData) {
+        const questionInput = document.getElementById('pollQuestion');
+        const optionList = document.getElementById('pollOptionList');
+        const addOptionBtn = document.getElementById('addPollOption');
+
+        if (!questionInput) return;
+
+        questionInput.addEventListener('change', () => {
+            this.slideManager.updateElement(elementId, { question: questionInput.value });
+            this.slideManager.renderCurrentSlide();
+            this.selectElementById(elementId);
+        });
+
+        if (optionList) {
+            optionList.querySelectorAll('.pair-item').forEach(item => {
+                const index = parseInt(item.dataset.index);
+
+                item.querySelector('.poll-opt-text')?.addEventListener('change', (e) => {
+                    elementData.options[index].text = e.target.value;
+                    this.slideManager.updateElement(elementId, { options: elementData.options });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+
+                item.querySelector('.remove-poll-opt')?.addEventListener('click', () => {
+                    elementData.options.splice(index, 1);
+                    this.slideManager.updateElement(elementId, { options: elementData.options });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            });
+        }
+
+        addOptionBtn?.addEventListener('click', () => {
+            const markers = 'ABCDEFGHIJ';
+            const idx = elementData.options.length;
+            elementData.options.push({ text: `選項 ${markers[idx] || idx + 1}` });
+            this.slideManager.updateElement(elementId, { options: elementData.options });
+            this.slideManager.renderCurrentSlide();
+            this.selectElementById(elementId);
+        });
+    }
+
+    /**
+     * 綁定排列順序事件
+     */
+    bindOrderingEvents(elementId, elementData) {
+        const stepList = document.getElementById('stepList');
+        const addStepBtn = document.getElementById('addStep');
+
+        if (!stepList) return;
+
+        stepList.querySelectorAll('.pair-item').forEach(item => {
+            const index = parseInt(item.dataset.index);
+
+            item.querySelector('.step-input').addEventListener('change', (e) => {
+                elementData.steps[index] = e.target.value;
+                this.slideManager.updateElement(elementId, { steps: elementData.steps });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+
+            item.querySelector('.remove-step').addEventListener('click', () => {
+                elementData.steps.splice(index, 1);
+                this.slideManager.updateElement(elementId, { steps: elementData.steps });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        });
+
+        if (addStepBtn) {
+            addStepBtn.addEventListener('click', () => {
+                elementData.steps.push('新步驟');
+                this.slideManager.updateElement(elementId, { steps: elementData.steps });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+    }
+
+    /**
+     * 綁定複製卡片事件
+     */
+    bindCopyCardEvents(elementId, elementData) {
+        const titleInput = document.getElementById('copyCardTitle');
+        const contentInput = document.getElementById('copyCardContent');
+
+        if (titleInput) {
+            titleInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { title: titleInput.value });
+                this.slideManager.renderCurrentSlide();
+                // title 較短且是 change 事件，保留 selectElementById 刷新面板無妨
+                this.selectElementById(elementId);
+            });
+        }
+
+        if (contentInput) {
+            contentInput.addEventListener('input', () => {
+                this.slideManager.updateElement(elementId, { content: contentInput.value });
+                this.slideManager.renderCurrentSlide();
+                // 移除 this.selectElementById(elementId) 避免每次輸入都重建整個屬性面板導致失去焦點卡住
+            });
+        }
+    }
+
+    /**
+     * 隱藏屬性面板
+     */
+    hidePropertyPanel() {
+        this.propertyContentEl.innerHTML = '';
+    }
+
+    /**
+     * 刪除選中元素
+     */
+    deleteSelected() {
+        if (this.selectedElement) {
+            const id = this.selectedElement.dataset.id;
+            this.slideManager.deleteElement(id);
+            this.deselectAll();
+        }
+    }
+}
