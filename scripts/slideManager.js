@@ -2140,8 +2140,10 @@ export class SlideManager {
             savedAt: new Date().toISOString()
         };
 
-        // localStorage 快取（即時）
-        localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+        // localStorage 快取（即時）— quota 超過時 silently skip
+        try {
+            localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+        } catch (_) { /* quota exceeded, rely on DB */ }
 
         // 更新快取的 updatedAt
         const p = this._projectsCache.find(p => p.id === this.currentProjectId);
@@ -2170,7 +2172,9 @@ export class SlideManager {
             savedAt: new Date().toISOString()
         };
 
-        localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+        try {
+            localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+        } catch (_) { /* quota exceeded */ }
 
         const p = this._projectsCache.find(p => p.id === this.currentProjectId);
         if (p) p.updatedAt = data.savedAt;
@@ -2355,7 +2359,7 @@ export class SlideManager {
             this.renderCurrentSlide();
             this.updateCounter();
             // 同步到 localStorage
-            localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(chosen));
+            try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(chosen)); } catch (_) { }
             return true;
         }
 
@@ -2392,7 +2396,7 @@ export class SlideManager {
                     savedAt: new Date().toISOString()
                 };
                 // 用 localStorage 即時寫入（同步，不會被頁面關閉中斷）
-                localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+                try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data)); } catch (_) { }
                 // 嘗試用 sendBeacon 通知 DB（best effort）
                 if (this._db && navigator.sendBeacon) {
                     try {
