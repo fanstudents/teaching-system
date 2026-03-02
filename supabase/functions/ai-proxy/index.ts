@@ -1,8 +1,8 @@
 // AI Proxy Edge Function for Supabase
-// 透過 Zeabur AI Hub 使用 Claude API（OpenAI-compatible 格式）
+// 透過 Zeabur AI Hub 使用 Claude API（Anthropic Messages 格式）
 //
 // Zeabur AI Hub endpoint: https://hnd1.aihub.zeabur.ai/
-// 使用 OpenAI Chat Completions 相容格式
+// 認證方式: x-api-key
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
@@ -23,16 +23,28 @@ serve(async (req) => {
     try {
         const { model, messages, temperature, max_tokens } = await req.json();
 
-        // 使用 OpenAI Chat Completions 相容格式（Zeabur AI Hub 支援）
-        const res = await fetch(`${ZEABUR_BASE_URL}/v1/chat/completions`, {
+        // Anthropic 格式：system 要從 messages 拆出來
+        let system = '';
+        const claudeMessages = [];
+        for (const msg of messages) {
+            if (msg.role === 'system') {
+                system += (system ? '\n' : '') + msg.content;
+            } else {
+                claudeMessages.push({ role: msg.role, content: msg.content });
+            }
+        }
+
+        const res = await fetch(`${ZEABUR_BASE_URL}/v1/messages`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${ZEABUR_API_KEY}`,
+                'x-api-key': ZEABUR_API_KEY,
+                'anthropic-version': '2023-06-01',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 model: model || 'claude-sonnet-4-5',
-                messages,
+                messages: claudeMessages,
+                ...(system ? { system } : {}),
                 temperature: temperature ?? 0.7,
                 max_tokens: max_tokens ?? 16000,
             }),
@@ -42,14 +54,14 @@ serve(async (req) => {
 
         if (!res.ok) {
             return new Response(
-                JSON.stringify({ error: data.error?.message || `Zeabur API error: ${res.status}` }),
+                JSON.stringify({ error: data.error?.message || `Zeabur Claude API error: ${res.status}`, detail: data }),
                 { status: res.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
 
-        const text = data.choices?.[0]?.message?.content || '';
+        const text = data.content?.[0]?.text || '';
         return new Response(
-            JSON.stringify({ text, content: text, choices: data.choices, usage: data.usage }),
+            JSON.stringify({ text, content: text }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
