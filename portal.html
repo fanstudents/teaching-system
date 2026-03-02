@@ -518,7 +518,8 @@
             if (config.transportInfo || config.venueAddress || config.venue) {
                 document.getElementById('transportArea').style.display = '';
                 if (config.transportInfo) {
-                    document.getElementById('transportContent').textContent = config.transportInfo;
+                    const linkified = config.transportInfo.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#6366f1;text-decoration:underline;">$1</a>');
+                    document.getElementById('transportContent').innerHTML = linkified;
                 }
                 // Google Maps embed
                 const mapQuery = config.venueAddress || config.venue || '';
