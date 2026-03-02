@@ -641,12 +641,19 @@
                 const { data: questions } = await db.select('survey_questions', { order: 'sort_order.asc', filter });
                 surveyQuestions = questions || [];
 
-                if (currentUser.email) {
+                if (currentUser.email && surveyQuestions.length > 0) {
+                    const qIds = surveyQuestions.map(q => q.id);
                     const { data: responses } = await db.select('survey_responses', {
-                        filter: { student_email: `eq.${currentUser.email}` }
+                        filter: {
+                            student_email: `eq.${currentUser.email}`,
+                            question_id: `in.(${qIds.join(',')})`
+                        }
                     });
-                    if (responses && responses.length > 0) {
+                    if (responses && responses.length >= surveyQuestions.length) {
                         surveySubmitted = true;
+                        responses.forEach(r => { surveyAnswers[r.question_id] = r.answer; });
+                    } else if (responses && responses.length > 0) {
+                        // Partial answers — restore them but don't mark as submitted
                         responses.forEach(r => { surveyAnswers[r.question_id] = r.answer; });
                     }
                 }
