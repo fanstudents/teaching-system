@@ -444,6 +444,18 @@
             </div>
         </div>
 
+        <!-- Checklist Detail -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <div class="dash-section-title">
+                    <span class="material-symbols-rounded">checklist</span> 課前事項完成明細
+                </div>
+            </div>
+            <div id="checklistDetailWrap">
+                <div class="loading">載入中…</div>
+            </div>
+        </div>
+
         <!-- Survey Results -->
         <div class="dash-section">
             <div class="dash-section-header">
@@ -455,6 +467,7 @@
                 <div class="loading">載入中…</div>
             </div>
         </div>
+    </div>
     </div>
 
     <script type="module">
@@ -526,6 +539,7 @@
 
             renderStats();
             renderStudentTable();
+            renderChecklistDetail();
             renderSurveyResults();
         }
 
@@ -627,6 +641,63 @@
             });
 
             html += '</tbody></table>';
+            wrap.innerHTML = html;
+        }
+
+        function renderChecklistDetail() {
+            const wrap = document.getElementById('checklistDetailWrap');
+            if (checklistItems.length === 0) {
+                wrap.innerHTML = '<div class="empty-state">尚無課前事項</div>';
+                return;
+            }
+            if (students.length === 0) {
+                wrap.innerHTML = '<div class="empty-state">尚無學員登錄</div>';
+                return;
+            }
+
+            let html = '';
+
+            // Per-item completion bars
+            checklistItems.forEach((item, idx) => {
+                const completed = students.filter(s =>
+                    checklistProgress.some(cp =>
+                        cp.student_email === s.email && cp.checklist_item_id === item.id && cp.completed
+                    )
+                ).length;
+                const pct = Math.round(completed / students.length * 100);
+                const barW = Math.max(completed / students.length * 100, 0);
+
+                html += `<div class="bar-row" style="margin-bottom:12px;">`;
+                html += `<div class="bar-label"><span>${idx + 1}. ${item.title}</span><span class="bar-stat">${completed}/${students.length} (${pct}%)</span></div>`;
+                html += `<div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:linear-gradient(90deg,#22c55e,#4ade80);"></div></div>`;
+                html += `</div>`;
+            });
+
+            // Student × Item matrix
+            html += `<div style="overflow-x:auto;margin-top:20px;">`;
+            html += `<table class="student-table">`;
+            html += `<thead><tr><th>#</th><th>姓名</th>`;
+            checklistItems.forEach((item, idx) => {
+                const shortTitle = item.title.length > 8 ? item.title.substring(0, 8) + '…' : item.title;
+                html += `<th style="text-align:center;" title="${item.title}">${idx + 1}</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            students.forEach((s, i) => {
+                html += `<tr><td>${i + 1}</td><td style="font-weight:500;color:#e2e8f0;white-space:nowrap;">${s.name || '—'}</td>`;
+                checklistItems.forEach(item => {
+                    const done = checklistProgress.some(cp =>
+                        cp.student_email === s.email && cp.checklist_item_id === item.id && cp.completed
+                    );
+                    html += `<td style="text-align:center;">${done
+                        ? '<span style="color:#4ade80;font-weight:700;">✓</span>'
+                        : '<span style="color:#334155;">✗</span>'
+                        }</td>`;
+                });
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table></div>`;
             wrap.innerHTML = html;
         }
 
