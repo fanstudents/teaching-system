@@ -102,7 +102,7 @@ export class AiSlideGenerator {
             : trimmedOutline;
         const prompts = await this._loadPrompts();
 
-        const BATCH_SIZE = 20;
+        const BATCH_SIZE = 10;
         const totalBatches = Math.ceil(pageCount / BATCH_SIZE);
         const allPlan = [];
 
