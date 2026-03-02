@@ -94,7 +94,12 @@ export class AiSlideGenerator {
     // Phase 1: 生成純文字白底投影片
     // ═══════════════════════════════════════
     async generateContent({ topic, level, pageCount, outline, pdfText }) {
-        const fullOutline = pdfText ? `${outline}\n\n【PDF 內容摘要】\n${pdfText}` : outline;
+        // 截斷防超限：大綱限 3000 字，PDF 限 2000 字
+        const trimmedOutline = (outline || '').substring(0, 3000);
+        const trimmedPdf = pdfText ? pdfText.substring(0, 2000) : '';
+        const fullOutline = trimmedPdf
+            ? `${trimmedOutline}\n\n【PDF 內容摘要】\n${trimmedPdf}`
+            : trimmedOutline;
         const prompts = await this._loadPrompts();
 
         const BATCH_SIZE = 20;
@@ -111,11 +116,14 @@ export class AiSlideGenerator {
             const batchProgress = (batch / totalBatches) * 30;
             this._emit(batchProgress, `規劃第 ${batchStart}-${batchEnd} 頁（第 ${batch + 1}/${totalBatches} 批）...`);
 
-            // 後續批次附帶前面已產生的標題摘要，讓 AI 銜接內容
+            // 後續批次只帶最近 10 頁的標題摘要（避免上下文過長）
             let contextHint = '';
             if (allPlan.length > 0) {
-                const prevTitles = allPlan.map((p, i) => `第${i + 1}頁: ${p.title}`).join('\n');
-                contextHint = `\n\n【已完成的頁面標題】\n${prevTitles}\n\n請從第 ${batchStart} 頁繼續，不要重複已有的內容。`;
+                const recentTitles = allPlan.slice(-10).map((p, i) => {
+                    const realIdx = allPlan.length - 10 + i;
+                    return `第${(realIdx < 0 ? allPlan.length + realIdx : realIdx) + 1}頁: ${p.title}`;
+                }).join('\n');
+                contextHint = `\n\n【最近完成的頁面標題（共已完成 ${allPlan.length} 頁）】\n${recentTitles}\n\n請從第 ${batchStart} 頁繼續，不要重複已有的內容。`;
             }
 
             const prompt = this._replaceVars(prompts.slide_content, {
