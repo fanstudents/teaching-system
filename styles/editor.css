@@ -9,7 +9,14 @@
     position: absolute;
     cursor: move;
     user-select: none;
+    touch-action: none;
+    /* 確保 pointer events 不被觸控手勢攔截 */
     transition: box-shadow var(--transition-fast);
+}
+
+/* 防止子元素（img, svg, span 等）攔截拖曳事件 */
+.editable-element>*:not(.resize-handle) {
+    pointer-events: none;
 }
 
 .editable-element:hover {
@@ -19,6 +26,12 @@
 .editable-element.selected {
     outline: 2px solid var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(74, 122, 232, 0.15);
+}
+
+.text-element.editing>*,
+.text-element[contenteditable="true"]>*,
+.editable-element.editing>* {
+    pointer-events: auto !important;
 }
 
 /* 簡報模式：保留 position:absolute 但禁用編輯交互 */

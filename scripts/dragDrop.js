@@ -26,18 +26,15 @@ export class DragDrop {
     }
 
     setupEventListeners() {
-        // 點擊畫布
-        this.canvasContentEl.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        document.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        // 使用 pointer events + setPointerCapture 確保不會丟失 pointerup
+        this.canvasContentEl.addEventListener('pointerdown', this.handleMouseDown.bind(this));
+        document.addEventListener('pointermove', this.handleMouseMove.bind(this));
+        document.addEventListener('pointerup', this.handleMouseUp.bind(this));
 
-        // 阻止瀏覽器原生圖片/元素拖曳（這會劫持 mouseup 導致拖曳甩不掉）
+        // 阻止瀏覽器原生拖曳（圖片等）
         this.canvasContentEl.addEventListener('dragstart', e => e.preventDefault());
-        this.canvasContentEl.addEventListener('selectstart', e => {
-            if (this.isDragging || this.isResizing) e.preventDefault();
-        });
 
-        // 安全重置：當視窗失焦或滑鼠離開文件時強制結束拖曳
+        // 安全重置
         window.addEventListener('blur', () => this.forceReset());
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) this.forceReset();
@@ -65,6 +62,7 @@ export class DragDrop {
         this.isResizing = false;
         this.activeElement = null;
         this.activeHandle = null;
+        this._pointerId = null;
         document.querySelectorAll('.snap-guide').forEach(g => g.remove());
     }
 
@@ -84,6 +82,10 @@ export class DragDrop {
             this.startTop = parseInt(this.activeElement.style.top) || 0;
             this.startWidth = this.activeElement.offsetWidth;
             this.startHeight = this.activeElement.offsetHeight;
+
+            // 鎖定 pointer — 確保 pointerup 不會丟失
+            this._pointerId = e.pointerId;
+            try { handle.setPointerCapture(e.pointerId); } catch (_) { }
 
             e.preventDefault();
             e.stopPropagation();
@@ -112,6 +114,10 @@ export class DragDrop {
             this.startLeft = parseInt(element.style.left) || 0;
             this.startTop = parseInt(element.style.top) || 0;
 
+            // 鎖定 pointer — 確保 pointerup 不會丟失
+            this._pointerId = e.pointerId;
+            try { element.setPointerCapture(e.pointerId); } catch (_) { }
+
             element.style.cursor = 'grabbing';
             e.preventDefault();
         }
@@ -119,7 +125,7 @@ export class DragDrop {
 
     handleMouseMove(e) {
         if (this.isDragging && this.activeElement) {
-            e.preventDefault(); // 阻止瀏覽器選取文字/圖片拖曳
+            e.preventDefault();
             const dx = e.clientX - this.startX;
             const dy = e.clientY - this.startY;
 
