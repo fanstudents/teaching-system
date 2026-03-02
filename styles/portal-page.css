@@ -233,9 +233,9 @@ body {
 
 /* ── Topbar ── */
 .portal-topbar {
-    background: rgba(15, 15, 19, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(15, 15, 19, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     padding: 12px 24px;
     display: flex;
@@ -392,10 +392,7 @@ body {
     gap: 0;
     margin-bottom: 28px;
     padding: 24px 32px 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
+    background: rgba(30, 30, 40, 0.85);
 }
 
 .timeline-step {
@@ -1907,7 +1904,7 @@ body {
     height: 220px;
     border: none;
     display: block;
-    filter: invert(90%) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+    filter: brightness(0.6) contrast(1.2);
 }
 
 .transport-map-link {
