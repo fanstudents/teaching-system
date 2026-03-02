@@ -1112,6 +1112,18 @@
                             style="padding:10px 12px;border:1px solid var(--border-light);border-radius:8px;font-size:14px;font-family:inherit;">
                     </div>
                 </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-primary);">講師名稱（選填）</label>
+                        <input type="text" id="eventOpenerInstructor" placeholder="例：王小明 老師"
+                            style="padding:10px 12px;border:1px solid var(--border-light);border-radius:8px;font-size:14px;font-family:inherit;">
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-primary);">講師頭像（選填）</label>
+                        <input type="file" id="eventOpenerAvatar" accept="image/*"
+                            style="padding:8px;border:1px solid var(--border-light);border-radius:8px;font-size:12px;">
+                    </div>
+                </div>
                 <button id="eventOpenerInsert"
                     style="margin-top:8px;padding:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
                     <span class="material-symbols-outlined"

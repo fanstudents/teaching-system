@@ -507,12 +507,24 @@ class App {
         eventOverlay?.addEventListener('click', (e) => {
             if (e.target === eventOverlay) eventOverlay.style.display = 'none';
         });
-        document.getElementById('eventOpenerInsert')?.addEventListener('click', () => {
+        document.getElementById('eventOpenerInsert')?.addEventListener('click', async () => {
             const title = document.getElementById('eventOpenerTitle')?.value?.trim();
             if (!title) { this.showToast('請輸入課程標題'); return; }
             const subtitle = document.getElementById('eventOpenerSubtitle')?.value?.trim() || '';
             const wifi = document.getElementById('eventOpenerWifi')?.value?.trim() || '';
             const password = document.getElementById('eventOpenerPassword')?.value?.trim() || '';
+            const instructorName = document.getElementById('eventOpenerInstructor')?.value?.trim() || '';
+
+            // 讀取講師頭像
+            let avatarSrc = '';
+            const avatarFile = document.getElementById('eventOpenerAvatar')?.files?.[0];
+            if (avatarFile) {
+                avatarSrc = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.readAsDataURL(avatarFile);
+                });
+            }
 
             const gen = () => this.slideManager.generateId();
             const elements = [];
@@ -522,15 +534,33 @@ class App {
             // 頂部裝飾線
             elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 80, height: 4, background: '#818cf8' });
             elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 4, height: 30, background: '#818cf8' });
-            // 右上角裝飾圓
-            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 780, y: 30, width: 120, height: 120, background: 'rgba(99,102,241,0.15)' });
-            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 830, y: 60, width: 60, height: 60, background: 'rgba(139,92,246,0.2)' });
             // 左下裝飾
             elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 30, y: 400, width: 100, height: 100, background: 'rgba(99,102,241,0.1)' });
 
+            // ── 右上角：課前入口 QR Code ──
+            const projectId = this.slideManager.projectId || '';
+            const preClassUrl = `${location.origin}/audience.html?id=${projectId}&phase=pre`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(preClassUrl)}&bgcolor=ffffff&color=312e81`;
+            // QR Code 背景卡片
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 740, y: 25, width: 190, height: 190, background: 'rgba(255,255,255,0.08)', borderRadius: 14 });
+            elements.push({
+                id: gen(), type: 'image', x: 775, y: 35, width: 120, height: 120,
+                src: qrApiUrl, label: '課前入口 QR Code'
+            });
+            elements.push({
+                id: gen(), type: 'text', x: 740, y: 160, width: 190, height: 20,
+                content: `<span style="font-size:11px;color:#a5b4fc;text-align:center;display:block;">📱 掃描進入課前頁</span>`,
+                fontSize: 11
+            });
+            elements.push({
+                id: gen(), type: 'text', x: 740, y: 180, width: 190, height: 20,
+                content: `<span style="font-size:9px;color:rgba(255,255,255,0.3);text-align:center;display:block;">完成問卷 · 準備上課</span>`,
+                fontSize: 9
+            });
+
             // 主標題
             elements.push({
-                id: gen(), type: 'text', x: 60, y: 100, width: 840, height: 70,
+                id: gen(), type: 'text', x: 60, y: 100, width: 650, height: 70,
                 content: `<b style="font-size:42px;color:#ffffff;letter-spacing:2px;">${title}</b>`,
                 fontSize: 42, bold: true, textAlign: 'left'
             });
@@ -538,7 +568,7 @@ class App {
             // 副標題
             if (subtitle) {
                 elements.push({
-                    id: gen(), type: 'text', x: 60, y: 180, width: 840, height: 35,
+                    id: gen(), type: 'text', x: 60, y: 180, width: 650, height: 35,
                     content: `<span style="font-size:20px;color:#a5b4fc;">${subtitle}</span>`,
                     fontSize: 20, textAlign: 'left'
                 });
@@ -571,8 +601,34 @@ class App {
                 }
             }
 
+            // ── 講師資訊（右下角）──
+            if (instructorName || avatarSrc) {
+                const yInst = 440;
+                // 講師卡片背景
+                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 680, y: yInst, width: 250, height: 70, background: 'rgba(255,255,255,0.06)', borderRadius: 10 });
+                if (avatarSrc) {
+                    elements.push({
+                        id: gen(), type: 'image', x: 695, y: yInst + 10, width: 50, height: 50,
+                        src: avatarSrc, label: '講師頭像', borderRadius: 25
+                    });
+                }
+                if (instructorName) {
+                    const textX = avatarSrc ? 755 : 695;
+                    elements.push({
+                        id: gen(), type: 'text', x: textX, y: yInst + 12, width: 160, height: 22,
+                        content: `<span style="font-size:10px;color:#818cf8;">講師</span>`,
+                        fontSize: 10
+                    });
+                    elements.push({
+                        id: gen(), type: 'text', x: textX, y: yInst + 32, width: 160, height: 26,
+                        content: `<b style="font-size:16px;color:#ffffff;">${instructorName}</b>`,
+                        fontSize: 16
+                    });
+                }
+            }
+
             // 「課程即將開始」提示
-            const yBottom = 440;
+            const yBottom = instructorName || avatarSrc ? 420 : 440;
             elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: yBottom, width: 12, height: 12, background: '#34d399' });
             elements.push({
                 id: gen(), type: 'text', x: 82, y: yBottom - 4, width: 400, height: 24,
@@ -582,7 +638,7 @@ class App {
 
             // 底部分隔線
             elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yBottom + 30, width: 840, height: 1, background: 'rgba(255,255,255,0.1)' });
-            // 底部日期/講師區
+            // 底部日期
             const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
             elements.push({
                 id: gen(), type: 'text', x: 60, y: yBottom + 40, width: 400, height: 22,

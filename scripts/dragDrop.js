@@ -31,6 +31,18 @@ export class DragDrop {
         document.addEventListener('mousemove', this.handleMouseMove.bind(this));
         document.addEventListener('mouseup', this.handleMouseUp.bind(this));
 
+        // 阻止瀏覽器原生圖片/元素拖曳（這會劫持 mouseup 導致拖曳甩不掉）
+        this.canvasContentEl.addEventListener('dragstart', e => e.preventDefault());
+        this.canvasContentEl.addEventListener('selectstart', e => {
+            if (this.isDragging || this.isResizing) e.preventDefault();
+        });
+
+        // 安全重置：當視窗失焦或滑鼠離開文件時強制結束拖曳
+        window.addEventListener('blur', () => this.forceReset());
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) this.forceReset();
+        });
+
         // 雙擊編輯文字
         this.canvasContentEl.addEventListener('dblclick', this.handleDoubleClick.bind(this));
 
@@ -43,6 +55,17 @@ export class DragDrop {
 
         // 鍵盤事件
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    }
+
+    forceReset() {
+        if (this.isDragging && this.activeElement) {
+            this.activeElement.style.cursor = 'move';
+        }
+        this.isDragging = false;
+        this.isResizing = false;
+        this.activeElement = null;
+        this.activeHandle = null;
+        document.querySelectorAll('.snap-guide').forEach(g => g.remove());
     }
 
     handleMouseDown(e) {
@@ -96,6 +119,7 @@ export class DragDrop {
 
     handleMouseMove(e) {
         if (this.isDragging && this.activeElement) {
+            e.preventDefault(); // 阻止瀏覽器選取文字/圖片拖曳
             const dx = e.clientX - this.startX;
             const dy = e.clientY - this.startY;
 
