@@ -30,6 +30,8 @@ export class DragDrop {
         this.canvasContentEl.addEventListener('pointerdown', this.handleMouseDown.bind(this));
         document.addEventListener('pointermove', this.handleMouseMove.bind(this));
         document.addEventListener('pointerup', this.handleMouseUp.bind(this));
+        // macOS 觸控板快速拖曳時會觸發 pointercancel 而非 pointerup
+        document.addEventListener('pointercancel', this.handleMouseUp.bind(this));
 
         // 阻止瀏覽器原生拖曳（圖片等）
         this.canvasContentEl.addEventListener('dragstart', e => e.preventDefault());
