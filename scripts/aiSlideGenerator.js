@@ -343,54 +343,61 @@ export class AiSlideGenerator {
 
         if (type === 'numbered-list') {
             const items = (page.content || '').split('<br>').filter(Boolean);
-            return {
-                id: gen(), background: '#ffffff',
-                elements: [
-                    // 左側色帶
-                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 45, height: 540, background: c.bg },
-                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 22, width: 5, height: 50, background: c.bar, borderRadius: 2 },
+            const textWidth = page.needsVisual ? 420 : 780;
+            const elements = [
+                // 左側色帶
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 45, height: 540, background: c.bg },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 22, width: 5, height: 50, background: c.bar, borderRadius: 2 },
+                {
+                    id: gen(), type: 'text', x: 78, y: 25, width: 820, height: 45,
+                    content: `<b style="font-size:26px;color:#1e293b">${page.title || ''}</b>`, fontSize: 26
+                },
+                ...items.slice(0, 5).flatMap((item, i) => [
+                    { id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: 90 + i * 85, width: 40, height: 40, background: c.bar },
                     {
-                        id: gen(), type: 'text', x: 78, y: 25, width: 820, height: 45,
-                        content: `<b style="font-size:26px;color:#1e293b">${page.title || ''}</b>`, fontSize: 26
+                        id: gen(), type: 'text', x: 60, y: 94 + i * 85, width: 40, height: 32,
+                        content: `<b style="font-size:18px;color:#fff;text-align:center;display:block">${i + 1}</b>`, fontSize: 18
                     },
-                    ...items.slice(0, 5).flatMap((item, i) => [
-                        { id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: 90 + i * 85, width: 40, height: 40, background: c.bar },
-                        {
-                            id: gen(), type: 'text', x: 60, y: 94 + i * 85, width: 40, height: 32,
-                            content: `<b style="font-size:18px;color:#fff;text-align:center;display:block">${i + 1}</b>`, fontSize: 18
-                        },
-                        {
-                            id: gen(), type: 'text', x: 120, y: 94 + i * 85, width: 780, height: 40,
-                            content: `<span style="font-size:16px;color:#1e293b">${item.trim()}</span>`, fontSize: 16
-                        },
-                    ])
-                ]
-            };
+                    {
+                        id: gen(), type: 'text', x: 120, y: 94 + i * 85, width: textWidth, height: 40,
+                        content: `<span style="font-size:16px;color:#1e293b">${item.trim()}</span>`, fontSize: 16
+                    },
+                ])
+            ];
+            // 預留圖表空間
+            if (page.needsVisual) {
+                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 520, y: 85, width: 400, height: 420, background: '#f8fafc', borderRadius: 12, border: '2px dashed #cbd5e1', _placeholder: 'visual' });
+            }
+            return { id: gen(), background: '#ffffff', elements };
         }
 
         // Default: key-points, practice, dark-content, content
         // 加入左側色帶 + 背景卡片區塊
-        return {
-            id: gen(), background: '#ffffff',
-            elements: [
-                // 左側細色帶
-                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 5, height: 540, background: c.bar },
-                // 標題左側色塊
-                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 25, width: 5, height: 50, background: c.bar, borderRadius: 2 },
-                {
-                    id: gen(), type: 'text', x: 62, y: 30, width: 840, height: 50,
-                    content: `<b style="font-size:28px;color:#1e293b">${page.title || ''}</b>`, fontSize: 28, bold: true
-                },
-                // 內容背景卡片
-                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 95, width: 880, height: 420, background: c.bg, borderRadius: 12 },
-                {
-                    id: gen(), type: 'text', x: 62, y: 110, width: 840, height: 390,
-                    content: `<div style="font-size:17px;color:#475569;line-height:2.2">${page.content || ''}</div>`, fontSize: 17
-                },
-                // 右下角裝飾圓
-                { id: gen(), type: 'shape', shapeType: 'circle', x: 880, y: 470, width: 50, height: 50, background: c.light, opacity: 0.4 },
-            ]
-        };
+        const contentWidth = page.needsVisual ? 420 : 840;
+        const cardWidth = page.needsVisual ? 450 : 880;
+        const elements = [
+            // 左側細色帶
+            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 5, height: 540, background: c.bar },
+            // 標題左側色塊
+            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 25, width: 5, height: 50, background: c.bar, borderRadius: 2 },
+            {
+                id: gen(), type: 'text', x: 62, y: 30, width: 840, height: 50,
+                content: `<b style="font-size:28px;color:#1e293b">${page.title || ''}</b>`, fontSize: 28, bold: true
+            },
+            // 內容背景卡片
+            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 95, width: cardWidth, height: 420, background: c.bg, borderRadius: 12 },
+            {
+                id: gen(), type: 'text', x: 62, y: 110, width: contentWidth, height: 390,
+                content: `<div style="font-size:17px;color:#475569;line-height:2.2">${page.content || ''}</div>`, fontSize: 17
+            },
+            // 右下角裝飾圓
+            { id: gen(), type: 'shape', shapeType: 'circle', x: 880, y: 470, width: 50, height: 50, background: c.light, opacity: 0.4 },
+        ];
+        // 預留圖表空間
+        if (page.needsVisual) {
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 520, y: 95, width: 400, height: 420, background: '#f8fafc', borderRadius: 12, border: '2px dashed #cbd5e1', _placeholder: 'visual' });
+        }
+        return { id: gen(), background: '#ffffff', elements };
     }
 
     // ═══════════════════════════════════════
@@ -497,13 +504,23 @@ export class AiSlideGenerator {
                 const svgCode = svgResult.replace(/```[a-z]*\n?|\n?```/g, '').trim();
                 if (!svgCode.includes('<svg')) continue;
 
-                // 將 SVG 插入該頁
+                // 將 SVG 插入該頁（偵測預留位置）
                 const slide = newSlides[idx];
+                const placeholderIdx = slide.elements.findIndex(e => e._placeholder === 'visual');
+                let svgX = 500, svgY = 120, svgW = 400, svgH = 300;
+                if (placeholderIdx >= 0) {
+                    const ph = slide.elements[placeholderIdx];
+                    svgX = ph.x + 10;
+                    svgY = ph.y + 10;
+                    svgW = ph.width - 20;
+                    svgH = ph.height - 20;
+                    slide.elements.splice(placeholderIdx, 1); // 移除 placeholder
+                }
                 const svgElement = {
                     id: gen(),
                     type: 'svg',
-                    x: 500, y: 120,
-                    width: 400, height: 300,
+                    x: svgX, y: svgY,
+                    width: svgW, height: svgH,
                     svgContent: svgCode,
                     label: v.title || '圖表'
                 };
@@ -1257,9 +1274,15 @@ thank-you    → 結尾頁（總結 + 行動呼籲）
     "slideType": "cover|section|content|two-column|three-card|comparison|quote|numbered-list|thank-you",
     "title": "頁面標題",
     "content": "頁面內容",
-    "day": "所屬天數或章節（選填）"
+    "day": "所屬天數或章節（選填）",
+    "needsVisual": true或false
   }
 ]
+
+══ needsVisual 判斷原則 ══
+- true：該頁內容適合搭配圖表、流程圖、示意圖等視覺化輔助（如：流程、比較、數據、架構）
+- false：封面頁、章節分隔頁、引言頁、結尾頁、三卡片頁、雙欄比較頁（這些版型不適合配圖）
+- 約 30-50% 的 content / numbered-list 頁面標記為 true
 
 ⚠️ 此階段專注內容結構，不需加入互動元件（quiz/poll 等），將由後續階段處理。`,
 
