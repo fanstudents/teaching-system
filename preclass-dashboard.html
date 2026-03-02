@@ -600,6 +600,7 @@
                     <th>課前事項</th>
                     <th>問卷</th>
                     <th>登錄時間</th>
+                    <th></th>
                 </tr></thead><tbody>`;
 
             students.forEach((s, i) => {
@@ -637,6 +638,13 @@
                     <td>${checkBadge}</td>
                     <td>${surveyBadge}</td>
                     <td style="font-size:0.78rem;color:#64748b;">${time}</td>
+                    <td><button onclick="deleteStudent('${s.id}','${(s.email || '').replace(/'/g, "\\'")}')"
+                        style="background:none;border:none;cursor:pointer;color:#64748b;padding:4px;border-radius:6px;transition:all 0.15s;"
+                        onmouseover="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.1)'"
+                        onmouseout="this.style.color='#64748b';this.style.background='none'"
+                        title="刪除此學員資料">
+                        <span class="material-symbols-rounded" style="font-size:18px;">delete</span>
+                    </button></td>
                 </tr>`;
             });
 
@@ -773,6 +781,19 @@
 
             wrap.innerHTML = html;
         }
+
+        window.deleteStudent = async function (studentId, email) {
+            if (!confirm(`確定要刪除學員「${email}」的所有資料嗎？\n（包含課前事項勾選、問卷填答）`)) return;
+            try {
+                // Delete related data first
+                await db.delete('checklist_progress', { student_email: `eq.${email}` });
+                await db.delete('survey_responses', { student_email: `eq.${email}` });
+                await db.delete('students', { id: `eq.${studentId}` });
+                await loadAll();
+            } catch (err) {
+                alert('刪除失敗：' + err.message);
+            }
+        };
 
         window.exportCSV = function () {
             if (!students.length) { alert('尚無資料可匯出'); return; }
