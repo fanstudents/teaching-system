@@ -97,26 +97,49 @@ export class AiSlideGenerator {
         const fullOutline = pdfText ? `${outline}\n\n【PDF 內容摘要】\n${pdfText}` : outline;
         const prompts = await this._loadPrompts();
 
-        this._emit(0, '正在分析大綱，規劃頁面結構...');
-        const prompt = this._replaceVars(prompts.slide_content, {
-            topic, level, pageCount, outline: fullOutline
-        });
+        const BATCH_SIZE = 20;
+        const totalBatches = Math.ceil(pageCount / BATCH_SIZE);
+        const allPlan = [];
 
-        const result = await ai.chat([
-            { role: 'system', content: '你是專業簡報規劃師。只回傳 JSON 陣列，不加任何其他文字或 markdown 標記。' },
-            { role: 'user', content: prompt }
-        ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 16000 });
+        this._emit(0, `正在分析大綱，規劃 ${pageCount} 頁結構（共 ${totalBatches} 批）...`);
 
-        const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
-        const plan = JSON.parse(jsonStr);
-        if (!Array.isArray(plan)) throw new Error('AI 回傳格式不正確');
+        for (let batch = 0; batch < totalBatches; batch++) {
+            const batchStart = batch * BATCH_SIZE + 1;
+            const batchEnd = Math.min((batch + 1) * BATCH_SIZE, pageCount);
+            const batchCount = batchEnd - batchStart + 1;
 
-        this._emit(30, `已規劃 ${plan.length} 頁，正在生成投影片...`);
+            const batchProgress = (batch / totalBatches) * 30;
+            this._emit(batchProgress, `規劃第 ${batchStart}-${batchEnd} 頁（第 ${batch + 1}/${totalBatches} 批）...`);
+
+            // 後續批次附帶前面已產生的標題摘要，讓 AI 銜接內容
+            let contextHint = '';
+            if (allPlan.length > 0) {
+                const prevTitles = allPlan.map((p, i) => `第${i + 1}頁: ${p.title}`).join('\n');
+                contextHint = `\n\n【已完成的頁面標題】\n${prevTitles}\n\n請從第 ${batchStart} 頁繼續，不要重複已有的內容。`;
+            }
+
+            const prompt = this._replaceVars(prompts.slide_content, {
+                topic, level, pageCount: batchCount, outline: fullOutline
+            }) + contextHint;
+
+            const result = await ai.chat([
+                { role: 'system', content: '你是專業簡報規劃師。只回傳 JSON 陣列，不加任何其他文字或 markdown 標記。' },
+                { role: 'user', content: prompt }
+            ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 16000 });
+
+            const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
+            const batchPlan = JSON.parse(jsonStr);
+            if (!Array.isArray(batchPlan)) throw new Error(`第 ${batch + 1} 批 AI 回傳格式不正確`);
+
+            allPlan.push(...batchPlan);
+        }
+
+        this._emit(30, `已規劃 ${allPlan.length} 頁，正在生成投影片...`);
 
         // 轉為純白底投影片
         const gen = () => this.slideManager.generateId();
-        const slides = plan.map((page, idx) => {
-            this._emit(30 + (idx / plan.length) * 60, `生成第 ${idx + 1}/${plan.length} 頁...`);
+        const slides = allPlan.map((page, idx) => {
+            this._emit(30 + (idx / allPlan.length) * 60, `生成第 ${idx + 1}/${allPlan.length} 頁...`);
             page._index = idx;
             return this._makeWhiteSlide(gen, page);
         });
@@ -369,42 +392,63 @@ export class AiSlideGenerator {
         const prompts = await this._loadPrompts();
         this._emit(0, '正在分析哪些頁面需要視覺化...');
 
-        // 提取每頁文字摘要
-        const summaries = slides.map((s, i) => {
-            const texts = (s.elements || [])
-                .filter(e => e.type === 'text')
-                .map(e => (e.content || '').replace(/<[^>]+>/g, '').trim())
-                .filter(Boolean)
-                .join(' ')
-                .substring(0, 200);
-            return `[Slide ${i + 1}] ${texts}`;
-        }).join('\n');
+        const BATCH_SIZE = 25;
+        const totalBatches = Math.ceil(slides.length / BATCH_SIZE);
+        const allVisuals = [];
 
-        const prompt = customPrompt || this._replaceVars(prompts.slide_visual, {
-            slideCount: slides.length,
-            slideSummaries: summaries
-        });
+        for (let batch = 0; batch < totalBatches; batch++) {
+            const start = batch * BATCH_SIZE;
+            const end = Math.min(start + BATCH_SIZE, slides.length);
 
-        const result = await ai.chat([
-            { role: 'system', content: '你是專業的資訊視覺化設計師。只回傳 JSON 陣列，不加任何其他文字。' },
-            { role: 'user', content: prompt }
-        ], { model: 'claude-sonnet-4-5', temperature: 0.6, maxTokens: 16000 });
+            this._emit((batch / totalBatches) * 30, `分析第 ${start + 1}-${end} 頁（第 ${batch + 1}/${totalBatches} 批）...`);
 
-        const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
-        const visuals = JSON.parse(jsonStr);
-        if (!Array.isArray(visuals)) throw new Error('AI 回傳格式不正確');
+            // 提取該批次的文字摘要
+            const summaries = slides.slice(start, end).map((s, i) => {
+                const texts = (s.elements || [])
+                    .filter(e => e.type === 'text')
+                    .map(e => (e.content || '').replace(/<[^>]+>/g, '').trim())
+                    .filter(Boolean)
+                    .join(' ')
+                    .substring(0, 200);
+                return `[Slide ${start + i + 1}] ${texts}`;
+            }).join('\n');
 
-        this._emit(40, `AI 建議為 ${visuals.length} 頁新增圖表...`);
+            const prompt = customPrompt || this._replaceVars(prompts.slide_visual, {
+                slideCount: end - start,
+                slideSummaries: summaries
+            });
+
+            try {
+                const result = await ai.chat([
+                    { role: 'system', content: '你是專業的資訊視覺化設計師。只回傳 JSON 陣列，不加任何其他文字。' },
+                    { role: 'user', content: prompt }
+                ], { model: 'claude-sonnet-4-5', temperature: 0.6, maxTokens: 16000 });
+
+                const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
+                const batchVisuals = JSON.parse(jsonStr);
+                if (Array.isArray(batchVisuals)) {
+                    // 修正 slideIndex 為全域索引
+                    for (const v of batchVisuals) {
+                        v.slideIndex = (v.slideIndex || 0) + start;
+                    }
+                    allVisuals.push(...batchVisuals);
+                }
+            } catch (e) {
+                console.warn(`第 ${batch + 1} 批視覺化分析失敗:`, e);
+            }
+        }
+
+        this._emit(40, `AI 建議為 ${allVisuals.length} 頁新增圖表...`);
 
         const gen = () => this.slideManager.generateId();
         const newSlides = [...slides];
 
-        for (let vi = 0; vi < visuals.length; vi++) {
-            const v = visuals[vi];
+        for (let vi = 0; vi < allVisuals.length; vi++) {
+            const v = allVisuals[vi];
             const idx = v.slideIndex;
             if (idx < 0 || idx >= newSlides.length) continue;
 
-            this._emit(40 + (vi / visuals.length) * 50, `生成第 ${idx + 1} 頁圖表...`);
+            this._emit(40 + (vi / allVisuals.length) * 50, `生成第 ${idx + 1} 頁圖表...`);
 
             // 用 AI 生成 SVG
             try {
@@ -461,7 +505,7 @@ export class AiSlideGenerator {
             }
         }
 
-        this._emit(100, `已為 ${visuals.length} 頁新增圖表`);
+        this._emit(100, `已為 ${allVisuals.length} 頁新增圖表`);
         return newSlides;
     }
 
@@ -835,49 +879,59 @@ export class AiSlideGenerator {
             return this._applyLayoutToSlide(slide, layout);
         });
 
-        // Step 3: AI 美化排版
+        // Step 3: AI 美化排版（分批處理）
         this._emit(60, '正在用 AI 優化排版...');
-        const simplified = layoutSlides.map((s, i) => {
-            const texts = (s.elements || [])
-                .filter(e => e.type === 'text')
-                .map(e => e.content?.replace(/<[^>]+>/g, '') || '')
-                .join(' ')
-                .substring(0, 120);
-            return { index: i, texts };
-        });
+        const DESIGN_BATCH = 30;
+        const designBatches = Math.ceil(layoutSlides.length / DESIGN_BATCH);
 
-        try {
-            const prompt = customPrompt || this._replaceVars(prompts.slide_design, {
-                themeName: theme.name,
-                layoutName: layout.name,
-                themeColors: JSON.stringify(theme.colors),
-                layoutDesc: layout.desc,
-                slidesJson: JSON.stringify(simplified, null, 2)
+        for (let batch = 0; batch < designBatches; batch++) {
+            const start = batch * DESIGN_BATCH;
+            const end = Math.min(start + DESIGN_BATCH, layoutSlides.length);
+
+            this._emit(60 + (batch / designBatches) * 35, `AI 美化第 ${start + 1}-${end} 頁（第 ${batch + 1}/${designBatches} 批）...`);
+
+            const simplified = layoutSlides.slice(start, end).map((s, i) => {
+                const texts = (s.elements || [])
+                    .filter(e => e.type === 'text')
+                    .map(e => e.content?.replace(/<[^>]+>/g, '') || '')
+                    .join(' ')
+                    .substring(0, 120);
+                return { index: start + i, texts };
             });
 
-            const result = await ai.chat([
-                { role: 'system', content: '你是簡報排版美化專家。只回傳修改後的 JSON。' },
-                { role: 'user', content: prompt }
-            ], { model: 'claude-sonnet-4-5', temperature: 0.5, maxTokens: 16000 });
+            try {
+                const prompt = customPrompt || this._replaceVars(prompts.slide_design, {
+                    themeName: theme.name,
+                    layoutName: layout.name,
+                    themeColors: JSON.stringify(theme.colors),
+                    layoutDesc: layout.desc,
+                    slidesJson: JSON.stringify(simplified, null, 2)
+                });
 
-            const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
-            const enhanced = JSON.parse(jsonStr);
+                const result = await ai.chat([
+                    { role: 'system', content: '你是簡報排版美化專家。只回傳修改後的 JSON。' },
+                    { role: 'user', content: prompt }
+                ], { model: 'claude-sonnet-4-5', temperature: 0.5, maxTokens: 16000 });
 
-            if (Array.isArray(enhanced)) {
-                for (const item of enhanced) {
-                    const idx = item.index;
-                    if (idx >= 0 && idx < layoutSlides.length && item.title) {
-                        const titleEl = layoutSlides[idx].elements?.find(el =>
-                            el.type === 'text' && el.fontSize >= 26
-                        );
-                        if (titleEl) {
-                            titleEl.content = titleEl.content.replace(/>(.*?)</, `>${item.title}<`);
+                const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
+                const enhanced = JSON.parse(jsonStr);
+
+                if (Array.isArray(enhanced)) {
+                    for (const item of enhanced) {
+                        const idx = item.index;
+                        if (idx >= 0 && idx < layoutSlides.length && item.title) {
+                            const titleEl = layoutSlides[idx].elements?.find(el =>
+                                el.type === 'text' && el.fontSize >= 26
+                            );
+                            if (titleEl) {
+                                titleEl.content = titleEl.content.replace(/>(.*?)</, `>${item.title}<`);
+                            }
                         }
                     }
                 }
+            } catch (e) {
+                console.warn(`AI 美化第 ${batch + 1} 批失敗，已套用基本色系:`, e);
             }
-        } catch (e) {
-            console.warn('AI 美化失敗，已套用基本色系:', e);
         }
 
         this._emit(100, `已套用「${theme.name}」+「${layout.name}」`);
