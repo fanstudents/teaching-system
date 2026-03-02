@@ -684,7 +684,12 @@
             }).join('');
 
             if (surveySubmitted) {
-                html += '<div class="survey-submit-row"><div class="survey-done"><span class="material-symbols-outlined">check_circle</span> 問卷已完成，感謝您的填寫！</div></div>';
+                html += `<div class="survey-submit-row" style="display:flex;align-items:center;gap:12px;">
+                    <div class="survey-done"><span class="material-symbols-outlined">check_circle</span> 問卷已完成，感謝您的填寫！</div>
+                    <button class="survey-reedit-btn" onclick="window.__reeditSurvey()" style="padding:8px 16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.6);font-size:0.82rem;font-family:inherit;cursor:pointer;white-space:nowrap;">
+                        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">edit</span> 重新填寫
+                    </button>
+                </div>`;
             } else {
                 const answered = surveyQuestions.filter(q => surveyAnswers[q.id] && surveyAnswers[q.id].trim()).length;
                 html += `<div class="survey-progress-row"><span class="survey-progress-text">${answered} / ${surveyQuestions.length} 題已填答</span></div>`;
@@ -730,6 +735,13 @@
             surveyAnswers[qid] = [...current].join(',');
             el.classList.toggle('selected');
             updateSurveyProgress();
+        };
+        window.__reeditSurvey = function () {
+            surveySubmitted = false;
+            // Expand the section if collapsed
+            const section = document.getElementById('surveySection');
+            if (section) section.classList.remove('collapsed');
+            renderSurvey();
         };
         window.__surveyAnswer = function (qid, value) {
             if (!surveySubmitted) {
