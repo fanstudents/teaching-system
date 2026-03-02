@@ -470,10 +470,10 @@ export const ai = {
     async chat(messages, opts = {}) {
         const maxRetries = 3;
         const body = JSON.stringify({
-            model: opts.model || 'gpt-4o',
+            model: opts.model || 'claude-sonnet-4-5',
             messages,
             temperature: opts.temperature ?? 0.7,
-            max_tokens: opts.maxTokens ?? 2000,
+            max_tokens: opts.maxTokens ?? 4096,
         });
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-proxy`, {

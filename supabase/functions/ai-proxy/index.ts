@@ -1,11 +1,13 @@
 // AI Proxy Edge Function for Supabase
-// 支援 OpenAI 和 Anthropic Claude API
+// 透過 Zeabur AI Hub 使用 Claude API
 //
-// 環境變數:
-//   OPENAI_API_KEY   — OpenAI key（model 帶 gpt / o1 / o3 時用）
-//   ANTHROPIC_API_KEY — Claude key（model 帶 claude 時用）
+// Zeabur AI Hub endpoint: https://hnd1.aihub.zeabur.ai/
+// 使用 Anthropic Messages API 格式
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+
+const ZEABUR_BASE_URL = 'https://hnd1.aihub.zeabur.ai';
+const ZEABUR_API_KEY = 'sk-CYwvqJAEhySFAYcksFAi0Q';
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -20,81 +22,31 @@ serve(async (req) => {
 
     try {
         const { model, messages, temperature, max_tokens } = await req.json();
-        const modelName = (model || 'gpt-4o-mini').toLowerCase();
 
-        // ── Route: Claude ──
-        if (modelName.includes('claude')) {
-            const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
-            if (!ANTHROPIC_API_KEY) {
-                return new Response(
-                    JSON.stringify({ error: 'ANTHROPIC_API_KEY not configured' }),
-                    { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-                );
+        // Anthropic 格式：system 要從 messages 拆出來
+        let system = '';
+        const claudeMessages = [];
+        for (const msg of messages) {
+            if (msg.role === 'system') {
+                system += (system ? '\n' : '') + msg.content;
+            } else {
+                claudeMessages.push({ role: msg.role, content: msg.content });
             }
-
-            // Anthropic 格式：system 要從 messages 拆出來
-            let system = '';
-            const claudeMessages = [];
-            for (const msg of messages) {
-                if (msg.role === 'system') {
-                    system += (system ? '\n' : '') + msg.content;
-                } else {
-                    claudeMessages.push({ role: msg.role, content: msg.content });
-                }
-            }
-
-            const res = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'x-api-key': ANTHROPIC_API_KEY,
-                    'anthropic-version': '2023-06-01',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model: model || 'claude-sonnet-4-20250514',
-                    messages: claudeMessages,
-                    ...(system ? { system } : {}),
-                    temperature: temperature ?? 0.7,
-                    max_tokens: max_tokens ?? 2000,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                return new Response(
-                    JSON.stringify({ error: data.error?.message || 'Anthropic API error' }),
-                    { status: res.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-                );
-            }
-
-            const text = data.content?.[0]?.text || '';
-            return new Response(
-                JSON.stringify({ text, content: text }),
-                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
         }
 
-        // ── Route: OpenAI (default) ──
-        const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-        if (!OPENAI_API_KEY) {
-            return new Response(
-                JSON.stringify({ error: 'OPENAI_API_KEY not configured' }),
-                { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-        }
-
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        const res = await fetch(`${ZEABUR_BASE_URL}/v1/messages`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'x-api-key': ZEABUR_API_KEY,
+                'anthropic-version': '2023-06-01',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: model || 'gpt-4o-mini',
-                messages,
+                model: model || 'claude-sonnet-4-5',
+                messages: claudeMessages,
+                ...(system ? { system } : {}),
                 temperature: temperature ?? 0.7,
-                max_tokens: max_tokens ?? 2000,
+                max_tokens: max_tokens ?? 4096,
             }),
         });
 
@@ -102,14 +54,14 @@ serve(async (req) => {
 
         if (!res.ok) {
             return new Response(
-                JSON.stringify({ error: data.error?.message || 'OpenAI API error' }),
+                JSON.stringify({ error: data.error?.message || `Zeabur Claude API error: ${res.status}` }),
                 { status: res.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
 
-        const text = data.choices?.[0]?.message?.content || '';
+        const text = data.content?.[0]?.text || '';
         return new Response(
-            JSON.stringify({ text, content: text, choices: data.choices, usage: data.usage }),
+            JSON.stringify({ text, content: text }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 

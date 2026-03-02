@@ -82,7 +82,7 @@ export class NewsCrawler {
             result = await ai.chat([
                 { role: 'system', content: '你是專業科技新聞研究員，擅長搜尋整理最新資訊。只回傳 JSON 陣列，不加任何其他文字或 markdown。' },
                 { role: 'user', content: prompt }
-            ], { model: 'gpt-4o', temperature: 0.3, maxTokens: 6000 });
+            ], { model: 'claude-sonnet-4-5', temperature: 0.3, maxTokens: 6000 });
         } catch (e) {
             console.error('AI 新聞查詢失敗:', e);
             throw new Error('AI 新聞查詢失敗，請檢查網路或 API 設定');

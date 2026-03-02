@@ -87,7 +87,7 @@ export class SlideAPI {
         const result = await ai.chat([
             { role: 'system', content: '你是簡報編輯助手。根據指令修改投影片內容。回傳 JSON: { "title": "新標題", "body": "<div>新內容 HTML</div>" }' },
             { role: 'user', content: `目前內容：${texts.join(' | ')}\n\n指令：${instruction}` }
-        ], { model: 'gpt-4o', temperature: 0.4, maxTokens: 1000 });
+        ], { model: 'claude-sonnet-4-5', temperature: 0.4, maxTokens: 1000 });
 
         const json = JSON.parse(result.replace(/```json\n?|\n?```/g, '').trim());
         return this.editSlide(index, json);

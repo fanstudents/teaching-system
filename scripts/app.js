@@ -1720,7 +1720,7 @@ class App {
             const result = await ai.chat([
                 { role: 'system', content: '你是教育內容生成器，只回傳 JSON，不加任何額外說明。' },
                 { role: 'user', content: prompt }
-            ], { model: 'openai/gpt-4o-mini', temperature: 0.8 });
+            ], { model: 'claude-haiku-4-5', temperature: 0.8 });
 
             // 解析 JSON
             const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
