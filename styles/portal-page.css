@@ -1880,16 +1880,10 @@ body {
 
 .section-body {
     overflow: visible;
-    transition: max-height 0.4s ease, opacity 0.3s ease, overflow 0s 0s;
-    opacity: 1;
-    max-height: none;
 }
 
 .collapsible.collapsed .section-body {
-    max-height: 0;
-    opacity: 0;
-    padding: 0;
-    overflow: hidden;
+    display: none;
 }
 
 /* ── Transport Map ── */
