@@ -37,7 +37,7 @@ serve(async (req) => {
         const res = await fetch(`${ZEABUR_BASE_URL}/v1/messages`, {
             method: 'POST',
             headers: {
-                'x-api-key': ZEABUR_API_KEY,
+                'Authorization': `Bearer ${ZEABUR_API_KEY}`,
                 'anthropic-version': '2023-06-01',
                 'Content-Type': 'application/json',
             },
