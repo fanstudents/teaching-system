@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課前統計儀表板 — 數位簡報室</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: #0f0f17;
+            color: #e8e8ed;
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .dash-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 28px;
+            background: rgba(15, 15, 23, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .dash-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dash-topbar-left .brand {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a5b4fc;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dash-topbar-left .course-name {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 12px;
+        }
+
+        .dash-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            font-size: 0.82rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-export {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #6366f1;
+            color: #fff;
+            font-size: 0.82rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-export:hover {
+            background: #818cf8;
+        }
+
+        /* ── Container ── */
+        .dash-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 24px;
+        }
+
+        /* ── Stat Cards ── */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent, #6366f1);
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .stat-value small {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #94a3b8;
+            margin-left: 4px;
+        }
+
+        .stat-sub {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* ── Section ── */
+        .dash-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .dash-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .dash-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .dash-section-title .material-symbols-rounded {
+            font-size: 20px;
+            color: #a5b4fc;
+        }
+
+        /* ── Student Table ── */
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .student-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .student-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+        }
+
+        .student-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge-done {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+        }
+
+        .badge-partial {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: rgba(255, 183, 77, 0.15);
+            color: #ffb74d;
+        }
+
+        .badge-none {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06);
+            color: #64748b;
+        }
+
+        /* ── Survey Charts ── */
+        .survey-q-card {
+            padding: 18px;
+            margin-bottom: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+        }
+
+        .survey-q-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .type-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        .survey-q-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .survey-q-count {
+            margin-left: auto;
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        .bar-row {
+            margin-bottom: 8px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            margin-bottom: 3px;
+        }
+
+        .bar-label .bar-stat {
+            color: #64748b;
+        }
+
+        .bar-track {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Text responses */
+        .text-responses {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .text-resp-item {
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+        }
+
+        .text-resp-email {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-right: 8px;
+        }
+
+        /* ── Empty / Loading ── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .dash-topbar {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .dash-container {
+                padding: 16px 12px;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .student-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dash-topbar">
+        <div class="dash-topbar-left">
+            <div class="brand">
+                <span class="material-symbols-rounded" style="font-size:22px;">bar_chart</span>
+                課前統計
+            </div>
+            <div class="course-name" id="courseName"></div>
+        </div>
+        <div class="dash-topbar-right">
+            <button class="btn-refresh" onclick="loadAll()">
+                <span class="material-symbols-rounded" style="font-size:16px;">refresh</span> 重新整理
+            </button>
+            <button class="btn-export" onclick="exportCSV()">
+                <span class="material-symbols-rounded" style="font-size:16px;">download</span> 匯出 CSV
+            </button>
+        </div>
+    </div>
+
+    <div class="dash-container">
+        <!-- Stat Cards -->
+        <div class="stat-grid" id="statGrid">
+            <div class="stat-card" style="--accent:#6366f1;">
+                <div class="stat-label">已登錄學員</div>
+                <div class="stat-value" id="statStudents">-</div>
+            </div>
+            <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-label">課前事項完成</div>
+                <div class="stat-value" id="statChecklist">-</div>
+                <div class="stat-sub" id="statChecklistSub"></div>
+            </div>
+            <div class="stat-card" style="--accent:#f59e0b;">
+                <div class="stat-label">問卷已填</div>
+                <div class="stat-value" id="statSurvey">-</div>
+                <div class="stat-sub" id="statSurveySub"></div>
+            </div>
+            <div class="stat-card" style="--accent:#ec4899;">
+                <div class="stat-label">課前事項數</div>
+                <div class="stat-value" id="statItems">-</div>
+            </div>
+        </div>
+
+        <!-- Student Detail Table -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <div class="dash-section-title">
+                    <span class="material-symbols-rounded">group</span> 學員報到與完成狀態
+                </div>
+            </div>
+            <div id="studentTableWrap">
+                <div class="loading">載入中…</div>
+            </div>
+        </div>
+
+        <!-- Survey Results -->
+        <div class="dash-section">
+            <div class="dash-section-header">
+                <div class="dash-section-title">
+                    <span class="material-symbols-rounded">quiz</span> 問卷填答統計
+                </div>
+            </div>
+            <div id="surveyResultsWrap">
+                <div class="loading">載入中…</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        const params = new URLSearchParams(location.search);
+        const code = params.get('code');
+        const sessionCode = params.get('session');
+
+        let students = [], checklistItems = [], checklistProgress = [];
+        let surveyQuestions = [], surveyResponses = [];
+        let projectName = '';
+
+        async function loadAll() {
+            // Load project info
+            if (code) {
+                const { data: pData } = await db.select('projects', {
+                    filter: { join_code: `eq.${code}` }, limit: 1
+                });
+                if (pData?.[0]) {
+                    projectName = pData[0].name;
+                    document.getElementById('courseName').textContent = projectName + (sessionCode ? ` — ${sessionCode}` : '');
+                }
+            }
+
+            // Determine filter key for session-scoped data
+            const sessionFilter = sessionCode ? { session_code: `eq.${sessionCode}` } : {};
+
+            // Load students for this session
+            const { data: sData } = await db.select('students', {
+                filter: sessionCode
+                    ? { session_code: `eq.${sessionCode}` }
+                    : {},
+                order: 'created_at.asc'
+            });
+            students = sData || [];
+
+            // Load checklist items
+            const { data: ciData } = await db.select('checklist_items', {
+                filter: sessionCode ? { session_code: `eq.${sessionCode}` } : {},
+                order: 'sort_order.asc'
+            });
+            checklistItems = ciData || [];
+
+            // Load checklist progress (for all students)
+            if (checklistItems.length > 0) {
+                const { data: cpData } = await db.select('checklist_progress', {});
+                checklistProgress = cpData || [];
+            } else {
+                checklistProgress = [];
+            }
+
+            // Load survey questions
+            const { data: sqData } = await db.select('survey_questions', {
+                filter: sessionCode ? { session_code: `eq.${sessionCode}` } : {},
+                order: 'sort_order.asc'
+            });
+            surveyQuestions = sqData || [];
+
+            // Load survey responses
+            if (surveyQuestions.length > 0) {
+                const { data: srData } = await db.select('survey_responses', {
+                    filter: { question_id: `in.(${surveyQuestions.map(q => q.id).join(',')})` }
+                });
+                surveyResponses = srData || [];
+            } else {
+                surveyResponses = [];
+            }
+
+            renderStats();
+            renderStudentTable();
+            renderSurveyResults();
+        }
+
+        function renderStats() {
+            // Students count
+            document.getElementById('statStudents').textContent = students.length;
+
+            // Checklist completeness
+            if (checklistItems.length === 0 || students.length === 0) {
+                document.getElementById('statChecklist').innerHTML = '—';
+                document.getElementById('statChecklistSub').textContent = '';
+            } else {
+                const ciIds = new Set(checklistItems.map(c => c.id));
+                let fullComplete = 0;
+                students.forEach(s => {
+                    const myProgress = checklistProgress.filter(cp =>
+                        cp.student_email === s.email && ciIds.has(cp.checklist_item_id) && cp.completed
+                    );
+                    if (myProgress.length >= checklistItems.length) fullComplete++;
+                });
+                const pct = Math.round(fullComplete / students.length * 100);
+                document.getElementById('statChecklist').innerHTML = `${fullComplete}<small>/ ${students.length}</small>`;
+                document.getElementById('statChecklistSub').textContent = `${pct}% 全部完成`;
+            }
+
+            // Survey completeness
+            if (surveyQuestions.length === 0 || students.length === 0) {
+                document.getElementById('statSurvey').innerHTML = '—';
+                document.getElementById('statSurveySub').textContent = '';
+            } else {
+                const surveyEmails = new Set(surveyResponses.map(r => r.student_email));
+                const filled = students.filter(s => surveyEmails.has(s.email)).length;
+                const pct = Math.round(filled / students.length * 100);
+                document.getElementById('statSurvey').innerHTML = `${filled}<small>/ ${students.length}</small>`;
+                document.getElementById('statSurveySub').textContent = `${pct}% 已填答`;
+            }
+
+            // Item count
+            document.getElementById('statItems').textContent = checklistItems.length;
+        }
+
+        function renderStudentTable() {
+            const wrap = document.getElementById('studentTableWrap');
+            if (students.length === 0) {
+                wrap.innerHTML = '<div class="empty-state">尚無學員登錄</div>';
+                return;
+            }
+
+            const ciIds = new Set(checklistItems.map(c => c.id));
+            const surveyEmails = new Set(surveyResponses.map(r => r.student_email));
+            const totalItems = checklistItems.length;
+
+            let html = `<table class="student-table">
+                <thead><tr>
+                    <th>#</th>
+                    <th>姓名</th>
+                    <th>Email</th>
+                    <th>課前事項</th>
+                    <th>問卷</th>
+                    <th>登錄時間</th>
+                </tr></thead><tbody>`;
+
+            students.forEach((s, i) => {
+                // Checklist progress
+                const myChecked = checklistProgress.filter(cp =>
+                    cp.student_email === s.email && ciIds.has(cp.checklist_item_id) && cp.completed
+                ).length;
+                let checkBadge;
+                if (totalItems === 0) {
+                    checkBadge = '<span class="badge-none">—</span>';
+                } else if (myChecked >= totalItems) {
+                    checkBadge = `<span class="badge-done">✓ 全部完成</span>`;
+                } else if (myChecked > 0) {
+                    checkBadge = `<span class="badge-partial">${myChecked}/${totalItems}</span>`;
+                } else {
+                    checkBadge = `<span class="badge-none">未開始</span>`;
+                }
+
+                // Survey status
+                const hasSurvey = surveyEmails.has(s.email);
+                const surveyBadge = surveyQuestions.length === 0
+                    ? '<span class="badge-none">—</span>'
+                    : hasSurvey
+                        ? '<span class="badge-done">✓ 已填</span>'
+                        : '<span class="badge-none">未填</span>';
+
+                const time = s.created_at ? new Date(s.created_at).toLocaleString('zh-TW', {
+                    month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                }) : '—';
+
+                html += `<tr>
+                    <td>${i + 1}</td>
+                    <td style="font-weight:500;color:#e2e8f0;">${s.name || '—'}</td>
+                    <td style="font-size:0.8rem;color:#94a3b8;">${s.email || '—'}</td>
+                    <td>${checkBadge}</td>
+                    <td>${surveyBadge}</td>
+                    <td style="font-size:0.78rem;color:#64748b;">${time}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+        }
+
+        function renderSurveyResults() {
+            const wrap = document.getElementById('surveyResultsWrap');
+            if (surveyQuestions.length === 0) {
+                wrap.innerHTML = '<div class="empty-state">尚無問卷題目</div>';
+                return;
+            }
+
+            const byQ = {};
+            surveyResponses.forEach(r => {
+                if (!byQ[r.question_id]) byQ[r.question_id] = [];
+                byQ[r.question_id].push(r);
+            });
+
+            let html = '';
+            surveyQuestions.forEach((q, idx) => {
+                const responses = byQ[q.id] || [];
+                const typeLabel = { choice: '單選', multi_select: '複選', truefalse: '是非', fillblank: '簡答' }[q.question_type] || q.question_type;
+
+                html += `<div class="survey-q-card">`;
+                html += `<div class="survey-q-header">`;
+                html += `<span class="type-badge">${typeLabel}</span>`;
+                html += `<span class="survey-q-text">Q${idx + 1}. ${q.question_text}</span>`;
+                html += `<span class="survey-q-count">${responses.length} 則回覆</span>`;
+                html += `</div>`;
+
+                if (['choice', 'multi_select', 'truefalse'].includes(q.question_type)) {
+                    let options;
+                    if (q.question_type === 'truefalse') {
+                        options = ['是', '否'];
+                    } else {
+                        try { options = JSON.parse(q.options || '[]'); } catch { options = []; }
+                    }
+                    const counts = {};
+                    options.forEach(o => counts[o] = 0);
+                    responses.forEach(r => {
+                        if (q.question_type === 'multi_select' && r.answer) {
+                            r.answer.split(',').forEach(a => { counts[a] = (counts[a] || 0) + 1; });
+                        } else if (r.answer) {
+                            counts[r.answer] = (counts[r.answer] || 0) + 1;
+                        }
+                    });
+                    const maxCount = Math.max(...Object.values(counts), 1);
+                    options.forEach(opt => {
+                        const count = counts[opt] || 0;
+                        const pct = responses.length ? Math.round(count / responses.length * 100) : 0;
+                        const barW = Math.max(count / maxCount * 100, 0);
+                        html += `<div class="bar-row">`;
+                        html += `<div class="bar-label"><span>${opt}</span><span class="bar-stat">${count} 票 (${pct}%)</span></div>`;
+                        html += `<div class="bar-track"><div class="bar-fill" style="width:${barW}%"></div></div>`;
+                        html += `</div>`;
+                    });
+                } else {
+                    // fillblank
+                    if (responses.length === 0) {
+                        html += `<div style="color:#64748b;font-size:0.82rem;">尚無回覆</div>`;
+                    } else {
+                        html += `<div class="text-responses">`;
+                        responses.forEach(r => {
+                            html += `<div class="text-resp-item">`;
+                            html += `<span class="text-resp-email">${r.student_email}</span>`;
+                            html += `${r.answer || '<em style="color:#475569;">未填寫</em>'}`;
+                            html += `</div>`;
+                        });
+                        html += `</div>`;
+                    }
+                }
+
+                html += `</div>`;
+            });
+
+            wrap.innerHTML = html;
+        }
+
+        window.exportCSV = function () {
+            if (!students.length) { alert('尚無資料可匯出'); return; }
+            const ciIds = checklistItems.map(c => c.id);
+            const surveyEmails = new Set(surveyResponses.map(r => r.student_email));
+            const qMap = {};
+            surveyQuestions.forEach((q, i) => qMap[q.id] = i);
+            const srByEmail = {};
+            surveyResponses.forEach(r => {
+                if (!srByEmail[r.student_email]) srByEmail[r.student_email] = new Array(surveyQuestions.length).fill('');
+                const idx = qMap[r.question_id];
+                if (idx !== undefined) srByEmail[r.student_email][idx] = r.answer || '';
+            });
+
+            const headers = [
+                'Email', '姓名',
+                ...checklistItems.map(c => `事項: ${c.title}`),
+                '課前事項完成度',
+                ...surveyQuestions.map((q, i) => `Q${i + 1}: ${q.question_text}`),
+                '問卷已填'
+            ];
+            const rows = [headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',')];
+            students.forEach(s => {
+                const checks = ciIds.map(id => {
+                    const cp = checklistProgress.find(p => p.student_email === s.email && p.checklist_item_id === id && p.completed);
+                    return cp ? '✓' : '';
+                });
+                const totalChecked = checks.filter(c => c === '✓').length;
+                const checkPct = checklistItems.length > 0 ? `${totalChecked}/${checklistItems.length}` : '—';
+                const answers = srByEmail[s.email] || new Array(surveyQuestions.length).fill('');
+                const hasSurvey = surveyEmails.has(s.email) ? '✓' : '';
+                const row = [
+                    s.email || '', s.name || '',
+                    ...checks, checkPct,
+                    ...answers, hasSurvey
+                ];
+                rows.push(row.map(v => `"${(v || '').replace(/"/g, '""')}"`).join(','));
+            });
+            const bom = '\uFEFF';
+            const blob = new Blob([bom + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `課前統計_${sessionCode || code || 'all'}.csv`;
+            a.click();
+        };
+
+        window.loadAll = loadAll;
+        loadAll();
+    </script>
+</body>
+
+</html>

@@ -691,6 +691,9 @@
                             <span class="tree-session-date">${s.date || '未設定'} ${s.time || ''}</span>
                             <span class="tree-session-loc">${loc}</span>
                             <span class="tree-session-code">${s.session_code || ''}</span>
+                            <a class="btn btn-sm" href="preclass-dashboard.html?code=${p.join_code}&session=${s.session_code}" title="課前統計">
+                                <span class="material-symbols-outlined">bar_chart</span>
+                            </a>
                             <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}&session=${s.session_code}" title="管理">
                                 <span class="material-symbols-outlined">settings</span>
                             </a>
