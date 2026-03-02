@@ -396,9 +396,10 @@
                 <div class="form-field">
                     <label>題型</label>
                     <select id="surveyType" onchange="toggleSurveyOptions()">
-                        <option value="choice">選擇</option>
-                        <option value="truefalse">是非</option>
-                        <option value="fillblank">簡答</option>
+                        <option value="choice">單選題</option>
+                        <option value="multi_select">複選題</option>
+                        <option value="truefalse">是非題</option>
+                        <option value="fillblank">文字留言</option>
                     </select>
                 </div>
                 <div class="form-field">
@@ -838,11 +839,11 @@
                 const defaults = [
                     { question_type: 'fillblank', question_text: '您目前的公司名稱與職級為何？（例如：OO公司 行銷主管）', sort_order: 1 },
                     { question_type: 'choice', question_text: '您目前使用 AI 工具的頻率？', options: JSON.stringify(['每天都用', '每週幾次', '偶爾使用', '很少使用', '從未使用過']), sort_order: 2 },
-                    { question_type: 'choice', question_text: '您目前使用過哪些 AI 工具？（可複選）', options: JSON.stringify(['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Midjourney / DALL-E', 'Notion AI', 'Perplexity', 'Make / Zapier 自動化', '都沒用過', '其他']), sort_order: 3 },
+                    { question_type: 'multi_select', question_text: '您目前使用過哪些 AI 工具？', options: JSON.stringify(['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Midjourney / DALL-E', 'Notion AI', 'Perplexity', 'Make / Zapier 自動化', '都沒用過', '其他']), sort_order: 3 },
                     { question_type: 'fillblank', question_text: '您目前工作中，覺得 AI 最有可能應用在哪些場景？（可列舉 2-3 個）', sort_order: 4 },
-                    { question_type: 'choice', question_text: '您最想在這堂課中學習哪些內容？（可複選）', options: JSON.stringify(['Prompt 工程技巧', 'AI 文案撰寫', 'AI 圖像生成', 'AI 數據分析', 'AI 簡報製作', 'AI 自動化流程', 'AI 程式開發輔助', '其他']), sort_order: 5 },
+                    { question_type: 'multi_select', question_text: '您最想在這堂課中學習哪些內容？', options: JSON.stringify(['Prompt 工程技巧', 'AI 文案撰寫', 'AI 圖像生成', 'AI 數據分析', 'AI 簡報製作', 'AI 自動化流程', 'AI 程式開發輔助', '其他']), sort_order: 5 },
                     { question_type: 'fillblank', question_text: '您希望在課程中解決什麼具體的工作問題？（越具體越好）', sort_order: 6 },
-                    { question_type: 'choice', question_text: '您偏好的學習方式？（可複選）', options: JSON.stringify(['講師示範後自己操作', '直接動手做再討論', '看案例分析', '小組討論', '一對一指導']), sort_order: 7 },
+                    { question_type: 'multi_select', question_text: '您偏好的學習方式？', options: JSON.stringify(['講師示範後自己操作', '直接動手做再討論', '看案例分析', '小組討論', '一對一指導']), sort_order: 7 },
                     { question_type: 'fillblank', question_text: '對本次課程有什麼期待或想對講師說的話？（選填）', sort_order: 8 },
                 ];
                 try {
@@ -858,9 +859,10 @@
                     return;
                 }
                 const typeBadges = {
-                    choice: '<span class="item-badge badge-choice">選擇</span>',
+                    choice: '<span class="item-badge badge-choice">單選</span>',
+                    multi_select: '<span class="item-badge" style="background:#dbeafe;color:#2563eb;">複選</span>',
                     truefalse: '<span class="item-badge badge-truefalse">是非</span>',
-                    fillblank: '<span class="item-badge badge-fillblank">簡答</span>'
+                    fillblank: '<span class="item-badge badge-fillblank">文字</span>'
                 };
                 list.innerHTML = surveyQuestions.map((q, i) => {
                     const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
@@ -941,6 +943,9 @@
                     `;
                     }
                 }
+                // Update label hint
+                const label = field.querySelector('label');
+                if (label) label.textContent = type === 'multi_select' ? '選項（學生可複選）' : '選項';
             };
 
             window.addOption = function () {

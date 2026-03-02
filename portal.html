@@ -657,9 +657,20 @@
             let html = surveyQuestions.map((q, i) => {
                 const answered = surveyAnswers[q.id] || '';
                 let optionsHtml = '';
+                const isMulti = q.question_type === 'multi_select';
+                const selectedSet = isMulti ? new Set(answered.split(',').filter(Boolean)) : new Set();
+
                 if (q.question_type === 'fillblank') {
                     optionsHtml = `<textarea class="sq-textarea" data-qid="${q.id}" placeholder="請輸入您的回答…" ${surveySubmitted ? 'disabled' : ''} onchange="window.__surveyAnswer('${q.id}', this.value)">${answered}</textarea>`;
+                } else if (isMulti) {
+                    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                    optionsHtml = '<div class="sq-options">' + opts.map(opt => `
+                        <div class="sq-option ${selectedSet.has(opt) ? 'selected' : ''}" data-qid="${q.id}" data-value="${opt}" data-multi="true" ${surveySubmitted ? '' : `onclick="window.__toggleMultiOption(this)"`}>
+                            <span class="checkbox"></span> ${opt}
+                        </div>
+                    `).join('') + '</div>';
                 } else {
+                    // choice + truefalse → single select
                     const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
                     optionsHtml = '<div class="sq-options">' + opts.map(opt => `
                         <div class="sq-option ${answered === opt ? 'selected' : ''}" data-qid="${q.id}" data-value="${opt}" ${surveySubmitted ? '' : `onclick="window.__selectOption(this)"`}>
@@ -667,7 +678,8 @@
                         </div>
                     `).join('') + '</div>';
                 }
-                const typeHint = q.question_type !== 'fillblank' ? '<span style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-left:6px;">(單選)</span>' : '';
+                const typeLabels = { choice: '單選', truefalse: '是非', multi_select: '複選', fillblank: '' };
+                const typeHint = typeLabels[q.question_type] ? `<span style="font-size:0.72rem;color:rgba(255,255,255,0.3);margin-left:6px;">(${typeLabels[q.question_type]})</span>` : '';
                 return `<div class="survey-question"><div class="sq-text"><span class="sq-num">${i + 1}.</span> <span>${q.question_text}</span>${typeHint}</div>${optionsHtml}</div>`;
             }).join('');
 
@@ -708,6 +720,15 @@
             el.closest('.sq-options').querySelectorAll('.sq-option').forEach(o => {
                 o.classList.toggle('selected', o.dataset.value === value);
             });
+            updateSurveyProgress();
+        };
+        window.__toggleMultiOption = function (el) {
+            if (surveySubmitted) return;
+            const qid = el.dataset.qid, value = el.dataset.value;
+            const current = new Set((surveyAnswers[qid] || '').split(',').filter(Boolean));
+            if (current.has(value)) { current.delete(value); } else { current.add(value); }
+            surveyAnswers[qid] = [...current].join(',');
+            el.classList.toggle('selected');
             updateSurveyProgress();
         };
         window.__surveyAnswer = function (qid, value) {
