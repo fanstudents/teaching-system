@@ -371,31 +371,93 @@ export class AiSlideGenerator {
             return { id: gen(), background: '#ffffff', elements };
         }
 
-        // Default: key-points, practice, dark-content, content
-        // 加入左側色帶 + 背景卡片區塊
+        // Default: content 版型 — 依 page index 輪替 4 種風格
         const contentWidth = page.needsVisual ? 420 : 840;
         const cardWidth = page.needsVisual ? 450 : 880;
-        const elements = [
-            // 左側細色帶
-            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 5, height: 540, background: c.bar },
-            // 標題左側色塊
-            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 25, width: 5, height: 50, background: c.bar, borderRadius: 2 },
-            {
-                id: gen(), type: 'text', x: 62, y: 30, width: 840, height: 50,
-                content: `<b style="font-size:28px;color:#1e293b">${page.title || ''}</b>`, fontSize: 28, bold: true
-            },
-            // 內容背景卡片
-            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 95, width: cardWidth, height: 420, background: c.bg, borderRadius: 12 },
-            {
-                id: gen(), type: 'text', x: 62, y: 110, width: contentWidth, height: 390,
-                content: `<div style="font-size:17px;color:#475569;line-height:2.2">${page.content || ''}</div>`, fontSize: 17
-            },
-            // 右下角裝飾圓
-            { id: gen(), type: 'shape', shapeType: 'circle', x: 880, y: 470, width: 50, height: 50, background: c.light, opacity: 0.4 },
-        ];
+        const variant = (page._index || 0) % 4;
+
+        // 文字層次處理：第一個要點加粗放大
+        const rawContent = page.content || '';
+        const lines = rawContent.split('<br>').filter(Boolean);
+        let styledContent;
+        if (lines.length > 1) {
+            const firstLine = `<b style="font-size:19px;color:#1e293b">${lines[0]}</b>`;
+            const rest = lines.slice(1).map(l => `<span style="font-size:16px;color:#475569">${l}</span>`).join('<br>');
+            styledContent = `<div style="line-height:2.4">${firstLine}<br>${rest}</div>`;
+        } else {
+            styledContent = `<div style="font-size:17px;color:#475569;line-height:2.2">${rawContent}</div>`;
+        }
+
+        let elements;
+
+        if (variant === 0) {
+            // ── 風格 A：深色標題色塊 + 白底內容 ──
+            elements = [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 90, background: c.bar },
+                {
+                    id: gen(), type: 'text', x: 50, y: 20, width: 860, height: 55,
+                    content: `<b style="font-size:30px;color:#ffffff">${page.title || ''}</b>`, fontSize: 30, bold: true
+                },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 110, width: cardWidth, height: 400, background: c.bg, borderRadius: 12 },
+                {
+                    id: gen(), type: 'text', x: 60, y: 125, width: contentWidth, height: 370,
+                    content: styledContent, fontSize: 17
+                },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 520, width: 960, height: 20, background: c.light },
+            ];
+        } else if (variant === 1) {
+            // ── 風格 B：左側寬色帶 (60px) + 大標題 ──
+            elements = [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 60, height: 540, background: c.bar },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 0, width: 10, height: 540, background: c.light },
+                {
+                    id: gen(), type: 'text', x: 90, y: 25, width: 820, height: 55,
+                    content: `<b style="font-size:30px;color:#1e293b">${page.title || ''}</b>`, fontSize: 30, bold: true
+                },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 90, y: 85, width: 120, height: 4, background: c.bar, borderRadius: 2 },
+                {
+                    id: gen(), type: 'text', x: 90, y: 105, width: contentWidth, height: 400,
+                    content: styledContent, fontSize: 17
+                },
+            ];
+        } else if (variant === 2) {
+            // ── 風格 C：全幅色塊標題區 (140px) + 下方內容卡片 ──
+            elements = [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 140, background: c.bg },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 135, width: 960, height: 6, background: c.bar },
+                {
+                    id: gen(), type: 'text', x: 50, y: 40, width: 860, height: 70,
+                    content: `<b style="font-size:32px;color:${c.bar}">${page.title || ''}</b>`, fontSize: 32, bold: true
+                },
+                {
+                    id: gen(), type: 'text', x: 60, y: 165, width: contentWidth, height: 350,
+                    content: styledContent, fontSize: 17
+                },
+                // 右下裝飾
+                { id: gen(), type: 'shape', shapeType: 'circle', x: 870, y: 10, width: 60, height: 60, background: c.bar, opacity: 0.15 },
+                { id: gen(), type: 'shape', shapeType: 'circle', x: 850, y: 460, width: 80, height: 80, background: c.light, opacity: 0.3 },
+            ];
+        } else {
+            // ── 風格 D：左側色帶 + 內容卡片（原始風格但加強） ──
+            elements = [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 5, height: 540, background: c.bar },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 25, width: 5, height: 50, background: c.bar, borderRadius: 2 },
+                {
+                    id: gen(), type: 'text', x: 62, y: 28, width: 840, height: 55,
+                    content: `<b style="font-size:30px;color:#1e293b">${page.title || ''}</b>`, fontSize: 30, bold: true
+                },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 95, width: cardWidth, height: 420, background: c.bg, borderRadius: 12 },
+                {
+                    id: gen(), type: 'text', x: 62, y: 110, width: contentWidth, height: 390,
+                    content: styledContent, fontSize: 17
+                },
+                { id: gen(), type: 'shape', shapeType: 'circle', x: 880, y: 470, width: 50, height: 50, background: c.light, opacity: 0.4 },
+            ];
+        }
+
         // 預留圖表空間
         if (page.needsVisual) {
-            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 520, y: 95, width: 400, height: 420, background: '#f8fafc', borderRadius: 12, border: '2px dashed #cbd5e1', _placeholder: 'visual' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 520, y: variant === 0 ? 110 : 95, width: 400, height: variant === 0 ? 400 : 420, background: '#f8fafc', borderRadius: 12, border: '2px dashed #cbd5e1', _placeholder: 'visual' });
         }
         return { id: gen(), background: '#ffffff', elements };
     }
@@ -524,7 +586,7 @@ export class AiSlideGenerator {
                         const imgPrompt = `Generate an image: ${v.description || v.title}. Style: clean flat illustration, professional, suitable for a teaching presentation slide. No text in the image. White or transparent background.`;
                         const imgResult = await ai.chat([
                             { role: 'user', content: imgPrompt }
-                        ], { model: 'gemini-2.5-flash-image', maxTokens: 4096 });
+                        ], { model: 'gemini-3-pro-image-preview', maxTokens: 4096 });
 
                         // Zeabur 回傳 choices[0].message.images[0].image_url.url (base64)
                         // 但 ai.chat 只回傳 text，需要從原始 response 取圖片
@@ -536,7 +598,7 @@ export class AiSlideGenerator {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
-                                model: 'gemini-2.5-flash-image',
+                                model: 'gemini-3-pro-image-preview',
                                 messages: [{ role: 'user', content: imgPrompt }],
                                 max_tokens: 4096,
                             }),
@@ -1336,26 +1398,35 @@ thank-you    → 結尾頁（總結 + 行動呼籲）
 {{slideSummaries}}
 
 ══ 你的任務 ══
-分析每頁內容，找出「用圖表比文字更有效」的頁面，為其設計專業圖表。
+分析每頁內容，找出「視覺化效果優於純文字」的頁面，為其建議圖表或圖片。
 
-══ 圖表類型指南 ══
+══ 視覺化類型 ══
 
-| 類型 | 最佳用途 | 資料結構描述 |
-|------|----------|-------------|
-| flowchart | 流程、決策路徑、SOP | 描述節點名稱、箭頭方向、分支條件 |
-| hierarchy | 組織架構、分類體系 | 描述根節點、子節點、層級關係 |
-| comparison | 兩方比較、優劣分析 | 描述左右兩方名稱、各自 3-4 個特點 |
-| stats | 數據趨勢、百分比分布 | 描述具體數字、單位、趨勢方向 |
-| timeline | 發展歷程、里程碑 | 描述時間點、事件名稱、關鍵數據 |
-| infographic | 綜合資訊、多維數據 | 描述指標名稱、數值、圖標建議 |
-| cycle | 循環流程、迭代過程 | 描述各階段名稱、順序、關聯 |
-| venn | 概念重疊、交集關係 | 描述各集合名稱、共同特點 |
+【SVG 圖表】資料/流程/結構性內容
+| chartType | 用途 |
+|-----------|------|
+| flowchart | 流程、SOP |
+| hierarchy | 組織架構、分類 |
+| comparison | 兩方比較 |
+| stats | 數據趨勢 |
+| timeline | 發展歷程 |
+| cycle | 循環流程 |
+| venn | 概念交集 |
+
+【AI 圖片】概念/場景/氛圍
+| chartType | 用途 |
+|-----------|------|
+| illustration | 概念卡通示意圖 |
+| concept | 技術概念視覺化隱喻 |
+| scene | 真實場景或應用情境 |
 
 ══ 選擇原則 ══
-1. 只為「視覺化效果明顯優於文字」的頁面建議圖表
-2. 封面、章節頁、結尾頁不需要圖表
-3. 整份簡報建議 3-6 個圖表（{{slideCount}} 頁以下取 2-3 個）
-4. description 必須包含足夠的「資料細節」讓 SVG 生成器能畫出具體圖表
+1. 只為「視覺化效果明顯優於文字」的頁面建議
+2. 封面、章節頁、結尾頁不需要
+3. 整份簡報建議 3-8 個視覺化（混搭 SVG 和圖片）
+4. 資料/流程/結構 → SVG 圖表類型
+5. 抽象概念/場景 → AI 圖片類型
+6. description 要足夠詳細
    ✅ 好："流程圖：需求分析 → 系統設計 → 開發測試 → 上線部署 → 迭代優化，各階段標注預計天數"
    ❌ 差："畫一個流程圖"
 
