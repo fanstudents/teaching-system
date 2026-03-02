@@ -366,6 +366,28 @@
                     <li class="empty-msg">載入中…</li>
                 </ul>
             </div>
+
+            <!-- ═══════ 問卷填答結果 ═══════ -->
+            <div class="setup-section" id="surveyResultsSection">
+                <div class="setup-section-header">
+                    <div class="setup-section-title">
+                        <span class="material-symbols-rounded">bar_chart</span> 填答結果
+                        <span id="respondentCount"
+                            style="font-weight:400;font-size:0.82rem;color:#64748b;margin-left:8px;"></span>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-sm btn-outline" onclick="loadSurveyResults()">
+                            <span class="material-symbols-rounded" style="font-size:16px;">refresh</span> 重新整理
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="exportSurveyCSV()">
+                            <span class="material-symbols-rounded" style="font-size:16px;">download</span> 匯出 CSV
+                        </button>
+                    </div>
+                </div>
+                <div id="surveyResultsBody" style="margin-top:8px;">
+                    <div class="empty-msg" style="color:#94a3b8;font-size:0.85rem;">載入中…</div>
+                </div>
+            </div>
         </div>
 
         <!-- Modal：新增/編輯清單項目 -->
@@ -418,7 +440,8 @@
                                 type="text" class="opt-input" placeholder="選項 2"><button type="button" class="opt-del"
                                 onclick="removeOption(this)" title="刪除">✕</button></div>
                     </div>
-                    <button class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="addOption()">+ 新增選項</button>
+                    <button class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="addOption()">+
+                        新增選項</button>
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-outline" onclick="closeModal('surveyModal')">取消</button>
@@ -1060,9 +1083,127 @@
                 });
             });
 
+            // ══════════════════════════════════════
+            //   Survey Results Viewer
+            // ══════════════════════════════════════
+            let cachedResponses = [];
+
+            async function loadSurveyResults() {
+                const body = document.getElementById('surveyResultsBody');
+                body.innerHTML = '<div class="empty-msg" style="color:#94a3b8;font-size:0.85rem;">載入中…</div>';
+                try {
+                    const { data } = await db.select('survey_responses', {
+                        filter: surveyQuestions.length ? { question_id: `in.(${surveyQuestions.map(q => q.id).join(',')})` } : {}
+                    });
+                    cachedResponses = data || [];
+                    if (cachedResponses.length === 0) {
+                        body.innerHTML = '<div class="empty-msg" style="color:#94a3b8;font-size:0.85rem;">尚無學員填答</div>';
+                        document.getElementById('respondentCount').textContent = '';
+                        return;
+                    }
+                    // Count unique respondents
+                    const emails = new Set(cachedResponses.map(r => r.student_email));
+                    document.getElementById('respondentCount').textContent = `共 ${emails.size} 人填答`;
+
+                    // Group by question
+                    const byQ = {};
+                    cachedResponses.forEach(r => {
+                        if (!byQ[r.question_id]) byQ[r.question_id] = [];
+                        byQ[r.question_id].push(r);
+                    });
+
+                    let html = '';
+                    surveyQuestions.forEach((q, idx) => {
+                        const responses = byQ[q.id] || [];
+                        const typeLabel = { choice: '單選', multi_select: '複選', truefalse: '是非', fillblank: '簡答' }[q.question_type] || q.question_type;
+                        html += `<div style="margin-bottom:20px;padding:16px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">`;
+                        html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">`;
+                        html += `<span style="background:#e0e7ff;color:#4338ca;font-size:0.72rem;font-weight:600;padding:2px 8px;border-radius:4px;">${typeLabel}</span>`;
+                        html += `<span style="font-size:0.9rem;font-weight:600;color:#1e293b;">Q${idx + 1}. ${q.question_text}</span>`;
+                        html += `<span style="margin-left:auto;font-size:0.78rem;color:#94a3b8;">${responses.length} 則回覆</span>`;
+                        html += `</div>`;
+
+                        if (['choice', 'multi_select', 'truefalse'].includes(q.question_type)) {
+                            // Bar chart for option-based questions
+                            let options;
+                            if (q.question_type === 'truefalse') {
+                                options = ['是', '否'];
+                            } else {
+                                try { options = JSON.parse(q.options || '[]'); } catch { options = []; }
+                            }
+                            // Count answers
+                            const counts = {};
+                            options.forEach(o => counts[o] = 0);
+                            responses.forEach(r => {
+                                if (q.question_type === 'multi_select' && r.answer) {
+                                    r.answer.split(',').forEach(a => { counts[a] = (counts[a] || 0) + 1; });
+                                } else if (r.answer) {
+                                    counts[r.answer] = (counts[r.answer] || 0) + 1;
+                                }
+                            });
+                            const maxCount = Math.max(...Object.values(counts), 1);
+                            options.forEach(opt => {
+                                const count = counts[opt] || 0;
+                                const pct = responses.length ? Math.round(count / responses.length * 100) : 0;
+                                const barW = Math.max(count / maxCount * 100, 0);
+                                html += `<div style="margin-bottom:6px;">`;
+                                html += `<div style="display:flex;justify-content:space-between;font-size:0.82rem;color:#475569;margin-bottom:2px;">`;
+                                html += `<span>${opt}</span><span style="color:#94a3b8;">${count} 票 (${pct}%)</span>`;
+                                html += `</div>`;
+                                html += `<div style="background:#e2e8f0;border-radius:4px;height:8px;overflow:hidden;">`;
+                                html += `<div style="width:${barW}%;height:100%;background:linear-gradient(90deg,#6366f1,#818cf8);border-radius:4px;transition:width 0.4s;"></div>`;
+                                html += `</div></div>`;
+                            });
+                        } else {
+                            // Text list for fillblank
+                            if (responses.length === 0) {
+                                html += `<div style="font-size:0.82rem;color:#94a3b8;">尚無回覆</div>`;
+                            } else {
+                                html += `<div style="max-height:200px;overflow-y:auto;">`;
+                                responses.forEach(r => {
+                                    html += `<div style="padding:8px 10px;margin-bottom:4px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;font-size:0.82rem;color:#334155;">`;
+                                    html += `<span style="color:#94a3b8;font-size:0.75rem;margin-right:6px;">${r.student_email}</span>`;
+                                    html += `${r.answer || '<em style="color:#cbd5e1;">未填寫</em>'}`;
+                                    html += `</div>`;
+                                });
+                                html += `</div>`;
+                            }
+                        }
+                        html += `</div>`;
+                    });
+                    body.innerHTML = html;
+                } catch (err) {
+                    body.innerHTML = `<div class="empty-msg" style="color:#d93025;font-size:0.85rem;">載入失敗：${err.message}</div>`;
+                }
+            }
+
+            function exportSurveyCSV() {
+                if (!cachedResponses.length) { alert('尚無填答資料可匯出'); return; }
+                // Build: Email | Q1 | Q2 | ...
+                const qMap = {};
+                surveyQuestions.forEach((q, i) => qMap[q.id] = i);
+                const byEmail = {};
+                cachedResponses.forEach(r => {
+                    if (!byEmail[r.student_email]) byEmail[r.student_email] = new Array(surveyQuestions.length).fill('');
+                    const idx = qMap[r.question_id];
+                    if (idx !== undefined) byEmail[r.student_email][idx] = r.answer || '';
+                });
+                const headers = ['Email', ...surveyQuestions.map((q, i) => `Q${i + 1}: ${q.question_text}`)];
+                const rows = [headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',')];
+                Object.entries(byEmail).forEach(([email, answers]) => {
+                    rows.push([`"${email}"`, ...answers.map(a => `"${(a || '').replace(/"/g, '""')}"`),].join(','));
+                });
+                const bom = '\uFEFF';
+                const blob = new Blob([bom + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `課前問卷填答結果_${dataCode || 'all'}.csv`;
+                a.click();
+            }
+
             // ── Init ──
             loadChecklist();
-            loadSurvey();
+            loadSurvey().then(() => loadSurveyResults());
         </script>
     </div><!-- /admin-main -->
     <script src="components/nav.js"></script>
