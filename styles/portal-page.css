@@ -2,6 +2,11 @@
    portal.html — 學習入口頁面（重新設計）
    ======================================== */
 
+html,
+body {
+    overflow-x: hidden;
+}
+
 body {
     background: #0f0f13;
     color: #e8e8ed;
