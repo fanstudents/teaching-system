@@ -417,7 +417,7 @@ export class AiSlideGenerator {
 
             this._emit((batch / totalBatches) * 30, `分析第 ${start + 1}-${end} 頁（第 ${batch + 1}/${totalBatches} 批）...`);
 
-            // 提取該批次的文字摘要
+            // 提取該批次的文字摘要（使用 0-based 局部索引）
             const summaries = slides.slice(start, end).map((s, i) => {
                 const texts = (s.elements || [])
                     .filter(e => e.type === 'text')
@@ -425,7 +425,7 @@ export class AiSlideGenerator {
                     .filter(Boolean)
                     .join(' ')
                     .substring(0, 200);
-                return `[Slide ${start + i + 1}] ${texts}`;
+                return `[${i}] ${texts}`;
             }).join('\n');
 
             const prompt = customPrompt || this._replaceVars(prompts.slide_visual, {
@@ -435,14 +435,14 @@ export class AiSlideGenerator {
 
             try {
                 const result = await ai.chat([
-                    { role: 'system', content: '你是專業的資訊視覺化設計師。只回傳 JSON 陣列，不加任何其他文字。' },
+                    { role: 'system', content: '你是專業的資訊視覺化設計師。只回傳 JSON 陣列，不加任何其他文字。slideIndex 必須使用上面摘要的方括號內的數字（0-based 索引），不要自行編號。' },
                     { role: 'user', content: prompt }
                 ], { model: 'claude-sonnet-4-5', temperature: 0.6, maxTokens: 16000 });
 
                 const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
                 const batchVisuals = JSON.parse(jsonStr);
                 if (Array.isArray(batchVisuals)) {
-                    // 修正 slideIndex 為全域索引
+                    // 將批次局部索引轉為全域索引
                     for (const v of batchVisuals) {
                         v.slideIndex = (v.slideIndex || 0) + start;
                     }
@@ -458,18 +458,34 @@ export class AiSlideGenerator {
         const gen = () => this.slideManager.generateId();
         const newSlides = [...slides];
 
+        const SVG_TYPES = ['flowchart', 'hierarchy', 'comparison', 'stats', 'timeline', 'infographic', 'cycle', 'venn'];
+
         for (let vi = 0; vi < allVisuals.length; vi++) {
             const v = allVisuals[vi];
             const idx = v.slideIndex;
             if (idx < 0 || idx >= newSlides.length) continue;
 
-            this._emit(40 + (vi / allVisuals.length) * 50, `生成第 ${idx + 1} 頁圖表...`);
+            const visualType = v.chartType || v.type || '';
+            const isSvg = SVG_TYPES.includes(visualType);
 
-            // 用 AI 生成 SVG
+            this._emit(40 + (vi / allVisuals.length) * 50, `生成第 ${idx + 1} 頁${isSvg ? '圖表' : '圖片'}...`);
+
+            const slide = newSlides[idx];
+            const placeholderIdx = slide.elements.findIndex(e => e._placeholder === 'visual');
+            let vX = 500, vY = 120, vW = 400, vH = 300;
+            if (placeholderIdx >= 0) {
+                const ph = slide.elements[placeholderIdx];
+                vX = ph.x + 10; vY = ph.y + 10;
+                vW = ph.width - 20; vH = ph.height - 20;
+                slide.elements.splice(placeholderIdx, 1);
+            }
+
             try {
-                const svgResult = await ai.chat([
-                    {
-                        role: 'system', content: `你是頂級的 SVG 資訊圖表設計師，擅長將資料轉為清晰美觀的向量圖形。
+                if (isSvg) {
+                    // ── SVG 圖表生成（flowchart, stats 等資料型圖表）──
+                    const svgResult = await ai.chat([
+                        {
+                            role: 'system', content: `你是頂級的 SVG 資訊圖表設計師，擅長將資料轉為清晰美觀的向量圖形。
 
 ══ SVG 規格 ══
 1. viewBox="0 0 400 300"（固定尺寸）
@@ -481,56 +497,83 @@ export class AiSlideGenerator {
 ══ 配色指南 ══
 • 主色系：#6366f1(靛藍), #8b5cf6(紫), #0d9488(青), #f59e0b(琥珀), #ef4444(珊瑚)
 • 背景：透明（不要加背景矩形）
-• 避免過於飽和的原色（純紅/純藍/純綠）
-• 使用漸層或半透明增加質感
 
 ══ 設計規則 ══
-• 節點/方框：圓角 rx="6"
-• 連接線/箭頭：使用 stroke-width="2"
-• 文字要居中對齊
-• 流程圖箭頭要有 marker-end
-• 留白充足，不要擠在一起` },
-                    {
-                        role: 'user', content: `請生成以下圖表的 SVG：
-
-類型：${v.chartType || v.type}
+• 節點/方框：圓角 rx="6"，連接線 stroke-width="2"
+• 文字居中對齊，留白充足` },
+                        {
+                            role: 'user', content: `請生成以下圖表的 SVG：
+類型：${visualType}
 主題：${v.title || v.description}
 具體資料：${v.dataPoints || v.content || v.description}
+注意：圖表必須包含具體的節點名稱和數據標籤。`
+                        }
+                    ], { model: 'claude-sonnet-4-5', temperature: 0.5, maxTokens: 4000 });
 
-注意：圖表必須包含具體的節點名稱、數據標籤，不能只有佔位符。`
+                    const svgCode = svgResult.replace(/```[a-z]*\n?|\n?```/g, '').trim();
+                    if (!svgCode.includes('<svg')) continue;
+
+                    slide.elements.push({
+                        id: gen(), type: 'svg',
+                        x: vX, y: vY, width: vW, height: vH,
+                        svgContent: svgCode, label: v.title || '圖表'
+                    });
+                } else {
+                    // ── AI 圖片生成（illustration, concept, scene 等卡通/示意圖）──
+                    try {
+                        const imgPrompt = `Generate an image: ${v.description || v.title}. Style: clean flat illustration, professional, suitable for a teaching presentation slide. No text in the image. White or transparent background.`;
+                        const imgResult = await ai.chat([
+                            { role: 'user', content: imgPrompt }
+                        ], { model: 'gemini-2.5-flash-image', maxTokens: 4096 });
+
+                        // Zeabur 回傳 choices[0].message.images[0].image_url.url (base64)
+                        // 但 ai.chat 只回傳 text，需要從原始 response 取圖片
+                        // 改用直接 fetch
+                        const imgRes = await fetch(`https://hnd1.aihub.zeabur.ai/v1/chat/completions`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer sk-CYwvqJAEhySFAYcksFAi0Q`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                model: 'gemini-2.5-flash-image',
+                                messages: [{ role: 'user', content: imgPrompt }],
+                                max_tokens: 4096,
+                            }),
+                        });
+                        const imgData = await imgRes.json();
+                        const imageUrl = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url || '';
+
+                        if (imageUrl) {
+                            slide.elements.push({
+                                id: gen(), type: 'image',
+                                x: vX, y: vY, width: vW, height: vH,
+                                src: imageUrl, label: v.title || '圖片'
+                            });
+                        }
+                    } catch (imgErr) {
+                        console.warn(`圖片生成失敗 (slide ${idx})，改用 SVG:`, imgErr);
+                        // fallback: 用 SVG 代替
+                        const svgResult = await ai.chat([
+                            { role: 'system', content: '你是 SVG 設計師。viewBox="0 0 400 300"，只回傳 <svg>...</svg>。' },
+                            { role: 'user', content: `生成一個簡單的示意圖 SVG：${v.title || v.description}` }
+                        ], { model: 'claude-haiku-4-5', temperature: 0.5, maxTokens: 3000 });
+                        const svgCode = svgResult.replace(/```[a-z]*\n?|\n?```/g, '').trim();
+                        if (svgCode.includes('<svg')) {
+                            slide.elements.push({
+                                id: gen(), type: 'svg',
+                                x: vX, y: vY, width: vW, height: vH,
+                                svgContent: svgCode, label: v.title || '圖表'
+                            });
+                        }
                     }
-                ], { model: 'claude-sonnet-4-5', temperature: 0.5, maxTokens: 4000 });
-
-                const svgCode = svgResult.replace(/```[a-z]*\n?|\n?```/g, '').trim();
-                if (!svgCode.includes('<svg')) continue;
-
-                // 將 SVG 插入該頁（偵測預留位置）
-                const slide = newSlides[idx];
-                const placeholderIdx = slide.elements.findIndex(e => e._placeholder === 'visual');
-                let svgX = 500, svgY = 120, svgW = 400, svgH = 300;
-                if (placeholderIdx >= 0) {
-                    const ph = slide.elements[placeholderIdx];
-                    svgX = ph.x + 10;
-                    svgY = ph.y + 10;
-                    svgW = ph.width - 20;
-                    svgH = ph.height - 20;
-                    slide.elements.splice(placeholderIdx, 1); // 移除 placeholder
                 }
-                const svgElement = {
-                    id: gen(),
-                    type: 'svg',
-                    x: svgX, y: svgY,
-                    width: svgW, height: svgH,
-                    svgContent: svgCode,
-                    label: v.title || '圖表'
-                };
-                slide.elements.push(svgElement);
             } catch (e) {
-                console.warn(`SVG 生成失敗 (slide ${idx}):`, e);
+                console.warn(`視覺生成失敗 (slide ${idx}):`, e);
             }
         }
 
-        this._emit(100, `已為 ${allVisuals.length} 頁新增圖表`);
+        this._emit(100, `已為 ${allVisuals.length} 頁新增視覺元素`);
         return newSlides;
     }
 
