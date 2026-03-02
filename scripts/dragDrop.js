@@ -54,6 +54,9 @@ export class DragDrop {
 
         // 鍵盤事件
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
+
+        // 縮圖被點擊時，取消選取畫布元素
+        window.addEventListener('thumbnailClicked', () => this.editor.deselectAll());
     }
 
     forceReset() {

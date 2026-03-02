@@ -1957,6 +1957,8 @@ export class SlideManager {
             });
 
             thumb.addEventListener('click', (e) => {
+                // 取消選取畫布上的元素，讓 Delete 可以刪除頁面
+                window.dispatchEvent(new CustomEvent('thumbnailClicked'));
                 if (e.shiftKey && this._lastClickedIndex >= 0) {
                     // Shift+Click: 範圍選取
                     const from = Math.min(this._lastClickedIndex, index);
@@ -1974,10 +1976,12 @@ export class SlideManager {
                     this._lastClickedIndex = index;
                     this._updateMultiSelectUI();
                 } else {
-                    // 普通 Click: 清除多選，切換投影片
+                    // 普通 Click: 清除多選，選取當前，切換投影片
                     this.selectedSlideIndices.clear();
+                    this.selectedSlideIndices.add(index);
                     this._lastClickedIndex = index;
                     this.navigateTo(index);
+                    this._updateMultiSelectUI();
                 }
             });
 
