@@ -46,7 +46,7 @@ serve(async (req) => {
                 messages: claudeMessages,
                 ...(system ? { system } : {}),
                 temperature: temperature ?? 0.7,
-                max_tokens: max_tokens ?? 4096,
+                max_tokens: max_tokens ?? 16000,
             }),
         });
 

@@ -105,7 +105,7 @@ export class AiSlideGenerator {
         const result = await ai.chat([
             { role: 'system', content: '你是專業簡報規劃師。只回傳 JSON 陣列，不加任何其他文字或 markdown 標記。' },
             { role: 'user', content: prompt }
-        ], { model: 'claude-haiku-4-5', temperature: 0.7, maxTokens: 8000 });
+        ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 16000 });
 
         const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
         const plan = JSON.parse(jsonStr);
@@ -388,7 +388,7 @@ export class AiSlideGenerator {
         const result = await ai.chat([
             { role: 'system', content: '你是專業的資訊視覺化設計師。只回傳 JSON 陣列，不加任何其他文字。' },
             { role: 'user', content: prompt }
-        ], { model: 'claude-sonnet-4-5', temperature: 0.6, maxTokens: 8000 });
+        ], { model: 'claude-sonnet-4-5', temperature: 0.6, maxTokens: 16000 });
 
         const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
         const visuals = JSON.parse(jsonStr);
@@ -858,7 +858,7 @@ export class AiSlideGenerator {
             const result = await ai.chat([
                 { role: 'system', content: '你是簡報排版美化專家。只回傳修改後的 JSON。' },
                 { role: 'user', content: prompt }
-            ], { model: 'claude-haiku-4-5', temperature: 0.5, maxTokens: 6000 });
+            ], { model: 'claude-sonnet-4-5', temperature: 0.5, maxTokens: 16000 });
 
             const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
             const enhanced = JSON.parse(jsonStr);
