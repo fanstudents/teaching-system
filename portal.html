@@ -667,7 +667,8 @@
                         </div>
                     `).join('') + '</div>';
                 }
-                return `<div class="survey-question"><div class="sq-text"><span class="sq-num">${i + 1}.</span> <span>${q.question_text}</span></div>${optionsHtml}</div>`;
+                const typeHint = q.question_type !== 'fillblank' ? '<span style="font-size:0.75rem;color:rgba(255,255,255,0.3);margin-left:6px;">(單選)</span>' : '';
+                return `<div class="survey-question"><div class="sq-text"><span class="sq-num">${i + 1}.</span> <span>${q.question_text}</span>${typeHint}</div>${optionsHtml}</div>`;
             }).join('');
 
             if (surveySubmitted) {
