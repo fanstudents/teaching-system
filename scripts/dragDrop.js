@@ -126,6 +126,12 @@ export class DragDrop {
     }
 
     handleMouseMove(e) {
+        // ★ 終極保險：如果滑鼠按鈕已放開但 isDragging 仍為 true，強制停止
+        if ((this.isDragging || this.isResizing) && e.buttons === 0) {
+            this.forceReset();
+            return;
+        }
+
         if (this.isDragging && this.activeElement) {
             e.preventDefault();
             const dx = e.clientX - this.startX;
