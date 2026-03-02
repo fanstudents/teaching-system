@@ -4,9 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學習入口 — 教學系統</title>
-    <meta name="description" content="學員學習入口，查看課程資訊與學習進度">
+    <title>學習入口 — 數位簡報室</title>
+    <meta name="description" content="數位簡報室 — 互動式教學簡報系統，即時簡報、互動練習、課後追蹤">
     <meta name="robots" content="noindex, nofollow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="數位簡報室 — 學習入口">
+    <meta property="og:description" content="互動式教學簡報系統，即時簡報、互動練習、課後追蹤">
+    <meta property="og:image" content="https://tbr.digital/og-image.png">
+    <meta property="og:url" content="https://tbr.digital">
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -75,7 +80,7 @@
                 <div class="topbar-brand-icon">
                     <span class="material-symbols-outlined">school</span>
                 </div>
-                <span class="topbar-brand-text" id="topbarCourseName">課程名稱</span>
+                <span class="topbar-brand-text" id="topbarCourseName">數位簡報室</span>
             </div>
             <div class="topbar-right">
                 <span class="topbar-phase-badge pre-class" id="topbarPhaseBadge">
@@ -361,7 +366,6 @@
             document.getElementById('mainContent').classList.remove('hidden');
 
             // UI bindings
-            document.getElementById('topbarCourseName').textContent = project.name;
             document.getElementById('heroTitle').textContent = project.name;
             document.getElementById('topbarAvatar').textContent = (currentUser.name || '?')[0];
             document.getElementById('topbarUserName').textContent = currentUser.name;
@@ -503,7 +507,11 @@
             const config = await getCourseConfig(code, db, sessionParam);
             if (config.date) document.getElementById('infoDate').textContent = config.date;
             if (config.time) document.getElementById('infoTime').textContent = config.time;
-            if (config.venue) document.getElementById('infoVenue').textContent = config.venue;
+            if (config.venue) {
+                const venueEl = document.getElementById('infoVenue');
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.venue)}`;
+                venueEl.innerHTML = `<a href="${mapUrl}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.25);text-underline-offset:3px;">${config.venue}</a>`;
+            }
             if (config.instructor) document.getElementById('infoInstructor').textContent = config.instructor;
 
             // Transport + Map

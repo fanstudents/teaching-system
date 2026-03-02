@@ -409,8 +409,14 @@
                 <div class="form-field" id="optionsField">
                     <label>選項</label>
                     <div id="optionsEditor">
-                        <div class="option-row"><input type="text" class="opt-input" placeholder="選項 1"></div>
-                        <div class="option-row"><input type="text" class="opt-input" placeholder="選項 2"></div>
+                        <div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle"
+                                style="font-size:16px;cursor:grab;color:#9ca3af;">drag_indicator</span><input
+                                type="text" class="opt-input" placeholder="選項 1"><button type="button" class="opt-del"
+                                onclick="removeOption(this)" title="刪除">✕</button></div>
+                        <div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle"
+                                style="font-size:16px;cursor:grab;color:#9ca3af;">drag_indicator</span><input
+                                type="text" class="opt-input" placeholder="選項 2"><button type="button" class="opt-del"
+                                onclick="removeOption(this)" title="刪除">✕</button></div>
                     </div>
                     <button class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="addOption()">+ 新增選項</button>
                 </div>
@@ -904,10 +910,7 @@
                 document.getElementById('surveyEditId').value = '';
                 document.getElementById('surveyType').value = 'choice';
                 document.getElementById('surveyText').value = '';
-                document.getElementById('optionsEditor').innerHTML = `
-                <div class="option-row"><input type="text" class="opt-input" placeholder="選項 1"></div>
-                <div class="option-row"><input type="text" class="opt-input" placeholder="選項 2"></div>
-            `;
+                document.getElementById('optionsEditor').innerHTML = _optRowHtml('', 1) + _optRowHtml('', 2);
                 toggleSurveyOptions();
                 document.getElementById('surveyModal').classList.add('active');
             };
@@ -922,9 +925,8 @@
                 const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
                 const editor = document.getElementById('optionsEditor');
                 editor.innerHTML = opts.length > 0
-                    ? opts.map((o, i) => `<div class="option-row"><input type="text" class="opt-input" placeholder="選項 ${i + 1}" value="${o}"></div>`).join('')
-                    : `<div class="option-row"><input type="text" class="opt-input" placeholder="選項 1"></div>
-                       <div class="option-row"><input type="text" class="opt-input" placeholder="選項 2"></div>`;
+                    ? opts.map((o, i) => _optRowHtml(o, i + 1)).join('')
+                    : _optRowHtml('', 1) + _optRowHtml('', 2);
                 toggleSurveyOptions();
                 document.getElementById('surveyModal').classList.add('active');
             };
@@ -939,8 +941,7 @@
                     if (type === 'truefalse') {
                         document.getElementById('optionsEditor').innerHTML = `
                         <div class="option-row"><input type="text" class="opt-input" value="是" readonly></div>
-                        <div class="option-row"><input type="text" class="opt-input" value="否" readonly></div>
-                    `;
+                        <div class="option-row"><input type="text" class="opt-input" value="否" readonly></div>`;
                     }
                 }
                 // Update label hint
@@ -948,14 +949,70 @@
                 if (label) label.textContent = type === 'multi_select' ? '選項（學生可複選）' : '選項';
             };
 
+            function _optRowHtml(value, num) {
+                const escaped = (value || '').replace(/"/g, '&quot;');
+                return `<div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle" style="font-size:16px;cursor:grab;color:#9ca3af;">drag_indicator</span><input type="text" class="opt-input" placeholder="選項 ${num}" value="${escaped}"><button type="button" class="opt-del" onclick="removeOption(this)" title="刪除">✕</button></div>`;
+            }
+
             window.addOption = function () {
                 const editor = document.getElementById('optionsEditor');
                 const count = editor.querySelectorAll('.option-row').length;
-                const row = document.createElement('div');
-                row.className = 'option-row';
-                row.innerHTML = `<input type="text" class="opt-input" placeholder="選項 ${count + 1}">`;
-                editor.appendChild(row);
+                editor.insertAdjacentHTML('beforeend', _optRowHtml('', count + 1));
+                initOptionDragSort();
             };
+
+            window.removeOption = function (btn) {
+                const editor = document.getElementById('optionsEditor');
+                const rows = editor.querySelectorAll('.option-row');
+                if (rows.length <= 2) { showToast('至少需要 2 個選項', { type: 'error' }); return; }
+                btn.closest('.option-row').remove();
+            };
+
+            // Option drag-sort
+            let _optDragItem = null;
+            function initOptionDragSort() {
+                const editor = document.getElementById('optionsEditor');
+                // Remove old listeners by cloning
+                editor.ondragstart = e => {
+                    const row = e.target.closest('.option-row');
+                    if (!row) return;
+                    _optDragItem = row;
+                    row.style.opacity = '0.4';
+                    e.dataTransfer.effectAllowed = 'move';
+                };
+                editor.ondragend = e => {
+                    const row = e.target.closest('.option-row');
+                    if (row) row.style.opacity = '';
+                    _optDragItem = null;
+                    editor.querySelectorAll('.option-row').forEach(r => r.classList.remove('drag-over'));
+                };
+                editor.ondragover = e => {
+                    e.preventDefault();
+                    const row = e.target.closest('.option-row');
+                    if (!row || row === _optDragItem) return;
+                    editor.querySelectorAll('.option-row').forEach(r => r.classList.remove('drag-over'));
+                    row.classList.add('drag-over');
+                };
+                editor.ondragleave = e => {
+                    const row = e.target.closest('.option-row');
+                    if (row) row.classList.remove('drag-over');
+                };
+                editor.ondrop = e => {
+                    e.preventDefault();
+                    const target = e.target.closest('.option-row');
+                    if (!target || !_optDragItem || target === _optDragItem) return;
+                    target.classList.remove('drag-over');
+                    // Determine insert position
+                    const rows = [...editor.querySelectorAll('.option-row')];
+                    const fromIdx = rows.indexOf(_optDragItem);
+                    const toIdx = rows.indexOf(target);
+                    if (fromIdx < toIdx) {
+                        target.after(_optDragItem);
+                    } else {
+                        target.before(_optDragItem);
+                    }
+                };
+            }
 
             window.saveSurveyQuestion = async function () {
                 const id = document.getElementById('surveyEditId').value;

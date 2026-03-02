@@ -367,11 +367,40 @@ body {
 
 .option-row {
     display: flex;
+    align-items: center;
     gap: 6px;
+    padding: 4px 0;
+    transition: background 0.15s;
+}
+
+.option-row.drag-over {
+    background: var(--accent-primary-light);
+    border-radius: 6px;
 }
 
 .option-row input {
     flex: 1;
+}
+
+.opt-del {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+
+.opt-del:hover {
+    color: var(--accent-danger);
+    background: var(--accent-danger-bg, #fef2f2);
 }
 
 @media (max-width: 768px) {
