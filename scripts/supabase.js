@@ -468,25 +468,34 @@ export function generateSessionCode(length = 6) {
 
 export const ai = {
     async chat(messages, opts = {}) {
-        // 呼叫 Supabase Edge Function: ai-proxy
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-proxy`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: opts.model || 'gpt-4o',
-                messages,
-                temperature: opts.temperature ?? 0.7,
-                max_tokens: opts.maxTokens ?? 2000,
-            })
+        const maxRetries = 3;
+        const body = JSON.stringify({
+            model: opts.model || 'gpt-4o',
+            messages,
+            temperature: opts.temperature ?? 0.7,
+            max_tokens: opts.maxTokens ?? 2000,
         });
-        if (!res.ok) throw new Error(`AI API error: ${res.status}`);
-        const json = await res.json();
-        if (json.error) throw new Error(json.message || json.error);
-        return json.text || json.content || json.choices?.[0]?.message?.content || '';
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-proxy`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body
+            });
+            if (res.status === 429 && attempt < maxRetries - 1) {
+                const wait = Math.pow(2, attempt + 1) * 1000; // 2s, 4s
+                console.warn(`[AI] 429 rate limit, retrying in ${wait / 1000}s... (${attempt + 1}/${maxRetries})`);
+                await new Promise(r => setTimeout(r, wait));
+                continue;
+            }
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(json.error || `AI API error: ${res.status}`);
+            if (json.error) throw new Error(json.error);
+            return json.text || json.content || json.choices?.[0]?.message?.content || '';
+        }
     }
 };
 

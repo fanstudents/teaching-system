@@ -582,6 +582,10 @@
                     <div class="panel-header">
                         <span>投影片</span>
                         <div style="display:flex;gap:4px;align-items:center;">
+                            <button class="add-slide-btn" id="importSlidesBtn" title="從其他專案匯入"
+                                onclick="window.__openImportSlides()">
+                                <span class="material-symbols-outlined">file_copy</span>
+                            </button>
                             <button class="add-slide-btn" id="addSlideBtn" title="新增投影片">
                                 <span class="material-symbols-outlined">add</span>
                             </button>
@@ -1652,6 +1656,159 @@
 
     <script src="scripts/app.js?v=20260228c" type="module"></script>
     <script src="components/nav.js"></script>
+
+    <!-- ═══ Import Slides Modal ═══ -->
+    <div id="importSlidesModal"
+        style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;">
+        <div
+            style="background:#1e1e2e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;width:90%;max-width:720px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;">
+            <div
+                style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-weight:600;font-size:1rem;color:#e2e8f0;display:flex;align-items:center;gap:8px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#a5b4fc;">file_copy</span>
+                    從其他專案匯入投影片
+                </span>
+                <button onclick="document.getElementById('importSlidesModal').style.display='none'"
+                    style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;">✕</button>
+            </div>
+            <div style="padding:16px 20px;">
+                <select id="importProjectSelect" onchange="window.__loadImportSlides()"
+                    style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#0f0f17;color:#e2e8f0;font-size:0.9rem;font-family:inherit;">
+                    <option value="">選擇來源專案…</option>
+                </select>
+            </div>
+            <div id="importSlidesGrid"
+                style="padding:0 20px 16px;overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+                <div style="grid-column:1/-1;text-align:center;color:#64748b;padding:40px 0;">請先選擇來源專案</div>
+            </div>
+            <div
+                style="padding:12px 20px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
+                <label style="color:#94a3b8;font-size:0.82rem;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <input type="checkbox" id="importSelectAll" onchange="window.__toggleImportAll()"
+                        style="accent-color:#6366f1;"> 全選
+                </label>
+                <div style="display:flex;gap:8px;">
+                    <button onclick="document.getElementById('importSlidesModal').style.display='none'"
+                        style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#94a3b8;cursor:pointer;font-family:inherit;">取消</button>
+                    <button onclick="window.__doImportSlides()"
+                        style="padding:8px 20px;border-radius:8px;border:none;background:#6366f1;color:#fff;cursor:pointer;font-weight:600;font-family:inherit;">匯入選取</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        let importSlides = [];
+
+        window.__openImportSlides = async function () {
+            const modal = document.getElementById('importSlidesModal');
+            modal.style.display = 'flex';
+            const select = document.getElementById('importProjectSelect');
+
+            // Load all projects
+            const { data: projects } = await db.select('projects', { order: 'updated_at.desc' });
+            select.innerHTML = '<option value="">選擇來源專案…</option>';
+            const currentPid = window.slideManager?.currentProjectId;
+            (projects || []).forEach(p => {
+                if (p.id === currentPid) return; // skip current project
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name || p.join_code || p.id;
+                select.appendChild(opt);
+            });
+            document.getElementById('importSlidesGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#64748b;padding:40px 0;">請先選擇來源專案</div>';
+            importSlides = [];
+        };
+
+        window.__loadImportSlides = async function () {
+            const pid = document.getElementById('importProjectSelect').value;
+            const grid = document.getElementById('importSlidesGrid');
+            if (!pid) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#64748b;padding:40px 0;">請先選擇來源專案</div>'; importSlides = []; return; }
+
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#64748b;padding:40px 0;">載入中…</div>';
+
+            const { data } = await db.select('projects', { filter: { id: `eq.${pid}` }, select: 'slides_data' });
+            const slidesData = data?.[0]?.slides_data;
+            importSlides = slidesData?.slides || [];
+
+            if (importSlides.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#64748b;padding:40px 0;">此專案沒有投影片</div>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            importSlides.forEach((slide, idx) => {
+                const card = document.createElement('div');
+                card.style.cssText = 'position:relative;border:2px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color 0.15s;aspect-ratio:16/9;background:#0f0f17;';
+                card.innerHTML = `
+                <div style="position:absolute;top:6px;left:6px;z-index:2;">
+                    <input type="checkbox" class="import-slide-cb" data-idx="${idx}" style="accent-color:#6366f1;width:16px;height:16px;" onchange="window.__updateImportBorder(this)">
+                </div>
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(0,0,0,0.6);font-size:0.72rem;color:#94a3b8;text-align:center;">${idx + 1}</div>
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:#475569;padding:8px;text-align:center;">
+                    ${slide.elements?.length || 0} 個元素
+                </div>
+            `;
+                card.onclick = (e) => {
+                    if (e.target.type === 'checkbox') return;
+                    const cb = card.querySelector('input[type="checkbox"]');
+                    cb.checked = !cb.checked;
+                    window.__updateImportBorder(cb);
+                };
+                grid.appendChild(card);
+            });
+        };
+
+        window.__updateImportBorder = function (cb) {
+            const card = cb.closest('div[style*="aspect-ratio"]') || cb.parentElement.parentElement;
+            card.style.borderColor = cb.checked ? '#6366f1' : 'rgba(255,255,255,0.06)';
+        };
+
+        window.__toggleImportAll = function () {
+            const all = document.getElementById('importSelectAll').checked;
+            document.querySelectorAll('.import-slide-cb').forEach(cb => {
+                cb.checked = all;
+                window.__updateImportBorder(cb);
+            });
+        };
+
+        window.__doImportSlides = function () {
+            const cbs = document.querySelectorAll('.import-slide-cb:checked');
+            if (cbs.length === 0) { alert('請先勾選要匯入的投影片'); return; }
+
+            const sm = window.slideManager;
+            if (!sm) { alert('SlideManager 尚未初始化'); return; }
+
+            let count = 0;
+            cbs.forEach(cb => {
+                const idx = parseInt(cb.dataset.idx);
+                const source = importSlides[idx];
+                if (!source) return;
+
+                const newSlide = {
+                    id: sm.generateId(),
+                    elements: JSON.parse(JSON.stringify(source.elements || [])),
+                    background: source.background || undefined
+                };
+                // Generate new IDs for all elements
+                newSlide.elements.forEach(el => { el.id = sm.generateId(); });
+                sm.slides.push(newSlide);
+                count++;
+            });
+
+            if (count > 0) {
+                sm.navigateTo(sm.slides.length - count);
+                sm.renderThumbnails();
+                sm.updateCounter();
+                sm.saveNow();
+            }
+
+            document.getElementById('importSlidesModal').style.display = 'none';
+            alert(`已匯入 ${count} 頁投影片`);
+        };
+    </script>
 
 </body>
 
