@@ -808,6 +808,28 @@ export class Editor {
             `;
         }
 
+        // 外觀設定（所有互動元件通用）
+        if (interactiveTypes.includes(type)) {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">外觀設定</div>
+                    <div class="property-row">
+                        <label>標題字級</label>
+                        <input type="number" id="propTitleFontSize" value="${elementData.titleFontSize || 18}" min="10" max="48" step="1">
+                    </div>
+                    <div class="property-row">
+                        <label>選項字級</label>
+                        <input type="number" id="propOptionFontSize" value="${elementData.optionFontSize || 15}" min="10" max="36" step="1">
+                    </div>
+                    <div class="property-row">
+                        <label>內距</label>
+                        <input type="range" id="propInteractivePadding" value="${elementData.interactivePadding || 16}" min="4" max="40" step="2" style="flex:1;">
+                        <span style="font-size:11px;color:#94a3b8;min-width:30px;text-align:right;">${elementData.interactivePadding || 16}px</span>
+                    </div>
+                </div>
+            `;
+        }
+
         // 倒數計時器（所有互動元件通用）
         if (interactiveTypes.includes(type)) {
             html += `
@@ -1218,6 +1240,35 @@ export class Editor {
                     this.selectElementById(elementId);
                 });
             }
+        }
+
+        // 外觀設定（標題字級 / 選項字級 / 內距）
+        const titleFSInput = document.getElementById('propTitleFontSize');
+        if (titleFSInput) {
+            titleFSInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { titleFontSize: parseInt(titleFSInput.value) || 18 });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+        const optionFSInput = document.getElementById('propOptionFontSize');
+        if (optionFSInput) {
+            optionFSInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { optionFontSize: parseInt(optionFSInput.value) || 15 });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+        const paddingInput = document.getElementById('propInteractivePadding');
+        if (paddingInput) {
+            const paddingLabel = paddingInput.nextElementSibling;
+            paddingInput.addEventListener('input', () => {
+                if (paddingLabel) paddingLabel.textContent = paddingInput.value + 'px';
+                const val = parseInt(paddingInput.value) || 16;
+                this.slideManager.updateElement(elementId, { interactivePadding: val });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
         }
 
         // 倒數計時器

@@ -906,61 +906,73 @@ export class SlideManager {
 
             case 'matching':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderMatchingElement(el, element);
                 break;
 
             case 'fillblank':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderFillBlankElement(el, element);
                 break;
 
             case 'ordering':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderOrderingElement(el, element);
                 break;
 
             case 'copycard':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderCopyCardElement(el, element);
                 break;
 
             case 'quiz':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderQuizElement(el, element);
                 break;
 
             case 'poll':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderPollElement(el, element);
                 break;
 
             case 'truefalse':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderTrueFalseElement(el, element);
                 break;
 
             case 'opentext':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderOpenTextElement(el, element);
                 break;
 
             case 'scale':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderScaleElement(el, element);
                 break;
 
             case 'buzzer':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderBuzzerElement(el, element);
                 break;
 
             case 'wordcloud':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderWordCloudElement(el, element);
                 break;
 
             case 'hotspot':
                 el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
                 this.renderHotspotElement(el, element);
                 break;
 
@@ -1479,6 +1491,18 @@ export class SlideManager {
                 </div>
             `;
         }
+    }
+
+    /**
+     * 套用互動元件的自訂外觀（CSS custom properties）
+     */
+    _applyInteractiveStyles(el, element) {
+        const tfs = element.titleFontSize || 18;
+        const ofs = element.optionFontSize || 15;
+        const pad = element.interactivePadding || 16;
+        el.style.setProperty('--ia-title-fs', tfs + 'px');
+        el.style.setProperty('--ia-option-fs', ofs + 'px');
+        el.style.setProperty('--ia-padding', pad + 'px');
     }
 
     /**

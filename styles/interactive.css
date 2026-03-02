@@ -821,6 +821,53 @@
 }
 
 /* ========================================
+   互動元件自訂外觀（由屬性面板 CSS vars 控制）
+   ======================================== */
+/* 標題字級 */
+.interactive-element .quiz-question,
+.interactive-element .poll-question,
+.interactive-element .matching-header,
+.interactive-element .fill-blank-title,
+.interactive-element .copy-card-title,
+.interactive-element .scale-question,
+.interactive-element .buzzer-question,
+.interactive-element .wc-question,
+.interactive-element .hs-question,
+.interactive-element .tf-question,
+.interactive-element .ot-question {
+    font-size: var(--ia-title-fs, 18px) !important;
+}
+
+/* 選項字級 */
+.interactive-element .quiz-option,
+.interactive-element .poll-option,
+.interactive-element .matching-item,
+.interactive-element .ordering-chip,
+.interactive-element .ordering-slot,
+.interactive-element .fill-blank-content,
+.interactive-element .copy-card-content,
+.interactive-element .tf-option,
+.interactive-element .ot-textarea {
+    font-size: var(--ia-option-fs, 15px) !important;
+}
+
+/* 內距 */
+.interactive-element .quiz-container,
+.interactive-element .poll-container,
+.interactive-element .matching-container,
+.interactive-element .fill-blank-container,
+.interactive-element .copy-card-container,
+.interactive-element .ordering-container,
+.interactive-element .scale-container,
+.interactive-element .buzzer-container,
+.interactive-element .wc-container,
+.interactive-element .hs-container,
+.interactive-element .tf-container,
+.interactive-element .ot-container {
+    padding: var(--ia-padding, 16px) !important;
+}
+
+/* ========================================
    互動元件編輯面板
    ======================================== */
 .interactive-editor {
