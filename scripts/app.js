@@ -1906,6 +1906,8 @@ class App {
                 })
             }]);
             statusEl.innerHTML = report;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">edit_note</span> 生成文案';
         } catch (err) {
             console.error('Phase 1 error:', err);
             statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
@@ -1950,6 +1952,8 @@ class App {
                 pages: interactivePages
             }]);
             statusEl.innerHTML = report;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">touch_app</span> 插入互動';
         } catch (err) {
             console.error('Phase 2 error:', err);
             statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
@@ -1994,6 +1998,8 @@ class App {
                 pages: animPages
             }]);
             statusEl.innerHTML = report;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">animation</span> 設定動畫';
         } catch (err) {
             console.error('Phase 4 anim error:', err);
             statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
@@ -2038,6 +2044,8 @@ class App {
                 pages: svgPages
             }]);
             statusEl.innerHTML = report;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">insert_chart</span> 生成圖表';
         } catch (err) {
             console.error('Phase 2 visual error:', err);
             statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
@@ -2146,6 +2154,8 @@ class App {
                 pages: designPages.slice(0, 15)
             }]);
             statusEl.innerHTML = report;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">auto_fix_high</span> 套用設計';
         } catch (err) {
             console.error('Phase 5 design error:', err);
             statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
@@ -2183,6 +2193,8 @@ class App {
                 pages: notesPages
             }]);
             statusEl.innerHTML = report;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">record_voice_over</span> 生成大綱';
         } catch (err) {
             console.error('Phase 6 notes error:', err);
             statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
