@@ -964,6 +964,54 @@ export class SlideManager {
                 this.renderHotspotElement(el, element);
                 break;
 
+            case 'news':
+                el.classList.add('interactive-element');
+                {
+                    const items = element.items || [];
+                    el.innerHTML = `
+                        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;height:100%;overflow-y:auto;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <span class="material-symbols-outlined" style="font-size:22px;color:#0891b2;">newspaper</span>
+                                <span style="font-size:1.1rem;font-weight:700;color:#0f172a;">最新相關新聞</span>
+                            </div>
+                            ${items.map((n, i) => `
+                                <div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;border-left:3px solid #0891b2;">
+                                    <div style="font-size:.92rem;font-weight:600;color:#0f172a;line-height:1.5;margin-bottom:6px;">${n.title}</div>
+                                    ${n.summary ? `<div style="font-size:.78rem;color:#475569;line-height:1.6;margin-bottom:6px;">${n.summary}</div>` : ''}
+                                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                                        <span style="font-size:.7rem;color:#94a3b8;">${n.source || ''}</span>
+                                        ${n.url ? `<a href="${n.url}" target="_blank" rel="noopener" style="font-size:.7rem;color:#0891b2;text-decoration:none;" onclick="event.stopPropagation()">查看原文 →</a>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                break;
+
+            case 'svg':
+                {
+                    const svgCode = element.svgContent || '';
+                    const label = element.label || '圖表';
+                    el.innerHTML = `
+                        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+                            <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%;">
+                                ${svgCode || '<span style="color:#94a3b8;font-size:14px;">SVG 圖表</span>'}
+                            </div>
+                            ${label ? `<div style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0;">${label}</div>` : ''}
+                        </div>
+                    `;
+                    // 讓 SVG 自適應容器
+                    const svgEl = el.querySelector('svg');
+                    if (svgEl) {
+                        svgEl.style.width = '100%';
+                        svgEl.style.height = '100%';
+                        svgEl.style.maxWidth = '100%';
+                        svgEl.style.maxHeight = '100%';
+                    }
+                }
+                break;
+
             case 'showcase':
                 el.classList.add('interactive-element', 'showcase-container');
                 el.dataset.assignmentTitle = element.assignmentTitle || element.linkedHomeworkTitle || '';
@@ -1891,6 +1939,15 @@ export class SlideManager {
             numEl.className = 'slide-thumbnail-number';
             numEl.textContent = index + 1;
             thumb.appendChild(numEl);
+
+            // 備註標記
+            if (slide.notes || slide.needsNotes) {
+                const badge = document.createElement('div');
+                badge.className = 'slide-notes-badge';
+                badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:10px;">sticky_note_2</span>';
+                badge.title = slide.notes ? '已有備註' : '標記為需要備註';
+                thumb.appendChild(badge);
+            }
 
             // 動態計算縮放比例
             requestAnimationFrame(() => {

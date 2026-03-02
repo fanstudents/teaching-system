@@ -543,6 +543,151 @@ body {
     color: var(--text-inverse);
 }
 
+/* AI 階段按鈕 */
+.ai-phase-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 14px 5px;
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+    position: relative;
+    min-width: 64px;
+}
+
+.ai-phase-btn:hover {
+    border-color: #c7d2fe;
+    background: #f8f7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(99, 102, 241, 0.12);
+}
+
+.ai-phase-btn:active {
+    transform: scale(0.97);
+}
+
+.ai-phase-num {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: .6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.ai-phase-label {
+    font-size: .65rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.ai-phase-arrow {
+    color: var(--text-muted);
+    font-size: .75rem;
+    align-self: center;
+    opacity: 0.5;
+}
+
+/* Prompt 手風琴 */
+.ai-prompt-accordion {
+    border: 1.5px solid var(--border-light);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ai-prompt-accordion summary {
+    padding: 8px 14px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    background: var(--bg-secondary);
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-prompt-accordion summary::before {
+    content: '⚙';
+    font-size: .7rem;
+}
+
+.ai-prompt-accordion[open] summary {
+    border-bottom: 1px solid var(--border-light);
+}
+
+.ai-prompt-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    font-size: .75rem;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    line-height: 1.6;
+    resize: vertical;
+    background: #fafbfc;
+    color: var(--text-primary);
+}
+
+.ai-prompt-textarea:focus {
+    outline: none;
+    background: #fff;
+}
+
+/* 佈局風格卡片 */
+.ai-layout-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 6px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.ai-layout-card:hover {
+    border-color: #c7d2fe;
+    background: #fafaff;
+}
+
+.ai-layout-card.selected {
+    border-color: #6366f1;
+    background: #eff0ff;
+}
+
+.ai-layout-card .material-symbols-outlined {
+    font-size: 22px;
+    color: var(--text-secondary);
+}
+
+.ai-layout-card.selected .material-symbols-outlined {
+    color: #6366f1;
+}
+
+.ai-layout-card span:last-child {
+    font-size: .6rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
 /* 主題色板 */
 .theme-swatches {
     display: flex;
@@ -1073,6 +1218,64 @@ body {
     flex: 1;
     padding: var(--spacing-md);
     overflow-y: auto;
+}
+
+/* 右側面板子頁簽 */
+.right-panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.right-panel-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+
+.right-panel-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.right-panel-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 600;
+}
+
+.right-panel-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* 投影片縮圖備註標記 */
+.slide-notes-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #8b5cf6;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    z-index: 2;
 }
 
 /* (按鈕樣式已統一至 base.css) */

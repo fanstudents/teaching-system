@@ -198,7 +198,7 @@ class App {
         if (layerDownBtn) layerDownBtn.addEventListener('click', () => this.moveLayer('down'));
 
         // 簡報模式
-        document.getElementById('presentBtn').addEventListener('click', () => {
+        document.getElementById('presentBtn')?.addEventListener('click', () => {
             this.startPresentation();
         });
 
@@ -322,6 +322,74 @@ class App {
             this.openAiGenerateModal();
         });
 
+        // AI 五階段按鈕
+        document.getElementById('aiPhaseContentBtn')?.addEventListener('click', () => {
+            this._loadOverlayPrompt('aiContentPrompt', 'slide_content');
+            document.getElementById('aiContentOverlay').style.display = 'flex';
+        });
+        document.getElementById('aiContentClose')?.addEventListener('click', () => {
+            document.getElementById('aiContentOverlay').style.display = 'none';
+        });
+        document.getElementById('aiContentStart')?.addEventListener('click', () => this.startAiPhase1());
+
+        document.getElementById('aiPhaseVisualBtn')?.addEventListener('click', () => {
+            document.getElementById('aiVisualSlideCount').textContent = this.slideManager.slides.length;
+            this._loadOverlayPrompt('aiVisualPrompt', 'slide_visual');
+            document.getElementById('aiVisualOverlay').style.display = 'flex';
+        });
+        document.getElementById('aiVisualClose')?.addEventListener('click', () => {
+            document.getElementById('aiVisualOverlay').style.display = 'none';
+        });
+        document.getElementById('aiVisualStart')?.addEventListener('click', () => this.startAiPhase2Visual());
+
+        document.getElementById('aiPhaseInteractiveBtn')?.addEventListener('click', () => {
+            document.getElementById('aiInteractiveSlideCount').textContent = this.slideManager.slides.length;
+            this._loadOverlayPrompt('aiInteractivePrompt', 'slide_interactive');
+            document.getElementById('aiInteractiveOverlay').style.display = 'flex';
+        });
+        document.getElementById('aiInteractiveClose')?.addEventListener('click', () => {
+            document.getElementById('aiInteractiveOverlay').style.display = 'none';
+        });
+        document.getElementById('aiInteractiveStart')?.addEventListener('click', () => this.startAiPhase3Interactive());
+
+        document.getElementById('aiPhaseAnimBtn')?.addEventListener('click', () => {
+            document.getElementById('aiAnimSlideCount').textContent = this.slideManager.slides.length;
+            document.getElementById('aiAnimOverlay').style.display = 'flex';
+        });
+        document.getElementById('aiAnimClose')?.addEventListener('click', () => {
+            document.getElementById('aiAnimOverlay').style.display = 'none';
+        });
+        document.getElementById('aiAnimStart')?.addEventListener('click', () => this.startAiPhase4Anim());
+
+        document.getElementById('aiPhaseDesignBtn')?.addEventListener('click', () => {
+            this.openAiDesignModal();
+        });
+        document.getElementById('aiDesignClose')?.addEventListener('click', () => {
+            document.getElementById('aiDesignOverlay').style.display = 'none';
+        });
+        document.getElementById('aiDesignStart')?.addEventListener('click', () => this.startAiPhase5Design());
+
+        // Phase 6: 講師教學大綱
+        document.getElementById('aiPhaseNotesBtn')?.addEventListener('click', () => {
+            document.getElementById('aiNotesOverlay').style.display = 'flex';
+            this._loadOverlayPrompt('aiNotesPrompt', 'slide_teaching_notes');
+        });
+        document.getElementById('aiNotesClose')?.addEventListener('click', () => {
+            document.getElementById('aiNotesOverlay').style.display = 'none';
+        });
+        document.getElementById('aiNotesStart')?.addEventListener('click', () => this.startAiPhase6Notes());
+
+        // 問卷驅動
+        document.getElementById('aiSurveyAdjustBtn')?.addEventListener('click', () => {
+            document.getElementById('aiSurveyOverlay').style.display = 'flex';
+            this._loadOverlayPrompt('aiSurveyPrompt', 'slide_survey_adjust');
+        });
+        document.getElementById('aiSurveyClose')?.addEventListener('click', () => {
+            document.getElementById('aiSurveyOverlay').style.display = 'none';
+        });
+        document.getElementById('aiSurveyLoadBtn')?.addEventListener('click', () => this.loadSurveyData());
+        document.getElementById('aiSurveyStart')?.addEventListener('click', () => this.startSurveyAdjust());
+
         // 複製文字卡片
         document.getElementById('copyCardBtn').addEventListener('click', () => {
             this.editor.addCopyCard();
@@ -341,6 +409,20 @@ class App {
         document.getElementById('addShowcaseBtn')?.addEventListener('click', () => {
             this.addShowcaseElement();
         });
+
+        // 新聞模組
+        document.getElementById('addNewsBtn')?.addEventListener('click', () => {
+            document.getElementById('newsOverlay').style.display = 'flex';
+            // 自動帶入簡報主題
+            const titleEl = document.querySelector('.header-presentation-title');
+            if (titleEl && !document.getElementById('newsTopicInput').value) {
+                document.getElementById('newsTopicInput').value = titleEl.textContent.trim();
+            }
+        });
+        document.getElementById('newsOverlayClose')?.addEventListener('click', () => {
+            document.getElementById('newsOverlay').style.display = 'none';
+        });
+        document.getElementById('newsSearchBtn')?.addEventListener('click', () => this.searchAndInsertNews());
 
         // === PDF 匯入 ===
         this._pdfFile = null;
@@ -412,6 +494,113 @@ class App {
                 progressText.textContent = `❌ 匯入失敗：${err.message}`;
                 pdfConfirmBtn.disabled = false;
             }
+        });
+
+        // === 活動開場封面頁 ===
+        const eventOverlay = document.getElementById('eventOpenerOverlay');
+        document.getElementById('insertEventOpenerBtn')?.addEventListener('click', () => {
+            if (eventOverlay) eventOverlay.style.display = 'flex';
+        });
+        document.getElementById('eventOpenerClose')?.addEventListener('click', () => {
+            if (eventOverlay) eventOverlay.style.display = 'none';
+        });
+        eventOverlay?.addEventListener('click', (e) => {
+            if (e.target === eventOverlay) eventOverlay.style.display = 'none';
+        });
+        document.getElementById('eventOpenerInsert')?.addEventListener('click', () => {
+            const title = document.getElementById('eventOpenerTitle')?.value?.trim();
+            if (!title) { this.showToast('請輸入課程標題'); return; }
+            const subtitle = document.getElementById('eventOpenerSubtitle')?.value?.trim() || '';
+            const wifi = document.getElementById('eventOpenerWifi')?.value?.trim() || '';
+            const password = document.getElementById('eventOpenerPassword')?.value?.trim() || '';
+
+            const gen = () => this.slideManager.generateId();
+            const elements = [];
+
+            // 背景漸層裝飾色塊（深色底 + 幾何裝飾）
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 540, background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%)' });
+            // 頂部裝飾線
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 80, height: 4, background: '#818cf8' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 4, height: 30, background: '#818cf8' });
+            // 右上角裝飾圓
+            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 780, y: 30, width: 120, height: 120, background: 'rgba(99,102,241,0.15)' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 830, y: 60, width: 60, height: 60, background: 'rgba(139,92,246,0.2)' });
+            // 左下裝飾
+            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 30, y: 400, width: 100, height: 100, background: 'rgba(99,102,241,0.1)' });
+
+            // 主標題
+            elements.push({
+                id: gen(), type: 'text', x: 60, y: 100, width: 840, height: 70,
+                content: `<b style="font-size:42px;color:#ffffff;letter-spacing:2px;">${title}</b>`,
+                fontSize: 42, bold: true, textAlign: 'left'
+            });
+
+            // 副標題
+            if (subtitle) {
+                elements.push({
+                    id: gen(), type: 'text', x: 60, y: 180, width: 840, height: 35,
+                    content: `<span style="font-size:20px;color:#a5b4fc;">${subtitle}</span>`,
+                    fontSize: 20, textAlign: 'left'
+                });
+            }
+
+            // Wi-Fi 資訊卡片
+            if (wifi) {
+                const yWifi = subtitle ? 250 : 220;
+                // 卡片背景
+                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yWifi, width: 380, height: password ? 110 : 70, background: 'rgba(255,255,255,0.08)', borderRadius: 12 });
+                // Wi-Fi 圖標 + 標題
+                elements.push({
+                    id: gen(), type: 'text', x: 80, y: yWifi + 12, width: 340, height: 30,
+                    content: `<span style="font-size:14px;color:#818cf8;">📶 Wi-Fi 連線資訊</span>`,
+                    fontSize: 14
+                });
+                // SSID
+                elements.push({
+                    id: gen(), type: 'text', x: 80, y: yWifi + 40, width: 340, height: 26,
+                    content: `<span style="font-size:16px;color:#e0e7ff;">名稱：<b style="color:#fff;">${wifi}</b></span>`,
+                    fontSize: 16
+                });
+                // 密碼
+                if (password) {
+                    elements.push({
+                        id: gen(), type: 'text', x: 80, y: yWifi + 68, width: 340, height: 26,
+                        content: `<span style="font-size:16px;color:#e0e7ff;">密碼：<b style="color:#fff;">${password}</b></span>`,
+                        fontSize: 16
+                    });
+                }
+            }
+
+            // 「課程即將開始」提示
+            const yBottom = 440;
+            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: yBottom, width: 12, height: 12, background: '#34d399' });
+            elements.push({
+                id: gen(), type: 'text', x: 82, y: yBottom - 4, width: 400, height: 24,
+                content: `<span style="font-size:15px;color:#6ee7b7;">課程即將開始，請稍候 ...</span>`,
+                fontSize: 15
+            });
+
+            // 底部分隔線
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yBottom + 30, width: 840, height: 1, background: 'rgba(255,255,255,0.1)' });
+            // 底部日期/講師區
+            const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+            elements.push({
+                id: gen(), type: 'text', x: 60, y: yBottom + 40, width: 400, height: 22,
+                content: `<span style="font-size:13px;color:rgba(255,255,255,0.4);">${today}</span>`,
+                fontSize: 13
+            });
+
+            // 插入為第 1 頁
+            const slide = { id: gen(), elements, background: '#0f172a' };
+            this.slideManager.slides.unshift(slide);
+            this.slideManager.currentIndex = 0;
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.renderThumbnails();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            if (eventOverlay) eventOverlay.style.display = 'none';
+            this.showToast('✅ 已在第 1 頁插入活動開場封面');
         });
 
         // === 匯出 ===
@@ -867,6 +1056,60 @@ class App {
         });
     }
 
+    async searchAndInsertNews() {
+        const topic = document.getElementById('newsTopicInput').value.trim();
+        if (!topic) { alert('請輸入搜尋主題'); return; }
+
+        const btn = document.getElementById('newsSearchBtn');
+        const statusEl = document.getElementById('newsStatus');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 搜尋中...';
+
+        try {
+            const { NewsCrawler } = await import('./newsCrawler.js');
+            const crawler = new NewsCrawler();
+            crawler.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const perPage = parseInt(document.getElementById('newsPerPage').value) || 4;
+            const pages = parseInt(document.getElementById('newsPages').value) || 1;
+            const dateRange = document.getElementById('newsDateRange')?.value || '14d';
+
+            const newsItems = await crawler.fetchNews(topic, { count: perPage, pages, dateRange });
+            const newSlides = crawler.buildNewsSlides(newsItems, perPage);
+
+            // 在當前位置之後插入
+            const insertIdx = this.slideManager.currentIndex + 1;
+            for (let i = 0; i < newSlides.length; i++) {
+                this.slideManager.slides.splice(insertIdx + i, 0, newSlides[i]);
+            }
+
+            this.slideManager.currentIndex = insertIdx;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            const newsPages = newSlides.map((s, sIdx) => {
+                const newsEl = (s.elements || []).find(e => e.type === 'news');
+                const titles = newsEl?.items?.map(n => n.title).slice(0, 2).join('、') || '新聞';
+                return { page: insertIdx + sIdx + 1, desc: titles.substring(0, 40) };
+            });
+            const report = this._buildResultReport('新聞插入', [{
+                label: `已在第 ${insertIdx + 1}${newSlides.length > 1 ? `-${insertIdx + newSlides.length}` : ''} 頁插入 ${newsItems.length} 則新聞`,
+                pages: newsPages
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('新聞搜尋失敗:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">搜尋失敗: ${err.message}</span>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">newspaper</span> 搜尋並插入新聞';
+        }
+    }
+
     async addShowcaseElement() {
         // 收集所有 slides 中的 homework 元素
         const homeworks = [];
@@ -1305,33 +1548,99 @@ class App {
        講師備註
        ========================================= */
     bindSpeakerNotes() {
-        const toggle = document.getElementById('speakerNotesToggle');
-        const panel = document.getElementById('speakerNotesPanel');
-        const textarea = document.getElementById('speakerNotesText');
+        // ── 右側面板 tab 切換 ──
+        const rightTabs = document.querySelectorAll('.right-panel-tab');
+        const propsBody = document.getElementById('rightPanelProps');
+        const notesBody = document.getElementById('rightPanelNotes');
 
-        if (!toggle || !panel || !textarea) return;
-
-        toggle.addEventListener('click', () => {
-            const isOpen = panel.classList.toggle('open');
-            textarea.style.display = isOpen ? 'block' : 'none';
-            if (isOpen) textarea.focus();
+        rightTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                rightTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const which = tab.dataset.rightTab;
+                if (propsBody) propsBody.style.display = which === 'props' ? '' : 'none';
+                if (notesBody) notesBody.style.display = which === 'notes' ? '' : 'none';
+            });
         });
 
-        // 儲存備註（debounced）
+        // ── 備註 textarea ──
+        const textarea = document.getElementById('speakerNotesRight');
+        const checkbox = document.getElementById('slideNeedsNotes');
+        const wordCount = document.getElementById('notesWordCount');
+
+        if (!textarea) return;
+
         let noteTimer = null;
         textarea.addEventListener('input', () => {
             const slide = this.slideManager.slides[this.slideManager.currentIndex];
-            if (slide) slide.notes = textarea.value;
+            if (slide) {
+                slide.notes = textarea.value;
+                // 自動勾選 needsNotes
+                if (textarea.value.trim() && checkbox && !checkbox.checked) {
+                    checkbox.checked = true;
+                    slide.needsNotes = true;
+                }
+            }
+            if (wordCount) wordCount.textContent = `${(textarea.value || '').length} 字`;
             clearTimeout(noteTimer);
-            noteTimer = setTimeout(() => this.slideManager.save(), 800);
+            noteTimer = setTimeout(() => {
+                this.slideManager.save();
+                this.slideManager.renderThumbnails();
+            }, 800);
         });
+
+        // ── checkbox ──
+        if (checkbox) {
+            checkbox.addEventListener('change', () => {
+                const slide = this.slideManager.slides[this.slideManager.currentIndex];
+                if (slide) {
+                    slide.needsNotes = checkbox.checked;
+                    this.slideManager.save();
+                    this.slideManager.renderThumbnails();
+                }
+            });
+        }
+
+        // ── 舊的底部 toggle（保留向下相容）──
+        const toggle = document.getElementById('speakerNotesToggle');
+        const panel = document.getElementById('speakerNotesPanel');
+        const oldTextarea = document.getElementById('speakerNotesText');
+
+        if (toggle && panel && oldTextarea) {
+            toggle.addEventListener('click', () => {
+                const isOpen = panel.classList.toggle('open');
+                oldTextarea.style.display = isOpen ? 'block' : 'none';
+                if (isOpen) oldTextarea.focus();
+            });
+            oldTextarea.addEventListener('input', () => {
+                const slide = this.slideManager.slides[this.slideManager.currentIndex];
+                if (slide) slide.notes = oldTextarea.value;
+                // 同步右側
+                if (textarea) textarea.value = oldTextarea.value;
+                if (wordCount) wordCount.textContent = `${(oldTextarea.value || '').length} 字`;
+                clearTimeout(noteTimer);
+                noteTimer = setTimeout(() => this.slideManager.save(), 800);
+            });
+        }
     }
 
     updateSpeakerNotes() {
-        const textarea = document.getElementById('speakerNotesText');
-        if (!textarea) return;
         const slide = this.slideManager.slides[this.slideManager.currentIndex];
-        textarea.value = slide?.notes || '';
+        const notes = slide?.notes || '';
+
+        // 右側面板
+        const textarea = document.getElementById('speakerNotesRight');
+        if (textarea) textarea.value = notes;
+
+        const checkbox = document.getElementById('slideNeedsNotes');
+        if (checkbox) checkbox.checked = !!slide?.needsNotes;
+
+        const wordCount = document.getElementById('notesWordCount');
+        if (wordCount) wordCount.textContent = `${notes.length} 字`;
+
+        // 底部（舊）
+        const oldTextarea = document.getElementById('speakerNotesText');
+        if (oldTextarea) oldTextarea.value = notes;
     }
 
     /* =========================================
@@ -1377,16 +1686,36 @@ class App {
         btn.style.opacity = '0.5';
 
         try {
-            const prompt = `你是一個教育內容專家。請根據以下條件生成選擇題：
-    主題：${topic}
-    題數：${count}
-    難度：${diffMap[difficulty] || '中等'}
+            const prompt = `你是一位資深教學評量設計師。請根據以下條件，設計高品質的選擇題來測驗學員的理解程度。
 
-    要求：
-    - 每題 4 個選項，僅 1 個正確
-    - 用繁體中文
-    - 回傳純 JSON 陣列，不要有任何其他文字
-    - 格式：[{"question": "題目", "options": [{"text": "選項A", "correct": true}, {"text": "選項B", "correct": false}, ...]}]`;
+══ 出題條件 ══
+主題：${topic}
+題數：${count}
+難度：${diffMap[difficulty] || '中等'}
+
+══ 出題原則 ══
+1. 題幹設計：
+   • 使用「情境化」題幹，模擬真實場景（例：「小明的公司需要處理每秒 10 萬筆交易…」）
+   • 避免「以下何者正確/錯誤？」這類空洞題幹
+   • 題目要測驗「理解」和「應用」能力，不是死背知識
+
+2. 選項設計：
+   • 每題 4 個選項，僅 1 個正確
+   • 干擾選項要「看起來合理但有關鍵錯誤」，不能是明顯錯誤
+   • 選項長度盡量一致，正確答案不要總是最長的那個
+   • 不要用「以上皆是」或「以上皆非」作為選項
+
+3. 難度校準：
+   • 簡單 → 直接測驗基本定義和核心概念
+   • 中等 → 需要理解原理或比較異同才能作答
+   • 困難 → 需要綜合多個概念或分析實際情境
+
+4. 格式要求：
+   • 全部使用繁體中文
+   • 回傳純 JSON 陣列
+
+══ 回傳格式 ══
+[{"question": "情境化題目", "options": [{"text": "選項A", "correct": true}, {"text": "選項B", "correct": false}, {"text": "選項C", "correct": false}, {"text": "選項D", "correct": false}]}]`;
 
             const result = await ai.chat([
                 { role: 'system', content: '你是教育內容生成器，只回傳 JSON，不加任何額外說明。' },
@@ -1529,6 +1858,497 @@ class App {
         }
     }
 
+    // ═══════════════════════════════════════
+    // AI 三階段獨立方法
+    // ═══════════════════════════════════════
+
+    async startAiPhase1() {
+        const topic = document.getElementById('aiContentTopic').value.trim();
+        const level = document.getElementById('aiContentLevel').value;
+        const pageCount = parseInt(document.getElementById('aiContentPages').value) || 30;
+        const outline = document.getElementById('aiContentOutline').value.trim();
+        if (!outline && !topic) { alert('請輸入課程主題或大綱'); return; }
+
+        let pdfText = '';
+        const pdfFile = document.getElementById('aiContentPdf')?.files[0];
+        if (pdfFile) { try { pdfText = await pdfFile.text(); } catch (e) { /* skip */ } }
+
+        const statusEl = document.getElementById('aiContentStatus');
+        const btn = document.getElementById('aiContentStart');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 生成中...';
+        statusEl.textContent = '正在連線 AI...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const slides = await generator.generateContent({
+                topic: topic || '課程', level, pageCount,
+                outline: outline || topic, pdfText
+            });
+
+            this.slideManager.slides = slides;
+            this.slideManager.currentIndex = 0;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            const report = this._buildResultReport('Phase 1 — 文案生成', [{
+                label: `已生成 ${slides.length} 頁投影片`,
+                pages: slides.map((s, i) => {
+                    const title = (s.elements || []).find(e => e.type === 'text' && e.fontSize >= 26);
+                    return { page: i + 1, desc: title ? title.content.replace(/<[^>]+>/g, '').substring(0, 30) : '投影片' };
+                })
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('Phase 1 error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">edit_note</span> 重試';
+        }
+    }
+
+    async startAiPhase2(customPrompt) {
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+
+        const statusEl = document.getElementById('aiInteractiveStatus');
+        const btn = document.getElementById('aiInteractiveStart');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 分析中...';
+        statusEl.textContent = '正在分析投影片內容...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const oldCount = parseInt(document.getElementById('aiInteractiveSlideCount')?.textContent || '0');
+            const slides = await generator.insertInteractive([...this.slideManager.slides]);
+            this.slideManager.slides = slides;
+            this.slideManager.currentIndex = 0;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            const addedCount = slides.length - oldCount;
+            const interactivePages = slides.map((s, i) => {
+                const interactive = (s.elements || []).find(e => ['quiz', 'poll', 'ordering', 'matching', 'fillblank', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud'].includes(e.type));
+                return interactive ? { page: i + 1, desc: `${interactive.type}：${interactive.question || interactive.title || ''}`.substring(0, 40) } : null;
+            }).filter(Boolean);
+
+            const report = this._buildResultReport('Phase 3 — 插入互動', [{
+                label: `新增 ${addedCount} 頁互動元件`,
+                pages: interactivePages
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('Phase 2 error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">touch_app</span> 重試';
+        }
+    }
+
+    async startAiPhase4Anim() {
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+
+        const statusEl = document.getElementById('aiAnimStatus');
+        const btn = document.getElementById('aiAnimStart');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 分析中...';
+        statusEl.textContent = '正在分析投影片版面...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const slides = await generator.addAnimations([...this.slideManager.slides]);
+            this.slideManager.slides = slides;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.save();
+
+            const animPages = slides.map((s, i) => {
+                const maxOrder = Math.max(0, ...(s.elements || []).map(e => e.animOrder || 0));
+                if (maxOrder > 0) {
+                    const title = (s.elements || []).find(e => e.type === 'text' && e.fontSize >= 26);
+                    return { page: i + 1, desc: `${maxOrder} 步動畫：${title ? title.content.replace(/<[^>]+>/g, '').substring(0, 25) : ''}` };
+                }
+                return null;
+            }).filter(Boolean);
+
+            const report = this._buildResultReport('Phase 4 — 動畫呈現', [{
+                label: `已為 ${animPages.length} 頁設定逐步動畫`,
+                pages: animPages
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('Phase 4 anim error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">animation</span> 重試';
+        }
+    }
+
+    async startAiPhase2Visual() {
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+
+        const statusEl = document.getElementById('aiVisualStatus');
+        const btn = document.getElementById('aiVisualStart');
+        const customPrompt = document.getElementById('aiVisualPrompt')?.value?.trim() || null;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 分析中...';
+        statusEl.textContent = '正在分析哪些頁面需要圖表...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const beforeSvgCount = this.slideManager.slides.reduce((n, s) => n + (s.elements || []).filter(e => e.type === 'svg').length, 0);
+            const slides = await generator.generateVisuals([...this.slideManager.slides], customPrompt || undefined);
+            this.slideManager.slides = slides;
+            this.slideManager.currentIndex = 0;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            const svgPages = slides.map((s, i) => {
+                const svgEls = (s.elements || []).filter(e => e.type === 'svg');
+                return svgEls.length > 0 ? { page: i + 1, desc: svgEls.map(e => e.label || '圖表').join(', ') } : null;
+            }).filter(Boolean);
+
+            const report = this._buildResultReport('Phase 2 — 生成圖表', [{
+                label: `已新增 ${svgPages.length} 個 SVG 圖表`,
+                pages: svgPages
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('Phase 2 visual error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">insert_chart</span> 重試';
+        }
+    }
+
+    async startAiPhase3Interactive() {
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+        // Delegate to existing startAiPhase2 but pass custom prompt
+        const customPrompt = document.getElementById('aiInteractivePrompt')?.value?.trim() || null;
+        await this.startAiPhase2(customPrompt);
+    }
+
+    async openAiDesignModal() {
+        const grid = document.getElementById('aiDesignThemeGrid');
+        const layoutGrid = document.getElementById('aiDesignLayoutGrid');
+        if (!grid) return;
+
+        // Render layout cards
+        const { LAYOUT_STYLES } = await import('./aiSlideGenerator.js');
+        const { MASTER_THEMES } = await import('./templates.js');
+
+        if (layoutGrid) {
+            layoutGrid.innerHTML = LAYOUT_STYLES.map(l => `
+                <div class="ai-layout-card" data-layout="${l.id}" title="${l.desc}">
+                    <span class="material-symbols-outlined">${l.icon}</span>
+                    <span>${l.name}</span>
+                </div>
+            `).join('');
+
+            let selectedLayout = LAYOUT_STYLES[0].id;
+            layoutGrid.querySelectorAll('.ai-layout-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    layoutGrid.querySelectorAll('.ai-layout-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedLayout = card.dataset.layout;
+                });
+            });
+            layoutGrid.querySelector('.ai-layout-card').classList.add('selected');
+            this._selectedDesignLayout = () => selectedLayout;
+        }
+
+        // Render theme cards
+        grid.innerHTML = MASTER_THEMES.map(t => `
+            <button class="ai-theme-card" data-theme="${t.id}"
+                style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;transition:all .2s;">
+                <div style="width:100%;height:32px;border-radius:4px;background:${t.preview.bg};display:flex;align-items:center;padding-left:6px;">
+                    <div style="width:12px;height:3px;border-radius:1px;background:${t.preview.accent};"></div>
+                </div>
+                <span style="font-size:.7rem;color:#475569;">${t.name}</span>
+            </button>
+        `).join('');
+
+        let selectedTheme = MASTER_THEMES[0].id;
+        grid.querySelectorAll('.ai-theme-card').forEach(card => {
+            card.addEventListener('click', () => {
+                grid.querySelectorAll('.ai-theme-card').forEach(c => c.style.borderColor = '#e2e8f0');
+                card.style.borderColor = '#6366f1';
+                selectedTheme = card.dataset.theme;
+            });
+        });
+        grid.querySelector('.ai-theme-card').style.borderColor = '#6366f1';
+        this._selectedDesignTheme = () => selectedTheme;
+
+        // Load prompt
+        this._loadOverlayPrompt('aiDesignPrompt', 'slide_design');
+
+        document.getElementById('aiDesignOverlay').style.display = 'flex';
+    }
+
+    async startAiPhase5Design() {
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+
+        const themeId = this._selectedDesignTheme?.() || 'biz';
+        const layoutId = this._selectedDesignLayout?.() || 'classic-center';
+        const customPrompt = document.getElementById('aiDesignPrompt')?.value?.trim() || null;
+        const statusEl = document.getElementById('aiDesignStatus');
+        const btn = document.getElementById('aiDesignStart');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 套用中...';
+        statusEl.textContent = '正在套用風格...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const slides = await generator.applyDesign([...this.slideManager.slides], themeId, layoutId, customPrompt || undefined);
+            this.slideManager.slides = slides;
+            this.slideManager.currentIndex = 0;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            const designPages = slides.map((s, i) => {
+                const title = (s.elements || []).find(e => e.type === 'text' && e.fontSize >= 26);
+                return { page: i + 1, desc: title ? title.content.replace(/<[^>]+>/g, '').substring(0, 30) : '投影片' };
+            });
+            const report = this._buildResultReport('Phase 5 — 美化設計', [{
+                label: `已為 ${slides.length} 頁套用風格「${themeId}」+ 版型「${layoutId}」`,
+                pages: designPages.slice(0, 15)
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('Phase 5 design error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">auto_fix_high</span> 重試';
+        }
+    }
+
+    async startAiPhase6Notes() {
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+
+        const customPrompt = document.getElementById('aiNotesPrompt')?.value?.trim() || null;
+        const statusEl = document.getElementById('aiNotesStatus');
+        const btn = document.getElementById('aiNotesStart');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 生成中...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            await generator.generateTeachingNotes(this.slideManager.slides, customPrompt || undefined);
+            this.slideManager.save();
+            this.updateSpeakerNotes();
+
+            const notesPages = this.slideManager.slides.map((s, i) => {
+                if (!s.notes) return null;
+                return { page: i + 1, desc: s.notes.substring(0, 40) + (s.notes.length > 40 ? '...' : '') };
+            }).filter(Boolean);
+            const report = this._buildResultReport('Phase 6 — 教學大綱', [{
+                label: `已為 ${notesPages.length} 頁生成講師備忘錄`,
+                pages: notesPages
+            }]);
+            statusEl.innerHTML = report;
+        } catch (err) {
+            console.error('Phase 6 notes error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">record_voice_over</span> 重試';
+        }
+    }
+
+    _surveyData = null;
+
+    async loadSurveyData() {
+        const preview = document.getElementById('surveyDataPreview');
+        const startBtn = document.getElementById('aiSurveyStart');
+        const statusEl = document.getElementById('aiSurveyStatus');
+        const loadBtn = document.getElementById('aiSurveyLoadBtn');
+        loadBtn.disabled = true;
+        loadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;animation:spin 1s linear infinite;">progress_activity</span> 載入中...';
+
+        try {
+            const { db } = await import('./supabase.js');
+            const joinCode = this.slideManager.getCurrentJoinCode?.() || '';
+
+            // 讀取問卷題目
+            const { data: questions } = await db.select('survey_questions', {
+                filter: joinCode ? { session_code: `eq.${joinCode}` } : {},
+                order: 'sort_order.asc'
+            });
+
+            // 讀取回覆
+            const { data: responses } = await db.select('survey_responses');
+
+            if (!questions || questions.length === 0) {
+                preview.innerHTML = '<span style="color:#f59e0b;">⚠ 尚未設定課前問卷題目，請先在課前設定中新增問卷。</span>';
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">download</span> 重新載入';
+                return;
+            }
+
+            // 統計
+            const stats = questions.map(q => {
+                const qResponses = (responses || []).filter(r => r.question_id === q.id);
+                const stat = {
+                    question: q.question_text,
+                    type: q.question_type,
+                    totalResponses: qResponses.length
+                };
+                if (q.question_type === 'fillblank') {
+                    stat.answers = qResponses.map(r => r.answer);
+                } else {
+                    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                    stat.distribution = {};
+                    opts.forEach(o => { stat.distribution[o] = qResponses.filter(r => r.answer === o).length; });
+                }
+                return stat;
+            });
+
+            this._surveyData = stats;
+
+            // 顯示預覽
+            preview.innerHTML = stats.map((s, i) => {
+                let detail = '';
+                if (s.distribution) {
+                    detail = Object.entries(s.distribution).map(([k, v]) =>
+                        `<span style="background:#e0e7ff;padding:2px 8px;border-radius:4px;margin:2px;">${k}: ${v}</span>`
+                    ).join(' ');
+                } else {
+                    detail = `<span style="color:#94a3b8;">${s.totalResponses} 則文字回覆</span>`;
+                }
+                return `<div style="margin-bottom:8px;"><b>${i + 1}. ${s.question}</b> (${s.totalResponses} 人回覆)<br>${detail}</div>`;
+            }).join('');
+
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            statusEl.innerHTML = `<span style="color:#059669;">✓ 已載入 ${stats.length} 題問卷數據（共 ${responses?.length || 0} 筆回覆）</span>`;
+        } catch (err) {
+            preview.innerHTML = `<span style="color:#dc2626;">載入失敗: ${err.message}</span>`;
+        } finally {
+            loadBtn.disabled = false;
+            loadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">download</span> 重新載入';
+        }
+    }
+
+    async startSurveyAdjust() {
+        if (!this._surveyData) { alert('請先載入問卷數據'); return; }
+        if (this.slideManager.slides.length === 0) { alert('請先生成投影片'); return; }
+
+        const customPrompt = document.getElementById('aiSurveyPrompt')?.value?.trim() || null;
+        const statusEl = document.getElementById('aiSurveyStatus');
+        const resultsEl = document.getElementById('aiSurveyResults');
+        const btn = document.getElementById('aiSurveyStart');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 調整中...';
+
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const generator = new AiSlideGenerator(this.slideManager);
+            generator.onProgress = (percent, msg) => {
+                statusEl.textContent = `${Math.round(percent)}% - ${msg}`;
+            };
+
+            const { slides, adjustments } = await generator.adjustBySurvey(
+                [...this.slideManager.slides], this._surveyData, customPrompt || undefined
+            );
+
+            this.slideManager.slides = slides;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            // 顯示調整結果
+            if (Array.isArray(adjustments) && adjustments.length > 0) {
+                resultsEl.style.display = 'block';
+                resultsEl.innerHTML = `<div style="font-size:.82rem;font-weight:600;margin-bottom:6px;">AI 調整報告：</div>` +
+                    adjustments.map(a => `<div style="padding:8px 12px;background:#f0fdf4;border-radius:6px;margin-bottom:4px;font-size:.78rem;">
+                        <b>第 ${a.page} 頁</b>：${a.reason || '已調整'}
+                    </div>`).join('');
+            }
+
+            statusEl.innerHTML = `<span style="color:#059669;">✓ 已調整 ${adjustments?.length || 0} 頁</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">tune</span> 根據問卷調整簡報';
+        } catch (err) {
+            console.error('Survey adjust error:', err);
+            statusEl.innerHTML = `<span style="color:#dc2626;">✗ ${err.message}</span>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">tune</span> 重試';
+        }
+    }
+
+    _buildResultReport(title, sections) {
+        const maxShow = 20;
+        let html = `<div style="max-height:300px;overflow-y:auto;text-align:left;">`;
+        html += `<div style="font-size:.9rem;font-weight:700;color:#059669;margin-bottom:8px;display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> ${title}</div>`;
+        for (const sec of sections) {
+            html += `<div style="font-size:.82rem;font-weight:600;color:#334155;margin-bottom:6px;">${sec.label}</div>`;
+            if (sec.pages && sec.pages.length > 0) {
+                html += `<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;">`;
+                const show = sec.pages.slice(0, maxShow);
+                for (const p of show) {
+                    html += `<div style="font-size:.76rem;color:#475569;padding:4px 10px;background:#f0fdf4;border-radius:6px;border-left:3px solid #059669;"><b>第 ${p.page} 頁</b>：${p.desc}</div>`;
+                }
+                if (sec.pages.length > maxShow) {
+                    html += `<div style="font-size:.72rem;color:#94a3b8;padding:2px 10px;">...及其他 ${sec.pages.length - maxShow} 頁</div>`;
+                }
+                html += `</div>`;
+            }
+        }
+        html += `</div>`;
+        return html;
+    }
+
+    async _loadOverlayPrompt(textareaId, promptKey) {
+        const el = document.getElementById(textareaId);
+        if (!el || el._loaded) return;
+        try {
+            const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+            const gen = new AiSlideGenerator(this.slideManager);
+            const prompts = await gen._loadPrompts();
+            el.value = prompts[promptKey] || '';
+            el._loaded = true;
+        } catch (e) {
+            el.placeholder = '載入失敗';
+        }
+    }
+
     /* =========================================
    模板選擇器
    ========================================= */
@@ -1546,18 +2366,72 @@ class App {
         // 渲染分類 tabs + 模板
         const renderGrid = (filter) => {
             const templates = filter === '全部' ? SLIDE_TEMPLATES : SLIDE_TEMPLATES.filter(t => (t.category || '其他') === filter);
+
+            // Mini wireframe layouts for each template
+            const wireframes = {
+                // 商務
+                'biz-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:65%;height:7px;background:#fafaf9;opacity:0.6;border-radius:2px;margin-bottom:5px;"></div><div style="width:20px;height:2px;background:#b45309;opacity:0.7;margin-bottom:4px;"></div><div style="width:40%;height:4px;background:#fafaf9;opacity:0.2;border-radius:2px;"></div></div>',
+                'biz-content': '<div style="padding:8px 14px;display:flex;flex-direction:column;height:100%;"><div style="width:100%;height:8px;background:#1c1917;border-radius:0;margin-bottom:6px;"></div><div style="display:flex;flex-direction:column;gap:3px;padding:4px;flex:1;justify-content:center;"><div style="width:60%;height:3px;background:currentColor;opacity:0.15;border-radius:2px;"></div><div style="width:80%;height:2px;background:currentColor;opacity:0.1;border-radius:2px;"></div><div style="width:70%;height:2px;background:currentColor;opacity:0.1;border-radius:2px;"></div></div></div>',
+                'biz-cards': '<div style="padding:6px 10px;display:flex;gap:4px;height:100%;"><div style="width:100%;height:8px;background:#1c1917;position:absolute;top:0;left:0;right:0;"></div><div style="flex:1;background:#f5f5f4;border-radius:3px;margin-top:12px;display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#b45309;opacity:0.6;">trending_up</span><div style="width:55%;height:2px;background:#1c1917;opacity:0.1;border-radius:2px;"></div></div><div style="flex:1;background:#f5f5f4;border-radius:3px;margin-top:12px;display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#b45309;opacity:0.6;">shield</span><div style="width:55%;height:2px;background:#1c1917;opacity:0.1;border-radius:2px;"></div></div><div style="flex:1;background:#f5f5f4;border-radius:3px;margin-top:12px;display:flex;flex-direction:column;align-items:center;padding-top:6px;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#b45309;opacity:0.6;">groups</span><div style="width:55%;height:2px;background:#1c1917;opacity:0.1;border-radius:2px;"></div></div></div>',
+                // 清新
+                'nature-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:2px;height:16px;background:#6b8f71;opacity:0.5;margin-bottom:4px;"></div><div style="width:60%;height:6px;background:#e8ede8;opacity:0.5;border-radius:2px;margin-bottom:4px;"></div><div style="width:35%;height:3px;background:#8faa8f;opacity:0.3;border-radius:2px;"></div></div>',
+                'nature-content': '<div style="padding:10px 14px;display:flex;flex-direction:column;gap:3px;height:100%;justify-content:center;"><div style="width:55%;height:5px;background:#2d3b2d;opacity:0.4;border-radius:2px;margin-bottom:2px;"></div><div style="width:15px;height:2px;background:#6b8f71;opacity:0.5;border-radius:2px;margin-bottom:3px;"></div><div style="width:80%;height:2px;background:#44544a;opacity:0.15;border-radius:2px;"></div><div style="width:70%;height:2px;background:#44544a;opacity:0.12;border-radius:2px;"></div></div>',
+                'nature-cards': '<div style="padding:6px 10px;display:flex;gap:4px;height:100%;align-items:center;"><div style="flex:1;background:#e8ede8;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;padding-top:8px;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#4a6b4a;opacity:0.6;">lightbulb</span><div style="width:55%;height:2px;background:#2d3b2d;opacity:0.1;border-radius:2px;"></div></div><div style="flex:1;background:#e8ede8;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;padding-top:8px;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#4a6b4a;opacity:0.6;">build</span><div style="width:55%;height:2px;background:#2d3b2d;opacity:0.1;border-radius:2px;"></div></div><div style="flex:1;background:#e8ede8;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;padding-top:8px;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#4a6b4a;opacity:0.6;">verified</span><div style="width:55%;height:2px;background:#2d3b2d;opacity:0.1;border-radius:2px;"></div></div></div>',
+                // 珊瑚
+                'coral-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:60%;height:7px;background:#f5e6e8;opacity:0.5;border-radius:2px;margin-bottom:5px;"></div><div style="width:100%;height:1px;background:rgba(204,112,112,0.15);margin-bottom:4px;"></div><div style="width:35%;height:3px;background:#b08a8e;opacity:0.3;border-radius:2px;"></div></div>',
+                'coral-content': '<div style="padding:10px 14px;display:flex;flex-direction:column;gap:3px;height:100%;justify-content:center;"><div style="width:50%;height:5px;background:#3d2529;opacity:0.4;border-radius:2px;margin-bottom:2px;"></div><div style="width:15px;height:2px;background:#c07070;opacity:0.5;border-radius:2px;margin-bottom:3px;"></div><div style="width:75%;height:2px;background:#5c3a3e;opacity:0.12;border-radius:2px;"></div><div style="width:65%;height:2px;background:#5c3a3e;opacity:0.1;border-radius:2px;"></div></div>',
+                // 海洋
+                'teal-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;position:relative;"><div style="width:60%;height:7px;background:#e0f0f0;opacity:0.5;border-radius:2px;margin-bottom:5px;"></div><div style="width:20px;height:2px;background:#2a8a8a;opacity:0.5;margin-bottom:4px;"></div><div style="width:35%;height:3px;background:#78a8a8;opacity:0.25;border-radius:2px;"></div><div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:#2a8a8a;opacity:0.3;"></div></div>',
+                'teal-cards': '<div style="padding:6px 10px;display:flex;flex-direction:column;gap:4px;height:100%;"><div style="width:45%;height:4px;background:#1a3c3c;opacity:0.35;border-radius:2px;margin-bottom:1px;"></div><div style="display:flex;gap:3px;flex:1;"><div style="flex:1;background:#e8f4f4;border-radius:3px;display:flex;flex-direction:column;align-items:center;padding-top:5px;gap:1px;"><span class="material-symbols-outlined" style="font-size:9px;color:#2a7a7a;opacity:0.5;">analytics</span><div style="width:50%;height:2px;background:#1a3c3c;opacity:0.08;border-radius:2px;"></div></div><div style="flex:1;background:#e8f4f4;border-radius:3px;display:flex;flex-direction:column;align-items:center;padding-top:5px;gap:1px;"><span class="material-symbols-outlined" style="font-size:9px;color:#2a7a7a;opacity:0.5;">psychology</span><div style="width:50%;height:2px;background:#1a3c3c;opacity:0.08;border-radius:2px;"></div></div><div style="flex:1;background:#e8f4f4;border-radius:3px;display:flex;flex-direction:column;align-items:center;padding-top:5px;gap:1px;"><span class="material-symbols-outlined" style="font-size:9px;color:#2a7a7a;opacity:0.5;">rocket_launch</span><div style="width:50%;height:2px;background:#1a3c3c;opacity:0.08;border-radius:2px;"></div></div></div></div>',
+                // 深灰
+                'char-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:60%;height:7px;background:#e8e8e8;opacity:0.45;border-radius:2px;margin-bottom:5px;"></div><div style="width:18px;height:2px;background:#6ebea8;opacity:0.5;margin-bottom:4px;"></div><div style="width:35%;height:3px;background:#888;opacity:0.2;border-radius:2px;"></div></div>',
+                'char-sidebar': '<div style="display:flex;height:100%;"><div style="width:35%;background:#1a1a1a;display:flex;flex-direction:column;padding:8px;justify-content:center;"><div style="width:65%;height:4px;background:#e8e8e8;opacity:0.4;border-radius:2px;margin-bottom:3px;"></div><div style="width:12px;height:2px;background:#6ebea8;opacity:0.4;border-radius:2px;"></div></div><div style="flex:1;padding:8px;display:flex;flex-direction:column;gap:3px;justify-content:center;"><div style="width:55%;height:3px;background:#2a2a2a;opacity:0.3;border-radius:2px;"></div><div style="width:85%;height:2px;background:#444;opacity:0.1;border-radius:2px;"></div><div style="width:75%;height:2px;background:#444;opacity:0.08;border-radius:2px;"></div></div></div>',
+                // 極簡
+                'mini-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:55%;height:6px;background:#111;opacity:0.4;border-radius:2px;margin-bottom:4px;"></div><div style="width:16px;height:2px;background:#111;opacity:0.25;margin-bottom:4px;"></div><div style="width:30%;height:3px;background:#888;opacity:0.15;border-radius:2px;"></div></div>',
+                'mini-split': '<div style="display:flex;height:100%;"><div style="flex:1;background:#111;display:flex;flex-direction:column;padding:10px;justify-content:center;"><div style="width:60%;height:5px;background:#fff;opacity:0.4;border-radius:2px;margin-bottom:3px;"></div><div style="width:12px;height:1px;background:#666;opacity:0.4;"></div></div><div style="flex:1;padding:10px;display:flex;flex-direction:column;gap:3px;justify-content:center;"><div style="width:70%;height:2px;background:#333;opacity:0.2;border-radius:2px;"></div><div style="width:60%;height:2px;background:#333;opacity:0.15;border-radius:2px;"></div></div></div>',
+                // 藏青
+                'navy-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:2px;height:14px;background:#b8960c;opacity:0.5;margin-bottom:2px;"></div><div style="width:55%;height:6px;background:#eae6d8;opacity:0.4;border-radius:2px;margin-bottom:4px;margin-left:8px;"></div><div style="width:35%;height:3px;background:#7a8aa0;opacity:0.2;border-radius:2px;margin-left:8px;"></div></div>',
+                'navy-data': '<div style="padding:8px 10px;display:flex;flex-direction:column;gap:4px;height:100%;"><div style="width:40%;height:3px;background:#eae6d8;opacity:0.3;border-radius:2px;"></div><div style="display:flex;gap:3px;"><div style="flex:1;background:rgba(184,150,12,0.06);border-radius:3px;height:24px;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:8px;color:#b8960c;opacity:0.4;">target</span></div><div style="flex:1;background:rgba(184,150,12,0.06);border-radius:3px;height:24px;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:8px;color:#b8960c;opacity:0.4;">speed</span></div><div style="flex:1;background:rgba(184,150,12,0.06);border-radius:3px;height:24px;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:8px;color:#b8960c;opacity:0.4;">thumb_up</span></div></div></div>',
+                // 暖橘
+                'terra-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;justify-content:center;height:100%;"><div style="width:60%;height:7px;background:#f0e4d7;opacity:0.5;border-radius:2px;margin-bottom:5px;"></div><div style="width:18px;height:2px;background:#c47d4e;opacity:0.5;margin-bottom:4px;"></div><div style="width:35%;height:3px;background:#a08670;opacity:0.25;border-radius:2px;"></div></div>',
+                'terra-steps': '<div style="padding:8px 14px;display:flex;flex-direction:column;justify-content:center;height:100%;position:relative;"><div style="position:absolute;left:16px;top:12px;bottom:12px;width:2px;background:#e0d5ca;opacity:0.5;"></div><div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;"><div style="width:7px;height:7px;border-radius:50%;background:#c47d4e;opacity:0.6;flex-shrink:0;z-index:1;"></div><div style="width:50%;height:3px;background:#3d2b1f;opacity:0.15;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;"><div style="width:7px;height:7px;border-radius:50%;background:#c47d4e;opacity:0.5;flex-shrink:0;z-index:1;"></div><div style="width:40%;height:3px;background:#3d2b1f;opacity:0.12;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;"><div style="width:7px;height:7px;border-radius:50%;background:#c47d4e;opacity:0.4;flex-shrink:0;z-index:1;"></div><div style="width:45%;height:3px;background:#3d2b1f;opacity:0.1;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:4px;"><div style="width:7px;height:7px;border-radius:50%;background:#c47d4e;opacity:0.3;flex-shrink:0;z-index:1;"></div><div style="width:35%;height:3px;background:#3d2b1f;opacity:0.08;border-radius:2px;"></div></div></div>',
+                // 酒紅
+                'wine-title': '<div style="padding:14px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;"><div style="width:60%;height:7px;background:#f5e8ec;opacity:0.45;border-radius:2px;margin-bottom:4px;"></div><div style="width:30px;height:1px;background:#8b3a50;opacity:0.4;margin-bottom:4px;"></div><div style="width:35%;height:3px;background:#9a7080;opacity:0.2;border-radius:2px;"></div></div>',
+                'wine-compare': '<div style="padding:6px 10px;display:flex;gap:4px;height:100%;align-items:center;"><div style="flex:1;background:#faf0f2;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#8b3a50;opacity:0.5;">close</span><div style="width:50%;height:2px;background:#5a2030;opacity:0.08;border-radius:2px;"></div></div><span style="font-size:8px;color:#bbb;">VS</span><div style="flex:1;background:#f0f5f2;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#2a7a4a;opacity:0.5;">check_circle</span><div style="width:50%;height:2px;background:#1a4a2a;opacity:0.08;border-radius:2px;"></div></div></div>',
+                // 通用
+                'blank': '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0.18;"><span class="material-symbols-outlined" style="font-size:28px;">crop_landscape</span></div>',
+                'blank-dark': '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:28px;color:rgba(255,255,255,0.25);">crop_landscape</span></div>',
+                'section-break': '<div style="padding:10px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;"><div style="font-size:18px;font-weight:900;color:currentColor;opacity:0.06;line-height:1;">01</div><div style="width:45%;height:5px;background:currentColor;opacity:0.3;border-radius:2px;margin-top:2px;"></div></div>',
+                'quote-card': '<div style="padding:10px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;"><div style="font-size:16px;opacity:0.1;line-height:1;">&ldquo;</div><div style="width:55%;height:3px;background:currentColor;opacity:0.15;border-radius:2px;margin:2px 0;"></div><div style="width:18px;height:1px;background:currentColor;opacity:0.08;margin-bottom:2px;"></div><div style="width:30%;height:2px;background:currentColor;opacity:0.08;border-radius:2px;"></div></div>',
+                'qa-page': '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;"><div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.35);">Q&A</div><div style="width:40%;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;"></div></div>',
+                'end-page': '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;"><div style="width:40%;height:5px;background:rgba(255,255,255,0.3);border-radius:2px;"></div><div style="width:25px;height:1px;background:rgba(255,255,255,0.1);"></div><div style="width:30%;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;"></div></div>',
+                // 結構
+                'timeline': '<div style="padding:6px 12px;display:flex;height:100%;"><div style="width:2px;background:#e2e8f0;margin:4px 6px 4px 8px;"></div><div style="flex:1;display:flex;flex-direction:column;gap:4px;justify-content:center;"><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;"></div><div style="width:60%;height:2px;background:#1e293b;opacity:0.12;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;flex-shrink:0;"></div><div style="width:50%;height:2px;background:#1e293b;opacity:0.1;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#059669;flex-shrink:0;"></div><div style="width:55%;height:2px;background:#1e293b;opacity:0.08;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#d97706;flex-shrink:0;"></div><div style="width:45%;height:2px;background:#1e293b;opacity:0.06;border-radius:2px;"></div></div></div></div>',
+                'comparison': '<div style="padding:6px 10px;display:flex;gap:4px;height:100%;align-items:center;"><div style="flex:1;background:#fef2f2;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#dc2626;opacity:0.5;">close</span><div style="width:50%;height:2px;background:#991b1b;opacity:0.08;border-radius:2px;"></div></div><span style="font-size:7px;color:#bbb;">VS</span><div style="flex:1;background:#ecfdf5;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#059669;opacity:0.5;">check_circle</span><div style="width:50%;height:2px;background:#065f46;opacity:0.08;border-radius:2px;"></div></div></div>',
+                'stats': '<div style="padding:6px 10px;display:flex;flex-direction:column;gap:4px;height:100%;"><div style="width:40%;height:3px;background:#1e293b;opacity:0.25;border-radius:2px;"></div><div style="display:flex;gap:3px;flex:1;"><div style="flex:1;background:#eff6ff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#2563eb;opacity:0.5;">95%</div><div style="flex:1;background:#ecfdf5;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#059669;opacity:0.5;">3.2x</div><div style="flex:1;background:#fefce8;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#d97706;opacity:0.5;">4.8</div></div></div>',
+                'flow': '<div style="padding:10px 10px;display:flex;gap:2px;height:100%;align-items:center;"><div style="flex:1;background:#eff6ff;border-radius:3px;height:50%;"></div><span class="material-symbols-outlined" style="font-size:8px;color:#cbd5e1;">arrow_forward</span><div style="flex:1;background:#ecfdf5;border-radius:3px;height:50%;"></div><span class="material-symbols-outlined" style="font-size:8px;color:#cbd5e1;">arrow_forward</span><div style="flex:1;background:#fefce8;border-radius:3px;height:50%;"></div><span class="material-symbols-outlined" style="font-size:8px;color:#cbd5e1;">arrow_forward</span><div style="flex:1;background:#fce7f3;border-radius:3px;height:50%;"></div></div>',
+                'layered-data': '<div style="padding:6px 10px;display:flex;flex-direction:column;gap:3px;height:100%;justify-content:center;"><div style="background:#eff6ff;border-radius:3px;height:20%;"></div><div style="background:#ecfdf5;border-radius:3px;height:20%;"></div><div style="background:#fefce8;border-radius:3px;height:20%;"></div><div style="background:#fce7f3;border-radius:3px;height:18%;"></div></div>',
+            };
+
+            // Fallback wireframe
+            const defaultWireframe = (icon, isDark) => {
+                const c = isDark ? 'rgba(255,255,255,' : 'rgba(0,0,0,';
+                return '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:20px;color:' + c + '0.2);">' + icon + '</span><div style="width:45%;height:3px;background:' + c + '0.1);border-radius:2px;"></div></div>';
+            };
+
             grid.innerHTML = `
             <div class="tpl-category-tabs">
                 ${categories.map(c => `<button class="tpl-tab ${c === filter ? 'active' : ''}" data-cat="${c}">${c}</button>`).join('')}
             </div>
             <div class="tpl-grid-inner">
                 ${templates.map(t => {
-                // 產生小預覽
                 const bg = t.create(() => '0').background || '#fff';
                 const bgStyle = bg.startsWith('linear') ? bg : bg;
+                const isDark = /^(linear-gradient.*(#0|#1|#2|#3|#4)|#0|#1|#2)/.test(bg);
+                const wf = wireframes[t.id] || defaultWireframe(t.icon, isDark);
                 return `
                     <div class="template-card" data-tpl="${t.id}" title="${t.name}">
-                        <div class="tpl-preview" style="background:${bgStyle};"></div>
+                        <div class="tpl-preview" style="background:${bgStyle};color:${isDark ? '#fff' : '#1e293b'};">${wf}</div>
                         <div class="tpl-info">
                             <span class="material-symbols-outlined" style="font-size:16px;">${t.icon}</span>
                             <span>${t.name}</span>
@@ -1816,14 +2690,20 @@ class App {
         const btn = document.getElementById('broadcastBtn');
         const icon = document.getElementById('broadcastBtnIcon');
         const label = document.getElementById('broadcastBtnLabel');
-        btn.classList.remove('broadcasting');
-        icon.textContent = 'cell_tower';
-        label.textContent = '廣播';
+        if (btn) btn.classList.remove('broadcasting');
+        if (icon) icon.textContent = 'cell_tower';
+        if (label) label.textContent = '廣播';
 
-        // UI — 隱藏狀態列
+        // UI — 隱藏狀態列（雙重保險）
         const bar = document.getElementById('broadcastBar');
-        bar.classList.remove('active');
-        document.querySelector('.admin-main').style.marginTop = '';
+        if (bar) {
+            bar.classList.remove('active');
+            bar.style.display = 'none';
+            // 下次啟動廣播時會重新 display:flex
+            setTimeout(() => { bar.style.display = ''; }, 100);
+        }
+        const adminMain = document.querySelector('.admin-main');
+        if (adminMain) adminMain.style.marginTop = '';
 
         this.showToast('📡 廣播已停止');
         this.sessionCode = null;
@@ -2307,11 +3187,22 @@ class App {
             presentationSlide.style.background = 'white';
         }
 
+        // 計算此頁的動畫步驟總數
+        const maxStep = Math.max(0, ...slide.elements.map(e => e.animOrder || 0));
+        this._currentBuildStep = 0;
+        this._maxBuildStep = maxStep;
+
         slide.elements.forEach(element => {
             const el = this.slideManager.createElementNode(element);
             if (el) {
-                // 保留 position:absolute；僅加上 presentation-element 禁用編輯交互
                 el.classList.add('presentation-element');
+                // 有 animOrder 的元素先隱藏
+                if (element.animOrder && element.animOrder > 0) {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(18px)';
+                    el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                    el.dataset.animOrder = element.animOrder;
+                }
                 presentationSlide.appendChild(el);
             }
         });
@@ -2347,6 +3238,20 @@ class App {
 
         // QR Code（廣播中 + 互動頁才顯示）
         this.updateQRCode();
+    }
+
+    // 顯示下一個動畫步驟，回傳 true 表示還有步驟要顯示
+    revealNextBuildStep() {
+        if (this._currentBuildStep >= this._maxBuildStep) return false;
+        this._currentBuildStep++;
+        const step = this._currentBuildStep;
+        const slide = document.getElementById('presentationSlide');
+        if (!slide) return false;
+        slide.querySelectorAll(`[data-anim-order="${step}"]`).forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        });
+        return this._currentBuildStep < this._maxBuildStep;
     }
 
     bindPresentationEvents() {
@@ -2442,7 +3347,10 @@ class App {
                 const tag = document.activeElement?.tagName;
                 if (['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'].includes(tag)) return;
                 e.preventDefault();
-                if (this.presentationIndex < this.slideManager.slides.length - 1) {
+                // 先顯示動畫步驟，全部顯示完再切下一頁
+                if (this._maxBuildStep > 0 && this._currentBuildStep < this._maxBuildStep) {
+                    this.revealNextBuildStep();
+                } else if (this.presentationIndex < this.slideManager.slides.length - 1) {
                     this.presentationIndex++;
                     this.renderPresentationSlide();
                     this.broadcastSlideData(this.presentationIndex);
@@ -2602,12 +3510,21 @@ class App {
 }
 
 // 啟動應用程式
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.app = new App();
-    });
-} else {
+async function initApp() {
     window.app = new App();
+    // 掛載 AI Agent 控制接口
+    try {
+        const { SlideAPI } = await import('./slideAPI.js');
+        window.SlideAPI = new SlideAPI(window.app.slideManager);
+        console.log('✅ SlideAPI ready — window.SlideAPI');
+    } catch (e) {
+        console.warn('SlideAPI load failed:', e);
+    }
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
 }
 
 // Q&A 全域函式

@@ -50,6 +50,10 @@
                 <button class="btn btn-ghost btn-sm" id="exportModalBtn" title="匯出簡報內容">
                     <span class="material-symbols-outlined icon-sm">download</span> 匯出
                 </button>
+                <button class="btn btn-ghost btn-sm" id="broadcastBtn" title="開始廣播 — 學員同步觀看">
+                    <span class="material-symbols-outlined icon-sm" id="broadcastBtnIcon">cell_tower</span>
+                    <span id="broadcastBtnLabel">廣播</span>
+                </button>
                 <button class="btn btn-primary btn-sm" id="playBtn" title="播放簡報（F5）">
                     <span class="material-symbols-outlined icon-sm">play_arrow</span> 播放
                 </button>
@@ -64,7 +68,9 @@
                 <div class="ribbon-tabs">
                     <button class="ribbon-tab active" data-tab="home">首頁</button>
                     <button class="ribbon-tab" data-tab="insert">插入</button>
+                    <button class="ribbon-tab" data-tab="interactive">互動</button>
                     <button class="ribbon-tab" data-tab="design">設計</button>
+                    <button class="ribbon-tab" data-tab="ai" style="color:#8b5cf6;font-weight:600;">AI 簡報</button>
                 </div>
 
                 <!-- 首頁面板 -->
@@ -181,32 +187,9 @@
                         </div>
                         <div class="ribbon-group-title">排列</div>
                     </div>
-                    <div class="ribbon-separator"></div>
-
-                    <!-- 簡報操作 -->
-                    <div class="ribbon-group">
-                        <div class="ribbon-group-content">
-                            <button class="ribbon-btn accent" id="presentBtn" title="開始播放簡報">
-                                <span class="material-symbols-outlined">play_circle</span>
-                                <span class="ribbon-btn-label">播放</span>
-                            </button>
-                        </div>
-                        <div class="ribbon-group-title">簡報</div>
-                    </div>
-                    <div class="ribbon-separator"></div>
-
-                    <!-- 廣播 -->
-                    <div class="ribbon-group">
-                        <div class="ribbon-group-content">
-                            <button class="ribbon-btn" id="broadcastBtn" title="開始廣播 — 學員同步觀看">
-                                <span class="material-symbols-outlined" id="broadcastBtnIcon">cell_tower</span>
-                                <span class="ribbon-btn-label" id="broadcastBtnLabel">廣播</span>
-                            </button>
-                        </div>
-                        <div class="ribbon-group-title">廣播</div>
-                    </div>
                 </div>
 
+                <!-- 插入面板 -->
                 <!-- 插入面板 -->
                 <div class="ribbon-panel" id="ribbon-insert">
                     <div class="ribbon-group">
@@ -242,6 +225,10 @@
                                 <span class="material-symbols-outlined">audio_file</span>
                                 <span class="ribbon-btn-label">音檔</span>
                             </button>
+                            <button class="ribbon-btn" id="bgmSettingBtn" title="設定背景音樂">
+                                <span class="material-symbols-outlined">music_note</span>
+                                <span class="ribbon-btn-label">音樂</span>
+                            </button>
                         </div>
                         <div class="ribbon-group-title">媒體</div>
                     </div>
@@ -249,68 +236,6 @@
 
                     <div class="ribbon-group">
                         <div class="ribbon-group-content">
-                            <button class="ribbon-btn interactive-btn" id="addMatchingBtn" title="連連看互動">
-                                <span class="material-symbols-outlined">drag_indicator</span>
-                                <span class="ribbon-btn-label">連連看</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addFillBlankBtn" title="填空題">
-                                <span class="material-symbols-outlined">edit_note</span>
-                                <span class="ribbon-btn-label">填空題</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addOrderingBtn" title="排列順序">
-                                <span class="material-symbols-outlined">format_list_numbered</span>
-                                <span class="ribbon-btn-label">排序</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addQuizBtn" title="選擇題">
-                                <span class="material-symbols-outlined">quiz</span>
-                                <span class="ribbon-btn-label">選擇題</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addPollBtn" title="投票">
-                                <span class="material-symbols-outlined">how_to_vote</span>
-                                <span class="ribbon-btn-label">投票</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addTrueFalseBtn" title="是非題">
-                                <span class="material-symbols-outlined">check_circle</span>
-                                <span class="ribbon-btn-label">是非題</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addOpenTextBtn" title="開放問答">
-                                <span class="material-symbols-outlined">chat</span>
-                                <span class="ribbon-btn-label">問答</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addScaleBtn" title="量表評分">
-                                <span class="material-symbols-outlined">linear_scale</span>
-                                <span class="ribbon-btn-label">量表</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addBuzzerBtn" title="搶答">
-                                <span class="material-symbols-outlined">notifications_active</span>
-                                <span class="ribbon-btn-label">搶答</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addWordCloudBtn" title="文字雲">
-                                <span class="material-symbols-outlined">cloud</span>
-                                <span class="ribbon-btn-label">文字雲</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="addHotspotBtn" title="圖片標註">
-                                <span class="material-symbols-outlined">my_location</span>
-                                <span class="ribbon-btn-label">標註</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="aiQuizBtn" title="AI 出題"
-                                style="position:relative;">
-                                <span class="material-symbols-outlined">auto_awesome</span>
-                                <span class="ribbon-btn-label">AI出題</span>
-                            </button>
-                            <button class="ribbon-btn" id="bgmSettingBtn" title="設定背景音樂">
-                                <span class="material-symbols-outlined">music_note</span>
-                                <span class="ribbon-btn-label">音樂</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="aiGenerateBtn" title="AI 生成簡報"
-                                style="position:relative;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:8px;">
-                                <span class="material-symbols-outlined">magic_button</span>
-                                <span class="ribbon-btn-label">AI簡報</span>
-                            </button>
-                            <button class="ribbon-btn interactive-btn" id="copyCardBtn" title="可複製文字卡片">
-                                <span class="material-symbols-outlined">content_paste</span>
-                                <span class="ribbon-btn-label">複製卡</span>
-                            </button>
                             <button class="ribbon-btn" id="addBarChartBtn" title="長條圖">
                                 <span class="material-symbols-outlined">bar_chart</span>
                                 <span class="ribbon-btn-label">長條圖</span>
@@ -324,7 +249,100 @@
                                 <span class="ribbon-btn-label">環形圖</span>
                             </button>
                         </div>
-                        <div class="ribbon-group-title">互動教學</div>
+                        <div class="ribbon-group-title">圖表</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn" id="importPdfBtn" title="匯入 PDF 簡報" style="color:#e65100;">
+                                <span class="material-symbols-outlined">picture_as_pdf</span>
+                                <span class="ribbon-btn-label">匯入 PDF</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="aiGenerateBtn" title="AI 生成簡報"
+                                style="position:relative;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-radius:8px;">
+                                <span class="material-symbols-outlined">magic_button</span>
+                                <span class="ribbon-btn-label">AI簡報</span>
+                            </button>
+                            <button class="ribbon-btn" id="insertEventOpenerBtn" title="插入活動開場封面頁"
+                                style="color:#8b5cf6;">
+                                <span class="material-symbols-outlined">celebration</span>
+                                <span class="ribbon-btn-label">活動開場</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">匯入 / 生成</div>
+                    </div>
+                </div>
+
+                <!-- 互動面板 -->
+                <div class="ribbon-panel" id="ribbon-interactive">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn interactive-btn" id="addQuizBtn" title="選擇題">
+                                <span class="material-symbols-outlined">quiz</span>
+                                <span class="ribbon-btn-label">選擇題</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addTrueFalseBtn" title="是非題">
+                                <span class="material-symbols-outlined">check_circle</span>
+                                <span class="ribbon-btn-label">是非題</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addFillBlankBtn" title="填空題">
+                                <span class="material-symbols-outlined">edit_note</span>
+                                <span class="ribbon-btn-label">填空題</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addOpenTextBtn" title="開放問答">
+                                <span class="material-symbols-outlined">chat</span>
+                                <span class="ribbon-btn-label">問答</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="aiQuizBtn" title="AI 出題"
+                                style="position:relative;">
+                                <span class="material-symbols-outlined">auto_awesome</span>
+                                <span class="ribbon-btn-label">AI出題</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">問答題目</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn interactive-btn" id="addPollBtn" title="投票">
+                                <span class="material-symbols-outlined">how_to_vote</span>
+                                <span class="ribbon-btn-label">投票</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addScaleBtn" title="量表評分">
+                                <span class="material-symbols-outlined">linear_scale</span>
+                                <span class="ribbon-btn-label">量表</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addWordCloudBtn" title="文字雲">
+                                <span class="material-symbols-outlined">cloud</span>
+                                <span class="ribbon-btn-label">文字雲</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">投票 / 回饋</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-content">
+                            <button class="ribbon-btn interactive-btn" id="addMatchingBtn" title="連連看互動">
+                                <span class="material-symbols-outlined">drag_indicator</span>
+                                <span class="ribbon-btn-label">連連看</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addOrderingBtn" title="排列順序">
+                                <span class="material-symbols-outlined">format_list_numbered</span>
+                                <span class="ribbon-btn-label">排序</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addBuzzerBtn" title="搶答">
+                                <span class="material-symbols-outlined">notifications_active</span>
+                                <span class="ribbon-btn-label">搶答</span>
+                            </button>
+                            <button class="ribbon-btn interactive-btn" id="addHotspotBtn" title="圖片標註">
+                                <span class="material-symbols-outlined">my_location</span>
+                                <span class="ribbon-btn-label">標註</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">遊戲 / 互動</div>
                     </div>
                     <div class="ribbon-separator"></div>
 
@@ -338,19 +356,16 @@
                                 <span class="material-symbols-outlined">gallery_thumbnail</span>
                                 <span class="ribbon-btn-label">展示牆</span>
                             </button>
-                        </div>
-                        <div class="ribbon-group-title">作業</div>
-                    </div>
-                    <div class="ribbon-separator"></div>
-
-                    <div class="ribbon-group">
-                        <div class="ribbon-group-content">
-                            <button class="ribbon-btn" id="importPdfBtn" title="匯入 PDF 簡報" style="color:#e65100;">
-                                <span class="material-symbols-outlined">picture_as_pdf</span>
-                                <span class="ribbon-btn-label">匯入 PDF</span>
+                            <button class="ribbon-btn interactive-btn" id="copyCardBtn" title="可複製文字卡片">
+                                <span class="material-symbols-outlined">content_paste</span>
+                                <span class="ribbon-btn-label">複製卡</span>
+                            </button>
+                            <button class="ribbon-btn" id="addNewsBtn" title="插入 AI 搜尋新聞" style="color:#0891b2;">
+                                <span class="material-symbols-outlined">newspaper</span>
+                                <span class="ribbon-btn-label">新聞</span>
                             </button>
                         </div>
-                        <div class="ribbon-group-title">匯入</div>
+                        <div class="ribbon-group-title">作業 / 其他</div>
                     </div>
                 </div>
 
@@ -486,6 +501,78 @@
                         <div class="ribbon-group-title">投影片大小</div>
                     </div>
                 </div>
+
+                <!-- AI 簡報面板 -->
+                <div class="ribbon-panel" id="ribbon-ai">
+                    <div class="ribbon-group" style="gap:0;">
+                        <div class="ribbon-group-content" style="gap:5px;align-items:stretch;">
+                            <!-- Phase 1 -->
+                            <button class="ai-phase-btn" id="aiPhaseContentBtn" title="Phase 1：生成白底文案投影片">
+                                <span class="ai-phase-num" style="background:#4f46e5;">1</span>
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#4f46e5;">edit_note</span>
+                                <span class="ai-phase-label">生成文案</span>
+                            </button>
+                            <span class="ai-phase-arrow">→</span>
+                            <!-- Phase 2 -->
+                            <button class="ai-phase-btn" id="aiPhaseVisualBtn" title="Phase 2：生成 SVG 圖表/示意圖">
+                                <span class="ai-phase-num" style="background:#0891b2;">2</span>
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#0891b2;">insert_chart</span>
+                                <span class="ai-phase-label">生成圖表</span>
+                            </button>
+                            <span class="ai-phase-arrow">→</span>
+                            <!-- Phase 3 -->
+                            <button class="ai-phase-btn" id="aiPhaseInteractiveBtn" title="Phase 3：插入互動元件">
+                                <span class="ai-phase-num" style="background:#0d9488;">3</span>
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#0d9488;">touch_app</span>
+                                <span class="ai-phase-label">插入互動</span>
+                            </button>
+                            <span class="ai-phase-arrow">→</span>
+                            <!-- Phase 4 -->
+                            <button class="ai-phase-btn" id="aiPhaseAnimBtn" title="Phase 4：設定逐步動畫呈現">
+                                <span class="ai-phase-num" style="background:#7c3aed;">4</span>
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#7c3aed;">animation</span>
+                                <span class="ai-phase-label">動畫呈現</span>
+                            </button>
+                            <span class="ai-phase-arrow">→</span>
+                            <!-- Phase 5 -->
+                            <button class="ai-phase-btn" id="aiPhaseDesignBtn" title="Phase 5：佈局風格 + 色系美化">
+                                <span class="ai-phase-num" style="background:#b45309;">5</span>
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#b45309;">auto_fix_high</span>
+                                <span class="ai-phase-label">美化設計</span>
+                            </button>
+                            <span class="ai-phase-arrow">→</span>
+                            <!-- Phase 6 -->
+                            <button class="ai-phase-btn" id="aiPhaseNotesBtn" title="Phase 6：生成講師教學大綱">
+                                <span class="ai-phase-num" style="background:#dc2626;">6</span>
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#dc2626;">record_voice_over</span>
+                                <span class="ai-phase-label">教學大綱</span>
+                            </button>
+                        </div>
+                        <div class="ribbon-group-title">AI 簡報流程</div>
+                    </div>
+                    <div class="ribbon-separator"></div>
+
+                    <!-- 問卷驅動 + 說明 -->
+                    <div class="ribbon-group" style="min-width:130px;">
+                        <div class="ribbon-group-content" style="flex-direction:column;align-items:center;gap:5px;">
+                            <button class="ai-phase-btn" id="aiSurveyAdjustBtn" title="根據課前問卷調整簡報內容"
+                                style="border-color:#8b5cf6;">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#8b5cf6;">tune</span>
+                                <span class="ai-phase-label">問卷驅動</span>
+                            </button>
+                            <div style="font-size:.6rem;color:#94a3b8;line-height:1.4;text-align:center;">
+                                可單獨執行任一階段<br>建議依序操作效果最佳</div>
+                        </div>
+                        <div class="ribbon-group-title">調整 / 說明</div>
+                    </div>
+                </div>
             </div>
 
             <!-- 主要內容區 -->
@@ -532,26 +619,40 @@
                             <span class="material-symbols-outlined">chevron_right</span>
                         </button>
                     </div>
-                    <!-- 講師備註 -->
-                    <div class="speaker-notes-panel" id="speakerNotesPanel">
-                        <div class="speaker-notes-header" id="speakerNotesToggle">
-                            <span class="material-symbols-outlined" style="font-size:16px;">sticky_note_2</span>
-                            講師備註
-                            <span class="material-symbols-outlined speaker-notes-chevron"
-                                id="notesChevron">expand_more</span>
-                        </div>
-                        <textarea class="speaker-notes-textarea" id="speakerNotesText" placeholder="在此輸入備註（學生看不到）…"
-                            style="display:none;"></textarea>
-                    </div>
                 </section>
 
-                <!-- 右側屬性面板 -->
+                <!-- 右側面板（屬性 + 講師備註）-->
                 <aside class="property-panel" id="propertyPanel">
-                    <div class="panel-header">
-                        <span>屬性</span>
+                    <div class="right-panel-tabs">
+                        <button class="right-panel-tab active" data-right-tab="props">屬性</button>
+                        <button class="right-panel-tab" data-right-tab="notes">
+                            <span class="material-symbols-outlined" style="font-size:14px;">sticky_note_2</span>
+                            講師備註
+                        </button>
                     </div>
-                    <div class="property-content" id="propertyContent">
-                        <!-- 動態屬性內容 -->
+                    <!-- 屬性 tab -->
+                    <div class="right-panel-body active" id="rightPanelProps">
+                        <div class="property-content" id="propertyContent">
+                            <!-- 動態屬性內容 -->
+                        </div>
+                    </div>
+                    <!-- 講師備註 tab -->
+                    <div class="right-panel-body" id="rightPanelNotes" style="display:none;">
+                        <div style="padding:12px;">
+                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                                <label
+                                    style="display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+                                    <input type="checkbox" id="slideNeedsNotes" style="accent-color:#8b5cf6;">
+                                    此頁需要備註
+                                </label>
+                            </div>
+                            <textarea id="speakerNotesRight"
+                                placeholder="在此輸入講師備註（學生看不到）…&#10;&#10;建議內容：&#10;• 講解重點與邏輯&#10;• 舉例或比喻&#10;• 互動提示（何時提問）&#10;• 時間控制建議"
+                                style="width:100%;min-height:280px;border:1px solid var(--border-light);border-radius:8px;padding:10px;font-size:13px;line-height:1.6;resize:vertical;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);"></textarea>
+                            <div id="notesWordCount"
+                                style="text-align:right;font-size:11px;color:var(--text-tertiary);margin-top:4px;">0 字
+                            </div>
+                        </div>
                     </div>
                 </aside>
             </main>
@@ -974,6 +1075,48 @@
             <span class="material-symbols-outlined">change_history</span> 三角形
         </button>
     </div>
+    <!-- 活動開場 -->
+    <div class="template-picker-overlay" id="eventOpenerOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:440px;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#8b5cf6;">celebration</span>
+                    活動開場封面頁
+                </h3>
+                <button class="template-picker-close" id="eventOpenerClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="template-picker-body" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <label style="font-size:13px;font-weight:600;color:var(--text-primary);">
+                    課程標題 <span style="color:#ef4444;">*</span>
+                </label>
+                <input type="text" id="eventOpenerTitle" placeholder="例：AI 時代的行銷策略實戰班"
+                    style="padding:10px 12px;border:1px solid var(--border-light);border-radius:8px;font-size:14px;font-family:inherit;">
+                <label style="font-size:13px;font-weight:600;color:var(--text-primary);">副標題（選填）</label>
+                <input type="text" id="eventOpenerSubtitle" placeholder="例：第一天 — 基礎概念篇"
+                    style="padding:10px 12px;border:1px solid var(--border-light);border-radius:8px;font-size:14px;font-family:inherit;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-primary);">Wi-Fi 名稱</label>
+                        <input type="text" id="eventOpenerWifi" placeholder="例：NTUST_Free"
+                            style="padding:10px 12px;border:1px solid var(--border-light);border-radius:8px;font-size:14px;font-family:inherit;">
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-primary);">Wi-Fi 密碼</label>
+                        <input type="text" id="eventOpenerPassword" placeholder="例：12345678"
+                            style="padding:10px 12px;border:1px solid var(--border-light);border-radius:8px;font-size:14px;font-family:inherit;">
+                    </div>
+                </div>
+                <button id="eventOpenerInsert"
+                    style="margin-top:8px;padding:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
+                    <span class="material-symbols-outlined"
+                        style="font-size:16px;vertical-align:middle;">add_circle</span>
+                    插入開場封面頁
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- AI 出題 -->
     <div class="template-picker-overlay" id="aiQuizOverlay" style="display:none;">
         <div class="template-picker-modal" style="width:420px;">
@@ -1118,6 +1261,367 @@
                     <span style="font-size:.72rem;color:#94a3b8;">模板套用</span>
                     <span style="font-size:.72rem;color:#94a3b8;">排版美化</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 階段一：生成文案 -->
+    <div class="template-picker-overlay" id="aiContentOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:520px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">edit_note</span>
+                    階段一：生成文案
+                </h3>
+                <button class="template-picker-close" id="aiContentClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="aiContentForm" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#f0f0ff;border-radius:8px;font-size:.8rem;color:#4338ca;line-height:1.6;">
+                    <b>說明：</b>此階段只產生白底純文字投影片，方便你先檢視並調整文案內容。
+                </div>
+                <div>
+                    <label
+                        style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">課程主題</label>
+                    <input type="text" id="aiContentTopic" placeholder="例如：AI 職場全方位應用"
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                </div>
+                <div style="display:flex;gap:12px;">
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">程度</label>
+                        <select id="aiContentLevel"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                            <option value="初級">初級（完全新手）</option>
+                            <option value="中級" selected>中級（有基本概念）</option>
+                            <option value="進階">進階（有使用經驗）</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">頁數</label>
+                        <input type="number" id="aiContentPages" value="30" min="10" max="200"
+                            style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">上傳
+                        PDF（選填）</label>
+                    <input type="file" id="aiContentPdf" accept=".pdf,.txt"
+                        style="width:100%;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem;">
+                </div>
+                <div>
+                    <label style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">課程大綱
+                        / 內容描述</label>
+                    <textarea id="aiContentOutline" rows="5" placeholder="請描述課程內容、主題、天數等..."
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;resize:vertical;line-height:1.6;"></textarea>
+                </div>
+                <!-- Prompt 設定 -->
+                <details class="ai-prompt-accordion">
+                    <summary>提示詞設定</summary>
+                    <textarea id="aiContentPrompt" rows="6" class="ai-prompt-textarea" data-prompt-key="slide_content"
+                        placeholder="載入中..."></textarea>
+                </details>
+                <button id="aiContentStart"
+                    style="padding:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">edit_note</span>
+                    開始生成文案
+                </button>
+                <div id="aiContentStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 階段二：生成圖表 -->
+    <div class="template-picker-overlay" id="aiVisualOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:500px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#0891b2;">insert_chart</span>
+                    階段二：生成圖表
+                </h3>
+                <button class="template-picker-close" id="aiVisualClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#ecfeff;border-radius:8px;font-size:.8rem;color:#155e75;line-height:1.6;">
+                    <b>說明：</b>AI 會分析每頁內容，自動判斷哪些頁面需要加入圖表、流程圖或示意圖，<br>
+                    並生成專業的 SVG 元件插入投影片。
+                </div>
+                <div style="font-size:.8rem;color:#475569;">
+                    目前投影片：<b id="aiVisualSlideCount">0</b> 頁
+                </div>
+                <details class="ai-prompt-accordion">
+                    <summary>提示詞設定</summary>
+                    <textarea id="aiVisualPrompt" rows="6" class="ai-prompt-textarea" data-prompt-key="slide_visual"
+                        placeholder="載入中..."></textarea>
+                </details>
+                <button id="aiVisualStart"
+                    style="padding:12px;background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">insert_chart</span>
+                    生成 SVG 圖表
+                </button>
+                <div id="aiVisualStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 階段三：插入互動 -->
+    <div class="template-picker-overlay" id="aiInteractiveOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:480px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#059669;">touch_app</span>
+                    階段三：插入互動元件
+                </h3>
+                <button class="template-picker-close" id="aiInteractiveClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="aiInteractiveForm" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#ecfdf5;border-radius:8px;font-size:.8rem;color:#065f46;line-height:1.6;">
+                    <b>說明：</b>AI 會分析現有投影片內容，每 8-12 頁自動插入互動元件。<br>
+                    支援：有獎徵答、問卷調查、排順序、連連看等。
+                </div>
+                <div style="font-size:.85rem;color:#1e293b;">
+                    目前簡報共 <b id="aiInteractiveSlideCount">0</b> 頁投影片
+                </div>
+                <details class="ai-prompt-accordion">
+                    <summary>提示詞設定</summary>
+                    <textarea id="aiInteractivePrompt" rows="6" class="ai-prompt-textarea"
+                        data-prompt-key="slide_interactive" placeholder="載入中..."></textarea>
+                </details>
+                <button id="aiInteractiveStart"
+                    style="padding:12px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">touch_app</span>
+                    開始插入互動元件
+                </button>
+                <div id="aiInteractiveStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 階段四：動畫呈現 -->
+    <div class="template-picker-overlay" id="aiAnimOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:500px;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#7c3aed;">animation</span>
+                    階段四：動畫呈現
+                </h3>
+                <button class="template-picker-close" id="aiAnimClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#f5f3ff;border-radius:8px;font-size:.8rem;color:#5b21b6;line-height:1.6;">
+                    <b>說明：</b>AI 會分析每一頁版面結構，自動判斷哪些元素需要逐步顯示。<br>
+                    簡報時按 → 鍵或簡報筆，內容會依序出現。
+                </div>
+                <div style="font-size:.8rem;color:#475569;">
+                    目前投影片：<b id="aiAnimSlideCount">0</b> 頁
+                </div>
+                <button id="aiAnimStart"
+                    style="padding:12px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">animation</span>
+                    設定逐步動畫
+                </button>
+                <div id="aiAnimStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 階段五：美化設計 -->
+    <div class="template-picker-overlay" id="aiDesignOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:640px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#d97706;">auto_fix_high</span>
+                    階段五：美化設計
+                </h3>
+                <button class="template-picker-close" id="aiDesignClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="aiDesignForm" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#fffbeb;border-radius:8px;font-size:.8rem;color:#92400e;line-height:1.6;">
+                    <b>說明：</b>選擇佈局風格和色系母板，AI 會將所有投影片重新排版並套用風格。
+                </div>
+                <div>
+                    <label
+                        style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:8px;">選擇佈局風格</label>
+                    <div id="aiDesignLayoutGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+                    </div>
+                </div>
+                <div>
+                    <label
+                        style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:8px;">選擇色系母板</label>
+                    <div id="aiDesignThemeGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;"></div>
+                </div>
+                <details class="ai-prompt-accordion">
+                    <summary>提示詞設定</summary>
+                    <textarea id="aiDesignPrompt" rows="6" class="ai-prompt-textarea" data-prompt-key="slide_design"
+                        placeholder="載入中..."></textarea>
+                </details>
+                <button id="aiDesignStart"
+                    style="padding:12px;background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">auto_fix_high</span>
+                    套用風格
+                </button>
+                <div id="aiDesignStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phase 6: 講師教學大綱 overlay -->
+    <div class="template-picker-overlay" id="aiNotesOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:520px;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined"
+                        style="font-size:20px;color:#dc2626;">record_voice_over</span>
+                    Phase 6：講師教學大綱
+                </h3>
+                <button class="template-picker-close" id="aiNotesClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#fef2f2;border-radius:8px;font-size:.8rem;color:#991b1b;line-height:1.6;">
+                    AI 會為每一頁投影片生成講師教學備忘錄，包含：<b>講解重點</b>、<b>舉例建議</b>、<b>表達技巧</b>、<b>互動提示</b>。結果會寫入每頁的「講師備註」欄位。
+                </div>
+                <details class="ai-prompt-accordion">
+                    <summary>提示詞設定</summary>
+                    <textarea id="aiNotesPrompt" rows="6" class="ai-prompt-textarea"
+                        data-prompt-key="slide_teaching_notes" placeholder="載入中..."></textarea>
+                </details>
+                <button id="aiNotesStart"
+                    style="padding:12px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">record_voice_over</span>
+                    生成教學大綱
+                </button>
+                <div id="aiNotesStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 問卷驅動調整 overlay -->
+    <div class="template-picker-overlay" id="aiSurveyOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:600px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#8b5cf6;">tune</span>
+                    問卷驅動簡報調整
+                </h3>
+                <button class="template-picker-close" id="aiSurveyClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#f5f3ff;border-radius:8px;font-size:.8rem;color:#5b21b6;line-height:1.6;">
+                    <b>說明：</b>AI 會讀取課前問卷的統計結果（學員組成、需求、投票），自動分析並建議需要調整的簡報頁面。
+                </div>
+                <div id="surveyDataPreview"
+                    style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:.78rem;color:#475569;max-height:200px;overflow-y:auto;">
+                    <span style="color:#94a3b8;">點擊下方按鈕載入問卷數據...</span>
+                </div>
+                <button id="aiSurveyLoadBtn"
+                    style="padding:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+                    載入問卷數據
+                </button>
+                <details class="ai-prompt-accordion">
+                    <summary>提示詞設定</summary>
+                    <textarea id="aiSurveyPrompt" rows="6" class="ai-prompt-textarea"
+                        data-prompt-key="slide_survey_adjust" placeholder="載入中..."></textarea>
+                </details>
+                <button id="aiSurveyStart" disabled
+                    style="padding:12px;background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;opacity:0.5;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">tune</span>
+                    根據問卷調整簡報
+                </button>
+                <div id="aiSurveyStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;">
+                </div>
+                <div id="aiSurveyResults" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新聞搜尋 overlay -->
+    <div class="template-picker-overlay" id="newsOverlay" style="display:none;">
+        <div class="template-picker-modal" style="width:560px;max-height:90vh;overflow-y:auto;">
+            <div class="template-picker-header">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:#0891b2;">newspaper</span>
+                    AI 新聞搜尋
+                </h3>
+                <button class="template-picker-close" id="newsOverlayClose">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+                <div
+                    style="padding:12px;background:#ecfeff;border-radius:8px;font-size:.8rem;color:#155e75;line-height:1.6;">
+                    <b>說明：</b>AI 會根據主題搜尋最新的相關新聞，生成含標題、摘要和來源連結的新聞投影片。
+                </div>
+                <div>
+                    <label
+                        style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">搜尋主題</label>
+                    <input type="text" id="newsTopicInput" placeholder="例如：AI 在職場的最新應用趨勢"
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                </div>
+                <div style="display:flex;gap:12px;">
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">日期範圍</label>
+                        <select id="newsDateRange"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                            <option value="3d">最近 3 天</option>
+                            <option value="14d" selected>最近 14 天</option>
+                            <option value="30d">最近一個月</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">每頁新聞數</label>
+                        <select id="newsPerPage"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                            <option value="3">3 則</option>
+                            <option value="4" selected>4 則</option>
+                            <option value="5">5 則</option>
+                        </select>
+                    </div>
+                    <div style="flex:1;">
+                        <label
+                            style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">生成頁數</label>
+                        <select id="newsPages"
+                            style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                            <option value="1" selected>1 頁</option>
+                            <option value="2">2 頁</option>
+                            <option value="3">3 頁</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="newsSearchBtn"
+                    style="padding:12px;background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">newspaper</span>
+                    搜尋並插入新聞
+                </button>
+                <div id="newsStatus" style="font-size:.82rem;color:#64748b;text-align:center;min-height:24px;"></div>
+                <div id="newsPreview" style="display:none;"></div>
             </div>
         </div>
     </div>
