@@ -822,43 +822,64 @@ export class SlideManager {
      * 渲染當前投影片
      */
     renderCurrentSlide() {
-        const slide = this.getCurrentSlide();
-        if (!slide) return;
+        // ★ Re-entrancy guard—避免過度遞迴導致 Chrome crash
+        if (this._isRendering) return;
+        this._isRendering = true;
 
-        // 套用背景
-        const canvas = document.getElementById('slideCanvas');
-        if (slide.background && slide.background !== '#ffffff') {
-            canvas.style.background = slide.background;
-        } else {
-            canvas.style.background = 'white';
+        // ★ Rate limiter—每秒最多 50 次
+        const now = Date.now();
+        if (!this._renderWindow) this._renderWindow = { start: now, count: 0 };
+        if (now - this._renderWindow.start > 1000) {
+            this._renderWindow = { start: now, count: 0 };
         }
-
-        // 清空畫布
-        this.canvasContentEl.innerHTML = '';
-
-        if (slide.elements.length === 0) {
-            this.canvasContentEl.innerHTML = '<p class="placeholder-text">點擊上方工具列新增內容</p>';
+        this._renderWindow.count++;
+        if (this._renderWindow.count > 50) {
+            console.warn('[SlideManager] renderCurrentSlide rate limit exceeded:', this._renderWindow.count);
+            this._isRendering = false;
             return;
         }
 
-        // 渲染每個元素
-        slide.elements.forEach(element => {
-            const el = this.createElementNode(element);
-            if (el) {
-                this.canvasContentEl.appendChild(el);
+        try {
+            const slide = this.getCurrentSlide();
+            if (!slide) return;
+
+            // 套用背景
+            const canvas = document.getElementById('slideCanvas');
+            if (slide.background && slide.background !== '#ffffff') {
+                canvas.style.background = slide.background;
+            } else {
+                canvas.style.background = 'white';
             }
-        });
 
-        // 過場動畫
-        const transType = slide.transition || 'fade';
-        ['slide-transition-fade', 'slide-transition-slide-left', 'slide-transition-zoom'].forEach(c =>
-            this.canvasContentEl.classList.remove(c)
-        );
-        void this.canvasContentEl.offsetWidth; // force reflow
-        this.canvasContentEl.classList.add(`slide-transition-${transType}`);
+            // 清空畫布
+            this.canvasContentEl.innerHTML = '';
 
-        // 觸發自訂事件
-        window.dispatchEvent(new CustomEvent('slideRendered', { detail: slide }));
+            if (slide.elements.length === 0) {
+                this.canvasContentEl.innerHTML = '<p class="placeholder-text">點擊上方工具列新增內容</p>';
+                return;
+            }
+
+            // 渲染每個元素
+            slide.elements.forEach(element => {
+                const el = this.createElementNode(element);
+                if (el) {
+                    this.canvasContentEl.appendChild(el);
+                }
+            });
+
+            // 過場動畫
+            const transType = slide.transition || 'fade';
+            ['slide-transition-fade', 'slide-transition-slide-left', 'slide-transition-zoom'].forEach(c =>
+                this.canvasContentEl.classList.remove(c)
+            );
+            void this.canvasContentEl.offsetWidth; // force reflow
+            this.canvasContentEl.classList.add(`slide-transition-${transType}`);
+
+            // 觸發自訂事件
+            window.dispatchEvent(new CustomEvent('slideRendered', { detail: slide }));
+        } finally {
+            this._isRendering = false;
+        }
     }
 
     /**
@@ -1615,9 +1636,39 @@ export class SlideManager {
             }
         }
 
-        // 重新渲染以更新所有 flowline 的位置
-        this.renderCurrentSlide();
+        // 直接更新 DOM 中的 SVG path（避免觸發 renderCurrentSlide）
+        for (const fl of flowlines) {
+            const flEl = this.canvasContentEl.querySelector(`[data-id="${fl.id}"]`);
+            if (flEl) {
+                const svg = flEl.querySelector('svg');
+                const path = svg?.querySelector('path');
+                if (path && fl.waypoints.length >= 2) {
+                    const pts = fl.waypoints;
+                    let d = `M ${pts[0].x} ${pts[0].y}`;
+                    if (fl.lineStyle === 'curve') {
+                        for (let i = 1; i < pts.length; i++) {
+                            const prev = pts[i - 1];
+                            const cur = pts[i];
+                            const cpx1 = prev.x + (cur.x - prev.x) * 0.5;
+                            const cpy1 = prev.y;
+                            const cpx2 = prev.x + (cur.x - prev.x) * 0.5;
+                            const cpy2 = cur.y;
+                            d += ` C ${cpx1} ${cpy1}, ${cpx2} ${cpy2}, ${cur.x} ${cur.y}`;
+                        }
+                    } else {
+                        for (let i = 1; i < pts.length; i++) {
+                            d += ` L ${pts[i].x} ${pts[i].y}`;
+                        }
+                    }
+                    path.setAttribute('d', d);
+                    // 同步動畫虛線 path
+                    const animPath = svg.querySelector('.flow-dash');
+                    if (animPath) animPath.setAttribute('d', d);
+                }
+            }
+        }
         this.renderThumbnails();
+        this.save();
     }
 
     /**
