@@ -3627,6 +3627,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (!presentationMode.classList.contains('active')) return;
 
             if (e.key === 'Escape') {
+                // 如果文件檢視器開著，先關它
+                if (this.documentViewer?._overlay) {
+                    this.documentViewer.closeViewer();
+                    return;
+                }
                 this.exitPresentation();
             } else if (e.key === 'ArrowRight' || e.key === ' ') {
                 // 不在互動元素內才切換頁面

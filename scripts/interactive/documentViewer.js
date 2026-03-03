@@ -12,15 +12,9 @@ export class DocumentViewer {
 
         // 全域函數：供 inline onclick 呼叫（最穩定的方式）
         window._openDocViewer = (elementId) => {
-            console.log('[DocViewer] onclick fired, elementId:', elementId);
-            const sc = document.getElementById('slideCanvas');
-            const pm = document.getElementById('presentationMode');
-            const isActive = pm?.classList.contains('active');
-            console.log('[DocViewer] slideCanvas:', !!sc, 'presMode active:', isActive);
-            const isEditing = !!sc && !isActive;
-            console.log('[DocViewer] isEditing:', isEditing);
-            if (isEditing) { console.log('[DocViewer] blocked by isEditing'); return; }
-            console.log('[DocViewer] calling openViewer');
+            const isEditing = !!document.getElementById('slideCanvas')
+                && !document.getElementById('presentationMode')?.classList.contains('active');
+            if (isEditing) return;
             this.openViewer(elementId);
         };
     }
@@ -33,32 +27,12 @@ export class DocumentViewer {
      * 直接綁定 click 到每個文件卡片（與其他互動模組相同方式）
      */
     init() {
+        // init 只設定 pointer-events，click 由 inline onclick 處理（避免重複觸發）
         const cards = document.querySelectorAll('.document-card-container');
         cards.forEach(card => {
-            if (card._docViewerBound) return;
-            card._docViewerBound = true;
-
-            // 強制設定 inline pointer-events（繞過 CSS 繼承）
             card.style.pointerEvents = 'auto';
             card.style.cursor = 'pointer';
-            // 父層也要可點擊
-            if (card.parentElement) {
-                card.parentElement.style.pointerEvents = 'auto';
-            }
-            // 所有子元素也要可點擊
-            card.querySelectorAll('*').forEach(child => {
-                child.style.pointerEvents = 'auto';
-            });
-
-            card.addEventListener('click', (e) => {
-                const isEditing = !!document.getElementById('slideCanvas')
-                    && !document.getElementById('presentationMode')?.classList.contains('active');
-                if (isEditing) return;
-
-                e.stopPropagation();
-                e.preventDefault();
-                this.openViewer(card.dataset.elementId);
-            });
+            if (card.parentElement) card.parentElement.style.pointerEvents = 'auto';
         });
     }
 
@@ -147,14 +121,11 @@ export class DocumentViewer {
      * 打開文件檢視器
      */
     async openViewer(elementId) {
-        console.log('[DocViewer] openViewer called, elementId:', elementId);
-        console.log('[DocViewer] window.app:', !!window.app, 'slideManager:', !!window.app?.slideManager, 'slides:', window.app?.slideManager?.slides?.length);
-        const data = this._getElementData(elementId);
-        console.log('[DocViewer] data found:', !!data, data?.docTitle);
-        if (!data) { console.log('[DocViewer] NO DATA FOUND - aborting'); return; }
+        // 防止重複開啟
+        if (this._overlay) return;
 
-        // 移除舊的 overlay
-        this.closeViewer();
+        const data = this._getElementData(elementId);
+        if (!data) return;
 
         const content = this.parseMarkdown(data.docContent || '');
         const anchors = data.docAnchors || [];
