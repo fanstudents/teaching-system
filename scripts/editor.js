@@ -437,7 +437,11 @@ export class Editor {
             flowSpeed: 2,
             flowDirection: 1,
             particleCount: 3,
-            dashLength: 16
+            dashLength: 16,
+            showArrow: false,
+            curveMode: 'curved',   // 'curved' | 'straight'
+            snapStartId: null,
+            snapEndId: null
         };
 
         this.slideManager.addElement(element);
@@ -840,7 +844,32 @@ export class Editor {
 
         // 流動線條屬性面板
         if (type === 'flowline') {
+            // 收集同一投影片上的其他元素，供吸附選擇
+            const otherElements = slide.elements.filter(e => e.id !== elementId && e.type !== 'flowline');
+            const snapOptions = otherElements.map(e => {
+                const label = e.type === 'text' ? (e.content || '文字').substring(0, 10) :
+                    e.type === 'shape' ? `形狀(${e.shapeType || ''})` :
+                        e.type === 'image' ? '圖片' : e.type;
+                return `<option value="${e.id}" ${elementData.snapStartId === e.id ? 'selected' : ''}>${label}</option>`;
+            }).join('');
+            const snapEndOptions = otherElements.map(e => {
+                const label = e.type === 'text' ? (e.content || '文字').substring(0, 10) :
+                    e.type === 'shape' ? `形狀(${e.shapeType || ''})` :
+                        e.type === 'image' ? '圖片' : e.type;
+                return `<option value="${e.id}" ${elementData.snapEndId === e.id ? 'selected' : ''}>${label}</option>`;
+            }).join('');
+
             html += `
+                <div class="property-section">
+                    <div class="property-section-title">路徑預設形狀</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                        <button class="flow-shape-preset" data-shape="wave" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:11px;font-family:inherit;">〰️ 波浪</button>
+                        <button class="flow-shape-preset" data-shape="ellipse" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:11px;font-family:inherit;">⭕ 橢圓</button>
+                        <button class="flow-shape-preset" data-shape="rectangle" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:11px;font-family:inherit;">⬜ 方形</button>
+                        <button class="flow-shape-preset" data-shape="triangle" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:11px;font-family:inherit;">🔺 三角</button>
+                        <button class="flow-shape-preset" data-shape="zigzag" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:11px;font-family:inherit;">⚡ 鋸齒</button>
+                    </div>
+                </div>
                 <div class="property-section">
                     <div class="property-section-title">線條樣式</div>
                     <div class="property-row">
@@ -855,6 +884,20 @@ export class Editor {
                         <label>線寬</label>
                         <input type="range" id="flowLineWidth" value="${elementData.lineWidth || 3}" min="1" max="8" step="1" style="flex:1;">
                         <span id="flowLineWidthVal" style="font-size:12px;min-width:20px;text-align:center;">${elementData.lineWidth || 3}</span>
+                    </div>
+                    <div class="property-row">
+                        <label>箭頭</label>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;">
+                            <input type="checkbox" id="flowShowArrow" ${elementData.showArrow ? 'checked' : ''} style="accent-color:#6366f1;">
+                            <span style="font-size:12px;">顯示箭頭</span>
+                        </label>
+                    </div>
+                    <div class="property-row">
+                        <label>線型</label>
+                        <select id="flowCurveMode" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="curved" ${(elementData.curveMode || 'curved') === 'curved' ? 'selected' : ''}>曲線</option>
+                            <option value="straight" ${elementData.curveMode === 'straight' ? 'selected' : ''}>直線</option>
+                        </select>
                     </div>
                 </div>
                 <div class="property-section">
@@ -876,6 +919,24 @@ export class Editor {
                         <input type="range" id="flowParticleCount" value="${elementData.particleCount || 3}" min="1" max="6" step="1" style="flex:1;">
                         <span id="flowParticleCountVal" style="font-size:12px;min-width:20px;text-align:center;">${elementData.particleCount || 3}</span>
                     </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title">吸附元素</div>
+                    <div class="property-row">
+                        <label>起點</label>
+                        <select id="flowSnapStart" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="">無</option>
+                            ${snapOptions}
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <label>終點</label>
+                        <select id="flowSnapEnd" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="">無</option>
+                            ${snapEndOptions}
+                        </select>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:2px;">選擇元素後，線條起/終點會自動吸附到該元素邊緣</div>
                 </div>
             `;
         }
@@ -1337,6 +1398,7 @@ export class Editor {
             flowBind('flowLineWidth', 'lineWidth', v => parseInt(v) || 3, 'flowLineWidthVal');
             flowBind('flowSpeed', 'flowSpeed', v => parseInt(v) || 2, 'flowSpeedVal');
             flowBind('flowParticleCount', 'particleCount', v => parseInt(v) || 3, 'flowParticleCountVal');
+
             const dirSelect = document.getElementById('flowDirection');
             if (dirSelect) {
                 dirSelect.addEventListener('change', () => {
@@ -1344,6 +1406,115 @@ export class Editor {
                     flowRerender();
                 });
             }
+
+            // 箭頭
+            const arrowCheck = document.getElementById('flowShowArrow');
+            if (arrowCheck) {
+                arrowCheck.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { showArrow: arrowCheck.checked });
+                    flowRerender();
+                });
+            }
+
+            // 曲線 / 直線
+            const curveModeSelect = document.getElementById('flowCurveMode');
+            if (curveModeSelect) {
+                curveModeSelect.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { curveMode: curveModeSelect.value });
+                    flowRerender();
+                });
+            }
+
+            // 吸附
+            const snapStartSelect = document.getElementById('flowSnapStart');
+            if (snapStartSelect) {
+                snapStartSelect.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { snapStartId: snapStartSelect.value || null });
+                    flowRerender();
+                });
+            }
+            const snapEndSelect = document.getElementById('flowSnapEnd');
+            if (snapEndSelect) {
+                snapEndSelect.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { snapEndId: snapEndSelect.value || null });
+                    flowRerender();
+                });
+            }
+
+            // 路徑預設形狀
+            document.querySelectorAll('.flow-shape-preset').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const shape = btn.dataset.shape;
+                    const w = elementData.width;
+                    const h = elementData.height;
+                    let newPts = [];
+                    const presetMode = shape === 'wave' ? 'curved' : (shape === 'ellipse' ? 'curved' : 'straight');
+
+                    switch (shape) {
+                        case 'wave':
+                            newPts = [
+                                { x: 0, y: h / 2 },
+                                { x: w * 0.25, y: h * 0.1 },
+                                { x: w * 0.5, y: h * 0.9 },
+                                { x: w * 0.75, y: h * 0.1 },
+                                { x: w, y: h / 2 }
+                            ];
+                            break;
+                        case 'ellipse': {
+                            const cx = w / 2, cy = h / 2;
+                            const rx = w / 2 * 0.9, ry = h / 2 * 0.9;
+                            const segments = 12;
+                            for (let i = 0; i <= segments; i++) {
+                                const angle = (2 * Math.PI * i) / segments;
+                                newPts.push({
+                                    x: Math.round(cx + rx * Math.cos(angle)),
+                                    y: Math.round(cy + ry * Math.sin(angle))
+                                });
+                            }
+                            break;
+                        }
+                        case 'rectangle': {
+                            const m = 20; // margin
+                            newPts = [
+                                { x: m, y: m },
+                                { x: w - m, y: m },
+                                { x: w - m, y: h - m },
+                                { x: m, y: h - m },
+                                { x: m, y: m }
+                            ];
+                            break;
+                        }
+                        case 'triangle': {
+                            const m = 20;
+                            newPts = [
+                                { x: w / 2, y: m },
+                                { x: w - m, y: h - m },
+                                { x: m, y: h - m },
+                                { x: w / 2, y: m }
+                            ];
+                            break;
+                        }
+                        case 'zigzag': {
+                            const segs = 6;
+                            for (let i = 0; i <= segs; i++) {
+                                newPts.push({
+                                    x: Math.round(w * i / segs),
+                                    y: i % 2 === 0 ? h * 0.2 : h * 0.8
+                                });
+                            }
+                            break;
+                        }
+                    }
+
+                    const updates = { waypoints: newPts };
+                    // 橢圓用曲線，其他預設用直線（使用者仍可手動切換）
+                    if (shape === 'ellipse' || shape === 'wave') updates.curveMode = 'curved';
+                    else updates.curveMode = 'straight';
+
+                    this.slideManager.updateElement(elementId, updates);
+                    flowRerender();
+                });
+            });
         }
 
         // 外觀設定（標題字級 / 選項字級 / 內距）

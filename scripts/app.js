@@ -32,6 +32,7 @@ class App {
         // 初始化模組
         this.slideManager = new SlideManager();
         this.editor = new Editor(this.slideManager);
+        window.__editorRef = this.editor;
         this.dragDrop = new DragDrop(this.slideManager, this.editor);
         this.iconLibrary = new IconLibrary(this.slideManager);
         this.matchingGame = new MatchingGame();
@@ -3509,7 +3510,7 @@ class App {
                 }
                 if (this.editor?.selectedElement) {
                     e.preventDefault();
-                    this.editor.deleteSelectedElement();
+                    this.editor.deleteSelected();
                 }
                 // 不再 fallback 刪除投影片，避免誤刪
             }

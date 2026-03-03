@@ -29,6 +29,8 @@ export class SlideManager {
                 // 確保不是正在編輯文字
                 const tag = document.activeElement?.tagName;
                 if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+                // 如果編輯器有選取中的元素，則不刪除投影片（應刪除元素）
+                if (window.__editorRef?.selectedElement) return;
                 e.preventDefault();
                 this.deleteSelectedSlides();
             }
@@ -1422,8 +1424,25 @@ export class SlideManager {
     renderFlowLineElement(el, element) {
         const w = element.width;
         const h = element.height;
-        const pts = element.waypoints || [];
+        let pts = [...(element.waypoints || [])];
         if (pts.length < 2) return;
+
+        // 吸附：如果設定了 snapStartId / snapEndId，計算目標元素邊緣的座標
+        const slide = this.getCurrentSlide();
+        if (element.snapStartId && slide) {
+            const target = slide.elements.find(e => e.id === element.snapStartId);
+            if (target) {
+                const sp = this._getSnapPoint(element, target, 'start');
+                pts[0] = { x: sp.x - element.x, y: sp.y - element.y };
+            }
+        }
+        if (element.snapEndId && slide) {
+            const target = slide.elements.find(e => e.id === element.snapEndId);
+            if (target) {
+                const sp = this._getSnapPoint(element, target, 'end');
+                pts[pts.length - 1] = { x: sp.x - element.x, y: sp.y - element.y };
+            }
+        }
 
         const color = element.lineColor || '#6366f1';
         const glow = element.glowColor || '#818cf8';
@@ -1432,9 +1451,11 @@ export class SlideManager {
         const dir = element.flowDirection || 1;
         const pCount = element.particleCount || 3;
         const dash = element.dashLength || 16;
+        const showArrow = element.showArrow || false;
+        const curveMode = element.curveMode || 'curved';
 
-        // 用 catmull-rom → cubic bezier 產生平滑路徑
-        const pathD = this._flowLinePath(pts);
+        // 產生路徑
+        const pathD = this._flowLinePath(pts, curveMode);
 
         // 計算路徑長度（粗估）
         let totalLen = 0;
@@ -1444,7 +1465,15 @@ export class SlideManager {
         totalLen = Math.max(totalLen, 200);
 
         // 動畫持續時間
-        const dur = (6 - speed) * 1.5 + 1; // speed=1 → 8.5s, speed=5 → 2.5s
+        const dur = (6 - speed) * 1.5 + 1;
+
+        // 箭頭 marker 定義
+        const arrowMarker = showArrow ? `
+            <marker id="flowArrow_${element.id}" markerWidth="10" markerHeight="8"
+                refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L10,4 L0,8 L2,4 Z" fill="${color}"/>
+            </marker>` : '';
+        const markerEnd = showArrow ? `marker-end="url(#flowArrow_${element.id})"` : '';
 
         // 建構粒子 path 元素
         let particlePaths = '';
@@ -1468,6 +1497,8 @@ export class SlideManager {
         const startPt = pts[0];
         const endPt = pts[pts.length - 1];
 
+        // viewBox 加大以容納箭頭和光暈
+        const pad = 20;
         el.style.overflow = 'visible';
         el.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"
@@ -1477,6 +1508,7 @@ export class SlideManager {
                         <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
                         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
                     </filter>
+                    ${arrowMarker}
                 </defs>
                 <!-- 底部光暈線 -->
                 <path d="${pathD}" fill="none" stroke="${glow}" stroke-width="${lw + 6}"
@@ -1484,27 +1516,59 @@ export class SlideManager {
                     filter="url(#flowGlow_${element.id})"/>
                 <!-- 底部靜態線 -->
                 <path d="${pathD}" fill="none" stroke="${color}" stroke-width="${lw}"
-                    stroke-linecap="round" opacity="0.2"/>
+                    stroke-linecap="round" opacity="0.2" ${markerEnd}/>
                 <!-- 流動粒子 -->
                 ${particlePaths}
                 <!-- 端點 -->
                 <circle cx="${startPt.x}" cy="${startPt.y}" r="${lw + 2}" fill="${color}" opacity="0.6"/>
-                <circle cx="${endPt.x}" cy="${endPt.y}" r="${lw + 2}" fill="${color}" opacity="0.6"/>
+                ${showArrow ? '' : `<circle cx="${endPt.x}" cy="${endPt.y}" r="${lw + 2}" fill="${color}" opacity="0.6"/>`}
             </svg>
         `;
     }
 
     /**
-     * 將 waypoints 轉為平滑 SVG path (catmull-rom 簡化版)
+     * 計算吸附點（目標元素最近邊緣中心）
      */
-    _flowLinePath(pts) {
+    _getSnapPoint(flowEl, target, which) {
+        // flowLine 的起點或終點的絕對座標
+        const pts = flowEl.waypoints || [];
+        const refPt = which === 'start' ? pts[pts.length - 1] : pts[0];
+        const refAbsX = flowEl.x + refPt.x;
+        const refAbsY = flowEl.y + refPt.y;
+
+        // 目標元素四個邊的中心點
+        const cx = target.x + target.width / 2;
+        const cy = target.y + target.height / 2;
+        const edges = [
+            { x: cx, y: target.y },                        // top
+            { x: cx, y: target.y + target.height },        // bottom
+            { x: target.x, y: cy },                        // left
+            { x: target.x + target.width, y: cy },         // right
+        ];
+
+        // 選最近的邊
+        let best = edges[0], bestDist = Infinity;
+        for (const e of edges) {
+            const d = Math.hypot(e.x - refAbsX, e.y - refAbsY);
+            if (d < bestDist) { bestDist = d; best = e; }
+        }
+        return best;
+    }
+
+    /**
+     * 將 waypoints 轉為 SVG path (curved 或 straight)
+     */
+    _flowLinePath(pts, mode = 'curved') {
         if (pts.length < 2) return '';
-        if (pts.length === 2) {
-            return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y}`;
+        if (pts.length === 2 || mode === 'straight') {
+            let d = `M${pts[0].x},${pts[0].y}`;
+            for (let i = 1; i < pts.length; i++) {
+                d += ` L${pts[i].x},${pts[i].y}`;
+            }
+            return d;
         }
 
         let d = `M${pts[0].x},${pts[0].y}`;
-
         for (let i = 0; i < pts.length - 1; i++) {
             const p0 = pts[Math.max(i - 1, 0)];
             const p1 = pts[i];
