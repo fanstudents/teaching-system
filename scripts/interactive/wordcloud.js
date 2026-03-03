@@ -14,8 +14,14 @@ export class WordCloudGame {
     }
 
     init() {
+        // ★ 清除舊的定時刷新（防止 renderCurrentSlide 導致 N 個並發 interval）
+        if (this._cloudIntervals) {
+            this._cloudIntervals.forEach(id => clearInterval(id));
+        }
+        this._cloudIntervals = [];
+
         document.querySelectorAll('.wordcloud-container').forEach(c => {
-            if (!c.dataset._wcReady) { c.dataset._wcReady = '1'; this.setupContainer(c); }
+            this.setupContainer(c);
         });
     }
 
@@ -149,7 +155,8 @@ export class WordCloudGame {
 
         // 定時刷新文字雲
         if (cloudEl) {
-            setInterval(() => this.renderCloud(elementId, cloudEl), 4000);
+            const intervalId = setInterval(() => this.renderCloud(elementId, cloudEl), 4000);
+            this._cloudIntervals.push(intervalId);
         }
     }
 

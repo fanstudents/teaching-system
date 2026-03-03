@@ -19,6 +19,12 @@ export class OrderingGame {
     }
 
     init() {
+        // ★ 清除舊的 MutationObserver（防止 renderCurrentSlide 導致 N 個並發 observer）
+        if (this._observers) {
+            this._observers.forEach(obs => obs.disconnect());
+        }
+        this._observers = [];
+
         document.querySelectorAll('.ordering-container').forEach(c => this.setupContainer(c));
     }
 
@@ -394,6 +400,7 @@ export class OrderingGame {
             });
         });
         observer.observe(container, { childList: true, subtree: true });
+        this._observers.push(observer);
     }
 
     /* ====================================================
