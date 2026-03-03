@@ -2702,7 +2702,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 排行榜 toggle
         document.getElementById('lbToggle')?.addEventListener('click', () => {
             const lb = document.getElementById('presLeaderboard');
+            const pm = document.getElementById('presentationMode');
             lb?.classList.toggle('open');
+            pm?.classList.toggle('lb-active', lb?.classList.contains('open'));
         });
     }
 

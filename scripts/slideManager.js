@@ -1835,6 +1835,18 @@ export class SlideManager {
         const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5 };
         const pts = element.points ?? defaultPts[element.type] ?? 0;
         el.dataset.points = pts;
+
+        // 分數徽章 — 加在 interactive-label 旁
+        if (pts > 0) {
+            const hasRightWrong = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'document'].includes(element.type);
+            const label = hasRightWrong ? `0~${pts}分` : `${pts}分`;
+            const badge = document.createElement('span');
+            badge.className = 'score-badge';
+            badge.textContent = label;
+            // 插入到 interactive-label 旁邊
+            const labelEl = el.querySelector('.interactive-label');
+            if (labelEl) labelEl.appendChild(badge);
+        }
     }
 
     /**

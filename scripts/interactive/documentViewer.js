@@ -19,13 +19,24 @@ export class DocumentViewer {
      * 直接綁定 click 到每個文件卡片（與其他互動模組相同方式）
      */
     init() {
-        document.querySelectorAll('.document-card-container').forEach(card => {
-            if (card._docViewerBound) return; // 避免重複綁定
+        const cards = document.querySelectorAll('.document-card-container');
+        cards.forEach(card => {
+            if (card._docViewerBound) return;
             card._docViewerBound = true;
+
+            // 強制設定 inline pointer-events（繞過 CSS 繼承）
+            card.style.pointerEvents = 'auto';
             card.style.cursor = 'pointer';
+            // 父層也要可點擊
+            if (card.parentElement) {
+                card.parentElement.style.pointerEvents = 'auto';
+            }
+            // 所有子元素也要可點擊
+            card.querySelectorAll('*').forEach(child => {
+                child.style.pointerEvents = 'auto';
+            });
 
             card.addEventListener('click', (e) => {
-                // 編輯畫布 (非簡報模式) 下不打開
                 const isEditing = !!document.getElementById('slideCanvas')
                     && !document.getElementById('presentationMode')?.classList.contains('active');
                 if (isEditing) return;

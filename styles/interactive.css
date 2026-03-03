@@ -878,6 +878,22 @@
     border-radius: 4px 4px 0 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
 }
 
 /* ========================================

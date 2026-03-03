@@ -1293,10 +1293,16 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    transition: padding-right 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .presentation-mode.active {
     display: flex;
+}
+
+/* 排行榜開啟時，簡報往左偏移但保持原尺寸 */
+.presentation-mode.lb-active {
+    padding-right: 260px;
 }
 
 .presentation-slide {
