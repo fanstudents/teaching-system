@@ -946,3 +946,272 @@
         touch-action: manipulation;
     }
 }
+
+/* ========================================
+   文件檢視器
+   ======================================== */
+.doc-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .25s ease;
+    pointer-events: none;
+}
+
+.doc-viewer-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.doc-viewer-overlay.closing {
+    opacity: 0;
+}
+
+.doc-viewer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+}
+
+.doc-viewer-panel {
+    position: relative;
+    width: 680px;
+    max-width: 92vw;
+    max-height: 85vh;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+.doc-viewer-overlay.open .doc-viewer-panel {
+    transform: translateY(0);
+}
+
+.doc-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.doc-viewer-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doc-viewer-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.doc-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doc-viewer-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .15s;
+}
+
+.doc-viewer-download-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.doc-viewer-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+}
+
+.doc-viewer-close-btn:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.doc-viewer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px 40px;
+}
+
+/* ── 文件內容排版 ── */
+.doc-viewer-content {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #1e293b;
+    word-break: break-word;
+}
+
+.doc-viewer-content h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.doc-viewer-content h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 28px 0 12px;
+    color: #1e293b;
+}
+
+.doc-viewer-content h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: #334155;
+}
+
+.doc-viewer-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 16px 0 6px;
+    color: #475569;
+}
+
+.doc-viewer-content p {
+    margin: 0 0 12px;
+}
+
+.doc-viewer-content ul,
+.doc-viewer-content ol {
+    margin: 0 0 12px;
+    padding-left: 24px;
+}
+
+.doc-viewer-content li {
+    margin: 4px 0;
+}
+
+.doc-viewer-content blockquote {
+    margin: 12px 0;
+    padding: 12px 16px;
+    border-left: 4px solid #0ea5e9;
+    background: #f0f9ff;
+    border-radius: 0 8px 8px 0;
+    color: #0c4a6e;
+}
+
+.doc-viewer-content code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85em;
+    color: #e11d48;
+}
+
+.doc-viewer-content pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 16px 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 12px 0;
+}
+
+.doc-viewer-content pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+.doc-viewer-content img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+.doc-viewer-content a {
+    color: #0284c7;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.doc-viewer-content hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 20px 0;
+}
+
+.doc-viewer-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+}
+
+.doc-viewer-content th,
+.doc-viewer-content td {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.doc-viewer-content th {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+/* ── Card hover effect ── */
+.document-card-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.15);
+}
+
+@media (max-width: 640px) {
+    .doc-viewer-panel {
+        max-width: 98vw;
+        max-height: 92vh;
+        border-radius: 12px;
+    }
+
+    .doc-viewer-body {
+        padding: 20px 16px 32px;
+    }
+
+    .doc-viewer-content h1 {
+        font-size: 1.3rem;
+    }
+
+    .doc-viewer-content h2 {
+        font-size: 1.1rem;
+    }
+}

@@ -20,6 +20,7 @@ import { ScaleGame } from './interactive/scale.js?v=20260228';
 import { BuzzerGame } from './interactive/buzzer.js?v=20260228';
 import { WordCloudGame } from './interactive/wordcloud.js?v=20260228';
 import { HotspotGame } from './interactive/hotspot.js?v=20260228';
+import { DocumentViewer } from './interactive/documentViewer.js?v=20260303';
 
 import { HomeworkSubmission } from './homework.js?v=20260224';
 import { db, realtime, generateSessionCode, ai } from './supabase.js';
@@ -49,6 +50,7 @@ class App {
         this.buzzer = new BuzzerGame();
         this.wordCloud = new WordCloudGame();
         this.hotspot = new HotspotGame();
+        this.documentViewer = new DocumentViewer();
         this.homework = new HomeworkSubmission();
 
         // Undo/Redo 歷史
@@ -394,6 +396,11 @@ class App {
         // 複製文字卡片
         document.getElementById('copyCardBtn').addEventListener('click', () => {
             this.editor.addCopyCard();
+        });
+
+        // 文件檢視器
+        document.getElementById('addDocumentBtn')?.addEventListener('click', () => {
+            this.editor.addDocument();
         });
 
         // 圖表

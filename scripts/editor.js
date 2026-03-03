@@ -417,6 +417,26 @@ export class Editor {
     }
 
     /**
+     * 新增文件檢視器
+     */
+    addDocument() {
+        const element = {
+            type: 'document',
+            x: 100,
+            y: 80,
+            width: 260,
+            height: 160,
+            docTitle: '文件名稱',
+            docContent: '# 文件標題\n\n這是一份文件範例，支援 **Markdown** 格式。\n\n## 章節一\n\n- 項目 A\n- 項目 B\n- 項目 C\n\n> 引用文字範例',
+            docDownloadUrl: '',
+            docDownloadName: ''
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增流動線條元素
      */
     addFlowLine() {
@@ -773,6 +793,28 @@ export class Editor {
             html += this.renderPollProperties(elementData);
         } else if (type === 'copycard') {
             html += this.renderCopyCardProperties(elementData);
+        } else if (type === 'document') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">文件檢視器設定</div>
+                    <div class="form-group">
+                        <label class="form-label">文件標題</label>
+                        <input type="text" class="form-input" id="docTitle" value="${(elementData.docTitle || '').replace(/"/g, '&quot;')}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">內容（支援 Markdown / HTML）</label>
+                        <textarea class="form-input" id="docContent" rows="8" style="resize:vertical;font-family:'Fira Code',monospace;font-size:12px;line-height:1.5;">${elementData.docContent || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">下載連結 <span style="font-weight:400;color:#94a3b8;">(選填)</span></label>
+                        <input type="text" class="form-input" id="docDownloadUrl" placeholder="https://example.com/file.pdf" value="${elementData.docDownloadUrl || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">下載檔名 <span style="font-weight:400;color:#94a3b8;">(選填)</span></label>
+                        <input type="text" class="form-input" id="docDownloadName" placeholder="文件.pdf" value="${elementData.docDownloadName || ''}">
+                    </div>
+                </div>
+            `;
         } else if (type === 'showcase') {
             html += this.renderShowcaseProperties(elementData);
         } else if (type === 'truefalse') {
@@ -1348,6 +1390,15 @@ export class Editor {
             bindSimple('scaleLabelRight', 'labelRight');
         } else if (elementData.type === 'buzzer') {
             bindSimple('buzzerQuestion', 'question');
+        } else if (elementData.type === 'document') {
+            bindSimple('docTitle', 'docTitle');
+            bindSimple('docDownloadUrl', 'docDownloadUrl');
+            bindSimple('docDownloadName', 'docDownloadName');
+            const contentEl = document.getElementById('docContent');
+            if (contentEl) contentEl.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { docContent: contentEl.value });
+                rerender();
+            });
         } else if (elementData.type === 'wordcloud') {
             bindSimple('wcQuestion', 'question');
             bindSimple('wcMaxWords', 'maxWords', v => parseInt(v) || 3);

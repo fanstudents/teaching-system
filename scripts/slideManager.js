@@ -966,6 +966,12 @@ export class SlideManager {
                 this.renderOrderingElement(el, element);
                 break;
 
+            case 'document':
+                el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
+                this.renderDocumentElement(el, element);
+                break;
+
             case 'copycard':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
@@ -1981,6 +1987,33 @@ export class SlideManager {
                 feedbackEl.classList.add('error');
             }
         });
+    }
+
+    /**
+     * 渲染文件檢視器卡片
+     */
+    renderDocumentElement(el, element) {
+        const hasDownload = !!element.docDownloadUrl;
+        el.innerHTML = `
+            <div class="interactive-label">文件檢視</div>
+            <div class="document-card-container" data-element-id="${element.id}" style="
+                display:flex;flex-direction:column;align-items:center;justify-content:center;
+                gap:10px;height:100%;cursor:pointer;
+                background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
+                border-radius:12px;border:1.5px solid #bae6fd;
+                transition:transform .15s,box-shadow .15s;position:relative;
+            ">
+                <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#0284c7,#0ea5e9);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(2,132,199,0.25);">
+                    <span class="material-symbols-outlined" style="font-size:28px;color:#fff;">description</span>
+                </div>
+                <div style="font-weight:600;font-size:0.95rem;color:#0c4a6e;text-align:center;line-height:1.4;padding:0 12px;">${element.docTitle || '文件名稱'}</div>
+                <div style="font-size:0.72rem;color:#7dd3fc;display:flex;align-items:center;gap:4px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">visibility</span>
+                    點擊查看文件
+                </div>
+                ${hasDownload ? `<div style="position:absolute;top:8px;right:8px;"><span class="material-symbols-outlined" style="font-size:16px;color:#0ea5e9;">download</span></div>` : ''}
+            </div>
+        `;
     }
 
     /**
