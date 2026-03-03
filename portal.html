@@ -567,6 +567,12 @@
             }
         }
 
+        function linkify(text) {
+            if (!text) return '';
+            return text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+                '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#6366f1;text-decoration:underline;">$1</a>');
+        }
+
         function renderChecklist() {
             const container = document.getElementById('checklistContainer');
             if (checklistItems.length === 0) {
@@ -579,7 +585,7 @@
                     <span class="check-icon ${done ? 'checked' : ''}" data-item-id="${item.id}" onclick="window.__toggleCheck(this)">✓</span>
                     <div class="item-content">
                         <strong>${item.title}</strong>
-                        ${item.description ? `<span class="desc">${item.description}</span>` : ''}
+                        ${item.description ? `<span class="desc">${linkify(item.description)}</span>` : ''}
                     </div>
                 </li>`;
             }).join('');

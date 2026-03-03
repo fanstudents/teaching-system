@@ -389,7 +389,12 @@
                 </div>
                 <div class="form-field">
                     <label>說明（選填）</label>
-                    <textarea id="checklistDesc" rows="2" placeholder="補充說明…"></textarea>
+                    <textarea id="checklistDesc" rows="2" placeholder="補充說明…&#10;支援超連結格式：[顯示文字](https://網址)"></textarea>
+                    <button type="button" class="btn btn-sm btn-outline" onclick="insertLink()"
+                        style="margin-top:6px;font-size:0.78rem;">
+                        <span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle;">link</span>
+                        插入連結
+                    </button>
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-outline" onclick="closeModal('checklistModal')">取消</button>
@@ -665,6 +670,32 @@
             };
 
             // ══════════════════════════════════════
+            //   Linkify helper — converts [text](url) to <a> tags
+            // ══════════════════════════════════════
+            function linkify(text) {
+                if (!text) return '';
+                // Convert markdown-style [text](url) to <a> tags
+                return text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+                    '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#6366f1;text-decoration:underline;">$1</a>');
+            }
+
+            window.insertLink = function () {
+                const url = prompt('請輸入連結網址：', 'https://');
+                if (!url || url === 'https://') return;
+                const label = prompt('請輸入顯示文字（留空則使用網址）：', '') || url;
+                const textarea = document.getElementById('checklistDesc');
+                const linkText = `[${label}](${url})`;
+                // Insert at cursor position
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const before = textarea.value.substring(0, start);
+                const after = textarea.value.substring(end);
+                textarea.value = before + linkText + after;
+                textarea.focus();
+                textarea.selectionStart = textarea.selectionEnd = start + linkText.length;
+            };
+
+            // ══════════════════════════════════════
             //   Drag & Drop helper
             // ══════════════════════════════════════
             function enableDragSort(listEl, items, onReorder) {
@@ -732,8 +763,8 @@
 
             async function seedDefaultChecklist() {
                 const defaults = [
-                    { title: '註冊 ChatGPT 帳號', description: '請至 chat.openai.com 註冊免費帳號，並確認可以正常登入使用。建議使用 Google 帳號直接註冊，方便快速。', sort_order: 1 },
-                    { title: '註冊 Claude 帳號', description: '請至 claude.ai 註冊帳號，作為課堂上的備用 AI 工具。Claude 提供免費方案，無需付費即可體驗。', sort_order: 2 },
+                    { title: '註冊 ChatGPT 帳號', description: '請至 [chat.openai.com](https://chat.openai.com) 註冊免費帳號，並確認可以正常登入使用。建議使用 Google 帳號直接註冊，方便快速。', sort_order: 1 },
+                    { title: '註冊 Claude 帳號', description: '請至 [claude.ai](https://claude.ai) 註冊帳號，作為課堂上的備用 AI 工具。Claude 提供免費方案，無需付費即可體驗。', sort_order: 2 },
                     { title: '攜帶筆記型電腦', description: '課程需要實際操作，請務必攜帶已充飽電的筆電，並確認 Wi-Fi 功能正常。若無筆電，平板也可以但操作體驗會稍受限。', sort_order: 3 },
                     { title: '更新瀏覽器至最新版本', description: '建議使用 Chrome 或 Edge 瀏覽器，並更新至最新版本以確保相容性。部分 AI 工具在舊版瀏覽器上可能無法正常使用。', sort_order: 4 },
                     { title: '準備一段您的工作情境描述', description: '請事先想好 1-2 個您工作中想用 AI 解決的具體問題或場景，課堂上會直接拿來練習。', sort_order: 5 },
@@ -760,7 +791,7 @@
                     <span class="item-order">${i + 1}</span>
                     <div class="item-info">
                         <div class="item-title">${item.title}</div>
-                        ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
+                        ${item.description ? `<div class="item-desc">${linkify(item.description)}</div>` : ''}
                     </div>
                     <div class="item-actions">
                         <button class="icon-btn" onclick="editChecklist('${item.id}')" title="編輯">
