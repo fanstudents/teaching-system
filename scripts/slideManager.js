@@ -952,78 +952,91 @@ export class SlideManager {
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderMatchingElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'fillblank':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderFillBlankElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'ordering':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderOrderingElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'document':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderDocumentElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'copycard':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderCopyCardElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'quiz':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderQuizElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'poll':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderPollElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'truefalse':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderTrueFalseElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'opentext':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderOpenTextElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'scale':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderScaleElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'buzzer':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderBuzzerElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'wordcloud':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderWordCloudElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'hotspot':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
                 this.renderHotspotElement(el, element);
+                this._addScoreBadge(el, element);
                 break;
 
             case 'news':
@@ -1835,18 +1848,22 @@ export class SlideManager {
         const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5 };
         const pts = element.points ?? defaultPts[element.type] ?? 0;
         el.dataset.points = pts;
+    }
 
-        // 分數徽章 — 加在 interactive-label 旁
-        if (pts > 0) {
-            const hasRightWrong = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'document'].includes(element.type);
-            const label = hasRightWrong ? `0~${pts}分` : `${pts}分`;
-            const badge = document.createElement('span');
-            badge.className = 'score-badge';
-            badge.textContent = label;
-            // 插入到 interactive-label 旁邊
-            const labelEl = el.querySelector('.interactive-label');
-            if (labelEl) labelEl.appendChild(badge);
-        }
+    /**
+     * 在 interactive-label 旁加入分數徽章（必須在 render 後呼叫）
+     */
+    _addScoreBadge(el, element) {
+        const pts = parseInt(el.dataset.points) || 0;
+        if (pts <= 0) return;
+        const hasRightWrong = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'document'].includes(element.type);
+        const label = hasRightWrong ? `0~${pts}分` : `${pts}分`;
+        const labelEl = el.querySelector('.interactive-label');
+        if (!labelEl) return;
+        const badge = document.createElement('span');
+        badge.className = 'score-badge';
+        badge.textContent = label;
+        labelEl.appendChild(badge);
     }
 
     /**
