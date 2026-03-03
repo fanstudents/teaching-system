@@ -1851,19 +1851,15 @@ export class SlideManager {
     }
 
     /**
-     * 在 interactive-label 旁加入分數徽章（必須在 render 後呼叫）
+     * 在互動元件上加入分數徽章（獨立定位，不依賴 interactive-label）
      */
     _addScoreBadge(el, element) {
         const pts = parseInt(el.dataset.points) || 0;
         if (pts <= 0) return;
-        const hasRightWrong = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'document'].includes(element.type);
-        const label = hasRightWrong ? `0~${pts}分` : `${pts}分`;
-        const labelEl = el.querySelector('.interactive-label');
-        if (!labelEl) return;
-        const badge = document.createElement('span');
-        badge.className = 'score-badge';
-        badge.textContent = label;
-        labelEl.appendChild(badge);
+        const badge = document.createElement('div');
+        badge.className = 'element-score-badge';
+        badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px;">stars</span> 1~${pts}分`;
+        el.appendChild(badge);
     }
 
     /**
@@ -2093,9 +2089,9 @@ export class SlideManager {
         const anchorCount = (element.docAnchors || []).length;
         el.innerHTML = `
             <div class="interactive-label">文件檢視</div>
-            <div class="document-card-container" data-element-id="${element.id}" style="
+            <div class="document-card-container" data-element-id="${element.id}" onclick="if(window._openDocViewer)window._openDocViewer('${element.id}')" style="
                 display:flex;flex-direction:column;align-items:center;justify-content:center;
-                gap:10px;height:100%;cursor:pointer;
+                gap:10px;height:100%;cursor:pointer;pointer-events:auto;
                 background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
                 border-radius:12px;border:1.5px solid #bae6fd;
                 transition:transform .15s,box-shadow .15s;position:relative;

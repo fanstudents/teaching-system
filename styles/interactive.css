@@ -883,17 +883,25 @@
     gap: 6px;
 }
 
-.score-badge {
-    display: inline-flex;
+/* 分數徽章 — 固定在互動元件右上角 */
+.element-score-badge {
+    position: absolute;
+    top: -8px;
+    right: -4px;
+    z-index: 10;
+    display: flex;
     align-items: center;
-    padding: 1px 6px;
-    background: rgba(255, 255, 255, 0.25);
-    border-radius: 3px;
-    font-size: 10px;
+    gap: 3px;
+    padding: 2px 8px 2px 6px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0;
-    text-transform: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
     white-space: nowrap;
+    pointer-events: none;
+    line-height: 1.4;
 }
 
 /* ========================================

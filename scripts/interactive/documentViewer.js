@@ -9,6 +9,14 @@ export class DocumentViewer {
     constructor() {
         this._overlay = null;
         this.setupEventListeners();
+
+        // 全域函數：供 inline onclick 呼叫（最穩定的方式）
+        window._openDocViewer = (elementId) => {
+            const isEditing = !!document.getElementById('slideCanvas')
+                && !document.getElementById('presentationMode')?.classList.contains('active');
+            if (isEditing) return;
+            this.openViewer(elementId);
+        };
     }
 
     setupEventListeners() {
