@@ -335,6 +335,24 @@
                         <input class="field-input" type="text" id="fieldGroupLabel" placeholder="例如：加入 LINE 群組">
                     </div>
                 </div>
+                <div class="field-row">
+                    <div>
+                        <label class="field-label">群組圖示 Icon（選填）</label>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div id="groupIconPreview"
+                                style="display:none;width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid #e2e8f0;flex-shrink:0;">
+                                <img id="groupIconImg" style="width:100%;height:100%;object-fit:cover;" alt="icon">
+                            </div>
+                            <input class="field-input" type="url" id="fieldGroupIconUrl" placeholder="貼上圖片 URL 或上傳"
+                                style="flex:1;">
+                            <label class="btn btn-sm btn-outline" style="cursor:pointer;white-space:nowrap;">
+                                <span class="material-symbols-rounded" style="font-size:16px;">upload</span>
+                                <input type="file" id="groupIconUpload" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
             </div>
 
             <!-- ═══════ 準備清單 ═══════ -->
@@ -588,6 +606,12 @@
                         document.getElementById('fieldReminders').value = s.reminders || '';
                         document.getElementById('fieldGroupUrl').value = s.group_link_url || '';
                         document.getElementById('fieldGroupLabel').value = s.group_link_label || '';
+                        // Group icon
+                        if (s.group_link_icon_url) {
+                            document.getElementById('fieldGroupIconUrl').value = s.group_link_icon_url;
+                            document.getElementById('groupIconImg').src = s.group_link_icon_url;
+                            document.getElementById('groupIconPreview').style.display = '';
+                        }
                         // Hero image
                         if (s.hero_image_url) {
                             document.getElementById('fieldHeroImageUrl').value = s.hero_image_url;
@@ -610,6 +634,7 @@
                             reminders: document.getElementById('fieldReminders').value.trim(),
                             group_link_url: document.getElementById('fieldGroupUrl').value.trim(),
                             group_link_label: document.getElementById('fieldGroupLabel').value.trim(),
+                            group_link_icon_url: document.getElementById('fieldGroupIconUrl').value.trim() || null,
                             hero_image_url: document.getElementById('fieldHeroImageUrl').value.trim() || null,
                         }, { id: `eq.${sessionId}` });
                         const indicator = document.getElementById('infoSaveStatus');
@@ -618,7 +643,7 @@
                     } catch (e) { showToast('儲存失敗: ' + e.message, { type: 'error' }); }
                 }, 800);
             }
-            ['fieldTransport', 'fieldReminders', 'fieldGroupUrl', 'fieldGroupLabel'].forEach(id => {
+            ['fieldTransport', 'fieldReminders', 'fieldGroupUrl', 'fieldGroupLabel', 'fieldGroupIconUrl'].forEach(id => {
                 document.getElementById(id).addEventListener('input', autoSaveSessionField);
             });
             // Show warning if no session (fields visible but can't save)
@@ -627,6 +652,35 @@
                 document.getElementById('sessionInfoSection').insertAdjacentHTML('afterbegin', warn);
                 document.getElementById('heroImageSection').insertAdjacentHTML('afterbegin', warn);
             }
+
+            // ── Group Icon handlers ──
+            document.getElementById('fieldGroupIconUrl').addEventListener('input', () => {
+                const url = document.getElementById('fieldGroupIconUrl').value.trim();
+                if (url) {
+                    document.getElementById('groupIconImg').src = url;
+                    document.getElementById('groupIconPreview').style.display = '';
+                } else {
+                    document.getElementById('groupIconPreview').style.display = 'none';
+                }
+                autoSaveSessionField();
+            });
+
+            document.getElementById('groupIconUpload').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const { storage } = await import('./scripts/supabase.js');
+                    const ext = file.name.split('.').pop();
+                    const path = `group-icons/${Date.now()}.${ext}`;
+                    const { data, error } = await storage.upload('homework', path, file);
+                    if (error) throw new Error(error.message || JSON.stringify(error));
+                    document.getElementById('fieldGroupIconUrl').value = data.url;
+                    document.getElementById('groupIconImg').src = data.url;
+                    document.getElementById('groupIconPreview').style.display = '';
+                    autoSaveSessionField();
+                } catch (err) { showToast('上傳失敗: ' + err.message, { type: 'error' }); }
+                e.target.value = '';
+            });
 
             // ── Hero Image handlers ──
             document.getElementById('fieldHeroImageUrl').addEventListener('input', () => {

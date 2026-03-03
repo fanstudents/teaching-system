@@ -281,6 +281,10 @@
                 const btn = document.getElementById('groupLinkBtn');
                 btn.href = config.groupLinkUrl;
                 btn.style.display = '';
+                if (config.groupLinkIconUrl) {
+                    btn.querySelector('.material-symbols-outlined').outerHTML =
+                        `<img src="${config.groupLinkIconUrl}" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">`;
+                }
                 if (config.groupLinkLabel) {
                     document.getElementById('groupLinkLabel').textContent = config.groupLinkLabel;
                 }

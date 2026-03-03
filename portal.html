@@ -540,6 +540,10 @@
                 document.getElementById('groupSection').style.display = '';
                 const btn = document.getElementById('btnGroup');
                 btn.href = config.groupLinkUrl;
+                if (config.groupLinkIconUrl) {
+                    btn.querySelector('.material-symbols-outlined').outerHTML =
+                        `<img src="${config.groupLinkIconUrl}" alt="" style="width:22px;height:22px;border-radius:50%;object-fit:cover;">`;
+                }
                 if (config.groupLinkLabel) document.getElementById('groupLabel').textContent = config.groupLinkLabel;
             }
         }
