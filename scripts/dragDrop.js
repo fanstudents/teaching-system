@@ -12,8 +12,13 @@ export class DragDrop {
 
         this.isDragging = false;
         this.isResizing = false;
+        this.isDraggingWaypoint = false;
         this.activeElement = null;
         this.activeHandle = null;
+        this._wpHandle = null;
+        this._wpFlowlineId = null;
+        this._wpIndex = -1;
+        this._wpSnapTarget = null;
 
         this.startX = 0;
         this.startY = 0;
@@ -65,13 +70,40 @@ export class DragDrop {
         }
         this.isDragging = false;
         this.isResizing = false;
+        this.isDraggingWaypoint = false;
         this.activeElement = null;
         this.activeHandle = null;
+        this._wpHandle = null;
+        this._wpFlowlineId = null;
+        this._wpIndex = -1;
+        this._wpSnapTarget = null;
         this._pointerId = null;
         document.querySelectorAll('.snap-guide').forEach(g => g.remove());
+        document.querySelectorAll('.flowline-snap-highlight').forEach(h => h.remove());
     }
 
     handleMouseDown(e) {
+        // ── Waypoint handle 拖曳 ──
+        const wpHandle = e.target.closest('.flowline-waypoint-handle');
+        if (wpHandle) {
+            this.isDraggingWaypoint = true;
+            this._wpHandle = wpHandle;
+            this._wpFlowlineId = wpHandle.dataset.flowlineId;
+            this._wpIndex = parseInt(wpHandle.dataset.waypointIndex);
+            this._wpSnapTarget = null;
+            this.startX = e.clientX;
+            this.startY = e.clientY;
+            this._wpStartLeft = parseInt(wpHandle.style.left) || 0;
+            this._wpStartTop = parseInt(wpHandle.style.top) || 0;
+            wpHandle.style.cursor = 'grabbing';
+            wpHandle.style.transform = 'scale(1.4)';
+            this._pointerId = e.pointerId;
+            try { wpHandle.setPointerCapture(e.pointerId); } catch (_) { }
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
         const element = e.target.closest('.editable-element');
         const handle = e.target.closest('.resize-handle');
 
@@ -130,8 +162,85 @@ export class DragDrop {
 
     handleMouseMove(e) {
         // ★ 終極保險：如果滑鼠按鈕已放開但 isDragging 仍為 true，強制停止
-        if ((this.isDragging || this.isResizing) && e.buttons === 0) {
+        if ((this.isDragging || this.isResizing || this.isDraggingWaypoint) && e.buttons === 0) {
             this.forceReset();
+            return;
+        }
+
+        // ── Waypoint handle 拖曳 ──
+        if (this.isDraggingWaypoint && this._wpHandle) {
+            e.preventDefault();
+            const dx = e.clientX - this.startX;
+            const dy = e.clientY - this.startY;
+            const newLeft = this._wpStartLeft + dx;
+            const newTop = this._wpStartTop + dy;
+            this._wpHandle.style.left = `${newLeft}px`;
+            this._wpHandle.style.top = `${newTop}px`;
+
+            // 自動吸附偵測：找最近的其他元素
+            const SNAP_DIST = 20;
+            const flowlineEl = this._wpHandle.closest('.editable-element');
+            const flowlineData = this.slideManager.getCurrentSlide()?.elements.find(e => e.id === this._wpFlowlineId);
+            if (!flowlineData) return;
+
+            // waypoint 的絕對座標
+            const absX = flowlineData.x + newLeft + 8; // center of handle
+            const absY = flowlineData.y + newTop + 8;
+
+            // 移除舊的 snap 高亮
+            document.querySelectorAll('.flowline-snap-highlight').forEach(h => h.remove());
+            this._wpSnapTarget = null;
+
+            const canvas = this.canvasContentEl;
+            const siblings = canvas.querySelectorAll('.slide-element');
+            let bestDist = SNAP_DIST;
+            let bestEl = null;
+            let bestEdge = null;
+
+            siblings.forEach(sib => {
+                if (sib === flowlineEl) return;
+                const sibData = this.slideManager.getCurrentSlide()?.elements.find(e => e.id === sib.dataset.id);
+                if (!sibData || sibData.type === 'flowline') return;
+
+                const cx = sibData.x + sibData.width / 2;
+                const cy = sibData.y + sibData.height / 2;
+                const edges = [
+                    { x: cx, y: sibData.y },
+                    { x: cx, y: sibData.y + sibData.height },
+                    { x: sibData.x, y: cy },
+                    { x: sibData.x + sibData.width, y: cy },
+                ];
+                for (const edge of edges) {
+                    const d = Math.hypot(edge.x - absX, edge.y - absY);
+                    if (d < bestDist) {
+                        bestDist = d;
+                        bestEl = sibData;
+                        bestEdge = edge;
+                    }
+                }
+            });
+
+            if (bestEl && bestEdge) {
+                this._wpSnapTarget = { elementId: bestEl.id, edge: bestEdge };
+                // 顯示吸附高亮
+                const highlight = document.createElement('div');
+                highlight.className = 'flowline-snap-highlight';
+                highlight.style.cssText = `
+                    position:absolute;
+                    left:${bestEl.x - 3}px;top:${bestEl.y - 3}px;
+                    width:${bestEl.width + 6}px;height:${bestEl.height + 6}px;
+                    border:2px solid #10b981;border-radius:6px;
+                    pointer-events:none;z-index:9998;
+                    box-shadow:0 0 8px rgba(16,185,129,0.4);
+                `;
+                canvas.appendChild(highlight);
+
+                // 吸附 handle 到邊緣
+                const snapLocalX = bestEdge.x - flowlineData.x - 8;
+                const snapLocalY = bestEdge.y - flowlineData.y - 8;
+                this._wpHandle.style.left = `${snapLocalX}px`;
+                this._wpHandle.style.top = `${snapLocalY}px`;
+            }
             return;
         }
 
@@ -245,6 +354,55 @@ export class DragDrop {
     }
 
     handleMouseUp(e) {
+        // ── Waypoint handle 拖曳完成 ──
+        if (this.isDraggingWaypoint && this._wpHandle) {
+            this._wpHandle.style.cursor = 'grab';
+            this._wpHandle.style.transform = '';
+
+            const flowlineData = this.slideManager.getCurrentSlide()?.elements.find(e => e.id === this._wpFlowlineId);
+            if (flowlineData) {
+                const pts = [...flowlineData.waypoints];
+                const handleSize = (this._wpIndex === 0 || this._wpIndex === pts.length - 1) ? 8 : 7;
+                const newLocalX = parseInt(this._wpHandle.style.left) + handleSize;
+                const newLocalY = parseInt(this._wpHandle.style.top) + handleSize;
+                pts[this._wpIndex] = { x: newLocalX, y: newLocalY };
+
+                const updates = { waypoints: pts };
+
+                // 設定吸附 ID
+                const isStart = this._wpIndex === 0;
+                const isEnd = this._wpIndex === pts.length - 1;
+                if (isStart) {
+                    updates.snapStartId = this._wpSnapTarget?.elementId || null;
+                }
+                if (isEnd) {
+                    updates.snapEndId = this._wpSnapTarget?.elementId || null;
+                }
+
+                this.slideManager.updateElement(this._wpFlowlineId, updates);
+            }
+
+            // 清除 snap 高亮
+            document.querySelectorAll('.flowline-snap-highlight').forEach(h => h.remove());
+
+            this.isDraggingWaypoint = false;
+            this._wpHandle = null;
+            this._wpFlowlineId = null;
+            this._wpIndex = -1;
+            this._wpSnapTarget = null;
+
+            // 重新渲染
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.renderThumbnails();
+
+            // 重新選取 flowline
+            if (this.editor.selectedElement) {
+                const id = this.editor.selectedElement.dataset.id;
+                this.editor.selectElementById(id);
+            }
+            return;
+        }
+
         if (this.isDragging && this.activeElement) {
             this.activeElement.style.cursor = 'move';
 
@@ -260,6 +418,9 @@ export class DragDrop {
             const propY = document.getElementById('propY');
             if (propX) propX.value = parseInt(this.activeElement.style.left);
             if (propY) propY.value = parseInt(this.activeElement.style.top);
+
+            // 更新連接的 flowline
+            this.slideManager.updateFlowLineSnaps(id);
         }
 
         if (this.isResizing && this.activeElement) {
@@ -280,6 +441,9 @@ export class DragDrop {
             if (propY) propY.value = parseInt(this.activeElement.style.top);
             if (propW) propW.value = this.activeElement.offsetWidth;
             if (propH) propH.value = this.activeElement.offsetHeight;
+
+            // 更新連接的 flowline
+            this.slideManager.updateFlowLineSnaps(id);
         }
 
         this.isDragging = false;

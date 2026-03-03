@@ -844,21 +844,6 @@ export class Editor {
 
         // 流動線條屬性面板
         if (type === 'flowline') {
-            // 收集同一投影片上的其他元素，供吸附選擇
-            const otherElements = slide.elements.filter(e => e.id !== elementId && e.type !== 'flowline');
-            const snapOptions = otherElements.map(e => {
-                const label = e.type === 'text' ? (e.content || '文字').substring(0, 10) :
-                    e.type === 'shape' ? `形狀(${e.shapeType || ''})` :
-                        e.type === 'image' ? '圖片' : e.type;
-                return `<option value="${e.id}" ${elementData.snapStartId === e.id ? 'selected' : ''}>${label}</option>`;
-            }).join('');
-            const snapEndOptions = otherElements.map(e => {
-                const label = e.type === 'text' ? (e.content || '文字').substring(0, 10) :
-                    e.type === 'shape' ? `形狀(${e.shapeType || ''})` :
-                        e.type === 'image' ? '圖片' : e.type;
-                return `<option value="${e.id}" ${elementData.snapEndId === e.id ? 'selected' : ''}>${label}</option>`;
-            }).join('');
-
             html += `
                 <div class="property-section">
                     <div class="property-section-title">路徑預設形狀</div>
@@ -921,22 +906,12 @@ export class Editor {
                     </div>
                 </div>
                 <div class="property-section">
-                    <div class="property-section-title">吸附元素</div>
-                    <div class="property-row">
-                        <label>起點</label>
-                        <select id="flowSnapStart" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
-                            <option value="">無</option>
-                            ${snapOptions}
-                        </select>
+                    <div class="property-section-title">路徑控制</div>
+                    <div style="font-size:11px;color:#64748b;line-height:1.6;">
+                        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">info</span>
+                        選取流動線後，拖曳<b style="color:#6366f1;">紫色圓點</b>即可調整路徑。端點靠近其他元素時會自動吸附。
                     </div>
-                    <div class="property-row">
-                        <label>終點</label>
-                        <select id="flowSnapEnd" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
-                            <option value="">無</option>
-                            ${snapEndOptions}
-                        </select>
-                    </div>
-                    <div style="font-size:11px;color:#94a3b8;margin-top:2px;">選擇元素後，線條起/終點會自動吸附到該元素邊緣</div>
+                    ${elementData.snapStartId || elementData.snapEndId ? `<div style="margin-top:6px;font-size:11px;color:#10b981;">✓ 已吸附元素，拖曳元素時線條會跟隨</div>` : ''}
                 </div>
             `;
         }
@@ -1421,22 +1396,6 @@ export class Editor {
             if (curveModeSelect) {
                 curveModeSelect.addEventListener('change', () => {
                     this.slideManager.updateElement(elementId, { curveMode: curveModeSelect.value });
-                    flowRerender();
-                });
-            }
-
-            // 吸附
-            const snapStartSelect = document.getElementById('flowSnapStart');
-            if (snapStartSelect) {
-                snapStartSelect.addEventListener('change', () => {
-                    this.slideManager.updateElement(elementId, { snapStartId: snapStartSelect.value || null });
-                    flowRerender();
-                });
-            }
-            const snapEndSelect = document.getElementById('flowSnapEnd');
-            if (snapEndSelect) {
-                snapEndSelect.addEventListener('change', () => {
-                    this.slideManager.updateElement(elementId, { snapEndId: snapEndSelect.value || null });
                     flowRerender();
                 });
             }

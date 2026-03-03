@@ -692,3 +692,21 @@
         stroke-dashoffset: -2000;
     }
 }
+
+/* Waypoint handles: 只在選取狀態顯示 */
+.flowline-waypoint-handle {
+    display: none;
+}
+
+.editable-element.selected .flowline-waypoint-handle {
+    display: block;
+}
+
+.flowline-waypoint-handle:hover {
+    transform: scale(1.3) !important;
+}
+
+/* 簡報模式隱藏 waypoint handles */
+.presentation-element .flowline-waypoint-handle {
+    display: none !important;
+}

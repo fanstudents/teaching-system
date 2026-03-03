@@ -1524,6 +1524,79 @@ export class SlideManager {
                 ${showArrow ? '' : `<circle cx="${endPt.x}" cy="${endPt.y}" r="${lw + 2}" fill="${color}" opacity="0.6"/>`}
             </svg>
         `;
+
+        // 加入可拖曳的 waypoint handles（編輯器模式時顯示）
+        pts.forEach((pt, i) => {
+            const handle = document.createElement('div');
+            handle.className = 'flowline-waypoint-handle';
+            handle.dataset.flowlineId = element.id;
+            handle.dataset.waypointIndex = i;
+            const isEndpoint = (i === 0 || i === pts.length - 1);
+            handle.style.cssText = `
+                position:absolute;
+                left:${pt.x - 7}px;
+                top:${pt.y - 7}px;
+                width:14px;height:14px;
+                border-radius:50%;
+                background:${isEndpoint ? '#6366f1' : '#a5b4fc'};
+                border:2px solid #fff;
+                cursor:grab;
+                z-index:20;
+                pointer-events:auto;
+                box-shadow:0 1px 4px rgba(0,0,0,0.3);
+                transition:transform 0.1s;
+            `;
+            if (isEndpoint) {
+                handle.style.width = '16px';
+                handle.style.height = '16px';
+                handle.style.left = `${pt.x - 8}px`;
+                handle.style.top = `${pt.y - 8}px`;
+            }
+            el.appendChild(handle);
+        });
+    }
+
+    /**
+     * 當元素移動後，更新所有連接到該元素的 flowline 吸附點
+     */
+    updateFlowLineSnaps(movedElementId) {
+        const slide = this.getCurrentSlide();
+        if (!slide) return;
+
+        const flowlines = slide.elements.filter(e => e.type === 'flowline' &&
+            (e.snapStartId === movedElementId || e.snapEndId === movedElementId));
+
+        if (flowlines.length === 0) return;
+
+        for (const fl of flowlines) {
+            const pts = [...fl.waypoints];
+            let changed = false;
+
+            if (fl.snapStartId === movedElementId) {
+                const target = slide.elements.find(e => e.id === movedElementId);
+                if (target) {
+                    const sp = this._getSnapPoint(fl, target, 'start');
+                    pts[0] = { x: sp.x - fl.x, y: sp.y - fl.y };
+                    changed = true;
+                }
+            }
+            if (fl.snapEndId === movedElementId) {
+                const target = slide.elements.find(e => e.id === movedElementId);
+                if (target) {
+                    const sp = this._getSnapPoint(fl, target, 'end');
+                    pts[pts.length - 1] = { x: sp.x - fl.x, y: sp.y - fl.y };
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                fl.waypoints = pts;
+            }
+        }
+
+        // 重新渲染以更新所有 flowline 的位置
+        this.renderCurrentSlide();
+        this.renderThumbnails();
     }
 
     /**
