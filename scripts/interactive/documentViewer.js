@@ -234,11 +234,18 @@ export class DocumentViewer {
             </div>
         `;
 
-        document.body.appendChild(overlay);
+        // 掛在簡報模式容器內，確保 z-index 生效
+        const presMode = document.getElementById('presentationMode');
+        const mountPoint = presMode?.classList.contains('active') ? presMode : document.body;
+        mountPoint.appendChild(overlay);
         this._overlay = overlay;
+        console.log('[DocViewer] overlay appended to', mountPoint.id || 'body', 'content length:', content.length);
 
         // 動畫進入
-        requestAnimationFrame(() => overlay.classList.add('open'));
+        requestAnimationFrame(() => {
+            overlay.classList.add('open');
+            console.log('[DocViewer] .open class added');
+        });
 
         // 關閉事件
         overlay.querySelector('.doc-viewer-close-btn').addEventListener('click', () => this.closeViewer());

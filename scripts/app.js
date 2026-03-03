@@ -3516,7 +3516,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (this.broadcasting && this.sessionCode) {
                 this.poll.loadVotesForPresenter(this.sessionCode);
             }
-            if (this.countdown) this.countdown.observeNewElements();
+            if (this.countdown?.observeNewElements) this.countdown.observeNewElements();
         }, 100);
 
         // 背景音樂
