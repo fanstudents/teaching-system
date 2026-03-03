@@ -1139,7 +1139,7 @@
     </div>
     <!-- AI 出題 -->
     <div class="template-picker-overlay" id="aiQuizOverlay" style="display:none;">
-        <div class="template-picker-modal" style="width:420px;">
+        <div class="template-picker-modal" style="width:480px;">
             <div class="template-picker-header">
                 <h3 style="margin:0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:6px;">
                     <span class="material-symbols-outlined" style="font-size:20px;color:#f59e0b;">auto_awesome</span>
@@ -1149,13 +1149,82 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+            <div style="padding:20px;display:flex;flex-direction:column;gap:14px;max-height:70vh;overflow-y:auto;">
+                <!-- 主題 -->
                 <div>
                     <label
                         style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">主題</label>
                     <input type="text" id="aiQuizTopic" placeholder="例如：AI 的基本概念"
                         style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;font-family:inherit;">
                 </div>
+
+                <!-- 題型選擇 -->
+                <div>
+                    <label
+                        style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:8px;">題型</label>
+                    <div id="aiQuizTypeGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                        <button class="ai-quiz-type-btn active" data-type="mixed"
+                            style="padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:0.78rem;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">shuffle</span>
+                            混合題型
+                        </button>
+                        <button class="ai-quiz-type-btn" data-type="quiz"
+                            style="padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:0.78rem;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+                            選擇題
+                        </button>
+                        <button class="ai-quiz-type-btn" data-type="truefalse"
+                            style="padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:0.78rem;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">thumbs_up_down</span>
+                            是非題
+                        </button>
+                        <button class="ai-quiz-type-btn" data-type="fillblank"
+                            style="padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:0.78rem;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">edit_note</span>
+                            填空題
+                        </button>
+                        <button class="ai-quiz-type-btn" data-type="ordering"
+                            style="padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:0.78rem;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">sort</span>
+                            排序題
+                        </button>
+                        <button class="ai-quiz-type-btn" data-type="matching"
+                            style="padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;font-size:0.78rem;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">link</span>
+                            配對題
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 場景 -->
+                <div>
+                    <label style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">場景情境
+                        <span style="font-weight:400;color:#94a3b8;">(選填)</span></label>
+                    <input type="text" id="aiQuizScenario" placeholder="例如：科技公司辦公室"
+                        style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;font-family:inherit;margin-bottom:8px;">
+                    <div id="aiQuizScenarioChips" style="display:flex;flex-wrap:wrap;gap:6px;">
+                        <button class="ai-quiz-chip" data-scenario="辦公室日常"
+                            style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:0.75rem;font-family:inherit;cursor:pointer;color:#475569;transition:all .15s;">🏢
+                            辦公室</button>
+                        <button class="ai-quiz-chip" data-scenario="HR人資招募與面試"
+                            style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:0.75rem;font-family:inherit;cursor:pointer;color:#475569;transition:all .15s;">👥
+                            HR 人資</button>
+                        <button class="ai-quiz-chip" data-scenario="行銷企劃與數位廣告"
+                            style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:0.75rem;font-family:inherit;cursor:pointer;color:#475569;transition:all .15s;">📣
+                            行銷</button>
+                        <button class="ai-quiz-chip" data-scenario="電商營運與客服"
+                            style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:0.75rem;font-family:inherit;cursor:pointer;color:#475569;transition:all .15s;">🛒
+                            電商</button>
+                        <button class="ai-quiz-chip" data-scenario="學校課堂教學"
+                            style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:0.75rem;font-family:inherit;cursor:pointer;color:#475569;transition:all .15s;">🎓
+                            教育</button>
+                        <button class="ai-quiz-chip" data-scenario="軟體開發與專案管理"
+                            style="padding:5px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:0.75rem;font-family:inherit;cursor:pointer;color:#475569;transition:all .15s;">💻
+                            科技業</button>
+                    </div>
+                </div>
+
+                <!-- 題數 + 難度 -->
                 <div style="display:flex;gap:12px;">
                     <div style="flex:1;">
                         <label
@@ -1173,22 +1242,48 @@
                             style="font-size:0.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">難度</label>
                         <select id="aiQuizDifficulty"
                             style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;font-family:inherit;">
-                            <option value="easy">簡單</option>
-                            <option value="medium" selected>中等</option>
-                            <option value="hard">困難</option>
+                            <option value="easy">初級</option>
+                            <option value="medium" selected>中級</option>
+                            <option value="hard">高級</option>
                         </select>
                     </div>
                 </div>
+
                 <button id="aiQuizGenerate"
                     style="padding:12px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform 0.15s;">
                     <span class="material-symbols-outlined"
                         style="font-size:18px;vertical-align:middle;margin-right:4px;">auto_awesome</span>
-                    生成選擇題
+                    開始生成
                 </button>
                 <div id="aiQuizStatus" style="font-size:0.8rem;color:#64748b;text-align:center;min-height:20px;"></div>
             </div>
         </div>
     </div>
+
+    <style>
+        .ai-quiz-type-btn.active {
+            border-color: #f59e0b !important;
+            background: #fffbeb !important;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .ai-quiz-type-btn:hover:not(.active) {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .ai-quiz-chip.active {
+            border-color: #f59e0b !important;
+            background: #fffbeb !important;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .ai-quiz-chip:hover:not(.active) {
+            background: #f1f5f9;
+        }
+    </style>
 
     <!-- AI 生成簡報 -->
     <div class="template-picker-overlay" id="aiGenerateOverlay" style="display:none;">

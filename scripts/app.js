@@ -1711,6 +1711,7 @@ class App {
         if (!overlay) return;
         overlay.style.display = 'flex';
 
+        // 關閉
         document.getElementById('aiQuizClose')?.addEventListener('click', () => {
             overlay.style.display = 'none';
         });
@@ -1718,8 +1719,31 @@ class App {
             if (e.target === overlay) overlay.style.display = 'none';
         });
 
+        // 題型按鈕切換
+        document.querySelectorAll('.ai-quiz-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ai-quiz-type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // 場景 chip 切換
+        document.querySelectorAll('.ai-quiz-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const input = document.getElementById('aiQuizScenario');
+                if (chip.classList.contains('active')) {
+                    chip.classList.remove('active');
+                    input.value = '';
+                } else {
+                    document.querySelectorAll('.ai-quiz-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    input.value = chip.dataset.scenario;
+                }
+            });
+        });
+
+        // 生成按鈕
         const genBtn = document.getElementById('aiQuizGenerate');
-        // 移除舊的 listener（避免重複綁定）
         const newBtn = genBtn.cloneNode(true);
         genBtn.parentNode.replaceChild(newBtn, genBtn);
         newBtn.addEventListener('click', () => this.generateAiQuiz());
@@ -1729,6 +1753,8 @@ class App {
         const topic = document.getElementById('aiQuizTopic').value.trim();
         const count = parseInt(document.getElementById('aiQuizCount').value) || 3;
         const difficulty = document.getElementById('aiQuizDifficulty').value;
+        const scenario = document.getElementById('aiQuizScenario').value.trim();
+        const quizType = document.querySelector('.ai-quiz-type-btn.active')?.dataset.type || 'mixed';
         const status = document.getElementById('aiQuizStatus');
 
         if (!topic) {
@@ -1737,8 +1763,10 @@ class App {
             return;
         }
 
-        const diffMap = { easy: '簡單', medium: '中等', hard: '困難' };
-        status.textContent = '⏳ AI 正在生成題目…';
+        const diffMap = { easy: '初級（基本定義和核心概念）', medium: '中級（需要理解原理或比較異同）', hard: '高級（綜合多個概念或分析實際情境）' };
+        const typeNameMap = { quiz: '選擇題', truefalse: '是非題', fillblank: '填空題', ordering: '排序題', matching: '配對題', mixed: '混合題型' };
+
+        status.textContent = `⏳ AI 正在生成 ${typeNameMap[quizType]}…`;
         status.style.color = '#64748b';
 
         const btn = document.getElementById('aiQuizGenerate');
@@ -1746,43 +1774,67 @@ class App {
         btn.style.opacity = '0.5';
 
         try {
-            const prompt = `你是一位資深教學評量設計師。請根據以下條件，設計高品質的選擇題來測驗學員的理解程度。
+            // 決定每題的題型
+            const allTypes = ['quiz', 'truefalse', 'fillblank', 'ordering', 'matching'];
+            let types;
+            if (quizType === 'mixed') {
+                types = Array.from({ length: count }, (_, i) => allTypes[i % allTypes.length]);
+                // shuffle
+                for (let i = types.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [types[i], types[j]] = [types[j], types[i]];
+                }
+            } else {
+                types = Array(count).fill(quizType);
+            }
+
+            const scenarioClause = scenario ? `\n場景情境：所有題目必須設計在「${scenario}」的真實工作場景中，讓學員有代入感。` : '';
+
+            const prompt = `你是一位資深教學評量設計師。請根據以下條件，設計高品質的互動題目。
 
 ══ 出題條件 ══
 主題：${topic}
 題數：${count}
-難度：${diffMap[difficulty] || '中等'}
+難度：${diffMap[difficulty] || '中級'}${scenarioClause}
+
+每題的指定題型（按順序）：
+${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
+
+══ 各題型格式規範 ══
+
+【選擇題 quiz】
+{"type":"quiz","question":"情境化題目","options":[{"text":"選項A","correct":true},{"text":"選項B","correct":false},{"text":"選項C","correct":false},{"text":"選項D","correct":false}]}
+• 4 個選項，僅 1 個正確。干擾選項要看起來合理但有關鍵錯誤。
+
+【是非題 truefalse】
+{"type":"truefalse","statement":"一個對或錯的陳述句","correct":true}
+• correct 為 true 表示該陳述正確，false 表示錯誤。陳述句要有深度，避免太明顯。
+
+【填空題 fillblank】
+{"type":"fillblank","sentence":"這是一段包含 ____ 的句子，其中 ____ 需要填入正確答案","blanks":["答案1","答案2"]}
+• sentence 中用 ____ 標記空格位置。blanks 陣列按順序對應每個空格的正確答案。
+
+【排序題 ordering】
+{"type":"ordering","question":"請將以下步驟排列正確順序","items":["步驟A","步驟B","步驟C","步驟D"]}
+• items 陣列中的順序就是正確順序（系統會自動打亂顯示）。4-6 個項目。
+
+【配對題 matching】
+{"type":"matching","question":"請將左邊與右邊配對","pairs":[{"left":"概念A","right":"定義A"},{"left":"概念B","right":"定義B"},{"left":"概念C","right":"定義C"}]}
+• pairs 中 left 和 right 是正確配對。3-5 組。
 
 ══ 出題原則 ══
-1. 題幹設計：
-   • 使用「情境化」題幹，模擬真實場景（例：「小明的公司需要處理每秒 10 萬筆交易…」）
-   • 避免「以下何者正確/錯誤？」這類空洞題幹
-   • 題目要測驗「理解」和「應用」能力，不是死背知識
-
-2. 選項設計：
-   • 每題 4 個選項，僅 1 個正確
-   • 干擾選項要「看起來合理但有關鍵錯誤」，不能是明顯錯誤
-   • 選項長度盡量一致，正確答案不要總是最長的那個
-   • 不要用「以上皆是」或「以上皆非」作為選項
-
-3. 難度校準：
-   • 簡單 → 直接測驗基本定義和核心概念
-   • 中等 → 需要理解原理或比較異同才能作答
-   • 困難 → 需要綜合多個概念或分析實際情境
-
-4. 格式要求：
-   • 全部使用繁體中文
-   • 回傳純 JSON 陣列
+1. 使用「情境化」題幹，模擬真實場景
+2. 全部使用繁體中文
+3. 回傳純 JSON 陣列，不加任何額外說明
 
 ══ 回傳格式 ══
-[{"question": "情境化題目", "options": [{"text": "選項A", "correct": true}, {"text": "選項B", "correct": false}, {"text": "選項C", "correct": false}, {"text": "選項D", "correct": false}]}]`;
+[{...}, {...}, ...]`;
 
             const result = await ai.chat([
                 { role: 'system', content: '你是教育內容生成器，只回傳 JSON，不加任何額外說明。' },
                 { role: 'user', content: prompt }
             ], { model: 'claude-haiku-4-5', temperature: 0.8 });
 
-            // 解析 JSON
             const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
             const questions = JSON.parse(jsonStr);
 
@@ -1790,25 +1842,67 @@ class App {
                 throw new Error('AI 回傳格式不正確');
             }
 
-            // 為每題建立一張投影片
+            // 為每題建立投影片
             for (const q of questions) {
                 const gen = () => this.slideManager.generateId();
-                const slide = {
-                    id: gen(),
-                    elements: [
-                        {
-                            id: gen(),
-                            type: 'quiz',
-                            x: 50, y: 50,
-                            width: 600, height: 400,
+                let element;
+
+                switch (q.type) {
+                    case 'truefalse':
+                        element = {
+                            id: gen(), type: 'truefalse',
+                            x: 50, y: 50, width: 600, height: 400,
+                            statement: q.statement,
+                            correct: !!q.correct
+                        };
+                        break;
+
+                    case 'fillblank':
+                        element = {
+                            id: gen(), type: 'fillblank',
+                            x: 50, y: 50, width: 600, height: 400,
+                            sentence: q.sentence,
+                            blanks: q.blanks || []
+                        };
+                        break;
+
+                    case 'ordering':
+                        element = {
+                            id: gen(), type: 'ordering',
+                            x: 50, y: 50, width: 600, height: 400,
+                            question: q.question,
+                            items: q.items || []
+                        };
+                        break;
+
+                    case 'matching':
+                        element = {
+                            id: gen(), type: 'matching',
+                            x: 50, y: 50, width: 600, height: 400,
+                            question: q.question,
+                            pairs: (q.pairs || []).map(p => ({
+                                left: p.left, right: p.right, matchId: gen()
+                            }))
+                        };
+                        break;
+
+                    case 'quiz':
+                    default:
+                        element = {
+                            id: gen(), type: 'quiz',
+                            x: 50, y: 50, width: 600, height: 400,
                             question: q.question,
                             multiple: false,
-                            options: q.options.map(o => ({
-                                text: o.text,
-                                correct: !!o.correct
+                            options: (q.options || []).map(o => ({
+                                text: o.text, correct: !!o.correct
                             }))
-                        }
-                    ],
+                        };
+                        break;
+                }
+
+                const slide = {
+                    id: gen(),
+                    elements: [element],
                     background: '#ffffff'
                 };
                 this.slideManager.slides.splice(this.slideManager.currentIndex + 1, 0, slide);
