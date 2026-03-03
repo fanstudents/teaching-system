@@ -1403,12 +1403,124 @@ export class SlideManager {
                 break;
         }
 
+        // 流動線條 — 獨立於 switch 外處理（因為不是 interactive-element）
+        if (element.type === 'flowline') {
+            this.renderFlowLineElement(el, element);
+        }
+
         // 倒數計時器（適用所有互動元件）
         if (element.timeLimit && element.timeLimit > 0) {
             el.dataset.timeLimit = element.timeLimit;
         }
 
         return el;
+    }
+
+    /**
+     * 渲染流動線條元素（SVG + CSS animation）
+     */
+    renderFlowLineElement(el, element) {
+        const w = element.width;
+        const h = element.height;
+        const pts = element.waypoints || [];
+        if (pts.length < 2) return;
+
+        const color = element.lineColor || '#6366f1';
+        const glow = element.glowColor || '#818cf8';
+        const lw = element.lineWidth || 3;
+        const speed = element.flowSpeed || 2;
+        const dir = element.flowDirection || 1;
+        const pCount = element.particleCount || 3;
+        const dash = element.dashLength || 16;
+
+        // 用 catmull-rom → cubic bezier 產生平滑路徑
+        const pathD = this._flowLinePath(pts);
+
+        // 計算路徑長度（粗估）
+        let totalLen = 0;
+        for (let i = 1; i < pts.length; i++) {
+            totalLen += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+        }
+        totalLen = Math.max(totalLen, 200);
+
+        // 動畫持續時間
+        const dur = (6 - speed) * 1.5 + 1; // speed=1 → 8.5s, speed=5 → 2.5s
+
+        // 建構粒子 path 元素
+        let particlePaths = '';
+        for (let i = 0; i < pCount; i++) {
+            const delay = (dur / pCount) * i;
+            const opacity = 0.5 + (0.5 / pCount) * (pCount - i);
+            const particleDash = dash + i * 4;
+            const gap = totalLen;
+            const animDir = dir === -1 ? 'reverse' : 'normal';
+            particlePaths += `
+                <path d="${pathD}" fill="none" stroke="${color}" stroke-width="${lw}"
+                    stroke-linecap="round"
+                    stroke-dasharray="${particleDash} ${gap}"
+                    opacity="${opacity.toFixed(2)}"
+                    style="animation: flowlineDash ${dur.toFixed(1)}s linear ${delay.toFixed(1)}s infinite ${animDir};">
+                    <set attributeName="stroke-dashoffset" to="${gap + particleDash}"/>
+                </path>`;
+        }
+
+        // 端點裝飾圓
+        const startPt = pts[0];
+        const endPt = pts[pts.length - 1];
+
+        el.style.overflow = 'visible';
+        el.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"
+                viewBox="0 0 ${w} ${h}" style="width:100%;height:100%;overflow:visible;">
+                <defs>
+                    <filter id="flowGlow_${element.id}" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                </defs>
+                <!-- 底部光暈線 -->
+                <path d="${pathD}" fill="none" stroke="${glow}" stroke-width="${lw + 6}"
+                    stroke-linecap="round" opacity="0.15"
+                    filter="url(#flowGlow_${element.id})"/>
+                <!-- 底部靜態線 -->
+                <path d="${pathD}" fill="none" stroke="${color}" stroke-width="${lw}"
+                    stroke-linecap="round" opacity="0.2"/>
+                <!-- 流動粒子 -->
+                ${particlePaths}
+                <!-- 端點 -->
+                <circle cx="${startPt.x}" cy="${startPt.y}" r="${lw + 2}" fill="${color}" opacity="0.6"/>
+                <circle cx="${endPt.x}" cy="${endPt.y}" r="${lw + 2}" fill="${color}" opacity="0.6"/>
+            </svg>
+        `;
+    }
+
+    /**
+     * 將 waypoints 轉為平滑 SVG path (catmull-rom 簡化版)
+     */
+    _flowLinePath(pts) {
+        if (pts.length < 2) return '';
+        if (pts.length === 2) {
+            return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y}`;
+        }
+
+        let d = `M${pts[0].x},${pts[0].y}`;
+
+        for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[Math.max(i - 1, 0)];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[Math.min(i + 2, pts.length - 1)];
+
+            const tension = 0.3;
+            const cp1x = p1.x + (p2.x - p0.x) * tension;
+            const cp1y = p1.y + (p2.y - p0.y) * tension;
+            const cp2x = p2.x - (p3.x - p1.x) * tension;
+            const cp2y = p2.y - (p3.y - p1.y) * tension;
+
+            d += ` C${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x},${p2.y}`;
+        }
+
+        return d;
     }
 
     /**

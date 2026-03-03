@@ -669,3 +669,26 @@
     color: var(--text-secondary);
     margin-bottom: 10px;
 }
+
+/* ========================================
+   流動線條動畫
+   ======================================== */
+.flowline-element {
+    pointer-events: auto;
+    overflow: visible !important;
+}
+
+.flowline-element svg {
+    pointer-events: none;
+    overflow: visible;
+}
+
+@keyframes flowlineDash {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -2000;
+    }
+}

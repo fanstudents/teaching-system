@@ -400,6 +400,9 @@ class App {
         document.getElementById('addHBarChartBtn')?.addEventListener('click', () => this.editor.addChart('horizontal-bar'));
         document.getElementById('addDonutChartBtn')?.addEventListener('click', () => this.editor.addChart('donut'));
 
+        // 流動線條
+        document.getElementById('addFlowLineBtn')?.addEventListener('click', () => this.editor.addFlowLine());
+
         // 作業提交
         document.getElementById('addHomeworkBtn').addEventListener('click', () => {
             this.showHomeworkDialog();

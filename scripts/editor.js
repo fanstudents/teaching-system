@@ -415,6 +415,36 @@ export class Editor {
     }
 
     /**
+     * 新增流動線條元素
+     */
+    addFlowLine() {
+        const element = {
+            type: 'flowline',
+            x: 50,
+            y: 100,
+            width: 860,
+            height: 340,
+            waypoints: [
+                { x: 0, y: 170 },
+                { x: 215, y: 40 },
+                { x: 430, y: 300 },
+                { x: 645, y: 100 },
+                { x: 860, y: 170 }
+            ],
+            lineColor: '#6366f1',
+            lineWidth: 3,
+            glowColor: '#818cf8',
+            flowSpeed: 2,
+            flowDirection: 1,
+            particleCount: 3,
+            dashLength: 16
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 選取元素
      */
     selectElement(element) {
@@ -804,6 +834,48 @@ export class Editor {
                     </div>
                     <div class="hs-nodes-list" id="hsNodesList">${nodesListHtml}</div>
                     ${nodes.length > 0 ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">綠色 = 正確答案（有問題的地方）</div>' : ''}
+                </div>
+            `;
+        }
+
+        // 流動線條屬性面板
+        if (type === 'flowline') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">線條樣式</div>
+                    <div class="property-row">
+                        <label>線條色</label>
+                        <input type="color" id="flowLineColor" value="${elementData.lineColor || '#6366f1'}">
+                    </div>
+                    <div class="property-row">
+                        <label>光暈色</label>
+                        <input type="color" id="flowGlowColor" value="${elementData.glowColor || '#818cf8'}">
+                    </div>
+                    <div class="property-row">
+                        <label>線寬</label>
+                        <input type="range" id="flowLineWidth" value="${elementData.lineWidth || 3}" min="1" max="8" step="1" style="flex:1;">
+                        <span id="flowLineWidthVal" style="font-size:12px;min-width:20px;text-align:center;">${elementData.lineWidth || 3}</span>
+                    </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title">流動效果</div>
+                    <div class="property-row">
+                        <label>流速</label>
+                        <input type="range" id="flowSpeed" value="${elementData.flowSpeed || 2}" min="1" max="5" step="1" style="flex:1;">
+                        <span id="flowSpeedVal" style="font-size:12px;min-width:20px;text-align:center;">${elementData.flowSpeed || 2}</span>
+                    </div>
+                    <div class="property-row">
+                        <label>方向</label>
+                        <select id="flowDirection" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="1" ${(elementData.flowDirection || 1) === 1 ? 'selected' : ''}>正向 →</option>
+                            <option value="-1" ${elementData.flowDirection === -1 ? 'selected' : ''}>反向 ←</option>
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <label>粒子數</label>
+                        <input type="range" id="flowParticleCount" value="${elementData.particleCount || 3}" min="1" max="6" step="1" style="flex:1;">
+                        <span id="flowParticleCountVal" style="font-size:12px;min-width:20px;text-align:center;">${elementData.particleCount || 3}</span>
+                    </div>
                 </div>
             `;
         }
@@ -1238,6 +1310,38 @@ export class Editor {
                     this.slideManager.updateElement(elementId, { nodes });
                     this.slideManager.renderCurrentSlide();
                     this.selectElementById(elementId);
+                });
+            }
+        }
+
+        // 流動線條事件
+        if (elementData.type === 'flowline') {
+            const flowRerender = () => {
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            };
+            const flowBind = (inputId, key, parse, valSpanId) => {
+                const el = document.getElementById(inputId);
+                if (!el) return;
+                el.addEventListener('input', () => {
+                    if (valSpanId) {
+                        const span = document.getElementById(valSpanId);
+                        if (span) span.textContent = el.value;
+                    }
+                    this.slideManager.updateElement(elementId, { [key]: parse ? parse(el.value) : el.value });
+                    flowRerender();
+                });
+            };
+            flowBind('flowLineColor', 'lineColor');
+            flowBind('flowGlowColor', 'glowColor');
+            flowBind('flowLineWidth', 'lineWidth', v => parseInt(v) || 3, 'flowLineWidthVal');
+            flowBind('flowSpeed', 'flowSpeed', v => parseInt(v) || 2, 'flowSpeedVal');
+            flowBind('flowParticleCount', 'particleCount', v => parseInt(v) || 3, 'flowParticleCountVal');
+            const dirSelect = document.getElementById('flowDirection');
+            if (dirSelect) {
+                dirSelect.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { flowDirection: parseInt(dirSelect.value) });
+                    flowRerender();
                 });
             }
         }
