@@ -20,7 +20,7 @@ import { ScaleGame } from './interactive/scale.js?v=20260228';
 import { BuzzerGame } from './interactive/buzzer.js?v=20260228';
 import { WordCloudGame } from './interactive/wordcloud.js?v=20260228';
 import { HotspotGame } from './interactive/hotspot.js?v=20260228';
-import { DocumentViewer } from './interactive/documentViewer.js?v=20260303';
+import { DocumentViewer } from './interactive/documentViewer.js?v=20260303b';
 
 import { HomeworkSubmission } from './homework.js?v=20260224';
 import { db, realtime, generateSessionCode, ai } from './supabase.js';
@@ -2705,6 +2705,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const pm = document.getElementById('presentationMode');
             lb?.classList.toggle('open');
             pm?.classList.toggle('lb-active', lb?.classList.contains('open'));
+            // 重新計算投影片縮放
+            setTimeout(() => this.scalePresentationSlide(), 420);
         });
     }
 
@@ -3452,7 +3454,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     scalePresentationSlide() {
         const presentationSlide = document.getElementById('presentationSlide');
-        const scaleX = window.innerWidth / 960;
+        const lbOpen = document.getElementById('presLeaderboard')?.classList.contains('open');
+        const availW = window.innerWidth - (lbOpen ? 260 : 0);
+        const scaleX = availW / 960;
         const scaleY = window.innerHeight / 540;
         const scale = Math.min(scaleX, scaleY) * 0.95;
         presentationSlide.style.transform = `scale(${scale})`;
@@ -3513,6 +3517,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (this.buzzer) this.buzzer.init();
             if (this.wordCloud) this.wordCloud.init();
             if (this.hotspot) this.hotspot.init();
+            if (this.documentViewer) this.documentViewer.init();
             if (this.broadcasting && this.sessionCode) {
                 this.poll.loadVotesForPresenter(this.sessionCode);
             }

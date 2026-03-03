@@ -13,34 +13,28 @@ export class DocumentViewer {
 
     setupEventListeners() {
         window.addEventListener('slideRendered', () => this.init());
-
-        // 事件代理：點擊文件卡片
-        document.addEventListener('click', (e) => {
-            const card = e.target.closest('.document-card-container');
-            if (!card) return;
-
-            // 編輯模式下不打開（但簡報模式可以）
-            const isEditing = !!document.getElementById('slideCanvas')
-                && !document.getElementById('presentationMode')?.classList.contains('active');
-            if (isEditing) return;
-
-            e.stopPropagation();
-            const elementId = card.dataset.elementId;
-            this.openViewer(elementId);
-        });
-
-        // 簡報模式也用雙擊打開
-        document.addEventListener('dblclick', (e) => {
-            const card = e.target.closest('.document-card-container');
-            if (!card) return;
-            e.stopPropagation();
-            const elementId = card.dataset.elementId;
-            this.openViewer(elementId);
-        });
     }
 
+    /**
+     * 直接綁定 click 到每個文件卡片（與其他互動模組相同方式）
+     */
     init() {
-        // 不需要做什麼，事件代理已處理
+        document.querySelectorAll('.document-card-container').forEach(card => {
+            if (card._docViewerBound) return; // 避免重複綁定
+            card._docViewerBound = true;
+            card.style.cursor = 'pointer';
+
+            card.addEventListener('click', (e) => {
+                // 編輯畫布 (非簡報模式) 下不打開
+                const isEditing = !!document.getElementById('slideCanvas')
+                    && !document.getElementById('presentationMode')?.classList.contains('active');
+                if (isEditing) return;
+
+                e.stopPropagation();
+                e.preventDefault();
+                this.openViewer(card.dataset.elementId);
+            });
+        });
     }
 
     /**

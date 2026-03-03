@@ -3105,16 +3105,7 @@
    ======================================== */
 
 /* 排行榜打開時，投影片容器改為雙欄佈局 */
-.presentation-mode.lb-active {
-    justify-content: flex-start;
-}
 
-.presentation-mode.lb-active .presentation-slide {
-    margin-left: auto;
-    margin-right: auto;
-    /* 扣除排行榜寬度後置中 */
-    max-width: calc(100vw - 280px);
-}
 
 .pres-leaderboard {
     position: fixed;

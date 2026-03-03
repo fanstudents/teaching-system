@@ -1477,27 +1477,81 @@ export class Editor {
                 overlay.id = 'docEditorOverlay';
                 overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
                 overlay.innerHTML = `
-                    <div style="background:white;border-radius:16px;width:min(90vw,800px);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e2e8f0;">
+                    <div style="background:white;border-radius:16px;width:min(92vw,860px);max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e2e8f0;">
                             <h3 style="margin:0;font-size:16px;color:#0f172a;display:flex;align-items:center;gap:8px;">
                                 <span class="material-symbols-outlined" style="font-size:20px;color:#0284c7;">description</span>
                                 文件內容編輯
                             </h3>
                             <div style="display:flex;gap:8px;">
-                                <button id="docEditorSave" style="padding:6px 16px;background:#0284c7;color:white;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">儲存</button>
-                                <button id="docEditorCancel" style="padding:6px 16px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;cursor:pointer;">取消</button>
+                                <button id="docEditorFormat" style="padding:5px 12px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;" title="自動格式化純文字為 Markdown 段落">
+                                    <span class="material-symbols-outlined" style="font-size:14px;">auto_fix_high</span> 自動排版
+                                </button>
+                                <button id="docEditorSave" style="padding:5px 16px;background:#0284c7;color:white;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">儲存</button>
+                                <button id="docEditorCancel" style="padding:5px 16px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;cursor:pointer;">取消</button>
                             </div>
                         </div>
-                        <div style="padding:4px 20px 4px;">
-                            <div style="font-size:11px;color:#94a3b8;line-height:1.4;">支援 Markdown、HTML 格式。可直接貼上含圖片的文字。</div>
+                        <div style="display:flex;border-bottom:1px solid #e2e8f0;">
+                            <button class="doc-ed-tab active" data-tab="edit" style="flex:1;padding:8px;border:none;background:none;font-size:12px;font-weight:600;color:#0284c7;border-bottom:2px solid #0284c7;cursor:pointer;">
+                                <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">edit</span> 編輯
+                            </button>
+                            <button class="doc-ed-tab" data-tab="preview" style="flex:1;padding:8px;border:none;background:none;font-size:12px;font-weight:500;color:#94a3b8;border-bottom:2px solid transparent;cursor:pointer;">
+                                <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">visibility</span> 預覽
+                            </button>
                         </div>
-                        <textarea id="docEditorTextarea" style="flex:1;margin:8px 20px 20px;padding:14px;border:1px solid #e2e8f0;border-radius:8px;font-family:'Fira Code','SF Mono',monospace;font-size:13px;line-height:1.6;resize:none;outline:none;min-height:400px;">${(freshData?.docContent || '').replace(/</g, '&lt;')}</textarea>
+                        <div id="docEditorEditPane" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+                            <div style="padding:4px 20px;font-size:11px;color:#94a3b8;line-height:1.4;">支援 Markdown、HTML。貼上純文字後可按「自動排版」整理格式。</div>
+                            <textarea id="docEditorTextarea" style="flex:1;margin:4px 20px 20px;padding:14px;border:1px solid #e2e8f0;border-radius:8px;font-family:'Fira Code','SF Mono',monospace;font-size:13px;line-height:1.7;resize:none;outline:none;min-height:380px;">${(freshData?.docContent || '').replace(/</g, '&lt;')}</textarea>
+                        </div>
+                        <div id="docEditorPreviewPane" style="flex:1;display:none;overflow-y:auto;padding:20px;min-height:380px;"></div>
                     </div>
                 `;
                 document.body.appendChild(overlay);
 
                 const textarea = overlay.querySelector('#docEditorTextarea');
+                const editPane = overlay.querySelector('#docEditorEditPane');
+                const previewPane = overlay.querySelector('#docEditorPreviewPane');
                 textarea?.focus();
+
+                // 頁籤切換
+                overlay.querySelectorAll('.doc-ed-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        overlay.querySelectorAll('.doc-ed-tab').forEach(t => {
+                            t.style.color = '#94a3b8'; t.style.fontWeight = '500'; t.style.borderBottomColor = 'transparent';
+                        });
+                        tab.style.color = '#0284c7'; tab.style.fontWeight = '600'; tab.style.borderBottomColor = '#0284c7';
+
+                        if (tab.dataset.tab === 'edit') {
+                            editPane.style.display = 'flex';
+                            previewPane.style.display = 'none';
+                        } else {
+                            editPane.style.display = 'none';
+                            previewPane.style.display = 'block';
+                            // 渲染預覽
+                            const { DocumentViewer } = window._app?.documentViewer?.constructor
+                                ? { DocumentViewer: window._app.documentViewer.constructor }
+                                : {};
+                            if (window._app?.documentViewer?.parseMarkdown) {
+                                previewPane.innerHTML = `<div class="doc-viewer-content">${window._app.documentViewer.parseMarkdown(textarea.value)}</div>`;
+                            } else {
+                                previewPane.innerHTML = `<div style="padding:20px;line-height:1.7;">${textarea.value.replace(/</g, '&lt;').replace(/\n/g, '<br>')}</div>`;
+                            }
+                        }
+                    });
+                });
+
+                // 自動排版
+                overlay.querySelector('#docEditorFormat')?.addEventListener('click', () => {
+                    let text = textarea.value;
+                    // 把連續的非空行用雙換行分段
+                    text = text
+                        .replace(/\r\n/g, '\n')
+                        .replace(/\n{3,}/g, '\n\n')  // 壓縮多餘空行
+                        .split('\n\n')
+                        .map(para => para.replace(/\n/g, '  \n')) // 保留段內換行（Markdown soft break）
+                        .join('\n\n');
+                    textarea.value = text;
+                });
 
                 const close = () => overlay.remove();
 
