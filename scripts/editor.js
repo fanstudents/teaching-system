@@ -794,6 +794,19 @@ export class Editor {
         } else if (type === 'copycard') {
             html += this.renderCopyCardProperties(elementData);
         } else if (type === 'document') {
+            const anchors = elementData.docAnchors || [];
+            const anchorsHtml = anchors.map((a, i) => `
+                <div class="doc-anchor-row" data-idx="${i}" style="display:flex;gap:6px;align-items:center;padding:6px 8px;background:${a.isError ? '#fef2f2' : '#f0fdf4'};border-radius:6px;border:1px solid ${a.isError ? '#fecaca' : '#bbf7d0'};">
+                    <span style="font-size:11px;font-weight:700;color:${a.isError ? '#dc2626' : '#16a34a'};min-width:16px;">${i + 1}</span>
+                    <input type="text" class="doc-anchor-text" value="${(a.text || '').replace(/"/g, '&quot;')}" placeholder="段落描述..."
+                        style="flex:1;padding:3px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:white;">
+                    <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:#dc2626;white-space:nowrap;cursor:pointer;">
+                        <input type="checkbox" class="doc-anchor-error" ${a.isError ? 'checked' : ''}> 錯誤
+                    </label>
+                    <button class="doc-anchor-del" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:14px;" title="刪除">✕</button>
+                </div>
+            `).join('');
+
             html += `
                 <div class="property-section">
                     <div class="property-section-title">文件檢視器設定</div>
@@ -805,14 +818,40 @@ export class Editor {
                         <label class="form-label">內容（支援 Markdown / HTML）</label>
                         <textarea class="form-input" id="docContent" rows="8" style="resize:vertical;font-family:'Fira Code',monospace;font-size:12px;line-height:1.5;">${elementData.docContent || ''}</textarea>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">下載連結 <span style="font-weight:400;color:#94a3b8;">(選填)</span></label>
-                        <input type="text" class="form-input" id="docDownloadUrl" placeholder="https://example.com/file.pdf" value="${elementData.docDownloadUrl || ''}">
+                </div>
+
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b;">flag</span>
+                        錨點（找錯練習）
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">下載檔名 <span style="font-weight:400;color:#94a3b8;">(選填)</span></label>
-                        <input type="text" class="form-input" id="docDownloadName" placeholder="文件.pdf" value="${elementData.docDownloadName || ''}">
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;line-height:1.4;">
+                        設定文件中的段落，標記哪些為「錯誤」。學員閱讀後勾選認為有錯的段落。
                     </div>
+                    <div id="docAnchorsList" style="display:flex;flex-direction:column;gap:4px;">
+                        ${anchorsHtml}
+                    </div>
+                    <button id="addDocAnchor" style="margin-top:6px;padding:6px;border:1px dashed #d1d5db;border-radius:6px;background:transparent;color:#64748b;cursor:pointer;font-size:12px;width:100%;transition:all .15s;">
+                        + 新增錨點
+                    </button>
+                </div>
+
+                <div class="property-section">
+                    <div class="property-section-title">檔案下載</div>
+                    <div class="form-group">
+                        <label class="form-label">上傳檔案 <span style="font-weight:400;color:#94a3b8;">(上傳到系統)</span></label>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="file" id="docFileUpload" style="font-size:12px;flex:1;">
+                            <button id="docUploadBtn" style="padding:4px 12px;background:#0284c7;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;">上傳</button>
+                        </div>
+                        <div id="docUploadStatus" style="font-size:11px;margin-top:4px;min-height:16px;"></div>
+                    </div>
+                    ${elementData.docDownloadUrl ? `
+                        <div style="font-size:11px;color:#16a34a;display:flex;align-items:center;gap:4px;margin-top:4px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span>
+                            已上傳：${elementData.docDownloadName || '檔案'}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         } else if (type === 'showcase') {
@@ -939,11 +978,11 @@ export class Editor {
         }
 
         // ── 統一計分設定（所有可計分互動元件） ──
-        const scorableTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard'];
+        const scorableTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document'];
         if (scorableTypes.includes(type)) {
-            const defaultPoints = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1 };
+            const defaultPoints = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5 };
             const pts = elementData.points ?? defaultPoints[type] ?? 1;
-            const hasCorrect = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot'].includes(type);
+            const hasCorrect = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'document'].includes(type);
             html += `
                 <div class="property-section">
                     <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
@@ -1440,12 +1479,89 @@ export class Editor {
             bindSimple('buzzerQuestion', 'question');
         } else if (elementData.type === 'document') {
             bindSimple('docTitle', 'docTitle');
-            bindSimple('docDownloadUrl', 'docDownloadUrl');
-            bindSimple('docDownloadName', 'docDownloadName');
             const contentEl = document.getElementById('docContent');
             if (contentEl) contentEl.addEventListener('change', () => {
                 this.slideManager.updateElement(elementId, { docContent: contentEl.value });
                 rerender();
+            });
+
+            // ── 錨點 CRUD ──
+            const syncAnchors = () => {
+                const rows = document.querySelectorAll('.doc-anchor-row');
+                const anchors = [...rows].map(row => ({
+                    id: 'a' + row.dataset.idx,
+                    text: row.querySelector('.doc-anchor-text')?.value || '',
+                    isError: row.querySelector('.doc-anchor-error')?.checked || false,
+                }));
+                this.slideManager.updateElement(elementId, { docAnchors: anchors });
+                rerender();
+            };
+
+            // 錨點文字/勾選變更
+            document.querySelectorAll('.doc-anchor-text').forEach(inp => {
+                inp.addEventListener('change', syncAnchors);
+            });
+            document.querySelectorAll('.doc-anchor-error').forEach(chk => {
+                chk.addEventListener('change', syncAnchors);
+            });
+
+            // 刪除錨點
+            document.querySelectorAll('.doc-anchor-del').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const anchors = [...(elementData.docAnchors || [])];
+                    const idx = parseInt(btn.closest('.doc-anchor-row').dataset.idx);
+                    anchors.splice(idx, 1);
+                    this.slideManager.updateElement(elementId, { docAnchors: anchors });
+                    this.renderPropertyPanel(elementId);
+                    this._bindPropertyEvents(elementId);
+                    rerender();
+                });
+            });
+
+            // 新增錨點
+            document.getElementById('addDocAnchor')?.addEventListener('click', () => {
+                const anchors = [...(elementData.docAnchors || [])];
+                anchors.push({ id: 'a' + Date.now(), text: '', isError: false });
+                this.slideManager.updateElement(elementId, { docAnchors: anchors });
+                this.renderPropertyPanel(elementId);
+                this._bindPropertyEvents(elementId);
+                rerender();
+                // 聚焦最後一個
+                setTimeout(() => {
+                    const inputs = document.querySelectorAll('.doc-anchor-text');
+                    inputs[inputs.length - 1]?.focus();
+                }, 50);
+            });
+
+            // ── 檔案上傳 ──
+            document.getElementById('docUploadBtn')?.addEventListener('click', async () => {
+                const fileInput = document.getElementById('docFileUpload');
+                const statusEl = document.getElementById('docUploadStatus');
+                const file = fileInput?.files?.[0];
+                if (!file) { if (statusEl) statusEl.textContent = '請先選擇檔案'; return; }
+
+                if (statusEl) { statusEl.textContent = '上傳中...'; statusEl.style.color = '#0284c7'; }
+                try {
+                    const { db } = await import('./supabase.js');
+                    const ext = file.name.split('.').pop() || 'pdf';
+                    const projectTitle = document.getElementById('projectTitle')?.textContent?.trim() || '教學專案';
+                    const docTitle = elementData.docTitle || '文件';
+                    const safeName = `${projectTitle}-${docTitle}`.replace(/[^a-zA-Z0-9\u4e00-\u9fff_-]/g, '_');
+                    const objectKey = `docs/${elementId}_${Date.now()}.${ext}`;
+                    const downloadName = `${safeName}.${ext}`;
+
+                    const { data, error } = await db.upload('documents', objectKey, file);
+                    if (error) throw new Error(error.message || '上傳失敗');
+
+                    const url = data?.url || db.getPublicUrl('documents', objectKey);
+                    this.slideManager.updateElement(elementId, { docDownloadUrl: url, docDownloadName: downloadName });
+                    if (statusEl) { statusEl.textContent = `✓ 上傳成功：${downloadName}`; statusEl.style.color = '#16a34a'; }
+                    this.renderPropertyPanel(elementId);
+                    this._bindPropertyEvents(elementId);
+                    rerender();
+                } catch (err) {
+                    if (statusEl) { statusEl.textContent = `✕ ${err.message}`; statusEl.style.color = '#dc2626'; }
+                }
             });
         } else if (elementData.type === 'wordcloud') {
             bindSimple('wcQuestion', 'question');

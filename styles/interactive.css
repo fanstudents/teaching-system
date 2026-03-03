@@ -3267,3 +3267,261 @@
 .pres-leaderboard.open~.lb-toggle {
     right: 232px;
 }
+
+/* ========================================
+   文件檢視器 — 錨點（找錯練習）
+   ======================================== */
+.doc-anchors-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.doc-anchors-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 14px;
+}
+
+.doc-anchors-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.doc-anchor-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.doc-anchor-card:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.doc-anchor-card.checked {
+    background: #fff7ed;
+    border-color: #fdba74;
+    box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.15);
+}
+
+.doc-anchor-card.checked .doc-anchor-check {
+    color: #f59e0b;
+}
+
+/* 公布後樣式 */
+.doc-anchor-card.revealed {
+    cursor: default;
+    pointer-events: none;
+}
+
+.doc-anchor-card.revealed.is-error {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12);
+}
+
+.doc-anchor-card.revealed.is-error::after {
+    content: '✕ 此處有錯';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.doc-anchor-card.revealed.is-correct {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.doc-anchor-card.revealed.is-correct::after {
+    content: '✓ 正確';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a;
+    background: #dcfce7;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.doc-anchor-card.revealed {
+    position: relative;
+}
+
+.doc-anchor-check {
+    color: #94a3b8;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.doc-anchor-check .material-symbols-outlined {
+    font-size: 22px;
+}
+
+.doc-anchor-label {
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.5;
+    flex: 1;
+}
+
+/* 提交 / 公布按鈕 */
+.doc-submit-anchors,
+.doc-reveal-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.doc-submit-anchors {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.doc-submit-anchors:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.doc-submit-anchors.submitted {
+    background: #22c55e;
+    cursor: default;
+    box-shadow: none;
+}
+
+.doc-reveal-btn {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.doc-reveal-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+}
+
+/* 統計面板 */
+.doc-stats-panel {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.doc-stats-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 14px;
+}
+
+.doc-stat-row {
+    margin-bottom: 10px;
+}
+
+.doc-stat-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+.doc-stat-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.doc-stat-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.doc-stat-tag.error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.doc-stat-tag.correct {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.doc-stat-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.doc-stat-bar-wrap {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 2px;
+}
+
+.doc-stat-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    min-width: 2px;
+}
+
+.doc-stat-pct {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+}

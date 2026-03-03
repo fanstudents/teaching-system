@@ -1832,7 +1832,7 @@ export class SlideManager {
         el.style.setProperty('--ia-padding', pad + 'px');
 
         // 計分分數 (供互動模組讀取)
-        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1 };
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5 };
         const pts = element.points ?? defaultPts[element.type] ?? 0;
         el.dataset.points = pts;
     }
@@ -2061,6 +2061,7 @@ export class SlideManager {
      */
     renderDocumentElement(el, element) {
         const hasDownload = !!element.docDownloadUrl;
+        const anchorCount = (element.docAnchors || []).length;
         el.innerHTML = `
             <div class="interactive-label">文件檢視</div>
             <div class="document-card-container" data-element-id="${element.id}" style="
@@ -2079,6 +2080,9 @@ export class SlideManager {
                     點擊查看文件
                 </div>
                 ${hasDownload ? `<div style="position:absolute;top:8px;right:8px;"><span class="material-symbols-outlined" style="font-size:16px;color:#0ea5e9;">download</span></div>` : ''}
+                ${anchorCount > 0 ? `<div style="position:absolute;top:8px;left:8px;background:#f59e0b;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;display:flex;align-items:center;gap:3px;">
+                    <span class="material-symbols-outlined" style="font-size:12px;">flag</span>${anchorCount} 錨點
+                </div>` : ''}
             </div>
         `;
     }
