@@ -919,7 +919,7 @@
                     const { data, error } = await storage.upload('homework', path, file);
                     if (error) throw new Error(error.message || JSON.stringify(error));
                     document.getElementById('checklistIconUrl').value = data.url;
-                    previewChecklistIcon();
+                    window.previewChecklistIcon();
                 } catch (err) { showToast('上傳失敗: ' + err.message, { type: 'error' }); }
                 e.target.value = '';
             };
@@ -942,7 +942,7 @@
                 document.getElementById('checklistTitle').value = item.title;
                 document.getElementById('checklistDesc').value = item.description || '';
                 document.getElementById('checklistIconUrl').value = item.icon_url || '';
-                previewChecklistIcon();
+                window.previewChecklistIcon();
                 document.getElementById('checklistModal').classList.add('active');
             };
 
