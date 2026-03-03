@@ -61,8 +61,8 @@ export class DocumentViewer {
      */
     _getElementData(elementId) {
         // 搜尋所有投影片（簡報模式可能在不同頁）
-        if (window._app?.slideManager?.slides) {
-            for (const s of window._app.slideManager.slides) {
+        if (window.app?.slideManager?.slides) {
+            for (const s of window.app.slideManager.slides) {
                 const found = s.elements?.find(e => e.id === elementId);
                 if (found) return found;
             }
