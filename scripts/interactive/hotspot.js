@@ -129,7 +129,7 @@ export class HotspotGame {
 
             const title = container.querySelector('.hotspot-question')?.textContent || '圖片標註';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
-            await stateManager.save(elementId, {
+            const _r = await stateManager.save(elementId, {
                 type: 'hotspot', title,
                 content: selectedIds.join(', '),
                 isCorrect: allRight,
@@ -137,6 +137,7 @@ export class HotspotGame {
                 points,
                 state: { selectedIds },
             });
+            if (_r?.isRetry) stateManager.showRetryBanner(container);
         });
 
         // 重新作答

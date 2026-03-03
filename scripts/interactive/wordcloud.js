@@ -142,10 +142,11 @@ export class WordCloudGame {
 
             const title = container.querySelector('.wordcloud-question')?.textContent || '文字雲';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 1;
-            await stateManager.save(elementId, {
+            const _r = await stateManager.save(elementId, {
                 type: 'wordcloud', title, content: collected.join(', '),
                 isCorrect: null, score: null, points, participated: true, state: { words: collected },
             });
+            if (_r?.isRetry) stateManager.showRetryBanner(container);
             setTimeout(() => this.renderCloud(elementId, cloudEl), 500);
         });
 

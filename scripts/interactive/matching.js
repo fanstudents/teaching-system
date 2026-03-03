@@ -370,7 +370,7 @@ export class MatchingGame {
     async reportScore(container, correct, total, pairs = {}) {
         const elementId = container.closest('[data-id]')?.dataset.id || container.dataset.elementId || '';
         const points = parseInt(container.closest('[data-points]')?.dataset.points) || 10;
-        await stateManager.save(elementId, {
+        const _r = await stateManager.save(elementId, {
             type: 'matching',
             title: '連連看',
             content: `${correct}/${total}`,
@@ -379,6 +379,6 @@ export class MatchingGame {
             points,
             state: { completed: true, pairs, correct, total },
         });
-        // 連連看成績已回報
+        if (_r?.isRetry) stateManager.showRetryBanner(container);
     }
 }

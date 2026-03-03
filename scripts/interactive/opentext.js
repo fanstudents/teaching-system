@@ -61,10 +61,11 @@ export class OpenTextGame {
             showSubmitted(text);
             const title = container.querySelector('.opentext-question')?.textContent || '開放問答';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 1;
-            await stateManager.save(elementId, {
+            const _r = await stateManager.save(elementId, {
                 type: 'opentext', title, content: text,
                 isCorrect: null, score: null, points, participated: true, state: { text },
             });
+            if (_r?.isRetry) stateManager.showRetryBanner(container);
         });
 
         resetBtn.addEventListener('click', async () => {

@@ -188,7 +188,7 @@ export class FillBlank {
     async reportScore(elementId, correct, total, answers) {
         const el = document.querySelector(`[data-id="${elementId}"]`);
         const points = parseInt(el?.dataset.points) || 10;
-        await stateManager.save(elementId, {
+        const _r = await stateManager.save(elementId, {
             type: 'fillblank',
             title: '填空題',
             content: `${correct}/${total}`,
@@ -197,7 +197,7 @@ export class FillBlank {
             points,
             state: { answers, correct, total },
         });
-        // 填空題成績已回報
+        if (_r?.isRetry) stateManager.showRetryBanner(container);
     }
 
     /**

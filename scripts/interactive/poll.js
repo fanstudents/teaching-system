@@ -94,7 +94,7 @@ export class PollGame {
         // 統一寫入 submissions（讓 email 模組可以查詢）
         const optLabel = optionEls[optionIndex]?.textContent?.trim() || `選項 ${optionIndex + 1}`;
         const points = parseInt(container.closest('[data-points]')?.dataset.points) || 1;
-        await stateManager.save(elementId, {
+        const _r = await stateManager.save(elementId, {
             type: 'poll',
             title: container.querySelector('.poll-question')?.textContent || '投票',
             content: optLabel,
@@ -104,6 +104,7 @@ export class PollGame {
             participated: true,
             state: { optionIndex, optionLabel: optLabel },
         });
+        if (_r?.isRetry) stateManager.showRetryBanner(container);
     }
 
     async _loadVotes(elementId, sessionCode, container) {

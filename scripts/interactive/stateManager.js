@@ -39,13 +39,16 @@ class InteractionState {
 
     /**
      * 儲存互動結果（記憶體 + DB upsert）
+     * 首次計分制：只有第一次作答的分數會被記錄，重複作答不覆蓋分數
+     * @returns {{ isRetry: boolean }} 是否為重複作答
      */
     async save(elementId, data) {
         const user = this.getUser();
         const sessionId = this.getSessionCode();
         const email = user ? (user.email || '') : 'guest';
+        const k = this._key(sessionId, elementId, email);
 
-        // 計算實際獲得的分數
+        // 計算本次實際獲得的分數
         const maxPoints = data.points ?? 0;
         let awardedPoints = 0;
         if (maxPoints > 0) {
@@ -54,12 +57,38 @@ class InteractionState {
             } else if (data.isCorrect === false) {
                 awardedPoints = 0;
             } else if (data.score != null && data.score > 0) {
-                // 部分正確：按百分比計算
                 awardedPoints = Math.round((parseFloat(data.score) / 100) * maxPoints);
             } else if (data.isCorrect === null && data.participated) {
-                // 參與型（投票、開放問答等）
                 awardedPoints = maxPoints;
             }
+        }
+
+        // ── 檢查是否已有首次作答（首次計分制）──
+        let isRetry = false;
+        let firstAwardedPoints = awardedPoints; // 預設用本次分數
+        const cached = this._cache.get(k);
+        if (cached) {
+            // 記憶體中已有紀錄 → 這是重複作答
+            isRetry = true;
+            firstAwardedPoints = cached.state?._awarded ?? cached.awarded_points ?? awardedPoints;
+        } else if (user) {
+            // 記憶體沒有但 DB 可能有
+            try {
+                const raw = await db.select('submissions', {
+                    filter: {
+                        session_id: `eq.${sessionId || ''}`,
+                        element_id: `eq.${elementId}`,
+                        student_email: `eq.${email}`,
+                    },
+                });
+                const existing = this._unwrap(raw);
+                if (existing.length > 0) {
+                    isRetry = true;
+                    let st = existing[0].state;
+                    if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                    firstAwardedPoints = st?._awarded ?? 0;
+                }
+            } catch { }
         }
 
         const record = {
@@ -73,20 +102,26 @@ class InteractionState {
             content: data.content || '',
             is_correct: data.isCorrect ?? null,
             score: data.score != null ? String(data.score) : null,
-            state: { ...(data.state || {}), _awarded: awardedPoints, _maxPts: maxPoints },
+            // 首次計分制：保留首次的分數
+            state: {
+                ...(data.state || {}),
+                _awarded: isRetry ? firstAwardedPoints : awardedPoints,
+                _maxPts: maxPoints,
+                _isRetry: isRetry,
+                _thisAttemptAwarded: awardedPoints,
+            },
             submitted_at: new Date().toISOString(),
         };
 
-        // 記憶體快取 (含 awarded_points 於 top level 方便查詢)
-        record.awarded_points = awardedPoints;
+        record.awarded_points = isRetry ? firstAwardedPoints : awardedPoints;
         record.max_points = maxPoints;
-        const k = this._key(sessionId, elementId, email);
+        record._isRetry = isRetry;
         this._cache.set(k, record);
 
         // 如果是訪客，不寫入 DB
-        if (!user) return;
+        if (!user) return { isRetry };
 
-        // DB upsert
+        // DB upsert（重複作答時只更新 content/state 但不改 _awarded）
         try {
             const raw = await db.select('submissions', {
                 filter: {
@@ -106,18 +141,35 @@ class InteractionState {
                     submitted_at: record.submitted_at,
                 }, { id: `eq.${existing[0].id}` });
             } else {
-                const { awarded_points, max_points, ...dbRecord } = record;
+                const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
                 await db.insert('submissions', dbRecord);
             }
         } catch (e) {
             console.warn('[stateManager] save failed, trying insert:', e);
             try {
-                const { awarded_points, max_points, ...dbRecord } = record;
+                const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
                 await db.insert('submissions', dbRecord);
             } catch (e2) {
                 console.warn('[stateManager] insert also failed:', e2);
             }
         }
+
+        return { isRetry };
+    }
+
+    /**
+     * 顯示「首次計分」重複作答提示橫幅
+     */
+    showRetryBanner(container) {
+        // 避免重複插入
+        if (container.querySelector('.retry-score-banner')) return;
+        const banner = document.createElement('div');
+        banner.className = 'retry-score-banner';
+        banner.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size:16px;">info</span>
+            <span>分數以第一次作答為準，本次答題不計入排行榜。繼續加油！</span>
+        `;
+        container.appendChild(banner);
     }
 
     /**

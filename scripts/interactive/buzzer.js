@@ -132,11 +132,12 @@ export class BuzzerGame {
 
             const title = container.querySelector('.buzzer-question')?.textContent || '搶答';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 10;
-            await stateManager.save(elementId, {
+            const _r = await stateManager.save(elementId, {
                 type: 'buzzer', title, content: answer,
                 isCorrect: null, score: null, points, participated: true,
                 state: { pressed: true, answer, timestamp },
             });
+            if (_r?.isRetry) stateManager.showRetryBanner(container);
             setTimeout(() => this.loadRanking(elementId, rankEl), 500);
         });
 

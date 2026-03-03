@@ -157,7 +157,7 @@ export class QuizGame {
         const title = container.querySelector('.quiz-question')?.textContent || '選擇題';
         const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
 
-        await stateManager.save(elementId, {
+        const result = await stateManager.save(elementId, {
             type: 'quiz',
             title,
             content: `${correct}/${total}`,
@@ -166,6 +166,8 @@ export class QuizGame {
             points,
             state: { selected: selectedIndices, correct: allCorrect },
         });
-        // 選擇題成績已回報
+        if (result?.isRetry) {
+            stateManager.showRetryBanner(container);
+        }
     }
 }

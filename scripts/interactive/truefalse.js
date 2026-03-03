@@ -169,7 +169,7 @@ export class TrueFalseGame {
                 markChosen(chosen);
                 const title = container.querySelector('.tf-question')?.textContent || '是非題';
                 const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
-                await stateManager.save(elementId, {
+                const _r = await stateManager.save(elementId, {
                     type: 'truefalse', title,
                     content: chosen ? '對' : '錯',
                     isCorrect: chosen === correctAnswer,
@@ -177,6 +177,7 @@ export class TrueFalseGame {
                     points,
                     state: { chosen },
                 });
+                if (_r?.isRetry) stateManager.showRetryBanner(container);
 
                 // 講師模式下，作答後仍等講師公布
                 // 不自動揭曉
