@@ -388,6 +388,26 @@
                     <input type="text" id="checklistTitle" placeholder="例如：註冊 ChatGPT 帳號">
                 </div>
                 <div class="form-field">
+                    <label>圖示 Logo（選填，取代編號）</label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <div id="checklistIconPreview"
+                            style="display:none;width:36px;height:36px;border-radius:50%;overflow:hidden;border:1.5px solid #e2e8f0;flex-shrink:0;">
+                            <img id="checklistIconImg" style="width:100%;height:100%;object-fit:cover;" alt="icon">
+                        </div>
+                        <input type="url" class="field-input" id="checklistIconUrl" placeholder="貼上圖片 URL 或上傳"
+                            style="flex:1;" oninput="previewChecklistIcon()">
+                        <label class="btn btn-sm btn-outline" style="cursor:pointer;white-space:nowrap;">
+                            <span class="material-symbols-rounded" style="font-size:16px;">upload</span>
+                            <input type="file" id="checklistIconUpload" accept="image/*" style="display:none;"
+                                onchange="uploadChecklistIcon(event)">
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="clearChecklistIcon()"
+                            style="color:#ef4444;padding:5px 6px;" title="清除">
+                            <span class="material-symbols-rounded" style="font-size:16px;">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-field">
                     <label>說明（選填）</label>
                     <textarea id="checklistDesc" rows="2" placeholder="補充說明…&#10;支援超連結格式：[顯示文字](https://網址)"></textarea>
                     <button type="button" class="btn btn-sm btn-outline" onclick="insertLink()"
@@ -788,7 +808,9 @@
                 list.innerHTML = checklistItems.map((item, i) => `
                 <li class="manage-item" draggable="true" data-id="${item.id}">
                     <span class="material-symbols-rounded drag-handle">drag_indicator</span>
-                    <span class="item-order">${i + 1}</span>
+                    ${item.icon_url
+                        ? `<img src="${item.icon_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #e2e8f0;">`
+                        : `<span class="item-order">${i + 1}</span>`}
                     <div class="item-info">
                         <div class="item-title">${item.title}</div>
                         ${item.description ? `<div class="item-desc">${linkify(item.description)}</div>` : ''}
@@ -817,11 +839,44 @@
                 } catch (e) { showToast('排序失敗', { type: 'error' }); }
             }
 
+            window.previewChecklistIcon = function () {
+                const url = document.getElementById('checklistIconUrl').value.trim();
+                const preview = document.getElementById('checklistIconPreview');
+                if (url) {
+                    document.getElementById('checklistIconImg').src = url;
+                    preview.style.display = '';
+                } else {
+                    preview.style.display = 'none';
+                }
+            };
+
+            window.clearChecklistIcon = function () {
+                document.getElementById('checklistIconUrl').value = '';
+                document.getElementById('checklistIconPreview').style.display = 'none';
+            };
+
+            window.uploadChecklistIcon = async function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const { storage } = await import('./scripts/supabase.js');
+                    const ext = file.name.split('.').pop();
+                    const path = `checklist-icons/${Date.now()}.${ext}`;
+                    const { data, error } = await storage.upload('homework', path, file);
+                    if (error) throw new Error(error.message || JSON.stringify(error));
+                    document.getElementById('checklistIconUrl').value = data.url;
+                    previewChecklistIcon();
+                } catch (err) { showToast('上傳失敗: ' + err.message, { type: 'error' }); }
+                e.target.value = '';
+            };
+
             window.showAddChecklist = function () {
                 document.getElementById('checklistModalTitle').textContent = '新增準備項目';
                 document.getElementById('checklistEditId').value = '';
                 document.getElementById('checklistTitle').value = '';
                 document.getElementById('checklistDesc').value = '';
+                document.getElementById('checklistIconUrl').value = '';
+                document.getElementById('checklistIconPreview').style.display = 'none';
                 document.getElementById('checklistModal').classList.add('active');
             };
 
@@ -832,6 +887,8 @@
                 document.getElementById('checklistEditId').value = id;
                 document.getElementById('checklistTitle').value = item.title;
                 document.getElementById('checklistDesc').value = item.description || '';
+                document.getElementById('checklistIconUrl').value = item.icon_url || '';
+                previewChecklistIcon();
                 document.getElementById('checklistModal').classList.add('active');
             };
 
@@ -839,15 +896,16 @@
                 const id = document.getElementById('checklistEditId').value;
                 const title = document.getElementById('checklistTitle').value.trim();
                 const description = document.getElementById('checklistDesc').value.trim();
+                const icon_url = document.getElementById('checklistIconUrl').value.trim();
                 if (!title) { showToast('請輸入項目名稱', { type: 'error' }); return; }
                 const sort_order = id
                     ? checklistItems.find(i => i.id === id)?.sort_order || 0
                     : checklistItems.length + 1;
                 try {
                     if (id) {
-                        await db.update('checklist_items', { title, description, sort_order }, { id: `eq.${id}` });
+                        await db.update('checklist_items', { title, description, icon_url, sort_order }, { id: `eq.${id}` });
                     } else {
-                        await db.insert('checklist_items', { title, description, sort_order, session_code: dataCode });
+                        await db.insert('checklist_items', { title, description, icon_url, sort_order, session_code: dataCode });
                     }
                     closeModal('checklistModal');
                     await loadChecklist();

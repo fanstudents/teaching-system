@@ -530,6 +530,7 @@
                         <span class="check-icon ${done ? 'checked' : ''}"
                               data-item-id="${item.id}"
                               onclick="window.__toggleCheck(this)">✓</span>
+                        ${item.icon_url ? `<img src="${item.icon_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #e2e8f0;">` : ''}
                         <div class="item-content">
                             <strong>${item.title}</strong>
                             ${item.description ? `<span class="desc">${linkify(item.description)}</span>` : ''}
