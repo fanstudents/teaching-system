@@ -12,9 +12,15 @@ export class DocumentViewer {
 
         // 全域函數：供 inline onclick 呼叫（最穩定的方式）
         window._openDocViewer = (elementId) => {
-            const isEditing = !!document.getElementById('slideCanvas')
-                && !document.getElementById('presentationMode')?.classList.contains('active');
-            if (isEditing) return;
+            console.log('[DocViewer] onclick fired, elementId:', elementId);
+            const sc = document.getElementById('slideCanvas');
+            const pm = document.getElementById('presentationMode');
+            const isActive = pm?.classList.contains('active');
+            console.log('[DocViewer] slideCanvas:', !!sc, 'presMode active:', isActive);
+            const isEditing = !!sc && !isActive;
+            console.log('[DocViewer] isEditing:', isEditing);
+            if (isEditing) { console.log('[DocViewer] blocked by isEditing'); return; }
+            console.log('[DocViewer] calling openViewer');
             this.openViewer(elementId);
         };
     }
@@ -141,8 +147,11 @@ export class DocumentViewer {
      * 打開文件檢視器
      */
     async openViewer(elementId) {
+        console.log('[DocViewer] openViewer called, elementId:', elementId);
+        console.log('[DocViewer] window.app:', !!window.app, 'slideManager:', !!window.app?.slideManager, 'slides:', window.app?.slideManager?.slides?.length);
         const data = this._getElementData(elementId);
-        if (!data) return;
+        console.log('[DocViewer] data found:', !!data, data?.docTitle);
+        if (!data) { console.log('[DocViewer] NO DATA FOUND - aborting'); return; }
 
         // 移除舊的 overlay
         this.closeViewer();
