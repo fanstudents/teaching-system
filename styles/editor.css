@@ -40,6 +40,10 @@
     user-select: text !important;
 }
 
+.presentation-element>* {
+    pointer-events: auto !important;
+}
+
 .presentation-element:hover {
     outline: none !important;
     box-shadow: none !important;

@@ -3480,6 +3480,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         slide.elements.forEach(element => {
             const el = this.slideManager.createElementNode(element);
             if (el) {
+                el.classList.remove('editable-element');
                 el.classList.add('presentation-element');
                 // 有 animOrder 的元素先隱藏
                 if (element.animOrder && element.animOrder > 0) {

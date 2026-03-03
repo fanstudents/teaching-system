@@ -19,9 +19,10 @@ export class DocumentViewer {
             const card = e.target.closest('.document-card-container');
             if (!card) return;
 
-            // 編輯模式下不打開
-            const isEditor = !!document.getElementById('slideCanvas');
-            if (isEditor) return;
+            // 編輯模式下不打開（但簡報模式可以）
+            const isEditing = !!document.getElementById('slideCanvas')
+                && !document.getElementById('presentationMode')?.classList.contains('active');
+            if (isEditing) return;
 
             e.stopPropagation();
             const elementId = card.dataset.elementId;
