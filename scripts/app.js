@@ -2702,11 +2702,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 排行榜 toggle
         document.getElementById('lbToggle')?.addEventListener('click', () => {
             const lb = document.getElementById('presLeaderboard');
-            const pm = document.getElementById('presentationMode');
             lb?.classList.toggle('open');
-            pm?.classList.toggle('lb-active', lb?.classList.contains('open'));
-            // 重新計算投影片縮放
-            setTimeout(() => this.scalePresentationSlide(), 420);
         });
     }
 
@@ -3454,9 +3450,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     scalePresentationSlide() {
         const presentationSlide = document.getElementById('presentationSlide');
-        const lbOpen = document.getElementById('presLeaderboard')?.classList.contains('open');
-        const availW = window.innerWidth - (lbOpen ? 260 : 0);
-        const scaleX = availW / 960;
+        const scaleX = window.innerWidth / 960;
         const scaleY = window.innerHeight / 540;
         const scale = Math.min(scaleX, scaleY) * 0.95;
         presentationSlide.style.transform = `scale(${scale})`;
@@ -3484,7 +3478,6 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         slide.elements.forEach(element => {
             const el = this.slideManager.createElementNode(element);
             if (el) {
-                el.classList.remove('editable-element');
                 el.classList.add('presentation-element');
                 // 有 animOrder 的元素先隱藏
                 if (element.animOrder && element.animOrder > 0) {

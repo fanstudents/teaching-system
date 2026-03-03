@@ -34,13 +34,15 @@
     pointer-events: auto !important;
 }
 
-/* 簡報模式：保留 position:absolute 但禁用編輯交互 */
+/* 簡報模式：保留 position:absolute 定位但啟用互動 */
 .presentation-element {
     cursor: default !important;
     user-select: text !important;
+    position: absolute;
 }
 
-.presentation-element>* {
+/* 覆蓋 editable-element>* 的 pointer-events:none */
+.editable-element.presentation-element>* {
     pointer-events: auto !important;
 }
 
