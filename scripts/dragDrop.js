@@ -35,12 +35,20 @@ export class DragDrop {
     }
 
     setupEventListeners() {
+        // 包裝 handler 方法，避免 runtime error 破壞整個編輯器
+        const safe = (fn) => (e) => {
+            try { fn.call(this, e); } catch (err) {
+                console.error('[DragDrop]', err);
+                this.forceReset();
+            }
+        };
+
         // 使用 pointer events + setPointerCapture 確保不會丟失 pointerup
-        this.canvasContentEl.addEventListener('pointerdown', this.handleMouseDown.bind(this));
-        document.addEventListener('pointermove', this.handleMouseMove.bind(this));
-        document.addEventListener('pointerup', this.handleMouseUp.bind(this));
+        this.canvasContentEl.addEventListener('pointerdown', safe(this.handleMouseDown));
+        document.addEventListener('pointermove', safe(this.handleMouseMove));
+        document.addEventListener('pointerup', safe(this.handleMouseUp));
         // macOS 觸控板快速拖曳時會觸發 pointercancel 而非 pointerup
-        document.addEventListener('pointercancel', this.handleMouseUp.bind(this));
+        document.addEventListener('pointercancel', safe(this.handleMouseUp));
 
         // 阻止瀏覽器原生拖曳（圖片等）
         this.canvasContentEl.addEventListener('dragstart', e => e.preventDefault());
@@ -52,17 +60,21 @@ export class DragDrop {
         });
 
         // 雙擊編輯文字
-        this.canvasContentEl.addEventListener('dblclick', this.handleDoubleClick.bind(this));
+        this.canvasContentEl.addEventListener('dblclick', safe(this.handleDoubleClick));
 
-        // 點擊空白處取消選取
+        // 點擊空白處取消選取（但跳過框選後的 click）
         document.getElementById('slideCanvas').addEventListener('click', (e) => {
+            if (this._justMarqueed) {
+                this._justMarqueed = false;
+                return;
+            }
             if (e.target.id === 'slideCanvas' || e.target.id === 'canvasContent') {
                 this.editor.deselectAll();
             }
         });
 
         // 鍵盤事件
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+        document.addEventListener('keydown', safe(this.handleKeyDown));
 
         // 縮圖被點擊時，取消選取畫布元素
         window.addEventListener('thumbnailClicked', () => this.editor.deselectAll());
@@ -167,30 +179,39 @@ export class DragDrop {
                 this._altDuplicating = true;
                 const slide = this.slideManager.getCurrentSlide();
                 if (slide) {
-                    const newEls = [];
-                    [...this.editor.selectedElements].forEach(sel => {
+                    // 先記錄要複製的元素數量（deselectAll 會清空）
+                    const originalCount = this.editor.selectedElements.size;
+                    const dupsToMake = [...this.editor.selectedElements].map(sel => {
                         const data = slide.elements.find(d => d.id === sel.dataset.id);
-                        if (data) {
-                            const dup = JSON.parse(JSON.stringify(data));
-                            dup.id = this.slideManager.generateId();
-                            dup.groupId = null;
-                            dup.x += 20;
-                            dup.y += 20;
-                            slide.elements.push(dup);
-                        }
+                        return data ? JSON.parse(JSON.stringify(data)) : null;
+                    }).filter(Boolean);
+
+                    const newIds = [];
+                    dupsToMake.forEach(dup => {
+                        dup.id = this.slideManager.generateId();
+                        dup.groupId = null;
+                        dup.x += 20;
+                        dup.y += 20;
+                        slide.elements.push(dup);
+                        newIds.push(dup.id);
                     });
+
                     this.slideManager.renderCurrentSlide();
-                    // 選取新複製的元素
                     this.editor.deselectAll();
                     const canvas = this.canvasContentEl;
-                    slide.elements.slice(-this.editor.selectedElements.size || -1).forEach(d => {
-                        const dom = canvas.querySelector(`[data-id="${d.id}"]`);
+                    newIds.forEach(id => {
+                        const dom = canvas.querySelector(`[data-id="${id}"]`);
                         if (dom) {
                             this.editor.selectedElements.add(dom);
                             dom.classList.add('selected');
                         }
                     });
-                    this.editor.selectedElement = [...this.editor.selectedElements][0];
+                    if (this.editor.selectedElements.size > 0) {
+                        this.editor.selectedElement = [...this.editor.selectedElements][0];
+                    }
+                    // 更新 element ref 指向新複製的 DOM（因 renderCurrentSlide 重建了 DOM）
+                    element = this.editor.selectedElement;
+                    if (!element) return;
                 }
             }
 
@@ -390,7 +411,7 @@ export class DragDrop {
             // 其他元素吸附
             const siblings = canvas.querySelectorAll('.slide-element');
             siblings.forEach(sib => {
-                if (sib === this.activeElement) return;
+                if (sib === this.activeElement || this.editor.selectedElements.has(sib)) return;
                 const sL = sib.offsetLeft, sT = sib.offsetTop;
                 const sW = sib.offsetWidth, sH = sib.offsetHeight;
                 const sCX = sL + sW / 2, sCY = sT + sH / 2;
@@ -425,7 +446,7 @@ export class DragDrop {
             const actualDx = newLeft - this.startLeft;
             const actualDy = newTop - this.startTop;
             this._multiDragOffsets.forEach(item => {
-                if (item.el !== this.activeElement) {
+                if (item.el !== this.activeElement && item.el?.isConnected) {
                     item.el.style.left = `${item.startLeft + actualDx}px`;
                     item.el.style.top = `${item.startTop + actualDy}px`;
                 }
@@ -506,6 +527,7 @@ export class DragDrop {
                 rect.remove();
             }
             this.isMarquee = false;
+            this._justMarqueed = true; // 防止接下來的 click 對消框選
             return;
         }
         // ── Waypoint handle 拖曳完成 ──
@@ -546,13 +568,14 @@ export class DragDrop {
             this._wpSnapTarget = null;
 
             // 重新渲染
+            // 先儲存ID，因為 renderCurrentSlide 會銷毀 DOM 使 selectedElement 變成 stale ref
+            const selectedId = this.editor.selectedElement?.dataset?.id;
             this.slideManager.renderCurrentSlide();
             this.slideManager.renderThumbnails();
 
-            // 重新選取 flowline
-            if (this.editor.selectedElement) {
-                const id = this.editor.selectedElement.dataset.id;
-                this.editor.selectElementById(id);
+            // 重新選取 flowline（使用新的 DOM）
+            if (selectedId) {
+                this.editor.selectElementById(selectedId);
             }
             return;
         }
@@ -561,7 +584,8 @@ export class DragDrop {
             this.activeElement.style.cursor = 'move';
 
             // 更新資料
-            const id = this.activeElement.dataset.id;
+            const id = this.activeElement?.dataset?.id;
+            if (!id) { this.isDragging = false; return; }
             this.slideManager.updateElement(id, {
                 x: parseInt(this.activeElement.style.left),
                 y: parseInt(this.activeElement.style.top)
@@ -575,10 +599,10 @@ export class DragDrop {
 
             // 更新所有拖曳元素的資料
             this._multiDragOffsets.forEach(item => {
-                if (item.el !== this.activeElement) {
+                if (item.el !== this.activeElement && item.el?.dataset?.id) {
                     this.slideManager.updateElement(item.el.dataset.id, {
-                        x: parseInt(item.el.style.left),
-                        y: parseInt(item.el.style.top)
+                        x: parseInt(item.el.style.left) || 0,
+                        y: parseInt(item.el.style.top) || 0
                     });
                 }
             });
@@ -589,7 +613,8 @@ export class DragDrop {
         }
 
         if (this.isResizing && this.activeElement) {
-            const id = this.activeElement.dataset.id;
+            const id = this.activeElement?.dataset?.id;
+            if (!id) { this.isResizing = false; return; }
             this.slideManager.updateElement(id, {
                 x: parseInt(this.activeElement.style.left),
                 y: parseInt(this.activeElement.style.top),

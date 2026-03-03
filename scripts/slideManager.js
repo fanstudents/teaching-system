@@ -743,6 +743,27 @@ export class SlideManager {
     }
 
     /**
+     * 批次刪除多個元素（只重新渲染一次）
+     */
+    deleteElementsBatch(ids) {
+        const slide = this.getCurrentSlide();
+        if (!slide) return;
+        let changed = false;
+        ids.forEach(id => {
+            const index = slide.elements.findIndex(el => el.id === id);
+            if (index > -1) {
+                slide.elements.splice(index, 1);
+                changed = true;
+            }
+        });
+        if (changed) {
+            this.renderCurrentSlide();
+            this.renderThumbnails();
+            this.saveNow();
+        }
+    }
+
+    /**
      * 調整元素圖層順序
      */
     moveElementLayer(elementId, direction) {

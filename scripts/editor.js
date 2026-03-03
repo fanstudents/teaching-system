@@ -587,6 +587,7 @@ export class Editor {
         const type = element.dataset.type;
         const elementId = element.dataset.id;
         const slide = this.slideManager.getCurrentSlide();
+        if (!slide) return;
         const elementData = slide.elements.find(el => el.id === elementId);
 
         if (!elementData) return;
@@ -1986,13 +1987,15 @@ export class Editor {
      */
     deleteSelected() {
         if (this.selectedElements.size > 0) {
-            const ids = [...this.selectedElements].map(el => el.dataset.id);
-            ids.forEach(id => this.slideManager.deleteElement(id));
+            const ids = [...this.selectedElements]
+                .map(el => el?.dataset?.id)
+                .filter(Boolean);
             this.deselectAll();
-        } else if (this.selectedElement) {
+            this.slideManager.deleteElementsBatch(ids);
+        } else if (this.selectedElement?.dataset?.id) {
             const id = this.selectedElement.dataset.id;
-            this.slideManager.deleteElement(id);
             this.deselectAll();
+            this.slideManager.deleteElement(id);
         }
     }
 
