@@ -66,9 +66,10 @@ export class ScaleGame {
             const value = parseInt(slider?.value || '5', 10);
             showSubmitted(value);
             const title = container.querySelector('.scale-question')?.textContent || '量表評分';
+            const points = parseInt(container.closest('[data-points]')?.dataset.points) || 1;
             await stateManager.save(elementId, {
                 type: 'scale', title, content: String(value),
-                isCorrect: null, score: null, state: { value },
+                isCorrect: null, score: null, points, participated: true, state: { value },
             });
         });
 

@@ -155,6 +155,7 @@ export class QuizGame {
     async reportScore(container, correct, total, selectedIndices, allCorrect) {
         const elementId = container.closest('[data-id]')?.dataset.id || container.dataset.elementId || '';
         const title = container.querySelector('.quiz-question')?.textContent || '選擇題';
+        const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
 
         await stateManager.save(elementId, {
             type: 'quiz',
@@ -162,6 +163,7 @@ export class QuizGame {
             content: `${correct}/${total}`,
             isCorrect: allCorrect,
             score: Math.round((correct / total) * 100),
+            points,
             state: { selected: selectedIndices, correct: allCorrect },
         });
         // 選擇題成績已回報

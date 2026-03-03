@@ -60,9 +60,10 @@ export class OpenTextGame {
             if (!text) return;
             showSubmitted(text);
             const title = container.querySelector('.opentext-question')?.textContent || '開放問答';
+            const points = parseInt(container.closest('[data-points]')?.dataset.points) || 1;
             await stateManager.save(elementId, {
                 type: 'opentext', title, content: text,
-                isCorrect: null, score: null, state: { text },
+                isCorrect: null, score: null, points, participated: true, state: { text },
             });
         });
 

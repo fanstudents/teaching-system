@@ -1830,6 +1830,11 @@ export class SlideManager {
         el.style.setProperty('--ia-title-fs', tfs + 'px');
         el.style.setProperty('--ia-option-fs', ofs + 'px');
         el.style.setProperty('--ia-padding', pad + 'px');
+
+        // 計分分數 (供互動模組讀取)
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1 };
+        const pts = element.points ?? defaultPts[element.type] ?? 0;
+        el.dataset.points = pts;
     }
 
     /**
@@ -2023,6 +2028,22 @@ export class SlideManager {
                 feedbackEl.textContent = '✓ 已複製到剪貼簿！';
                 feedbackEl.classList.add('success');
                 copyBtn.classList.add('copied');
+
+                // 計分
+                const elementId = el.dataset?.id || el.closest('[data-id]')?.dataset.id || '';
+                if (elementId) {
+                    const { stateManager } = await import('./interactive/stateManager.js');
+                    const points = parseInt(el.dataset?.points) || 1;
+                    await stateManager.save(elementId, {
+                        type: 'copycard',
+                        title: element.title || '複製文字',
+                        content: textToCopy.substring(0, 100),
+                        isCorrect: null, score: null,
+                        points, participated: true,
+                        state: { copied: true },
+                    });
+                }
+
                 setTimeout(() => {
                     feedbackEl.textContent = '';
                     feedbackEl.classList.remove('success');

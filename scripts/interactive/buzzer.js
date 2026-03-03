@@ -131,9 +131,10 @@ export class BuzzerGame {
             showPressed(answer);
 
             const title = container.querySelector('.buzzer-question')?.textContent || '搶答';
+            const points = parseInt(container.closest('[data-points]')?.dataset.points) || 10;
             await stateManager.save(elementId, {
                 type: 'buzzer', title, content: answer,
-                isCorrect: null, score: null,
+                isCorrect: null, score: null, points, participated: true,
                 state: { pressed: true, answer, timestamp },
             });
             setTimeout(() => this.loadRanking(elementId, rankEl), 500);

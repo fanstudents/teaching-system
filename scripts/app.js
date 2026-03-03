@@ -2698,6 +2698,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 });
             }
         });
+
+        // 排行榜 toggle
+        document.getElementById('lbToggle')?.addEventListener('click', () => {
+            document.getElementById('presLeaderboard')?.classList.toggle('open');
+        });
     }
 
     async startBroadcast() {
@@ -2816,6 +2821,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             this.showToast(`🟢 廣播已開始！課堂代碼：${this.sessionCode}`);
             console.log('[Broadcast] started, code:', this.sessionCode);
 
+            // 啟動排行榜輪詢
+            this.startLeaderboardPolling();
+
             // 自動進入全螢幕簡報模式
             this.startPresentation();
         } catch (err) {
@@ -2859,6 +2867,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.broadcasting = false;
         this.onlineStudents = new Map();
 
+        // 停止排行榜輪詢
+        this.stopLeaderboardPolling();
+
         // UI — 按鈕恢復
         const btn = document.getElementById('broadcastBtn');
         const icon = document.getElementById('broadcastBtnIcon');
@@ -2867,12 +2878,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (icon) icon.textContent = 'cell_tower';
         if (label) label.textContent = '廣播';
 
+        // UI — 隱藏排行榜
+        document.getElementById('presLeaderboard')?.classList.remove('open');
+
         // UI — 隱藏狀態列（雙重保險）
         const bar = document.getElementById('broadcastBar');
         if (bar) {
             bar.classList.remove('active');
             bar.style.display = 'none';
-            // 下次啟動廣播時會重新 display:flex
             setTimeout(() => { bar.style.display = ''; }, 100);
         }
         const adminMain = document.querySelector('.admin-main');
@@ -2880,6 +2893,47 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         this.showToast('📡 廣播已停止');
         this.sessionCode = null;
+    }
+
+    // ─── 排行榜輪詢 ───
+    startLeaderboardPolling() {
+        this.stopLeaderboardPolling();
+        this.updateLeaderboard(); // 立即更新一次
+        this._lbTimer = setInterval(() => this.updateLeaderboard(), 5000);
+    }
+
+    stopLeaderboardPolling() {
+        if (this._lbTimer) { clearInterval(this._lbTimer); this._lbTimer = null; }
+    }
+
+    async updateLeaderboard() {
+        if (!this.sessionCode) return;
+        try {
+            const { stateManager } = await import('./interactive/stateManager.js');
+            const board = await stateManager.getLeaderboard(this.sessionCode);
+            const list = document.getElementById('lbList');
+            if (!list) return;
+
+            if (!board.length) {
+                list.innerHTML = '<div class="lb-empty">尚無學員互動</div>';
+                return;
+            }
+
+            list.innerHTML = board.map((s, i) => {
+                const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                return `<div class="lb-row" style="animation-delay:${i * 0.04}s">
+                    <div class="lb-rank ${rankClass}">${i + 1}</div>
+                    <div class="lb-name">${this._escHtml(s.name)}</div>
+                    <div class="lb-pts">${s.totalPoints}</div>
+                </div>`;
+            }).join('');
+        } catch (e) {
+            console.warn('[Leaderboard] update failed:', e);
+        }
+    }
+
+    _escHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     /**

@@ -128,11 +128,13 @@ export class HotspotGame {
             const allRight = correctCount === correctIds.length && selectedIds.length === correctIds.length;
 
             const title = container.querySelector('.hotspot-question')?.textContent || '圖片標註';
+            const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
             await stateManager.save(elementId, {
                 type: 'hotspot', title,
                 content: selectedIds.join(', '),
                 isCorrect: allRight,
                 score: Math.round((correctCount / Math.max(correctIds.length, 1)) * 100),
+                points,
                 state: { selectedIds },
             });
         });

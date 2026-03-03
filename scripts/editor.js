@@ -938,6 +938,31 @@ export class Editor {
             `;
         }
 
+        // ── 統一計分設定（所有可計分互動元件） ──
+        const scorableTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard'];
+        if (scorableTypes.includes(type)) {
+            const defaultPoints = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1 };
+            const pts = elementData.points ?? defaultPoints[type] ?? 1;
+            const hasCorrect = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot'].includes(type);
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b;">emoji_events</span>
+                        計分設定
+                    </div>
+                    <div class="property-row">
+                        <label>分數</label>
+                        <input type="number" id="elementPoints" value="${pts}" min="0" max="100" step="1"
+                            style="width:60px;text-align:center;">
+                        <span style="font-size:12px;color:#94a3b8;">分</span>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.5;">
+                        ${hasCorrect ? '答對得設定分數，答錯 0 分。部分正確依比例計算。' : '學員參與互動即得分。'}
+                    </div>
+                </div>
+            `;
+        }
+
         // 流動線條屬性面板
         if (type === 'flowline') {
             html += `
@@ -1395,6 +1420,9 @@ export class Editor {
                 rerender();
             });
         };
+
+        // 統一計分 points 綁定
+        bindSimple('elementPoints', 'points', v => parseInt(v) || 0);
         if (elementData.type === 'truefalse') {
             bindSimple('tfQuestion', 'question');
             bindSimple('tfAnswer', 'answer', v => v === 'true');

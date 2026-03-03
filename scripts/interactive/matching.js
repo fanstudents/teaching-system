@@ -369,12 +369,14 @@ export class MatchingGame {
 
     async reportScore(container, correct, total, pairs = {}) {
         const elementId = container.closest('[data-id]')?.dataset.id || container.dataset.elementId || '';
+        const points = parseInt(container.closest('[data-points]')?.dataset.points) || 10;
         await stateManager.save(elementId, {
             type: 'matching',
             title: '連連看',
             content: `${correct}/${total}`,
             isCorrect: correct === total,
             score: Math.round((correct / total) * 100),
+            points,
             state: { completed: true, pairs, correct, total },
         });
         // 連連看成績已回報

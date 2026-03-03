@@ -454,12 +454,15 @@ export class OrderingGame {
             return chip ? chip.dataset.value : null;
         });
 
+        const el = document.querySelector(`[data-id="${elementId}"]`);
+        const points = parseInt(el?.dataset.points) || 10;
         await stateManager.save(elementId, {
             type: 'ordering',
             title: '排列順序',
             content: `${correct}/${total}`,
             isCorrect: correct === total,
             score: Math.round((correct / total) * 100),
+            points,
             state: { completed: true, order, correct, total },
         });
         // 排列順序成績已回報

@@ -186,12 +186,15 @@ export class FillBlank {
      * 回報成績 — 透過 stateManager
      */
     async reportScore(elementId, correct, total, answers) {
+        const el = document.querySelector(`[data-id="${elementId}"]`);
+        const points = parseInt(el?.dataset.points) || 10;
         await stateManager.save(elementId, {
             type: 'fillblank',
             title: '填空題',
             content: `${correct}/${total}`,
             isCorrect: correct === total,
             score: Math.round((correct / total) * 100),
+            points,
             state: { answers, correct, total },
         });
         // 填空題成績已回報

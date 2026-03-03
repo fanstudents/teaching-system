@@ -168,11 +168,13 @@ export class TrueFalseGame {
                 const chosen = btn.classList.contains('tf-btn-true');
                 markChosen(chosen);
                 const title = container.querySelector('.tf-question')?.textContent || '是非題';
+                const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
                 await stateManager.save(elementId, {
                     type: 'truefalse', title,
                     content: chosen ? '對' : '錯',
                     isCorrect: chosen === correctAnswer,
                     score: chosen === correctAnswer ? 100 : 0,
+                    points,
                     state: { chosen },
                 });
 

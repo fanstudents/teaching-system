@@ -45,6 +45,23 @@ class InteractionState {
         const sessionId = this.getSessionCode();
         const email = user ? (user.email || '') : 'guest';
 
+        // 計算實際獲得的分數
+        const maxPoints = data.points ?? 0;
+        let awardedPoints = 0;
+        if (maxPoints > 0) {
+            if (data.isCorrect === true) {
+                awardedPoints = maxPoints;
+            } else if (data.isCorrect === false) {
+                awardedPoints = 0;
+            } else if (data.score != null && data.score > 0) {
+                // 部分正確：按百分比計算
+                awardedPoints = Math.round((parseFloat(data.score) / 100) * maxPoints);
+            } else if (data.isCorrect === null && data.participated) {
+                // 參與型（投票、開放問答等）
+                awardedPoints = maxPoints;
+            }
+        }
+
         const record = {
             session_id: sessionId || null,
             element_id: elementId,
@@ -56,11 +73,13 @@ class InteractionState {
             content: data.content || '',
             is_correct: data.isCorrect ?? null,
             score: data.score != null ? String(data.score) : null,
-            state: data.state || {},
+            state: { ...(data.state || {}), _awarded: awardedPoints, _maxPts: maxPoints },
             submitted_at: new Date().toISOString(),
         };
 
-        // 記憶體快取
+        // 記憶體快取 (含 awarded_points 於 top level 方便查詢)
+        record.awarded_points = awardedPoints;
+        record.max_points = maxPoints;
         const k = this._key(sessionId, elementId, email);
         this._cache.set(k, record);
 
@@ -87,12 +106,14 @@ class InteractionState {
                     submitted_at: record.submitted_at,
                 }, { id: `eq.${existing[0].id}` });
             } else {
-                await db.insert('submissions', record);
+                const { awarded_points, max_points, ...dbRecord } = record;
+                await db.insert('submissions', dbRecord);
             }
         } catch (e) {
             console.warn('[stateManager] save failed, trying insert:', e);
             try {
-                await db.insert('submissions', record);
+                const { awarded_points, max_points, ...dbRecord } = record;
+                await db.insert('submissions', dbRecord);
             } catch (e2) {
                 console.warn('[stateManager] insert also failed:', e2);
             }
@@ -182,6 +203,43 @@ class InteractionState {
             return this._unwrap(raw);
         } catch (e) {
             console.warn('[stateManager] loadAll failed:', e);
+            return [];
+        }
+    }
+
+    /**
+     * 取得排行榜資料
+     * @param {string} sessionId
+     * @returns {Promise<Array<{name: string, email: string, totalPoints: number}>>}
+     */
+    async getLeaderboard(sessionId) {
+        if (!sessionId) return [];
+        try {
+            const raw = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${sessionId}`,
+                    student_email: 'neq.guest',
+                },
+            });
+            const rows = this._unwrap(raw);
+
+            // 按學員分組加總 state._awarded
+            const map = new Map();
+            for (const r of rows) {
+                const key = r.student_email || r.student_name;
+                if (!key) continue;
+                if (!map.has(key)) {
+                    map.set(key, { name: r.student_name || key, email: r.student_email, totalPoints: 0 });
+                }
+                let st = r.state;
+                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                map.get(key).totalPoints += (parseInt(st?._awarded) || 0);
+            }
+
+            // 排序（高分在前）
+            return [...map.values()].sort((a, b) => b.totalPoints - a.totalPoints);
+        } catch (e) {
+            console.warn('[stateManager] getLeaderboard failed:', e);
             return [];
         }
     }
