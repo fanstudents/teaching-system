@@ -3101,23 +3101,34 @@
 }
 
 /* ========================================
-   簡報排行榜側邊欄
+   簡報排行榜 — 右側欄
    ======================================== */
+
+/* 排行榜打開時，投影片容器改為雙欄佈局 */
+.presentation-mode.lb-active {
+    justify-content: flex-start;
+}
+
+.presentation-mode.lb-active .presentation-slide {
+    margin-left: auto;
+    margin-right: auto;
+    /* 扣除排行榜寬度後置中 */
+    max-width: calc(100vw - 280px);
+}
+
 .pres-leaderboard {
     position: fixed;
-    top: 48px;
+    top: 0;
     right: 0;
     bottom: 0;
-    width: 220px;
-    background: rgba(15, 23, 42, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    width: 260px;
+    background: #0f172a;
+    border-left: 1px solid rgba(255, 255, 255, 0.06);
     z-index: 180;
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
     overflow: hidden;
 }
 
@@ -3129,7 +3140,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 14px 16px;
+    padding: 16px 18px;
     color: #fbbf24;
     font-size: 14px;
     font-weight: 700;
@@ -3137,47 +3148,43 @@
     flex-shrink: 0;
 }
 
+.lb-header .material-symbols-outlined {
+    font-size: 20px;
+}
+
 .lb-list {
     flex: 1;
     overflow-y: auto;
-    padding: 8px 0;
+    padding: 10px 0;
 }
 
 .lb-empty {
-    padding: 24px 16px;
+    padding: 32px 18px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.3);
     font-size: 13px;
 }
 
+/* 每一列：名次 + 名字 + 分數 + 長條圖 */
 .lb-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 14px;
-    transition: background 0.15s;
-    animation: lb-in 0.3s ease both;
+    padding: 8px 18px;
+    transition: background 0.2s;
 }
 
 .lb-row:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
 }
 
-@keyframes lb-in {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.lb-row-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 
 .lb-rank {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -3185,7 +3192,7 @@
     font-size: 11px;
     font-weight: 800;
     flex-shrink: 0;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.06);
 }
 
@@ -3207,7 +3214,7 @@
 .lb-name {
     flex: 1;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.75);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3224,10 +3231,43 @@
     font-weight: 700;
     color: #fbbf24;
     flex-shrink: 0;
+    min-width: 28px;
+    text-align: right;
 }
 
 .lb-row:nth-child(n+4) .lb-pts {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* 長條圖 */
+.lb-bar-wrap {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.lb-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+    min-width: 0;
+}
+
+.lb-row:nth-child(1) .lb-bar {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+}
+
+.lb-row:nth-child(2) .lb-bar {
+    background: linear-gradient(90deg, #9ca3af, #d1d5db);
+}
+
+.lb-row:nth-child(3) .lb-bar {
+    background: linear-gradient(90deg, #d97706, #b45309);
+}
+
+.lb-row:nth-child(n+4) .lb-bar {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 /* Toggle button */
@@ -3247,7 +3287,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .lb-toggle:hover {
@@ -3265,7 +3305,7 @@
 }
 
 .pres-leaderboard.open~.lb-toggle {
-    right: 232px;
+    right: 272px;
 }
 
 /* ========================================

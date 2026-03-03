@@ -2701,7 +2701,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // 排行榜 toggle
         document.getElementById('lbToggle')?.addEventListener('click', () => {
-            document.getElementById('presLeaderboard')?.classList.toggle('open');
+            const lb = document.getElementById('presLeaderboard');
+            const pm = document.getElementById('presentationMode');
+            lb?.classList.toggle('open');
+            pm?.classList.toggle('lb-active', lb?.classList.contains('open'));
         });
     }
 
@@ -2880,6 +2883,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // UI — 隱藏排行榜
         document.getElementById('presLeaderboard')?.classList.remove('open');
+        document.getElementById('presentationMode')?.classList.remove('lb-active');
 
         // UI — 隱藏狀態列（雙重保險）
         const bar = document.getElementById('broadcastBar');
@@ -2915,18 +2919,72 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (!list) return;
 
             if (!board.length) {
-                list.innerHTML = '<div class="lb-empty">尚無學員互動</div>';
+                if (!list.querySelector('.lb-empty')) {
+                    list.innerHTML = '<div class="lb-empty">尚無學員互動</div>';
+                }
                 return;
             }
 
-            list.innerHTML = board.map((s, i) => {
+            const maxPts = Math.max(...board.map(s => s.totalPoints), 1);
+            const existingRows = list.querySelectorAll('.lb-row');
+            const existingMap = new Map();
+            existingRows.forEach(row => existingMap.set(row.dataset.email, row));
+
+            // Remove empty placeholder
+            list.querySelector('.lb-empty')?.remove();
+
+            const newEmails = new Set(board.map(s => s.email));
+
+            // Remove rows that no longer exist
+            existingRows.forEach(row => {
+                if (!newEmails.has(row.dataset.email)) row.remove();
+            });
+
+            // Update or create rows
+            board.forEach((s, i) => {
                 const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-                return `<div class="lb-row" style="animation-delay:${i * 0.04}s">
-                    <div class="lb-rank ${rankClass}">${i + 1}</div>
-                    <div class="lb-name">${this._escHtml(s.name)}</div>
-                    <div class="lb-pts">${s.totalPoints}</div>
-                </div>`;
-            }).join('');
+                const barPct = maxPts > 0 ? Math.round((s.totalPoints / maxPts) * 100) : 0;
+                let row = existingMap.get(s.email);
+
+                if (row) {
+                    // Update existing row in place (smooth)
+                    const rankEl = row.querySelector('.lb-rank');
+                    if (rankEl) {
+                        rankEl.textContent = i + 1;
+                        rankEl.className = `lb-rank ${rankClass}`;
+                    }
+                    const nameEl = row.querySelector('.lb-name');
+                    if (nameEl) nameEl.textContent = s.name;
+                    const ptsEl = row.querySelector('.lb-pts');
+                    if (ptsEl) ptsEl.textContent = s.totalPoints;
+                    const barEl = row.querySelector('.lb-bar');
+                    if (barEl) barEl.style.width = barPct + '%';
+                } else {
+                    // Create new row
+                    row = document.createElement('div');
+                    row.className = 'lb-row';
+                    row.dataset.email = s.email;
+                    row.innerHTML = `
+                        <div class="lb-row-top">
+                            <div class="lb-rank ${rankClass}">${i + 1}</div>
+                            <div class="lb-name">${this._escHtml(s.name)}</div>
+                            <div class="lb-pts">${s.totalPoints}</div>
+                        </div>
+                        <div class="lb-bar-wrap"><div class="lb-bar" style="width:0%"></div></div>
+                    `;
+                    list.appendChild(row);
+                    // Animate bar in
+                    requestAnimationFrame(() => {
+                        row.querySelector('.lb-bar').style.width = barPct + '%';
+                    });
+                }
+
+                // Ensure correct order
+                const currentRows = list.querySelectorAll('.lb-row');
+                if (currentRows[i] !== row) {
+                    list.insertBefore(row, currentRows[i] || null);
+                }
+            });
         } catch (e) {
             console.warn('[Leaderboard] update failed:', e);
         }
