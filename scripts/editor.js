@@ -807,6 +807,8 @@ export class Editor {
                 </div>
             `).join('');
 
+            const contentPreview = (elementData.docContent || '').substring(0, 60);
+
             html += `
                 <div class="property-section">
                     <div class="property-section-title">文件檢視器設定</div>
@@ -815,8 +817,14 @@ export class Editor {
                         <input type="text" class="form-input" id="docTitle" value="${(elementData.docTitle || '').replace(/"/g, '&quot;')}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">內容（支援 Markdown / HTML）</label>
-                        <textarea class="form-input" id="docContent" rows="8" style="resize:vertical;font-family:'Fira Code',monospace;font-size:12px;line-height:1.5;">${elementData.docContent || ''}</textarea>
+                        <label class="form-label">文件內容</label>
+                        <div style="font-size:11px;color:#64748b;padding:6px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;min-height:32px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            ${contentPreview ? contentPreview + '...' : '<span style="color:#94a3b8;">尚未輸入內容</span>'}
+                        </div>
+                        <button id="docOpenEditor" style="margin-top:6px;width:100%;padding:8px;border:1px solid #0284c7;border-radius:6px;background:#eff6ff;color:#0284c7;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:16px;">edit_note</span>
+                            展開編輯器
+                        </button>
                     </div>
                 </div>
 
@@ -834,24 +842,6 @@ export class Editor {
                     <button id="addDocAnchor" style="margin-top:6px;padding:6px;border:1px dashed #d1d5db;border-radius:6px;background:transparent;color:#64748b;cursor:pointer;font-size:12px;width:100%;transition:all .15s;">
                         + 新增錨點
                     </button>
-                </div>
-
-                <div class="property-section">
-                    <div class="property-section-title">檔案下載</div>
-                    <div class="form-group">
-                        <label class="form-label">上傳檔案 <span style="font-weight:400;color:#94a3b8;">(上傳到系統)</span></label>
-                        <div style="display:flex;gap:6px;align-items:center;">
-                            <input type="file" id="docFileUpload" style="font-size:12px;flex:1;">
-                            <button id="docUploadBtn" style="padding:4px 12px;background:#0284c7;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;">上傳</button>
-                        </div>
-                        <div id="docUploadStatus" style="font-size:11px;margin-top:4px;min-height:16px;"></div>
-                    </div>
-                    ${elementData.docDownloadUrl ? `
-                        <div style="font-size:11px;color:#16a34a;display:flex;align-items:center;gap:4px;margin-top:4px;">
-                            <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span>
-                            已上傳：${elementData.docDownloadName || '檔案'}
-                        </div>
-                    ` : ''}
                 </div>
             `;
         } else if (type === 'showcase') {
@@ -1479,13 +1469,64 @@ export class Editor {
             bindSimple('buzzerQuestion', 'question');
         } else if (elementData.type === 'document') {
             bindSimple('docTitle', 'docTitle');
-            const contentEl = document.getElementById('docContent');
-            if (contentEl) contentEl.addEventListener('change', () => {
-                this.slideManager.updateElement(elementId, { docContent: contentEl.value });
-                rerender();
+
+            // ── 彈出式編輯器 ──
+            document.getElementById('docOpenEditor')?.addEventListener('click', () => {
+                const freshData = this.slideManager.getCurrentSlide()?.elements?.find(e => e.id === elementId);
+                const overlay = document.createElement('div');
+                overlay.id = 'docEditorOverlay';
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+                overlay.innerHTML = `
+                    <div style="background:white;border-radius:16px;width:min(90vw,800px);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e2e8f0;">
+                            <h3 style="margin:0;font-size:16px;color:#0f172a;display:flex;align-items:center;gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;color:#0284c7;">description</span>
+                                文件內容編輯
+                            </h3>
+                            <div style="display:flex;gap:8px;">
+                                <button id="docEditorSave" style="padding:6px 16px;background:#0284c7;color:white;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">儲存</button>
+                                <button id="docEditorCancel" style="padding:6px 16px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;cursor:pointer;">取消</button>
+                            </div>
+                        </div>
+                        <div style="padding:4px 20px 4px;">
+                            <div style="font-size:11px;color:#94a3b8;line-height:1.4;">支援 Markdown、HTML 格式。可直接貼上含圖片的文字。</div>
+                        </div>
+                        <textarea id="docEditorTextarea" style="flex:1;margin:8px 20px 20px;padding:14px;border:1px solid #e2e8f0;border-radius:8px;font-family:'Fira Code','SF Mono',monospace;font-size:13px;line-height:1.6;resize:none;outline:none;min-height:400px;">${(freshData?.docContent || '').replace(/</g, '&lt;')}</textarea>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                const textarea = overlay.querySelector('#docEditorTextarea');
+                textarea?.focus();
+
+                const close = () => overlay.remove();
+
+                overlay.querySelector('#docEditorCancel').addEventListener('click', close);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+                overlay.querySelector('#docEditorSave').addEventListener('click', () => {
+                    const val = textarea.value;
+                    this.slideManager.updateElement(elementId, { docContent: val });
+                    close();
+                    this.renderPropertyPanel(elementId);
+                    this._bindPropertyEvents(elementId);
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
             });
 
             // ── 錨點 CRUD ──
+            const getAnchors = () => {
+                const d = this.slideManager.getCurrentSlide()?.elements?.find(e => e.id === elementId);
+                return d?.docAnchors ? [...d.docAnchors] : [];
+            };
+
+            const refreshPanel = () => {
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            };
+
+            // 錨點文字/勾選變更
             const syncAnchors = () => {
                 const rows = document.querySelectorAll('.doc-anchor-row');
                 const anchors = [...rows].map(row => ({
@@ -1494,10 +1535,9 @@ export class Editor {
                     isError: row.querySelector('.doc-anchor-error')?.checked || false,
                 }));
                 this.slideManager.updateElement(elementId, { docAnchors: anchors });
-                rerender();
+                refreshPanel();
             };
 
-            // 錨點文字/勾選變更
             document.querySelectorAll('.doc-anchor-text').forEach(inp => {
                 inp.addEventListener('change', syncAnchors);
             });
@@ -1508,60 +1548,24 @@ export class Editor {
             // 刪除錨點
             document.querySelectorAll('.doc-anchor-del').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const anchors = [...(elementData.docAnchors || [])];
+                    const anchors = getAnchors();
                     const idx = parseInt(btn.closest('.doc-anchor-row').dataset.idx);
                     anchors.splice(idx, 1);
                     this.slideManager.updateElement(elementId, { docAnchors: anchors });
-                    this.renderPropertyPanel(elementId);
-                    this._bindPropertyEvents(elementId);
-                    rerender();
+                    refreshPanel();
                 });
             });
 
             // 新增錨點
             document.getElementById('addDocAnchor')?.addEventListener('click', () => {
-                const anchors = [...(elementData.docAnchors || [])];
+                const anchors = getAnchors();
                 anchors.push({ id: 'a' + Date.now(), text: '', isError: false });
                 this.slideManager.updateElement(elementId, { docAnchors: anchors });
-                this.renderPropertyPanel(elementId);
-                this._bindPropertyEvents(elementId);
-                rerender();
-                // 聚焦最後一個
+                refreshPanel();
                 setTimeout(() => {
                     const inputs = document.querySelectorAll('.doc-anchor-text');
                     inputs[inputs.length - 1]?.focus();
-                }, 50);
-            });
-
-            // ── 檔案上傳 ──
-            document.getElementById('docUploadBtn')?.addEventListener('click', async () => {
-                const fileInput = document.getElementById('docFileUpload');
-                const statusEl = document.getElementById('docUploadStatus');
-                const file = fileInput?.files?.[0];
-                if (!file) { if (statusEl) statusEl.textContent = '請先選擇檔案'; return; }
-
-                if (statusEl) { statusEl.textContent = '上傳中...'; statusEl.style.color = '#0284c7'; }
-                try {
-                    const { db } = await import('./supabase.js');
-                    const ext = file.name.split('.').pop() || 'pdf';
-                    const projectTitle = document.getElementById('projectTitle')?.textContent?.trim() || '教學專案';
-                    const docTitle = elementData.docTitle || '文件';
-                    const safeName = `${projectTitle}-${docTitle}`.replace(/[^a-zA-Z0-9\u4e00-\u9fff_-]/g, '_');
-                    const objectKey = `docs/${elementId}_${Date.now()}.${ext}`;
-                    const downloadName = `${safeName}.${ext}`;
-
-                    const { data, error } = await db.upload('documents', objectKey, file);
-                    if (error) throw new Error(error.message || '上傳失敗');
-
-                    const url = data?.url || db.getPublicUrl('documents', objectKey);
-                    this.slideManager.updateElement(elementId, { docDownloadUrl: url, docDownloadName: downloadName });
-                    if (statusEl) { statusEl.textContent = `✓ 上傳成功：${downloadName}`; statusEl.style.color = '#16a34a'; }
-                    this.renderPropertyPanel(elementId);
-                    this._bindPropertyEvents(elementId);
-                    rerender();
-                } catch (err) {
-                    if (statusEl) { statusEl.textContent = `✕ ${err.message}`; statusEl.style.color = '#dc2626'; }
-                }
+                }, 100);
             });
         } else if (elementData.type === 'wordcloud') {
             bindSimple('wcQuestion', 'question');

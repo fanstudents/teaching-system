@@ -134,7 +134,6 @@ export class DocumentViewer {
         this.closeViewer();
 
         const content = this.parseMarkdown(data.docContent || '');
-        const hasDownload = !!data.docDownloadUrl;
         const anchors = data.docAnchors || [];
         const hasAnchors = anchors.length > 0;
         const isPresenter = this._isPresenter();
@@ -194,12 +193,11 @@ export class DocumentViewer {
                         <h2 class="doc-viewer-title">${data.docTitle || '文件'}</h2>
                     </div>
                     <div class="doc-viewer-actions">
-                        ${hasDownload ? `
-                            <a class="doc-viewer-download-btn" href="${data.docDownloadUrl}" download="${data.docDownloadName || ''}" target="_blank" rel="noopener"
-                               onclick="event.stopPropagation();">
+                        ${data.docContent ? `
+                            <button class="doc-viewer-download-btn" id="docAutoDownload" onclick="event.stopPropagation();">
                                 <span class="material-symbols-outlined" style="font-size:18px;">download</span>
                                 下載文件
-                            </a>
+                            </button>
                         ` : ''}
                         <button class="doc-viewer-close-btn">
                             <span class="material-symbols-outlined">close</span>
@@ -228,6 +226,21 @@ export class DocumentViewer {
             if (e.key === 'Escape') this.closeViewer();
         };
         document.addEventListener('keydown', this._escHandler);
+
+        // 自動下載
+        const dlBtn = overlay.querySelector('#docAutoDownload');
+        if (dlBtn) {
+            dlBtn.addEventListener('click', () => {
+                const htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${this._esc(data.docTitle || '文件')}</title><style>body{font-family:-apple-system,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#1e293b;}h1,h2,h3{color:#0f172a;}code{background:#f1f5f9;padding:2px 6px;border-radius:4px;}pre{background:#f1f5f9;padding:16px;border-radius:8px;overflow-x:auto;}blockquote{border-left:4px solid #0284c7;margin:0;padding:0 16px;color:#475569;}img{max-width:100%;border-radius:8px;}</style></head><body>${content}</body></html>`;
+                const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${data.docTitle || '文件'}.html`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
 
         // ── 錨點互動 ──
         if (hasAnchors) {
