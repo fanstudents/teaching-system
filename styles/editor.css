@@ -710,3 +710,18 @@
 .presentation-element .flowline-waypoint-handle {
     display: none !important;
 }
+
+/* ═══ 框選 (marquee) ═══ */
+.marquee-rect {
+    border: 1.5px dashed #6366f1;
+    background: rgba(99, 102, 241, 0.08);
+    pointer-events: none;
+    z-index: 9999;
+    border-radius: 3px;
+}
+
+/* ═══ 多選高亮 ═══ */
+.editable-element.selected {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}

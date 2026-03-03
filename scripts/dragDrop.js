@@ -13,12 +13,16 @@ export class DragDrop {
         this.isDragging = false;
         this.isResizing = false;
         this.isDraggingWaypoint = false;
+        this.isMarquee = false;
         this.activeElement = null;
         this.activeHandle = null;
         this._wpHandle = null;
         this._wpFlowlineId = null;
         this._wpIndex = -1;
         this._wpSnapTarget = null;
+        this._multiDragOffsets = [];
+        this._altDuplicating = false;
+        this._copiedElements = null;
 
         this.startX = 0;
         this.startY = 0;
@@ -71,15 +75,19 @@ export class DragDrop {
         this.isDragging = false;
         this.isResizing = false;
         this.isDraggingWaypoint = false;
+        this.isMarquee = false;
         this.activeElement = null;
         this.activeHandle = null;
         this._wpHandle = null;
         this._wpFlowlineId = null;
         this._wpIndex = -1;
         this._wpSnapTarget = null;
+        this._multiDragOffsets = [];
+        this._altDuplicating = false;
         this._pointerId = null;
         document.querySelectorAll('.snap-guide').forEach(g => g.remove());
         document.querySelectorAll('.flowline-snap-highlight').forEach(h => h.remove());
+        document.querySelectorAll('.marquee-rect').forEach(m => m.remove());
     }
 
     handleMouseDown(e) {
@@ -130,40 +138,135 @@ export class DragDrop {
         }
 
         if (element) {
-            // 如果此元素正在編輯中，或者雙擊後需要正常進行文字編輯，略過拖曳與 preventDefault
+            // 如果此元素正在編輯中，略過拖曳
             if (element.contentEditable === 'true' || element.classList.contains('editing')) {
                 return;
             }
 
-            // 選取並開始拖曳
-            this.editor.selectElement(element);
+            // Shift+click 多選
+            if (e.shiftKey) {
+                this.editor.selectElement(element, true);
+                e.preventDefault();
+                return;
+            }
+
+            // 如果元素已在多選集合中，不重新單選
+            if (this.editor.selectedElements.has(element)) {
+                // 不改變選取
+            } else {
+                this.editor.selectElement(element);
+            }
 
             // 如果是互動元件內的元素，不拖曳
             if (e.target.closest('.matching-item') || e.target.closest('.fill-blank-input')) {
                 return;
             }
 
+            // Alt+drag 複製
+            if (e.altKey && this.editor.selectedElements.size > 0) {
+                this._altDuplicating = true;
+                const slide = this.slideManager.getCurrentSlide();
+                if (slide) {
+                    const newEls = [];
+                    [...this.editor.selectedElements].forEach(sel => {
+                        const data = slide.elements.find(d => d.id === sel.dataset.id);
+                        if (data) {
+                            const dup = JSON.parse(JSON.stringify(data));
+                            dup.id = this.slideManager.generateId();
+                            dup.groupId = null;
+                            dup.x += 20;
+                            dup.y += 20;
+                            slide.elements.push(dup);
+                        }
+                    });
+                    this.slideManager.renderCurrentSlide();
+                    // 選取新複製的元素
+                    this.editor.deselectAll();
+                    const canvas = this.canvasContentEl;
+                    slide.elements.slice(-this.editor.selectedElements.size || -1).forEach(d => {
+                        const dom = canvas.querySelector(`[data-id="${d.id}"]`);
+                        if (dom) {
+                            this.editor.selectedElements.add(dom);
+                            dom.classList.add('selected');
+                        }
+                    });
+                    this.editor.selectedElement = [...this.editor.selectedElements][0];
+                }
+            }
+
+            // 多元素拖曳設定
             this.isDragging = true;
             this.activeElement = element;
-
             this.startX = e.clientX;
             this.startY = e.clientY;
             this.startLeft = parseInt(element.style.left) || 0;
             this.startTop = parseInt(element.style.top) || 0;
 
-            // 鎖定 pointer — 確保 pointerup 不會丟失
+            // 記錄所有選取元素的初始位置
+            this._multiDragOffsets = [];
+            this.editor.selectedElements.forEach(sel => {
+                this._multiDragOffsets.push({
+                    el: sel,
+                    startLeft: parseInt(sel.style.left) || 0,
+                    startTop: parseInt(sel.style.top) || 0
+                });
+            });
+
+            // 鎖定 pointer
             this._pointerId = e.pointerId;
             try { element.setPointerCapture(e.pointerId); } catch (_) { }
 
             element.style.cursor = 'grabbing';
             e.preventDefault();
+        } else {
+            // 點擊空白處 → 開始框選 (marquee)
+            const canvasRect = this.canvasContentEl.getBoundingClientRect();
+            const x = e.clientX - canvasRect.left;
+            const y = e.clientY - canvasRect.top;
+            // 只在畫布內容區域內開始框選
+            if (x >= 0 && y >= 0 && x <= canvasRect.width && y <= canvasRect.height) {
+                this.isMarquee = true;
+                this._marqueeStartX = x;
+                this._marqueeStartY = y;
+                this.startX = e.clientX;
+                this.startY = e.clientY;
+                this.editor.deselectAll();
+
+                // 建立框選視覺元素
+                const rect = document.createElement('div');
+                rect.className = 'marquee-rect';
+                rect.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:0;height:0;`;
+                this.canvasContentEl.appendChild(rect);
+                e.preventDefault();
+            }
         }
     }
 
     handleMouseMove(e) {
-        // ★ 終極保險：如果滑鼠按鈕已放開但 isDragging 仍為 true，強制停止
-        if ((this.isDragging || this.isResizing || this.isDraggingWaypoint) && e.buttons === 0) {
+        // ★ 終極保險
+        if ((this.isDragging || this.isResizing || this.isDraggingWaypoint || this.isMarquee) && e.buttons === 0) {
             this.forceReset();
+            return;
+        }
+
+        // ── 框選 ──
+        if (this.isMarquee) {
+            e.preventDefault();
+            const canvasRect = this.canvasContentEl.getBoundingClientRect();
+            const curX = e.clientX - canvasRect.left;
+            const curY = e.clientY - canvasRect.top;
+            const x = Math.min(this._marqueeStartX, curX);
+            const y = Math.min(this._marqueeStartY, curY);
+            const w = Math.abs(curX - this._marqueeStartX);
+            const h = Math.abs(curY - this._marqueeStartY);
+
+            const rect = this.canvasContentEl.querySelector('.marquee-rect');
+            if (rect) {
+                rect.style.left = `${x}px`;
+                rect.style.top = `${y}px`;
+                rect.style.width = `${w}px`;
+                rect.style.height = `${h}px`;
+            }
             return;
         }
 
@@ -317,6 +420,16 @@ export class DragDrop {
 
             this.activeElement.style.left = `${newLeft}px`;
             this.activeElement.style.top = `${newTop}px`;
+
+            // 多元素同步移動
+            const actualDx = newLeft - this.startLeft;
+            const actualDy = newTop - this.startTop;
+            this._multiDragOffsets.forEach(item => {
+                if (item.el !== this.activeElement) {
+                    item.el.style.left = `${item.startLeft + actualDx}px`;
+                    item.el.style.top = `${item.startTop + actualDy}px`;
+                }
+            });
         }
 
         if (this.isResizing && this.activeElement) {
@@ -354,6 +467,47 @@ export class DragDrop {
     }
 
     handleMouseUp(e) {
+        // ── 框選完成 ──
+        if (this.isMarquee) {
+            const rect = this.canvasContentEl.querySelector('.marquee-rect');
+            if (rect) {
+                const rL = parseInt(rect.style.left);
+                const rT = parseInt(rect.style.top);
+                const rW = parseInt(rect.style.width);
+                const rH = parseInt(rect.style.height);
+
+                if (rW > 5 && rH > 5) {
+                    // 找出框內所有元素
+                    const canvas = this.canvasContentEl;
+                    canvas.querySelectorAll('.slide-element').forEach(el => {
+                        const eL = el.offsetLeft;
+                        const eT = el.offsetTop;
+                        const eW = el.offsetWidth;
+                        const eH = el.offsetHeight;
+
+                        // 交集檢查
+                        if (eL < rL + rW && eL + eW > rL && eT < rT + rH && eT + eH > rT) {
+                            this.editor.selectedElements.add(el);
+                            el.classList.add('selected');
+                        }
+                    });
+
+                    if (this.editor.selectedElements.size > 0) {
+                        this.editor.selectedElement = [...this.editor.selectedElements][0];
+                        if (this.editor.selectedElements.size === 1) {
+                            this.editor.addResizeHandles(this.editor.selectedElement);
+                            this.editor.showPropertyPanel(this.editor.selectedElement);
+                        } else {
+                            this.editor.showMultiSelectPanel();
+                        }
+                    }
+                }
+
+                rect.remove();
+            }
+            this.isMarquee = false;
+            return;
+        }
         // ── Waypoint handle 拖曳完成 ──
         if (this.isDraggingWaypoint && this._wpHandle) {
             this._wpHandle.style.cursor = 'grab';
@@ -419,8 +573,19 @@ export class DragDrop {
             if (propX) propX.value = parseInt(this.activeElement.style.left);
             if (propY) propY.value = parseInt(this.activeElement.style.top);
 
+            // 更新所有拖曳元素的資料
+            this._multiDragOffsets.forEach(item => {
+                if (item.el !== this.activeElement) {
+                    this.slideManager.updateElement(item.el.dataset.id, {
+                        x: parseInt(item.el.style.left),
+                        y: parseInt(item.el.style.top)
+                    });
+                }
+            });
+
             // 更新連接的 flowline
             this.slideManager.updateFlowLineSnaps(id);
+            this._altDuplicating = false;
         }
 
         if (this.isResizing && this.activeElement) {
@@ -460,6 +625,19 @@ export class DragDrop {
         if (!element) return;
 
         const type = element.dataset.type;
+        const id = element.dataset.id;
+
+        // 雙擊群組元素 → 進入群組內部編輯
+        const slide = this.slideManager.getCurrentSlide();
+        if (slide) {
+            const elData = slide.elements.find(el => el.id === id);
+            if (elData?.groupId && this.editor._editingGroupId !== elData.groupId) {
+                this.editor._editingGroupId = elData.groupId;
+                this.editor.deselectAll();
+                this.editor.selectElement(element);
+                return;
+            }
+        }
 
         if (type === 'text') {
             // 啟用文字編輯
@@ -490,37 +668,164 @@ export class DragDrop {
     }
 
     handleKeyDown(e) {
+        const isMeta = e.ctrlKey || e.metaKey;
+        const active = document.activeElement;
+        const isEditing = active && (active.isContentEditable || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+
+        // Ctrl+A 全選
+        if (isMeta && e.key === 'a' && !isEditing) {
+            e.preventDefault();
+            this.editor.deselectAll();
+            const canvas = this.canvasContentEl;
+            canvas.querySelectorAll('.slide-element').forEach(el => {
+                this.editor.selectedElements.add(el);
+                el.classList.add('selected');
+            });
+            if (this.editor.selectedElements.size > 0) {
+                this.editor.selectedElement = [...this.editor.selectedElements][0];
+                if (this.editor.selectedElements.size === 1) {
+                    this.editor.addResizeHandles(this.editor.selectedElement);
+                    this.editor.showPropertyPanel(this.editor.selectedElement);
+                } else {
+                    this.editor.showMultiSelectPanel();
+                }
+            }
+            return;
+        }
+
+        // Ctrl+G 群組
+        if (isMeta && e.key === 'g' && !e.shiftKey && !isEditing) {
+            e.preventDefault();
+            this.editor.groupSelected();
+            return;
+        }
+
+        // Ctrl+Shift+G 解散群組
+        if (isMeta && e.key === 'g' && e.shiftKey && !isEditing) {
+            e.preventDefault();
+            this.editor.ungroupSelected();
+            return;
+        }
+
+        // Ctrl+D 快速複製元素（原位偏移）
+        if (isMeta && e.key === 'd' && !isEditing && this.editor.selectedElements.size > 0) {
+            e.preventDefault();
+            const slide = this.slideManager.getCurrentSlide();
+            if (!slide) return;
+            const newIds = [];
+            [...this.editor.selectedElements].forEach(sel => {
+                const data = slide.elements.find(d => d.id === sel.dataset.id);
+                if (data) {
+                    const dup = JSON.parse(JSON.stringify(data));
+                    dup.id = this.slideManager.generateId();
+                    dup.groupId = null;
+                    dup.x += 20;
+                    dup.y += 20;
+                    slide.elements.push(dup);
+                    newIds.push(dup.id);
+                }
+            });
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.renderThumbnails();
+            this.editor.deselectAll();
+            const canvas = this.canvasContentEl;
+            newIds.forEach(id => {
+                const dom = canvas.querySelector(`[data-id="${id}"]`);
+                if (dom) {
+                    this.editor.selectedElements.add(dom);
+                    dom.classList.add('selected');
+                }
+            });
+            if (this.editor.selectedElements.size > 0) {
+                this.editor.selectedElement = [...this.editor.selectedElements][0];
+                if (this.editor.selectedElements.size === 1) {
+                    this.editor.addResizeHandles(this.editor.selectedElement);
+                    this.editor.showPropertyPanel(this.editor.selectedElement);
+                } else {
+                    this.editor.showMultiSelectPanel();
+                }
+            }
+            return;
+        }
+
+        // Ctrl+C 複製元素（有選取時）
+        if (isMeta && e.key === 'c' && !e.shiftKey && this.editor.selectedElements.size > 0 && !isEditing) {
+            e.preventDefault();
+            const slide = this.slideManager.getCurrentSlide();
+            if (!slide) return;
+            this._copiedElements = [...this.editor.selectedElements].map(sel => {
+                const data = slide.elements.find(d => d.id === sel.dataset.id);
+                return data ? JSON.parse(JSON.stringify(data)) : null;
+            }).filter(Boolean);
+            return;
+        }
+
+        // Ctrl+V 貼上元素
+        if (isMeta && e.key === 'v' && !e.shiftKey && this._copiedElements?.length > 0 && !isEditing) {
+            e.preventDefault();
+            const slide = this.slideManager.getCurrentSlide();
+            if (!slide) return;
+            const newIds = [];
+            this._copiedElements.forEach(data => {
+                const dup = JSON.parse(JSON.stringify(data));
+                dup.id = this.slideManager.generateId();
+                dup.groupId = null;
+                dup.x += 20;
+                dup.y += 20;
+                slide.elements.push(dup);
+                newIds.push(dup.id);
+            });
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.renderThumbnails();
+            this.editor.deselectAll();
+            const canvas = this.canvasContentEl;
+            newIds.forEach(id => {
+                const dom = canvas.querySelector(`[data-id="${id}"]`);
+                if (dom) {
+                    this.editor.selectedElements.add(dom);
+                    dom.classList.add('selected');
+                }
+            });
+            if (this.editor.selectedElements.size > 0) {
+                this.editor.selectedElement = [...this.editor.selectedElements][0];
+                if (this.editor.selectedElements.size === 1) {
+                    this.editor.addResizeHandles(this.editor.selectedElement);
+                    this.editor.showPropertyPanel(this.editor.selectedElement);
+                } else {
+                    this.editor.showMultiSelectPanel();
+                }
+            }
+            return;
+        }
+
         // Delete 或 Backspace 刪除選中元素
         if ((e.key === 'Delete' || e.key === 'Backspace') && this.editor.selectedElement) {
-            // 確保不是在編輯文字
-            if (document.activeElement.contentEditable !== 'true' &&
-                !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+            if (!isEditing) {
                 e.preventDefault();
                 this.editor.deleteSelected();
             }
         }
 
-        // 方向鍵移動元素
+        // 方向鍵移動元素（多選支援）
         if (this.editor.selectedElement && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-            if (document.activeElement.contentEditable !== 'true') {
+            if (!isEditing) {
                 e.preventDefault();
                 const step = e.shiftKey ? 10 : 1;
-                const element = this.editor.selectedElement;
-                let x = parseInt(element.style.left) || 0;
-                let y = parseInt(element.style.top) || 0;
-
+                let dx = 0, dy = 0;
                 switch (e.key) {
-                    case 'ArrowUp': y -= step; break;
-                    case 'ArrowDown': y += step; break;
-                    case 'ArrowLeft': x -= step; break;
-                    case 'ArrowRight': x += step; break;
+                    case 'ArrowUp': dy = -step; break;
+                    case 'ArrowDown': dy = step; break;
+                    case 'ArrowLeft': dx = -step; break;
+                    case 'ArrowRight': dx = step; break;
                 }
 
-                element.style.left = `${x}px`;
-                element.style.top = `${y}px`;
-
-                const id = element.dataset.id;
-                this.slideManager.updateElement(id, { x, y });
+                this.editor.selectedElements.forEach(el => {
+                    let x = (parseInt(el.style.left) || 0) + dx;
+                    let y = (parseInt(el.style.top) || 0) + dy;
+                    el.style.left = `${x}px`;
+                    el.style.top = `${y}px`;
+                    this.slideManager.updateElement(el.dataset.id, { x, y });
+                });
             }
         }
     }

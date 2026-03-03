@@ -3501,19 +3501,7 @@ class App {
                 this.startPresentation();
             }
 
-            // Delete / Backspace 刪除選取元素
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                // 正在編輯文字時不攔截
-                const active = document.activeElement;
-                if (active && (active.isContentEditable || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
-                    return;
-                }
-                if (this.editor?.selectedElement) {
-                    e.preventDefault();
-                    this.editor.deleteSelected();
-                }
-                // 不再 fallback 刪除投影片，避免誤刪
-            }
+            // Delete / Backspace — 由 dragDrop.js 統一處理（支援多選）
 
             // Escape 取消選取
             if (e.key === 'Escape') {

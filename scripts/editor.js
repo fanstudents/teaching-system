@@ -7,6 +7,8 @@ export class Editor {
     constructor(slideManager) {
         this.slideManager = slideManager;
         this.selectedElement = null;
+        this.selectedElements = new Set(); // 多選集合
+        this._editingGroupId = null;      // 群組內部編輯模式
 
         this.canvasContentEl = document.getElementById('canvasContent');
         this.propertyContentEl = document.getElementById('propertyContent');
@@ -450,26 +452,75 @@ export class Editor {
 
     /**
      * 選取元素
+     * @param {HTMLElement} element
+     * @param {boolean} addToSelection - Shift+click 多選
      */
-    selectElement(element) {
+    selectElement(element, addToSelection = false) {
         // 強制讓其他正在編輯的元素 blur 以便存檔
         document.querySelectorAll('.editable-element.editing').forEach(el => {
             if (el !== element) el.blur();
         });
 
+        if (addToSelection && element) {
+            // Shift+click: 追加或移除
+            if (this.selectedElements.has(element)) {
+                this.selectedElements.delete(element);
+                element.classList.remove('selected');
+                element.querySelectorAll('.resize-handle').forEach(h => h.remove());
+                // 如果 Set 剩一個，將其設為主選取
+                if (this.selectedElements.size === 1) {
+                    this.selectedElement = [...this.selectedElements][0];
+                    this.showPropertyPanel(this.selectedElement);
+                } else if (this.selectedElements.size === 0) {
+                    this.selectedElement = null;
+                    this.hidePropertyPanel();
+                } else {
+                    this.selectedElement = [...this.selectedElements][0];
+                    this.showMultiSelectPanel();
+                }
+            } else {
+                this.selectedElements.add(element);
+                element.classList.add('selected');
+                if (this.selectedElement && !this.selectedElements.has(this.selectedElement)) {
+                    this.selectedElements.add(this.selectedElement);
+                }
+                this.selectedElement = element;
+                if (this.selectedElements.size > 1) {
+                    this.showMultiSelectPanel();
+                } else {
+                    this.showPropertyPanel(element);
+                }
+            }
+            return;
+        }
+
+        // 單選模式
+        // 檢查群組：如果元素有 groupId 且不在群組內部編輯模式，則選取整個群組
+        if (element) {
+            const id = element.dataset.id;
+            const slide = this.slideManager.getCurrentSlide();
+            if (slide) {
+                const elData = slide.elements.find(e => e.id === id);
+                if (elData?.groupId && this._editingGroupId !== elData.groupId) {
+                    this._selectGroup(elData.groupId);
+                    return;
+                }
+            }
+        }
+
         // 取消先前選取
         document.querySelectorAll('.editable-element.selected').forEach(el => {
             if (el !== element) {
                 el.classList.remove('selected');
-                // 移除 resize handles
                 el.querySelectorAll('.resize-handle').forEach(h => h.remove());
             }
         });
 
+        this.selectedElements.clear();
         this.selectedElement = element;
 
         if (element) {
-            // 如果原本還沒 selected 才需要加上 resize-handles
+            this.selectedElements.add(element);
             if (!element.classList.contains('selected')) {
                 element.classList.add('selected');
                 this.addResizeHandles(element);
@@ -509,6 +560,8 @@ export class Editor {
         });
 
         this.selectedElement = null;
+        this.selectedElements.clear();
+        this._editingGroupId = null;
         this.hidePropertyPanel();
 
         window.dispatchEvent(new CustomEvent('elementSelected', { detail: null }));
@@ -1929,13 +1982,201 @@ export class Editor {
     }
 
     /**
-     * 刪除選中元素
+     * 刪除選中元素（支援多選）
      */
     deleteSelected() {
-        if (this.selectedElement) {
+        if (this.selectedElements.size > 0) {
+            const ids = [...this.selectedElements].map(el => el.dataset.id);
+            ids.forEach(id => this.slideManager.deleteElement(id));
+            this.deselectAll();
+        } else if (this.selectedElement) {
             const id = this.selectedElement.dataset.id;
             this.slideManager.deleteElement(id);
             this.deselectAll();
         }
+    }
+
+    /**
+     * 多選屬性面板（對齊按鈕）
+     */
+    showMultiSelectPanel() {
+        const count = this.selectedElements.size;
+        this.propertyContentEl.innerHTML = `
+            <div class="property-section">
+                <div class="property-section-title">多選操作</div>
+                <div style="font-size:13px;color:#475569;margin-bottom:12px;">已選取 <b>${count}</b> 個元素</div>
+                <div class="property-section-title">對齊</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px;">
+                    <button class="layer-btn" id="alignLeft" title="靠左對齊">◧</button>
+                    <button class="layer-btn" id="alignCenterH" title="水平置中">⬚</button>
+                    <button class="layer-btn" id="alignRight" title="靠右對齊">◨</button>
+                    <button class="layer-btn" id="alignTop" title="靠上對齊">⬒</button>
+                    <button class="layer-btn" id="alignCenterV" title="垂直置中">⬔</button>
+                    <button class="layer-btn" id="alignBottom" title="靠下對齊">⬓</button>
+                </div>
+                <div class="property-section-title" style="margin-top:8px;">分佈</div>
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:12px;">
+                    <button class="layer-btn" id="distributeH">水平等距</button>
+                    <button class="layer-btn" id="distributeV">垂直等距</button>
+                </div>
+                <div class="property-section-title" style="margin-top:8px;">群組</div>
+                <button class="layer-btn" id="groupBtn" style="width:100%;padding:6px;">Ctrl+G 群組</button>
+            </div>
+            <button class="delete-element-btn" id="deleteMulti">刪除 ${count} 個元素</button>
+        `;
+        this._bindMultiSelectEvents();
+    }
+
+    /**
+     * 綁定多選面板事件
+     */
+    _bindMultiSelectEvents() {
+        const getSelectedData = () => {
+            const slide = this.slideManager.getCurrentSlide();
+            if (!slide) return [];
+            return [...this.selectedElements].map(el => {
+                const data = slide.elements.find(e => e.id === el.dataset.id);
+                return data ? { el, data } : null;
+            }).filter(Boolean);
+        };
+
+        const rerender = () => {
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.renderThumbnails();
+        };
+
+        // 對齊
+        document.getElementById('alignLeft')?.addEventListener('click', () => {
+            const items = getSelectedData();
+            const minX = Math.min(...items.map(i => i.data.x));
+            items.forEach(i => this.slideManager.updateElement(i.data.id, { x: minX }));
+            rerender();
+        });
+        document.getElementById('alignCenterH')?.addEventListener('click', () => {
+            const items = getSelectedData();
+            const centers = items.map(i => i.data.x + i.data.width / 2);
+            const avg = centers.reduce((a, b) => a + b, 0) / centers.length;
+            items.forEach(i => this.slideManager.updateElement(i.data.id, { x: Math.round(avg - i.data.width / 2) }));
+            rerender();
+        });
+        document.getElementById('alignRight')?.addEventListener('click', () => {
+            const items = getSelectedData();
+            const maxRight = Math.max(...items.map(i => i.data.x + i.data.width));
+            items.forEach(i => this.slideManager.updateElement(i.data.id, { x: maxRight - i.data.width }));
+            rerender();
+        });
+        document.getElementById('alignTop')?.addEventListener('click', () => {
+            const items = getSelectedData();
+            const minY = Math.min(...items.map(i => i.data.y));
+            items.forEach(i => this.slideManager.updateElement(i.data.id, { y: minY }));
+            rerender();
+        });
+        document.getElementById('alignCenterV')?.addEventListener('click', () => {
+            const items = getSelectedData();
+            const centers = items.map(i => i.data.y + i.data.height / 2);
+            const avg = centers.reduce((a, b) => a + b, 0) / centers.length;
+            items.forEach(i => this.slideManager.updateElement(i.data.id, { y: Math.round(avg - i.data.height / 2) }));
+            rerender();
+        });
+        document.getElementById('alignBottom')?.addEventListener('click', () => {
+            const items = getSelectedData();
+            const maxBottom = Math.max(...items.map(i => i.data.y + i.data.height));
+            items.forEach(i => this.slideManager.updateElement(i.data.id, { y: maxBottom - i.data.height }));
+            rerender();
+        });
+
+        // 分佈
+        document.getElementById('distributeH')?.addEventListener('click', () => {
+            const items = getSelectedData().sort((a, b) => a.data.x - b.data.x);
+            if (items.length < 3) return;
+            const minX = items[0].data.x;
+            const maxRight = items[items.length - 1].data.x + items[items.length - 1].data.width;
+            const totalWidth = items.reduce((s, i) => s + i.data.width, 0);
+            const gap = (maxRight - minX - totalWidth) / (items.length - 1);
+            let x = minX;
+            items.forEach(i => {
+                this.slideManager.updateElement(i.data.id, { x: Math.round(x) });
+                x += i.data.width + gap;
+            });
+            rerender();
+        });
+        document.getElementById('distributeV')?.addEventListener('click', () => {
+            const items = getSelectedData().sort((a, b) => a.data.y - b.data.y);
+            if (items.length < 3) return;
+            const minY = items[0].data.y;
+            const maxBottom = items[items.length - 1].data.y + items[items.length - 1].data.height;
+            const totalHeight = items.reduce((s, i) => s + i.data.height, 0);
+            const gap = (maxBottom - minY - totalHeight) / (items.length - 1);
+            let y = minY;
+            items.forEach(i => {
+                this.slideManager.updateElement(i.data.id, { y: Math.round(y) });
+                y += i.data.height + gap;
+            });
+            rerender();
+        });
+
+        // 群組
+        document.getElementById('groupBtn')?.addEventListener('click', () => this.groupSelected());
+
+        // 刪除
+        document.getElementById('deleteMulti')?.addEventListener('click', () => this.deleteSelected());
+    }
+
+    /**
+     * 選取群組內所有元素
+     */
+    _selectGroup(groupId) {
+        const slide = this.slideManager.getCurrentSlide();
+        if (!slide) return;
+
+        this.deselectAll();
+        const groupEls = slide.elements.filter(e => e.groupId === groupId);
+        const canvas = this.canvasContentEl;
+        groupEls.forEach(elData => {
+            const dom = canvas.querySelector(`[data-id="${elData.id}"]`);
+            if (dom) {
+                this.selectedElements.add(dom);
+                dom.classList.add('selected');
+            }
+        });
+        if (this.selectedElements.size > 0) {
+            this.selectedElement = [...this.selectedElements][0];
+            this.showMultiSelectPanel();
+        }
+    }
+
+    /**
+     * 群組選取的元素
+     */
+    groupSelected() {
+        if (this.selectedElements.size < 2) return;
+        const groupId = 'g_' + Date.now().toString(36);
+        [...this.selectedElements].forEach(el => {
+            this.slideManager.updateElement(el.dataset.id, { groupId });
+        });
+        this.slideManager.renderCurrentSlide();
+        this.slideManager.renderThumbnails();
+        this.slideManager.saveNow();
+    }
+
+    /**
+     * 解散群組
+     */
+    ungroupSelected() {
+        const slide = this.slideManager.getCurrentSlide();
+        if (!slide) return;
+        const groupIds = new Set();
+        [...this.selectedElements].forEach(el => {
+            const data = slide.elements.find(e => e.id === el.dataset.id);
+            if (data?.groupId) groupIds.add(data.groupId);
+        });
+        groupIds.forEach(gid => {
+            slide.elements.filter(e => e.groupId === gid).forEach(e => {
+                this.slideManager.updateElement(e.id, { groupId: null });
+            });
+        });
+        this.slideManager.renderCurrentSlide();
+        this.slideManager.renderThumbnails();
+        this.slideManager.saveNow();
     }
 }
