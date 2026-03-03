@@ -47,14 +47,14 @@ export class DocumentViewer {
      * 取得元素資料
      */
     _getElementData(elementId) {
-        // 嘗試從 slideManager 取得
-        if (window._app?.slideManager) {
-            const slide = window._app.slideManager.getCurrentSlide();
-            if (slide) {
-                return slide.elements.find(e => e.id === elementId);
+        // 搜尋所有投影片（簡報模式可能在不同頁）
+        if (window._app?.slideManager?.slides) {
+            for (const s of window._app.slideManager.slides) {
+                const found = s.elements?.find(e => e.id === elementId);
+                if (found) return found;
             }
         }
-        // 嘗試從 presenter 取得
+        // 嘗試從 presenter（學員端）取得
         if (window._presenterApp?.slides) {
             for (const s of window._presenterApp.slides) {
                 const found = s.elements?.find(e => e.id === elementId);
