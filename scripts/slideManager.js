@@ -1951,12 +1951,31 @@ export class SlideManager {
     }
 
     renderCopyCardElement(el, element) {
+        const rawContent = element.content || '';
+        // 提取 {{變數}} 名稱
+        const varRegex = /\{\{([^}]+)\}\}/g;
+        const vars = [];
+        let m;
+        while ((m = varRegex.exec(rawContent)) !== null) {
+            if (!vars.includes(m[1])) vars.push(m[1]);
+        }
+        const hasVars = vars.length > 0;
+
+        // 將 {{var}} 替換為可見的 inline input
+        let displayHtml = rawContent.replace(/\n/g, '<br>');
+        if (hasVars) {
+            displayHtml = displayHtml.replace(/\{\{([^}]+)\}\}/g, (_, name) => {
+                return `<input type="text" class="cc-var-input" data-var="${name}" placeholder="${name}" autocomplete="off">`;
+            });
+        }
+
         el.innerHTML = `
             <div class="interactive-label">複製文字</div>
-            <div class="copy-card-container">
+            <div class="copy-card-container" data-copy-template="${rawContent.replace(/"/g, '&quot;')}">
                 <div class="copy-card-title">${element.title || '點擊複製'}</div>
-                <div class="copy-card-content" data-copy-text="${element.content || ''}">${element.content || ''}</div>
-                <button class="copy-card-btn">
+                <div class="copy-card-content">${displayHtml}</div>
+                ${hasVars ? `<div class="cc-var-hint">請填寫所有欄位後再複製</div>` : ''}
+                <button class="copy-card-btn" ${hasVars ? 'disabled' : ''}>
                     <span class="copy-icon">⧉</span>
                     <span class="copy-text">點擊複製</span>
                 </button>
@@ -1964,14 +1983,41 @@ export class SlideManager {
             </div>
         `;
 
-        // 綁定複製事件
+        const container = el.querySelector('.copy-card-container');
         const copyBtn = el.querySelector('.copy-card-btn');
-        const contentEl = el.querySelector('.copy-card-content');
         const feedbackEl = el.querySelector('.copy-card-feedback');
+        const hintEl = el.querySelector('.cc-var-hint');
 
+        // 變數輸入監聽：全填滿才啟用複製
+        if (hasVars) {
+            const inputs = el.querySelectorAll('.cc-var-input');
+            const checkFilled = () => {
+                const allFilled = [...inputs].every(inp => inp.value.trim() !== '');
+                copyBtn.disabled = !allFilled;
+                if (hintEl) {
+                    hintEl.style.display = allFilled ? 'none' : '';
+                }
+            };
+            inputs.forEach(inp => {
+                inp.addEventListener('input', checkFilled);
+                inp.addEventListener('click', (e) => e.stopPropagation());
+            });
+        }
+
+        // 複製事件
         copyBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            const textToCopy = contentEl.textContent;
+            let textToCopy = rawContent;
+
+            // 替換變數
+            if (hasVars) {
+                const inputs = el.querySelectorAll('.cc-var-input');
+                inputs.forEach(inp => {
+                    const varName = inp.dataset.var;
+                    textToCopy = textToCopy.replaceAll(`{{${varName}}}`, inp.value.trim());
+                });
+            }
+
             try {
                 await navigator.clipboard.writeText(textToCopy);
                 feedbackEl.textContent = '✓ 已複製到剪貼簿！';

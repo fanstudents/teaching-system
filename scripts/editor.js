@@ -1117,16 +1117,36 @@ export class Editor {
      * 渲染複製卡片屬性
      */
     renderCopyCardProperties(elementData) {
+        // 提取目前的變數
+        const vars = [];
+        const regex = /\{\{([^}]+)\}\}/g;
+        let m;
+        while ((m = regex.exec(elementData.content || '')) !== null) {
+            if (!vars.includes(m[1])) vars.push(m[1]);
+        }
+        const varsHtml = vars.length > 0
+            ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">${vars.map(v => `<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;font-size:11px;color:#1d4ed8;">⬡ ${v}</span>`).join('')}</div>`
+            : '';
+
         return `
             <div class="property-section">
                 <div class="property-section-title">複製卡片設定</div>
                 <div class="form-group">
                     <label class="form-label">標題</label>
-                    <input type="text" class="form-input" id="copyCardTitle" value="${elementData.title || '點擊複製'}">
+                    <input type="text" class="form-input" id="copyCardTitle" value="${(elementData.title || '點擊複製').replace(/"/g, '&quot;')}">
                 </div>
                 <div class="form-group">
                     <label class="form-label">要複製的文字內容</label>
-                    <textarea class="form-input" id="copyCardContent" rows="4" placeholder="請輸入讓學生複製的內容...">${elementData.content || ''}</textarea>
+                    <textarea class="form-input" id="copyCardContent" rows="5" placeholder="請輸入讓學生複製的內容...">${elementData.content || ''}</textarea>
+                    <div style="margin-top:8px;padding:10px 12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
+                        <div style="font-size:0.78rem;font-weight:600;color:#0369a1;margin-bottom:4px;">💡 變數功能</div>
+                        <div style="font-size:0.72rem;color:#0c4a6e;line-height:1.6;">
+                            用 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;font-size:11px;">\{\{變數名\}\}</code> 建立可填寫欄位。<br>
+                            例如：<code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;font-size:11px;">我是\{\{職業\}\}，專長是\{\{技能\}\}</code><br>
+                            學員需填完所有變數才能複製。
+                        </div>
+                        ${varsHtml}
+                    </div>
                 </div>
             </div>
         `;
