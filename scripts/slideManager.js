@@ -2148,18 +2148,20 @@ export class SlideManager {
     }
 
     renderTrueFalseElement(el, element) {
+        const tl = element.trueLabel || '對';
+        const fl = element.falseLabel || '錯';
         el.innerHTML = `
             <div class="interactive-label">是非題</div>
-            <div class="truefalse-container" data-answer="${element.answer ? 'true' : 'false'}">
+            <div class="truefalse-container" data-answer="${element.answer ? 'true' : 'false'}" data-true-label="${this._esc(tl)}" data-false-label="${this._esc(fl)}">
                 <div class="tf-question">${element.question || '對或錯？'}</div>
                 <div class="tf-buttons">
                     <button class="tf-btn tf-btn-true">
                         <span class="tf-icon">✓</span>
-                        <span class="tf-label">對</span>
+                        <span class="tf-label">${this._esc(tl)}</span>
                     </button>
                     <button class="tf-btn tf-btn-false">
                         <span class="tf-icon">✗</span>
-                        <span class="tf-label">錯</span>
+                        <span class="tf-label">${this._esc(fl)}</span>
                     </button>
                 </div>
                 <div class="tf-result"></div>

@@ -712,8 +712,10 @@
     transform: scale(1.3) !important;
 }
 
-/* 簡報模式隱藏 waypoint handles */
-.presentation-element .flowline-waypoint-handle {
+/* 簡報模式隱藏 waypoint handles + resize handles */
+.presentation-element .flowline-waypoint-handle,
+.presentation-element .resize-handle,
+.presentation-slide .resize-handle {
     display: none !important;
 }
 

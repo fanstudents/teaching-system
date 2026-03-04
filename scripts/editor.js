@@ -847,6 +847,8 @@ export class Editor {
         } else if (type === 'showcase') {
             html += this.renderShowcaseProperties(elementData);
         } else if (type === 'truefalse') {
+            const tl = elementData.trueLabel || '對';
+            const fl = elementData.falseLabel || '錯';
             html += `
                 <div class="property-section">
                     <div class="property-section-title">是非題設定</div>
@@ -855,10 +857,18 @@ export class Editor {
                         <input type="text" class="form-input" id="tfQuestion" value="${elementData.question || ''}">
                     </div>
                     <div class="property-row">
+                        <label>選項 A 文字</label>
+                        <input type="text" class="form-input" id="tfTrueLabel" value="${tl}" style="flex:1;" placeholder="對">
+                    </div>
+                    <div class="property-row">
+                        <label>選項 B 文字</label>
+                        <input type="text" class="form-input" id="tfFalseLabel" value="${fl}" style="flex:1;" placeholder="錯">
+                    </div>
+                    <div class="property-row">
                         <label>正確答案</label>
                         <select id="tfAnswer" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
-                            <option value="true" ${elementData.answer ? 'selected' : ''}>對</option>
-                            <option value="false" ${!elementData.answer ? 'selected' : ''}>錯</option>
+                            <option value="true" ${elementData.answer ? 'selected' : ''}>${tl}</option>
+                            <option value="false" ${!elementData.answer ? 'selected' : ''}>${fl}</option>
                         </select>
                     </div>
                 </div>
@@ -1455,6 +1465,8 @@ export class Editor {
         if (elementData.type === 'truefalse') {
             bindSimple('tfQuestion', 'question');
             bindSimple('tfAnswer', 'answer', v => v === 'true');
+            bindSimple('tfTrueLabel', 'trueLabel');
+            bindSimple('tfFalseLabel', 'falseLabel');
         } else if (elementData.type === 'opentext') {
             bindSimple('otQuestion', 'question');
             bindSimple('otPlaceholder', 'placeholder');

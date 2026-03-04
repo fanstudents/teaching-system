@@ -24,6 +24,8 @@ export class TrueFalseGame {
     async setupContainer(container) {
         const elementId = container.closest('[data-id]')?.dataset.id || container.dataset.elementId || '';
         const correctAnswer = container.dataset.answer === 'true';
+        const trueLabel = container.dataset.trueLabel || '對';
+        const falseLabel = container.dataset.falseLabel || '錯';
         let answered = false;
         let revealed = false;
         let chosenValue = null;
@@ -87,6 +89,7 @@ export class TrueFalseGame {
             const btnTrue = container.querySelector('.tf-btn-true');
             const btnFalse = container.querySelector('.tf-btn-false');
             const resultEl = container.querySelector('.tf-result');
+            const correctLabel = correctAnswer ? trueLabel : falseLabel;
 
             // 移除等待狀態
             container.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('tf-waiting'));
@@ -104,11 +107,11 @@ export class TrueFalseGame {
                 }
                 if (resultEl) {
                     resultEl.className = 'tf-result ' + (isCorrect ? 'success' : 'error');
-                    resultEl.textContent = isCorrect ? '✓ 回答正確！' : '✗ 答案是' + (correctAnswer ? '「對」' : '「錯」');
+                    resultEl.textContent = isCorrect ? '✓ 回答正確！' : `✗ 答案是「${correctLabel}」`;
                 }
             } else if (resultEl) {
                 resultEl.className = 'tf-result tf-revealed';
-                resultEl.textContent = '正確答案：' + (correctAnswer ? '對 ✓' : '錯 ✗');
+                resultEl.textContent = `正確答案：${correctLabel}`;
             }
 
             // 隱藏公布按鈕
@@ -169,9 +172,10 @@ export class TrueFalseGame {
                 markChosen(chosen);
                 const title = container.querySelector('.tf-question')?.textContent || '是非題';
                 const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
+                const chosenLabel = chosen ? trueLabel : falseLabel;
                 const _r = await stateManager.save(elementId, {
                     type: 'truefalse', title,
-                    content: chosen ? '對' : '錯',
+                    content: chosenLabel,
                     isCorrect: chosen === correctAnswer,
                     score: chosen === correctAnswer ? 100 : 0,
                     points,
