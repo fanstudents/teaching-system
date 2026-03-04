@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程回饋問卷 — 數位簡報室</title>
+    <meta name="description" content="課程回饋問卷">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(145deg, #1e1b4b, #312e81);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        .survey-page {
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .survey-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .survey-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .survey-header p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .survey-card {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .survey-q-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .survey-stars {
+            display: flex;
+            gap: 8px;
+        }
+
+        .survey-star {
+            font-size: 32px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.12);
+            transition: color 0.15s, transform 0.15s;
+            user-select: none;
+        }
+
+        .survey-star:hover {
+            transform: scale(1.15);
+        }
+
+        .survey-star.active {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+        }
+
+        .survey-textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .survey-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .survey-textarea:focus {
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .survey-submit {
+            width: 100%;
+            margin-top: 8px;
+            padding: 12px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .survey-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .survey-submit:not(:disabled):hover {
+            opacity: 0.9;
+        }
+
+        /* 身份輸入 */
+        .id-card {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .id-card label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .id-card input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .id-card input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 完成畫面 */
+        .survey-done {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .survey-done-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+
+        .survey-done h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .survey-done p {
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="survey-page" id="surveyPage">
+        <div class="survey-header">
+            <h1>📋 課程回饋問卷</h1>
+            <p>你的回饋是我們進步的動力 ✨</p>
+        </div>
+
+        <!-- 身份 -->
+        <div class="id-card" id="idCard">
+            <label>姓名</label>
+            <input type="text" id="surveyName" placeholder="請輸入姓名">
+            <label>Email</label>
+            <input type="email" id="surveyEmail" placeholder="your@email.com">
+        </div>
+
+        <!-- 星星題 -->
+        <div class="survey-card">
+            <div class="survey-q-label">1. 課程整體滿意度</div>
+            <div class="survey-stars" data-qid="q1"></div>
+        </div>
+        <div class="survey-card">
+            <div class="survey-q-label">2. 講師教學表現</div>
+            <div class="survey-stars" data-qid="q2"></div>
+        </div>
+        <div class="survey-card">
+            <div class="survey-q-label">3. 課程內容實用性</div>
+            <div class="survey-stars" data-qid="q3"></div>
+        </div>
+
+        <!-- 文字題 -->
+        <div class="survey-card">
+            <div class="survey-q-label">4. 這堂課最大的收穫是什麼？</div>
+            <textarea class="survey-textarea" id="q4" rows="3" placeholder="請分享你印象最深刻的部分…"></textarea>
+        </div>
+        <div class="survey-card">
+            <div class="survey-q-label">5. 你覺得還想學哪些相關主題？</div>
+            <textarea class="survey-textarea" id="q5" rows="3" placeholder="例如：AI 繪圖、自動化工具…"></textarea>
+        </div>
+        <div class="survey-card">
+            <div class="survey-q-label">6. 給講師的一句話或建議 💬</div>
+            <textarea class="survey-textarea" id="q6" rows="3" placeholder="任何想說的話都可以！"></textarea>
+        </div>
+
+        <button class="survey-submit" id="submitBtn" disabled>
+            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+            提交問卷
+        </button>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        const sessionCode = new URLSearchParams(location.search).get('code') || '';
+
+        // 初始化星星
+        document.querySelectorAll('.survey-stars').forEach(container => {
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.className = 'survey-star';
+                star.textContent = '★';
+                star.dataset.value = i;
+                star.addEventListener('click', () => {
+                    container.dataset.selected = i;
+                    container.querySelectorAll('.survey-star').forEach(s => {
+                        s.classList.toggle('active', parseInt(s.dataset.value) <= i);
+                    });
+                    checkSubmit();
+                });
+                container.appendChild(star);
+            }
+        });
+
+        // 自動帶入已存的身份
+        const savedUser = JSON.parse(sessionStorage.getItem('homework_user') || 'null');
+        if (savedUser) {
+            document.getElementById('surveyName').value = savedUser.name || '';
+            document.getElementById('surveyEmail').value = savedUser.email || '';
+        }
+
+        // 啟用 / 停用提交
+        function checkSubmit() {
+            const name = document.getElementById('surveyName').value.trim();
+            const email = document.getElementById('surveyEmail').value.trim();
+            let allStars = true;
+            document.querySelectorAll('.survey-stars').forEach(el => {
+                if (!el.dataset.selected || el.dataset.selected === '0') allStars = false;
+            });
+            document.getElementById('submitBtn').disabled = !(allStars && name && email.includes('@'));
+        }
+
+        document.getElementById('surveyName').addEventListener('input', checkSubmit);
+        document.getElementById('surveyEmail').addEventListener('input', checkSubmit);
+
+        // 提交
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 1s linear infinite;font-size:18px;">progress_activity</span> 提交中…';
+
+            const name = document.getElementById('surveyName').value.trim();
+            const email = document.getElementById('surveyEmail').value.trim();
+
+            const answers = {};
+            document.querySelectorAll('.survey-stars').forEach(el => {
+                answers[el.dataset.qid] = {
+                    question: el.closest('.survey-card').querySelector('.survey-q-label').textContent.replace(/^\d+\.\s*/, ''),
+                    type: 'stars',
+                    value: parseInt(el.dataset.selected || '0')
+                };
+            });
+            ['q4', 'q5', 'q6'].forEach(id => {
+                const ta = document.getElementById(id);
+                const label = ta.closest('.survey-card').querySelector('.survey-q-label').textContent.replace(/^\d+\.\s*/, '');
+                answers[id] = { question: label, type: 'text', value: ta.value.trim() };
+            });
+
+            // 存到 sessionStorage
+            sessionStorage.setItem('homework_user', JSON.stringify({ name, email, joinedAt: new Date().toISOString() }));
+
+            try {
+                // 檢查是否已提交
+                const { data: existing } = await db.select('submissions', {
+                    filter: {
+                        session_id: `eq.${sessionCode}`,
+                        element_id: 'eq._post_survey',
+                        student_email: `eq.${email}`
+                    }
+                });
+
+                const record = {
+                    session_id: sessionCode || null,
+                    element_id: '_post_survey',
+                    student_name: name,
+                    student_email: email,
+                    student_group: '',
+                    assignment_title: '課後問卷',
+                    type: 'survey',
+                    content: JSON.stringify(answers),
+                    is_correct: null,
+                    score: null,
+                    state: { answers, _awarded: 2, _maxPts: 2 },
+                    submitted_at: new Date().toISOString()
+                };
+
+                if (existing && existing.length > 0) {
+                    await db.update('submissions', {
+                        content: record.content,
+                        state: record.state,
+                        submitted_at: record.submitted_at
+                    }, { id: `eq.${existing[0].id}` });
+                } else {
+                    await db.insert('submissions', record);
+                }
+
+                // 顯示感謝
+                document.getElementById('surveyPage').innerHTML = `
+                    <div class="survey-done">
+                        <div class="survey-done-icon">🎉</div>
+                        <h2>感謝你的回饋！</h2>
+                        <p>你的意見對我們非常重要，<br>期待下次課程再見！</p>
+                    </div>
+                `;
+            } catch (e) {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">send</span> 提交問卷';
+                alert('提交失敗：' + e.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

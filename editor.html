@@ -639,8 +639,11 @@
                 <!-- 左側投影片面板 -->
                 <aside class="slide-panel" id="slidePanel">
                     <div class="panel-header">
-                        <span>投影片</span>
+                        <span id="panelTabLabel">投影片</span>
                         <div style="display:flex;gap:4px;align-items:center;">
+                            <button class="add-slide-btn" id="feedbackTabBtn" title="課後回饋系統" style="color:#8b5cf6;">
+                                <span class="material-symbols-outlined">forward_to_inbox</span>
+                            </button>
                             <button class="add-slide-btn" id="importSlidesBtn" title="從其他專案匯入"
                                 onclick="window.__openImportSlides()">
                                 <span class="material-symbols-outlined">file_copy</span>
@@ -655,6 +658,33 @@
                     </div>
                     <div class="slide-list" id="slideList">
                         <!-- 投影片縮略圖動態載入 -->
+                    </div>
+
+                    <!-- 課後回饋系統面板 -->
+                    <div id="feedbackPanel"
+                        style="display:none;position:absolute;inset:0;top:40px;background:#1e293b;z-index:10;overflow-y:auto;padding:12px;">
+                        <div style="margin-bottom:12px;">
+                            <div style="font-size:11px;color:#64748b;margin-bottom:4px;">課堂代碼</div>
+                            <div style="display:flex;gap:6px;">
+                                <input id="fbSessionCode" type="text" placeholder="輸入代碼"
+                                    style="flex:1;padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#fff;font-size:13px;">
+                                <button id="fbLoadBtn"
+                                    style="padding:6px 10px;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;white-space:nowrap;">載入</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:8px;">
+                            <div style="font-size:11px;color:#64748b;margin-bottom:4px;">問卷連結 <span id="fbSurveyLink"
+                                    style="color:#6366f1;cursor:pointer;font-size:10px;">(複製)</span></div>
+                        </div>
+                        <div id="fbStudentList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+                        </div>
+                        <button id="fbGenBtn"
+                            style="display:none;width:100%;padding:8px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:none;align-items:center;justify-content:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:16px;">auto_awesome</span>
+                            AI 生成個人化信件
+                        </button>
+                        <div id="fbEmailResults" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+                        </div>
                     </div>
                 </aside>
 
