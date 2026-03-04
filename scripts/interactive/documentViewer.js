@@ -142,26 +142,29 @@ export class DocumentViewer {
         const overlay = document.createElement('div');
         overlay.className = 'doc-viewer-overlay';
 
-        // 錨點 HTML
-        let anchorsSection = '';
+        // ── 段落式內容渲染（可點擊標記錯誤）──
+        let contentHtml;
         if (hasAnchors) {
-            const anchorCards = anchors.map((a, i) => {
-                const checked = prevSel.includes(a.id);
-                return `<div class="doc-anchor-card ${checked ? 'checked' : ''}" data-anchor-id="${a.id}" data-idx="${i}">
-                    <div class="doc-anchor-check">
-                        <span class="material-symbols-outlined">${checked ? 'check_box' : 'check_box_outline_blank'}</span>
-                    </div>
-                    <div class="doc-anchor-label">${this._esc(a.text || `段落 ${i + 1}`)}</div>
-                </div>`;
-            }).join('');
-
-            anchorsSection = `
-                <div class="doc-anchors-section">
-                    <div class="doc-anchors-title">
-                        <span class="material-symbols-outlined" style="font-size:18px;color:#f59e0b;">flag</span>
-                        請勾選你認為有錯誤的段落
-                    </div>
-                    <div class="doc-anchors-grid">${anchorCards}</div>
+            // 有錨點 → 段落化，每段可點擊標記
+            const paragraphs = this._splitIntoParagraphs(content);
+            contentHtml = `
+                <div class="doc-para-hint">
+                    <span class="material-symbols-outlined" style="font-size:16px;">touch_app</span>
+                    點擊你認為有錯誤的段落
+                </div>
+                <div class="doc-para-list">
+                    ${paragraphs.map((p, i) => {
+                const checked = prevSel.includes(i);
+                return `<div class="doc-para-item ${checked ? 'marked' : ''}" data-para-idx="${i}">
+                            <div class="doc-para-badge">${i + 1}</div>
+                            <div class="doc-para-text">${p}</div>
+                            <div class="doc-para-mark">
+                                <span class="material-symbols-outlined">${checked ? 'flag' : 'outlined_flag'}</span>
+                            </div>
+                        </div>`;
+            }).join('')}
+                </div>
+                <div class="doc-para-actions">
                     ${isPresenter ? `
                         <button class="doc-reveal-btn" id="docRevealBtn">
                             <span class="material-symbols-outlined" style="font-size:18px;">visibility</span>
@@ -176,6 +179,8 @@ export class DocumentViewer {
                     <div class="doc-stats-panel" id="docStatsPanel" style="display:none;"></div>
                 </div>
             `;
+        } else {
+            contentHtml = content;
         }
 
         overlay.innerHTML = `
@@ -199,8 +204,7 @@ export class DocumentViewer {
                     </div>
                 </div>
                 <div class="doc-viewer-body">
-                    <div class="doc-viewer-content">${content}</div>
-                    ${anchorsSection}
+                    <div class="doc-viewer-content">${contentHtml}</div>
                 </div>
             </div>
         `;
@@ -243,23 +247,24 @@ export class DocumentViewer {
             });
         }
 
-        // ── 錨點互動 ──
+        // ── 段落點擊互動 ──
         if (hasAnchors) {
             const selectedSet = new Set(prevSel);
 
-            // 勾選切換
-            overlay.querySelectorAll('.doc-anchor-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    if (card.classList.contains('revealed')) return; // 已公布
-                    const id = card.dataset.anchorId;
-                    if (selectedSet.has(id)) {
-                        selectedSet.delete(id);
-                        card.classList.remove('checked');
-                        card.querySelector('.doc-anchor-check .material-symbols-outlined').textContent = 'check_box_outline_blank';
+            // 段落點擊切換
+            overlay.querySelectorAll('.doc-para-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (item.classList.contains('revealed')) return;
+                    const idx = parseInt(item.dataset.paraIdx);
+                    const icon = item.querySelector('.doc-para-mark .material-symbols-outlined');
+                    if (selectedSet.has(idx)) {
+                        selectedSet.delete(idx);
+                        item.classList.remove('marked');
+                        if (icon) icon.textContent = 'outlined_flag';
                     } else {
-                        selectedSet.add(id);
-                        card.classList.add('checked');
-                        card.querySelector('.doc-anchor-check .material-symbols-outlined').textContent = 'check_box';
+                        selectedSet.add(idx);
+                        item.classList.add('marked');
+                        if (icon) icon.textContent = 'flag';
                     }
                 });
             });
@@ -269,18 +274,18 @@ export class DocumentViewer {
             if (submitBtn) {
                 submitBtn.addEventListener('click', async () => {
                     const selected = [...selectedSet];
-                    const correctErrors = anchors.filter(a => a.isError).map(a => a.id);
-                    const correctCount = selected.filter(id => correctErrors.includes(id)).length;
-                    const wrongCount = selected.filter(id => !correctErrors.includes(id)).length;
-                    const total = correctErrors.length;
+                    const errorIndices = anchors.map((a, i) => a.isError ? i : -1).filter(i => i >= 0);
+                    const correctCount = selected.filter(i => errorIndices.includes(i)).length;
+                    const wrongCount = selected.filter(i => !errorIndices.includes(i)).length;
+                    const total = errorIndices.length;
                     const allRight = correctCount === total && wrongCount === 0;
                     const score = total > 0 ? Math.round(((correctCount - wrongCount * 0.5) / total) * 100) : 100;
                     const points = parseInt(document.querySelector(`[data-id="${elementId}"]`)?.dataset.points) || 5;
 
-                    await stateManager.save(elementId, {
+                    const _r = await stateManager.save(elementId, {
                         type: 'document',
                         title: data.docTitle || '文件',
-                        content: `${selected.length} 項`,
+                        content: `標記 ${selected.length} 段`,
                         isCorrect: allRight,
                         score: Math.max(0, score),
                         points,
@@ -290,9 +295,10 @@ export class DocumentViewer {
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">check</span> 已提交';
                     submitBtn.classList.add('submitted');
+                    if (_r?.isRetry) stateManager.showRetryBanner(overlay.querySelector('.doc-para-actions'));
 
-                    // 鎖定所有卡片
-                    overlay.querySelectorAll('.doc-anchor-card').forEach(c => c.style.pointerEvents = 'none');
+                    // 鎖定段落
+                    overlay.querySelectorAll('.doc-para-item').forEach(c => c.style.pointerEvents = 'none');
                 });
             }
 
@@ -303,20 +309,19 @@ export class DocumentViewer {
                     revealBtn.disabled = true;
                     revealBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> 載入中...';
 
-                    // 揭曉正確答案
-                    overlay.querySelectorAll('.doc-anchor-card').forEach(card => {
-                        card.classList.add('revealed');
-                        const id = card.dataset.anchorId;
-                        const anchor = anchors.find(a => a.id === id);
+                    // 揭曉：標記正確/錯誤段落
+                    overlay.querySelectorAll('.doc-para-item').forEach(item => {
+                        item.classList.add('revealed');
+                        const idx = parseInt(item.dataset.paraIdx);
+                        const anchor = anchors[idx];
                         if (anchor?.isError) {
-                            card.classList.add('is-error');
+                            item.classList.add('is-error');
                         } else {
-                            card.classList.add('is-correct');
+                            item.classList.add('is-correct');
                         }
                     });
 
-                    // 載入統計
-                    await this._loadStats(elementId, anchors, overlay);
+                    await this._loadStatsForParagraphs(elementId, anchors, overlay);
                     revealBtn.style.display = 'none';
                 });
             }
@@ -324,7 +329,110 @@ export class DocumentViewer {
     }
 
     /**
-     * 載入統計資料
+     * 將 HTML 內容拆分為段落陣列
+     */
+    _splitIntoParagraphs(html) {
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        const paragraphs = [];
+        // 取得所有直接子元素（p, h1-h6, li, blockquote, pre, div 等）
+        const children = temp.children;
+        if (children.length > 0) {
+            for (const child of children) {
+                const text = child.innerHTML?.trim();
+                if (text) paragraphs.push(text);
+            }
+        }
+        // 如果解析不到子元素（純文字），按換行拆
+        if (paragraphs.length === 0) {
+            const lines = html.split(/<br\s*\/?>\s*<br\s*\/?>/gi);
+            for (const line of lines) {
+                const t = line.trim();
+                if (t) paragraphs.push(t);
+            }
+        }
+        // 最後防護：至少回傳整段
+        if (paragraphs.length === 0 && html.trim()) {
+            paragraphs.push(html.trim());
+        }
+        return paragraphs;
+    }
+
+    /**
+     * 載入段落統計資料（以段落 index 為 key）
+     */
+    async _loadStatsForParagraphs(elementId, anchors, overlay) {
+        const statsPanel = overlay.querySelector('#docStatsPanel');
+        if (!statsPanel) return;
+
+        try {
+            const { db } = await import('../supabase.js');
+            const sessionCode = window.app?.sessionCode || '';
+            const { data: rows } = await db.select('submissions', {
+                filter: {
+                    element_id: `eq.${elementId}`,
+                    ...(sessionCode ? { session_id: `eq.${sessionCode}` } : {}),
+                },
+            });
+
+            const submissions = Array.isArray(rows) ? rows : [];
+            const totalStudents = submissions.length;
+
+            if (totalStudents === 0) {
+                statsPanel.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:16px;">尚無學員作答</div>';
+                statsPanel.style.display = 'block';
+                return;
+            }
+
+            // 統計每段被標記的次數
+            const countMap = {};
+            anchors.forEach((_, i) => { countMap[i] = 0; });
+
+            for (const sub of submissions) {
+                let st = sub.state;
+                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                const sel = st?.selectedAnchors || [];
+                sel.forEach(idx => {
+                    if (countMap[idx] !== undefined) countMap[idx]++;
+                });
+            }
+
+            const statsHtml = anchors.map((a, i) => {
+                const count = countMap[i] || 0;
+                const pct = totalStudents > 0 ? Math.round((count / totalStudents) * 100) : 0;
+                const barColor = a.isError ? '#ef4444' : '#22c55e';
+                const tag = a.isError
+                    ? '<span class="doc-stat-tag error">有錯</span>'
+                    : '<span class="doc-stat-tag correct">正確</span>';
+                return `
+                    <div class="doc-stat-row">
+                        <div class="doc-stat-label">
+                            <span class="doc-stat-num">${i + 1}</span>
+                            ${tag}
+                        </div>
+                        <div class="doc-stat-bar-wrap">
+                            <div class="doc-stat-bar" style="width:${pct}%;background:${barColor};"></div>
+                        </div>
+                        <div class="doc-stat-pct">${count}人 (${pct}%)</div>
+                    </div>
+                `;
+            }).join('');
+
+            statsPanel.innerHTML = `
+                <div class="doc-stats-header">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">bar_chart</span>
+                    標記統計（共 ${totalStudents} 人作答）
+                </div>
+                ${statsHtml}
+            `;
+            statsPanel.style.display = 'block';
+        } catch (e) {
+            console.warn('[docViewer] stats load error:', e);
+        }
+    }
+
+    /**
+     * 載入統計資料（舊版 — 保留向下相容）
      */
     async _loadStats(elementId, anchors, overlay) {
         const statsPanel = overlay.querySelector('#docStatsPanel');

@@ -3609,3 +3609,117 @@
         transform: translateY(0);
     }
 }
+
+/* ═══ 文件檢視器 — 段落點擊式 ═══ */
+.doc-para-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #fef3c7, #fffbeb);
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    color: #92400e;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.doc-para-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.doc-para-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+    position: relative;
+}
+
+.doc-para-item:hover {
+    border-color: #f59e0b;
+    background: #fffbeb;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+}
+
+.doc-para-item.marked {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+.doc-para-item.revealed.is-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.doc-para-item.revealed.is-correct {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.doc-para-badge {
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.doc-para-item.marked .doc-para-badge {
+    background: #f59e0b;
+    color: white;
+}
+
+.doc-para-item.revealed.is-error .doc-para-badge {
+    background: #ef4444;
+    color: white;
+}
+
+.doc-para-item.revealed.is-correct .doc-para-badge {
+    background: #22c55e;
+    color: white;
+}
+
+.doc-para-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #334155;
+}
+
+.doc-para-mark {
+    flex-shrink: 0;
+    color: #cbd5e1;
+    transition: color 0.2s;
+}
+
+.doc-para-item.marked .doc-para-mark {
+    color: #f59e0b;
+}
+
+.doc-para-item:hover .doc-para-mark {
+    color: #94a3b8;
+}
+
+.doc-para-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
