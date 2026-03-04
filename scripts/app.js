@@ -3835,6 +3835,20 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             }
         });
 
+        // 強制同步按鈕
+        document.getElementById('presForceSync')?.addEventListener('click', () => {
+            if (!this.broadcasting || !this.sessionCode) return;
+            // 重新廣播目前投影片
+            this.broadcastSlideData(this.presentationIndex);
+            // 強制所有學員回到跟隨模式
+            realtime.publish(`session:${this.sessionCode}`, 'force_follow', {});
+            // 視覺回饋
+            const btn = document.getElementById('presForceSync');
+            btn.style.opacity = '1';
+            btn.style.color = '#22c55e';
+            setTimeout(() => { btn.style.opacity = '0.5'; btn.style.color = '#fff'; }, 1200);
+        });
+
         // 全螢幕切換
         if (fsToggle) {
             fsToggle.addEventListener('click', () => {
@@ -3904,9 +3918,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 }
                 this.exitPresentation();
             } else if (e.key === 'ArrowRight' || e.key === ' ') {
-                // 不在互動元素內才切換頁面
+                // 在文字輸入框內不攔截
                 const tag = document.activeElement?.tagName;
-                if (['INPUT', 'TEXTAREA', 'BUTTON', 'SELECT'].includes(tag)) return;
+                if (['INPUT', 'TEXTAREA'].includes(tag)) return;
+                // 如果焦點在按鈕上，先 blur
+                if (tag === 'BUTTON' || tag === 'SELECT') document.activeElement.blur();
                 e.preventDefault();
                 // 先顯示動畫步驟，全部顯示完再切下一頁
                 if (this._maxBuildStep > 0 && this._currentBuildStep < this._maxBuildStep) {
