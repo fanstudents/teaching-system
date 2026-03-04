@@ -3256,13 +3256,45 @@ export class SlideManager {
             } catch (_) { }
         }
 
-        // ── DB 備份（嘗試寫入 project_backups 表）──
+        // ── DB 備份（嘗試寫入 project_backups 表，只保留 20 筆）──
         if (this._db) {
+            // 去除 base64 圖片，避免備份表膨脹
+            const lightData = {
+                ...data,
+                slides: data.slides.map(s => ({
+                    ...s,
+                    elements: (s.elements || []).map(el => {
+                        if (el.type === 'image' && el.src?.startsWith('data:') && el.src.length > 1000) {
+                            return { ...el, src: '[backup-stripped]' };
+                        }
+                        return el;
+                    })
+                }))
+            };
+
             this._db.insert('project_backups', {
                 project_id: this.currentProjectId,
-                slides_data: data,
+                slides_data: lightData,
                 slide_count: this.slides.length,
                 created_at: new Date().toISOString()
+            }).then(() => {
+                // ★ 輪替：只保留最新 20 筆，刪除舊的
+                this._db.select('project_backups', {
+                    filter: { project_id: `eq.${this.currentProjectId}` },
+                    select: 'id',
+                    order: 'created_at.desc',
+                    limit: 100,
+                    offset: 20
+                }).then(({ data: old }) => {
+                    if (old?.length > 0) {
+                        const ids = old.map(r => r.id);
+                        this._db.delete('project_backups', {
+                            id: `in.(${ids.join(',')})`
+                        }).then(() => {
+                            console.log(`[Backup] 已清除 ${ids.length} 筆舊備份`);
+                        }).catch(() => { });
+                    }
+                }).catch(() => { });
             }).catch(() => {
                 // project_backups 表可能不存在，靜默失敗
             });
