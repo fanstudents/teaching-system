@@ -697,6 +697,9 @@
                             <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}&session=${s.session_code}" title="管理">
                                 <span class="material-symbols-outlined">settings</span>
                             </a>
+                            <button class="btn btn-sm" title="複製問卷連結" onclick="event.stopPropagation();navigator.clipboard.writeText(location.origin+'/survey.html?code=${s.session_code}').then(()=>showToast('問卷連結已複製：'+location.origin+'/survey.html?code=${s.session_code}'))">
+                                <span class="material-symbols-outlined">assignment_turned_in</span>
+                            </button>
                         </div>`;
                     }).join('')
                     : '<div class="tree-session tree-empty">尚無場次</div>';
