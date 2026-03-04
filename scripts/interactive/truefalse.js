@@ -33,12 +33,12 @@ export class TrueFalseGame {
         // 判斷是否為講師（簡報模式）
         const isPresenter = !!container.closest('.presentation-slide');
 
-        // 重新作答按鈕
+        // 重新作答按鈕（僅講師端）
         const resetBtn = document.createElement('button');
         resetBtn.className = 'interactive-reset-btn';
         resetBtn.innerHTML = '<span class="material-symbols-outlined">refresh</span>重新作答';
         container.style.position = 'relative';
-        container.appendChild(resetBtn);
+        if (isPresenter) container.appendChild(resetBtn);
 
         // 統計區（使用已有的 tf-stats-area）
         const statsArea = container.querySelector('.tf-stats-area');

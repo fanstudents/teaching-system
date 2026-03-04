@@ -154,6 +154,11 @@ class InteractionState {
             }
         }
 
+        // 加分動畫（非重複作答 + 有得分 + 非講師端）
+        if (!isRetry && awardedPoints > 0 && !document.querySelector('.presentation-slide')) {
+            this.showScorePopup(awardedPoints);
+        }
+
         return { isRetry };
     }
 
@@ -411,6 +416,22 @@ class InteractionState {
         } catch (e) {
             console.warn('[stateManager] play audio failed:', e);
         }
+    }
+
+    /**
+     * 顯示加分動畫
+     */
+    showScorePopup(points) {
+        const popup = document.createElement('div');
+        popup.className = 'score-popup';
+        popup.innerHTML = `
+            <div class="score-popup-inner">
+                <span class="material-symbols-outlined">star</span>
+                +${points} 分
+            </div>
+        `;
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 2000);
     }
 }
 

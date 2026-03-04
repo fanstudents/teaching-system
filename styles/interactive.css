@@ -2275,19 +2275,24 @@
 }
 
 .tf-result {
-    margin-top: 8px;
+    margin-top: 14px;
+    padding: 8px 12px;
     font-size: 15px;
     font-weight: 600;
     min-height: 20px;
     text-align: center;
+    border-radius: 8px;
+    clear: both;
 }
 
 .tf-result.success {
-    color: #22c55e;
+    color: #16a34a;
+    background: #f0fdf4;
 }
 
 .tf-result.error {
-    color: #ef4444;
+    color: #dc2626;
+    background: #fef2f2;
 }
 
 .tf-result.tf-pending {
@@ -4245,4 +4250,64 @@
 
 .link-card-arrow .material-symbols-outlined {
     font-size: 18px;
+}
+
+/* ========================================
+   加分動畫 — Score Popup
+   ======================================== */
+.score-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    z-index: 10000;
+    pointer-events: none;
+    animation: scorePopupAnim 1.8s ease forwards;
+}
+
+.score-popup-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #78350f;
+    border-radius: 24px;
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4),
+        0 0 0 3px rgba(251, 191, 36, 0.2);
+    font-family: 'Noto Sans TC', sans-serif;
+    white-space: nowrap;
+}
+
+.score-popup-inner .material-symbols-outlined {
+    font-size: 22px;
+    color: #92400e;
+}
+
+@keyframes scorePopupAnim {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    30% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translate(-50%, -60%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.8);
+    }
 }
