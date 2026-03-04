@@ -2353,6 +2353,21 @@ export class SlideManager {
                     this.saveNow();
                     this.renderThumbnails();
                 });
+
+                // ── 拖曳移動分組標籤 ──
+                header.draggable = true;
+                header.addEventListener('dragstart', (e) => {
+                    this._dragSectionIndex = index; // 記錄來源 startIndex
+                    this._dragIndex = undefined;    // 清除 slide drag
+                    header.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', `section:${index}`);
+                });
+                header.addEventListener('dragend', () => {
+                    header.classList.remove('dragging');
+                    this._dragSectionIndex = undefined;
+                });
+
                 this.slideListEl.appendChild(header);
             }
 
@@ -2389,6 +2404,30 @@ export class SlideManager {
             });
             thumb.addEventListener('drop', (e) => {
                 e.preventDefault();
+
+                // ── 分組標籤拖放 ──
+                if (this._dragSectionIndex !== undefined) {
+                    const fromIdx = this._dragSectionIndex;
+                    const toIdx = index;
+                    if (fromIdx === toIdx) { this.renderThumbnails(); return; }
+                    const sec = this.sections.find(s => s.startIndex === fromIdx);
+                    if (sec) {
+                        // 目標位置不能已有另一個 section
+                        const conflict = this.sections.find(s => s.startIndex === toIdx);
+                        if (conflict && conflict !== sec) {
+                            // swap positions
+                            conflict.startIndex = fromIdx;
+                        }
+                        sec.startIndex = toIdx;
+                        this.sections.sort((a, b) => a.startIndex - b.startIndex);
+                        this.saveNow();
+                        this.renderThumbnails();
+                    }
+                    this._dragSectionIndex = undefined;
+                    return;
+                }
+
+                // ── 投影片排序 ──
                 const fromIndex = this._dragIndex;
                 const rect = thumb.getBoundingClientRect();
                 const mid = rect.top + rect.height / 2;
