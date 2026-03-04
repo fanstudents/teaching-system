@@ -969,36 +969,41 @@
 .pair-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm);
+    gap: 4px;
+    padding: 6px;
     background: var(--bg-tertiary);
     border-radius: var(--radius-sm);
+    min-width: 0;
 }
 
 .pair-item input {
     flex: 1;
-    padding: 6px 10px;
+    min-width: 0;
+    padding: 5px 6px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     background: var(--bg-secondary);
     color: var(--text-primary);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
 }
 
 .pair-item .pair-arrow {
     color: var(--text-muted);
-    font-size: 1rem;
+    font-size: 0.85rem;
+    flex-shrink: 0;
 }
 
 .pair-item .remove-pair {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border: none;
     background: transparent;
     color: var(--accent-danger);
     cursor: pointer;
     border-radius: var(--radius-sm);
     transition: background 0.2s ease;
+    flex-shrink: 0;
+    font-size: 0.7rem;
 }
 
 .pair-item .remove-pair:hover {
