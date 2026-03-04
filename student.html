@@ -129,6 +129,39 @@
         </div>
     </div>
 
+    <!-- 學員 Q&A 按鈕 + 彈窗 -->
+    <button id="studentQABtn" title="提問" style="
+        position:fixed;bottom:124px;right:12px;z-index:200;width:36px;height:36px;
+        border-radius:50%;border:none;background:rgba(234,88,12,0.85);
+        backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
+        align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(234,88,12,0.3);
+    "><span class="material-symbols-outlined" style="font-size:20px;">forum</span></button>
+
+    <div id="studentQAPopup" style="
+        position:fixed;bottom:170px;right:12px;z-index:300;width:280px;
+        background:white;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);
+        padding:16px;display:none;flex-direction:column;gap:10px;
+    ">
+        <div style="font-size:14px;font-weight:600;color:#1e293b;display:flex;align-items:center;gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#ea580c;">question_answer</span>
+            提出問題
+        </div>
+        <textarea id="studentQAInput" rows="3" placeholder="輸入你的問題…" style="
+            width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;
+            font-size:14px;font-family:inherit;resize:none;outline:none;color:#1e293b;
+        "></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="studentQACancel" style="
+                padding:6px 14px;border-radius:6px;border:1px solid #e2e8f0;
+                background:white;color:#64748b;cursor:pointer;font-size:13px;font-family:inherit;
+            ">取消</button>
+            <button id="studentQASend" style="
+                padding:6px 14px;border-radius:6px;border:none;
+                background:#ea580c;color:white;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;
+            ">送出</button>
+        </div>
+    </div>
+
     <!-- 斷線提示 -->
     <div class="disconnected-overlay" id="disconnectedOverlay">
         <span class="material-symbols-outlined">wifi_off</span>
@@ -550,6 +583,45 @@
                     const isOpen = lbPanel.classList.toggle('open');
                     const pres = document.getElementById('studentPresentation');
                     pres.style.paddingRight = isOpen ? '260px' : '';
+                });
+
+                // ── Q&A 提問功能 ──
+                const qaBtn = document.getElementById('studentQABtn');
+                const qaPopup = document.getElementById('studentQAPopup');
+                qaBtn.style.display = 'flex';
+
+                qaBtn.addEventListener('click', () => {
+                    const isVisible = qaPopup.style.display === 'flex';
+                    qaPopup.style.display = isVisible ? 'none' : 'flex';
+                });
+
+                document.getElementById('studentQACancel').addEventListener('click', () => {
+                    qaPopup.style.display = 'none';
+                    document.getElementById('studentQAInput').value = '';
+                });
+
+                document.getElementById('studentQASend').addEventListener('click', () => {
+                    const input = document.getElementById('studentQAInput');
+                    const text = input.value.trim();
+                    if (!text) return;
+
+                    const questionId = `qa_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+                    realtime.publish(`session:${sessionCode}`, 'qa', {
+                        type: 'question',
+                        id: questionId,
+                        text: text,
+                        author: studentName || '匿名'
+                    });
+
+                    input.value = '';
+                    qaPopup.style.display = 'none';
+
+                    // 簡短回饋
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position:fixed;bottom:170px;right:12px;z-index:400;background:#059669;color:white;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+                    toast.textContent = '✓ 問題已送出';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 2000);
                 });
                 // 排行榜輪詢
                 async function updateStudentLeaderboard() {
