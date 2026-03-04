@@ -122,7 +122,7 @@
         backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
         align-items:center;justify-content:center;
     "><span class="material-symbols-outlined" style="font-size:20px;">leaderboard</span></button>
-    <div class="pres-leaderboard" id="studentLeaderboard" style="display:none;">
+    <div class="pres-leaderboard" id="studentLeaderboard">
         <div class="lb-header"><span class="lb-title">🏆 排行榜</span></div>
         <div class="lb-list" id="studentLbList">
             <div class="lb-empty">尚無學員互動</div>
@@ -451,6 +451,20 @@
                     document.getElementById('disconnectedOverlay').classList.add('active');
                 });
 
+                // 講師排行榜同步
+                realtime.on('leaderboard_toggle', (msg) => {
+                    const payload = msg.payload || msg;
+                    const lbPanel = document.getElementById('studentLeaderboard');
+                    const pres = document.getElementById('studentPresentation');
+                    if (payload.open) {
+                        lbPanel?.classList.add('open');
+                        if (pres) pres.style.paddingRight = '260px';
+                    } else {
+                        lbPanel?.classList.remove('open');
+                        if (pres) pres.style.paddingRight = '';
+                    }
+                });
+
                 // 頁面關閉時通知離線
                 window.addEventListener('beforeunload', () => {
                     realtime.publish(`session:${sessionCode}`, 'student_leave', {
@@ -498,11 +512,9 @@
                 const lbPanel = document.getElementById('studentLeaderboard');
                 lbToggle.style.display = 'flex';
                 lbToggle.addEventListener('click', () => {
-                    const open = lbPanel.style.display !== 'block';
-                    lbPanel.style.display = open ? 'block' : 'none';
+                    const isOpen = lbPanel.classList.toggle('open');
                     const pres = document.getElementById('studentPresentation');
-                    if (open) pres.style.paddingRight = '260px';
-                    else pres.style.paddingRight = '';
+                    pres.style.paddingRight = isOpen ? '260px' : '';
                 });
                 // 排行榜輪詢
                 async function updateStudentLeaderboard() {

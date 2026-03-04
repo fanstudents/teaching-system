@@ -2731,6 +2731,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const pm = document.getElementById('presentationMode');
             lb?.classList.toggle('open');
             pm?.classList.toggle('lb-active', lb?.classList.contains('open'));
+            // 通知學員端同步排行榜
+            if (this.sessionCode) {
+                realtime.publish(`session:${this.sessionCode}`, 'leaderboard_toggle', {
+                    open: lb?.classList.contains('open') || false
+                });
+            }
         });
     }
 
