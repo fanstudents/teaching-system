@@ -994,6 +994,29 @@ export class SlideManager {
                 }
                 break;
             }
+            case 'leaderboard': {
+                el.classList.add('leaderboard-element');
+                el.style.overflow = 'hidden';
+                const title = element.lbTitle || '🏆 排行榜';
+                // 在編輯模式用假資料，播放/廣播時載入真實資料
+                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                const placeholder = [
+                    { name: '冠軍同學', totalPoints: 850 },
+                    { name: '亞軍同學', totalPoints: 720 },
+                    { name: '季軍同學', totalPoints: 680 },
+                    { name: '同學 D', totalPoints: 550 },
+                    { name: '同學 E', totalPoints: 420 },
+                ];
+                this._renderLeaderboardContent(el, title, placeholder);
+                if (isLive && window.app?.sessionCode) {
+                    import('./interactive/stateManager.js').then(({ stateManager }) => {
+                        stateManager.getLeaderboard(window.app.sessionCode).then(data => {
+                            if (data.length > 0) this._renderLeaderboardContent(el, title, data);
+                        });
+                    });
+                }
+                break;
+            }
 
             case 'matching':
                 el.classList.add('interactive-element');
@@ -1907,6 +1930,75 @@ export class SlideManager {
         badge.className = 'element-score-badge';
         badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px;">stars</span> 1~${pts}分`;
         el.appendChild(badge);
+    }
+
+    /**
+     * 渲染排行榜內容（獎台 + 列表）
+     */
+    _renderLeaderboardContent(el, title, data) {
+        const medals = ['🥇', '🥈', '🥉'];
+        const podiumColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+        const podiumHeights = [140, 110, 90];
+        const podiumOrder = [1, 0, 2]; // 亞、冠、季（視覺位置）
+
+        const top3 = data.slice(0, 3);
+        const rest = data.slice(3, 10);
+
+        // 獎台 HTML (2nd, 1st, 3rd 排列)
+        let podiumHtml = '<div class="lb-podium">';
+        podiumOrder.forEach(rank => {
+            const s = top3[rank];
+            if (!s) {
+                podiumHtml += '<div class="lb-podium-slot lb-empty-slot"></div>';
+                return;
+            }
+            const h = podiumHeights[rank];
+            const color = podiumColors[rank];
+            const medal = medals[rank];
+            const nameStr = s.name?.length > 6 ? s.name.slice(0, 6) + '…' : (s.name || '—');
+            podiumHtml += `
+                <div class="lb-podium-slot">
+                    <div class="lb-podium-avatar" style="border-color:${color}">
+                        <span class="lb-medal">${medal}</span>
+                    </div>
+                    <div class="lb-podium-name">${nameStr}</div>
+                    <div class="lb-podium-pts">${s.totalPoints} 分</div>
+                    <div class="lb-podium-bar" style="height:${h}px;background:linear-gradient(135deg, ${color}40, ${color}20);border-top:3px solid ${color};">
+                        <span class="lb-podium-rank">${rank + 1}</span>
+                    </div>
+                </div>
+            `;
+        });
+        podiumHtml += '</div>';
+
+        // 列表 HTML
+        let listHtml = '';
+        if (rest.length > 0) {
+            listHtml = '<div class="lb-rest">';
+            rest.forEach((s, i) => {
+                const rank = i + 4;
+                listHtml += `
+                    <div class="lb-row">
+                        <span class="lb-row-rank">${rank}</span>
+                        <span class="lb-row-name">${s.name || '—'}</span>
+                        <span class="lb-row-pts">${s.totalPoints} 分</span>
+                    </div>
+                `;
+            });
+            listHtml += '</div>';
+        }
+
+        el.innerHTML = `
+            <div class="lb-widget">
+                <div class="lb-widget-title">
+                    <span class="lb-trophy">🏆</span>
+                    <span>${title}</span>
+                </div>
+                ${podiumHtml}
+                ${listHtml}
+                ${data.length === 0 ? '<div class="lb-no-data">尚無排行資料</div>' : ''}
+            </div>
+        `;
     }
 
     /**

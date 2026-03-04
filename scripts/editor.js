@@ -94,6 +94,20 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    addLeaderboard() {
+        const element = {
+            type: 'leaderboard',
+            x: 60,
+            y: 40,
+            width: 520,
+            height: 420,
+            lbTitle: '🏆 排行榜',
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
     /**
      * 新增形狀元素
      */

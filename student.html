@@ -390,6 +390,21 @@
                     joinedAt: new Date().toISOString()
                 }));
 
+                // ★ 預設「加入課堂」得 1 分 → 確保每位同學都出現在排行榜
+                try {
+                    const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                    await stateManager.save('_join_bonus', {
+                        type: 'join',
+                        title: '加入課堂',
+                        content: '出席獎勵',
+                        isCorrect: null,
+                        score: null,
+                        points: 1,
+                        participated: true,
+                        state: {}
+                    });
+                } catch (e) { console.warn('[Join] bonus point failed:', e); }
+
                 // 連線 Realtime（不阻塞主流程）
                 try {
                     await Promise.race([
@@ -766,6 +781,43 @@
                         e.stopPropagation();
                         window.open(linkUrl, '_blank');
                     });
+                    break;
+                }
+
+                case 'leaderboard': {
+                    el.classList.add('leaderboard-element');
+                    el.style.overflow = 'hidden';
+                    const lbTitle = element.lbTitle || '🏆 排行榜';
+                    // 先用 placeholder，然後載入真實資料
+                    const medals = ['🥇', '🥈', '🥉'];
+                    const pColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+                    const pHeights = [140, 110, 90];
+                    const pOrder = [1, 0, 2];
+                    const renderLB = (data) => {
+                        const top3 = data.slice(0, 3);
+                        const rest = data.slice(3, 10);
+                        let podium = '<div class="lb-podium">';
+                        pOrder.forEach(rank => {
+                            const s = top3[rank];
+                            if (!s) { podium += '<div class="lb-podium-slot lb-empty-slot"></div>'; return; }
+                            const nm = s.name?.length > 6 ? s.name.slice(0, 6) + '…' : (s.name || '—');
+                            podium += `<div class="lb-podium-slot"><div class="lb-podium-avatar" style="border-color:${pColors[rank]}"><span class="lb-medal">${medals[rank]}</span></div><div class="lb-podium-name">${nm}</div><div class="lb-podium-pts">${s.totalPoints} 分</div><div class="lb-podium-bar" style="height:${pHeights[rank]}px;background:linear-gradient(135deg,${pColors[rank]}40,${pColors[rank]}20);border-top:3px solid ${pColors[rank]};"><span class="lb-podium-rank">${rank + 1}</span></div></div>`;
+                        });
+                        podium += '</div>';
+                        let list = '';
+                        if (rest.length > 0) {
+                            list = '<div class="lb-rest">' + rest.map((s, i) => `<div class="lb-row"><span class="lb-row-rank">${i + 4}</span><span class="lb-row-name">${s.name || '—'}</span><span class="lb-row-pts">${s.totalPoints} 分</span></div>`).join('') + '</div>';
+                        }
+                        el.innerHTML = `<div class="lb-widget"><div class="lb-widget-title"><span class="lb-trophy">🏆</span><span>${lbTitle}</span></div>${podium}${list}${data.length === 0 ? '<div class="lb-no-data">尚無排行資料</div>' : ''}</div>`;
+                    };
+                    renderLB([]);
+                    // 載入真實資料
+                    const sc = new URLSearchParams(location.search).get('code') || '';
+                    if (sc) {
+                        import('./scripts/interactive/stateManager.js').then(({ stateManager }) => {
+                            stateManager.getLeaderboard(sc).then(d => renderLB(d));
+                        }).catch(() => { });
+                    }
                     break;
                 }
 

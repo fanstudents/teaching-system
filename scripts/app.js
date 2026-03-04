@@ -217,6 +217,11 @@ class App {
             this.editor.addLink();
         });
 
+        // 新增排行榜
+        document.getElementById('addLeaderboardBtn')?.addEventListener('click', () => {
+            this.editor.addLeaderboard();
+        });
+
         // 新增圖形
         document.getElementById('addShapeBtn').addEventListener('click', (e) => {
             this.showShapePicker(e.currentTarget);
