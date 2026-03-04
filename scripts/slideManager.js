@@ -665,7 +665,17 @@ export class SlideManager {
 
         this.currentIndex = index;
         this.renderCurrentSlide();
-        this.renderThumbnails();
+
+        // ★ 輕量更新：只切換 active class，不重建全部縮略圖
+        const thumbs = this.slideListEl.querySelectorAll('.slide-thumbnail');
+        thumbs.forEach((t, i) => {
+            t.classList.toggle('active', i === index);
+        });
+        // 滾動到可視範圍
+        if (thumbs[index]) {
+            thumbs[index].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+
         this.updateCounter();
     }
 
@@ -2870,7 +2880,12 @@ export class SlideManager {
             }
         }, 10000);
 
-        // ★ 頁面關閉前立即存檔（防止 debounce 中的資料遺失）
+        // ★ 每 15 分鐘自動備份
+        this._backupInterval = setInterval(() => {
+            this._createBackup();
+        }, 15 * 60 * 1000);
+
+        // ★ 頁面關閉前立即存檔 + 備份
         window.addEventListener('beforeunload', () => {
             if (this.currentProjectId && this.slides.length > 0) {
                 this.saveCurrentSlide();
@@ -2889,6 +2904,57 @@ export class SlideManager {
                 }
             }
         });
+    }
+
+    /**
+     * 建立備份快照（localStorage + DB 雙重備份）
+     */
+    _createBackup() {
+        if (!this.currentProjectId || this.slides.length <= 1) return;
+
+        this.saveCurrentSlide();
+        const data = {
+            slides: this.slides,
+            currentIndex: this.currentIndex,
+            savedAt: new Date().toISOString(),
+            slideCount: this.slides.length
+        };
+
+        // ── localStorage 備份（保留最近 3 份）──
+        const prefix = `backup_${this.currentProjectId}_`;
+        try {
+            // 取得現有備份
+            const existing = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.startsWith(prefix)) existing.push(key);
+            }
+            existing.sort();
+
+            // 刪除最舊的，只保留 2 份（加上新的就是 3 份）
+            while (existing.length >= 3) {
+                localStorage.removeItem(existing.shift());
+            }
+
+            // 存入新備份
+            const ts = new Date().toISOString().replace(/[:.]/g, '-');
+            localStorage.setItem(`${prefix}${ts}`, JSON.stringify(data));
+            console.log(`[Backup] localStorage 備份完成 (${this.slides.length} slides)`);
+        } catch (e) {
+            console.warn('[Backup] localStorage 備份失敗:', e.message);
+        }
+
+        // ── DB 備份（嘗試寫入 project_backups 表）──
+        if (this._db) {
+            this._db.insert('project_backups', {
+                project_id: this.currentProjectId,
+                slides_data: data,
+                slide_count: this.slides.length,
+                created_at: new Date().toISOString()
+            }).catch(() => {
+                // project_backups 表可能不存在，靜默失敗
+            });
+        }
     }
 
     /**

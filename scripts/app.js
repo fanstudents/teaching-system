@@ -3704,12 +3704,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this.slideManager.next();
             }
 
-            // Arrow Up / Arrow Down（切換投影片）
-            if (e.key === 'ArrowUp') {
+            // Arrow Up / Arrow Down（切換投影片 — 文字編輯中不觸發）
+            if (e.key === 'ArrowUp' && !this._isEditingText()) {
                 e.preventDefault();
                 this.slideManager.prev();
             }
-            if (e.key === 'ArrowDown') {
+            if (e.key === 'ArrowDown' && !this._isEditingText()) {
                 e.preventDefault();
                 this.slideManager.next();
             }
@@ -3775,6 +3775,20 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     /* =========================================
        Toast 通知
        ========================================= */
+    /**
+     * 檢查使用者是否正在編輯文字
+     */
+    _isEditingText() {
+        const active = document.activeElement;
+        if (!active) return false;
+        const tag = active.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+        if (active.contentEditable === 'true' || active.isContentEditable) return true;
+        // 編輯器中選取的文字元素
+        if (this.editor?.selectedElement?.dataset?.type === 'text') return true;
+        return false;
+    }
+
     showToast(message) {
         let toast = document.querySelector('.toast-notification');
         if (!toast) {
