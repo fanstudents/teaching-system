@@ -11,6 +11,11 @@ const POLL_INTERVAL = 5000;
 const TYPE_ICONS = { quiz: 'quiz', poll: 'how_to_vote', matching: 'drag_indicator', ordering: 'format_list_numbered', fillblank: 'edit_note', truefalse: 'check_circle', opentext: 'chat', scale: 'linear_scale', buzzer: 'notifications_active', wordcloud: 'cloud', hotspot: 'my_location' };
 const TYPE_LABELS = { quiz: '\u9078\u64C7\u984C', poll: '\u6295\u7968', matching: '\u9023\u9023\u770B', ordering: '\u6392\u5217\u9806\u5E8F', fillblank: '\u586B\u7A7A\u984C', truefalse: '\u662F\u975E\u984C', opentext: '\u958B\u653E\u554F\u7B54', scale: '\u91CF\u8868\u8A55\u5206', buzzer: '\u6436\u7B54', wordcloud: '\u6587\u5B57\u96F2', hotspot: '\u5716\u7247\u6A19\u8A3B' };
 
+// Helper: handle is_correct as both boolean and string
+function isCorrectTrue(v) { return v === true || v === 'true'; }
+function isCorrectFalse(v) { return v === false || v === 'false'; }
+function isCorrectGraded(v) { return v !== null && v !== undefined && v !== ''; }
+
 // ── State ──
 let currentSessionCode = '';
 let allSessions = [];           // { session_code, date, venue, ... }
@@ -76,11 +81,18 @@ export async function init() {
 // ══════════════════════
 async function loadSessions() {
     try {
-        const { data } = await db.select('project_sessions', {
-            select: 'id,session_code,join_code,date,venue,status',
-            order: 'date.desc',
+        const { data } = await db.select('sessions', {
+            select: 'id,session_code,title,is_broadcasting,created_at',
+            order: 'created_at.desc',
         });
-        allSessions = data || [];
+        allSessions = (data || []).map(s => ({
+            ...s,
+            session_code: s.session_code,
+            join_code: s.session_code,
+            status: s.is_broadcasting === 'true' || s.is_broadcasting === true ? 'active' : 'ended',
+            date: s.created_at ? new Date(s.created_at).toISOString().slice(0, 10) : '',
+            venue: '',
+        }));
 
         const sel = document.getElementById('sessionSelect');
         sel.innerHTML = '';
@@ -89,8 +101,8 @@ async function loadSessions() {
             return;
         }
         allSessions.forEach(s => {
-            const code = s.session_code || s.join_code || '';
-            const label = (s.date || '') + (s.venue ? ' \u00B7 ' + s.venue : '') + (s.status === 'active' ? '' : ' (\u5DF2\u7D50\u675F)');
+            const code = s.session_code || '';
+            const label = (s.title || '') + (s.date ? ' \u00B7 ' + s.date : '') + (s.status === 'active' ? ' \uD83D\uDFE2' : '');
             const opt = document.createElement('option');
             opt.value = code;
             opt.textContent = label || code;
@@ -135,13 +147,40 @@ async function loadOnlineStudents() {
 // ══════════════════════
 async function loadProjectSlides() {
     try {
-        const { data: projects } = await db.select('projects', {
+        // 嘗試用 join_code 找 project
+        let projects = [];
+        const { data: byJoinCode } = await db.select('projects', {
             filter: { join_code: 'eq.' + currentSessionCode },
             select: 'id,name,slides_data',
             limit: 1,
         });
-        if (projects && projects.length > 0 && projects[0].slides_data) {
-            slides = projects[0].slides_data.slides || [];
+        projects = byJoinCode || [];
+
+        // 如果找不到，嘗試從 sessions 取 project_id
+        if (projects.length === 0) {
+            try {
+                const { data: sessRows } = await db.select('sessions', {
+                    filter: { session_code: 'eq.' + currentSessionCode },
+                    select: 'project_id',
+                    limit: 1,
+                });
+                const pid = sessRows?.[0]?.project_id;
+                if (pid) {
+                    const { data: byId } = await db.select('projects', {
+                        filter: { id: 'eq.' + pid },
+                        select: 'id,name,slides_data',
+                        limit: 1,
+                    });
+                    projects = byId || [];
+                }
+            } catch { /* no project_id column, skip */ }
+        }
+
+        if (projects.length > 0 && projects[0].slides_data) {
+            const sd = typeof projects[0].slides_data === 'string'
+                ? JSON.parse(projects[0].slides_data)
+                : projects[0].slides_data;
+            slides = sd.slides || [];
             document.getElementById('dashProjectName').textContent = projects[0].name || '\u8AB2\u5802\u5100\u8868\u677F';
             extractInteractiveElements();
         } else {
@@ -283,8 +322,8 @@ function renderScoreBody(el) {
         const name = studentNames[email] || email.split('@')[0];
         let cls, icon, score;
         if (!r) { cls = 'status-pending'; icon = '\u23F3'; score = ''; }
-        else if (r.is_correct === true) { cls = 'status-correct'; icon = '\u2713'; score = r.content || ''; }
-        else if (r.is_correct === false) { cls = 'status-wrong'; icon = '\u2717'; score = r.content || ''; }
+        else if (isCorrectTrue(r.is_correct)) { cls = 'status-correct'; icon = '\u2713'; score = r.content || ''; }
+        else if (isCorrectFalse(r.is_correct)) { cls = 'status-wrong'; icon = '\u2717'; score = r.content || ''; }
         else { cls = 'status-voted'; icon = '\uD83D\uDCDD'; score = r.content || ''; }
         html += '<div class="dash-student"><div class="dash-student-status ' + cls + '">' + icon + '</div><div class="dash-student-name">' + esc(name) + '</div>' + (score ? '<div class="dash-student-score">' + esc(score) + '</div>' : '') + '</div>';
     });
@@ -320,7 +359,7 @@ function renderProgress(el) {
     const total = onlineStudents.size;
     if (!total) return '';
     const answered = Object.keys(subs).filter(e => onlineStudents.has(e)).length;
-    const correct = Object.values(subs).filter(s => onlineStudents.has(s.student_email) && s.is_correct === true).length;
+    const correct = Object.values(subs).filter(s => onlineStudents.has(s.student_email) && isCorrectTrue(s.is_correct)).length;
     const pct = Math.round(correct / total * 100);
     return '<div class="dash-card-progress"><div class="dash-progress-bar"><div class="dash-progress-fill green" style="width:' + pct + '%"></div></div><div class="dash-progress-text">' + answered + '/' + total + ' \u5DF2\u7B54 \u00B7 ' + correct + ' \u7B54\u5C0D (' + pct + '%)</div></div>';
 }
@@ -360,8 +399,8 @@ function renderMatrixView() {
                 answered++;
                 const content = sub.content || '';
                 const tip = esc(name) + ': ' + esc(content.length > 60 ? content.slice(0, 60) + '...' : content);
-                if (sub.is_correct === true) { correct++; graded++; row += '<td class="matrix-cell matrix-correct" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2713</td>'; }
-                else if (sub.is_correct === false) { graded++; row += '<td class="matrix-cell matrix-wrong" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2717</td>'; }
+                if (isCorrectTrue(sub.is_correct)) { correct++; graded++; row += '<td class="matrix-cell matrix-correct" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2713</td>'; }
+                else if (isCorrectFalse(sub.is_correct)) { graded++; row += '<td class="matrix-cell matrix-wrong" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2717</td>'; }
                 else { row += '<td class="matrix-cell matrix-voted" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2713</td>'; }
             } else { row += '<td class="matrix-cell matrix-pending">\u23F3</td>'; }
         });
@@ -508,7 +547,7 @@ async function renderCompareView() {
                 const subs = sd.subs.filter(s => s.element_id === eid);
                 if (subs.length > 0) {
                     let correct = 0, graded = 0;
-                    subs.forEach(s => { if (s.is_correct !== null && s.is_correct !== undefined) { graded++; if (s.is_correct) correct++; } });
+                    subs.forEach(s => { if (isCorrectGraded(s.is_correct)) { graded++; if (isCorrectTrue(s.is_correct)) correct++; } });
                     if (graded > 0) {
                         const rate = Math.round(correct / graded * 100);
                         const clr = rate >= 80 ? 'var(--dash-success)' : rate >= 50 ? 'var(--dash-warning)' : 'var(--dash-danger)';
@@ -526,7 +565,7 @@ async function renderCompareView() {
     tbody += '<tr style="border-top:2px solid var(--dash-border);font-weight:700;"><td style="text-align:left;">\u6574\u9AD4</td><td></td>';
     sessionData.forEach(sd => {
         let correct = 0, graded = 0;
-        sd.subs.forEach(s => { if (s.is_correct !== null && s.is_correct !== undefined) { graded++; if (s.is_correct) correct++; } });
+        sd.subs.forEach(s => { if (isCorrectGraded(s.is_correct)) { graded++; if (isCorrectTrue(s.is_correct)) correct++; } });
         const rate = graded > 0 ? Math.round(correct / graded * 100) + '%' : '-';
         const cur = sd.code === currentSessionCode;
         tbody += '<td' + (cur ? ' style="background:#f8fbff;"' : '') + '>' + rate + '<br><span style="font-weight:400;font-size:0.65rem;color:#8b949e;">' + sd.subs.length + '\u7B46</span></td>';
@@ -564,7 +603,7 @@ function updateStats() {
         Object.values(byS).forEach(s => {
             if (onlineStudents.has(s.student_email)) {
                 totalAnswered++;
-                if (s.is_correct !== null && s.is_correct !== undefined) { totalSubs++; if (s.is_correct) totalCorrect++; }
+                if (isCorrectGraded(s.is_correct)) { totalSubs++; if (isCorrectTrue(s.is_correct)) totalCorrect++; }
             }
         });
     });
