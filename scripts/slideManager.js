@@ -3006,11 +3006,8 @@ export class SlideManager {
             if (result.error) {
                 console.error('[SaveDB] ❌ DB returned error:', result.error);
                 this._showSaveError('資料庫儲存失敗：' + (result.error?.message || JSON.stringify(result.error)));
-            } else if (!result.data || result.data.length === 0) {
-                console.error('[SaveDB] ❌ DB returned empty data (no rows matched?):', result);
-                this._showSaveError('儲存失敗：找不到對應的專案記錄');
             } else {
-                console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, rows: result.data.length });
+                console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, rows: result.data?.length ?? 0 });
                 this._lastSaveOk = true;
             }
         } catch (e) {
