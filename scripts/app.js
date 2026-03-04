@@ -1516,6 +1516,7 @@ class App {
 
             const baseUrl = location.origin + location.pathname.replace(/\/[^/]*$/, '/');
             const portalUrl = `${baseUrl}portal.html?code=${proj.joinCode}`;
+            const directUrl = `${baseUrl}student.html?code=${proj.joinCode}`;
             const phaseLabels = { 'pre-class': '課前準備', 'in-class': '課程進行中', 'post-class': '課後回顧' };
             const currentPhase = proj.currentPhase || 'pre-class';
 
@@ -1534,7 +1535,7 @@ class App {
                     <div style="
                         background:#fff;border-radius:16px;padding:28px 24px;
                         max-width:480px;width:92%;box-shadow:0 12px 40px rgba(0,0,0,0.15);
-                        font-family:'Noto Sans TC',sans-serif;
+                        font-family:'Noto Sans TC',sans-serif;max-height:90vh;overflow-y:auto;
                     ">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
                             <span style="font-size:1.1rem;font-weight:700;">📎 學員入口連結</span>
@@ -1544,8 +1545,8 @@ class App {
                             <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">Join Code</label>
                             <div style="font-size:2rem;font-weight:800;letter-spacing:6px;color:#1a1a2e;text-align:center;padding:8px 0;">${proj.joinCode}</div>
                         </div>
-                        <div style="margin-bottom:20px;">
-                            <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">入口網址</label>
+                        <div style="margin-bottom:16px;">
+                            <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">入口網址（課堂入口）</label>
                             <div style="display:flex;gap:8px;">
                                 <input id="shareUrlInput" readonly value="${portalUrl}" style="
                                     flex:1;padding:9px 12px;border:2px solid #e2e8f0;border-radius:8px;
@@ -1553,6 +1554,20 @@ class App {
                                 ">
                                 <button id="copyUrlBtn" style="
                                     padding:9px 16px;background:#1a1a2e;
+                                    color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;
+                                    font-size:0.85rem;white-space:nowrap;
+                                ">複製</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">📺 直達簡報連結<span style="font-weight:400;color:#94a3b8;margin-left:6px;">不需廣播即可觀看</span></label>
+                            <div style="display:flex;gap:8px;">
+                                <input id="shareDirectInput" readonly value="${directUrl}" style="
+                                    flex:1;padding:9px 12px;border:2px solid #e2e8f0;border-radius:8px;
+                                    font-size:0.85rem;font-family:monospace;background:#f8f9fa;color:#334155;
+                                ">
+                                <button id="copyDirectBtn" style="
+                                    padding:9px 16px;background:#6366f1;
                                     color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;
                                     font-size:0.85rem;white-space:nowrap;
                                 ">複製</button>
@@ -1580,7 +1595,7 @@ class App {
             modal.querySelector('#shareModalClose').addEventListener('click', () => modal.remove());
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 
-            // Copy
+            // Copy portal URL
             modal.querySelector('#copyUrlBtn').addEventListener('click', () => {
                 navigator.clipboard.writeText(portalUrl).then(() => {
                     this.showToast('已複製入口連結');
@@ -1588,6 +1603,17 @@ class App {
                     modal.querySelector('#shareUrlInput').select();
                     document.execCommand('copy');
                     this.showToast('已複製入口連結');
+                });
+            });
+
+            // Copy direct presentation URL
+            modal.querySelector('#copyDirectBtn').addEventListener('click', () => {
+                navigator.clipboard.writeText(directUrl).then(() => {
+                    this.showToast('已複製直達簡報連結');
+                }).catch(() => {
+                    modal.querySelector('#shareDirectInput').select();
+                    document.execCommand('copy');
+                    this.showToast('已複製直達簡報連結');
                 });
             });
 
