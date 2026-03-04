@@ -38,7 +38,7 @@ class App {
         this.iconLibrary = new IconLibrary(this.slideManager);
         this.matchingGame = new MatchingGame();
         this.fillBlank = new FillBlank();
-        this.cardCopy = new CardCopy();
+        this.cardCopy = new CardCopy(this.slideManager);
         this.showcase = new Showcase(this.slideManager);
         this.ordering = new OrderingGame();
         this.quiz = new QuizGame();

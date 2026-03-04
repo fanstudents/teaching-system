@@ -3143,28 +3143,41 @@ export class SlideManager {
             slideCount: this.slides.length
         };
 
-        // ── localStorage 備份（保留最近 3 份）──
+        // ── localStorage 備份（只保留 1 份，去除 base64 圖片避免爆容量）──
         const prefix = `backup_${this.currentProjectId}_`;
         try {
-            // 取得現有備份
+            // 清除所有舊備份
             const existing = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key?.startsWith(prefix)) existing.push(key);
             }
-            existing.sort();
+            existing.forEach(k => localStorage.removeItem(k));
 
-            // 刪除最舊的，只保留 2 份（加上新的就是 3 份）
-            while (existing.length >= 3) {
-                localStorage.removeItem(existing.shift());
-            }
+            // 去除 base64 圖片 src（太大會爆 localStorage 5MB 配額）
+            const lightSlides = data.slides.map(s => ({
+                ...s,
+                elements: (s.elements || []).map(el => {
+                    if (el.type === 'image' && el.src?.startsWith('data:')) {
+                        return { ...el, src: '[base64-stripped]' };
+                    }
+                    return el;
+                })
+            }));
+            const lightData = { ...data, slides: lightSlides };
 
-            // 存入新備份
             const ts = new Date().toISOString().replace(/[:.]/g, '-');
-            localStorage.setItem(`${prefix}${ts}`, JSON.stringify(data));
+            localStorage.setItem(`${prefix}${ts}`, JSON.stringify(lightData));
             console.log(`[Backup] localStorage 備份完成 (${this.slides.length} slides)`);
         } catch (e) {
             console.warn('[Backup] localStorage 備份失敗:', e.message);
+            // 超出配額就清除所有備份
+            try {
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const k = localStorage.key(i);
+                    if (k?.startsWith('backup_')) localStorage.removeItem(k);
+                }
+            } catch (_) { }
         }
 
         // ── DB 備份（嘗試寫入 project_backups 表）──
