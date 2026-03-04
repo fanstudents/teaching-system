@@ -656,8 +656,7 @@
         const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
-            const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
-            if (!sessionCode || !hasInteractive) {
+            if (!sessionCode) {
                 if (qrEl) qrEl.style.display = 'none';
                 return;
             }
@@ -1097,6 +1096,21 @@
                             const matchedAssignment = sessionAssignments.find(a => a.title === element.title);
                             const userObj = typeof currentUser === 'string' ? { name: currentUser } : currentUser;
                             await homework.submit(element.title || '課堂作業', type, content, userObj, matchedAssignment?.id || element.id);
+
+                            // 繳交作業也計分
+                            if (stateManager) {
+                                try {
+                                    await stateManager.save(element.id, {
+                                        type: 'homework',
+                                        answer: type,
+                                        isCorrect: null,
+                                        participated: true,
+                                        points: element.points || 10,
+                                        score: 100
+                                    });
+                                } catch (e) { console.warn('[HW] score save err:', e); }
+                            }
+
                             el.querySelector('.hw-inline-form').style.display = 'none';
                             el.querySelector('.hw-submitted-badge').style.display = 'flex';
                             homework.showSuccessToast();
