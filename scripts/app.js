@@ -3250,8 +3250,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     // ═══════════ QR Code Overlay ═══════════
     updateQRCode() {
         let qrEl = document.getElementById('presQRCode');
+        const slide = this.slideManager.slides[this.presentationIndex];
+        const hasInteractive = slide?.elements?.some(el =>
+            ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud',
+                'hotspot', 'matching', 'fillblank', 'ordering', 'homework'].includes(el.type));
 
-        if (!this.broadcasting || !this.sessionCode) {
+        if (!this.broadcasting || !this.sessionCode || !hasInteractive) {
             if (qrEl) qrEl.style.display = 'none';
             return;
         }

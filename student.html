@@ -653,10 +653,11 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
-            if (!sessionCode) {
+            const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
+            if (!sessionCode || !hasInteractive) {
                 if (qrEl) qrEl.style.display = 'none';
                 return;
             }
