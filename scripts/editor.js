@@ -121,43 +121,69 @@ export class Editor {
     }
 
     /**
-     * 處理圖片上傳
+     * 處理圖片上傳 — 壓縮 + 上傳到 Storage（fallback base64）
      */
-    handleImageUpload(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                // 等比縮放圖片
-                let width = img.width;
-                let height = img.height;
-                const maxWidth = 400;
-                const maxHeight = 300;
+    async handleImageUpload(file) {
+        // 讀取原始圖片取得尺寸
+        const dataUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.readAsDataURL(file);
+        });
+        const img = await new Promise((resolve) => {
+            const i = new Image();
+            i.onload = () => resolve(i);
+            i.src = dataUrl;
+        });
 
-                if (width > maxWidth) {
-                    height = (height / width) * maxWidth;
-                    width = maxWidth;
-                }
-                if (height > maxHeight) {
-                    width = (width / height) * maxHeight;
-                    height = maxHeight;
-                }
+        // 元素尺寸（在 canvas 上顯示的大小）
+        let width = img.width;
+        let height = img.height;
+        const maxWidth = 400;
+        const maxHeight = 300;
+        if (width > maxWidth) { height = (height / width) * maxWidth; width = maxWidth; }
+        if (height > maxHeight) { width = (width / height) * maxHeight; height = maxHeight; }
 
-                const element = {
-                    type: 'image',
-                    x: 100,
-                    y: 100,
-                    width: width,
-                    height: height,
-                    src: e.target.result
-                };
+        // ── 壓縮圖片（max 1200px, JPEG 0.7）避免 base64 過大 ──
+        const MAX_DIM = 1200;
+        let cw = img.width, ch = img.height;
+        if (cw > MAX_DIM || ch > MAX_DIM) {
+            if (cw > ch) { ch = Math.round(ch * MAX_DIM / cw); cw = MAX_DIM; }
+            else { cw = Math.round(cw * MAX_DIM / ch); ch = MAX_DIM; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = cw;
+        canvas.height = ch;
+        canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        const compressedBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.7));
+        const compressedUrl = canvas.toDataURL('image/jpeg', 0.7);
+        console.log(`[Image] original ${(file.size / 1024).toFixed(0)}KB → compressed ${(compressedBlob.size / 1024).toFixed(0)}KB (${cw}x${ch})`);
 
-                this.slideManager.addElement(element);
-                this.selectElementById(element.id);
-            };
-            img.src = e.target.result;
+        // ── 嘗試上傳到 Supabase Storage ──
+        let src = compressedUrl; // fallback = compressed base64
+        try {
+            const { storage } = await import('./supabase.js');
+            const key = `images/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+            const result = await storage.upload('slides', key, compressedBlob);
+            if (result.data?.url) {
+                src = result.data.url;
+                console.log('[Image] uploaded to Storage:', src);
+            }
+        } catch (e) {
+            console.warn('[Image] Storage upload failed, using compressed base64:', e.message);
+        }
+
+        const element = {
+            type: 'image',
+            x: 100,
+            y: 100,
+            width,
+            height,
+            src
         };
-        reader.readAsDataURL(file);
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
     }
 
     /**
