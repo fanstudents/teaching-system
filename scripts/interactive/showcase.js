@@ -42,8 +42,14 @@ export class Showcase {
         console.log('[Showcase] setupContainer title:', title, 'sessionCode:', this.sessionCode);
         if (!title) return;
 
+        // 每個容器有唯一 ID，避免多個同 title 容器互相覆蓋 hash
+        if (!container._showcaseId) {
+            container._showcaseId = title + '_' + Math.random().toString(36).substr(2, 6);
+        }
+        const cid = container._showcaseId;
+
         // 清除舊 hash，確保新容器一定會渲染
-        if (this._lastDataHash) delete this._lastDataHash[title];
+        if (this._lastDataHash) delete this._lastDataHash[cid];
 
         container.innerHTML = `
             <div class="showcase-loading">
@@ -53,15 +59,16 @@ export class Showcase {
 
         await this.fetchAndRender(container, title);
 
-        if (this.pollingTimers[title]) clearInterval(this.pollingTimers[title]);
+        if (this.pollingTimers[cid]) clearInterval(this.pollingTimers[cid]);
         const timerId = setInterval(() => this.fetchAndRender(container, title), 5000);
-        this.pollingTimers[title] = timerId;
+        this.pollingTimers[cid] = timerId;
     }
 
     /**
      * 從 DB 拉取並渲染
      */
     async fetchAndRender(container, assignmentTitle) {
+        const cid = container._showcaseId || assignmentTitle;
         try {
             let { data, error } = await db.select('submissions', {
                 filter: { assignment_title: `eq.${assignmentTitle}` },
@@ -99,11 +106,11 @@ export class Showcase {
 
             // 比較資料是否有變化，沒變就不重新渲染（避免重設捲動位置）
             const dataHash = JSON.stringify(data.map(s => s.id + (s.submitted_at || '')));
-            if (this._lastDataHash && this._lastDataHash[assignmentTitle] === dataHash) {
+            if (this._lastDataHash && this._lastDataHash[cid] === dataHash) {
                 return; // 資料沒變，跳過
             }
             if (!this._lastDataHash) this._lastDataHash = {};
-            this._lastDataHash[assignmentTitle] = dataHash;
+            this._lastDataHash[cid] = dataHash;
 
             this.cache[assignmentTitle] = data;
             console.log('[Showcase] submissions for', assignmentTitle, data);
