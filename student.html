@@ -1062,7 +1062,7 @@
                     // 提交
                     const hwSubmitBtn = el.querySelector('.hw-submit-btn');
                     if (hwSubmitBtn) {
-                        hwSubmitBtn.addEventListener('click', (e) => {
+                        hwSubmitBtn.addEventListener('click', async (e) => {
                             e.stopPropagation();
                             // 直接使用已登入的 studentName
                             const currentUser = studentName || homework.getUser() || '匿名';
@@ -1095,7 +1095,8 @@
                                 }
                             }
                             const matchedAssignment = sessionAssignments.find(a => a.title === element.title);
-                            homework.submit(element.title || '課堂作業', type, content, currentUser, matchedAssignment?.id || element.id);
+                            const userObj = typeof currentUser === 'string' ? { name: currentUser } : currentUser;
+                            await homework.submit(element.title || '課堂作業', type, content, userObj, matchedAssignment?.id || element.id);
                             el.querySelector('.hw-inline-form').style.display = 'none';
                             el.querySelector('.hw-submitted-badge').style.display = 'flex';
                             homework.showSuccessToast();
