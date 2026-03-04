@@ -21,6 +21,7 @@ export class Showcase {
      */
     init() {
         this.destroy();
+        this._lastDataHash = {};  // 強制重新渲染
         const containers = document.querySelectorAll('.showcase-container');
         containers.forEach(c => this.setupContainer(c));
     }
