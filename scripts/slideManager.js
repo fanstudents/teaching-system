@@ -7,6 +7,7 @@ export class SlideManager {
     constructor() {
         SlideManager._instance = this;
         this.slides = [];
+        this.sections = []; // [{ name, startIndex }]
         this.currentIndex = 0;
         this.slideListEl = document.getElementById('slideList');
 
@@ -592,6 +593,7 @@ export class SlideManager {
 
         if (insertAfterCurrent && this.slides.length > 0) {
             this.slides.splice(this.currentIndex + 1, 0, slide);
+            this._adjustSectionIndices(this.currentIndex + 1, 1);
             this.navigateTo(this.currentIndex + 1);
         } else {
             this.slides.push(slide);
@@ -615,6 +617,7 @@ export class SlideManager {
         }
 
         this.slides.splice(index, 1);
+        this._adjustSectionIndices(index, -1);
 
         // 調整當前索引
         if (this.currentIndex >= this.slides.length) {
@@ -2270,7 +2273,51 @@ export class SlideManager {
     renderThumbnails() {
         this.slideListEl.innerHTML = '';
 
+        // 建立 section startIndex → section 的對照
+        const sectionMap = new Map();
+        (this.sections || []).forEach(s => sectionMap.set(s.startIndex, s));
+
         this.slides.forEach((slide, index) => {
+            // 如果此 index 有 section header，先插入
+            if (sectionMap.has(index)) {
+                const sec = sectionMap.get(index);
+                const header = document.createElement('div');
+                header.className = 'slide-section-header';
+                header.dataset.startIndex = index;
+                header.innerHTML = `
+                    <span class="section-color-bar"></span>
+                    <span class="section-name" title="雙擊編輯">${sec.name || '未命名分組'}</span>
+                    <button class="section-remove-btn" title="移除分組標頭">×</button>
+                `;
+                // 雙擊編輯名稱
+                header.querySelector('.section-name').addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    const nameEl = e.target;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = sec.name || '';
+                    input.className = 'section-name-input';
+                    nameEl.replaceWith(input);
+                    input.focus();
+                    input.select();
+                    const commit = () => {
+                        sec.name = input.value.trim() || '未命名分組';
+                        this.saveNow();
+                        this.renderThumbnails();
+                    };
+                    input.addEventListener('blur', commit);
+                    input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') input.blur(); });
+                });
+                // 刪除分組
+                header.querySelector('.section-remove-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.sections = this.sections.filter(s => s.startIndex !== index);
+                    this.saveNow();
+                    this.renderThumbnails();
+                });
+                this.slideListEl.appendChild(header);
+            }
+
             const thumb = document.createElement('div');
             thumb.className = `slide-thumbnail ${index === this.currentIndex ? 'active' : ''}`;
             thumb.dataset.index = index;
@@ -2577,9 +2624,15 @@ export class SlideManager {
                 <div class="context-menu-item danger" data-action="delete-multi">🗑 刪除 ${count} 張投影片</div>
             `;
         } else {
+            const hasSection = (this.sections || []).some(s => s.startIndex === index);
             menu.innerHTML = `
                 <div class="context-menu-item" data-action="duplicate">📋 複製投影片</div>
                 <div class="context-menu-item" data-action="insert">➕ 插入新投影片</div>
+                <div class="context-menu-divider"></div>
+                ${hasSection
+                    ? '<div class="context-menu-item" data-action="remove-section">🏷️ 移除分組標頭</div>'
+                    : '<div class="context-menu-item" data-action="add-section">🏷️ 新增分組標頭</div>'
+                }
                 <div class="context-menu-divider"></div>
                 <div class="context-menu-item danger" data-action="delete">🗑 刪除</div>
             `;
@@ -2598,6 +2651,10 @@ export class SlideManager {
                 this.deleteSlide(index);
             } else if (action === 'delete-multi') {
                 this.deleteSelectedSlides();
+            } else if (action === 'add-section') {
+                this.addSection(index);
+            } else if (action === 'remove-section') {
+                this.removeSection(index);
             }
             menu.remove();
         });
@@ -2606,6 +2663,62 @@ export class SlideManager {
         setTimeout(() => {
             document.addEventListener('click', () => menu.remove(), { once: true });
         }, 10);
+    }
+
+    // ── Section 管理 ──
+
+    addSection(slideIndex, name) {
+        if (!this.sections) this.sections = [];
+        // 避免重複
+        if (this.sections.some(s => s.startIndex === slideIndex)) return;
+        const defaultName = prompt('請輸入分組名稱：', '新分組');
+        if (defaultName === null) return; // 使用者取消
+        this.sections.push({ name: defaultName || '新分組', startIndex: slideIndex });
+        this.sections.sort((a, b) => a.startIndex - b.startIndex);
+        this.saveNow();
+        this.renderThumbnails();
+    }
+
+    removeSection(slideIndex) {
+        this.sections = (this.sections || []).filter(s => s.startIndex !== slideIndex);
+        this.saveNow();
+        this.renderThumbnails();
+    }
+
+    getSectionForSlide(slideIndex) {
+        if (!this.sections || this.sections.length === 0) return null;
+        let current = null;
+        for (const sec of this.sections) {
+            if (sec.startIndex <= slideIndex) {
+                current = sec;
+            } else {
+                break;
+            }
+        }
+        if (!current) return null;
+        // 計算組內位置
+        const nextSec = this.sections.find(s => s.startIndex > current.startIndex);
+        const endIndex = nextSec ? nextSec.startIndex : this.slides.length;
+        const posInSection = slideIndex - current.startIndex + 1;
+        const sectionTotal = endIndex - current.startIndex;
+        return { name: current.name, pos: posInSection, total: sectionTotal, startIndex: current.startIndex };
+    }
+
+    /** 投影片增刪時更新 section indices */
+    _adjustSectionIndices(changeIndex, delta) {
+        if (!this.sections) return;
+        this.sections.forEach(s => {
+            if (s.startIndex >= changeIndex) {
+                s.startIndex = Math.max(0, s.startIndex + delta);
+            }
+        });
+        // 去重
+        const seen = new Set();
+        this.sections = this.sections.filter(s => {
+            if (seen.has(s.startIndex)) return false;
+            seen.add(s.startIndex);
+            return true;
+        });
     }
 
     /**
@@ -2680,6 +2793,7 @@ export class SlideManager {
 
         const data = {
             slides: this.slides,
+            sections: this.sections,
             currentIndex: this.currentIndex,
             savedAt: new Date().toISOString()
         };
@@ -2876,6 +2990,7 @@ export class SlideManager {
 
         if (chosen && chosen.slides && chosen.slides.length > 0) {
             this.slides = chosen.slides;
+            this.sections = chosen.sections || [];
             this.currentIndex = chosen.currentIndex || 0;
             this.renderThumbnails();
             this.renderCurrentSlide();
@@ -3223,6 +3338,7 @@ export class SlideManager {
         try {
             const data = JSON.parse(jsonString);
             this.slides = data.slides || [];
+            this.sections = data.sections || [];
             this.currentIndex = 0;
 
             if (this.slides.length === 0) {

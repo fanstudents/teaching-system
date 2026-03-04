@@ -3584,6 +3584,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             counter.textContent = `${this.presentationIndex + 1} / ${this.slideManager.slides.length}`;
         }
 
+        // 更新分組進度條
+        this._renderSectionProgressBar();
+
         // 初始化互動元件
         setTimeout(() => {
             this.matchingGame.init();
@@ -3610,6 +3613,79 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // QR Code（廣播中 + 互動頁才顯示）
         this.updateQRCode();
+    }
+
+    _renderSectionProgressBar() {
+        const bar = document.getElementById('presSectionBar');
+        if (!bar) return;
+        const sections = this.slideManager.sections || [];
+        if (sections.length === 0) {
+            bar.style.display = 'none';
+            return;
+        }
+        bar.style.display = 'flex';
+        bar.innerHTML = '';
+        const total = this.slideManager.slides.length;
+        const currentIdx = this.presentationIndex;
+        const sectionInfo = this.slideManager.getSectionForSlide(currentIdx);
+
+        // 為每個 section 建立色塊
+        const colors = ['#6366f1', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0d9488', '#c026d3'];
+        sections.forEach((sec, i) => {
+            const nextStart = (i + 1 < sections.length) ? sections[i + 1].startIndex : total;
+            const count = nextStart - sec.startIndex;
+            if (count <= 0) return;
+            const pct = (count / total) * 100;
+            const isCurrent = sectionInfo && sectionInfo.startIndex === sec.startIndex;
+            const color = colors[i % colors.length];
+            const seg = document.createElement('div');
+            seg.style.cssText = `
+                flex: ${count};
+                height: 18px;
+                border-radius: 3px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                font-weight: ${isCurrent ? '700' : '500'};
+                color: ${isCurrent ? '#fff' : 'rgba(255,255,255,0.45)'};
+                background: ${isCurrent ? color : 'rgba(255,255,255,0.1)'};
+                transition: all 0.3s ease;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                padding: 0 6px;
+                cursor: default;
+            `;
+            if (isCurrent) {
+                seg.textContent = `${sec.name} ${sectionInfo.pos}/${sectionInfo.total}`;
+            } else {
+                seg.textContent = sec.name;
+            }
+            seg.title = `${sec.name}（${count} 頁）`;
+            bar.appendChild(seg);
+        });
+
+        // 如果第一個 section 不從 0 開始，前面的頁也顯示
+        if (sections[0].startIndex > 0) {
+            const beforeCount = sections[0].startIndex;
+            const beforeSeg = document.createElement('div');
+            const isCurrent = currentIdx < sections[0].startIndex;
+            beforeSeg.style.cssText = `
+                flex: ${beforeCount};
+                height: 18px;
+                border-radius: 3px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                color: ${isCurrent ? '#fff' : 'rgba(255,255,255,0.3)'};
+                background: ${isCurrent ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'};
+                transition: all 0.3s ease;
+                padding: 0 6px;
+            `;
+            bar.insertBefore(beforeSeg, bar.firstChild);
+        }
     }
 
     // 顯示下一個動畫步驟，回傳 true 表示還有步驟要顯示

@@ -1279,6 +1279,85 @@ body {
     z-index: 2;
 }
 
+/* ── 投影片分組標頭 ── */
+.slide-section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    border-radius: 6px;
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    cursor: default;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.slide-section-header:first-child {
+    margin-top: 0;
+}
+
+.section-color-bar {
+    width: 3px;
+    height: 16px;
+    border-radius: 2px;
+    background: #6366f1;
+    flex-shrink: 0;
+}
+
+.section-name {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4338ca;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: text;
+}
+
+.section-name-input {
+    width: 100%;
+    padding: 2px 6px;
+    border: 1px solid #6366f1;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4338ca;
+    background: #fff;
+    outline: none;
+    font-family: inherit;
+}
+
+.section-remove-btn {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    opacity: 0;
+}
+
+.slide-section-header:hover .section-remove-btn {
+    opacity: 1;
+}
+
+.section-remove-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
 /* (按鈕樣式已統一至 base.css) */
 
 /* (模態對話框樣式已統一至 base.css) */
