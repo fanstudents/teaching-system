@@ -3279,16 +3279,16 @@
 
 /* 長條圖 */
 .lb-bar-wrap {
-    height: 14px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 7px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
     overflow: hidden;
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
 .lb-bar {
     height: 100%;
-    border-radius: 7px;
+    border-radius: 10px;
     transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
     min-width: 0;
 }
