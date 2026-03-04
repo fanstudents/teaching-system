@@ -107,11 +107,8 @@ export class TrueFalseGame {
                 }
                 if (resultEl) {
                     resultEl.className = 'tf-result ' + (isCorrect ? 'success' : 'error');
-                    resultEl.textContent = isCorrect ? '✓ 回答正確！' : `✗ 答案是「${correctLabel}」`;
+                    resultEl.textContent = isCorrect ? '✓ 回答正確！' : '✗ 答錯了';
                 }
-            } else if (resultEl) {
-                resultEl.className = 'tf-result tf-revealed';
-                resultEl.textContent = `正確答案：${correctLabel}`;
             }
 
             // 隱藏公布按鈕
