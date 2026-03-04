@@ -1667,9 +1667,17 @@
                     style="padding:12px;background:#f5f3ff;border-radius:8px;font-size:.8rem;color:#5b21b6;line-height:1.6;">
                     <b>說明：</b>AI 會讀取課前問卷的統計結果（學員組成、需求、投票），自動分析並建議需要調整的簡報頁面。
                 </div>
+                <div>
+                    <label
+                        style="font-size:.82rem;font-weight:600;color:#334155;display:block;margin-bottom:6px;">選擇場次</label>
+                    <select id="aiSurveySessionSelect"
+                        style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;font-family:inherit;">
+                        <option value="">載入中...</option>
+                    </select>
+                </div>
                 <div id="surveyDataPreview"
                     style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:.78rem;color:#475569;max-height:200px;overflow-y:auto;">
-                    <span style="color:#94a3b8;">點擊下方按鈕載入問卷數據...</span>
+                    <span style="color:#94a3b8;">選擇場次後點擊下方按鈕載入問卷數據...</span>
                 </div>
                 <button id="aiSurveyLoadBtn"
                     style="padding:10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.85rem;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">

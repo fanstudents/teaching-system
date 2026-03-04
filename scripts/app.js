@@ -386,6 +386,7 @@ class App {
         document.getElementById('aiSurveyAdjustBtn')?.addEventListener('click', () => {
             document.getElementById('aiSurveyOverlay').style.display = 'flex';
             this._loadOverlayPrompt('aiSurveyPrompt', 'slide_survey_adjust');
+            this.populateSurveySessions();
         });
         document.getElementById('aiSurveyClose')?.addEventListener('click', () => {
             document.getElementById('aiSurveyOverlay').style.display = 'none';
@@ -2392,6 +2393,40 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     _surveyData = null;
 
+    async populateSurveySessions() {
+        const { db } = await import('./supabase.js');
+        const select = document.getElementById('aiSurveySessionSelect');
+        if (!select) return;
+        select.innerHTML = '<option value="">載入場次中...</option>';
+        try {
+            const { data: questions } = await db.select('survey_questions', {
+                select: 'session_code',
+                order: 'created_at.desc'
+            });
+            const codes = [...new Set((questions || []).map(q => q.session_code).filter(Boolean))];
+            select.innerHTML = '<option value="">— 請選擇場次 —</option>';
+            // 取得場次名稱
+            for (const code of codes) {
+                const { data: sessions } = await db.select('sessions', {
+                    filter: { session_code: `eq.${code}` },
+                    select: 'title',
+                    limit: 1
+                });
+                const title = sessions?.[0]?.title || '';
+                const label = title ? `${code}（${title}）` : code;
+                select.innerHTML += `<option value="${code}">${label}</option>`;
+            }
+            // 預選目前的 joinCode
+            const joinCode = this.slideManager.getCurrentJoinCode?.() || '';
+            if (joinCode && codes.includes(joinCode)) {
+                select.value = joinCode;
+            }
+        } catch (e) {
+            select.innerHTML = '<option value="">載入失敗</option>';
+            console.error('[Survey] populate sessions error:', e);
+        }
+    }
+
     async loadSurveyData() {
         const preview = document.getElementById('surveyDataPreview');
         const startBtn = document.getElementById('aiSurveyStart');
@@ -2402,11 +2437,19 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         try {
             const { db } = await import('./supabase.js');
-            const joinCode = this.slideManager.getCurrentJoinCode?.() || '';
+            const sessionSelect = document.getElementById('aiSurveySessionSelect');
+            const joinCode = sessionSelect?.value || this.slideManager.getCurrentJoinCode?.() || '';
+
+            if (!joinCode) {
+                preview.innerHTML = '<span style="color:#f59e0b;">⚠ 請先選擇場次。</span>';
+                loadBtn.disabled = false;
+                loadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">download</span> 重新載入';
+                return;
+            }
 
             // 讀取問卷題目
             const { data: questions } = await db.select('survey_questions', {
-                filter: joinCode ? { session_code: `eq.${joinCode}` } : {},
+                filter: { session_code: `eq.${joinCode}` },
                 order: 'sort_order.asc'
             });
 
@@ -2414,7 +2457,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const { data: responses } = await db.select('survey_responses');
 
             if (!questions || questions.length === 0) {
-                preview.innerHTML = '<span style="color:#f59e0b;">⚠ 尚未設定課前問卷題目，請先在課前設定中新增問卷。</span>';
+                preview.innerHTML = '<span style="color:#f59e0b;">⚠ 此場次尚未設定課前問卷題目。</span>';
                 loadBtn.disabled = false;
                 loadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">download</span> 重新載入';
                 return;
