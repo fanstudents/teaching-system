@@ -452,6 +452,11 @@
                     while (slidesCache.length < total) slidesCache.push(null);
                     slidesCache[idx] = slide;
 
+                    // 廣播開始時，強制切到跟隨模式
+                    if (mode === 'free') {
+                        setMode('follow');
+                    }
+
                     if (mode === 'follow') {
                         currentIndex = idx;
                         renderSlide(slide, idx, total);
@@ -742,6 +747,10 @@
             if (interactiveTypes.includes(element.type)) {
                 const pts = parseInt(element.points) || defaultPts[element.type] || 0;
                 el.dataset.points = pts;
+                // 套用 CSS custom properties（與講師端 _applyInteractiveStyles 對齊）
+                el.style.setProperty('--ia-title-fs', (element.titleFontSize || 18) + 'px');
+                el.style.setProperty('--ia-option-fs', (element.optionFontSize || 15) + 'px');
+                el.style.setProperty('--ia-padding', (element.interactivePadding || 16) + 'px');
                 if (pts > 0) {
                     const badge = document.createElement('div');
                     badge.className = 'element-score-badge';
