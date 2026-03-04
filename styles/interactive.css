@@ -3723,3 +3723,57 @@
     flex-direction: column;
     gap: 8px;
 }
+
+/* ═══ 下載格式選單 ═══ */
+.doc-download-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    min-width: 180px;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.doc-download-menu.open {
+    display: block;
+}
+
+.doc-dl-opt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    color: #334155;
+    transition: background 0.15s;
+    text-align: left;
+}
+
+.doc-dl-opt:hover {
+    background: #f1f5f9;
+}
+
+.doc-dl-opt .material-symbols-outlined {
+    font-size: 18px;
+    color: #64748b;
+}
+
+.doc-dl-opt:first-child {
+    border-bottom: 1px solid #f1f5f9;
+    font-weight: 600;
+    color: #0284c7;
+}
+
+.doc-dl-opt:first-child .material-symbols-outlined {
+    color: #0284c7;
+}

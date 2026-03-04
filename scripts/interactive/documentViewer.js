@@ -193,10 +193,19 @@ export class DocumentViewer {
                     </div>
                     <div class="doc-viewer-actions">
                         ${data.docContent ? `
-                            <button class="doc-viewer-download-btn" id="docAutoDownload" onclick="event.stopPropagation();">
-                                <span class="material-symbols-outlined" style="font-size:18px;">download</span>
-                                下載文件
-                            </button>
+                            <div class="doc-download-wrap" style="position:relative;">
+                                <button class="doc-viewer-download-btn" id="docDownloadToggle" onclick="event.stopPropagation();">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">download</span>
+                                    下載文件
+                                    <span class="material-symbols-outlined" style="font-size:14px;margin-left:2px;">expand_more</span>
+                                </button>
+                                <div class="doc-download-menu" id="docDownloadMenu">
+                                    <button class="doc-dl-opt" data-fmt="pdf"><span class="material-symbols-outlined">picture_as_pdf</span> PDF（預設）</button>
+                                    <button class="doc-dl-opt" data-fmt="docx"><span class="material-symbols-outlined">description</span> Word (.docx)</button>
+                                    <button class="doc-dl-opt" data-fmt="gdoc"><span class="material-symbols-outlined">edit_document</span> Google 文件</button>
+                                    <button class="doc-dl-opt" data-fmt="html"><span class="material-symbols-outlined">code</span> HTML</button>
+                                </div>
+                            </div>
                         ` : ''}
                         <button class="doc-viewer-close-btn">
                             <span class="material-symbols-outlined">close</span>
@@ -232,18 +241,27 @@ export class DocumentViewer {
         };
         document.addEventListener('keydown', this._escHandler);
 
-        // 自動下載
-        const dlBtn = overlay.querySelector('#docAutoDownload');
-        if (dlBtn) {
-            dlBtn.addEventListener('click', () => {
-                const htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${this._esc(data.docTitle || '文件')}</title><style>body{font-family:-apple-system,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#1e293b;}h1,h2,h3{color:#0f172a;}code{background:#f1f5f9;padding:2px 6px;border-radius:4px;}pre{background:#f1f5f9;padding:16px;border-radius:8px;overflow-x:auto;}blockquote{border-left:4px solid #0284c7;margin:0;padding:0 16px;color:#475569;}img{max-width:100%;border-radius:8px;}</style></head><body>${content}</body></html>`;
-                const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${data.docTitle || '文件'}.html`;
-                a.click();
-                URL.revokeObjectURL(url);
+        // 下載格式選單
+        const dlToggle = overlay.querySelector('#docDownloadToggle');
+        const dlMenu = overlay.querySelector('#docDownloadMenu');
+        if (dlToggle && dlMenu) {
+            dlToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dlMenu.classList.toggle('open');
+            });
+            // 點外面關閉
+            overlay.addEventListener('click', () => dlMenu.classList.remove('open'));
+
+            const title = this._esc(data.docTitle || '文件');
+            const htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${title}</title><style>body{font-family:-apple-system,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#1e293b;}h1,h2,h3{color:#0f172a;}code{background:#f1f5f9;padding:2px 6px;border-radius:4px;}pre{background:#f1f5f9;padding:16px;border-radius:8px;overflow-x:auto;}blockquote{border-left:4px solid #0284c7;margin:0;padding:0 16px;color:#475569;}img{max-width:100%;border-radius:8px;}</style></head><body>${content}</body></html>`;
+
+            overlay.querySelectorAll('.doc-dl-opt').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const fmt = btn.dataset.fmt;
+                    dlMenu.classList.remove('open');
+                    this._downloadAs(fmt, title, htmlDoc, content);
+                });
             });
         }
 
@@ -324,6 +342,67 @@ export class DocumentViewer {
                     await this._loadStatsForParagraphs(elementId, anchors, overlay);
                     revealBtn.style.display = 'none';
                 });
+            }
+        }
+    }
+
+    /**
+     * 下載文件（支援多種格式）
+     */
+    _downloadAs(fmt, title, htmlDoc, content) {
+        switch (fmt) {
+            case 'pdf': {
+                // 開新視窗列印為 PDF
+                const w = window.open('', '_blank');
+                w.document.write(htmlDoc);
+                w.document.close();
+                w.onload = () => { w.print(); };
+                break;
+            }
+            case 'docx': {
+                // Word 相容 HTML（.doc 格式，Word 可開啟）
+                const wordHtml = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                          xmlns:w="urn:schemas-microsoft-com:office:word"
+                          xmlns="http://www.w3.org/TR/REC-html40">
+                    <head><meta charset="utf-8"><title>${title}</title>
+                    <style>body{font-family:Calibri,sans-serif;line-height:1.6;color:#333;}h1,h2,h3{color:#111;}</style>
+                    </head><body>${content}</body></html>`;
+                const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title}.doc`;
+                a.click();
+                URL.revokeObjectURL(url);
+                break;
+            }
+            case 'gdoc': {
+                // 上傳 HTML 到 Google Docs
+                const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                // Google Docs 匯入方式：先下載 HTML，再用 Google Docs 開啟
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title}.html`;
+                a.click();
+                URL.revokeObjectURL(url);
+                // 同時開啟 Google Docs 新文件頁面
+                setTimeout(() => {
+                    window.open('https://docs.google.com/document/create', '_blank');
+                }, 500);
+                break;
+            }
+            case 'html':
+            default: {
+                const blob = new Blob([htmlDoc], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title}.html`;
+                a.click();
+                URL.revokeObjectURL(url);
+                break;
             }
         }
     }
