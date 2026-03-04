@@ -1084,14 +1084,14 @@
                     let ccDisplay = rawCopy.replace(/\n/g, '<br>');
                     if (ccHasVars) {
                         ccDisplay = ccDisplay.replace(/\{\{([^}]+)\}\}/g, (_, name) =>
-                            `<input type="text" class="cc-var-input" data-var="${name}" placeholder="${name}" autocomplete="off" style="border:1px solid #8b5cf6;border-radius:4px;padding:2px 6px;background:rgba(139,92,246,0.08);color:#1e293b;font-size:inherit;min-width:80px;outline:none;">`
+                            `<input type="text" class="cc-var-input" data-var="${name}" placeholder="${name}" autocomplete="off">`
                         );
                     }
                     el.innerHTML = `
                         <div class="copy-card-container" data-copy-template="${rawCopy.replace(/"/g, '&quot;')}">
                             <div class="copy-card-title">${element.title || '點擊複製'}</div>
                             <div class="copy-card-content">${ccDisplay}</div>
-                            ${ccHasVars ? '<div style="font-size:11px;color:#8b5cf6;margin:4px 12px;">請填寫所有欄位後再複製</div>' : ''}
+                            ${ccHasVars ? '<div class="cc-var-hint">請填寫所有欄位後再複製</div>' : ''}
                             <button class="copy-card-btn" ${ccHasVars ? 'disabled' : ''}>
                                 <span class="copy-icon">⧉</span>
                                 <span class="copy-text">點擊複製</span>
