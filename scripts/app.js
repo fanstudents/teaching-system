@@ -2,6 +2,51 @@
  * 互動式教學簡報系統 - 主程式入口
  */
 
+// ── IndexedDB 音頻儲存（取代 localStorage，無容量限制）──
+const audioStore = {
+    _db: null,
+    async _open() {
+        if (this._db) return this._db;
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open('ix_audio', 1);
+            req.onupgradeneeded = () => req.result.createObjectStore('files');
+            req.onsuccess = () => { this._db = req.result; resolve(this._db); };
+            req.onerror = () => reject(req.error);
+        });
+    },
+    async save(key, blob) {
+        const db = await this._open();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('files', 'readwrite');
+            tx.objectStore('files').put(blob, key);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+    },
+    async load(key) {
+        const db = await this._open();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('files', 'readonly');
+            const req = tx.objectStore('files').get(key);
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => reject(req.error);
+        });
+    },
+    async remove(key) {
+        const db = await this._open();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('files', 'readwrite');
+            tx.objectStore('files').delete(key);
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+    },
+    async getUrl(key) {
+        const blob = await this.load(key);
+        return blob ? URL.createObjectURL(blob) : null;
+    }
+};
+
 import { SlideManager } from './slideManager.js?v=20260304b';
 import { Editor } from './editor.js?v=20260304b';
 import { DragDrop } from './dragDrop.js?v=20260304b';
@@ -305,17 +350,19 @@ class App {
             this.editor.addHotspot();
         });
 
+
         // AI 出題
         document.getElementById('aiQuizBtn')?.addEventListener('click', () => {
             this.openAiQuizModal();
         });
 
         // 背景音樂設定（上傳檔案）
-        document.getElementById('bgmSettingBtn')?.addEventListener('click', () => {
-            const current = localStorage.getItem('ix_bgm_url');
-            if (current) {
+        document.getElementById('bgmSettingBtn')?.addEventListener('click', async () => {
+            const existing = await audioStore.load('bgm');
+            if (existing) {
                 const action = confirm('已設定背景音樂。\n\n確定 → 重新上傳\n取消 → 清除音樂');
                 if (!action) {
+                    await audioStore.remove('bgm');
                     localStorage.removeItem('ix_bgm_url');
                     alert('已清除背景音樂');
                     return;
@@ -324,26 +371,23 @@ class App {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'audio/*';
-            input.addEventListener('change', () => {
+            input.addEventListener('change', async () => {
                 const file = input.files[0];
                 if (!file) return;
-                if (file.size > 10 * 1024 * 1024) { alert('檔案太大（上限 10MB）'); return; }
-                const reader = new FileReader();
-                reader.onload = () => {
-                    localStorage.setItem('ix_bgm_url', reader.result);
-                    alert('✓ 已設定背景音樂：' + file.name);
-                };
-                reader.readAsDataURL(file);
+                if (file.size > 15 * 1024 * 1024) { alert('檔案太大（上限 15MB）'); return; }
+                await audioStore.save('bgm', file);
+                alert('✓ 已設定背景音樂：' + file.name);
             });
             input.click();
         });
 
         // 排行榜音樂設定
-        document.getElementById('lbMusicBtn')?.addEventListener('click', () => {
-            const current = localStorage.getItem('ix_lb_music_url');
-            if (current) {
+        document.getElementById('lbMusicBtn')?.addEventListener('click', async () => {
+            const existing = await audioStore.load('lb_music');
+            if (existing) {
                 const action = confirm('已設定排行榜音樂。\n\n確定 → 重新上傳\n取消 → 清除音樂');
                 if (!action) {
+                    await audioStore.remove('lb_music');
                     localStorage.removeItem('ix_lb_music_url');
                     alert('已清除排行榜音樂');
                     return;
@@ -352,16 +396,12 @@ class App {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'audio/*';
-            input.addEventListener('change', () => {
+            input.addEventListener('change', async () => {
                 const file = input.files[0];
                 if (!file) return;
-                if (file.size > 10 * 1024 * 1024) { alert('檔案太大（上限 10MB）'); return; }
-                const reader = new FileReader();
-                reader.onload = () => {
-                    localStorage.setItem('ix_lb_music_url', reader.result);
-                    alert('✓ 已設定排行榜音樂：' + file.name);
-                };
-                reader.readAsDataURL(file);
+                if (file.size > 15 * 1024 * 1024) { alert('檔案太大（上限 15MB）'); return; }
+                await audioStore.save('lb_music', file);
+                alert('✓ 已設定排行榜音樂：' + file.name);
             });
             input.click();
         });
@@ -2826,21 +2866,23 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         });
 
         // 排行榜 toggle
-        document.getElementById('lbToggle')?.addEventListener('click', () => {
+        document.getElementById('lbToggle')?.addEventListener('click', async () => {
             const lb = document.getElementById('presLeaderboard');
             const pm = document.getElementById('presentationMode');
             lb?.classList.toggle('open');
             const isOpen = lb?.classList.contains('open') || false;
             pm?.classList.toggle('lb-active', isOpen);
 
-            // 排行榜音樂
-            const lbMusicUrl = localStorage.getItem('ix_lb_music_url');
-            if (lbMusicUrl) {
-                if (!this._lbAudio) {
+            // 排行榜音樂（從 IndexedDB 讀取）
+            if (!this._lbAudio) {
+                const lbMusicUrl = await audioStore.getUrl('lb_music');
+                if (lbMusicUrl) {
                     this._lbAudio = new Audio(lbMusicUrl);
                     this._lbAudio.loop = true;
                     this._lbAudio.volume = 0.4;
                 }
+            }
+            if (this._lbAudio) {
                 if (isOpen) {
                     this._lbAudio.play().catch(() => { });
                 } else {
@@ -3305,9 +3347,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     }
 
     // ── 背景音樂 ──
-    initBGM() {
+    async initBGM() {
         if (this._bgmAudio) return;
-        const bgmUrl = this.slideManager?.slides?.[0]?.bgmUrl || localStorage.getItem('ix_bgm_url') || '';
+        // 優先從 IndexedDB 讀，fallback 到 localStorage（舊有）
+        let bgmUrl = this.slideManager?.slides?.[0]?.bgmUrl || '';
+        if (!bgmUrl) bgmUrl = await audioStore.getUrl('bgm');
+        if (!bgmUrl) bgmUrl = localStorage.getItem('ix_bgm_url') || '';
         if (!bgmUrl) return;
         this._bgmAudio = new Audio(bgmUrl);
         this._bgmAudio.loop = true;
