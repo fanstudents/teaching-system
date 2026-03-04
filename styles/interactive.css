@@ -2154,11 +2154,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px 24px;
+    justify-content: flex-start;
+    padding: 12px 24px;
     background: #f8fafc;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
+    overflow: hidden;
 }
 
 .tf-question {
@@ -2174,8 +2175,9 @@
     display: flex;
     gap: 20px;
     width: 100%;
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
+    max-height: 55%;
 }
 
 .tf-btn {
@@ -2269,10 +2271,11 @@
 }
 
 .tf-result {
-    margin-top: 12px;
-    font-size: 16px;
+    margin-top: 8px;
+    font-size: 15px;
     font-weight: 600;
-    min-height: 24px;
+    min-height: 20px;
+    text-align: center;
 }
 
 .tf-result.success {
