@@ -2967,8 +2967,35 @@ export class SlideManager {
             console.warn('[SaveDB] skip — no db or no project ID', { db: !!this._db, pid: this.currentProjectId });
             return;
         }
+        // ★ 正在存檔中就跳過（避免併發）
+        if (this._isSaving) return;
+        this._isSaving = true;
         try {
-            const payloadSize = JSON.stringify(data).length;
+            let payload = JSON.stringify(data);
+            let payloadSize = payload.length;
+
+            // ★ 如果 payload > 4MB，自動去除所有 base64 圖片
+            if (payloadSize > 4 * 1024 * 1024) {
+                console.warn(`[SaveDB] payload ${(payloadSize / 1024 / 1024).toFixed(1)}MB 太大，正在壓縮…`);
+                const lightData = {
+                    ...data,
+                    slides: data.slides.map(s => ({
+                        ...s,
+                        elements: (s.elements || []).map(el => {
+                            if (el.type === 'image' && el.src?.startsWith('data:') && el.src.length > 50000) {
+                                // 用一個小的灰色 placeholder 替代
+                                return { ...el, src: 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' };
+                            }
+                            return el;
+                        })
+                    }))
+                };
+                payload = JSON.stringify(lightData);
+                payloadSize = payload.length;
+                data = lightData;
+                console.log(`[SaveDB] 壓縮後 ${(payloadSize / 1024).toFixed(1)}KB`);
+            }
+
             console.log('[SaveDB] saving to project', this.currentProjectId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
 
             const result = await this._db.update('projects', {
@@ -2989,6 +3016,53 @@ export class SlideManager {
         } catch (e) {
             console.error('[SaveDB] ❌ exception:', e);
             this._showSaveError('資料庫連線失敗：' + e.message);
+        } finally {
+            this._isSaving = false;
+        }
+    }
+
+    /**
+     * ★ 自動壓縮 slides 中所有 base64 圖片（一次性遷移）
+     * 在 load() 後呼叫，將 > 50KB 的 base64 圖片用 canvas 壓縮
+     */
+    async _compressBase64Images() {
+        let count = 0;
+        const MAX_DIM = 1200;
+        for (const slide of this.slides) {
+            for (const el of (slide.elements || [])) {
+                if (el.type !== 'image' || !el.src?.startsWith('data:')) continue;
+                if (el.src.length < 50000) continue; // < 50KB 不處理
+
+                try {
+                    const img = await new Promise((resolve, reject) => {
+                        const i = new Image();
+                        i.onload = () => resolve(i);
+                        i.onerror = reject;
+                        i.src = el.src;
+                    });
+                    let cw = img.width, ch = img.height;
+                    if (cw > MAX_DIM || ch > MAX_DIM) {
+                        if (cw > ch) { ch = Math.round(ch * MAX_DIM / cw); cw = MAX_DIM; }
+                        else { cw = Math.round(cw * MAX_DIM / ch); ch = MAX_DIM; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cw;
+                    canvas.height = ch;
+                    canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+                    const compressed = canvas.toDataURL('image/jpeg', 0.6);
+                    if (compressed.length < el.src.length) {
+                        console.log(`[Compress] ${(el.src.length / 1024).toFixed(0)}KB → ${(compressed.length / 1024).toFixed(0)}KB`);
+                        el.src = compressed;
+                        count++;
+                    }
+                } catch (e) {
+                    console.warn('[Compress] failed for image:', e.message);
+                }
+            }
+        }
+        if (count > 0) {
+            console.log(`[Compress] ✅ 已壓縮 ${count} 張圖片，立即儲存`);
+            this.saveNow();
         }
     }
 
@@ -3073,7 +3147,9 @@ export class SlideManager {
             this.renderThumbnails();
             this.renderCurrentSlide();
             this.updateCounter();
-            // 同步到 localStorage
+            // ★ 自動壓縮舊的 base64 圖片（一次性遷移）
+            this._compressBase64Images();
+            // 同步到 localStorage（壓縮完成後覆蓋）
             try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(chosen)); } catch (_) { }
             return true;
         }
