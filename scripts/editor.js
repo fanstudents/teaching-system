@@ -164,7 +164,7 @@ export class Editor {
         try {
             const { storage } = await import('./supabase.js');
             const key = `images/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
-            const result = await storage.upload('slides', key, compressedBlob);
+            const result = await storage.upload('homework', key, compressedBlob);
             if (result.data?.url) {
                 src = result.data.url;
                 console.log('[Image] uploaded to Storage:', src);
