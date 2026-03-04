@@ -117,10 +117,10 @@
 
     <!-- 排行榜 -->
     <button class="student-lb-toggle" id="studentLbToggle" title="排行榜" style="
-        position:fixed;top:12px;right:12px;z-index:200;width:36px;height:36px;
-        border-radius:50%;border:none;background:rgba(255,255,255,0.15);
+        position:fixed;bottom:80px;right:12px;z-index:200;width:36px;height:36px;
+        border-radius:50%;border:none;background:rgba(99,102,241,0.85);
         backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
-        align-items:center;justify-content:center;
+        align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(99,102,241,0.3);
     "><span class="material-symbols-outlined" style="font-size:20px;">leaderboard</span></button>
     <div class="pres-leaderboard" id="studentLeaderboard">
         <div class="lb-header"><span class="lb-title">🏆 排行榜</span></div>
@@ -964,36 +964,65 @@
 
                 case 'copycard': {
                     el.classList.add('interactive-element');
+                    const rawCopy = element.content || '';
+                    const ccVarRe = /\{\{([^}]+)\}\}/g;
+                    const ccVars = [];
+                    let ccM;
+                    while ((ccM = ccVarRe.exec(rawCopy)) !== null) {
+                        if (!ccVars.includes(ccM[1])) ccVars.push(ccM[1]);
+                    }
+                    const ccHasVars = ccVars.length > 0;
+                    let ccDisplay = rawCopy.replace(/\n/g, '<br>');
+                    if (ccHasVars) {
+                        ccDisplay = ccDisplay.replace(/\{\{([^}]+)\}\}/g, (_, name) =>
+                            `<input type="text" class="cc-var-input" data-var="${name}" placeholder="${name}" autocomplete="off" style="border:1px solid #8b5cf6;border-radius:4px;padding:2px 6px;background:rgba(139,92,246,0.08);color:#1e293b;font-size:inherit;min-width:80px;outline:none;">`
+                        );
+                    }
                     el.innerHTML = `
-                        <div class="copy-card-container">
+                        <div class="copy-card-container" data-copy-template="${rawCopy.replace(/"/g, '&quot;')}">
                             <div class="copy-card-title">${element.title || '點擊複製'}</div>
-                            <div class="copy-card-content" data-copy-text="${element.content || ''}">${element.content || ''}</div>
-                            <button class="copy-card-btn">
+                            <div class="copy-card-content">${ccDisplay}</div>
+                            ${ccHasVars ? '<div style="font-size:11px;color:#8b5cf6;margin:4px 12px;">請填寫所有欄位後再複製</div>' : ''}
+                            <button class="copy-card-btn" ${ccHasVars ? 'disabled' : ''}>
                                 <span class="copy-icon">⧉</span>
                                 <span class="copy-text">點擊複製</span>
                             </button>
                             <div class="copy-card-feedback"></div>
                         </div>
                     `;
-                    // 綁定複製事件
-                    const copyBtn = el.querySelector('.copy-card-btn');
-                    const contentEl = el.querySelector('.copy-card-content');
-                    const feedbackEl = el.querySelector('.copy-card-feedback');
-                    copyBtn.addEventListener('click', async (e) => {
+                    if (ccHasVars) {
+                        const ccInputs = el.querySelectorAll('.cc-var-input');
+                        const ccBtn = el.querySelector('.copy-card-btn');
+                        ccInputs.forEach(inp => {
+                            inp.addEventListener('input', () => {
+                                ccBtn.disabled = ![...ccInputs].every(i => i.value.trim());
+                            });
+                            inp.addEventListener('click', e => e.stopPropagation());
+                        });
+                    }
+                    const ccCopyBtn = el.querySelector('.copy-card-btn');
+                    const ccFeedback = el.querySelector('.copy-card-feedback');
+                    ccCopyBtn.addEventListener('click', async (e) => {
                         e.stopPropagation();
+                        let txt = rawCopy;
+                        if (ccHasVars) {
+                            el.querySelectorAll('.cc-var-input').forEach(inp => {
+                                txt = txt.replaceAll(`{{${inp.dataset.var}}}`, inp.value.trim());
+                            });
+                        }
                         try {
-                            await navigator.clipboard.writeText(contentEl.textContent);
-                            feedbackEl.textContent = '✓ 已複製到剪貼簿！';
-                            feedbackEl.classList.add('success');
-                            copyBtn.classList.add('copied');
+                            await navigator.clipboard.writeText(txt);
+                            ccFeedback.textContent = '✓ 已複製到剪貼簿！';
+                            ccFeedback.classList.add('success');
+                            ccCopyBtn.classList.add('copied');
                             setTimeout(() => {
-                                feedbackEl.textContent = '';
-                                feedbackEl.classList.remove('success');
-                                copyBtn.classList.remove('copied');
+                                ccFeedback.textContent = '';
+                                ccFeedback.classList.remove('success');
+                                ccCopyBtn.classList.remove('copied');
                             }, 2000);
                         } catch (err) {
-                            feedbackEl.textContent = '複製失敗，請手動選取文字';
-                            feedbackEl.classList.add('error');
+                            ccFeedback.textContent = '複製失敗，請手動選取文字';
+                            ccFeedback.classList.add('error');
                         }
                     });
                     break;
@@ -1219,9 +1248,10 @@
                     el.classList.add('interactive-element');
                     const tl = element.trueLabel || '對';
                     const fl = element.falseLabel || '錯';
+                    const tfTitleFs = element.interactiveTitleFontSize || '1.1rem';
                     el.innerHTML = `
                         <div class="truefalse-container" data-answer="${element.answer ? 'true' : 'false'}" data-true-label="${tl}" data-false-label="${fl}">
-                            <div class="tf-question">${element.question || '對或錯？'}</div>
+                            <div class="tf-question" style="font-size:${tfTitleFs}">${element.question || '對或錯？'}</div>
                             <div class="tf-buttons">
                                 <button class="tf-btn tf-btn-true"><span class="tf-label">${tl}</span></button>
                                 <button class="tf-btn tf-btn-false"><span class="tf-label">${fl}</span></button>
@@ -1321,8 +1351,9 @@
 
                 case 'document': {
                     el.classList.add('interactive-element');
+                    const docUrl = element.docUrl || '';
                     el.innerHTML = `
-                        <div class="document-card-container" data-element-id="${element.id}" onclick="if(window._openDocViewer)window._openDocViewer('${element.id}')" style="
+                        <div class="document-card-container" style="
                             display:flex;flex-direction:column;align-items:center;justify-content:center;
                             gap:10px;height:100%;cursor:pointer;pointer-events:auto;
                             background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
@@ -1338,6 +1369,10 @@
                                 點擊查看文件
                             </div>
                         </div>`;
+                    el.querySelector('.document-card-container')?.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (docUrl) window.open(docUrl, '_blank');
+                    });
                     break;
                 }
 
