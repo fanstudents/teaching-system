@@ -663,8 +663,9 @@ export class SlideManager {
     navigateTo(index) {
         if (index < 0 || index >= this.slides.length) return;
 
-        // 儲存當前投影片狀態
+        // 儲存當前投影片狀態並立即寫 DB
         this.saveCurrentSlide();
+        this.saveNow();
 
         this.currentIndex = index;
         this.renderCurrentSlide();
@@ -3061,10 +3062,10 @@ export class SlideManager {
             }
         }, 10000);
 
-        // ★ 每 15 分鐘自動備份
+        // ★ 每 5 分鐘自動備份
         this._backupInterval = setInterval(() => {
             this._createBackup();
-        }, 15 * 60 * 1000);
+        }, 5 * 60 * 1000);
 
         // ★ 頁面關閉前立即存檔 + 備份
         window.addEventListener('beforeunload', () => {
@@ -3072,6 +3073,7 @@ export class SlideManager {
                 this.saveCurrentSlide();
                 const data = {
                     slides: this.slides,
+                    sections: this.sections,
                     currentIndex: this.currentIndex,
                     savedAt: new Date().toISOString()
                 };
@@ -3096,6 +3098,7 @@ export class SlideManager {
         this.saveCurrentSlide();
         const data = {
             slides: this.slides,
+            sections: this.sections,
             currentIndex: this.currentIndex,
             savedAt: new Date().toISOString(),
             slideCount: this.slides.length
