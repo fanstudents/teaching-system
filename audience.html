@@ -728,19 +728,7 @@
                 // 訂閱 realtime
                 await realtime.subscribe(`session:${sessionCode}`);
 
-                // 通知上線
-                realtime.publish(`session:${sessionCode}`, 'student_join', {
-                    studentId, studentName
-                });
-
-                // 心跳
-                heartbeatTimer = setInterval(() => {
-                    realtime.publish(`session:${sessionCode}`, 'student_heartbeat', {
-                        studentId, studentName
-                    });
-                }, 15000);
-
-                // 監聽投影片變化
+                // 先註冊監聽器（避免 student_join 回應的 slide_change 被漏掉）
                 realtime.on('slide_change', (msg) => {
                     const payload = msg.payload || msg;
                     const slide = payload.slide;
@@ -753,6 +741,18 @@
                     if (heartbeatTimer) clearInterval(heartbeatTimer);
                     document.getElementById('audDisconnected').classList.add('active');
                 });
+
+                // 通知上線（講師會回傳當前投影片）
+                realtime.publish(`session:${sessionCode}`, 'student_join', {
+                    studentId, studentName
+                });
+
+                // 心跳
+                heartbeatTimer = setInterval(() => {
+                    realtime.publish(`session:${sessionCode}`, 'student_heartbeat', {
+                        studentId, studentName
+                    });
+                }, 15000);
 
                 window.addEventListener('beforeunload', () => {
                     realtime.publish(`session:${sessionCode}`, 'student_leave', {
