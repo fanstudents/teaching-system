@@ -20,7 +20,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles/base.css?v=20260224">
     <link rel="stylesheet" href="styles/student-page.css?v=20260224">
-    <link rel="stylesheet" href="styles/interactive.css?v=20260224">
+    <link rel="stylesheet" href="styles/interactive.css?v=20260304">
+    <link rel="stylesheet" href="styles/interactive-theme.css?v=20260304">
     <link rel="stylesheet" href="styles/homework.css?v=20260224">
 </head>
 
@@ -114,6 +115,20 @@
         </div>
     </div>
 
+    <!-- 排行榜 -->
+    <button class="student-lb-toggle" id="studentLbToggle" title="排行榜" style="
+        position:fixed;top:12px;right:12px;z-index:200;width:36px;height:36px;
+        border-radius:50%;border:none;background:rgba(255,255,255,0.15);
+        backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
+        align-items:center;justify-content:center;
+    "><span class="material-symbols-outlined" style="font-size:20px;">leaderboard</span></button>
+    <div class="pres-leaderboard" id="studentLeaderboard" style="display:none;">
+        <div class="lb-header"><span class="lb-title">🏆 排行榜</span></div>
+        <div class="lb-list" id="studentLbList">
+            <div class="lb-empty">尚無學員互動</div>
+        </div>
+    </div>
+
     <!-- 斷線提示 -->
     <div class="disconnected-overlay" id="disconnectedOverlay">
         <span class="material-symbols-outlined">wifi_off</span>
@@ -128,18 +143,32 @@
         import { OrderingGame } from './scripts/interactive/ordering.js';
         import { QuizGame } from './scripts/interactive/quiz.js';
         import { PollGame } from './scripts/interactive/poll.js';
+        import { TrueFalseGame } from './scripts/interactive/truefalse.js';
+        import { OpenTextGame } from './scripts/interactive/opentext.js';
+        import { ScaleGame } from './scripts/interactive/scale.js';
+        import { BuzzerGame } from './scripts/interactive/buzzer.js';
+        import { WordCloudGame } from './scripts/interactive/wordcloud.js';
+        import { HotspotGame } from './scripts/interactive/hotspot.js';
         import { CountdownTimer } from './scripts/interactive/countdown.js';
         import { Showcase } from './scripts/interactive/showcase.js';
         import { HomeworkSubmission } from './scripts/homework.js';
+        import { stateManager } from './scripts/interactive/stateManager.js';
 
         const matchingGame = new MatchingGame();
         const fillBlank = new FillBlank();
         const orderingGame = new OrderingGame();
         const quizGame = new QuizGame();
         const pollGame = new PollGame();
+        const trueFalse = new TrueFalseGame();
+        const openText = new OpenTextGame();
+        const scale = new ScaleGame();
+        const buzzer = new BuzzerGame();
+        const wordCloud = new WordCloudGame();
+        const hotspot = new HotspotGame();
         const countdown = new CountdownTimer();
         const showcase = new Showcase();
         const homework = new HomeworkSubmission();
+        let lbTimer = null;
 
         let sessionCode = '';
         let studentName = '';
@@ -464,6 +493,41 @@
                     } catch { /* non-critical */ }
                 }
 
+                // 排行榜
+                const lbToggle = document.getElementById('studentLbToggle');
+                const lbPanel = document.getElementById('studentLeaderboard');
+                lbToggle.style.display = 'flex';
+                lbToggle.addEventListener('click', () => {
+                    const open = lbPanel.style.display !== 'block';
+                    lbPanel.style.display = open ? 'block' : 'none';
+                    const pres = document.getElementById('studentPresentation');
+                    if (open) pres.style.paddingRight = '260px';
+                    else pres.style.paddingRight = '';
+                });
+                // 排行榜輪詢
+                async function updateStudentLeaderboard() {
+                    if (!sessionCode) return;
+                    try {
+                        const board = await stateManager.getLeaderboard(sessionCode);
+                        const list = document.getElementById('studentLbList');
+                        if (!list) return;
+                        if (!board.length) {
+                            if (!list.querySelector('.lb-empty'))
+                                list.innerHTML = '<div class="lb-empty">尚無學員互動</div>';
+                            return;
+                        }
+                        list.querySelector('.lb-empty')?.remove();
+                        const maxPts = Math.max(...board.map(s => s.totalPoints), 1);
+                        list.innerHTML = board.map((s, i) => {
+                            const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                            const barPct = Math.round((s.totalPoints / maxPts) * 100);
+                            return `<div class="lb-row"><div class="lb-row-top"><div class="lb-rank ${rc}">${i + 1}</div><div class="lb-name">${s.name}</div><div class="lb-pts">${s.totalPoints}</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%"></div></div></div>`;
+                        }).join('');
+                    } catch (e) { console.warn('[LB]', e); }
+                }
+                updateStudentLeaderboard();
+                lbTimer = setInterval(updateStudentLeaderboard, 5000);
+
                 scaleSlide();
                 window.addEventListener('resize', scaleSlide);
 
@@ -561,6 +625,12 @@
                 showcase.init();
                 quizGame.init();
                 pollGame.init();
+                trueFalse.init();
+                openText.init();
+                scale.init();
+                buzzer.init();
+                wordCloud.init();
+                hotspot.init();
                 countdown.observeNewElements();
             }, 100);
         }
@@ -991,6 +1061,132 @@
                 case 'showcase': {
                     el.classList.add('interactive-element', 'showcase-container');
                     el.dataset.assignmentTitle = element.assignmentTitle || '';
+                    break;
+                }
+
+                case 'truefalse': {
+                    el.classList.add('interactive-element');
+                    const tl = element.trueLabel || '對';
+                    const fl = element.falseLabel || '錯';
+                    el.innerHTML = `
+                        <div class="truefalse-container" data-answer="${element.answer ? 'true' : 'false'}" data-true-label="${tl}" data-false-label="${fl}">
+                            <div class="tf-question">${element.question || '對或錯？'}</div>
+                            <div class="tf-buttons">
+                                <button class="tf-btn tf-btn-true"><span class="tf-icon">✓</span><span class="tf-label">${tl}</span></button>
+                                <button class="tf-btn tf-btn-false"><span class="tf-icon">✗</span><span class="tf-label">${fl}</span></button>
+                            </div>
+                            <div class="tf-result"></div>
+                            <div class="tf-reveal-area"></div>
+                            <div class="tf-stats-area"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'opentext': {
+                    el.classList.add('interactive-element');
+                    const maxLen = element.maxLength || 500;
+                    el.innerHTML = `
+                        <div class="opentext-container">
+                            <div class="opentext-question">${element.question || '請輸入你的想法'}</div>
+                            <textarea class="opentext-input" placeholder="${element.placeholder || '在這裡輸入你的回答...'}" maxlength="${maxLen}"></textarea>
+                            <div class="opentext-footer">
+                                <span class="opentext-counter">0 / ${maxLen}</span>
+                                <button class="opentext-submit">送出</button>
+                            </div>
+                            <div class="opentext-result"></div>
+                        </div>`;
+                    const otTextarea = el.querySelector('.opentext-input');
+                    const otCounter = el.querySelector('.opentext-counter');
+                    otTextarea?.addEventListener('input', () => {
+                        if (otCounter) otCounter.textContent = otTextarea.value.length + ' / ' + maxLen;
+                    });
+                    break;
+                }
+
+                case 'scale': {
+                    el.classList.add('interactive-element');
+                    const sMin = element.min || 1;
+                    const sMax = element.max || 10;
+                    const sStep = element.step || 1;
+                    const defaultVal = Math.round((sMin + sMax) / 2);
+                    el.innerHTML = `
+                        <div class="scale-container">
+                            <div class="scale-question">${element.question || '請評分'}</div>
+                            <div class="scale-slider-wrap">
+                                ${element.labelLeft ? '<span class="scale-label-edge">' + element.labelLeft + '</span>' : ''}
+                                <input type="range" class="scale-slider" min="${sMin}" max="${sMax}" step="${sStep}" value="${defaultVal}">
+                                ${element.labelRight ? '<span class="scale-label-edge">' + element.labelRight + '</span>' : ''}
+                            </div>
+                            <div class="scale-value">${defaultVal}</div>
+                            <button class="scale-submit">提交</button>
+                            <div class="scale-result"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'buzzer': {
+                    el.classList.add('interactive-element');
+                    el.innerHTML = `
+                        <div class="buzzer-container">
+                            <div class="buzzer-question">${element.question || '準備好了嗎？'}</div>
+                            <div class="buzzer-input-row">
+                                <input type="text" class="buzzer-text-input" placeholder="輸入你的答案..." />
+                                <button class="buzzer-submit-btn"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">campaign</span> 搶答</button>
+                            </div>
+                            <div class="buzzer-result"></div>
+                            <div class="buzzer-ranking"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'wordcloud': {
+                    el.classList.add('interactive-element');
+                    const maxWords = element.maxWords || 3;
+                    el.innerHTML = `
+                        <div class="wordcloud-container" data-max-words="${maxWords}">
+                            <div class="wordcloud-question">${element.question || '輸入你想到的關鍵字'}</div>
+                            <div class="wordcloud-cloud"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'hotspot': {
+                    el.classList.add('interactive-element');
+                    const hsSrc = element.image || element.src || '';
+                    const hsNodes = element.nodes || [];
+                    const hsNodesJson = JSON.stringify(hsNodes).replace(/"/g, '&quot;');
+                    el.innerHTML = `
+                        <div class="hotspot-container" data-nodes="${hsNodesJson}">
+                            <div class="hotspot-question">${element.question || '圈出你認為有問題的地方'}</div>
+                            <div class="hotspot-image-wrap" style="position:relative;">
+                                ${hsSrc ? '<img src="' + hsSrc + '" class="hotspot-image" draggable="false" />' : '<div class="hotspot-placeholder">（請設定圖片）</div>'}
+                                ${hsNodes.map(n => '<div class="hs-node" data-id="' + n.id + '" style="left:' + n.x + '%;top:' + n.y + '%;">' + n.label + '</div>').join('')}
+                            </div>
+                            <div class="hotspot-actions"><button class="hs-submit-btn" disabled>確認送出</button></div>
+                            <div class="hotspot-result"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'document': {
+                    el.classList.add('interactive-element');
+                    el.innerHTML = `
+                        <div class="document-card-container" data-element-id="${element.id}" onclick="if(window._openDocViewer)window._openDocViewer('${element.id}')" style="
+                            display:flex;flex-direction:column;align-items:center;justify-content:center;
+                            gap:10px;height:100%;cursor:pointer;pointer-events:auto;
+                            background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
+                            border-radius:12px;border:1.5px solid #bae6fd;
+                            transition:transform .15s,box-shadow .15s;position:relative;
+                        ">
+                            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#0284c7,#0ea5e9);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(2,132,199,0.25);">
+                                <span class="material-symbols-outlined" style="font-size:28px;color:#fff;">description</span>
+                            </div>
+                            <div style="font-weight:600;font-size:0.95rem;color:#0c4a6e;text-align:center;line-height:1.4;padding:0 12px;">${element.docTitle || '文件名稱'}</div>
+                            <div style="font-size:0.72rem;color:#7dd3fc;display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:14px;">visibility</span>
+                                點擊查看文件
+                            </div>
+                        </div>`;
                     break;
                 }
 
