@@ -4087,9 +4087,10 @@ ${surveyAnswers || '（未填寫）'}
 - 結尾署名區塊：
   ---
   樊松蒲
-  📧 sungpu@fanstudent.com
-  📱 LINE：@fanstudent
-  🧊 數位茶水間（免費社群）：https://line.me/ti/g2/fanstudent-lounge
+  📧 Email：service@tbr.digital
+  🧵 Threads：https://www.threads.com/@tbr.digital
+  🧊 數位茶水間：https://club.tbr.digital
+  💻 數位簡報室：https://tbr.digital
 - 全文用繁體中文
 - 不要加主旨（Subject）行
 - 總長度控制在 300-400 字`;
