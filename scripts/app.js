@@ -2967,10 +2967,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             realtime.on('student_heartbeat', (msg) => {
                 const p = msg.payload || msg;
                 if (p.studentId) {
+                    const isNew = !this.onlineStudents.has(p.studentId);
                     this.onlineStudents.set(p.studentId, {
                         name: p.studentName,
                         joinedAt: Date.now()
                     });
+                    if (isNew) this.updateViewerCount();
                 }
             });
 

@@ -479,11 +479,13 @@
                     console.warn('[Student] realtime connect failed (non-fatal):', rtErr);
                 }
 
-                // 通知講師上線
-                realtime.publish(`session:${sessionCode}`, 'student_join', {
-                    studentId,
-                    studentName
-                });
+                // 通知講師上線（延遲確保 channel join 完成）
+                setTimeout(() => {
+                    realtime.publish(`session:${sessionCode}`, 'student_join', {
+                        studentId,
+                        studentName
+                    });
+                }, 500);
 
                 // 啟動心跳（每 15 秒）
                 heartbeatTimer = setInterval(() => {

@@ -2,7 +2,7 @@
  * 作業展示模組 — 投影片內嵌的作品展示牆
  * 自動從 DB 拉取提交，渲染繳交狀態 + 作品 grid
  */
-import { db } from '../supabase.js';
+import { db, realtime } from '../supabase.js';
 
 export class Showcase {
     constructor() {
@@ -42,6 +42,10 @@ export class Showcase {
         console.log('[Showcase] setupContainer title:', title, 'sessionCode:', this.sessionCode);
         if (!title) return;
 
+        // 偵測是否為講師端
+        this._isPresenter = !!container.closest('.presentation-slide');
+        this._broadcasting = !!window.app?.broadcasting;
+
         // 每個容器有唯一 ID，避免多個同 title 容器互相覆蓋 hash
         if (!container._showcaseId) {
             container._showcaseId = title + '_' + Math.random().toString(36).substr(2, 6);
@@ -62,6 +66,25 @@ export class Showcase {
         if (this.pollingTimers[cid]) clearInterval(this.pollingTimers[cid]);
         const timerId = setInterval(() => this.fetchAndRender(container, title), 5000);
         this.pollingTimers[cid] = timerId;
+
+        // 學員端：監聽講師捲動同步
+        if (!this._isPresenter) {
+            realtime.on('showcase_scroll', (msg) => {
+                const p = msg.payload || msg;
+                if (p.title !== title) return;
+                const grid = container.querySelector('.showcase-grid');
+                if (grid) {
+                    const maxScroll = grid.scrollWidth - grid.clientWidth;
+                    grid.scrollTo({ left: maxScroll * p.scrollPct, behavior: 'smooth' });
+                }
+            });
+            realtime.on('showcase_focus', (msg) => {
+                const p = msg.payload || msg;
+                if (p.title !== title) return;
+                const subs = this.cache[title];
+                if (subs) this.openFocus(subs, p.index, container);
+            });
+        }
     }
 
     /**
@@ -190,8 +213,32 @@ export class Showcase {
             card.addEventListener('click', () => {
                 const idx = parseInt(card.dataset.index);
                 this.openFocus(submissions, idx, container);
+                // 講師端：廣播聚焦
+                if (this._isPresenter && this._broadcasting) {
+                    realtime.publish(`session:${this.sessionCode}`, 'showcase_focus', {
+                        title: assignmentTitle, index: idx
+                    });
+                }
             });
         });
+
+        // 講師端：廣播捲動位置
+        const grid = container.querySelector('.showcase-grid');
+        if (grid && this._isPresenter && this._broadcasting) {
+            let scrollThrottle = null;
+            grid.addEventListener('scroll', () => {
+                if (scrollThrottle) return;
+                scrollThrottle = setTimeout(() => {
+                    const pct = grid.scrollWidth > grid.clientWidth
+                        ? grid.scrollLeft / (grid.scrollWidth - grid.clientWidth)
+                        : 0;
+                    realtime.publish(`session:${this.sessionCode}`, 'showcase_scroll', {
+                        title: assignmentTitle, scrollPct: pct
+                    });
+                    scrollThrottle = null;
+                }, 150);
+            });
+        }
     }
 
     /* ───── 圖片來源提取 ───── */
