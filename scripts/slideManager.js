@@ -663,9 +663,9 @@ export class SlideManager {
     navigateTo(index) {
         if (index < 0 || index >= this.slides.length) return;
 
-        // 儲存當前投影片狀態並立即寫 DB
+        // 儲存當前投影片狀態（debounced 寫 DB，避免快速切頁造成寫入風暴）
         this.saveCurrentSlide();
-        this.saveNow();
+        this.save();
 
         this.currentIndex = index;
         this.renderCurrentSlide();
