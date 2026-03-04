@@ -912,6 +912,18 @@ export class Editor {
                             <option value="false" ${!elementData.answer ? 'selected' : ''}>${fl}</option>
                         </select>
                     </div>
+                    <div class="property-row">
+                        <label>文字對齊</label>
+                        <select id="tfTextAlign" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="center" ${(elementData.tfTextAlign || 'center') === 'center' ? 'selected' : ''}>置中</option>
+                            <option value="left" ${elementData.tfTextAlign === 'left' ? 'selected' : ''}>靠左</option>
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <label>行高</label>
+                        <input type="range" id="tfLineHeight" min="1" max="2.5" step="0.1" value="${elementData.tfLineHeight || 1.4}" style="flex:1;">
+                        <span style="font-size:11px;color:#64748b;min-width:28px;text-align:right;">${elementData.tfLineHeight || 1.4}</span>
+                    </div>
                 </div>
             `;
         } else if (type === 'opentext') {
@@ -1509,6 +1521,15 @@ export class Editor {
             bindSimple('tfTrueLabel', 'trueLabel');
             bindSimple('tfFalseLabel', 'falseLabel');
             bindSimple('tfTextAlign', 'tfTextAlign');
+            bindSimple('tfLineHeight', 'tfLineHeight', v => parseFloat(v) || 1.4);
+            // 行高 slider 即時回饋
+            const lhSlider = document.getElementById('tfLineHeight');
+            if (lhSlider) {
+                lhSlider.addEventListener('input', () => {
+                    const span = lhSlider.nextElementSibling;
+                    if (span) span.textContent = lhSlider.value;
+                });
+            }
         } else if (elementData.type === 'opentext') {
             bindSimple('otQuestion', 'question');
             bindSimple('otPlaceholder', 'placeholder');

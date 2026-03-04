@@ -2188,9 +2188,12 @@ export class SlideManager {
         const tl = element.trueLabel || '對';
         const fl = element.falseLabel || '錯';
         const align = element.tfTextAlign || 'center';
+        const lh = element.tfLineHeight || 1.4;
+        const alignItems = align === 'left' ? 'flex-start' : 'center';
+        const containerStyle = `text-align:${align};--tf-text-align:${align};--tf-align-items:${alignItems};--tf-line-height:${lh};`;
         el.innerHTML = `
             <div class="interactive-label">是非題</div>
-            <div class="truefalse-container" data-answer="${element.answer ? 'true' : 'false'}" data-true-label="${esc(tl)}" data-false-label="${esc(fl)}" style="text-align:${align};">
+            <div class="truefalse-container" data-answer="${element.answer ? 'true' : 'false'}" data-true-label="${esc(tl)}" data-false-label="${esc(fl)}" style="${containerStyle}">
                 <div class="tf-question" style="text-align:${align};">${element.question || '對或錯？'}</div>
                 <div class="tf-buttons">
                     <button class="tf-btn tf-btn-true">
