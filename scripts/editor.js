@@ -1467,6 +1467,7 @@ export class Editor {
             bindSimple('tfAnswer', 'answer', v => v === 'true');
             bindSimple('tfTrueLabel', 'trueLabel');
             bindSimple('tfFalseLabel', 'falseLabel');
+            bindSimple('tfTextAlign', 'tfTextAlign');
         } else if (elementData.type === 'opentext') {
             bindSimple('otQuestion', 'question');
             bindSimple('otPlaceholder', 'placeholder');

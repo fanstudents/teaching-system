@@ -2201,7 +2201,7 @@
 }
 
 .tf-label {
-    font-size: 22px;
+    font-size: var(--ia-option-fs, 22px);
     font-weight: 700;
     letter-spacing: 2px;
 }
@@ -2212,13 +2212,13 @@
 }
 
 .tf-btn-true:hover {
-    border-color: #86efac;
-    background: #f0fdf4;
+    border-color: #93c5fd;
+    background: #f0f4ff;
 }
 
 .tf-btn-false:hover {
-    border-color: #fca5a5;
-    background: #fef2f2;
+    border-color: #93c5fd;
+    background: #f0f4ff;
 }
 
 .tf-btn.selected {
