@@ -3285,7 +3285,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!this._bgmAudio) return;
         const slide = this.slideManager.slides[this.presentationIndex];
         if (!slide) return;
-        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot'];
+        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'copycard', 'document'];
         const hasInteractive = slide.elements.some(el => interactiveTypes.includes(el.type));
         if (hasInteractive) {
             this._bgmAudio.play().catch(() => { });
@@ -3325,7 +3325,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const slide = this.slideManager.slides[this.presentationIndex];
         const hasInteractive = slide?.elements?.some(el =>
             ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud',
-                'hotspot', 'matching', 'fillblank', 'ordering', 'homework'].includes(el.type));
+                'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document'].includes(el.type));
 
         if (!this.broadcasting || !this.sessionCode || !hasInteractive) {
             if (qrEl) qrEl.style.display = 'none';
