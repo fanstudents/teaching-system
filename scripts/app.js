@@ -338,6 +338,34 @@ class App {
             input.click();
         });
 
+        // 排行榜音樂設定
+        document.getElementById('lbMusicBtn')?.addEventListener('click', () => {
+            const current = localStorage.getItem('ix_lb_music_url');
+            if (current) {
+                const action = confirm('已設定排行榜音樂。\n\n確定 → 重新上傳\n取消 → 清除音樂');
+                if (!action) {
+                    localStorage.removeItem('ix_lb_music_url');
+                    alert('已清除排行榜音樂');
+                    return;
+                }
+            }
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'audio/*';
+            input.addEventListener('change', () => {
+                const file = input.files[0];
+                if (!file) return;
+                if (file.size > 10 * 1024 * 1024) { alert('檔案太大（上限 10MB）'); return; }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    localStorage.setItem('ix_lb_music_url', reader.result);
+                    alert('✓ 已設定排行榜音樂：' + file.name);
+                };
+                reader.readAsDataURL(file);
+            });
+            input.click();
+        });
+
         // AI 生成簡報
         document.getElementById('aiGenerateBtn')?.addEventListener('click', () => {
             this.openAiGenerateModal();
@@ -2802,11 +2830,29 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const lb = document.getElementById('presLeaderboard');
             const pm = document.getElementById('presentationMode');
             lb?.classList.toggle('open');
-            pm?.classList.toggle('lb-active', lb?.classList.contains('open'));
+            const isOpen = lb?.classList.contains('open') || false;
+            pm?.classList.toggle('lb-active', isOpen);
+
+            // 排行榜音樂
+            const lbMusicUrl = localStorage.getItem('ix_lb_music_url');
+            if (lbMusicUrl) {
+                if (!this._lbAudio) {
+                    this._lbAudio = new Audio(lbMusicUrl);
+                    this._lbAudio.loop = true;
+                    this._lbAudio.volume = 0.4;
+                }
+                if (isOpen) {
+                    this._lbAudio.play().catch(() => { });
+                } else {
+                    this._lbAudio.pause();
+                    this._lbAudio.currentTime = 0;
+                }
+            }
+
             // 通知學員端同步排行榜
             if (this.sessionCode) {
                 realtime.publish(`session:${this.sessionCode}`, 'leaderboard_toggle', {
-                    open: lb?.classList.contains('open') || false
+                    open: isOpen
                 });
             }
         });

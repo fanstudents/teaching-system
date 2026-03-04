@@ -3270,33 +3270,37 @@
 
 /* 長條圖 */
 .lb-bar-wrap {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 3px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
     overflow: hidden;
+    margin-top: 2px;
 }
 
 .lb-bar {
     height: 100%;
-    border-radius: 3px;
+    border-radius: 7px;
     transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
     min-width: 0;
 }
 
 .lb-row:nth-child(1) .lb-bar {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
 
 .lb-row:nth-child(2) .lb-bar {
-    background: linear-gradient(90deg, #9ca3af, #d1d5db);
+    background: linear-gradient(90deg, #94a3b8, #cbd5e1, #94a3b8);
+    box-shadow: 0 0 8px rgba(148, 163, 184, 0.4);
 }
 
 .lb-row:nth-child(3) .lb-bar {
-    background: linear-gradient(90deg, #d97706, #b45309);
+    background: linear-gradient(90deg, #d97706, #f59e0b, #d97706);
+    box-shadow: 0 0 8px rgba(217, 119, 6, 0.4);
 }
 
 .lb-row:nth-child(n+4) .lb-bar {
-    background: rgba(255, 255, 255, 0.15);
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.4), rgba(139, 92, 246, 0.3));
 }
 
 /* Toggle button */
