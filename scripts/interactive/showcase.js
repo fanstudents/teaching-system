@@ -75,11 +75,14 @@ export class Showcase {
                 order: 'submitted_at.asc'
             });
 
-            // 如果精確匹配無結果，且有 sessionCode，用 session_id 回撈
+            // 如果精確匹配無結果，且有 sessionCode，用 session_id 回撈（僅作業類型）
             if ((!data || data.length === 0) && this.sessionCode) {
                 console.log('[Showcase] title match empty, trying session_id:', this.sessionCode);
                 const fallback = await db.select('submissions', {
-                    filter: { session_id: `eq.${this.sessionCode}` },
+                    filter: {
+                        session_id: `eq.${this.sessionCode}`,
+                        type: 'in.(text,image,video,audio,link)'
+                    },
                     order: 'submitted_at.asc'
                 });
                 console.log('[Showcase] session_id fallback result:', fallback.data?.length, 'rows');
