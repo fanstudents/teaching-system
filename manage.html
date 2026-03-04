@@ -978,7 +978,12 @@
                     <td>${s.company || '-'}</td>
                     <td>${s.group_name || '-'}</td>
                     <td><span class="status-badge ${status}">${statusLabel[status] || status}</span></td>
-                    <td>${actionBtn}</td>
+                    <td style="display:flex;gap:4px;align-items:center;">
+                        ${actionBtn}
+                        <button class="btn btn-sm" style="color:#ef4444;" onclick="deleteStudent('${s.id}','${(s.email || '').replace(/'/g, "\\'")}','${(s.name || '').replace(/'/g, "\\'")}')" title="刪除學員及作業">
+                            <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+                        </button>
+                    </td>
                 </tr>`;
             }).join('');
         }
@@ -998,6 +1003,25 @@
                 showToast(`已更新為${newStatus === 'registered' ? '已報名' : '已出席'}`);
             } catch (e) {
                 showToast('操作失敗：' + e.message);
+            }
+        };
+
+        // 刪除學員（含所有作業/互動資料）
+        window.deleteStudent = async function (studentId, email, name) {
+            if (!confirm(`確定要刪除「${name}」(${email}) 嗎？\n\n這會同時刪除該學員的所有互動作業資料，無法復原。`)) return;
+            try {
+                // 刪除該學員的所有 submissions
+                if (email) {
+                    await db.delete('submissions', { student_email: `eq.${email}` });
+                }
+                // 刪除學員
+                await db.delete('students', { id: `eq.${studentId}` });
+                students = students.filter(s => s.id !== studentId);
+                renderStudentTable();
+                updateStats();
+                showToast(`已刪除「${name}」及其所有作業資料`);
+            } catch (e) {
+                showToast('刪除失敗：' + e.message);
             }
         };
 
