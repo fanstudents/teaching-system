@@ -2795,6 +2795,7 @@ export class SlideManager {
 
         const data = {
             slides: this.slides,
+            sections: this.sections,
             currentIndex: this.currentIndex,
             savedAt: new Date().toISOString()
         };
