@@ -2409,6 +2409,33 @@ export class SlideManager {
                         miniEl.style.background = '#e8eaf6';
                         miniEl.style.border = '2px solid #7986cb';
                         miniEl.innerHTML = '<span class="mini-text-content" style="color:#283593;font-size:16px;">🔲 嵌入</span>';
+                    } else if (element.type === 'truefalse') {
+                        miniEl.style.background = '#e8f5e9';
+                        miniEl.style.border = '2px solid #66bb6a';
+                        miniEl.innerHTML = '<span class="mini-text-content" style="color:#2e7d32;font-size:16px;">⚖️ 是非</span>';
+                    } else if (element.type === 'opentext') {
+                        miniEl.style.background = '#e3f2fd';
+                        miniEl.style.border = '2px solid #42a5f5';
+                        miniEl.innerHTML = '<span class="mini-text-content" style="color:#1565c0;font-size:16px;">💬 開放題</span>';
+                    } else if (element.type === 'scale') {
+                        miniEl.style.background = '#fff3e0';
+                        miniEl.style.border = '2px solid #ff9800';
+                        miniEl.innerHTML = '<span class="mini-text-content" style="color:#e65100;font-size:16px;">📏 量表</span>';
+                    } else if (element.type === 'buzzer') {
+                        miniEl.style.background = '#fce4ec';
+                        miniEl.style.border = '2px solid #f44336';
+                        miniEl.innerHTML = '<span class="mini-text-content" style="color:#c62828;font-size:16px;">🔔 搶答</span>';
+                    } else if (element.type === 'wordcloud') {
+                        miniEl.style.background = '#e0f2f1';
+                        miniEl.style.border = '2px solid #26a69a';
+                        miniEl.innerHTML = '<span class="mini-text-content" style="color:#00695c;font-size:16px;">☁️ 文字雲</span>';
+                    } else if (element.type === 'hotspot') {
+                        miniEl.style.background = '#fbe9e7';
+                        miniEl.style.border = '2px solid #ff7043';
+                        miniEl.innerHTML = '<span class="mini-text-content" style="color:#bf360c;font-size:16px;">📍 熱點</span>';
+                    } else if (element.type === 'line') {
+                        miniEl.style.borderTop = `${element.strokeWidth || 2}px ${element.lineStyle || 'solid'} ${element.color || '#4285f4'}`;
+                        miniEl.style.height = '0';
                     }
 
                     previewContainer.appendChild(miniEl);
