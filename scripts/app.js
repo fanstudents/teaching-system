@@ -2405,15 +2405,26 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             });
             const codes = [...new Set((questions || []).map(q => q.session_code).filter(Boolean))];
             select.innerHTML = '<option value="">— 請選擇場次 —</option>';
-            // 取得場次名稱
+            // 取得場次名稱（優先從 projects 取，再從 sessions 取）
             for (const code of codes) {
-                const { data: sessions } = await db.select('sessions', {
-                    filter: { session_code: `eq.${code}` },
-                    select: 'title',
+                let title = '';
+                // 先查 projects（有完整課程名稱）
+                const { data: projects } = await db.select('projects', {
+                    filter: { join_code: `eq.${code}` },
+                    select: 'name',
                     limit: 1
                 });
-                const title = sessions?.[0]?.title || '';
-                const label = title ? `${code}（${title}）` : code;
+                title = projects?.[0]?.name || '';
+                // 再查 sessions
+                if (!title) {
+                    const { data: sessions } = await db.select('sessions', {
+                        filter: { session_code: `eq.${code}` },
+                        select: 'title',
+                        limit: 1
+                    });
+                    title = sessions?.[0]?.title || '';
+                }
+                const label = title ? `${title}（${code}）` : code;
                 select.innerHTML += `<option value="${code}">${label}</option>`;
             }
             // 預選目前的 joinCode
