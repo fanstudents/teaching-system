@@ -11,6 +11,40 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link rel="icon" type="image/png" href="favicon.png">
+    <script>
+        // ★ 全域錯誤捕獲 — 防止頁面崩潰
+        window.addEventListener('error', function (e) {
+            console.error('[GlobalError]', e.message, e.filename, e.lineno);
+            _showErrorToast(e.message);
+            // 嘗試緊急存檔到 localStorage
+            try {
+                const sm = window.app?.slideManager;
+                if (sm?.currentProjectId && sm?.slides?.length > 0) {
+                    sm.saveCurrentSlide?.();
+                    const data = { slides: sm.slides, sections: sm.sections, currentIndex: sm.currentIndex, savedAt: new Date().toISOString() };
+                    localStorage.setItem(`project_${sm.currentProjectId}`, JSON.stringify(data));
+                    console.log('[GlobalError] emergency save OK');
+                }
+            } catch (_) { }
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+            console.error('[UnhandledRejection]', e.reason);
+            _showErrorToast('Promise 錯誤: ' + (e.reason?.message || e.reason));
+        });
+        function _showErrorToast(msg) {
+            let t = document.getElementById('_errToast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = '_errToast';
+                t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#dc2626;color:#fff;padding:10px 20px;border-radius:8px;z-index:99999;font-size:13px;max-width:80vw;word-break:break-all;box-shadow:0 4px 12px rgba(0,0,0,.3);pointer-events:auto;cursor:pointer;';
+                t.onclick = () => t.remove();
+                document.body?.appendChild(t) || document.addEventListener('DOMContentLoaded', () => document.body.appendChild(t));
+            }
+            t.textContent = '⚠ ' + msg;
+            clearTimeout(t._tid);
+            t._tid = setTimeout(() => t.remove(), 8000);
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link
