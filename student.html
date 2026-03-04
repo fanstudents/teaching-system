@@ -260,6 +260,16 @@
                 setTimeout(() => joinSession(), 200);
             }
         }
+        // ── Auto-rejoin on refresh (from sessionStorage) ──
+        else {
+            const saved = JSON.parse(sessionStorage.getItem('ix_student_session') || 'null');
+            if (saved && saved.sessionCode && saved.studentName && saved.studentEmail) {
+                document.getElementById('sessionCode').value = saved.sessionCode;
+                document.getElementById('studentEmail').value = saved.studentEmail;
+                document.getElementById('studentName').value = saved.studentName;
+                setTimeout(() => joinSession(), 200);
+            }
+        }
 
         // ── Mode Toggle ──
         document.getElementById('followModeBtn').addEventListener('click', () => setMode('follow'));
@@ -267,6 +277,7 @@
 
         // ── Close Button ──
         document.getElementById('studentCloseBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('ix_student_session');
             realtime.publish(`session:${sessionCode}`, 'student_leave', { studentId, studentName });
             if (heartbeatTimer) clearInterval(heartbeatTimer);
             const joinCode = new URLSearchParams(location.search).get('joinCode') || new URLSearchParams(location.search).get('code') || '';
@@ -391,8 +402,18 @@
                 loadOverlay.classList.remove('active');
             }
 
-            // 產生唯一學員 ID
-            studentId = `${studentName}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+            // 產生唯一學員 ID（或復用已存的）
+            const savedSession = JSON.parse(sessionStorage.getItem('ix_student_session') || 'null');
+            if (savedSession && savedSession.sessionCode === sessionCode && savedSession.studentName === studentName) {
+                studentId = savedSession.studentId;
+            } else {
+                studentId = `${studentName}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+            }
+
+            // 儲存 session 狀態，重新整理時可自動回復
+            sessionStorage.setItem('ix_student_session', JSON.stringify({
+                sessionCode, studentName, studentEmail, studentId
+            }));
 
             try {
                 // 先查 projects 表確認 join code 有效

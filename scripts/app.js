@@ -3454,13 +3454,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!this.broadcasting || !this.sessionCode) return;
         // 監聽 reaction 事件
         this._reactionHandler = (payload) => {
-            const emoji = payload?.payload?.emoji || payload?.new?.emoji;
+            const emoji = payload?.emoji;
             if (emoji) this.spawnEmojiParticle(emoji);
         };
         // 向 realtime channel 訂閱 reaction
-        if (this._realtimeChannel) {
-            this._realtimeChannel.on('broadcast', { event: 'reaction' }, this._reactionHandler);
-        }
+        realtime.on('reaction', this._reactionHandler);
     }
 
     spawnEmojiParticle(emoji) {
@@ -3521,7 +3519,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // 監聽 Q&A 事件
         this._qaHandler = (payload) => {
-            const data = payload?.payload || payload?.new;
+            const data = payload?.type ? payload : (payload?.payload || payload);
             if (!data) return;
             if (data.type === 'question') {
                 const existing = this._qaQuestions.find(q => q.id === data.id);
@@ -3535,9 +3533,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 if (q) { q.votes = (q.votes || 0) + 1; this.renderQAList(); }
             }
         };
-        if (this._realtimeChannel) {
-            this._realtimeChannel.on('broadcast', { event: 'qa' }, this._qaHandler);
-        }
+        realtime.on('qa', this._qaHandler);
     }
 
     toggleQAPanel() {
