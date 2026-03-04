@@ -2157,11 +2157,9 @@ export class SlideManager {
                 <div class="tf-question">${element.question || '對或錯？'}</div>
                 <div class="tf-buttons">
                     <button class="tf-btn tf-btn-true">
-                        <span class="tf-icon">✓</span>
                         <span class="tf-label">${esc(tl)}</span>
                     </button>
                     <button class="tf-btn tf-btn-false">
-                        <span class="tf-icon">✗</span>
                         <span class="tf-label">${esc(fl)}</span>
                     </button>
                 </div>

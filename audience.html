@@ -990,10 +990,10 @@
                             <div class="tf-question">${element.question || '是非題'}</div>
                             <div class="tf-options">
                                 <button class="tf-btn correct" data-value="true" data-answer="${answer}">
-                                    <span class="material-symbols-outlined">check_circle</span> 正確
+                                    ${element.trueLabel || '對'}
                                 </button>
                                 <button class="tf-btn wrong" data-value="false" data-answer="${!answer}">
-                                    <span class="material-symbols-outlined">cancel</span> 錯誤
+                                    ${element.falseLabel || '錯'}
                                 </button>
                             </div>
                             <div class="tf-result"></div>
