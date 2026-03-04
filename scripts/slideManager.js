@@ -961,6 +961,39 @@ export class SlideManager {
                 `;
                 break;
 
+            case 'link': {
+                el.classList.add('link-element');
+                const url = element.linkUrl || '#';
+                const label = element.linkLabel || '開啟連結';
+                const desc = element.linkDesc || '';
+                el.innerHTML = `
+                    <div class="link-card" data-url="${url.replace(/"/g, '&quot;')}">
+                        <div class="link-card-icon">
+                            <span class="material-symbols-outlined">open_in_new</span>
+                        </div>
+                        <div class="link-card-body">
+                            <div class="link-card-label">${label}</div>
+                            ${desc ? `<div class="link-card-desc">${desc}</div>` : ''}
+                            <div class="link-card-url">${url}</div>
+                        </div>
+                        <div class="link-card-arrow">
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </div>
+                    </div>
+                `;
+                // 簡報模式才可點擊
+                const card = el.querySelector('.link-card');
+                if (card) {
+                    card.addEventListener('click', (e) => {
+                        if (el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap')) {
+                            e.stopPropagation();
+                            window.open(url, '_blank');
+                        }
+                    });
+                }
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);

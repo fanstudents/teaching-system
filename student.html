@@ -743,6 +743,32 @@
                     `;
                     break;
 
+                case 'link': {
+                    el.classList.add('link-element');
+                    const linkUrl = element.linkUrl || '#';
+                    const linkLabel = element.linkLabel || '開啟連結';
+                    const linkDesc = element.linkDesc || '';
+                    el.innerHTML = `
+                        <div class="link-card" data-url="${linkUrl.replace(/"/g, '&quot;')}">
+                            <div class="link-card-icon">
+                                <span class="material-symbols-outlined">open_in_new</span>
+                            </div>
+                            <div class="link-card-body">
+                                <div class="link-card-label">${linkLabel}</div>
+                                ${linkDesc ? `<div class="link-card-desc">${linkDesc}</div>` : ''}
+                                <div class="link-card-url">${linkUrl}</div>
+                            </div>
+                            <div class="link-card-arrow">
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </div>
+                        </div>`;
+                    el.querySelector('.link-card')?.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        window.open(linkUrl, '_blank');
+                    });
+                    break;
+                }
+
                 case 'matching': {
                     el.classList.add('interactive-element');
                     const pairs = element.pairs || [];

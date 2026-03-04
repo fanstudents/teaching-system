@@ -76,6 +76,25 @@ export class Editor {
     }
 
     /**
+     * 新增連結元素
+     */
+    addLink() {
+        const element = {
+            type: 'link',
+            x: 100,
+            y: 200,
+            width: 380,
+            height: 72,
+            linkUrl: 'https://example.com',
+            linkLabel: '點擊開啟連結',
+            linkDesc: '',
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增形狀元素
      */
     addShape(shapeType) {
@@ -743,6 +762,28 @@ export class Editor {
                 </div>
             `;
         }
+
+        // 連結元件
+        if (type === 'link') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">連結設定</div>
+                    <div class="form-group">
+                        <label class="form-label">連結網址</label>
+                        <input type="url" class="form-input" id="linkUrl" value="${(elementData.linkUrl || '').replace(/"/g, '&quot;')}" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">顯示文字</label>
+                        <input type="text" class="form-input" id="linkLabel" value="${(elementData.linkLabel || '').replace(/"/g, '&quot;')}" placeholder="點擊開啟連結">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">說明（選填）</label>
+                        <input type="text" class="form-input" id="linkDesc" value="${(elementData.linkDesc || '').replace(/"/g, '&quot;')}" placeholder="連結的簡短說明">
+                    </div>
+                </div>
+            `;
+        }
+
         // 圖表元件
         if (type === 'chart') {
             const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
@@ -1480,6 +1521,10 @@ export class Editor {
             bindSimple('scaleLabelRight', 'labelRight');
         } else if (elementData.type === 'buzzer') {
             bindSimple('buzzerQuestion', 'question');
+        } else if (elementData.type === 'link') {
+            bindSimple('linkUrl', 'linkUrl');
+            bindSimple('linkLabel', 'linkLabel');
+            bindSimple('linkDesc', 'linkDesc');
         } else if (elementData.type === 'document') {
             bindSimple('docTitle', 'docTitle');
 

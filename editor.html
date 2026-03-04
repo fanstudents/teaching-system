@@ -210,6 +210,10 @@
                                 <span class="material-symbols-outlined">emoji_symbols</span>
                                 <span class="ribbon-btn-label">Icon</span>
                             </button>
+                            <button class="ribbon-btn" id="addLinkBtn" title="插入連結">
+                                <span class="material-symbols-outlined">link</span>
+                                <span class="ribbon-btn-label">連結</span>
+                            </button>
                         </div>
                         <div class="ribbon-group-title">基本元素</div>
                     </div>
@@ -1075,29 +1079,19 @@
             </div>
         </div>
 
-        <!-- 底部導航 -->
-        <div class="presentation-nav">
-            <button class="pres-nav-btn" id="presPrev">
-                <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-            <button class="pres-nav-btn" id="presNext">
-                <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-        </div>
-
         <!-- 分組進度條 -->
         <div id="presSectionBar" style="
             position: fixed;
             bottom: 0; left: 0; right: 0;
             z-index: 200;
-            height: 28px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            height: 44px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.7));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: none;
-            align-items: center;
-            padding: 0 12px;
-            gap: 2px;
+            align-items: stretch;
+            padding: 6px 16px;
+            gap: 3px;
             font-family: 'Noto Sans TC', sans-serif;
         "></div>
     </div>

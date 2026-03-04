@@ -212,6 +212,11 @@ class App {
             this.editor.addText();
         });
 
+        // 新增連結
+        document.getElementById('addLinkBtn')?.addEventListener('click', () => {
+            this.editor.addLink();
+        });
+
         // 新增圖形
         document.getElementById('addShapeBtn').addEventListener('click', (e) => {
             this.showShapePicker(e.currentTarget);
@@ -3627,65 +3632,68 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         bar.innerHTML = '';
         const total = this.slideManager.slides.length;
         const currentIdx = this.presentationIndex;
-        const sectionInfo = this.slideManager.getSectionForSlide(currentIdx);
-
-        // 為每個 section 建立色塊
         const colors = ['#6366f1', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0d9488', '#c026d3'];
+
+        // 前綴（section 0 不從 0 開始時）
+        if (sections[0].startIndex > 0) {
+            const beforeCount = sections[0].startIndex;
+            const isCurrent = currentIdx < sections[0].startIndex;
+            const group = document.createElement('div');
+            group.style.cssText = `flex:${beforeCount};display:flex;flex-direction:column;gap:2px;justify-content:flex-end;`;
+            const segs = document.createElement('div');
+            segs.style.cssText = 'display:flex;gap:1px;flex:1;align-items:stretch;';
+            for (let j = 0; j < beforeCount; j++) {
+                const s = document.createElement('div');
+                const isThis = currentIdx === j;
+                s.style.cssText = `flex:1;border-radius:2px;background:${isThis ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.08)'};transition:all 0.3s;min-width:2px;`;
+                segs.appendChild(s);
+            }
+            group.appendChild(segs);
+            bar.appendChild(group);
+        }
+
         sections.forEach((sec, i) => {
             const nextStart = (i + 1 < sections.length) ? sections[i + 1].startIndex : total;
             const count = nextStart - sec.startIndex;
             if (count <= 0) return;
-            const pct = (count / total) * 100;
-            const isCurrent = sectionInfo && sectionInfo.startIndex === sec.startIndex;
+            const isCurrent = currentIdx >= sec.startIndex && currentIdx < nextStart;
             const color = colors[i % colors.length];
-            const seg = document.createElement('div');
-            seg.style.cssText = `
-                flex: ${count};
-                height: 18px;
-                border-radius: 3px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 10px;
-                font-weight: ${isCurrent ? '700' : '500'};
-                color: ${isCurrent ? '#fff' : 'rgba(255,255,255,0.45)'};
-                background: ${isCurrent ? color : 'rgba(255,255,255,0.1)'};
-                transition: all 0.3s ease;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                padding: 0 6px;
-                cursor: default;
-            `;
-            if (isCurrent) {
-                seg.textContent = `${sec.name} ${sectionInfo.pos}/${sectionInfo.total}`;
-            } else {
-                seg.textContent = sec.name;
-            }
-            seg.title = `${sec.name}（${count} 頁）`;
-            bar.appendChild(seg);
-        });
+            const posInSec = isCurrent ? currentIdx - sec.startIndex + 1 : 0;
 
-        // 如果第一個 section 不從 0 開始，前面的頁也顯示
-        if (sections[0].startIndex > 0) {
-            const beforeCount = sections[0].startIndex;
-            const beforeSeg = document.createElement('div');
-            const isCurrent = currentIdx < sections[0].startIndex;
-            beforeSeg.style.cssText = `
-                flex: ${beforeCount};
-                height: 18px;
-                border-radius: 3px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 10px;
-                color: ${isCurrent ? '#fff' : 'rgba(255,255,255,0.3)'};
-                background: ${isCurrent ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'};
-                transition: all 0.3s ease;
-                padding: 0 6px;
+            const group = document.createElement('div');
+            group.style.cssText = `flex:${count};display:flex;flex-direction:column;gap:2px;min-width:0;`;
+            group.title = `${sec.name}（${count} 頁）`;
+
+            // 標題列
+            const label = document.createElement('div');
+            label.style.cssText = `
+                font-size:10px;font-weight:${isCurrent ? '700' : '500'};
+                color:${isCurrent ? '#fff' : 'rgba(255,255,255,0.4)'};
+                overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                padding:0 2px;line-height:1;
             `;
-            bar.insertBefore(beforeSeg, bar.firstChild);
-        }
+            label.textContent = isCurrent ? `${sec.name} ${posInSec}/${count}` : sec.name;
+            group.appendChild(label);
+
+            // 分頁格
+            const segs = document.createElement('div');
+            segs.style.cssText = 'display:flex;gap:1px;flex:1;align-items:stretch;';
+            for (let j = 0; j < count; j++) {
+                const slideIdx = sec.startIndex + j;
+                const isThis = slideIdx === currentIdx;
+                const isPast = slideIdx < currentIdx && isCurrent;
+                const s = document.createElement('div');
+                let bg;
+                if (isThis) bg = color;
+                else if (isPast) bg = color + '80'; // 50% opacity
+                else if (isCurrent) bg = 'rgba(255,255,255,0.12)';
+                else bg = 'rgba(255,255,255,0.06)';
+                s.style.cssText = `flex:1;border-radius:2px;background:${bg};transition:all 0.3s;min-width:2px;`;
+                segs.appendChild(s);
+            }
+            group.appendChild(segs);
+            bar.appendChild(group);
+        });
     }
 
     // 顯示下一個動畫步驟，回傳 true 表示還有步驟要顯示
@@ -3711,7 +3719,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         exitBtn.addEventListener('click', () => this.exitPresentation());
 
-        prevBtn.addEventListener('click', () => {
+        prevBtn?.addEventListener('click', () => {
             if (this.presentationIndex > 0) {
                 this.presentationIndex--;
                 this.renderPresentationSlide();
@@ -3719,7 +3727,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             }
         });
 
-        nextBtn.addEventListener('click', () => {
+        nextBtn?.addEventListener('click', () => {
             if (this.presentationIndex < this.slideManager.slides.length - 1) {
                 this.presentationIndex++;
                 this.renderPresentationSlide();
