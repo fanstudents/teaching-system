@@ -61,10 +61,22 @@ export class Showcase {
      */
     async fetchAndRender(container, assignmentTitle) {
         try {
-            const { data, error } = await db.select('submissions', {
+            let { data, error } = await db.select('submissions', {
                 filter: { assignment_title: `eq.${assignmentTitle}` },
                 order: 'submitted_at.asc'
             });
+
+            // 如果精確匹配無結果，且有 sessionCode，用 session_id 回撈
+            if ((!data || data.length === 0) && this.sessionCode) {
+                const fallback = await db.select('submissions', {
+                    filter: { session_id: `eq.${this.sessionCode}` },
+                    order: 'submitted_at.asc'
+                });
+                if (fallback.data && fallback.data.length > 0) {
+                    data = fallback.data;
+                    error = fallback.error;
+                }
+            }
 
             if (error || !data) {
                 this.renderError(container, '無法載入作品');
