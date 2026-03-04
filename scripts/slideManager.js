@@ -3167,6 +3167,7 @@ export class SlideManager {
                 this.saveCurrentSlide();
                 const data = {
                     slides: this.slides,
+                    sections: this.sections,
                     currentIndex: this.currentIndex,
                     savedAt: new Date().toISOString()
                 };
