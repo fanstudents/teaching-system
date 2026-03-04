@@ -39,6 +39,7 @@ export class Showcase {
      */
     async setupContainer(container) {
         const title = container.dataset.assignmentTitle || '';
+        console.log('[Showcase] setupContainer title:', title, 'sessionCode:', this.sessionCode);
         if (!title) return;
 
         // 清除舊 hash，確保新容器一定會渲染
@@ -69,10 +70,12 @@ export class Showcase {
 
             // 如果精確匹配無結果，且有 sessionCode，用 session_id 回撈
             if ((!data || data.length === 0) && this.sessionCode) {
+                console.log('[Showcase] title match empty, trying session_id:', this.sessionCode);
                 const fallback = await db.select('submissions', {
                     filter: { session_id: `eq.${this.sessionCode}` },
                     order: 'submitted_at.asc'
                 });
+                console.log('[Showcase] session_id fallback result:', fallback.data?.length, 'rows');
                 if (fallback.data && fallback.data.length > 0) {
                     data = fallback.data;
                     error = fallback.error;
