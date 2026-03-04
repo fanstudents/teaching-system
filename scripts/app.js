@@ -53,6 +53,9 @@ class App {
         this.documentViewer = new DocumentViewer();
         this.homework = new HomeworkSubmission();
 
+        // Email 生成
+        this._initEmailModal();
+
         // Undo/Redo 歷史
         this.undoStack = [];
         this.redoStack = [];
@@ -220,6 +223,11 @@ class App {
         // 新增排行榜
         document.getElementById('addLeaderboardBtn')?.addEventListener('click', () => {
             this.editor.addLeaderboard();
+        });
+
+        // 新增問卷
+        document.getElementById('addSurveyBtn')?.addEventListener('click', () => {
+            this.editor.addSurvey();
         });
 
         // 新增圖形
@@ -3962,6 +3970,174 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 編輯器中選取的文字元素
         if (this.editor?.selectedElement?.dataset?.type === 'text') return true;
         return false;
+    }
+
+    // ── Email 生成系統 ──
+
+    _initEmailModal() {
+        document.getElementById('generateEmailBtn')?.addEventListener('click', () => {
+            this.generateEmailDrafts();
+        });
+    }
+
+    async generateEmailDrafts() {
+        const sessionCode = document.getElementById('emailSessionCode')?.value?.trim() || this.sessionCode || '';
+        if (!sessionCode) {
+            this.showToast('請輸入課堂代碼');
+            return;
+        }
+
+        const btn = document.getElementById('generateEmailBtn');
+        const results = document.getElementById('emailResults');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 1s linear infinite;font-size:18px;">progress_activity</span> 載入學員資料…';
+        results.innerHTML = '';
+
+        try {
+            // 1. 撈取所有 submissions
+            const { data: submissions } = await db.select('submissions', {
+                filter: { session_id: `eq.${sessionCode}`, student_email: 'neq.guest' },
+                order: 'submitted_at.asc'
+            });
+
+            if (!submissions || submissions.length === 0) {
+                results.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:20px;">找不到任何學員資料</div>';
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span> 用 AI 生成個人化信件';
+                return;
+            }
+
+            // 2. 按學員分組
+            const studentMap = new Map();
+            for (const s of submissions) {
+                const key = s.student_email || s.student_name;
+                if (!key) continue;
+                if (!studentMap.has(key)) {
+                    studentMap.set(key, { name: s.student_name, email: s.student_email, submissions: [] });
+                }
+                studentMap.get(key).submissions.push(s);
+            }
+
+            const students = [...studentMap.values()];
+            results.innerHTML = `<div style="color:#94a3b8;text-align:center;padding:8px;">找到 ${students.length} 位學員，開始生成信件…</div>`;
+
+            // 3. 逐一生成
+            for (let i = 0; i < students.length; i++) {
+                const stu = students[i];
+                btn.innerHTML = `<span class="material-symbols-outlined" style="animation:spin 1s linear infinite;font-size:18px;">progress_activity</span> 生成中 (${i + 1}/${students.length})…`;
+
+                // 彙整該學員的學習數據
+                let surveyAnswers = '';
+                let quizResults = [];
+                let homeworkCount = 0;
+                let totalPoints = 0;
+
+                for (const sub of stu.submissions) {
+                    let st = sub.state;
+                    if (typeof st === 'string') try { st = JSON.parse(st); } catch { st = {}; }
+                    totalPoints += parseInt(st?._awarded) || 0;
+
+                    if (sub.type === 'survey') {
+                        try {
+                            const answers = JSON.parse(sub.content);
+                            surveyAnswers = Object.values(answers).map(a =>
+                                `${a.question}：${a.type === 'stars' ? '⭐'.repeat(a.value) : a.value}`
+                            ).join('\n');
+                        } catch { }
+                    } else if (['quiz', 'truefalse', 'matching', 'fillblank'].includes(sub.type)) {
+                        quizResults.push({
+                            title: sub.assignment_title || sub.type,
+                            score: sub.score,
+                            correct: sub.is_correct
+                        });
+                    } else if (['text', 'image', 'video', 'audio'].includes(sub.type)) {
+                        homeworkCount++;
+                    }
+                }
+
+                const correctCount = quizResults.filter(q => q.correct === 'true' || q.correct === true).length;
+                const accuracy = quizResults.length > 0 ? Math.round(correctCount / quizResults.length * 100) : 0;
+
+                const prompt = `你是一位專業的教育培訓講師「樊松蒲」，剛結束一堂「提示詞工程 (Prompt Engineering)」課程。
+請根據以下學員資料，為這位學員撰寫一封「課後感謝 + 學習摘要」Email。
+
+學員姓名：${stu.name}
+答題正確率：${quizResults.length > 0 ? `${accuracy}%（${correctCount}/${quizResults.length} 題）` : '未作答'}
+繳交作業數：${homeworkCount} 份
+累積積分：${totalPoints} 分
+問卷回覆：
+${surveyAnswers || '（未填寫）'}
+
+課程重點摘要（請基於這些重點撰寫）：
+1. 提示詞的核心結構：角色設定、任務描述、格式指定、範例提供
+2. 提示詞的品質差異：好的提示詞 vs 壞的提示詞
+3. 實作練習：圖片逆向工程
+4. 情境應用：HR 面試 AI 評估系統
+5. 官方最佳實踐：Gemini / Claude / ChatGPT 官方提示詞指南
+
+信件要求：
+- 以「Hi ${stu.name}，」開頭
+- 語氣溫暖鼓勵，讓學員覺得自己很棒
+- 包含「🎯 課程回顧」段落（3-4 個重點）
+- 包含「📊 你的學習成果」段落（引用真實數據）
+- 包含「💡 下一步建議」段落（根據問卷的「還想學什麼」回答，若無則給通用建議）
+- 包含「📎 延伸學習資源」段落，列出：
+  • Gemini 官方提示詞指南：https://cloud.google.com/gemini-enterprise/resources/prompt-guide?hl=zh-TW
+  • ChatGPT 官方提示詞指南：https://help.openai.com/zh-hant/articles/10032626-prompt-engineering-best-practices-for-chatgpt
+- 結尾署名區塊：
+  ---
+  樊松蒲
+  📧 sungpu@fanstudent.com
+  📱 LINE：@fanstudent
+  🧊 數位茶水間（免費社群）：https://line.me/ti/g2/fanstudent-lounge
+- 全文用繁體中文
+- 不要加主旨（Subject）行
+- 總長度控制在 300-400 字`;
+
+                try {
+                    const emailText = await ai.chat([{ role: 'user', content: prompt }], {
+                        temperature: 0.8,
+                        maxTokens: 1200,
+                    });
+
+                    const card = document.createElement('div');
+                    card.style.cssText = 'background:#0f172a;border-radius:12px;padding:16px;';
+                    card.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-weight:600;">${stu.name} <span style="color:#64748b;font-size:12px;">${stu.email}</span></span>
+                            <button class="copy-email-btn" style="background:#6366f1;border:none;color:#fff;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;">📋 複製</button>
+                        </div>
+                        <pre style="white-space:pre-wrap;font-size:12px;color:#cbd5e1;line-height:1.6;margin:0;font-family:inherit;">${emailText}</pre>
+                    `;
+                    card.querySelector('.copy-email-btn').addEventListener('click', () => {
+                        navigator.clipboard.writeText(emailText).then(() => {
+                            card.querySelector('.copy-email-btn').textContent = '✓ 已複製';
+                            setTimeout(() => { card.querySelector('.copy-email-btn').textContent = '📋 複製'; }, 2000);
+                        });
+                    });
+                    results.appendChild(card);
+                } catch (e) {
+                    const errCard = document.createElement('div');
+                    errCard.style.cssText = 'background:#7f1d1d;border-radius:12px;padding:12px;color:#fca5a5;font-size:13px;';
+                    errCard.textContent = `❌ ${stu.name}：生成失敗 — ${e.message}`;
+                    results.appendChild(errCard);
+                }
+
+                // 避免 rate limit
+                if (i < students.length - 1) {
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            }
+
+            // 完成
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span> 重新生成信件';
+
+        } catch (err) {
+            results.innerHTML = `<div style="color:#fca5a5;text-align:center;padding:20px;">❌ 載入失敗：${err.message}</div>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span> 用 AI 生成個人化信件';
+        }
     }
 
     showToast(message) {

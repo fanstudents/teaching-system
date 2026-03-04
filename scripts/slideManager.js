@@ -1018,6 +1018,22 @@ export class SlideManager {
                 break;
             }
 
+            case 'survey': {
+                el.classList.add('survey-element');
+                el.style.overflow = 'hidden';
+                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                if (isLive) {
+                    import('./interactive/survey.js').then(({ SurveyGame }) => {
+                        new SurveyGame().render(el, element);
+                    });
+                } else {
+                    import('./interactive/survey.js').then(({ SurveyGame }) => {
+                        new SurveyGame().renderPreview(el, element);
+                    });
+                }
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);

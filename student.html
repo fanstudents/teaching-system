@@ -784,6 +784,17 @@
                     break;
                 }
 
+                case 'survey': {
+                    el.classList.add('survey-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/survey.js').then(({ SurveyGame }) => {
+                        new SurveyGame().render(el, element);
+                    }).catch(e => {
+                        el.innerHTML = '<div style="padding:20px;color:#666;">問卷載入失敗</div>';
+                    });
+                    break;
+                }
+
                 case 'leaderboard': {
                     el.classList.add('leaderboard-element');
                     el.style.overflow = 'hidden';

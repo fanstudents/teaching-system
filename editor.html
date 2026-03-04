@@ -414,6 +414,15 @@
                                 <span class="material-symbols-outlined">newspaper</span>
                                 <span class="ribbon-btn-label">新聞</span>
                             </button>
+                            <button class="ribbon-btn" id="addSurveyBtn" title="插入課後問卷" style="color:#8b5cf6;">
+                                <span class="material-symbols-outlined">rate_review</span>
+                                <span class="ribbon-btn-label">問卷</span>
+                            </button>
+                            <button class="ribbon-btn" id="openEmailModalBtn" title="生成課後信件" style="color:#0d9488;"
+                                onclick="document.getElementById('emailModal').style.display=''">
+                                <span class="material-symbols-outlined">forward_to_inbox</span>
+                                <span class="ribbon-btn-label">信件</span>
+                            </button>
                         </div>
                         <div class="ribbon-group-title">作業 / 其他</div>
                     </div>
@@ -1994,6 +2003,29 @@
             alert(`已匯入 ${count} 頁投影片`);
         };
     </script>
+
+    <!-- Email 生成 Modal -->
+    <div id="emailModal"
+        style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);overflow-y:auto;">
+        <div style="max-width:800px;margin:40px auto;background:#1e293b;border-radius:16px;color:#fff;padding:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h2 style="margin:0;font-size:20px;">📧 生成課後個人化信件</h2>
+                <button onclick="document.getElementById('emailModal').style.display='none'"
+                    style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:13px;color:#94a3b8;">Session Code（課堂代碼）</label>
+                <input id="emailSessionCode" type="text" placeholder="輸入課堂代碼"
+                    style="width:100%;margin-top:4px;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:14px;box-sizing:border-box;">
+            </div>
+            <button id="generateEmailBtn"
+                style="width:100%;padding:10px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span>
+                用 AI 生成個人化信件
+            </button>
+            <div id="emailResults" style="margin-top:16px;display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+    </div>
 
 </body>
 
