@@ -153,6 +153,7 @@
         import { Showcase } from './scripts/interactive/showcase.js';
         import { HomeworkSubmission } from './scripts/homework.js';
         import { stateManager } from './scripts/interactive/stateManager.js';
+        import { DocumentViewer } from './scripts/interactive/documentViewer.js';
 
         const matchingGame = new MatchingGame();
         const fillBlank = new FillBlank();
@@ -168,6 +169,10 @@
         const countdown = new CountdownTimer();
         const showcase = new Showcase();
         const homework = new HomeworkSubmission();
+        const documentViewer = new DocumentViewer();
+
+        // 預設分數對照表
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, homework: 5, survey: 2 };
         let lbTimer = null;
 
         let sessionCode = '';
@@ -178,6 +183,8 @@
         // ── 廣播模式狀態 ──
         let mode = 'follow'; // 'follow' | 'free'
         let slidesCache = []; // 儲存所有收到的投影片
+        // 曝露給 DocumentViewer 用
+        window._presenterApp = { get slides() { return slidesCache; } };
         let currentIndex = 0;
         let totalSlides = 0;
         let instructorIndex = 0; // 講師目前頁碼
@@ -460,10 +467,18 @@
                     }
                 });
 
-                // 監聽 session_end 事件
+                // 監聽 session_end 事件 → 切回自行瀏覽模式（不強制重新登入）
                 realtime.on('session_end', () => {
                     if (heartbeatTimer) clearInterval(heartbeatTimer);
-                    document.getElementById('disconnectedOverlay').classList.add('active');
+                    // 切換到「自行瀏覽」tab
+                    const browseTab = document.querySelector('[data-tab="browse"]');
+                    if (browseTab) browseTab.click();
+                    // 顯示提示
+                    const toast = document.createElement('div');
+                    toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#1e293b;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+                    toast.textContent = '📢 講師已結束廣播，你可以繼續瀏覽簡報';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 5000);
                 });
 
                 // 講師排行榜同步
@@ -721,6 +736,19 @@
             el.style.height = `${element.height}px`;
             if (element.rotation) el.style.transform = `rotate(${element.rotation}deg)`;
             if (element.zIndex) el.style.zIndex = element.zIndex;
+
+            // 設定分數並加入分數徽章
+            const interactiveTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework', 'survey'];
+            if (interactiveTypes.includes(element.type)) {
+                const pts = parseInt(element.points) || defaultPts[element.type] || 0;
+                el.dataset.points = pts;
+                if (pts > 0) {
+                    const badge = document.createElement('div');
+                    badge.className = 'element-score-badge';
+                    badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px;">stars</span> 1~${pts}分`;
+                    setTimeout(() => el.appendChild(badge), 0);
+                }
+            }
 
             switch (element.type) {
                 case 'text':
@@ -1351,9 +1379,8 @@
 
                 case 'document': {
                     el.classList.add('interactive-element');
-                    const docUrl = element.docUrl || '';
                     el.innerHTML = `
-                        <div class="document-card-container" style="
+                        <div class="document-card-container" data-element-id="${element.id}" style="
                             display:flex;flex-direction:column;align-items:center;justify-content:center;
                             gap:10px;height:100%;cursor:pointer;pointer-events:auto;
                             background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);
@@ -1371,7 +1398,7 @@
                         </div>`;
                     el.querySelector('.document-card-container')?.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        if (docUrl) window.open(docUrl, '_blank');
+                        if (window._openDocViewer) window._openDocViewer(element.id);
                     });
                     break;
                 }
