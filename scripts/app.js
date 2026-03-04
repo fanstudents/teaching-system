@@ -2,31 +2,31 @@
  * 互動式教學簡報系統 - 主程式入口
  */
 
-import { SlideManager } from './slideManager.js?v=20260304';
-import { Editor } from './editor.js?v=20260304';
-import { DragDrop } from './dragDrop.js?v=20260304';
-import { showToast, showConfirm, showInput } from './ui.js?v=20260304';
-import { MatchingGame } from './interactive/matching.js?v=20260304';
-import { FillBlank } from './interactive/fillBlank.js?v=20260304';
-import { CardCopy } from './interactive/cardCopy.js?v=20260304';
-import { Showcase } from './interactive/showcase.js?v=20260304';
-import { OrderingGame } from './interactive/ordering.js?v=20260304';
-import { QuizGame } from './interactive/quiz.js?v=20260304';
-import { PollGame } from './interactive/poll.js?v=20260304';
-import { CountdownTimer } from './interactive/countdown.js?v=20260304';
-import { TrueFalseGame } from './interactive/truefalse.js?v=20260304';
-import { OpenTextGame } from './interactive/opentext.js?v=20260304';
-import { ScaleGame } from './interactive/scale.js?v=20260304';
-import { BuzzerGame } from './interactive/buzzer.js?v=20260304';
-import { WordCloudGame } from './interactive/wordcloud.js?v=20260304';
-import { HotspotGame } from './interactive/hotspot.js?v=20260304';
-import { DocumentViewer } from './interactive/documentViewer.js?v=20260304';
+import { SlideManager } from './slideManager.js?v=20260304b';
+import { Editor } from './editor.js?v=20260304b';
+import { DragDrop } from './dragDrop.js?v=20260304b';
+import { showToast, showConfirm, showInput } from './ui.js?v=20260304b';
+import { MatchingGame } from './interactive/matching.js?v=20260304b';
+import { FillBlank } from './interactive/fillBlank.js?v=20260304b';
+import { CardCopy } from './interactive/cardCopy.js?v=20260304b';
+import { Showcase } from './interactive/showcase.js?v=20260304b';
+import { OrderingGame } from './interactive/ordering.js?v=20260304b';
+import { QuizGame } from './interactive/quiz.js?v=20260304b';
+import { PollGame } from './interactive/poll.js?v=20260304b';
+import { CountdownTimer } from './interactive/countdown.js?v=20260304b';
+import { TrueFalseGame } from './interactive/truefalse.js?v=20260304b';
+import { OpenTextGame } from './interactive/opentext.js?v=20260304b';
+import { ScaleGame } from './interactive/scale.js?v=20260304b';
+import { BuzzerGame } from './interactive/buzzer.js?v=20260304b';
+import { WordCloudGame } from './interactive/wordcloud.js?v=20260304b';
+import { HotspotGame } from './interactive/hotspot.js?v=20260304b';
+import { DocumentViewer } from './interactive/documentViewer.js?v=20260304b';
 
-import { HomeworkSubmission } from './homework.js?v=20260304';
+import { HomeworkSubmission } from './homework.js?v=20260304b';
 import { db, realtime, generateSessionCode, ai } from './supabase.js';
-import { SLIDE_TEMPLATES } from './templates.js?v=20260304';
-import { IconLibrary } from './iconLibrary.js?v=20260304';
-import { SlideExporter } from './exportSlides.js?v=20260304';
+import { SLIDE_TEMPLATES } from './templates.js?v=20260304b';
+import { IconLibrary } from './iconLibrary.js?v=20260304b';
+import { SlideExporter } from './exportSlides.js?v=20260304b';
 
 class App {
     constructor() {
