@@ -2281,33 +2281,57 @@
 }
 
 .tf-result {
-    margin-top: 14px;
-    padding: 8px 12px;
-    font-size: 15px;
-    font-weight: 600;
-    min-height: 20px;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 18px;
+    font-size: 14px;
+    font-weight: 700;
     text-align: center;
-    border-radius: 8px;
-    clear: both;
+    border-radius: 20px;
+    z-index: 10;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    animation: tfResultPop 0.3s ease;
 }
 
-.tf-result.success {
-    color: #16a34a;
-    background: #f0fdf4;
+.tf-result:empty {
+    display: none;
 }
 
-.tf-result.error {
-    color: #dc2626;
-    background: #fef2f2;
+@keyframes tfResultPop {
+    from {
+        transform: translateX(-50%) scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
 }
 
 .tf-result.tf-pending {
-    color: #3b82f6;
-    font-size: 14px;
+    color: #6366f1;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+}
+
+.tf-result.success {
+    color: #fff;
+    background: #16a34a;
+}
+
+.tf-result.error {
+    color: #fff;
+    background: #dc2626;
 }
 
 .tf-result.tf-revealed {
     color: #475569;
+    background: #f1f5f9;
 }
 
 /* 公布答案按鈕 */
