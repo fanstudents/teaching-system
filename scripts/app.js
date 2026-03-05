@@ -3380,6 +3380,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!slide) return;
         const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'copycard', 'document', 'homework', 'showcase'];
         const hasInteractive = slide.elements.some(el => interactiveTypes.includes(el.type));
+        // 按鈕永遠顯示
+        if (this._bgmToggle) this._bgmToggle.style.display = '';
         if (hasInteractive) {
             this._bgmAudio.play().catch(() => { });
             if (!this._bgmMuted) {
@@ -3391,7 +3393,6 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     if (vol >= 0.3) clearInterval(fadeIn);
                 }, 50);
             }
-            if (this._bgmToggle) this._bgmToggle.style.display = '';
         } else {
             // 淡出
             if (!this._bgmAudio.paused) {
@@ -3402,7 +3403,6 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     if (vol <= 0) { clearInterval(fadeOut); this._bgmAudio.pause(); }
                 }, 50);
             }
-            if (this._bgmToggle) this._bgmToggle.style.display = 'none';
         }
     }
 
