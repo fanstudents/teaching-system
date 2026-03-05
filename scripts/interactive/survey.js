@@ -18,16 +18,18 @@ export class SurveyGame {
     /**
      * 在學員端渲染可填寫的問卷
      */
-    async render(container, element) {
+    async render(container, element, prefill = null) {
         const elementId = element.id;
         const questions = element.surveyQuestions || this.defaultQuestions;
         const title = element.surveyTitle || '📋 課程回饋問卷';
 
-        // 檢查是否已填寫
-        const existing = await stateManager.load(elementId);
-        if (existing) {
-            this._renderThankYou(container, title);
-            return;
+        // 檢查是否已填寫（有 prefill 時跳過，代表是返回編輯）
+        if (!prefill) {
+            const existing = await stateManager.load(elementId);
+            if (existing) {
+                this._renderThankYou(container, element, existing?.state?.answers);
+                return;
+            }
         }
 
         container.innerHTML = `
@@ -39,14 +41,21 @@ export class SurveyGame {
                 </div>
                 <button class="survey-submit-btn" disabled>
                     <span class="material-symbols-outlined">send</span>
-                    提交問卷
+                    ${prefill ? '更新問卷' : '提交問卷'}
                 </button>
             </div>
         `;
 
         // 星星評分互動
         container.querySelectorAll('.survey-stars').forEach(starsEl => {
+            const qid = starsEl.dataset.qid;
             const stars = starsEl.querySelectorAll('.survey-star');
+            // prefill stars
+            if (prefill?.[qid]?.value) {
+                const pv = prefill[qid].value;
+                starsEl.dataset.selected = pv;
+                stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value) <= pv));
+            }
             stars.forEach(star => {
                 star.addEventListener('click', () => {
                     const val = parseInt(star.dataset.value);
@@ -59,10 +68,15 @@ export class SurveyGame {
             });
         });
 
-        // 文字輸入監聽
+        // 文字輸入監聽 + prefill
         container.querySelectorAll('.survey-textarea').forEach(ta => {
+            const qid = ta.id.replace('survey_', '');
+            if (prefill?.[qid]?.value) ta.value = prefill[qid].value;
             ta.addEventListener('input', () => this._checkCanSubmit(container));
         });
+
+        // 如果有 prefill，重新檢查 submit 按鈕狀態
+        if (prefill) this._checkCanSubmit(container);
 
         // 提交
         container.querySelector('.survey-submit-btn')?.addEventListener('click', async () => {
@@ -100,7 +114,7 @@ export class SurveyGame {
                 state: { answers }
             });
 
-            this._renderThankYou(container, title);
+            this._renderThankYou(container, element, answers);
             stateManager.playSuccessFeedback(container);
         });
     }
@@ -136,7 +150,8 @@ export class SurveyGame {
         if (btn) btn.disabled = !allStarsSelected;
     }
 
-    _renderThankYou(container, title) {
+    _renderThankYou(container, element, savedAnswers) {
+        const title = element.surveyTitle || '📋 課程回饋問卷';
         container.innerHTML = `
             <div class="survey-widget survey-done" style="max-width:480px;margin:0 auto;">
                 <!-- 感謝標題 -->
@@ -198,8 +213,19 @@ export class SurveyGame {
                         我們會在 <strong style="color:#c7d2fe;">課後兩天內</strong>，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬
                     </div>
                 </div>
+                <!-- 返回修改 -->
+                <div style="margin-top:12px;text-align:center;">
+                    <button class="survey-edit-back-btn" type="button" style="background:none;border:1px solid #475569;color:#94a3b8;border-radius:10px;padding:8px 20px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.borderColor='#818cf8';this.style.color='#c7d2fe'" onmouseout="this.style.borderColor='#475569';this.style.color='#94a3b8'">
+                        <span class="material-symbols-outlined" style="font-size:16px;">edit_note</span>
+                        返回修改問卷
+                    </button>
+                </div>
             </div>
         `;
+
+        container.querySelector('.survey-edit-back-btn')?.addEventListener('click', () => {
+            this.render(container, element, savedAnswers);
+        });
     }
 
     /**
