@@ -1111,7 +1111,17 @@
                     }
                     el.querySelector('.link-card')?.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        window.open(linkUrl, '_blank');
+                        let finalUrl = linkUrl;
+                        // 自動帶入 session 和 student 參數（survey.html）
+                        if (finalUrl.includes('survey.html')) {
+                            try {
+                                const u = new URL(finalUrl, location.origin);
+                                if (!u.searchParams.get('session') && sessionCode) u.searchParams.set('session', sessionCode);
+                                if (!u.searchParams.get('student') && studentEmail) u.searchParams.set('student', studentEmail);
+                                finalUrl = u.toString();
+                            } catch (_) { }
+                        }
+                        window.open(finalUrl, '_blank');
                     });
                     break;
                 }

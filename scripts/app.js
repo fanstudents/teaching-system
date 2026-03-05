@@ -2989,6 +2989,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 if (changed) this.updateViewerCount();
             }, 60000);
 
+            // 每 10 秒主動廣播人數（保底，避免漏掉事件）
+            this._countBroadcast = setInterval(() => this.updateViewerCount(), 10000);
+
             // 監聽投票事件
             realtime.on('poll_vote', (msg) => {
                 const p = msg.payload || msg;
@@ -3050,10 +3053,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     async stopBroadcast() {
         if (!this.broadcasting) return;
 
-        // 清除心跳清理
+        // 清除心跳清理 + 人數廣播
         if (this._heartbeatCleanup) {
             clearInterval(this._heartbeatCleanup);
             this._heartbeatCleanup = null;
+        }
+        if (this._countBroadcast) {
+            clearInterval(this._countBroadcast);
+            this._countBroadcast = null;
         }
 
         // 更新 DB
