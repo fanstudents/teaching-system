@@ -969,21 +969,43 @@ export class SlideManager {
                 const desc = element.linkDesc || '';
                 const lColor = element.linkColor || '#6366f1';
                 const lIcon = element.linkIcon || 'open_in_new';
-                el.innerHTML = `
-                    <div class="link-card" data-url="${url.replace(/"/g, '&quot;')}" style="--link-color:${lColor};">
-                        <div class="link-card-icon" style="background:${lColor};">
-                            <span class="material-symbols-outlined">${lIcon}</span>
+                const lImage = element.linkImage || '';
+
+                if (lImage) {
+                    // 圖片卡片模式
+                    el.innerHTML = `
+                        <div class="link-card link-card--image" data-url="${url.replace(/"/g, '&quot;')}" style="--link-color:${lColor};flex-direction:column;padding:0;overflow:hidden;">
+                            <div style="position:relative;width:100%;padding-top:56.25%;overflow:hidden;">
+                                <img src="${lImage}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+                                <div style="position:absolute;top:8px;left:8px;width:28px;height:28px;border-radius:8px;background:${lColor};display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                                    <span class="material-symbols-outlined" style="font-size:16px;color:white;">${lIcon}</span>
+                                </div>
+                            </div>
+                            <div style="padding:10px 14px;">
+                                <div class="link-card-label">${label}</div>
+                                ${desc ? `<div class="link-card-desc">${desc}</div>` : ''}
+                                <div class="link-card-url" style="margin-top:4px;">${url}</div>
+                            </div>
                         </div>
-                        <div class="link-card-body">
-                            <div class="link-card-label">${label}</div>
-                            ${desc ? `<div class="link-card-desc">${desc}</div>` : ''}
-                            <div class="link-card-url">${url}</div>
+                    `;
+                } else {
+                    // 原始橫向模式
+                    el.innerHTML = `
+                        <div class="link-card" data-url="${url.replace(/"/g, '&quot;')}" style="--link-color:${lColor};">
+                            <div class="link-card-icon" style="background:${lColor};">
+                                <span class="material-symbols-outlined">${lIcon}</span>
+                            </div>
+                            <div class="link-card-body">
+                                <div class="link-card-label">${label}</div>
+                                ${desc ? `<div class="link-card-desc">${desc}</div>` : ''}
+                                <div class="link-card-url">${url}</div>
+                            </div>
+                            <div class="link-card-arrow" style="color:${lColor};">
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </div>
                         </div>
-                        <div class="link-card-arrow" style="color:${lColor};">
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
                 // 簡報模式才可點擊
                 const card = el.querySelector('.link-card');
                 if (card) {

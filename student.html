@@ -157,27 +157,47 @@
     "><span class="material-symbols-outlined" style="font-size:20px;">forum</span></button>
 
     <div id="studentQAPopup" style="
-        position:fixed;bottom:170px;right:12px;z-index:300;width:280px;
-        background:white;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.15);
-        padding:16px;display:none;flex-direction:column;gap:10px;
+        position:fixed;bottom:170px;right:12px;z-index:300;width:320px;
+        background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:16px;
+        box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:0;display:none;flex-direction:column;
+        border:1px solid rgba(255,255,255,0.6);overflow:hidden;
     ">
-        <div style="font-size:14px;font-weight:600;color:#1e293b;display:flex;align-items:center;gap:6px;">
-            <span class="material-symbols-outlined" style="font-size:18px;color:#ea580c;">question_answer</span>
-            提出問題
+        <div style="padding:14px 18px 10px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">chat</span>
+            <span style="font-size:15px;font-weight:700;color:#0f172a;">提出問題</span>
         </div>
-        <textarea id="studentQAInput" rows="3" placeholder="輸入你的問題…" style="
-            width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;
-            font-size:14px;font-family:inherit;resize:none;outline:none;color:#1e293b;
-        "></textarea>
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
-            <button id="studentQACancel" style="
-                padding:6px 14px;border-radius:6px;border:1px solid #e2e8f0;
-                background:white;color:#64748b;cursor:pointer;font-size:13px;font-family:inherit;
-            ">取消</button>
-            <button id="studentQASend" style="
-                padding:6px 14px;border-radius:6px;border:none;
-                background:#ea580c;color:white;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;
-            ">送出</button>
+        <div style="padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;">
+            <textarea id="studentQAInput" rows="3" placeholder="描述你的問題…" style="
+                width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;
+                font-size:14px;font-family:inherit;resize:none;outline:none;color:#1e293b;
+                transition:border-color 0.2s;background:#f8fafc;
+            " onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+            <!-- 圖片預覽 -->
+            <div id="qaImagePreview" style="display:none;position:relative;">
+                <img id="qaPreviewImg"
+                    style="max-width:100%;max-height:120px;border-radius:8px;border:1px solid #e2e8f0;" />
+                <button id="qaRemoveImg"
+                    style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                <label id="qaAttachImgLabel"
+                    style="display:flex;align-items:center;gap:4px;font-size:12px;color:#6366f1;cursor:pointer;padding:4px 8px;border-radius:6px;background:#eef2ff;transition:background 0.2s;"
+                    title="附上圖片">
+                    <span class="material-symbols-outlined" style="font-size:16px;">image</span>附圖
+                    <input type="file" id="qaImageInput" accept="image/*" style="display:none;" />
+                </label>
+                <div style="display:flex;gap:8px;">
+                    <button id="studentQACancel" style="
+                        padding:7px 16px;border-radius:8px;border:1px solid #e2e8f0;
+                        background:white;color:#64748b;cursor:pointer;font-size:13px;font-family:inherit;
+                    ">取消</button>
+                    <button id="studentQASend" style="
+                        padding:7px 18px;border-radius:8px;border:none;
+                        background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;
+                        font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 2px 8px rgba(99,102,241,0.3);
+                    ">送出</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -715,18 +735,56 @@
                 document.getElementById('studentQACancel').addEventListener('click', () => {
                     qaPopup.style.display = 'none';
                     document.getElementById('studentQAInput').value = '';
+                    document.getElementById('qaImagePreview').style.display = 'none';
+                    document.getElementById('qaPreviewImg').src = '';
+                    document.getElementById('qaImageInput').value = '';
+                });
+
+                // 圖片附件
+                let qaImageData = null;
+                document.getElementById('qaImageInput').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            // 壓縮到 800px
+                            const MAX = 800;
+                            let w = img.width, h = img.height;
+                            if (w > MAX || h > MAX) {
+                                if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+                                else { w = Math.round(w * MAX / h); h = MAX; }
+                            }
+                            const c = document.createElement('canvas');
+                            c.width = w; c.height = h;
+                            c.getContext('2d').drawImage(img, 0, 0, w, h);
+                            qaImageData = c.toDataURL('image/jpeg', 0.7);
+                            document.getElementById('qaPreviewImg').src = qaImageData;
+                            document.getElementById('qaImagePreview').style.display = 'block';
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+                document.getElementById('qaRemoveImg').addEventListener('click', () => {
+                    qaImageData = null;
+                    document.getElementById('qaImagePreview').style.display = 'none';
+                    document.getElementById('qaPreviewImg').src = '';
+                    document.getElementById('qaImageInput').value = '';
                 });
 
                 document.getElementById('studentQASend').addEventListener('click', () => {
                     const input = document.getElementById('studentQAInput');
                     const text = input.value.trim();
-                    if (!text) return;
+                    if (!text && !qaImageData) return;
 
                     const questionId = `qa_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
                     realtime.publish(`session:${sessionCode}`, 'qa', {
                         type: 'question',
                         id: questionId,
                         text: text,
+                        image: qaImageData || null,
                         author: studentName || '匿名'
                     });
 
@@ -740,10 +798,14 @@
                         element_id: questionId,
                         session_id: sessionCode,
                         submitted_at: new Date().toISOString(),
-                        state: { questionId }
+                        state: { questionId, image: qaImageData || null }
                     }).catch(e => console.warn('[QA] DB save err:', e));
 
                     input.value = '';
+                    qaImageData = null;
+                    document.getElementById('qaImagePreview').style.display = 'none';
+                    document.getElementById('qaPreviewImg').src = '';
+                    document.getElementById('qaImageInput').value = '';
                     qaPopup.style.display = 'none';
 
                     // 簡短回饋
@@ -1012,20 +1074,39 @@
                     const linkDesc = element.linkDesc || '';
                     const lColor = element.linkColor || '#6366f1';
                     const lIcon = element.linkIcon || 'open_in_new';
-                    el.innerHTML = `
-                        <div class="link-card" data-url="${linkUrl.replace(/"/g, '&quot;')}" style="--link-color:${lColor};">
-                            <div class="link-card-icon" style="background:${lColor};">
-                                <span class="material-symbols-outlined">${lIcon}</span>
-                            </div>
-                            <div class="link-card-body">
-                                <div class="link-card-label">${linkLabel}</div>
-                                ${linkDesc ? `<div class="link-card-desc">${linkDesc}</div>` : ''}
-                                <div class="link-card-url">${linkUrl}</div>
-                            </div>
-                            <div class="link-card-arrow" style="color:${lColor};">
-                                <span class="material-symbols-outlined">arrow_forward</span>
-                            </div>
-                        </div>`;
+                    const lImage = element.linkImage || '';
+
+                    if (lImage) {
+                        el.innerHTML = `
+                            <div class="link-card link-card--image" data-url="${linkUrl.replace(/"/g, '&quot;')}" style="--link-color:${lColor};flex-direction:column;padding:0;overflow:hidden;">
+                                <div style="position:relative;width:100%;padding-top:56.25%;overflow:hidden;">
+                                    <img src="${lImage}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+                                    <div style="position:absolute;top:8px;left:8px;width:28px;height:28px;border-radius:8px;background:${lColor};display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                                        <span class="material-symbols-outlined" style="font-size:16px;color:white;">${lIcon}</span>
+                                    </div>
+                                </div>
+                                <div style="padding:10px 14px;">
+                                    <div class="link-card-label">${linkLabel}</div>
+                                    ${linkDesc ? `<div class="link-card-desc">${linkDesc}</div>` : ''}
+                                    <div class="link-card-url" style="margin-top:4px;">${linkUrl}</div>
+                                </div>
+                            </div>`;
+                    } else {
+                        el.innerHTML = `
+                            <div class="link-card" data-url="${linkUrl.replace(/"/g, '&quot;')}" style="--link-color:${lColor};">
+                                <div class="link-card-icon" style="background:${lColor};">
+                                    <span class="material-symbols-outlined">${lIcon}</span>
+                                </div>
+                                <div class="link-card-body">
+                                    <div class="link-card-label">${linkLabel}</div>
+                                    ${linkDesc ? `<div class="link-card-desc">${linkDesc}</div>` : ''}
+                                    <div class="link-card-url">${linkUrl}</div>
+                                </div>
+                                <div class="link-card-arrow" style="color:${lColor};">
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+                                </div>
+                            </div>`;
+                    }
                     el.querySelector('.link-card')?.addEventListener('click', (e) => {
                         e.stopPropagation();
                         window.open(linkUrl, '_blank');

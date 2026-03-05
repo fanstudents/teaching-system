@@ -863,6 +863,14 @@ export class Editor {
                             ${LINK_ICONS.map(i => `<button class="link-icon-btn${i.icon === curIcon ? ' active' : ''}" data-icon="${i.icon}" title="${i.label}" style="width:34px;height:34px;border-radius:8px;border:2px solid ${i.icon === curIcon ? '#6366f1' : '#e2e8f0'};background:${i.icon === curIcon ? '#eef2ff' : '#f8fafc'};cursor:pointer;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:18px;">${i.icon}</span></button>`).join('')}
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">預覽圖（選填）</label>
+                        ${elementData.linkImage ? `<div id="linkImagePreviewWrap" style="position:relative;margin-bottom:6px;"><img src="${elementData.linkImage}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;" /><button id="linkImageRemove" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button></div>` : ''}
+                        <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;border:1.5px dashed #cbd5e1;border-radius:8px;cursor:pointer;font-size:12px;color:#64748b;justify-content:center;">
+                            <span class="material-symbols-outlined" style="font-size:16px;">upload</span>上傳圖片
+                            <input type="file" id="linkImageUpload" accept="image/*" style="display:none;" />
+                        </label>
+                    </div>
                 </div>
             `;
         }
@@ -1633,19 +1641,49 @@ export class Editor {
             document.querySelectorAll('.link-color-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     elementData.linkColor = btn.dataset.color;
-                    this.slideManager.renderElement(domEl, elementData);
+                    this.slideManager.renderCurrentSlide();
                     this.slideManager.saveCurrentSlide();
-                    this.showPropertyPanel(domEl);
+                    this.selectElementById(elementId);
                 });
             });
             // 圖示選擇
             document.querySelectorAll('.link-icon-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     elementData.linkIcon = btn.dataset.icon;
-                    this.slideManager.renderElement(domEl, elementData);
+                    this.slideManager.renderCurrentSlide();
                     this.slideManager.saveCurrentSlide();
-                    this.showPropertyPanel(domEl);
+                    this.selectElementById(elementId);
                 });
+            });
+            // 預覽圖上傳
+            document.getElementById('linkImageUpload')?.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const MAX = 600;
+                        let w = img.width, h = img.height;
+                        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+                        const c = document.createElement('canvas');
+                        c.width = w; c.height = h;
+                        c.getContext('2d').drawImage(img, 0, 0, w, h);
+                        elementData.linkImage = c.toDataURL('image/jpeg', 0.75);
+                        this.slideManager.renderCurrentSlide();
+                        this.slideManager.saveCurrentSlide();
+                        this.selectElementById(elementId);
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            // 移除預覽圖
+            document.getElementById('linkImageRemove')?.addEventListener('click', () => {
+                delete elementData.linkImage;
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.saveCurrentSlide();
+                this.selectElementById(elementId);
             });
         } else if (elementData.type === 'document') {
             bindSimple('docTitle', 'docTitle');

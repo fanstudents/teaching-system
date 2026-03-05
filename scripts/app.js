@@ -3530,7 +3530,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (data.type === 'question') {
                 const existing = this._qaQuestions.find(q => q.id === data.id);
                 if (!existing) {
-                    this._qaQuestions.push({ id: data.id, text: data.text, author: data.author, votes: 1, answered: false, time: Date.now() });
+                    this._qaQuestions.push({ id: data.id, text: data.text, image: data.image || null, author: data.author, votes: 1, answered: false, private: false, time: Date.now() });
                     this.updateQABadge();
                     this.renderQAList();
                 }
@@ -3573,21 +3573,33 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         container.innerHTML = sorted.map(q => {
             const initial = (q.author || '匿')[0];
             const timeStr = q.time ? new Date(q.time).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '';
+            const bgColor = q.answered ? '#f0fdf4' : q.private ? '#fef3c7' : '#f1f5f9';
+            const borderColor = q.answered ? '#d1fae5' : q.private ? '#fde68a' : '#e2e8f0';
+            const imageHtml = q.image ? `<img src="${q.image}" style="max-width:100%;max-height:140px;border-radius:8px;margin-top:6px;cursor:pointer;" onclick="window.open(this.src)" />` : '';
+            // 狀態標籤
+            let statusLabel = '';
+            if (q.answered) statusLabel = '<span style="font-size:10px;background:#d1fae5;color:#059669;padding:1px 6px;border-radius:4px;font-weight:600;">✓ 已解決</span>';
+            else if (q.private) statusLabel = '<span style="font-size:10px;background:#fef3c7;color:#b45309;padding:1px 6px;border-radius:4px;font-weight:600;">🤝 私下討論</span>';
             return `
-            <div style="display:flex;gap:10px;margin-bottom:12px;align-items:flex-start;">
+            <div style="display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;">
                 <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#475569,#334155);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;">${initial}</div>
                 <div style="flex:1;min-width:0;">
-                    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
                         <span style="font-size:13px;font-weight:600;color:#1e293b;">${q.author || '匿名'}</span>
                         <span style="font-size:10px;color:#94a3b8;">${timeStr}</span>
+                        ${statusLabel}
                     </div>
-                    <div style="padding:10px 14px;border-radius:0 12px 12px 12px;background:${q.answered ? '#f0fdf4' : '#f1f5f9'};border:1px solid ${q.answered ? '#d1fae5' : '#e2e8f0'};">
-                        <div style="font-size:14px;color:#1e293b;line-height:1.5;">${q.text}</div>
+                    <div style="padding:10px 14px;border-radius:0 12px 12px 12px;background:${bgColor};border:1px solid ${borderColor};">
+                        <div style="font-size:14px;color:#1e293b;line-height:1.5;">${q.text || ''}</div>
+                        ${imageHtml}
                     </div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
                         <span style="display:flex;align-items:center;gap:2px;font-size:12px;color:#6366f1;font-weight:500;cursor:default;"><span class="material-symbols-outlined" style="font-size:14px;">thumb_up</span> ${q.votes}</span>
                         <button onclick="window.__markQAAnswered('${q.id}')" style="font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid ${q.answered ? '#86efac' : '#cbd5e1'};background:${q.answered ? '#d1fae5' : 'transparent'};color:${q.answered ? '#059669' : '#64748b'};cursor:pointer;">
-                            ${q.answered ? '已回答' : '標記已答'}
+                            ${q.answered ? '✓ 已解決' : '標記已解決'}
+                        </button>
+                        <button onclick="window.__markQAPrivate('${q.id}')" style="font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid ${q.private ? '#fde68a' : '#cbd5e1'};background:${q.private ? '#fef3c7' : 'transparent'};color:${q.private ? '#b45309' : '#64748b'};cursor:pointer;">
+                            ${q.private ? '🤝 私下討論' : '標記私下討論'}
                         </button>
                     </div>
                 </div>
@@ -4329,5 +4341,10 @@ if (document.readyState === 'loading') {
 window.__markQAAnswered = function (qid) {
     if (!window.app || !window.app._qaQuestions) return;
     const q = window.app._qaQuestions.find(q => q.id === qid);
-    if (q) { q.answered = !q.answered; window.app.renderQAList(); window.app.updateQABadge(); }
+    if (q) { q.answered = !q.answered; if (q.answered) q.private = false; window.app.renderQAList(); window.app.updateQABadge(); }
+};
+window.__markQAPrivate = function (qid) {
+    if (!window.app || !window.app._qaQuestions) return;
+    const q = window.app._qaQuestions.find(q => q.id === qid);
+    if (q) { q.private = !q.private; if (q.private) q.answered = false; window.app.renderQAList(); window.app.updateQABadge(); }
 };
