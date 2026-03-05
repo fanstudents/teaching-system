@@ -3119,7 +3119,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!this.sessionCode) return;
         try {
             const { stateManager } = await import('./interactive/stateManager.js');
-            const board = await stateManager.getLeaderboard(this.sessionCode);
+            const board = await stateManager.getLeaderboard(this.sessionCode, this.slideManager.currentProjectId);
             const list = document.getElementById('lbList');
             if (!list) return;
 

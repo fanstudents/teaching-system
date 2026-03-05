@@ -269,9 +269,23 @@ class InteractionState {
      * @param {string} sessionId
      * @returns {Promise<Array<{name: string, email: string, totalPoints: number}>>}
      */
-    async getLeaderboard(sessionId) {
+    async getLeaderboard(sessionId, projectId) {
         if (!sessionId) return [];
         try {
+            // 自動查找 projectId（如果未提供）
+            if (!projectId) {
+                try {
+                    const sessRaw = await db.select('sessions', {
+                        filter: { session_code: `eq.${sessionId}` },
+                        select: 'project_id',
+                        limit: 1,
+                    });
+                    const sess = this._unwrap(sessRaw);
+                    if (sess[0]?.project_id) projectId = sess[0].project_id;
+                } catch { }
+            }
+
+            // 1. 取得 submissions 的分數
             const raw = await db.select('submissions', {
                 filter: {
                     session_id: `eq.${sessionId}`,
@@ -293,8 +307,26 @@ class InteractionState {
                 map.get(key).totalPoints += (parseInt(st?._awarded) || 0);
             }
 
-            // 排序（高分在前）
-            return [...map.values()].sort((a, b) => b.totalPoints - a.totalPoints);
+            // 2. 取得已註冊學員（從 students 表），補齊沒有互動紀錄的學員
+            if (projectId) {
+                try {
+                    const studentsRaw = await db.select('students', {
+                        filter: { project_id: `eq.${projectId}` },
+                        select: 'email,name',
+                    });
+                    const students = this._unwrap(studentsRaw);
+                    for (const s of students) {
+                        if (s.email && !map.has(s.email)) {
+                            map.set(s.email, { name: s.name || s.email, email: s.email, totalPoints: 0 });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[stateManager] fetch registered students failed:', e);
+                }
+            }
+
+            // 排序（高分在前，同分按名字排序）
+            return [...map.values()].sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
         } catch (e) {
             console.warn('[stateManager] getLeaderboard failed:', e);
             return [];
