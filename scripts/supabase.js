@@ -261,6 +261,14 @@ class RealtimeClient {
         this._heartbeatRef = null;
         this._ref = 0;
         this._pendingReplies = new Map();
+        // ★ 指數退避重連
+        this._reconnectAttempt = 0;
+        this._maxReconnectDelay = 30000;
+        // ★ 發布重試佇列
+        this._publishQueue = [];
+        // ★ 連線狀態回調
+        this._statusCallbacks = [];
+        this._status = 'disconnected'; // 'connected' | 'reconnecting' | 'disconnected'
     }
 
     _nextRef() {
@@ -283,6 +291,8 @@ class RealtimeClient {
             this.ws.onopen = () => {
                 clearTimeout(timeout);
                 this.isConnected = true;
+                this._reconnectAttempt = 0; // ★ 重置退避計數器
+                this._setStatus('connected');
                 console.log('[Realtime] connected');
 
                 // Heartbeat
@@ -300,6 +310,15 @@ class RealtimeClient {
                 // Re-subscribe channels
                 for (const [ch] of this._subscribedChannels) {
                     this._joinChannel(ch);
+                }
+
+                // ★ Flush 重連佇列
+                const queued = this._publishQueue.splice(0);
+                if (queued.length > 0) {
+                    console.log(`[Realtime] flushing ${queued.length} queued messages`);
+                    for (const msg of queued) {
+                        this.publish(msg.channel, msg.event, msg.payload);
+                    }
                 }
 
                 resolve();
@@ -343,15 +362,20 @@ class RealtimeClient {
             this.ws.onclose = () => {
                 this.isConnected = false;
                 clearInterval(this._heartbeatRef);
-                console.log('[Realtime] disconnected');
+                this._setStatus('reconnecting');
 
-                // Auto-reconnect after 3s
+                // ★ 指數退避重連 (1s → 2s → 4s → ... → max 30s) + 隨機 jitter
+                const delay = Math.min(
+                    1000 * Math.pow(2, this._reconnectAttempt) + Math.random() * 1000,
+                    this._maxReconnectDelay
+                );
+                this._reconnectAttempt++;
+                console.log(`[Realtime] disconnected, reconnecting in ${(delay / 1000).toFixed(1)}s (attempt ${this._reconnectAttempt})`);
                 setTimeout(() => {
                     if (!this.isConnected) {
-                        console.log('[Realtime] reconnecting...');
                         this.connect().catch(console.error);
                     }
-                }, 3000);
+                }, delay);
             };
 
             this.ws.onerror = (err) => {
@@ -413,7 +437,11 @@ class RealtimeClient {
      */
     publish(channel, event, payload) {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-            console.warn('[Realtime] not connected');
+            // ★ 佇列訊息，重連後自動補發（最多保留 50 條）
+            if (this._publishQueue.length < 50) {
+                this._publishQueue.push({ channel, event, payload });
+                console.warn(`[Realtime] not connected, queued (${this._publishQueue.length} pending)`);
+            }
             return;
         }
         this.ws.send(JSON.stringify({
@@ -446,8 +474,30 @@ class RealtimeClient {
 
     disconnect() {
         clearInterval(this._heartbeatRef);
+        this._reconnectAttempt = 999; // 阻止自動重連
         this.ws?.close();
         this.isConnected = false;
+        this._setStatus('disconnected');
+    }
+
+    // ★ 連線狀態管理
+    _setStatus(status) {
+        if (this._status === status) return;
+        this._status = status;
+        for (const cb of this._statusCallbacks) {
+            try { cb(status); } catch (e) { console.warn('[Realtime] status callback error:', e); }
+        }
+    }
+
+    get status() { return this._status; }
+
+    onStatusChange(callback) {
+        this._statusCallbacks.push(callback);
+        // 立即通知目前狀態
+        callback(this._status);
+        return () => {
+            this._statusCallbacks = this._statusCallbacks.filter(cb => cb !== callback);
+        };
     }
 }
 

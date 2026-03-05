@@ -2940,6 +2940,23 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             await realtime.connect();
             await realtime.subscribe(`session:${this.sessionCode}`);
 
+            // ★ 連線狀態指示燈
+            this._realtimeStatusCleanup = realtime.onStatusChange((status) => {
+                const dot = document.getElementById('realtimeStatusDot');
+                if (!dot) return;
+                const colors = { connected: '#22c55e', reconnecting: '#f59e0b', disconnected: '#ef4444' };
+                const shadows = { connected: '0 0 4px #22c55e', reconnecting: '0 0 4px #f59e0b', disconnected: '0 0 4px #ef4444' };
+                dot.style.background = colors[status] || '#94a3b8';
+                dot.style.boxShadow = shadows[status] || 'none';
+                dot.title = `WebSocket: ${status}`;
+                if (status === 'reconnecting') {
+                    this.showToast('⚠️ 連線中斷，正在重新連線…');
+                } else if (status === 'connected' && this._wasReconnecting) {
+                    this.showToast('✅ 連線已恢復');
+                }
+                this._wasReconnecting = (status === 'reconnecting');
+            });
+
             // 監聽學員上線/下線
             realtime.on('student_join', (msg) => {
                 const p = msg.payload || msg;
@@ -3070,6 +3087,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 通知學員
         realtime.publish(`session:${this.sessionCode}`, 'session_end', {});
         realtime.unsubscribe(`session:${this.sessionCode}`);
+        if (this._realtimeStatusCleanup) { this._realtimeStatusCleanup(); this._realtimeStatusCleanup = null; }
         realtime.disconnect();
 
         this.broadcasting = false;

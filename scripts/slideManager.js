@@ -3105,6 +3105,10 @@ export class SlideManager {
         if (this._isSaving) return;
         this._isSaving = true;
         try {
+            // ★ 樂觀鎖：遞增版本號
+            this._dbVersion = (this._dbVersion || 0) + 1;
+            data._version = this._dbVersion;
+
             let payload = JSON.stringify(data);
             let payloadSize = payload.length;
 
@@ -3141,7 +3145,7 @@ export class SlideManager {
                 console.error('[SaveDB] ❌ DB returned error:', result.error);
                 this._showSaveError('資料庫儲存失敗：' + (result.error?.message || JSON.stringify(result.error)));
             } else {
-                console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, rows: result.data?.length ?? 0 });
+                console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, version: data._version });
                 this._lastSaveOk = true;
             }
         } catch (e) {
@@ -3249,8 +3253,10 @@ export class SlideManager {
         if (dbData) {
             const dbSlideCount = dbData.slides?.length || 0;
             const dbElementCount = (dbData.slides || []).reduce((sum, s) => sum + (s.elements?.length || 0), 0);
-            console.log(`[Load] ✅ Using DB data (${dbSlideCount} slides, ${dbElementCount} elements, savedAt: ${dbData.savedAt})`);
+            console.log(`[Load] ✅ Using DB data (${dbSlideCount} slides, ${dbElementCount} elements, savedAt: ${dbData.savedAt}, v${dbData._version || 0})`);
             chosen = dbData;
+            // ★ 記錄 DB 版本號
+            this._dbVersion = dbData._version || 0;
             // 同步 DB → localStorage（作為離線備援）
             try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(dbData)); } catch (_) { }
         } else if (localData) {
