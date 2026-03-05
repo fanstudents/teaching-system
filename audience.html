@@ -15,8 +15,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
-    <link rel="stylesheet" href="styles/interactive.css?v=20260228">
-    <link rel="stylesheet" href="styles/interactive-theme.css?v=20260228">
+    <link rel="stylesheet" href="styles/interactive.css?v=20260305">
+    <link rel="stylesheet" href="styles/interactive-theme.css?v=20260305">
     <style>
         *,
         *::before,
@@ -652,6 +652,30 @@
         import { stateManager } from './scripts/interactive/stateManager.js';
         import { SurveyGame } from './scripts/interactive/survey.js';
 
+        // ★ Toast 工具
+        function showToast(msg, type = 'error') {
+            let t = document.getElementById('_audToast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = '_audToast';
+                t.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;z-index:9999;font-size:13px;max-width:90vw;text-align:center;pointer-events:auto;cursor:pointer;transition:opacity .3s;';
+                t.onclick = () => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); };
+                document.body.appendChild(t);
+            }
+            const colors = { error: '#dc2626', warn: '#f59e0b', success: '#22c55e' };
+            t.style.background = colors[type] || colors.error;
+            t.style.color = '#fff';
+            t.style.opacity = '1';
+            t.textContent = msg;
+            clearTimeout(t._tid);
+            t._tid = setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 4000);
+        }
+
+        // ★ 監聽互動提交失敗
+        window.addEventListener('submission-error', (e) => {
+            showToast('⚠ 提交失敗，請確認網路連線後重試', 'error');
+        });
+
         const surveyGame = new SurveyGame();
 
         // 互動類型清單
@@ -758,6 +782,48 @@
                         studentId, studentName
                     });
                 }, 15000);
+
+                // ★ WebSocket 重連後自動同步當前投影片
+                realtime.onStatusChange((status) => {
+                    if (status === 'connected' && sessionCode) {
+                        // 重連成功 → 從 DB 拉取最新投影片
+                        db.select('sessions', {
+                            filter: { session_code: `eq.${sessionCode}` },
+                            select: 'current_slide,project_id,is_broadcasting',
+                            limit: 1
+                        }).then(async ({ data }) => {
+                            if (!data?.[0]) return;
+                            if (data[0].is_broadcasting !== 'true') {
+                                document.getElementById('audDisconnected').classList.add('active');
+                                return;
+                            }
+                            const currentSlide = parseInt(data[0].current_slide || '0');
+                            const projectId = data[0].project_id;
+                            if (!projectId) return;
+                            const { data: project } = await db.select('projects', {
+                                filter: { id: `eq.${projectId}` },
+                                select: 'slides_data', limit: 1
+                            });
+                            if (project?.[0]?.slides_data) {
+                                const slides = typeof project[0].slides_data === 'string'
+                                    ? JSON.parse(project[0].slides_data)
+                                    : project[0].slides_data;
+                                const slideArray = slides.slides || slides;
+                                if (Array.isArray(slideArray) && slideArray[currentSlide]) {
+                                    renderInteraction(slideArray[currentSlide], currentSlide, slideArray.length);
+                                    showToast('✅ 已重新同步', 'success');
+                                }
+                            }
+                        }).catch(e => console.warn('[Reconnect] sync failed:', e));
+
+                        // 重新通知上線
+                        realtime.publish(`session:${sessionCode}`, 'student_join', {
+                            studentId, studentName
+                        });
+                    } else if (status === 'reconnecting') {
+                        showToast('⚠ 連線中斷，正在重新連線…', 'warn');
+                    }
+                });
 
                 window.addEventListener('beforeunload', () => {
                     realtime.publish(`session:${sessionCode}`, 'student_leave', {
@@ -1255,18 +1321,29 @@
                 type: 'question', id: qid, text, author: studentName
             });
 
-            // 儲存到 DB
-            db.insert('submissions', {
-                student_name: studentName,
-                student_email: studentId,
-                assignment_title: 'Q&A 提問',
-                type: 'qa',
-                content: text,
-                element_id: qid,
-                session_id: sessionCode,
-                submitted_at: new Date().toISOString(),
-                state: { questionId: qid }
-            }).catch(e => console.warn('[QA] DB save err:', e));
+            // 儲存到 DB（★ 含重試）
+            const saveQA = async (retries = 2) => {
+                for (let i = 0; i <= retries; i++) {
+                    try {
+                        if (i > 0) await new Promise(r => setTimeout(r, 1000));
+                        await db.insert('submissions', {
+                            student_name: studentName,
+                            student_email: studentId,
+                            assignment_title: 'Q&A 提問',
+                            type: 'qa',
+                            content: text,
+                            element_id: qid,
+                            session_id: sessionCode,
+                            submitted_at: new Date().toISOString(),
+                            state: { questionId: qid }
+                        });
+                        return;
+                    } catch (e) {
+                        if (i === retries) showToast('⚠ 提問儲存失敗', 'error');
+                    }
+                }
+            };
+            saveQA();
 
             // 加入本地列表
             qaQuestions.push({ id: qid, text, author: studentName, votes: 1, mine: true });

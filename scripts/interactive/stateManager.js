@@ -122,35 +122,43 @@ class InteractionState {
         if (!user) return { isRetry };
 
         // DB upsert（重複作答時只更新 content/state 但不改 _awarded）
-        try {
-            const raw = await db.select('submissions', {
-                filter: {
-                    session_id: `eq.${sessionId || ''}`,
-                    element_id: `eq.${elementId}`,
-                    student_email: `eq.${email}`,
-                },
-            });
-            const existing = this._unwrap(raw);
-
-            if (existing.length > 0) {
-                await db.update('submissions', {
-                    content: record.content,
-                    is_correct: record.is_correct,
-                    score: record.score,
-                    state: record.state,
-                    submitted_at: record.submitted_at,
-                }, { id: `eq.${existing[0].id}` });
-            } else {
-                const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
-                await db.insert('submissions', dbRecord);
-            }
-        } catch (e) {
-            console.warn('[stateManager] save failed, trying insert:', e);
+        // ★ 加入重試機制，失敗時通知 UI
+        const MAX_RETRIES = 2;
+        let saved = false;
+        for (let attempt = 0; attempt <= MAX_RETRIES && !saved; attempt++) {
             try {
-                const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
-                await db.insert('submissions', dbRecord);
-            } catch (e2) {
-                console.warn('[stateManager] insert also failed:', e2);
+                if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+
+                const raw = await db.select('submissions', {
+                    filter: {
+                        session_id: `eq.${sessionId || ''}`,
+                        element_id: `eq.${elementId}`,
+                        student_email: `eq.${email}`,
+                    },
+                });
+                const existing = this._unwrap(raw);
+
+                if (existing.length > 0) {
+                    await db.update('submissions', {
+                        content: record.content,
+                        is_correct: record.is_correct,
+                        score: record.score,
+                        state: record.state,
+                        submitted_at: record.submitted_at,
+                    }, { id: `eq.${existing[0].id}` });
+                } else {
+                    const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
+                    await db.insert('submissions', dbRecord);
+                }
+                saved = true;
+            } catch (e) {
+                console.warn(`[stateManager] save attempt ${attempt + 1}/${MAX_RETRIES + 1} failed:`, e);
+                if (attempt === MAX_RETRIES) {
+                    // ★ 所有重試都失敗 → 通知 UI 顯示 toast
+                    window.dispatchEvent(new CustomEvent('submission-error', {
+                        detail: { elementId, type: data.type, error: e.message || '儲存失敗' }
+                    }));
+                }
             }
         }
 
