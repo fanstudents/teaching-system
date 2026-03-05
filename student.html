@@ -334,13 +334,20 @@
         }
 
         function navigateSlide(dir) {
+            const maxIdx = Math.max(instructorIndex, currentIndex);
             const newIdx = currentIndex + dir;
             if (newIdx < 0 || newIdx >= totalSlides) return;
+            // 自由瀏覽模式不能超過講師目前教到的頁
+            if (dir > 0 && newIdx > instructorIndex) return;
             goToSlide(newIdx);
         }
 
         function goToSlide(index) {
             if (index < 0 || index >= slidesCache.length) return;
+            // 限制不能超過講師教到的頁（跟隨模式由講師控制，不受限）
+            if (mode === 'free' && index > instructorIndex) {
+                index = instructorIndex;
+            }
             currentIndex = index;
             renderSlide(slidesCache[index], index, totalSlides);
             updateNavButtons();
@@ -355,7 +362,8 @@
             const prevBtn = document.getElementById('prevSlideBtn');
             const nextBtn = document.getElementById('nextSlideBtn');
             prevBtn.disabled = currentIndex <= 0;
-            nextBtn.disabled = currentIndex >= totalSlides - 1;
+            // 不能超過講師教到的頁
+            nextBtn.disabled = currentIndex >= totalSlides - 1 || currentIndex >= instructorIndex;
         }
 
         async function joinSession() {
