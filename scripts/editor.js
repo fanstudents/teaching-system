@@ -875,6 +875,68 @@ export class Editor {
             `;
         }
 
+        // 問卷元件
+        if (type === 'survey') {
+            const cfg = elementData.thankYouConfig || {};
+            const ctaCards = cfg.ctaCards || [
+                { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+                { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
+                { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL 讓老師看到你的感受！', url: 'https://www.threads.net/intent/post?text=' + encodeURIComponent('剛上完數位簡報室的課程！收穫滿滿 🎓✨ @TBR.DIGITAL'), icon: 'share', color: '#10b981' }
+            ];
+            const farewell = cfg.farewell || '🙌 歡迎來找老師聊聊天、私下互動\n或是開心地離開教室，回家注意安全！';
+            const emailNotice = cfg.emailNotice || '我們會在課後兩天內，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬';
+            const sectionTitle = cfg.sectionTitle || '✨ 修完這堂課，你還可以…';
+
+            const ctaCardsHtml = ctaCards.map((c, i) => `
+                <div class="survey-cta-card-editor" data-idx="${i}" style="padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:${c.color || '#6366f1'};">${c.icon || 'link'}</span>
+                        <strong style="font-size:12px;flex:1;">CTA #${i + 1}</strong>
+                        <button class="survey-cta-remove" data-idx="${i}" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:14px;" title="移除">✕</button>
+                    </div>
+                    <input class="form-input survey-cta-title" data-idx="${i}" value="${(c.title || '').replace(/"/g, '&quot;')}" placeholder="標題" style="margin-bottom:4px;font-size:12px;">
+                    <input class="form-input survey-cta-desc" data-idx="${i}" value="${(c.desc || '').replace(/"/g, '&quot;')}" placeholder="說明" style="margin-bottom:4px;font-size:12px;">
+                    <input class="form-input survey-cta-url" data-idx="${i}" value="${(c.url || '').replace(/"/g, '&quot;')}" placeholder="網址" style="margin-bottom:4px;font-size:12px;">
+                    <div style="display:flex;gap:4px;align-items:center;">
+                        <label style="font-size:11px;color:#64748b;">圖示</label>
+                        <input class="form-input survey-cta-icon" data-idx="${i}" value="${c.icon || 'link'}" placeholder="icon" style="width:80px;font-size:11px;">
+                        <label style="font-size:11px;color:#64748b;">色</label>
+                        <input type="color" class="survey-cta-color" data-idx="${i}" value="${c.color || '#6366f1'}" style="width:28px;height:24px;border:none;cursor:pointer;">
+                    </div>
+                </div>
+            `).join('');
+
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">問卷設定</div>
+                    <div class="form-group">
+                        <label class="form-label">問卷標題</label>
+                        <input type="text" class="form-input" id="surveyTitle" value="${(elementData.surveyTitle || '📋 課程回饋問卷').replace(/"/g, '&quot;')}" placeholder="📋 課程回饋問卷">
+                    </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title">感謝頁設定</div>
+                    <div class="form-group">
+                        <label class="form-label">區塊標題</label>
+                        <input type="text" class="form-input" id="thankYouSectionTitle" value="${sectionTitle.replace(/"/g, '&quot;')}" placeholder="✨ 修完這堂課，你還可以…">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CTA 卡片</label>
+                        <div id="ctaCardsContainer">${ctaCardsHtml}</div>
+                        <button id="addCtaCardBtn" style="width:100%;padding:6px;border:1.5px dashed #cbd5e1;border-radius:8px;background:none;color:#64748b;cursor:pointer;font-size:12px;margin-top:4px;">+ 新增卡片</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">告別訊息</label>
+                        <textarea class="form-input" id="thankYouFarewell" rows="3" style="font-size:12px;">${farewell.replace(/"/g, '&quot;')}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email 通知文字</label>
+                        <textarea class="form-input" id="thankYouEmail" rows="3" style="font-size:12px;">${emailNotice.replace(/"/g, '&quot;')}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
         // 圖表元件
         if (type === 'chart') {
             const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
@@ -1683,6 +1745,77 @@ export class Editor {
                 delete elementData.linkImage;
                 this.slideManager.renderCurrentSlide();
                 this.slideManager.saveCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        } else if (elementData.type === 'survey') {
+            bindSimple('surveyTitle', 'surveyTitle');
+
+            // 感謝頁設定
+            const ensureCfg = () => {
+                if (!elementData.thankYouConfig) {
+                    elementData.thankYouConfig = {
+                        sectionTitle: '✨ 修完這堂課，你還可以…',
+                        ctaCards: [
+                            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+                            { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
+                            { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL 讓老師看到你的感受！', url: 'https://www.threads.net/intent/post?text=' + encodeURIComponent('剛上完數位簡報室的課程！收穫滿滿 🎓✨ @TBR.DIGITAL'), icon: 'share', color: '#10b981' }
+                        ],
+                        farewell: '🙌 歡迎來找老師聊聊天、私下互動\n或是開心地離開教室，回家注意安全！',
+                        emailNotice: '我們會在課後兩天內，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬'
+                    };
+                }
+                return elementData.thankYouConfig;
+            };
+
+            // 區塊標題
+            document.getElementById('thankYouSectionTitle')?.addEventListener('change', () => {
+                const cfg = ensureCfg();
+                cfg.sectionTitle = document.getElementById('thankYouSectionTitle').value;
+                this.slideManager.saveCurrentSlide();
+            });
+            // 告別
+            document.getElementById('thankYouFarewell')?.addEventListener('change', () => {
+                const cfg = ensureCfg();
+                cfg.farewell = document.getElementById('thankYouFarewell').value.replace(/\n/g, '<br>');
+                this.slideManager.saveCurrentSlide();
+            });
+            // Email
+            document.getElementById('thankYouEmail')?.addEventListener('change', () => {
+                const cfg = ensureCfg();
+                cfg.emailNotice = document.getElementById('thankYouEmail').value;
+                this.slideManager.saveCurrentSlide();
+            });
+            // CTA 卡片欄位
+            document.querySelectorAll('.survey-cta-title, .survey-cta-desc, .survey-cta-url, .survey-cta-icon, .survey-cta-color').forEach(input => {
+                input.addEventListener('change', () => {
+                    const cfg = ensureCfg();
+                    const idx = parseInt(input.dataset.idx);
+                    if (!cfg.ctaCards[idx]) return;
+                    if (input.classList.contains('survey-cta-title')) cfg.ctaCards[idx].title = input.value;
+                    if (input.classList.contains('survey-cta-desc')) cfg.ctaCards[idx].desc = input.value;
+                    if (input.classList.contains('survey-cta-url')) cfg.ctaCards[idx].url = input.value;
+                    if (input.classList.contains('survey-cta-icon')) cfg.ctaCards[idx].icon = input.value;
+                    if (input.classList.contains('survey-cta-color')) cfg.ctaCards[idx].color = input.value;
+                    this.slideManager.saveCurrentSlide();
+                });
+            });
+            // 移除 CTA
+            document.querySelectorAll('.survey-cta-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cfg = ensureCfg();
+                    const idx = parseInt(btn.dataset.idx);
+                    cfg.ctaCards.splice(idx, 1);
+                    this.slideManager.saveCurrentSlide();
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            });
+            // 新增 CTA
+            document.getElementById('addCtaCardBtn')?.addEventListener('click', () => {
+                const cfg = ensureCfg();
+                cfg.ctaCards.push({ title: '新連結', desc: '', url: '#', icon: 'link', color: '#6366f1' });
+                this.slideManager.saveCurrentSlide();
+                this.slideManager.renderCurrentSlide();
                 this.selectElementById(elementId);
             });
         } else if (elementData.type === 'document') {
