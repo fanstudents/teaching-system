@@ -1168,9 +1168,12 @@
                     ccCopyBtn.addEventListener('click', async (e) => {
                         e.stopPropagation();
                         let txt = rawCopy;
+                        const variables = {};
                         if (ccHasVars) {
                             el.querySelectorAll('.cc-var-input').forEach(inp => {
-                                txt = txt.replaceAll(`{{${inp.dataset.var}}}`, inp.value.trim());
+                                const val = inp.value.trim();
+                                variables[inp.dataset.var] = val;
+                                txt = txt.replaceAll(`{{${inp.dataset.var}}}`, val);
                             });
                         }
                         try {
@@ -1178,6 +1181,19 @@
                             ccFeedback.textContent = '✓ 已複製到剪貼簿！';
                             ccFeedback.classList.add('success');
                             ccCopyBtn.classList.add('copied');
+
+                            // 儲存到 DB（變數 + 最終文字）
+                            await stateManager.save(element.id, {
+                                type: 'copycard',
+                                title: element.title || '複製卡',
+                                content: txt,
+                                isCorrect: null,
+                                score: null,
+                                points: parseInt(element.points) || defaultPts.copycard || 1,
+                                participated: true,
+                                state: { variables, template: rawCopy }
+                            });
+
                             setTimeout(() => {
                                 ccFeedback.textContent = '';
                                 ccFeedback.classList.remove('success');
