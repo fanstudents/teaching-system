@@ -2973,6 +2973,7 @@ export class SlideManager {
             sections: this.sections,
             currentIndex: this.currentIndex,
             thankYouConfig: this.thankYouConfig || null,
+            surveyConfig: this.surveyConfig || null,
             savedAt: new Date().toISOString()
         };
 
@@ -3275,6 +3276,7 @@ export class SlideManager {
             this.sections = chosen.sections || [];
             this.currentIndex = chosen.currentIndex || 0;
             this.thankYouConfig = chosen.thankYouConfig || null;
+            this.surveyConfig = chosen.surveyConfig || null;
             this.renderThumbnails();
             this.renderCurrentSlide();
             this.updateCounter();

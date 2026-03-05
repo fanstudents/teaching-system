@@ -957,7 +957,7 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'survey', 'showcase'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
             const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
@@ -1112,17 +1112,6 @@
                     el.querySelector('.link-card')?.addEventListener('click', (e) => {
                         e.stopPropagation();
                         window.open(linkUrl, '_blank');
-                    });
-                    break;
-                }
-
-                case 'survey': {
-                    el.classList.add('survey-element');
-                    el.style.overflow = 'hidden';
-                    import('./scripts/interactive/survey.js').then(({ SurveyGame }) => {
-                        new SurveyGame().render(el, element);
-                    }).catch(e => {
-                        el.innerHTML = '<div style="padding:20px;color:#666;">問卷載入失敗</div>';
                     });
                     break;
                 }

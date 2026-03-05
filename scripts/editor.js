@@ -110,20 +110,6 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
-    addSurvey() {
-        const element = {
-            type: 'survey',
-            x: 60,
-            y: 30,
-            width: 520,
-            height: 450,
-            surveyTitle: '📋 課程回饋問卷',
-        };
-
-        this.slideManager.addElement(element);
-        this.selectElementById(element.id);
-    }
-
     /**
      * 新增形狀元素
      */

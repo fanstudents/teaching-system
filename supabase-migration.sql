@@ -93,9 +93,12 @@ CREATE TABLE IF NOT EXISTS public.sessions (
   title text,
   current_slide text,
   is_broadcasting text,
+  project_id text DEFAULT '',
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
+-- Migration: add project_id if not exists
+ALTER TABLE public.sessions ADD COLUMN IF NOT EXISTS project_id text DEFAULT '';
 CREATE TRIGGER sessions_update_timestamp
   BEFORE UPDATE ON public.sessions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();

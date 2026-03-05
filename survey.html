@@ -4,115 +4,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>課程回饋問卷 — 數位簡報室</title>
-    <meta name="description" content="課程回饋問卷">
-    <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    <title>課後問卷 — 數位簡報室</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet">
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background: #f8f9fb;
+            font-family: 'Noto Sans TC', system-ui, sans-serif;
+            background: linear-gradient(165deg, #0d1117 0%, #161b28 40%, #1a1f35 100%);
+            color: #e2e8f0;
             min-height: 100vh;
-            color: #1e293b;
             display: flex;
+            align-items: center;
             justify-content: center;
-            padding: 40px 16px;
+            padding: 20px;
         }
 
-        .survey-page {
+        .survey-container {
             width: 100%;
-            max-width: 580px;
+            max-width: 540px;
+            animation: fadeInUp 0.5s ease;
         }
 
-        /* ─ Header ─ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Loading ── */
+        .survey-loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .survey-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Card ── */
+        .survey-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 32px 28px;
+            backdrop-filter: blur(20px);
+        }
+
         .survey-header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
+        }
+
+        .survey-header .emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
         }
 
         .survey-header h1 {
-            font-size: 22px;
+            font-size: 1.4rem;
             font-weight: 700;
-            color: #1e293b;
-            letter-spacing: -0.3px;
+            color: #f1f5f9;
+            margin-bottom: 4px;
         }
 
         .survey-header p {
-            font-size: 13px;
+            font-size: 0.85rem;
             color: #94a3b8;
-            margin-top: 6px;
-            line-height: 1.5;
         }
 
-        .survey-header .header-line {
-            width: 40px;
-            height: 3px;
-            background: #6366f1;
-            border-radius: 2px;
-            margin: 12px auto 0;
-        }
-
-        /* ─ Section Label ─ */
-        .section-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #6366f1;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 28px 0 12px;
-            padding-left: 2px;
-        }
-
-        /* ─ Card ─ */
-        .survey-card {
-            background: #fff;
-            border: 1px solid #e8ecf1;
-            border-radius: 10px;
-            padding: 18px 20px;
-            margin-bottom: 12px;
-            transition: border-color 0.2s;
-        }
-
-        .survey-card:focus-within {
-            border-color: #a5b4fc;
+        /* ── Questions ── */
+        .survey-q {
+            margin-bottom: 24px;
         }
 
         .survey-q-label {
-            font-size: 14px;
+            font-size: 0.9rem;
             font-weight: 600;
-            color: #334155;
-            margin-bottom: 12px;
-            line-height: 1.5;
+            color: #cbd5e1;
+            margin-bottom: 10px;
         }
 
-        .survey-q-num {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            background: #eef2ff;
-            color: #6366f1;
-            font-size: 11px;
-            font-weight: 700;
-            margin-right: 8px;
-            flex-shrink: 0;
-            vertical-align: middle;
-        }
-
-        /* ─ Stars ─ */
         .survey-stars {
             display: flex;
             gap: 6px;
@@ -120,524 +121,406 @@
 
         .survey-star {
             font-size: 28px;
+            color: #334155;
             cursor: pointer;
-            color: #e2e8f0;
-            transition: color 0.15s, transform 0.15s;
+            transition: all 0.15s;
             user-select: none;
         }
 
-        .survey-star:hover {
-            transform: scale(1.12);
-        }
-
+        .survey-star:hover,
         .survey-star.active {
             color: #fbbf24;
+            transform: scale(1.15);
         }
 
-        .star-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 4px;
-            padding: 0 2px;
-        }
-
-        /* ─ Radio options ─ */
-        .survey-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .survey-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid #e8ecf1;
-            transition: all 0.15s;
-            font-size: 14px;
-            color: #475569;
-        }
-
-        .survey-option:hover {
-            background: #f8fafc;
-            border-color: #c7d2fe;
-        }
-
-        .survey-option.selected {
-            background: #eef2ff;
-            border-color: #6366f1;
-            color: #4338ca;
-            font-weight: 500;
-        }
-
-        .survey-option input[type="radio"] {
-            display: none;
-        }
-
-        .survey-dot {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 2px solid #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: border-color 0.15s;
-            flex-shrink: 0;
-        }
-
-        .survey-dot::after {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: transparent;
-            transition: background 0.15s;
-        }
-
-        .survey-option.selected .survey-dot {
-            border-color: #6366f1;
-        }
-
-        .survey-option.selected .survey-dot::after {
-            background: #6366f1;
-        }
-
-        /* ─ Textarea ─ */
         .survey-textarea {
             width: 100%;
-            background: #f8fafc;
-            border: 1px solid #e8ecf1;
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: #1e293b;
-            font-size: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            font-size: 0.88rem;
             font-family: inherit;
-            resize: none;
-            outline: none;
+            resize: vertical;
+            min-height: 48px;
             transition: border-color 0.2s;
-            line-height: 1.6;
-        }
-
-        .survey-textarea::placeholder {
-            color: #94a3b8;
+            outline: none;
         }
 
         .survey-textarea:focus {
-            border-color: #a5b4fc;
-            background: #fff;
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.06);
         }
 
-        /* ─ Submit ─ */
+        .survey-textarea::placeholder {
+            color: #475569;
+        }
+
+        /* ── Submit ── */
         .survey-submit {
             width: 100%;
-            margin-top: 16px;
             padding: 14px;
-            background: #4f46e5;
-            color: #fff;
             border: none;
-            border-radius: 10px;
-            font-size: 15px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            font-size: 0.95rem;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            transition: background 0.2s;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-top: 8px;
         }
 
         .survey-submit:disabled {
-            background: #c7d2fe;
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
         .survey-submit:not(:disabled):hover {
-            background: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
         }
 
-        /* ─ ID Card ─ */
-        .id-card {
-            background: #fff;
-            border: 1px solid #e8ecf1;
-            border-radius: 10px;
-            padding: 18px 20px;
+        /* ── Thank You ── */
+        .thankyou-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .thankyou-section .emoji {
+            font-size: 48px;
             margin-bottom: 8px;
         }
 
-        .id-card label {
-            font-size: 12px;
-            color: #64748b;
-            font-weight: 500;
-            display: block;
-            margin-bottom: 4px;
+        .thankyou-section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f1f5f9;
         }
 
-        .id-card input {
-            width: 100%;
-            background: #f8fafc;
-            border: 1px solid #e8ecf1;
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: #1e293b;
+        .thankyou-section p {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .cta-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .cta-card:hover {
+            filter: brightness(1.15);
+        }
+
+        .cta-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cta-icon .material-symbols-outlined {
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .cta-title {
             font-size: 14px;
-            font-family: inherit;
-            outline: none;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .cta-desc {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .cta-arrow {
+            margin-left: auto;
+            font-size: 18px;
+        }
+
+        .farewell-box {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .email-notice {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(99, 102, 241, 0.06);
+            border-radius: 10px;
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .email-notice .material-symbols-outlined {
+            color: #818cf8;
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── Error ── */
+        .survey-error {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .survey-error .material-symbols-outlined {
+            font-size: 48px;
+            color: #ef4444;
             margin-bottom: 12px;
         }
 
-        .id-card input:last-child {
-            margin-bottom: 0;
-        }
-
-        .id-card input::placeholder {
+        .survey-error p {
             color: #94a3b8;
-        }
-
-        .id-card input:focus {
-            border-color: #a5b4fc;
-            background: #fff;
-        }
-
-        /* ─ Done ─ */
-        .survey-done {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .survey-done-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .survey-done h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .survey-done p {
-            color: #64748b;
-            line-height: 1.7;
-            font-size: 14px;
-        }
-
-        /* ─ Progress ─ */
-        .progress-bar {
-            height: 3px;
-            background: #e8ecf1;
-            border-radius: 2px;
-            margin-bottom: 28px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #6366f1;
-            border-radius: 2px;
-            transition: width 0.4s ease;
-            width: 0%;
-        }
-
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ─ Footer ─ */
-        .survey-footer {
-            text-align: center;
-            margin-top: 24px;
-            padding: 16px;
-            font-size: 11px;
-            color: #94a3b8;
-        }
-
-        .survey-footer a {
-            color: #6366f1;
-            text-decoration: none;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
-    <div class="survey-page" id="surveyPage">
-        <div class="survey-header">
-            <h1>課程回饋問卷</h1>
-            <p>您的反饋將協助我們持續優化課程品質，<br>所有資料僅供內部教學改善使用。</p>
-            <div class="header-line"></div>
-        </div>
-
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-
-        <!-- 身份 -->
-        <div class="id-card" id="idCard">
-            <label>姓名</label>
-            <input type="text" id="surveyName" placeholder="請輸入姓名">
-            <label>Email</label>
-            <input type="email" id="surveyEmail" placeholder="your@email.com">
-        </div>
-
-        <!-- ═══ Part A：滿意度評分 ═══ -->
-        <div class="section-label">Part A — 課程滿意度</div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">1</span>課程整體滿意度</div>
-            <div class="survey-stars" data-qid="q1"></div>
-            <div class="star-labels"><span>很不滿意</span><span>非常滿意</span></div>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">2</span>講師教學表現（節奏、互動、表達清晰度）</div>
-            <div class="survey-stars" data-qid="q2"></div>
-            <div class="star-labels"><span>需加強</span><span>非常優秀</span></div>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">3</span>課程內容的實用性與可應用程度</div>
-            <div class="survey-stars" data-qid="q3"></div>
-            <div class="star-labels"><span>不太實用</span><span>立即可用</span></div>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">4</span>教材與互動體驗的流暢度</div>
-            <div class="survey-stars" data-qid="q4"></div>
-            <div class="star-labels"><span>體驗不佳</span><span>非常流暢</span></div>
-        </div>
-
-        <!-- ═══ Part B：學習成效 ═══ -->
-        <div class="section-label">Part B — 學習成效</div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">5</span>上完這堂課後，你對課程主題的掌握程度？</div>
-            <div class="survey-options" data-qid="q5">
-                <label class="survey-option" data-v="1"><input type="radio" name="q5" value="1"><span
-                        class="survey-dot"></span>還是不太了解</label>
-                <label class="survey-option" data-v="2"><input type="radio" name="q5" value="2"><span
-                        class="survey-dot"></span>有基本概念，但還需要練習</label>
-                <label class="survey-option" data-v="3"><input type="radio" name="q5" value="3"><span
-                        class="survey-dot"></span>已經可以開始嘗試應用</label>
-                <label class="survey-option" data-v="4"><input type="radio" name="q5" value="4"><span
-                        class="survey-dot"></span>有信心在工作中實際運用</label>
-            </div>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">6</span>你是否願意將這堂課推薦給同事或朋友？</div>
-            <div class="survey-options" data-qid="q6">
-                <label class="survey-option" data-v="5"><input type="radio" name="q6" value="5"><span
-                        class="survey-dot"></span>一定會推薦</label>
-                <label class="survey-option" data-v="4"><input type="radio" name="q6" value="4"><span
-                        class="survey-dot"></span>可能會推薦</label>
-                <label class="survey-option" data-v="3"><input type="radio" name="q6" value="3"><span
-                        class="survey-dot"></span>不確定</label>
-                <label class="survey-option" data-v="2"><input type="radio" name="q6" value="2"><span
-                        class="survey-dot"></span>可能不會</label>
-            </div>
-        </div>
-
-        <!-- ═══ Part C：開放式回饋 ═══ -->
-        <div class="section-label">Part C — 開放式回饋</div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">7</span>這堂課讓你印象最深刻或最有收穫的部分是？</div>
-            <textarea class="survey-textarea" id="q7" rows="3" placeholder="例如：某個工具的實作演練、某個觀念的突破…"></textarea>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">8</span>課程中是否有讓你感到困惑、節奏太快或不清楚的地方？</div>
-            <textarea class="survey-textarea" id="q8" rows="3" placeholder="具體描述將幫助我們改善教學節奏…"></textarea>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">9</span>你還希望在後續課程中學到哪些主題或技能？</div>
-            <textarea class="survey-textarea" id="q9" rows="3" placeholder="例如：進階 Prompt 技巧、AI 自動化流程設計…"></textarea>
-        </div>
-
-        <div class="survey-card">
-            <div class="survey-q-label"><span class="survey-q-num">10</span>其他想對講師說的話，或任何建議</div>
-            <textarea class="survey-textarea" id="q10" rows="3" placeholder="（選填）任何想法都歡迎！"></textarea>
-        </div>
-
-        <button class="survey-submit" id="submitBtn" disabled>
-            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
-            提交問卷
-        </button>
-
-        <div class="survey-footer">
-            Powered by <a href="https://tbr.digital" target="_blank">數位簡報室</a>
+    <div class="survey-container" id="surveyRoot">
+        <div class="survey-loading">
+            <div class="spinner"></div>
+            <p style="color:#94a3b8;">載入問卷中…</p>
         </div>
     </div>
 
     <script type="module">
         import { db } from './scripts/supabase.js';
 
-        const sessionCode = new URLSearchParams(location.search).get('code') || '';
-        const starQids = ['q1', 'q2', 'q3', 'q4'];
-        const radioQids = ['q5', 'q6'];
-        const textQids = ['q7', 'q8', 'q9', 'q10'];
-        const totalRequired = starQids.length + radioQids.length + textQids.length - 1; // q10 optional
+        const params = new URLSearchParams(location.search);
+        const sessionCode = params.get('session') || '';
+        const studentEmail = params.get('student') || '';
+        const root = document.getElementById('surveyRoot');
 
-        // ── 初始化星星 ──
-        document.querySelectorAll('.survey-stars').forEach(container => {
-            for (let i = 1; i <= 5; i++) {
-                const star = document.createElement('span');
-                star.className = 'survey-star';
-                star.textContent = '★';
-                star.dataset.value = i;
-                star.addEventListener('click', () => {
-                    container.dataset.selected = i;
-                    container.querySelectorAll('.survey-star').forEach(s => {
-                        s.classList.toggle('active', parseInt(s.dataset.value) <= i);
-                    });
-                    checkSubmit();
-                });
-                container.appendChild(star);
-            }
-        });
-
-        // ── 初始化 Radio 選項 ──
-        document.querySelectorAll('.survey-options').forEach(group => {
-            group.querySelectorAll('.survey-option').forEach(opt => {
-                opt.addEventListener('click', () => {
-                    group.querySelectorAll('.survey-option').forEach(o => o.classList.remove('selected'));
-                    opt.classList.add('selected');
-                    opt.querySelector('input').checked = true;
-                    group.dataset.selected = opt.dataset.v;
-                    checkSubmit();
-                });
-            });
-        });
-
-        // ── 帶入已存的身份 ──
-        const savedUser = JSON.parse(sessionStorage.getItem('homework_user') || 'null');
-        if (savedUser) {
-            document.getElementById('surveyName').value = savedUser.name || '';
-            document.getElementById('surveyEmail').value = savedUser.email || '';
+        if (!sessionCode) {
+            root.innerHTML = `<div class="survey-card survey-error">
+                <span class="material-symbols-outlined">error</span>
+                <p>缺少 session 參數，無法載入問卷。</p>
+            </div>`;
+        } else {
+            init();
         }
 
-        // ── 進度 & 提交檢查 ──
-        function checkSubmit() {
-            const name = document.getElementById('surveyName').value.trim();
-            const email = document.getElementById('surveyEmail').value.trim();
-            let filled = 0;
-
-            starQids.forEach(qid => {
-                const el = document.querySelector(`.survey-stars[data-qid="${qid}"]`);
-                if (el?.dataset.selected && el.dataset.selected !== '0') filled++;
-            });
-            radioQids.forEach(qid => {
-                const el = document.querySelector(`.survey-options[data-qid="${qid}"]`);
-                if (el?.dataset.selected) filled++;
-            });
-            textQids.slice(0, -1).forEach(id => { // q10 optional
-                if (document.getElementById(id)?.value.trim()) filled++;
-            });
-
-            // Progress bar
-            const pct = Math.min(Math.round((filled / totalRequired) * 100), 100);
-            document.getElementById('progressFill').style.width = pct + '%';
-
-            document.getElementById('submitBtn').disabled =
-                !(filled >= totalRequired && name && email.includes('@'));
-        }
-
-        document.getElementById('surveyName').addEventListener('input', checkSubmit);
-        document.getElementById('surveyEmail').addEventListener('input', checkSubmit);
-        document.querySelectorAll('.survey-textarea').forEach(ta =>
-            ta.addEventListener('input', checkSubmit));
-
-        // ── 提交 ──
-        document.getElementById('submitBtn').addEventListener('click', async () => {
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 1s linear infinite;font-size:18px;">progress_activity</span> 提交中…';
-
-            const name = document.getElementById('surveyName').value.trim();
-            const email = document.getElementById('surveyEmail').value.trim();
-
-            const answers = {};
-            // Stars
-            document.querySelectorAll('.survey-stars').forEach(el => {
-                answers[el.dataset.qid] = {
-                    question: el.closest('.survey-card').querySelector('.survey-q-label').textContent.replace(/^\d+/, '').trim(),
-                    type: 'stars',
-                    value: parseInt(el.dataset.selected || '0')
-                };
-            });
-            // Radio
-            document.querySelectorAll('.survey-options').forEach(el => {
-                answers[el.dataset.qid] = {
-                    question: el.closest('.survey-card').querySelector('.survey-q-label').textContent.replace(/^\d+/, '').trim(),
-                    type: 'choice',
-                    value: parseInt(el.dataset.selected || '0'),
-                    label: el.querySelector('.selected')?.textContent.trim() || ''
-                };
-            });
-            // Text
-            textQids.forEach(id => {
-                const ta = document.getElementById(id);
-                const label = ta.closest('.survey-card').querySelector('.survey-q-label').textContent.replace(/^\d+/, '').trim();
-                answers[id] = { question: label, type: 'text', value: ta.value.trim() };
-            });
-
-            sessionStorage.setItem('homework_user', JSON.stringify({ name, email, joinedAt: new Date().toISOString() }));
-
+        async function init() {
             try {
-                const { data: existing } = await db.select('submissions', {
-                    filter: {
-                        session_id: `eq.${sessionCode}`,
-                        element_id: 'eq._post_survey',
-                        student_email: `eq.${email}`
+                // 1. session → project_id
+                const sessRows = await db.select('sessions', {
+                    filter: { session_code: `eq.${sessionCode}` },
+                    limit: 1,
+                });
+                const sess = (sessRows?.data || sessRows)?.[0];
+                if (!sess?.project_id) throw new Error('找不到此 session');
+
+                // 2. project → slides_data
+                const projRows = await db.select('projects', {
+                    filter: { id: `eq.${sess.project_id}` },
+                    limit: 1,
+                });
+                const proj = (projRows?.data || projRows)?.[0];
+                if (!proj) throw new Error('找不到專案');
+
+                const slidesData = typeof proj.slides_data === 'string'
+                    ? JSON.parse(proj.slides_data) : proj.slides_data || {};
+
+                const surveyConfig = slidesData.surveyConfig || {};
+                const thankYouConfig = slidesData.thankYouConfig || {};
+
+                // 3. 檢查是否已填
+                if (studentEmail) {
+                    const existing = await db.select('submissions', {
+                        filter: {
+                            session_id: `eq.${sessionCode}`,
+                            student_email: `eq.${studentEmail}`,
+                            type: 'eq.survey',
+                        },
+                        limit: 1,
+                    });
+                    if ((existing?.data || existing)?.[0]) {
+                        renderThankYou(thankYouConfig);
+                        return;
+                    }
+                }
+
+                // 4. 顯示問卷
+                renderSurvey(surveyConfig, thankYouConfig);
+            } catch (e) {
+                console.error(e);
+                root.innerHTML = `<div class="survey-card survey-error">
+                    <span class="material-symbols-outlined">error</span>
+                    <p>${e.message || '載入失敗'}</p>
+                </div>`;
+            }
+        }
+
+        function renderSurvey(surveyConfig, thankYouConfig) {
+            const questions = surveyConfig.questions || [
+                { id: 'q1', type: 'stars', text: '課程整體滿意度', max: 5 },
+                { id: 'q2', type: 'stars', text: '講師教學表現', max: 5 },
+                { id: 'q3', type: 'stars', text: '課程內容實用性', max: 5 },
+                { id: 'q4', type: 'text', text: '這堂課最大的收穫是什麼？', placeholder: '請分享你印象最深刻的部分…' },
+                { id: 'q5', type: 'text', text: '你覺得還想學哪些相關主題？', placeholder: '例如：AI 繪圖、自動化工具…' },
+                { id: 'q6', type: 'text', text: '給講師的一句話或建議 💬', placeholder: '任何想說的話都可以！' },
+            ];
+            const title = surveyConfig.title || '📋 課程回饋問卷';
+
+            root.innerHTML = `
+                <div class="survey-card">
+                    <div class="survey-header">
+                        <div class="emoji">📋</div>
+                        <h1>${title}</h1>
+                        <p>你的回饋是我們進步的動力 ✨</p>
+                    </div>
+                    <div id="questionsArea">
+                        ${questions.map((q, i) => renderQuestion(q, i)).join('')}
+                    </div>
+                    <button class="survey-submit" id="submitBtn" disabled>
+                        <span class="material-symbols-outlined">send</span>
+                        提交問卷
+                    </button>
+                </div>`;
+
+            // Stars
+            root.querySelectorAll('.survey-stars').forEach(starsEl => {
+                starsEl.querySelectorAll('.survey-star').forEach(star => {
+                    star.addEventListener('click', () => {
+                        const val = parseInt(star.dataset.value);
+                        starsEl.dataset.selected = val;
+                        starsEl.querySelectorAll('.survey-star').forEach(s =>
+                            s.classList.toggle('active', parseInt(s.dataset.value) <= val));
+                        checkSubmit();
+                    });
+                });
+            });
+            root.querySelectorAll('.survey-textarea').forEach(ta => ta.addEventListener('input', checkSubmit));
+
+            document.getElementById('submitBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 0.8s linear infinite;">progress_activity</span> 提交中…';
+
+                const answers = {};
+                questions.forEach(q => {
+                    if (q.type === 'stars') {
+                        const el = root.querySelector(`[data-qid="${q.id}"]`);
+                        answers[q.id] = { question: q.text, type: 'stars', value: parseInt(el?.dataset.selected || '0') };
+                    } else {
+                        const ta = root.querySelector(`#survey_${q.id}`);
+                        answers[q.id] = { question: q.text, type: 'text', value: ta?.value?.trim() || '' };
                     }
                 });
 
-                const record = {
-                    session_id: sessionCode || null,
-                    element_id: '_post_survey',
-                    student_name: name,
-                    student_email: email,
-                    student_group: '',
-                    assignment_title: '課後問卷',
-                    type: 'survey',
-                    content: JSON.stringify(answers),
-                    is_correct: null,
-                    score: null,
-                    state: { answers, _awarded: 2, _maxPts: 2 },
-                    submitted_at: new Date().toISOString()
-                };
+                try {
+                    await db.insert('submissions', {
+                        session_id: sessionCode,
+                        student_email: studentEmail,
+                        student_name: studentEmail.split('@')[0] || '匿名',
+                        assignment_title: title,
+                        type: 'survey',
+                        content: JSON.stringify(answers),
+                        element_id: 'standalone_survey',
+                        submitted_at: new Date().toISOString(),
+                        state: { answers },
+                    });
+                } catch (e) { console.warn('Survey save error:', e); }
 
-                if (existing && existing.length > 0) {
-                    await db.update('submissions', {
-                        content: record.content,
-                        state: record.state,
-                        submitted_at: record.submitted_at
-                    }, { id: `eq.${existing[0].id}` });
-                } else {
-                    await db.insert('submissions', record);
-                }
+                renderThankYou(thankYouConfig);
+            });
 
-                document.getElementById('surveyPage').innerHTML = `
-                    <div class="survey-done">
-                        <div class="survey-done-icon">✅</div>
-                        <h2>感謝您的回饋！</h2>
-                        <p>您的意見是我們持續改進的重要依據，<br>期待在未來的課程中再次與您相見。</p>
-                    </div>
-                `;
-            } catch (e) {
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">send</span> 提交問卷';
-                alert('提交失敗：' + e.message);
+            function checkSubmit() {
+                let ok = true;
+                root.querySelectorAll('.survey-stars').forEach(el => {
+                    if (parseInt(el.dataset.selected || '0') === 0) ok = false;
+                });
+                document.getElementById('submitBtn').disabled = !ok;
             }
-        });
+        }
+
+        function renderQuestion(q, i) {
+            if (q.type === 'stars') {
+                return `<div class="survey-q">
+                    <div class="survey-q-label">${i + 1}. ${q.text}</div>
+                    <div class="survey-stars" data-qid="${q.id}" data-selected="0">
+                        ${Array.from({ length: q.max || 5 }, (_, j) =>
+                    `<span class="survey-star" data-value="${j + 1}">★</span>`).join('')}
+                    </div>
+                </div>`;
+            }
+            return `<div class="survey-q">
+                <div class="survey-q-label">${i + 1}. ${q.text}</div>
+                <textarea class="survey-textarea" id="survey_${q.id}" placeholder="${q.placeholder || ''}" rows="2"></textarea>
+            </div>`;
+        }
+
+        function renderThankYou(cfg) {
+            const ctaCards = cfg.ctaCards || [
+                { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+                { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
+                { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL', url: 'https://www.threads.net/intent/post?text=' + encodeURIComponent('剛上完數位簡報室的課程！收穫滿滿 🎓✨ @TBR.DIGITAL'), icon: 'share', color: '#10b981' }
+            ];
+            const sectionTitle = cfg.sectionTitle || '✨ 修完這堂課，你還可以…';
+            const farewell = cfg.farewell || '🙌 歡迎來找老師聊聊天、私下互動<br>或是開心地離開教室，回家注意安全！';
+            const emailNotice = cfg.emailNotice || '我們會在課後兩天內，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬';
+
+            root.innerHTML = `
+                <div class="survey-card">
+                    <div class="thankyou-section">
+                        <div class="emoji">🎉</div>
+                        <h2>感謝你的回饋！</h2>
+                        <p>你的意見是我們進步的動力</p>
+                    </div>
+                    <div style="font-size:14px;font-weight:600;color:#cbd5e1;margin-bottom:12px;text-align:center;">${sectionTitle}</div>
+                    ${ctaCards.map(c => {
+                const bg = c.color || '#6366f1';
+                return `<a href="${c.url || '#'}" target="_blank" class="cta-card" style="background:${bg}18;border:1px solid ${bg}40;">
+                            <div class="cta-icon" style="background:linear-gradient(135deg,${bg},${bg}cc);">
+                                <span class="material-symbols-outlined">${c.icon || 'link'}</span>
+                            </div>
+                            <div>
+                                <div class="cta-title">${c.title}</div>
+                                <div class="cta-desc">${c.desc || ''}</div>
+                            </div>
+                            <span class="material-symbols-outlined cta-arrow" style="color:${bg};">arrow_forward</span>
+                        </a>`;
+            }).join('')}
+                    <div class="farewell-box">${farewell}</div>
+                    <div class="email-notice">
+                        <span class="material-symbols-outlined">mail</span>
+                        <div>${emailNotice}</div>
+                    </div>
+                </div>`;
+        }
     </script>
 </body>
 

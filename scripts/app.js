@@ -270,9 +270,9 @@ class App {
             this.editor.addLeaderboard();
         });
 
-        // 新增問卷
+        // 課後問卷設定（專案層級）
         document.getElementById('addSurveyBtn')?.addEventListener('click', () => {
-            this.editor.addSurvey();
+            this.openSurveySettings();
         });
 
         // 新增圖形
@@ -2924,7 +2924,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 session_code: this.sessionCode,
                 title: document.querySelector('.file-name')?.textContent || '教學簡報',
                 current_slide: '0',
-                is_broadcasting: 'true'
+                is_broadcasting: 'true',
+                project_id: this.slideManager.currentProjectId || ''
             });
             if (error) {
                 console.error('建立 session 失敗:', error);
@@ -3649,6 +3650,229 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         document.getElementById('presQAPanel')?.remove();
         // 不清空 _qaQuestions，保留歷史問題
         this._qaOpen = false;
+    }
+
+    // ═══════════ Survey Settings Overlay ═══════════
+    openSurveySettings() {
+        const sm = this.slideManager;
+        const cfg = sm.surveyConfig || {};
+        const tyCfg = sm.thankYouConfig || {};
+        const questions = cfg.questions || [
+            { id: 'q1', type: 'stars', text: '課程整體滿意度', max: 5 },
+            { id: 'q2', type: 'stars', text: '講師教學表現', max: 5 },
+            { id: 'q3', type: 'stars', text: '課程內容實用性', max: 5 },
+            { id: 'q4', type: 'text', text: '這堂課最大的收穫是什麼？', placeholder: '請分享你印象最深刻的部分…' },
+            { id: 'q5', type: 'text', text: '你覺得還想學哪些相關主題？', placeholder: '例如：AI 繪圖、自動化工具…' },
+            { id: 'q6', type: 'text', text: '給講師的一句話或建議 💬', placeholder: '任何想說的話都可以！' },
+        ];
+        const ctaCards = tyCfg.ctaCards || [
+            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+            { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
+            { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL', url: 'https://www.threads.net/', icon: 'share', color: '#10b981' },
+        ];
+
+        document.querySelector('.survey-settings-overlay')?.remove();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'survey-settings-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+
+        const surveyUrl = this.sessionCode
+            ? `${location.origin}/survey.html?session=${this.sessionCode}&student={email}`
+            : `${location.origin}/survey.html?session={code}&student={email}`;
+
+        overlay.innerHTML = `
+            <div style="background:#1e293b;border-radius:16px;width:90vw;max-width:720px;max-height:85vh;overflow-y:auto;padding:28px 32px;color:#e2e8f0;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+                <div style="display:flex;align-items:center;justify-content:between;margin-bottom:24px;">
+                    <div style="flex:1;">
+                        <h2 style="font-size:1.2rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px;">
+                            <span class="material-symbols-outlined" style="color:#8b5cf6;">rate_review</span>
+                            課後問卷設定
+                        </h2>
+                        <p style="font-size:0.82rem;color:#94a3b8;margin-top:4px;">這些設定會儲存在專案層級，廣播時可透過連結讓學員填寫</p>
+                    </div>
+                    <button class="survey-settings-close" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:24px;padding:4px;">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- 問卷標題 -->
+                <div style="margin-bottom:20px;">
+                    <label style="font-size:12px;color:#94a3b8;margin-bottom:4px;display:block;">問卷標題</label>
+                    <input id="ssCfgTitle" type="text" value="${cfg.title || '📋 課程回饋問卷'}" style="width:100%;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:14px;font-family:inherit;">
+                </div>
+
+                <!-- 問卷題目 -->
+                <div style="margin-bottom:20px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                        <label style="font-size:13px;font-weight:600;color:#cbd5e1;">問卷題目</label>
+                        <button id="ssAddQ" style="padding:4px 12px;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;">+ 新增題目</button>
+                    </div>
+                    <div id="ssQuestionList" style="display:flex;flex-direction:column;gap:8px;">
+                        ${questions.map((q, i) => this._renderSurveyQuestionRow(q, i)).join('')}
+                    </div>
+                </div>
+
+                <hr style="border:none;border-top:1px solid #334155;margin:20px 0;">
+
+                <!-- 感謝頁設定 -->
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:13px;font-weight:600;color:#cbd5e1;margin-bottom:8px;display:block;">感謝頁設定</label>
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:12px;color:#94a3b8;margin-bottom:4px;display:block;">區塊標題</label>
+                        <input id="ssSectionTitle" type="text" value="${tyCfg.sectionTitle || '✨ 修完這堂課，你還可以…'}" style="width:100%;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:13px;font-family:inherit;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:12px;color:#94a3b8;margin-bottom:4px;display:block;">告別訊息</label>
+                        <textarea id="ssFarewell" rows="2" style="width:100%;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:13px;font-family:inherit;resize:vertical;">${tyCfg.farewell || '🙌 歡迎來找老師聊聊天、私下互動\n或是開心地離開教室，回家注意安全！'}</textarea>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:12px;color:#94a3b8;margin-bottom:4px;display:block;">Email 通知文字</label>
+                        <textarea id="ssEmailNotice" rows="2" style="width:100%;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:13px;font-family:inherit;resize:vertical;">${tyCfg.emailNotice || '我們會在課後兩天內，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬'}</textarea>
+                    </div>
+                </div>
+
+                <!-- CTA 卡片 -->
+                <div style="margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                        <label style="font-size:13px;font-weight:600;color:#cbd5e1;">CTA 卡片</label>
+                        <button id="ssAddCTA" style="padding:4px 12px;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;">+ 新增</button>
+                    </div>
+                    <div id="ssCtaList" style="display:flex;flex-direction:column;gap:8px;">
+                        ${ctaCards.map((c, i) => this._renderSurveyCTARow(c, i)).join('')}
+                    </div>
+                </div>
+
+                <hr style="border:none;border-top:1px solid #334155;margin:20px 0;">
+
+                <!-- 問卷連結 -->
+                <div style="margin-bottom:20px;padding:12px 16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);border-radius:10px;">
+                    <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">問卷連結預覽（廣播後可使用）</div>
+                    <code style="font-size:11px;color:#818cf8;word-break:break-all;">${surveyUrl}</code>
+                </div>
+
+                <!-- 儲存 -->
+                <div style="display:flex;justify-content:flex-end;gap:10px;">
+                    <button class="survey-settings-close" style="padding:8px 20px;background:transparent;border:1px solid #475569;border-radius:8px;color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">取消</button>
+                    <button id="ssSaveBtn" style="padding:8px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">儲存</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // Close handlers
+        overlay.querySelectorAll('.survey-settings-close').forEach(btn => btn.addEventListener('click', () => overlay.remove()));
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        // Add question
+        overlay.querySelector('#ssAddQ').addEventListener('click', () => {
+            const list = overlay.querySelector('#ssQuestionList');
+            const idx = list.children.length;
+            const newQ = { id: `q${Date.now()}`, type: 'text', text: '新問題', placeholder: '' };
+            const div = document.createElement('div');
+            div.innerHTML = this._renderSurveyQuestionRow(newQ, idx);
+            list.appendChild(div.firstElementChild);
+            this._bindSurveyQuestionRow(list.lastElementChild);
+        });
+
+        // Add CTA
+        overlay.querySelector('#ssAddCTA').addEventListener('click', () => {
+            const list = overlay.querySelector('#ssCtaList');
+            const newC = { title: '新卡片', desc: '', url: '', icon: 'link', color: '#6366f1' };
+            const div = document.createElement('div');
+            div.innerHTML = this._renderSurveyCTARow(newC, list.children.length);
+            list.appendChild(div.firstElementChild);
+            this._bindSurveyCTARow(list.lastElementChild);
+        });
+
+        // Bind existing rows
+        overlay.querySelectorAll('.ss-q-row').forEach(r => this._bindSurveyQuestionRow(r));
+        overlay.querySelectorAll('.ss-cta-row').forEach(r => this._bindSurveyCTARow(r));
+
+        // Save
+        overlay.querySelector('#ssSaveBtn').addEventListener('click', () => {
+            // Collect questions
+            const qRows = overlay.querySelectorAll('.ss-q-row');
+            const newQuestions = [];
+            qRows.forEach(row => {
+                const type = row.querySelector('.ss-q-type')?.value || 'text';
+                const text = row.querySelector('.ss-q-text')?.value || '';
+                const placeholder = row.querySelector('.ss-q-placeholder')?.value || '';
+                newQuestions.push({
+                    id: row.dataset.qid || `q${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+                    type, text, max: 5, placeholder,
+                });
+            });
+
+            // Collect CTAs
+            const ctaRows = overlay.querySelectorAll('.ss-cta-row');
+            const newCTAs = [];
+            ctaRows.forEach(row => {
+                newCTAs.push({
+                    title: row.querySelector('.ss-cta-title')?.value || '',
+                    desc: row.querySelector('.ss-cta-desc')?.value || '',
+                    url: row.querySelector('.ss-cta-url')?.value || '',
+                    icon: row.querySelector('.ss-cta-icon')?.value || 'link',
+                    color: row.querySelector('.ss-cta-color')?.value || '#6366f1',
+                });
+            });
+
+            sm.surveyConfig = {
+                title: overlay.querySelector('#ssCfgTitle')?.value || '📋 課程回饋問卷',
+                questions: newQuestions,
+            };
+            sm.thankYouConfig = {
+                sectionTitle: overlay.querySelector('#ssSectionTitle')?.value || '',
+                ctaCards: newCTAs,
+                farewell: overlay.querySelector('#ssFarewell')?.value || '',
+                emailNotice: overlay.querySelector('#ssEmailNotice')?.value || '',
+            };
+            sm.save();
+            this.showToast('問卷設定已儲存');
+            overlay.remove();
+        });
+    }
+
+    _renderSurveyQuestionRow(q, idx) {
+        return `
+            <div class="ss-q-row" data-qid="${q.id}" style="display:flex;gap:6px;align-items:center;padding:8px 10px;background:#0f172a;border-radius:8px;border:1px solid #334155;">
+                <select class="ss-q-type" style="padding:4px 6px;background:#1e293b;border:1px solid #475569;border-radius:4px;color:#e2e8f0;font-size:12px;">
+                    <option value="stars" ${q.type === 'stars' ? 'selected' : ''}>⭐ 星星</option>
+                    <option value="text" ${q.type === 'text' ? 'selected' : ''}>📝 文字</option>
+                </select>
+                <input class="ss-q-text" type="text" value="${q.text}" style="flex:1;padding:6px 8px;background:transparent;border:1px solid #475569;border-radius:4px;color:#e2e8f0;font-size:13px;font-family:inherit;">
+                <input class="ss-q-placeholder" type="text" value="${q.placeholder || ''}" placeholder="提示文字" style="width:120px;padding:6px 8px;background:transparent;border:1px solid #334155;border-radius:4px;color:#94a3b8;font-size:11px;font-family:inherit;${q.type === 'stars' ? 'display:none;' : ''}">
+                <button class="ss-q-remove" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:2px;" title="移除">
+                    <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+                </button>
+            </div>`;
+    }
+
+    _bindSurveyQuestionRow(row) {
+        row.querySelector('.ss-q-type')?.addEventListener('change', (e) => {
+            const placeholder = row.querySelector('.ss-q-placeholder');
+            placeholder.style.display = e.target.value === 'stars' ? 'none' : '';
+        });
+        row.querySelector('.ss-q-remove')?.addEventListener('click', () => row.remove());
+    }
+
+    _renderSurveyCTARow(c, idx) {
+        return `
+            <div class="ss-cta-row" style="display:flex;gap:6px;align-items:center;padding:8px 10px;background:#0f172a;border-radius:8px;border:1px solid #334155;">
+                <input class="ss-cta-color" type="color" value="${c.color || '#6366f1'}" style="width:28px;height:28px;border:none;cursor:pointer;border-radius:4px;">
+                <input class="ss-cta-icon" type="text" value="${c.icon || 'link'}" placeholder="icon" style="width:60px;padding:4px 6px;background:#1e293b;border:1px solid #475569;border-radius:4px;color:#e2e8f0;font-size:11px;">
+                <input class="ss-cta-title" type="text" value="${c.title}" placeholder="標題" style="flex:1;padding:6px 8px;background:transparent;border:1px solid #475569;border-radius:4px;color:#e2e8f0;font-size:13px;font-family:inherit;">
+                <input class="ss-cta-desc" type="text" value="${c.desc || ''}" placeholder="說明" style="flex:1;padding:6px 8px;background:transparent;border:1px solid #334155;border-radius:4px;color:#94a3b8;font-size:12px;font-family:inherit;">
+                <input class="ss-cta-url" type="text" value="${c.url || ''}" placeholder="https://..." style="width:140px;padding:6px 8px;background:transparent;border:1px solid #334155;border-radius:4px;color:#818cf8;font-size:11px;font-family:inherit;">
+                <button class="ss-cta-remove" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:2px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+                </button>
+            </div>`;
+    }
+
+    _bindSurveyCTARow(row) {
+        row.querySelector('.ss-cta-remove')?.addEventListener('click', () => row.remove());
     }
 
     exitPresentation() {
