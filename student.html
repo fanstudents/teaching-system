@@ -882,11 +882,16 @@
                     el.style.textDecoration = element.underline ? 'underline' : 'none';
                     if (element.textAlign) el.style.textAlign = element.textAlign;
                     if (element.fontFamily) el.style.fontFamily = element.fontFamily;
+                    if (element.lineHeight) el.style.lineHeight = element.lineHeight;
+                    el.style.overflow = 'visible';
                     break;
 
                 case 'shape':
                     el.classList.add(element.shapeType || 'rectangle');
                     el.style.background = element.background || '';
+                    if (element.borderRadius) el.style.borderRadius = `${element.borderRadius}px`;
+                    if (element.opacity !== undefined) el.style.opacity = element.opacity;
+                    if (element.border) el.style.border = element.border;
                     break;
 
                 case 'image':
