@@ -2922,7 +2922,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             await db.delete('sessions', { session_code: `eq.${this.sessionCode}` });
             const { error } = await db.insert('sessions', {
                 session_code: this.sessionCode,
-                title: document.querySelector('.file-name')?.textContent || '教學簡報',
+                title: this.slideManager._projectsCache?.find(p => p.id === this.slideManager.currentProjectId)?.name || document.querySelector('.file-name')?.textContent || '教學簡報',
                 current_slide: '0',
                 is_broadcasting: 'true',
                 project_id: this.slideManager.currentProjectId || ''
@@ -2968,12 +2968,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             realtime.on('student_heartbeat', (msg) => {
                 const p = msg.payload || msg;
                 if (p.studentId) {
-                    const isNew = !this.onlineStudents.has(p.studentId);
                     this.onlineStudents.set(p.studentId, {
                         name: p.studentName,
                         joinedAt: Date.now()
                     });
-                    if (isNew) this.updateViewerCount();
+                    this.updateViewerCount();
                 }
             });
 
