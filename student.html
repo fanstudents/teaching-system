@@ -809,7 +809,7 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'survey', 'showcase'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
             const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
