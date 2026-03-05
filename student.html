@@ -1154,11 +1154,26 @@
                         </div>
                     `;
                     if (ccHasVars) {
+                        const draftKey = `cc_draft_${element.id}`;
                         const ccInputs = el.querySelectorAll('.cc-var-input');
                         const ccBtn = el.querySelector('.copy-card-btn');
+
+                        // 還原暫存草稿
+                        try {
+                            const draft = JSON.parse(sessionStorage.getItem(draftKey) || '{}');
+                            ccInputs.forEach(inp => {
+                                if (draft[inp.dataset.var]) inp.value = draft[inp.dataset.var];
+                            });
+                            ccBtn.disabled = ![...ccInputs].every(i => i.value.trim());
+                        } catch { /* ignore */ }
+
                         ccInputs.forEach(inp => {
                             inp.addEventListener('input', () => {
                                 ccBtn.disabled = ![...ccInputs].every(i => i.value.trim());
+                                // 暫存草稿到 sessionStorage
+                                const draft = {};
+                                ccInputs.forEach(i => { draft[i.dataset.var] = i.value; });
+                                sessionStorage.setItem(draftKey, JSON.stringify(draft));
                             });
                             inp.addEventListener('click', e => e.stopPropagation());
                         });
@@ -1193,6 +1208,8 @@
                                 participated: true,
                                 state: { variables, template: rawCopy }
                             });
+                            // 清除草稿
+                            sessionStorage.removeItem(`cc_draft_${element.id}`);
 
                             setTimeout(() => {
                                 ccFeedback.textContent = '';
