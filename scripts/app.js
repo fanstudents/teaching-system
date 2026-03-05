@@ -3632,8 +3632,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         image: r.state?.image || null,
                         author: r.student_name || '匿名',
                         votes: 1,
-                        answered: false,
-                        private: false,
+                        answered: !!r.state?.answered,
+                        private: !!r.state?.private,
                         time: new Date(r.submitted_at || r.created_at).getTime(),
                     });
                 });
@@ -4602,12 +4602,28 @@ if (document.readyState === 'loading') {
 window.__markQAAnswered = function (qid) {
     if (!window.app || !window.app._qaQuestions) return;
     const q = window.app._qaQuestions.find(q => q.id === qid);
-    if (q) { q.answered = !q.answered; if (q.answered) q.private = false; window.app.renderQAList(); window.app.updateQABadge(); }
+    if (q) {
+        q.answered = !q.answered;
+        if (q.answered) q.private = false;
+        window.app.renderQAList();
+        window.app.updateQABadge();
+        // 持久化到 DB
+        db.update('submissions', { state: { image: q.image || null, answered: q.answered, private: q.private } },
+            { element_id: `eq.${qid}`, session_id: `eq.${window.app.sessionCode}`, type: 'eq.qa' }).catch(() => { });
+    }
 };
 window.__markQAPrivate = function (qid) {
     if (!window.app || !window.app._qaQuestions) return;
     const q = window.app._qaQuestions.find(q => q.id === qid);
-    if (q) { q.private = !q.private; if (q.private) q.answered = false; window.app.renderQAList(); window.app.updateQABadge(); }
+    if (q) {
+        q.private = !q.private;
+        if (q.private) q.answered = false;
+        window.app.renderQAList();
+        window.app.updateQABadge();
+        // 持久化到 DB
+        db.update('submissions', { state: { image: q.image || null, answered: q.answered, private: q.private } },
+            { element_id: `eq.${qid}`, session_id: `eq.${window.app.sessionCode}`, type: 'eq.qa' }).catch(() => { });
+    }
 };
 
 // Q&A 圖片放大 lightbox
