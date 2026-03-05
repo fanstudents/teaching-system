@@ -99,15 +99,6 @@ export class WordCloudGame {
             // 提交後放大文字雲顯示區 + 隱藏輸入區
             inputArea.classList.add('wc-submitted');
             cloudEl.classList.add('wc-cloud-expanded');
-
-            // 立即將自己的詞渲染到文字雲（不等 DB）
-            const colors = ['#0969da', '#cf222e', '#1a7f37', '#9a6700', '#7c3aed', '#0e7490'];
-            const localHtml = wordList.map((w, i) =>
-                '<span class="wordcloud-word" style="font-size:1.6rem;color:' + colors[i % colors.length] + ';">' + this.esc(w) + '</span>'
-            ).join(' ');
-            if (cloudEl.querySelector('.wordcloud-empty') || !cloudEl.children.length) {
-                cloudEl.innerHTML = localHtml;
-            }
         };
 
         const resetUI = () => {
@@ -170,8 +161,6 @@ export class WordCloudGame {
                 select: 'content',
             });
             if (!data || !data.length) {
-                // 如果本地已有提交的詞，不覆蓋
-                if (!cloudEl.querySelector('.wordcloud-empty') && cloudEl.querySelector('.wordcloud-word')) return;
                 cloudEl.innerHTML = '<span class="wordcloud-empty">等待學員提交...</span>';
                 return;
             }
