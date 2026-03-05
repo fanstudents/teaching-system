@@ -1301,7 +1301,11 @@
                             <div class="hw-submitted-badge" style="display:none;">
                                 <span class="material-symbols-outlined">check_circle</span>
                                 <span>已成功繳交</span>
+                                <button class="hw-edit-btn" type="button" style="margin-left:auto;background:none;border:1px solid #94a3b8;color:#64748b;border-radius:8px;padding:4px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                                    <span class="material-symbols-outlined" style="font-size:14px;">edit</span> 編輯
+                                </button>
                             </div>
+                            <div class="hw-submitted-preview" style="display:none;"></div>
                         </div>
                     `;
 
@@ -1326,15 +1330,85 @@
                         });
                     }
 
-                    // 開始繳交
+                    // ── 狀態恢復 ──
+                    const hwStateKey = `hw_submitted_${element.id}`;
+                    const prevState = (() => { try { return JSON.parse(sessionStorage.getItem(hwStateKey)); } catch { return null; } })();
+
                     const hwStartBtn = el.querySelector('.hw-start-btn');
+                    const hwInlineForm = el.querySelector('.hw-inline-form');
+                    const hwBadge = el.querySelector('.hw-submitted-badge');
+                    const hwPreview = el.querySelector('.hw-submitted-preview');
+
+                    function showSubmittedState(state) {
+                        hwStartBtn.style.display = 'none';
+                        hwInlineForm.style.display = 'none';
+                        hwBadge.style.display = 'flex';
+                        // 預覽已繳交內容
+                        let previewHtml = '';
+                        if (state.type === 'image' && state.content) {
+                            const imgSrc = typeof state.content === 'string' && state.content.startsWith('data:')
+                                ? state.content
+                                : (state.content.image || state.content);
+                            previewHtml = `<img src="${typeof imgSrc === 'string' ? imgSrc : ''}" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:8px;">`;
+                            if (state.content.prompt) {
+                                previewHtml += `<div style="font-size:12px;color:#64748b;margin-top:4px;">Prompt: ${state.content.prompt}</div>`;
+                            }
+                        } else if (state.type === 'link') {
+                            previewHtml = `<div style="font-size:13px;color:#6366f1;margin-top:8px;word-break:break-all;">${state.content}</div>`;
+                        } else if (state.content) {
+                            const txt = typeof state.content === 'string' ? state.content : JSON.stringify(state.content);
+                            previewHtml = `<div style="font-size:13px;color:#475569;margin-top:8px;white-space:pre-wrap;">${txt.length > 200 ? txt.slice(0, 200) + '…' : txt}</div>`;
+                        }
+                        hwPreview.innerHTML = previewHtml;
+                        hwPreview.style.display = previewHtml ? 'block' : 'none';
+                    }
+
+                    function openEditMode(state) {
+                        hwBadge.style.display = 'none';
+                        hwPreview.style.display = 'none';
+                        hwStartBtn.style.display = 'none';
+                        hwInlineForm.style.display = 'block';
+                        // pre-fill
+                        if (state) {
+                            if (hwMode === 'text_only' || (!hwMode && state.type === 'text')) {
+                                const ta = el.querySelector(`#hwText_${element.id}`);
+                                if (ta) ta.value = typeof state.content === 'string' ? state.content : '';
+                            } else if (hwMode === 'image_prompt' && state.content?.prompt) {
+                                const ta = el.querySelector(`#hwPrompt_${element.id}`);
+                                if (ta) ta.value = state.content.prompt;
+                            }
+                            if (state.type === 'image' && state.content) {
+                                const imgSrc = typeof state.content === 'string' ? state.content : state.content.image;
+                                if (imgSrc) {
+                                    hwUploadedData = imgSrc;
+                                    const preview = el.querySelector('.hw-preview');
+                                    if (preview) preview.innerHTML = `<img src="${imgSrc}" style="max-width:100%;max-height:120px;border-radius:8px;">`;
+                                    const zone = el.querySelector('.hw-upload-zone');
+                                    if (zone) zone.style.display = 'none';
+                                }
+                            }
+                        }
+                        el.querySelector('.hw-submit-btn').innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">sync</span> 更新作業';
+                    }
+
+                    if (prevState) {
+                        showSubmittedState(prevState);
+                    }
+
+                    // 開始繳交
                     if (hwStartBtn) {
                         hwStartBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
                             hwStartBtn.style.display = 'none';
-                            el.querySelector('.hw-inline-form').style.display = 'block';
+                            hwInlineForm.style.display = 'block';
                         });
                     }
+
+                    // 編輯按鈕
+                    el.querySelector('.hw-edit-btn')?.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openEditMode(prevState);
+                    });
 
                     // tab 切換
                     el.querySelectorAll('.hw-tab').forEach(tab => {
@@ -1426,8 +1500,10 @@
                                 } catch (e) { console.warn('[HW] score save err:', e); }
                             }
 
-                            el.querySelector('.hw-inline-form').style.display = 'none';
-                            el.querySelector('.hw-submitted-badge').style.display = 'flex';
+                            // 記住繳交狀態
+                            const savedState = { type, content };
+                            sessionStorage.setItem(hwStateKey, JSON.stringify(savedState));
+                            showSubmittedState(savedState);
                             homework.showSuccessToast();
                         });
                     }
