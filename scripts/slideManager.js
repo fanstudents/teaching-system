@@ -3244,31 +3244,21 @@ export class SlideManager {
             try { localData = JSON.parse(localRaw); } catch { /* ignore */ }
         }
 
-        // 3. 比較時間戳，取較新的（含資料遺失防護）
+        // 3. ★ DB-First 策略：DB 永遠優先，localStorage 只作離線備援
         let chosen = null;
-        if (dbData && localData) {
-            const dbTime = dbData.savedAt ? new Date(dbData.savedAt).getTime() : 0;
-            const localTime = localData.savedAt ? new Date(localData.savedAt).getTime() : 0;
+        if (dbData) {
             const dbSlideCount = dbData.slides?.length || 0;
-            const localSlideCount = localData.slides?.length || 0;
-
-            // ★ 資料遺失防護：localStorage 比 DB 少很多投影片時，優先用 DB
-            if (localTime > dbTime && dbSlideCount > 3 && localSlideCount < dbSlideCount * 0.5) {
-                console.warn(`[Load] ⚠️ 資料遺失防護：localStorage 只有 ${localSlideCount} 張，DB 有 ${dbSlideCount} 張。使用 DB 資料。`);
-                chosen = dbData;
-                // 同步 DB 回 localStorage
-                try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(dbData)); } catch (_) { }
-            } else if (localTime > dbTime) {
-                console.log('[Load] Using localStorage (newer)', { local: localData.savedAt, db: dbData.savedAt });
-                // 同步較新的 localStorage 到 DB
-                this._saveToDB(localData);
-                chosen = localData;
-            } else {
-                console.log('[Load] Using DB data', { db: dbData.savedAt, local: localData.savedAt });
-                chosen = dbData;
-            }
-        } else {
-            chosen = dbData || localData;
+            const dbElementCount = (dbData.slides || []).reduce((sum, s) => sum + (s.elements?.length || 0), 0);
+            console.log(`[Load] ✅ Using DB data (${dbSlideCount} slides, ${dbElementCount} elements, savedAt: ${dbData.savedAt})`);
+            chosen = dbData;
+            // 同步 DB → localStorage（作為離線備援）
+            try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(dbData)); } catch (_) { }
+        } else if (localData) {
+            // DB 無資料時才使用 localStorage（離線模式）
+            console.warn('[Load] ⚠️ DB 無資料，使用 localStorage 離線備援');
+            chosen = localData;
+            // 嘗試回寫 DB
+            if (this._db) this._saveToDB(localData);
         }
 
         if (chosen && chosen.slides && chosen.slides.length > 0) {
@@ -3282,8 +3272,6 @@ export class SlideManager {
             this.updateCounter();
             // ★ 自動壓縮舊的 base64 圖片（一次性遷移）
             this._compressBase64Images();
-            // 同步到 localStorage（壓縮完成後覆蓋）
-            try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(chosen)); } catch (_) { }
             return true;
         }
 
