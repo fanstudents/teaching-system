@@ -88,6 +88,8 @@ export class Editor {
             linkUrl: 'https://example.com',
             linkLabel: '點擊開啟連結',
             linkDesc: '',
+            linkColor: '#6366f1',
+            linkIcon: 'open_in_new',
         };
 
         this.slideManager.addElement(element);
@@ -819,6 +821,21 @@ export class Editor {
 
         // 連結元件
         if (type === 'link') {
+            const LINK_COLORS = ['#6366f1', '#3b82f6', '#0284c7', '#10b981', '#eab308', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#475569'];
+            const LINK_ICONS = [
+                { icon: 'open_in_new', label: '開啟' },
+                { icon: 'edit_note', label: '問卷' },
+                { icon: 'school', label: '課程' },
+                { icon: 'handshake', label: '服務' },
+                { icon: 'share', label: '分享' },
+                { icon: 'link', label: '連結' },
+                { icon: 'download', label: '下載' },
+                { icon: 'play_circle', label: '播放' },
+                { icon: 'article', label: '文章' },
+                { icon: 'calendar_today', label: '行事曆' },
+            ];
+            const curColor = elementData.linkColor || '#6366f1';
+            const curIcon = elementData.linkIcon || 'open_in_new';
             html += `
                 <div class="property-section">
                     <div class="property-section-title">連結設定</div>
@@ -833,6 +850,18 @@ export class Editor {
                     <div class="form-group">
                         <label class="form-label">說明（選填）</label>
                         <input type="text" class="form-input" id="linkDesc" value="${(elementData.linkDesc || '').replace(/"/g, '&quot;')}" placeholder="連結的簡短說明">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">卡片顏色</label>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            ${LINK_COLORS.map(c => `<button class="link-color-btn${c === curColor ? ' active' : ''}" data-color="${c}" style="width:26px;height:26px;border-radius:50%;border:2px solid ${c === curColor ? '#1e293b' : 'transparent'};background:${c};cursor:pointer;"></button>`).join('')}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">圖示</label>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            ${LINK_ICONS.map(i => `<button class="link-icon-btn${i.icon === curIcon ? ' active' : ''}" data-icon="${i.icon}" title="${i.label}" style="width:34px;height:34px;border-radius:8px;border:2px solid ${i.icon === curIcon ? '#6366f1' : '#e2e8f0'};background:${i.icon === curIcon ? '#eef2ff' : '#f8fafc'};cursor:pointer;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:18px;">${i.icon}</span></button>`).join('')}
+                        </div>
                     </div>
                 </div>
             `;
@@ -1600,6 +1629,24 @@ export class Editor {
             bindSimple('linkUrl', 'linkUrl');
             bindSimple('linkLabel', 'linkLabel');
             bindSimple('linkDesc', 'linkDesc');
+            // 顏色選擇
+            document.querySelectorAll('.link-color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    elementData.linkColor = btn.dataset.color;
+                    this.slideManager.renderElement(domEl, elementData);
+                    this.slideManager.saveCurrentSlide();
+                    this.showPropertyPanel(domEl);
+                });
+            });
+            // 圖示選擇
+            document.querySelectorAll('.link-icon-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    elementData.linkIcon = btn.dataset.icon;
+                    this.slideManager.renderElement(domEl, elementData);
+                    this.slideManager.saveCurrentSlide();
+                    this.showPropertyPanel(domEl);
+                });
+            });
         } else if (elementData.type === 'document') {
             bindSimple('docTitle', 'docTitle');
 

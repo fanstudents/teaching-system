@@ -967,17 +967,19 @@ export class SlideManager {
                 const url = element.linkUrl || '#';
                 const label = element.linkLabel || '開啟連結';
                 const desc = element.linkDesc || '';
+                const lColor = element.linkColor || '#6366f1';
+                const lIcon = element.linkIcon || 'open_in_new';
                 el.innerHTML = `
-                    <div class="link-card" data-url="${url.replace(/"/g, '&quot;')}">
-                        <div class="link-card-icon">
-                            <span class="material-symbols-outlined">open_in_new</span>
+                    <div class="link-card" data-url="${url.replace(/"/g, '&quot;')}" style="--link-color:${lColor};">
+                        <div class="link-card-icon" style="background:${lColor};">
+                            <span class="material-symbols-outlined">${lIcon}</span>
                         </div>
                         <div class="link-card-body">
                             <div class="link-card-label">${label}</div>
                             ${desc ? `<div class="link-card-desc">${desc}</div>` : ''}
                             <div class="link-card-url">${url}</div>
                         </div>
-                        <div class="link-card-arrow">
+                        <div class="link-card-arrow" style="color:${lColor};">
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </div>
                     </div>
