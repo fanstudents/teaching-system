@@ -26,6 +26,7 @@ let onlineStudents = new Set();  // email — 在線學員
 let studentNames = {};
 let submissionsMap = {};
 let pollVotesMap = {};
+let rawSubmissions = [];  // 原始提交列表（軌跡檢視用）
 let lastFetchTime = null;
 let currentView = 'cards';
 
@@ -217,7 +218,8 @@ async function fetchSubmissions() {
         ]);
 
         submissionsMap = {};
-        (subRes?.data || []).forEach(s => {
+        rawSubmissions = subRes?.data || [];
+        rawSubmissions.forEach(s => {
             if (!s.element_id) return;
             if (!submissionsMap[s.element_id]) submissionsMap[s.element_id] = {};
             submissionsMap[s.element_id][s.student_email] = s;
@@ -272,12 +274,13 @@ window._dashRefresh = async function () {
 // ══════════════════════
 window._dashSetView = function (view) {
     currentView = view;
-    ['viewCards', 'viewMatrix', 'viewCompare'].forEach(id => {
+    ['viewCards', 'viewMatrix', 'viewCompare', 'viewTrail'].forEach(id => {
         document.getElementById(id)?.classList.toggle('active', id === 'view' + view.charAt(0).toUpperCase() + view.slice(1));
     });
     document.getElementById('dashCards').style.display = view === 'cards' ? '' : 'none';
     document.getElementById('dashMatrix').style.display = view === 'matrix' ? '' : 'none';
     document.getElementById('dashCompare').style.display = view === 'compare' ? '' : 'none';
+    document.getElementById('dashTrail').style.display = view === 'trail' ? '' : 'none';
     renderAll();
 };
 
@@ -289,6 +292,7 @@ function renderAll() {
     if (currentView === 'cards') renderCardsView();
     else if (currentView === 'matrix') renderMatrixView();
     else if (currentView === 'compare') renderCompareView();
+    else if (currentView === 'trail') renderTrailView();
 }
 
 // ── 卡片檢視 ──
@@ -635,6 +639,148 @@ function renderError(msg) {
 function esc(str) {
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ── 學員軌跡檢視 ──
+function renderTrailView() {
+    const wrap = document.getElementById('dashTrail');
+    if (!wrap) return;
+
+    // 合併 submissions + poll_votes 為統一列表
+    const allItems = [];
+    rawSubmissions.forEach(s => {
+        allItems.push({
+            name: s.student_name || '匿名',
+            email: s.student_email || '',
+            type: s.type || s.assignment_title || 'unknown',
+            title: s.assignment_title || '',
+            content: s.content || '',
+            answer: s.content || '',
+            isCorrect: s.is_correct,
+            time: s.submitted_at || s.created_at || '',
+            state: typeof s.state === 'string' ? (() => { try { return JSON.parse(s.state); } catch { return s.state; } })() : (s.state || {}),
+            elementId: s.element_id || ''
+        });
+    });
+    // poll votes
+    Object.values(pollVotesMap).flat().forEach(v => {
+        allItems.push({
+            name: v.student_name || '匿名',
+            email: v.student_email || '',
+            type: 'poll',
+            title: '投票',
+            content: v.option_text || `選項 ${v.option_index + 1}`,
+            answer: v.option_text || '',
+            isCorrect: null,
+            time: v.created_at || '',
+            state: {},
+            elementId: v.element_id || ''
+        });
+    });
+
+    // group by student name
+    const byStudent = {};
+    allItems.forEach(item => {
+        const key = item.name || item.email || '匿名';
+        if (!byStudent[key]) byStudent[key] = [];
+        byStudent[key].push(item);
+    });
+    // sort each student's items by time
+    Object.values(byStudent).forEach(arr => arr.sort((a, b) => new Date(a.time) - new Date(b.time)));
+
+    const students = Object.keys(byStudent).sort();
+
+    if (students.length === 0) {
+        wrap.innerHTML = '<div class="dash-empty"><span class="material-symbols-outlined">pending_actions</span><p>目前沒有學員互動紀錄。</p></div>';
+        return;
+    }
+
+    const typeIcons = {
+        quiz: 'quiz', poll: 'how_to_vote', truefalse: 'check_circle', opentext: 'chat',
+        scale: 'linear_scale', buzzer: 'notifications_active', wordcloud: 'cloud',
+        hotspot: 'my_location', matching: 'drag_indicator', ordering: 'format_list_numbered',
+        fillblank: 'edit_note', homework: 'assignment', copycard: 'content_copy',
+        qa: 'help_outline', survey: 'rate_review', document: 'description', showcase: 'collections'
+    };
+    const typeLabels = {
+        quiz: '選擇題', poll: '投票', truefalse: '是非題', opentext: '開放問答',
+        scale: '量表', buzzer: '搶答', wordcloud: '文字雲', hotspot: '圖片標註',
+        matching: '連連看', ordering: '排列', fillblank: '填空', homework: '作業',
+        copycard: '複製卡', qa: 'Q&A 提問', survey: '問卷', document: '文件', showcase: '展示'
+    };
+
+    const formatTime = (t) => {
+        if (!t) return '';
+        const d = new Date(t);
+        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+    };
+
+    const correctBadge = (v) => {
+        if (isCorrectTrue(v)) return '<span style="color:#16a34a;font-weight:600;">✓ 正確</span>';
+        if (isCorrectFalse(v)) return '<span style="color:#dc2626;font-weight:600;">✗ 錯誤</span>';
+        return '';
+    };
+
+    const contentPreview = (item) => {
+        let c = item.content || item.answer || '';
+        if (typeof c === 'object') c = JSON.stringify(c);
+        // copycard variables
+        if (item.type === 'copycard' && item.state?.variables) {
+            const vars = Object.entries(item.state.variables).map(([k, v]) => `${k}: ${v}`).join('、');
+            return esc(vars || c).slice(0, 120);
+        }
+        if (c.startsWith('data:image')) return '📷 圖片';
+        if (c.startsWith('http')) return `<a href="${esc(c)}" target="_blank" style="color:#6366f1;">${esc(c.slice(0, 60))}</a>`;
+        return esc(c).slice(0, 120);
+    };
+
+    wrap.innerHTML = students.map(name => {
+        const items = byStudent[name];
+        const count = items.length;
+        return `
+            <div class="trail-student" style="margin-bottom:12px;">
+                <div class="trail-student-header" onclick="this.parentElement.classList.toggle('open')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-weight:600;font-size:14px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">person</span>
+                    <span style="flex:1;">${esc(name)}</span>
+                    <span style="background:#f1f5f9;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:500;color:#475569;">${count} 筆</span>
+                    <span class="material-symbols-outlined trail-arrow" style="font-size:16px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
+                </div>
+                <div class="trail-items" style="display:none;padding:8px 0 0 28px;border-left:2px solid #e2e8f0;margin-left:24px;">
+                    ${items.map(item => {
+            const icon = typeIcons[item.type] || 'circle';
+            const label = typeLabels[item.type] || item.type;
+            return `
+                            <div style="position:relative;padding:8px 12px;margin-bottom:6px;background:#fafbfc;border-radius:8px;font-size:13px;border:1px solid #f0f0f0;">
+                                <div style="position:absolute;left:-22px;top:12px;width:10px;height:10px;border-radius:50%;background:#e2e8f0;border:2px solid #fff;"></div>
+                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                                    <span class="material-symbols-outlined" style="font-size:14px;color:#6366f1;">${icon}</span>
+                                    <span style="font-weight:600;color:#334155;">${esc(label)}</span>
+                                    ${item.title && item.title !== label ? `<span style="color:#94a3b8;font-size:12px;">— ${esc(item.title)}</span>` : ''}
+                                    <span style="margin-left:auto;color:#94a3b8;font-size:11px;">${formatTime(item.time)}</span>
+                                </div>
+                                <div style="color:#475569;line-height:1.5;">
+                                    ${contentPreview(item)}
+                                    ${correctBadge(item.isCorrect)}
+                                </div>
+                            </div>
+                        `;
+        }).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Toggle open/close
+    wrap.querySelectorAll('.trail-student-header').forEach(h => {
+        h.addEventListener('click', () => {
+            const parent = h.parentElement;
+            const items = parent.querySelector('.trail-items');
+            const arrow = h.querySelector('.trail-arrow');
+            const isOpen = parent.classList.contains('open');
+            items.style.display = isOpen ? 'none' : 'block';
+            arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+        });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => init());

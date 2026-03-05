@@ -79,6 +79,10 @@
             <span class="material-symbols-outlined">compare_arrows</span>
             場次比較
         </button>
+        <button class="dash-toggle-btn" id="viewTrail" onclick="window._dashSetView('trail')">
+            <span class="material-symbols-outlined">timeline</span>
+            學員軌跡
+        </button>
     </div>
 
     <!-- 矩陣檢視 -->
@@ -86,6 +90,9 @@
 
     <!-- 場次比較 -->
     <div class="dash-matrix-wrap" id="dashCompare" style="display:none;"></div>
+
+    <!-- 學員軌跡 -->
+    <div class="dash-matrix-wrap" id="dashTrail" style="display:none;"></div>
 
     <!-- 互動卡片區 -->
     <main class="dash-cards" id="dashCards">

@@ -662,6 +662,19 @@
                         author: studentName || '匿名'
                     });
 
+                    // 儲存到 DB
+                    db.insert('submissions', {
+                        student_name: studentName || '匿名',
+                        student_email: '',
+                        assignment_title: 'Q&A 提問',
+                        type: 'qa',
+                        content: text,
+                        element_id: questionId,
+                        session_id: sessionCode,
+                        submitted_at: new Date().toISOString(),
+                        state: { questionId }
+                    }).catch(e => console.warn('[QA] DB save err:', e));
+
                     input.value = '';
                     qaPopup.style.display = 'none';
 

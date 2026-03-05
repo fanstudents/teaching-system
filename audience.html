@@ -1255,6 +1255,19 @@
                 type: 'question', id: qid, text, author: studentName
             });
 
+            // 儲存到 DB
+            db.insert('submissions', {
+                student_name: studentName,
+                student_email: studentId,
+                assignment_title: 'Q&A 提問',
+                type: 'qa',
+                content: text,
+                element_id: qid,
+                session_id: sessionCode,
+                submitted_at: new Date().toISOString(),
+                state: { questionId: qid }
+            }).catch(e => console.warn('[QA] DB save err:', e));
+
             // 加入本地列表
             qaQuestions.push({ id: qid, text, author: studentName, votes: 1, mine: true });
             votedIds.add(qid);
