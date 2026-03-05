@@ -1012,7 +1012,7 @@
             if (element.zIndex) el.style.zIndex = element.zIndex;
 
             // 設定分數並加入分數徽章
-            const interactiveTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework', 'survey'];
+            const interactiveTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework'];
             if (interactiveTypes.includes(element.type)) {
                 const pts = parseInt(element.points) || defaultPts[element.type] || 0;
                 el.dataset.points = pts;

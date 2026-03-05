@@ -3493,8 +3493,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     // ═══════════ Q&A Panel ═══════════
     initQA() {
         if (!this.broadcasting || !this.sessionCode) return;
-        this._qaQuestions = [];
+        if (!this._qaQuestions) this._qaQuestions = [];
         this._qaOpen = false;
+
+        // 從 DB 載入本次 session 的歷史 Q&A
+        this._loadQAFromDB();
 
         // 建立 Q&A 按鈕
         let qaBtn = document.getElementById('presQABtn');
@@ -3607,10 +3610,44 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         }).join('');
     }
 
+    async _loadQAFromDB() {
+        try {
+            const rows = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${this.sessionCode}`,
+                    type: 'eq.qa',
+                },
+                order: 'submitted_at.asc',
+            });
+            const data = rows?.data || rows || [];
+            if (data && data.length > 0) {
+                const existingIds = new Set(this._qaQuestions.map(q => q.id));
+                data.forEach(r => {
+                    const qid = r.element_id || r.id;
+                    if (existingIds.has(qid)) return; // 已存在，跳過
+                    this._qaQuestions.push({
+                        id: qid,
+                        text: r.content || '',
+                        image: r.state?.image || null,
+                        author: r.student_name || '匿名',
+                        votes: 1,
+                        answered: false,
+                        private: false,
+                        time: new Date(r.submitted_at || r.created_at).getTime(),
+                    });
+                });
+                this.renderQAList();
+                this.updateQABadge();
+            }
+        } catch (e) {
+            console.warn('[QA] load from DB failed:', e);
+        }
+    }
+
     removeQA() {
         document.getElementById('presQABtn')?.remove();
         document.getElementById('presQAPanel')?.remove();
-        this._qaQuestions = [];
+        // 不清空 _qaQuestions，保留歷史問題
         this._qaOpen = false;
     }
 
