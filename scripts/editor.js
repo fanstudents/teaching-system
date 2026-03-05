@@ -1725,13 +1725,13 @@ export class Editor {
                 reader.onload = (ev) => {
                     const img = new Image();
                     img.onload = () => {
-                        const MAX = 600;
+                        const MAX = 1200;
                         let w = img.width, h = img.height;
                         if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
                         const c = document.createElement('canvas');
                         c.width = w; c.height = h;
                         c.getContext('2d').drawImage(img, 0, 0, w, h);
-                        elementData.linkImage = c.toDataURL('image/jpeg', 0.75);
+                        elementData.linkImage = c.toDataURL('image/jpeg', 0.88);
                         this.slideManager.renderCurrentSlide();
                         this.slideManager.saveCurrentSlide();
                         this.selectElementById(elementId);

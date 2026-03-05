@@ -7,7 +7,9 @@ import { stateManager } from './stateManager.js';
 export class PollGame {
     constructor() {
         this._voteCounts = {};   // elementId → [count0, count1, ...]
+        this._voteNames = {};    // elementId → [[name1, name2], [name3], ...]
         this._voted = new Set(); // 已投票的 elementId
+        this._revealed = new Set(); // 已開票的 elementId
         this.setupEventListeners();
     }
 
@@ -39,7 +41,7 @@ export class PollGame {
 
         optionEls.forEach((opt, i) => {
             opt.addEventListener('click', () => {
-                if (this._voted.has(elementId)) return;
+                if (this._voted.has(elementId) || container.classList.contains('poll-locked')) return;
                 this._voted.add(elementId);
 
                 // 視覺回饋
@@ -50,6 +52,24 @@ export class PollGame {
                 this._submitVote(elementId, i, sessionCode, container, optionEls);
             });
         });
+
+        // 監聽開票鎖定
+        if (typeof realtime !== 'undefined' && realtime.isConnected && sessionCode) {
+            realtime.on('poll_lock', (msg) => {
+                if (msg.elementId === elementId) {
+                    container.classList.add('poll-locked');
+                    optionEls.forEach(opt => { opt.style.cursor = 'default'; opt.style.pointerEvents = 'none'; });
+                    let lockStatus = container.querySelector('.poll-lock-status');
+                    if (!lockStatus) {
+                        lockStatus = document.createElement('div');
+                        lockStatus.className = 'poll-lock-status';
+                        lockStatus.style.cssText = 'text-align:center;padding:6px;font-size:12px;color:#94a3b8;margin-top:8px;';
+                        container.appendChild(lockStatus);
+                    }
+                    lockStatus.textContent = '🔒 投票已截止';
+                }
+            });
+        }
     }
 
     async _submitVote(elementId, optionIndex, sessionCode, container, optionEls) {
@@ -183,29 +203,35 @@ export class PollGame {
      * 講師端：接收 realtime 投票事件，更新即時統計
      */
     handleVoteEvent(payload) {
-        const { elementId, optionIndex } = payload;
+        const { elementId, optionIndex, studentName } = payload;
         if (!this._voteCounts[elementId]) {
-            // 嘗試找對應 container
             const containers = document.querySelectorAll('.poll-container');
             containers.forEach(c => {
                 const eid = c.closest('[data-id]')?.dataset.id || '';
                 if (!this._voteCounts[eid]) {
                     const opts = c.querySelectorAll('.poll-option');
                     this._voteCounts[eid] = new Array(opts.length).fill(0);
+                    this._voteNames[eid] = Array.from({ length: opts.length }, () => []);
                 }
             });
         }
 
         if (this._voteCounts[elementId]) {
             this._voteCounts[elementId][optionIndex]++;
+            if (!this._voteNames[elementId]) this._voteNames[elementId] = this._voteCounts[elementId].map(() => []);
+            if (!this._voteNames[elementId][optionIndex]) this._voteNames[elementId][optionIndex] = [];
+            this._voteNames[elementId][optionIndex].push(studentName || '匿名');
 
-            // 更新 UI
             const containers = document.querySelectorAll('.poll-container');
             containers.forEach(c => {
                 const eid = c.closest('[data-id]')?.dataset.id || '';
                 if (eid === elementId) {
                     const optionEls = c.querySelectorAll('.poll-option');
-                    this._renderBars(c, optionEls, this._voteCounts[elementId]);
+                    if (this._revealed.has(elementId)) {
+                        this._renderBarsWithNames(c, optionEls, this._voteCounts[elementId], this._voteNames[elementId]);
+                    } else {
+                        this._renderBars(c, optionEls, this._voteCounts[elementId]);
+                    }
                 }
             });
         }
@@ -220,6 +246,7 @@ export class PollGame {
             const elementId = c.closest('[data-id]')?.dataset.id || '';
             const optionEls = c.querySelectorAll('.poll-option');
             const counts = new Array(optionEls.length).fill(0);
+            const names = Array.from({ length: optionEls.length }, () => []);
             try {
                 const rows = await db.select('poll_votes', {
                     filter: {
@@ -232,13 +259,100 @@ export class PollGame {
                     data.forEach(r => {
                         if (r.option_index >= 0 && r.option_index < counts.length) {
                             counts[r.option_index]++;
+                            names[r.option_index].push(r.student_name || '匿名');
                         }
                     });
                 }
             } catch (e) { /* ignore */ }
             this._voteCounts[elementId] = counts;
+            this._voteNames[elementId] = names;
             this._renderBars(c, optionEls, counts);
+
+            // 新增「公布結果」按鈕
+            if (!c.querySelector('.poll-reveal-btn')) {
+                const revealBtn = document.createElement('button');
+                revealBtn.className = 'poll-reveal-btn';
+                revealBtn.style.cssText = 'display:block;margin:10px auto 0;padding:8px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;';
+                revealBtn.textContent = '📊 公布結果';
+                revealBtn.addEventListener('click', () => this.revealResults(elementId, sessionCode));
+                c.appendChild(revealBtn);
+            }
         }
+    }
+
+    /**
+     * 講師端：公布結果 — 鎖定投票 + 顯示誰投了什麼
+     */
+    revealResults(elementId, sessionCode) {
+        this._revealed.add(elementId);
+
+        // 廣播鎖定事件給學員
+        if (realtime.isConnected && sessionCode) {
+            realtime.publish(`session:${sessionCode}`, 'poll_lock', { elementId });
+        }
+
+        // 更新講師端 UI
+        const containers = document.querySelectorAll('.poll-container');
+        containers.forEach(c => {
+            const eid = c.closest('[data-id]')?.dataset.id || '';
+            if (eid === elementId) {
+                const optionEls = c.querySelectorAll('.poll-option');
+                const counts = this._voteCounts[elementId] || [];
+                const names = this._voteNames[elementId] || [];
+                this._renderBarsWithNames(c, optionEls, counts, names);
+
+                // 移除按鈕，加上已開票狀態
+                c.querySelector('.poll-reveal-btn')?.remove();
+                let tag = c.querySelector('.poll-revealed-tag');
+                if (!tag) {
+                    tag = document.createElement('div');
+                    tag.className = 'poll-revealed-tag';
+                    tag.style.cssText = 'text-align:center;padding:6px;font-size:12px;color:#10b981;font-weight:600;margin-top:8px;';
+                    tag.textContent = '✓ 已公布結果';
+                    c.appendChild(tag);
+                }
+            }
+        });
+    }
+
+    /**
+     * 含投票人姓名的 bar 渲染
+     */
+    _renderBarsWithNames(container, optionEls, counts, names) {
+        const total = counts.reduce((a, b) => a + b, 0);
+        optionEls.forEach((opt, i) => {
+            const count = counts[i] || 0;
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const voters = names[i] || [];
+
+            // bar
+            let bar = opt.querySelector('.poll-bar');
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.className = 'poll-bar';
+                opt.appendChild(bar);
+            }
+            bar.style.width = `${pct}%`;
+
+            // pct label
+            let label = opt.querySelector('.poll-pct');
+            if (!label) {
+                label = document.createElement('span');
+                label.className = 'poll-pct';
+                opt.appendChild(label);
+            }
+            label.textContent = `${count} 票 (${pct}%)`;
+
+            // voter names
+            let voterEl = opt.querySelector('.poll-voters');
+            if (!voterEl) {
+                voterEl = document.createElement('div');
+                voterEl.className = 'poll-voters';
+                voterEl.style.cssText = 'font-size:11px;color:#64748b;margin-top:4px;line-height:1.5;display:flex;flex-wrap:wrap;gap:4px;';
+                opt.appendChild(voterEl);
+            }
+            voterEl.innerHTML = voters.map(n => `<span style="background:#f1f5f9;padding:1px 6px;border-radius:4px;white-space:nowrap;">${n}</span>`).join('');
+        });
     }
 
     // ─ Helpers ─

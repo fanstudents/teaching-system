@@ -666,6 +666,37 @@ body {
     pointer-events: none;
 }
 
+/* ── Shape elements ── */
+.student-slide .shape-element {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.student-slide .shape-element.rectangle {
+    background: linear-gradient(135deg, #5B8DEF 0%, #4A7AE8 100%);
+    border-radius: 8px;
+}
+
+.student-slide .shape-element.circle {
+    background: linear-gradient(135deg, #3bba6c 0%, #2da85c 100%);
+    border-radius: 50%;
+}
+
+.student-slide .shape-element.triangle {
+    background: transparent;
+    width: 0 !important;
+    height: 0 !important;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-bottom: 86px solid #f0a830;
+}
+
+.student-slide .shape-element.arrow {
+    background: #e74c5e;
+    clip-path: polygon(0 35%, 70% 35%, 70% 0, 100% 50%, 70% 100%, 70% 65%, 0 65%);
+}
+
 /* ═══════════════════════════════════════════
    MOBILE RWD
    ═══════════════════════════════════════════ */

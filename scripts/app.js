@@ -3575,7 +3575,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const timeStr = q.time ? new Date(q.time).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '';
             const bgColor = q.answered ? '#f0fdf4' : q.private ? '#fef3c7' : '#f1f5f9';
             const borderColor = q.answered ? '#d1fae5' : q.private ? '#fde68a' : '#e2e8f0';
-            const imageHtml = q.image ? `<img src="${q.image}" style="max-width:100%;max-height:140px;border-radius:8px;margin-top:6px;cursor:pointer;" onclick="window.open(this.src)" />` : '';
+            const imageHtml = q.image ? `<img src="${q.image}" style="max-width:100%;max-height:140px;border-radius:8px;margin-top:6px;cursor:pointer;" onclick="window.__showQALightbox(this.src)" />` : '';
             // 狀態標籤
             let statusLabel = '';
             if (q.answered) statusLabel = '<span style="font-size:10px;background:#d1fae5;color:#059669;padding:1px 6px;border-radius:4px;font-weight:600;">✓ 已解決</span>';
@@ -4347,4 +4347,13 @@ window.__markQAPrivate = function (qid) {
     if (!window.app || !window.app._qaQuestions) return;
     const q = window.app._qaQuestions.find(q => q.id === qid);
     if (q) { q.private = !q.private; if (q.private) q.answered = false; window.app.renderQAList(); window.app.updateQABadge(); }
+};
+
+// Q&A 圖片放大 lightbox
+window.__showQALightbox = function (src) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(4px);animation:fadeIn .2s;';
+    overlay.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.5);" />`;
+    overlay.addEventListener('click', () => overlay.remove());
+    document.body.appendChild(overlay);
 };

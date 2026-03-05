@@ -909,6 +909,8 @@
         function renderSlide(slide, index, total) {
             if (!slide) return;
             slideEl.innerHTML = '';
+            // 切頁時關閉作業牆展開的卡片
+            document.querySelector('.showcase-focus-overlay')?.remove();
 
             // 背景
             if (slide.background && slide.background !== '#ffffff') {
