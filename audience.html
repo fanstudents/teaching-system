@@ -649,11 +649,16 @@
         import { BuzzerGame } from './scripts/interactive/buzzer.js';
         import { WordCloudGame } from './scripts/interactive/wordcloud.js';
         import { HotspotGame } from './scripts/interactive/hotspot.js';
+        import { stateManager } from './scripts/interactive/stateManager.js';
+        import { SurveyGame } from './scripts/interactive/survey.js';
+
+        const surveyGame = new SurveyGame();
 
         // 互動類型清單
         const interactiveTypes = [
             'matching', 'fillblank', 'ordering', 'quiz', 'poll',
-            'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot'
+            'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot',
+            'copycard', 'survey', 'homework', 'document', 'showcase'
         ];
 
         // 初始化互動遊戲模組
@@ -763,6 +768,11 @@
 
                 // UI 切換
                 document.getElementById('audJoin').style.display = 'none';
+
+                // 設定 stateManager 需要的 session info
+                sessionStorage.setItem('homework_user', JSON.stringify({ name: studentName, email: studentId }));
+                sessionStorage.setItem('session_code', sessionCode);
+                sessionStorage.setItem('project_id', session.project_id || '');
                 document.getElementById('audMain').classList.add('active');
                 document.getElementById('audTitle').textContent = session.title || '課堂互動';
                 document.getElementById('audNameBadge').textContent = name;
@@ -1087,6 +1097,102 @@
                                 <button class="hs-submit-btn" disabled>確認送出</button>
                             </div>
                             <div class="hotspot-result"></div>
+                        </div>
+                    `;
+                    break;
+                }
+                case 'copycard': {
+                    const rawCopy = element.content || '';
+                    const ccVarRe = /\{\{([^}]+)\}\}/g;
+                    const ccVars = [];
+                    let ccM;
+                    while ((ccM = ccVarRe.exec(rawCopy)) !== null) {
+                        if (!ccVars.includes(ccM[1])) ccVars.push(ccM[1]);
+                    }
+                    const ccHasVars = ccVars.length > 0;
+                    let ccDisplay = rawCopy.replace(/\n/g, '<br>');
+                    if (ccHasVars) {
+                        ccDisplay = ccDisplay.replace(/\{\{([^}]+)\}\}/g, (_, name) =>
+                            `<input type="text" class="cc-var-input" data-var="${name}" placeholder="${name}" autocomplete="off">`
+                        );
+                    }
+                    el.innerHTML = `
+                        <div class="copy-card-container" data-copy-template="${rawCopy.replace(/"/g, '&quot;')}">
+                            <div class="copy-card-title">${element.title || '點擊複製'}</div>
+                            <div class="copy-card-content">${ccDisplay}</div>
+                            ${ccHasVars ? '<div class="cc-var-hint">請填寫所有欄位後再複製</div>' : ''}
+                            <button class="copy-card-btn" ${ccHasVars ? 'disabled' : ''}>
+                                <span class="copy-icon">⧉</span>
+                                <span class="copy-text">點擊複製</span>
+                            </button>
+                            <div class="copy-card-feedback"></div>
+                        </div>
+                    `;
+                    if (ccHasVars) {
+                        const draftKey = `cc_draft_${element.id}`;
+                        const ccInputs = el.querySelectorAll('.cc-var-input');
+                        const ccBtn = el.querySelector('.copy-card-btn');
+                        try {
+                            const draft = JSON.parse(sessionStorage.getItem(draftKey) || '{}');
+                            ccInputs.forEach(inp => { if (draft[inp.dataset.var]) inp.value = draft[inp.dataset.var]; });
+                            ccBtn.disabled = ![...ccInputs].every(i => i.value.trim());
+                        } catch { /* ignore */ }
+                        ccInputs.forEach(inp => {
+                            inp.addEventListener('input', () => {
+                                ccBtn.disabled = ![...ccInputs].every(i => i.value.trim());
+                                const draft = {};
+                                ccInputs.forEach(i => { draft[i.dataset.var] = i.value; });
+                                sessionStorage.setItem(draftKey, JSON.stringify(draft));
+                            });
+                            inp.addEventListener('click', e => e.stopPropagation());
+                        });
+                    }
+                    const ccCopyBtn = el.querySelector('.copy-card-btn');
+                    const ccFeedback = el.querySelector('.copy-card-feedback');
+                    ccCopyBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        let txt = rawCopy;
+                        const variables = {};
+                        if (ccHasVars) {
+                            el.querySelectorAll('.cc-var-input').forEach(inp => {
+                                const val = inp.value.trim();
+                                variables[inp.dataset.var] = val;
+                                txt = txt.replaceAll(`{{${inp.dataset.var}}}`, val);
+                            });
+                        }
+                        try {
+                            await navigator.clipboard.writeText(txt);
+                            ccFeedback.textContent = '✓ 已複製到剪貼簿！';
+                            ccFeedback.classList.add('success');
+                            ccCopyBtn.classList.add('copied');
+                            await stateManager.save(element.id, {
+                                type: 'copycard', title: element.title || '複製卡',
+                                content: txt, isCorrect: null, score: null,
+                                points: parseInt(element.points) || 1,
+                                participated: true, state: { variables, template: rawCopy }
+                            });
+                            sessionStorage.removeItem(`cc_draft_${element.id}`);
+                            setTimeout(() => { ccFeedback.textContent = ''; ccFeedback.classList.remove('success'); ccCopyBtn.classList.remove('copied'); }, 2000);
+                        } catch {
+                            ccFeedback.textContent = '複製失敗，請手動選取文字';
+                            ccFeedback.classList.add('error');
+                        }
+                    });
+                    break;
+                }
+                case 'survey': {
+                    // delegate to SurveyGame
+                    setTimeout(() => surveyGame.render(el, element), 0);
+                    break;
+                }
+                case 'homework':
+                case 'document':
+                case 'showcase': {
+                    el.innerHTML = `
+                        <div style="text-align:center;padding:30px 16px;color:#94a3b8;">
+                            <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:8px;">laptop_mac</span>
+                            <div style="font-size:14px;">此功能請在電腦上操作</div>
+                            <div style="font-size:12px;margin-top:4px;color:#64748b;">請使用投影片頁面完整瀏覽</div>
                         </div>
                     `;
                     break;
