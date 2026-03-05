@@ -739,7 +739,7 @@ function renderTrailView() {
         const count = items.length;
         return `
             <div class="trail-student" style="margin-bottom:12px;">
-                <div class="trail-student-header" onclick="this.parentElement.classList.toggle('open')" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-weight:600;font-size:14px;">
+                <div class="trail-student-header" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-weight:600;font-size:14px;">
                     <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">person</span>
                     <span style="flex:1;">${esc(name)}</span>
                     <span style="background:#f1f5f9;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:500;color:#475569;">${count} 筆</span>
