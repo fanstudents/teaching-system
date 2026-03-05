@@ -2950,6 +2950,7 @@ export class SlideManager {
             slides: this.slides,
             sections: this.sections,
             currentIndex: this.currentIndex,
+            thankYouConfig: this.thankYouConfig || null,
             savedAt: new Date().toISOString()
         };
 
@@ -3251,6 +3252,7 @@ export class SlideManager {
             this.slides = chosen.slides;
             this.sections = chosen.sections || [];
             this.currentIndex = chosen.currentIndex || 0;
+            this.thankYouConfig = chosen.thankYouConfig || null;
             this.renderThumbnails();
             this.renderCurrentSlide();
             this.updateCounter();

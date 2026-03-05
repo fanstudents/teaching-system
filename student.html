@@ -74,6 +74,16 @@
                     <span class="student-title" id="displayTitle"></span>
                     <span class="student-session-detail" id="displaySessionInfo"></span>
                 </div>
+                <div class="student-header-meta" id="headerMeta"
+                    style="display:none;margin-left:8px;font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px;">
+                    <span id="headerTeacher" style="display:flex;align-items:center;gap:3px;"><span
+                            class="material-symbols-outlined" style="font-size:14px;">person</span><span
+                            id="headerTeacherName"></span></span>
+                    <span style="color:#475569;">·</span>
+                    <span id="headerOnline" style="display:flex;align-items:center;gap:3px;"><span
+                            class="material-symbols-outlined" style="font-size:14px;">group</span><span
+                            id="headerOnlineCount">–</span></span>
+                </div>
             </div>
             <div class="student-header-center">
                 <div class="mode-toggle" id="modeToggle">
@@ -89,13 +99,22 @@
                 <div class="student-counter" id="slideCounter">— / —</div>
             </div>
             <div class="student-header-right">
-                <div class="student-name-badge">
+                <div class="student-name-badge" id="studentNameBadge" style="cursor:pointer;" title="點擊修改姓名">
                     <div class="student-avatar" id="displayAvatar"></div>
                     <span id="displayName"></span>
+                    <span class="material-symbols-outlined"
+                        style="font-size:14px;color:#94a3b8;margin-left:2px;">edit</span>
                 </div>
                 <button class="student-close-btn" id="studentCloseBtn" title="離開課堂">
                     <span class="material-symbols-outlined">close</span>
                 </button>
+            </div>
+        </div>
+        <!-- 進度條 -->
+        <div class="student-progress-bar" id="studentProgressBar"
+            style="height:3px;background:#1e293b;position:relative;">
+            <div id="studentProgressFill"
+                style="height:100%;background:linear-gradient(90deg,#6366f1,#818cf8);width:0%;transition:width 0.3s ease;border-radius:0 2px 2px 0;">
             </div>
         </div>
         <div class="student-slide-wrapper" id="slideWrapper">
@@ -550,6 +569,15 @@
                     setTimeout(() => toast.remove(), 5000);
                 });
 
+                // 監聽學員人數廣播
+                realtime.on('student_count', (msg) => {
+                    const p = msg.payload || msg;
+                    const el = document.getElementById('headerOnlineCount');
+                    if (el) el.textContent = `${p.count || 0} 人`;
+                    const meta = document.getElementById('headerMeta');
+                    if (meta) meta.style.display = 'flex';
+                });
+
                 // 講師強制同步（切到跟隨模式）
                 realtime.on('force_follow', () => {
                     if (mode !== 'follow') {
@@ -602,6 +630,12 @@
                 document.getElementById('displayName').textContent = studentName;
                 document.getElementById('displayAvatar').textContent = studentName.charAt(0);
 
+                // 顯示講師名稱 + 上課人數
+                if (project?.instructor) {
+                    document.getElementById('headerTeacherName').textContent = project.instructor;
+                    document.getElementById('headerMeta').style.display = 'flex';
+                }
+
                 // 顯示場次資訊（日期 · 時段）取代六位數代碼
                 const sessionInfoEl = document.getElementById('displaySessionInfo');
                 if (sessionInfoEl && project) {
@@ -632,6 +666,40 @@
                     const isOpen = lbPanel.classList.toggle('open');
                     const pres = document.getElementById('studentPresentation');
                     pres.style.paddingRight = isOpen ? '260px' : '';
+                });
+
+                // ── 修改姓名 ──
+                document.getElementById('studentNameBadge')?.addEventListener('click', async () => {
+                    const newName = prompt('修改你的顯示名稱：', studentName);
+                    if (!newName || newName.trim() === '' || newName.trim() === studentName) return;
+                    const oldName = studentName;
+                    studentName = newName.trim();
+                    // 更新 UI
+                    document.getElementById('displayName').textContent = studentName;
+                    document.getElementById('displayAvatar').textContent = studentName.charAt(0);
+                    // 更新 sessionStorage
+                    sessionStorage.setItem('student_name', studentName);
+                    sessionStorage.setItem('homework_user', JSON.stringify({
+                        name: studentName,
+                        email: studentEmail,
+                        joinedAt: new Date().toISOString()
+                    }));
+                    // 更新 stateManager
+                    try {
+                        const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                        if (stateManager.studentName) stateManager.studentName = studentName;
+                    } catch { }
+                    // 通知講師
+                    realtime.publish(`session:${sessionCode}`, 'student_rename', {
+                        studentId, oldName, newName: studentName
+                    });
+                    // 批次更新 DB 中的所有 submissions
+                    try {
+                        await db.update('submissions',
+                            { student_name: studentName },
+                            { student_email: `eq.${studentEmail}`, session_id: `eq.${sessionCode}` }
+                        );
+                    } catch (e) { console.warn('[Rename] DB update failed:', e); }
                 });
 
                 // ── Q&A 提問功能 ──
@@ -799,6 +867,9 @@
             // 計數器
             document.getElementById('slideCounter').textContent =
                 `${(index || 0) + 1} / ${total || '—'}`;
+            // 更新進度條
+            const pFill = document.getElementById('studentProgressFill');
+            if (pFill && total > 0) pFill.style.width = `${((index + 1) / total) * 100}%`;
 
             // 初始化互動元件
             setTimeout(() => {

@@ -3041,6 +3041,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 更新 presTopBar 中的廣播資訊
         const presViewers = document.getElementById('presBroadcastViewers');
         if (presViewers) presViewers.textContent = text;
+        // 廣播給學員端
+        if (this.broadcasting && this.sessionCode) {
+            realtime.publish(`session:${this.sessionCode}`, 'student_count', { count });
+        }
     }
 
     async stopBroadcast() {
