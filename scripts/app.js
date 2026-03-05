@@ -4374,7 +4374,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 複製問卷連結
         document.getElementById('fbSurveyLink')?.addEventListener('click', () => {
             const code = document.getElementById('fbSessionCode')?.value?.trim() || '';
-            const url = `${location.origin}${location.pathname.replace(/editor\.html.*/, '')}survey.html?code=${code}`;
+            const url = `${location.origin}${location.pathname.replace(/editor\.html.*/, '')}survey.html?session=${code}`;
             navigator.clipboard.writeText(url).then(() => {
                 document.getElementById('fbSurveyLink').textContent = '✓ 已複製！';
                 setTimeout(() => { document.getElementById('fbSurveyLink').textContent = '(複製)'; }, 2000);
