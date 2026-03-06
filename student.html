@@ -1908,11 +1908,19 @@
         // ── 縮放投影片適應視窗 ──
         function scaleSlide() {
             const wrapper = document.querySelector('.student-slide-wrapper');
-            if (!wrapper) return;
-            const ww = wrapper.clientWidth - 40;
-            const wh = wrapper.clientHeight - 40;
-            const scale = Math.min(ww / 960, wh / 540);
+            if (!wrapper || !slideEl) return;
+            const pad = window.innerWidth <= 480 ? 8 : 40;
+            const ww = wrapper.clientWidth - pad;
+            const wh = wrapper.clientHeight - pad;
+            const scale = Math.min(ww / 960, wh / 540, 1);
             slideEl.style.transform = `scale(${scale})`;
+            // 讓 wrapper 知道縮放後的實際尺寸（避免 overflow 裁切）
+            slideEl.style.width = '960px';
+            slideEl.style.height = '540px';
+            slideEl.style.marginBottom = `-${540 - 540 * scale}px`;
+            if (window.innerWidth <= 480) {
+                slideEl.style.transformOrigin = 'top center';
+            }
         }
     </script>
 

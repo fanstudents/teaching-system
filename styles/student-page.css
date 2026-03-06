@@ -475,7 +475,7 @@ body {
     position: relative;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 16px 48px rgba(0, 0, 0, 0.25);
-    transform-origin: center center;
+    transform-origin: top center;
     border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -824,6 +824,75 @@ body {
 
     .mode-btn .material-symbols-outlined {
         font-size: 13px;
+    }
+}
+
+/* ── Mobile ≤480px — slide below header, scroll for interactions ── */
+@media (max-width: 480px) {
+    .student-header {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 6px 10px;
+        gap: 4px;
+    }
+
+    .student-header-center {
+        order: -1;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .student-header-left {
+        display: none;
+    }
+
+    .student-name-badge {
+        font-size: 0.68rem;
+    }
+
+    .mode-btn {
+        padding: 3px 7px;
+        font-size: 0.65rem;
+    }
+
+    .mode-btn .material-symbols-outlined {
+        font-size: 13px;
+    }
+
+    /* 投影片改為從上方開始，可捲動 */
+    .student-slide-wrapper {
+        align-items: flex-start;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 8px 4px 80px;
+    }
+
+    .student-slide {
+        transform-origin: top center;
+        flex-shrink: 0;
+    }
+
+    /* QR code 太佔空間，隱藏 */
+    #studentQRCode {
+        display: none !important;
+    }
+
+    /* 浮動按鈕縮小 */
+    .student-qa-fab,
+    .student-lb-fab {
+        width: 40px !important;
+        height: 40px !important;
+        bottom: 12px !important;
+    }
+
+    .student-qa-fab {
+        right: 12px !important;
+    }
+
+    .student-lb-fab {
+        right: 12px !important;
+        bottom: 58px !important;
     }
 }
 
