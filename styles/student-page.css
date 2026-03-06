@@ -1000,16 +1000,20 @@ body {
     position: fixed !important;
     right: 8px !important;
     left: auto !important;
-    top: 50% !important;
+    top: 12px !important;
     bottom: auto !important;
-    transform: translateY(-50%) !important;
+    transform: none !important;
 }
 
 .student-presentation.immersive-mode #studentLeaderboard {
-    right: 8px !important;
+    right: 0 !important;
     left: auto !important;
-    max-height: 70vh;
+    width: 200px !important;
+    max-height: 60vh;
     overflow-y: auto;
+    top: 48px !important;
+    bottom: auto !important;
+    border-radius: 0 0 0 12px !important;
 }
 
 .student-presentation.immersive-mode #studentQRCode {

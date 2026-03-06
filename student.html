@@ -702,7 +702,10 @@
                 lbToggle.addEventListener('click', () => {
                     const isOpen = lbPanel.classList.toggle('open');
                     const pres = document.getElementById('studentPresentation');
-                    pres.style.paddingRight = isOpen ? '260px' : '';
+                    // 桌面版才改 paddingRight，手機沉浸模式不改
+                    if (window.innerWidth > 1024) {
+                        pres.style.paddingRight = isOpen ? '260px' : '';
+                    }
                 });
 
                 // ── 修改姓名 ──
