@@ -18,13 +18,35 @@ export class HomeworkSubmission {
     loadSubmissions() {
         const saved = localStorage.getItem('homework_submissions');
         if (saved) {
-            try { this.submissions = JSON.parse(saved); }
+            try {
+                this.submissions = JSON.parse(saved);
+                // ★ 清理舊的 base64 data，避免 localStorage 膨脹
+                let cleaned = false;
+                for (const s of this.submissions) {
+                    if (typeof s.content === 'string' && s.content.startsWith('data:')) {
+                        s.content = '(image)';
+                        cleaned = true;
+                    }
+                }
+                if (cleaned) this.saveSubmissions();
+            }
             catch { this.submissions = []; }
         }
     }
 
     saveSubmissions() {
-        localStorage.setItem('homework_submissions', JSON.stringify(this.submissions));
+        try {
+            // ★ 存之前清掉 base64，只保留 URL 或文字
+            const safe = this.submissions.map(s => ({
+                ...s,
+                content: typeof s.content === 'string' && s.content.startsWith('data:')
+                    ? '(image)' : s.content
+            }));
+            localStorage.setItem('homework_submissions', JSON.stringify(safe));
+        } catch (e) {
+            // localStorage 滿了就跳過，不影響 DB 寫入
+            console.warn('[Homework] localStorage save skipped:', e.message);
+        }
     }
 
     /* ── 輕量使用者識別 ── */

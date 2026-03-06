@@ -949,7 +949,7 @@
                 buzzer.init();
                 wordCloud.init();
                 hotspot.init();
-                countdown.observeNewElements();
+                if (countdown.observeNewElements) countdown.observeNewElements();
             }, 100);
 
             // QR Code
