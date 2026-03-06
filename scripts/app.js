@@ -637,7 +637,7 @@ class App {
 
             // ── 右上角：課前入口 QR Code ──
             const projectId = this.slideManager.projectId || '';
-            const preClassUrl = `${location.origin}/audience.html?id=${projectId}&phase=pre`;
+            const preClassUrl = `${location.origin}/student.html?id=${projectId}&phase=pre`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(preClassUrl)}&bgcolor=ffffff&color=312e81`;
             // QR Code 背景卡片
             elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 740, y: 25, width: 190, height: 190, background: 'rgba(255,255,255,0.08)', borderRadius: 14 });
