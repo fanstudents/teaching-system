@@ -868,6 +868,94 @@ body {
     }
 }
 
+/* ═══════════════════════════════════════════
+   MOBILE SIDE PANEL (左側資訊面板)
+   ═══════════════════════════════════════════ */
+.mobile-side-panel {
+    display: none;
+    /* 桌面版隱藏 */
+}
+
+.student-presentation.immersive-mode .mobile-side-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: fixed;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 300;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 8px 4px;
+}
+
+.msp-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.msp-live {
+    width: 32px;
+    height: 20px;
+}
+
+.msp-live .live-dot {
+    width: 8px;
+    height: 8px;
+}
+
+.msp-page {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+    height: auto;
+    padding: 2px 0;
+}
+
+.msp-divider {
+    width: 18px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 2px 0;
+}
+
+.msp-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.msp-btn:hover,
+.msp-btn:active {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.msp-btn.active {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.15);
+}
+
+.msp-btn .material-symbols-outlined {
+    font-size: 18px;
+}
 
 @keyframes studentSlideIn {
     from {

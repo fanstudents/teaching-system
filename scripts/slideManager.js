@@ -1327,10 +1327,10 @@ export class SlideManager {
                                             session_id: `eq.${sessionCode}`,
                                             'state->>base_element_id': `eq.${element.id}`
                                         },
-                                        columns: 'id'
+                                        columns: 'student_name'
                                     });
-                                    const count = result.data?.length || 0;
-                                    counterNum.textContent = count;
+                                    const unique = new Set((result.data || []).map(r => r.student_name));
+                                    counterNum.textContent = unique.size;
                                 }
                             } catch (e) { /* ignore */ }
                         })();

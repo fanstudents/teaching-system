@@ -113,11 +113,27 @@
                 </button>
             </div>
         </div>
-        <!-- 手機版 header 切換鈕 -->
-        <button id="mobileHeaderToggle"
-            style="display:none;position:absolute;top:6px;left:6px;z-index:30;width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(8px);">
-            <span class="material-symbols-outlined" style="font-size:18px;">menu</span>
-        </button>
+        <!-- 手機版左側資訊面板 -->
+        <div id="mobileSidePanel" class="mobile-side-panel">
+            <div class="msp-item msp-live">
+                <span class="live-dot"></span>
+            </div>
+            <div class="msp-item msp-page" id="mspPageCounter">—/—</div>
+            <div class="msp-divider"></div>
+            <button class="msp-item msp-btn" id="mspFollowBtn" title="跟隨講師">
+                <span class="material-symbols-outlined">sync</span>
+            </button>
+            <button class="msp-item msp-btn" id="mspFreeBtn" title="自行瀏覽">
+                <span class="material-symbols-outlined">swipe</span>
+            </button>
+            <div class="msp-divider"></div>
+            <button class="msp-item msp-btn" id="mspFullscreenBtn" title="退出全螢幕">
+                <span class="material-symbols-outlined">fullscreen_exit</span>
+            </button>
+            <button class="msp-item msp-btn" id="mspCloseBtn" title="離開課堂">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
         <!-- 進度條 -->
         <div class="student-progress-bar" id="studentProgressBar"
             style="height:3px;background:#1e293b;position:relative;">
@@ -1515,9 +1531,10 @@
                                         session_id: `eq.${sc}`,
                                         'state->>base_element_id': `eq.${element.id}`
                                     },
-                                    columns: 'id'
+                                    columns: 'student_name'
                                 });
-                                if (hwCounterNum) hwCounterNum.textContent = countResult.data?.length || 0;
+                                const unique = new Set((countResult.data || []).map(r => r.student_name));
+                                if (hwCounterNum) hwCounterNum.textContent = unique.size;
                             }
                         } catch (e) { /* ignore */ }
                     })();
@@ -1946,32 +1963,49 @@
             slideEl.style.height = '540px';
         }
 
-        // ── 手機版 header 切換 ──
-        (function initMobileHeader() {
-            const toggle = document.getElementById('mobileHeaderToggle');
-            const header = document.querySelector('.student-header');
-            if (!toggle || !header) return;
+        // ── 手機版側面板 ──
+        (function initMobileSidePanel() {
+            const panel = document.getElementById('mobileSidePanel');
+            if (!panel) return;
 
-            function checkMobile() {
-                if (window.innerWidth <= 1024) {
-                    toggle.style.display = 'flex';
-                } else {
-                    toggle.style.display = 'none';
-                    header.classList.remove('mobile-visible');
-                }
+            // 頁碼同步
+            const mainCounter = document.getElementById('slideCounter');
+            const mspCounter = document.getElementById('mspPageCounter');
+            if (mainCounter && mspCounter) {
+                const syncCount = () => {
+                    mspCounter.textContent = mainCounter.textContent.replace(/\s/g, '');
+                };
+                syncCount();
+                new MutationObserver(syncCount).observe(mainCounter, { childList: true, characterData: true, subtree: true });
             }
-            checkMobile();
-            window.addEventListener('resize', checkMobile);
 
-            let hideTimer = null;
-            toggle.addEventListener('click', () => {
-                header.classList.toggle('mobile-visible');
-                if (header.classList.contains('mobile-visible')) {
-                    clearTimeout(hideTimer);
-                    hideTimer = setTimeout(() => {
-                        header.classList.remove('mobile-visible');
-                    }, 4000);
-                }
+            // 模式切換同步
+            const followBtn = document.getElementById('mspFollowBtn');
+            const freeBtn = document.getElementById('mspFreeBtn');
+            const mainFollowBtn = document.getElementById('followModeBtn');
+            const mainFreeBtn = document.getElementById('freeModeBtn');
+
+            function syncModeState() {
+                const isFollow = mainFollowBtn?.classList.contains('active');
+                followBtn?.classList.toggle('active', isFollow);
+                freeBtn?.classList.toggle('active', !isFollow);
+            }
+            syncModeState();
+
+            followBtn?.addEventListener('click', () => { mainFollowBtn?.click(); syncModeState(); });
+            freeBtn?.addEventListener('click', () => { mainFreeBtn?.click(); syncModeState(); });
+
+            // 監聽桌面端 mode 變化
+            new MutationObserver(syncModeState).observe(mainFollowBtn, { attributes: true, attributeFilter: ['class'] });
+
+            // 全螢幕退出
+            document.getElementById('mspFullscreenBtn')?.addEventListener('click', () => {
+                document.getElementById('studentFullscreenBtn')?.click();
+            });
+
+            // 離開課堂
+            document.getElementById('mspCloseBtn')?.addEventListener('click', () => {
+                document.getElementById('studentCloseBtn')?.click();
             });
         })();
 

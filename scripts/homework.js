@@ -621,16 +621,17 @@ export class HomeworkSubmission {
         // ★ Realtime 廣播提交事件（讓講師端 + 其他學員更新計數器）
         if (saved && sessionCode) {
             try {
-                // 查詢當前這個作業的提交總數（用 base_element_id 查）
+                // 查詢當前這個作業的不重複學員數（用 base_element_id 查）
                 const baseId = assignmentId || '';
                 const countResult = await db.select('submissions', {
                     filter: {
                         session_id: `eq.${sessionCode}`,
                         'state->>base_element_id': `eq.${baseId}`
                     },
-                    columns: 'id'
+                    columns: 'student_name'
                 });
-                const order = countResult.data?.length || 1;
+                const uniqueStudents = new Set((countResult.data || []).map(r => r.student_name));
+                const order = uniqueStudents.size || 1;
 
                 realtime.publish(`session:${sessionCode}`, 'hw_submitted', {
                     elementId: assignmentId,
