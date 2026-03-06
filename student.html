@@ -1912,75 +1912,132 @@
         function scaleSlide() {
             const wrapper = document.querySelector('.student-slide-wrapper');
             if (!wrapper || !slideEl) return;
-            const pad = window.innerWidth <= 480 ? 8 : 40;
-            const ww = wrapper.clientWidth - pad;
-            const wh = wrapper.clientHeight - pad;
-            const scale = Math.min(ww / 960, wh / 540, 1);
-            slideEl.style.transform = `scale(${scale})`;
+            const pres = document.getElementById('studentPresentation');
+            const isImmersive = pres?.classList.contains('immersive-mode') ||
+                !!document.fullscreenElement || !!document.webkitFullscreenElement;
+
+            if (isImmersive) {
+                // 沉浸模式：用整個視窗大小，置中
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const scale = Math.min(vw / 960, vh / 540, 1);
+                slideEl.style.transform = `scale(${scale})`;
+                slideEl.style.transformOrigin = 'center center';
+                slideEl.style.marginBottom = '0';
+            } else {
+                // 一般模式
+                const pad = window.innerWidth <= 768 ? 4 : 40;
+                const ww = wrapper.clientWidth - pad;
+                const wh = wrapper.clientHeight - pad;
+                const scale = Math.min(ww / 960, wh / 540, 1);
+                slideEl.style.transform = `scale(${scale})`;
+                slideEl.style.transformOrigin = window.innerWidth <= 768 ? 'top center' : 'center center';
+                slideEl.style.marginBottom = window.innerWidth <= 768 ? `-${540 - 540 * scale}px` : '0';
+            }
             slideEl.style.width = '960px';
             slideEl.style.height = '540px';
-            slideEl.style.marginBottom = `-${540 - 540 * scale}px`;
-            if (window.innerWidth <= 480) {
-                slideEl.style.transformOrigin = 'top center';
-            }
         }
 
-        // ── 全螢幕切換 ──
-        (function initFullscreen() {
+        // ── 全螢幕 / 沉浸模式 ──
+        (function initImmersive() {
             const btn = document.getElementById('studentFullscreenBtn');
             const pres = document.getElementById('studentPresentation');
-            if (!btn || !pres) return;
+            const wrapper = document.querySelector('.student-slide-wrapper');
+            const header = document.querySelector('.student-header');
+            if (!pres) return;
 
-            let isFullscreen = false;
+            let isImmersive = false;
 
-            btn.addEventListener('click', () => {
-                if (!isFullscreen) {
-                    // 嘗試原生全螢幕 API
-                    const el = pres;
-                    if (el.requestFullscreen) el.requestFullscreen();
-                    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-                    else {
-                        // 降級：CSS 全螢幕模式
+            function enterImmersive() {
+                if (isImmersive) return;
+                // 優先用原生 Fullscreen API
+                if (pres.requestFullscreen) {
+                    pres.requestFullscreen().catch(() => {
+                        // fallback: CSS immersive
                         pres.classList.add('immersive-mode');
-                        scaleSlide();
-                    }
+                    });
+                } else if (pres.webkitRequestFullscreen) {
+                    pres.webkitRequestFullscreen();
+                } else {
+                    pres.classList.add('immersive-mode');
+                }
+                isImmersive = true;
+                if (btn) {
                     btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen_exit';
                     btn.title = '退出全螢幕';
-                    isFullscreen = true;
-                } else {
-                    if (document.exitFullscreen) document.exitFullscreen();
-                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                    pres.classList.remove('immersive-mode');
-                    btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
-                    btn.title = '全螢幕';
-                    isFullscreen = false;
-                    scaleSlide();
                 }
-            });
+                setTimeout(scaleSlide, 100);
 
-            // 監聽原生全螢幕退出（例如 ESC 鍵）
-            document.addEventListener('fullscreenchange', () => {
-                if (!document.fullscreenElement) {
-                    pres.classList.remove('immersive-mode');
+                // 顯示退出提示
+                showImmersiveHint();
+            }
+
+            function exitImmersive() {
+                if (!isImmersive) return;
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else if (document.webkitFullscreenElement) {
+                    document.webkitExitFullscreen();
+                }
+                pres.classList.remove('immersive-mode');
+                isImmersive = false;
+                if (btn) {
                     btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
                     btn.title = '全螢幕';
-                    isFullscreen = false;
-                    scaleSlide();
-                } else {
-                    scaleSlide();
                 }
-            });
-            document.addEventListener('webkitfullscreenchange', () => {
-                if (!document.webkitFullscreenElement) {
+                setTimeout(scaleSlide, 100);
+                // 移除提示
+                document.querySelector('.immersive-hint')?.remove();
+            }
+
+            function showImmersiveHint() {
+                document.querySelector('.immersive-hint')?.remove();
+                const hint = document.createElement('div');
+                hint.className = 'immersive-hint';
+                hint.textContent = '點擊投影片退出全螢幕';
+                document.body.appendChild(hint);
+                setTimeout(() => hint.remove(), 3500);
+            }
+
+            // 按鈕切換
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    isImmersive ? exitImmersive() : enterImmersive();
+                });
+            }
+
+            // ★ 點擊投影片進入沉浸模式（手機）
+            if (slideEl) {
+                slideEl.addEventListener('click', (e) => {
+                    // 不要攔截互動元素的點擊
+                    if (e.target.closest('.interactive-element, button, input, textarea, select, a, .hw-card, .showcase-container')) return;
+                    if (isImmersive) {
+                        exitImmersive();
+                    } else if (window.innerWidth <= 768) {
+                        // 只在手機上啟用點擊進入
+                        enterImmersive();
+                    }
+                });
+            }
+
+            // 監聽原生全螢幕退出
+            const onFSExit = () => {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                     pres.classList.remove('immersive-mode');
-                    btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
-                    btn.title = '全螢幕';
-                    isFullscreen = false;
-                    scaleSlide();
+                    isImmersive = false;
+                    if (btn) {
+                        btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
+                        btn.title = '全螢幕';
+                    }
+                    document.querySelector('.immersive-hint')?.remove();
+                    setTimeout(scaleSlide, 100);
                 } else {
-                    scaleSlide();
+                    setTimeout(scaleSlide, 100);
                 }
-            });
+            };
+            document.addEventListener('fullscreenchange', onFSExit);
+            document.addEventListener('webkitfullscreenchange', onFSExit);
         })();
     </script>
 

@@ -722,9 +722,10 @@ body {
         font-size: 24px;
     }
 
+    /* ── Header 極簡化 ── */
     .student-header {
-        padding: 0 12px;
-        height: 44px;
+        padding: 0 8px;
+        height: 38px;
         gap: 4px;
     }
 
@@ -733,168 +734,130 @@ body {
         transform: none;
     }
 
+    /* 隱藏非必要資訊 */
+    .student-header-left .student-header-info,
+    .student-header-left .student-header-meta,
+    .student-header-left .student-header-menu {
+        display: none;
+    }
+
     .student-header-left {
-        gap: 6px;
+        gap: 4px;
+        flex: 0 0 auto;
     }
 
     .student-title {
-        font-size: 0.78rem;
-        max-width: 120px;
+        display: none;
+    }
+
+    /* mode toggle 只顯示 icon */
+    .mode-btn {
+        padding: 4px 6px;
+        font-size: 0;
+        gap: 0;
+    }
+
+    .mode-btn .material-symbols-outlined {
+        font-size: 15px;
+    }
+
+    .student-session-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px 2px 5px;
     }
 
     .student-counter {
         font-size: 0.7rem;
     }
 
+    /* 姓名只顯示 avatar */
+    .student-name-badge span:not(.student-avatar) {
+        display: none;
+    }
+
     .student-name-badge {
-        font-size: 0.72rem;
+        gap: 0;
     }
 
     .student-avatar {
-        width: 24px;
-        height: 24px;
-        font-size: 0.6rem;
+        width: 22px;
+        height: 22px;
+        font-size: 0.55rem;
     }
 
-    .mode-btn {
-        padding: 3px 8px;
-        font-size: 0.68rem;
+    .student-close-btn {
+        width: 28px;
+        height: 28px;
     }
 
-    .mode-btn .material-symbols-outlined {
-        font-size: 14px;
+    .student-close-btn .material-symbols-outlined {
+        font-size: 16px;
     }
 
-    .student-session-badge {
-        font-size: 0.68rem;
-        padding: 2px 7px 2px 6px;
-    }
-
+    /* ── 投影片撐滿寬度 ── */
     .student-slide-wrapper {
-        padding: 8px;
-    }
-
-    .slide-nav-arrow {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-    }
-
-    .slide-nav-arrow.prev {
-        left: 4px;
-    }
-
-    .slide-nav-arrow.next {
-        right: 4px;
-    }
-
-    .follow-banner {
-        font-size: 0.72rem;
-        padding: 6px 14px;
-        bottom: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .student-header {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 6px 10px;
-        gap: 4px;
-    }
-
-    .student-header-center {
-        order: -1;
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .student-header-left {
-        display: none;
-    }
-
-    .student-name-badge {
-        font-size: 0.68rem;
-    }
-
-    .mode-btn {
-        padding: 3px 7px;
-        font-size: 0.65rem;
-    }
-
-    .mode-btn .material-symbols-outlined {
-        font-size: 13px;
-    }
-}
-
-/* ── Mobile ≤480px — slide below header, scroll for interactions ── */
-@media (max-width: 480px) {
-    .student-header {
-        flex-wrap: wrap;
-        height: auto;
-        padding: 6px 10px;
-        gap: 4px;
-    }
-
-    .student-header-center {
-        order: -1;
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .student-header-left {
-        display: none;
-    }
-
-    .student-name-badge {
-        font-size: 0.68rem;
-    }
-
-    .mode-btn {
-        padding: 3px 7px;
-        font-size: 0.65rem;
-    }
-
-    .mode-btn .material-symbols-outlined {
-        font-size: 13px;
-    }
-
-    /* 投影片改為從上方開始，可捲動 */
-    .student-slide-wrapper {
+        padding: 2px 0 0;
         align-items: flex-start;
+        justify-content: flex-start;
         overflow-y: auto;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
-        padding: 8px 4px 80px;
     }
 
     .student-slide {
         transform-origin: top center;
         flex-shrink: 0;
+        border-radius: 0;
     }
 
-    /* QR code 太佔空間，隱藏 */
+    .slide-nav-arrow {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+    }
+
+    .slide-nav-arrow.prev {
+        left: 2px;
+    }
+
+    .slide-nav-arrow.next {
+        right: 2px;
+    }
+
+    .follow-banner {
+        font-size: 0.7rem;
+        padding: 5px 12px;
+        bottom: 6px;
+    }
+
+    /* QR code 隱藏 */
     #studentQRCode {
         display: none !important;
     }
 
-    /* 浮動按鈕縮小 */
+    /* 浮動按鈕精簡 */
     .student-qa-fab,
     .student-lb-fab {
-        width: 40px !important;
-        height: 40px !important;
-        bottom: 12px !important;
+        width: 36px !important;
+        height: 36px !important;
     }
 
     .student-qa-fab {
-        right: 12px !important;
+        right: 6px !important;
+        bottom: 6px !important;
     }
 
     .student-lb-fab {
-        right: 12px !important;
-        bottom: 58px !important;
+        right: 6px !important;
+        bottom: 48px !important;
+    }
+
+    .student-qa-fab .material-symbols-outlined,
+    .student-lb-fab .material-symbols-outlined {
+        font-size: 17px !important;
     }
 }
+
 
 @keyframes studentSlideIn {
     from {
@@ -926,6 +889,8 @@ body {
 /* ═══════════════════════════════════════════
    FULLSCREEN / IMMERSIVE MODE
    ═══════════════════════════════════════════ */
+
+/* 原生 Fullscreen API (Android Chrome) */
 .student-presentation:fullscreen,
 .student-presentation:-webkit-full-screen {
     background: #000;
@@ -933,16 +898,37 @@ body {
 
 .student-presentation:fullscreen .student-header,
 .student-presentation:-webkit-full-screen .student-header {
-    background: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: transparent;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.student-presentation:fullscreen .student-header:hover,
+.student-presentation:-webkit-full-screen .student-header:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(16px);
 }
 
 .student-presentation:fullscreen .student-slide-wrapper,
 .student-presentation:-webkit-full-screen .student-slide-wrapper {
     background: #000;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
 }
 
-/* CSS fallback for iOS Safari (no Fullscreen API) */
+.student-presentation:fullscreen .student-progress-bar,
+.student-presentation:-webkit-full-screen .student-progress-bar {
+    display: none;
+}
+
+/* CSS fallback — immersive mode (iOS Safari / 點擊投影片進入) */
 .student-presentation.immersive-mode {
     position: fixed;
     inset: 0;
@@ -951,10 +937,70 @@ body {
 }
 
 .student-presentation.immersive-mode .student-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: transparent;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.student-presentation.immersive-mode .student-header.visible {
+    opacity: 1;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(16px);
 }
 
 .student-presentation.immersive-mode .student-slide-wrapper {
     background: #000;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.student-presentation.immersive-mode .student-progress-bar {
+    display: none;
+}
+
+/* 沉浸模式隱藏非必要元素 */
+.student-presentation.immersive-mode #studentQRCode,
+.student-presentation.immersive-mode .student-qa-fab,
+.student-presentation.immersive-mode .student-lb-fab,
+.student-presentation.immersive-mode #studentLeaderboard {
+    display: none !important;
+}
+
+/* 沉浸模式提示 */
+.immersive-hint {
+    position: fixed;
+    bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    z-index: 100000;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    animation: hintFadeOut 3s ease-in-out forwards;
+}
+
+@keyframes hintFadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
