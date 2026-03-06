@@ -3247,6 +3247,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         presentationMode.classList.add('active');
         document.body.style.overflow = 'hidden';
 
+        // ★ 簡報模式自動存檔（每 30 秒）
+        if (this._presAutoSave) clearInterval(this._presAutoSave);
+        this._presAutoSave = setInterval(() => {
+            this.slideManager.save();
+            console.log('[Presentation] auto-saved');
+        }, 30000);
+
         // 講師身份標示 + 廣播整合
         const badge = document.getElementById('presInstructorBadge');
         const presCode = document.getElementById('presBroadcastCode');
@@ -3907,6 +3914,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const presentationMode = document.getElementById('presentationMode');
         presentationMode.classList.remove('active');
         document.body.style.overflow = '';
+
+        // ★ 停止自動存檔
+        if (this._presAutoSave) { clearInterval(this._presAutoSave); this._presAutoSave = null; }
+        this.slideManager.save(); // 退出時存一次
 
         // 清除 mouse handler
         if (this._presMouseHandler) {

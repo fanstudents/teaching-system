@@ -853,9 +853,11 @@
                             select: 'slides_data', limit: 1
                         });
                         if (project?.[0]?.slides_data) {
-                            const slides = JSON.parse(project[0].slides_data);
-                            if (slides[currentSlide]) {
-                                renderInteraction(slides[currentSlide], currentSlide, slides.length);
+                            const raw = project[0].slides_data;
+                            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                            const slideArray = parsed.slides || parsed;
+                            if (Array.isArray(slideArray) && slideArray[currentSlide]) {
+                                renderInteraction(slideArray[currentSlide], currentSlide, slideArray.length);
                             }
                         }
                     }
@@ -1287,8 +1289,12 @@
             qaBtn.style.display = 'flex';
         }
 
+        let _lastReaction = 0;
         reactionBar.querySelectorAll('.aud-reaction-btn').forEach(btn => {
             btn.addEventListener('click', () => {
+                const now = Date.now();
+                if (now - _lastReaction < 500) return; // ★ 500ms throttle
+                _lastReaction = now;
                 const emoji = btn.dataset.emoji;
                 if (!sessionCode) return;
                 realtime.publish(`session:${sessionCode}`, 'reaction', { emoji });
