@@ -114,24 +114,35 @@
             </div>
         </div>
         <!-- 手機版左側資訊面板 -->
-        <div id="mobileSidePanel" class="mobile-side-panel">
+        <div id="mobileSidePanel" class="mobile-side-panel msp-left">
             <div class="msp-item msp-live">
                 <span class="live-dot"></span>
             </div>
             <div class="msp-item msp-page" id="mspPageCounter">—/—</div>
             <div class="msp-divider"></div>
-            <button class="msp-item msp-btn" id="mspFollowBtn" title="跟隨講師">
+            <button class="msp-item msp-btn active" id="mspFollowBtn" title="跟隨講師">
                 <span class="material-symbols-outlined">sync</span>
+                <span class="msp-label">跟隨</span>
             </button>
             <button class="msp-item msp-btn" id="mspFreeBtn" title="自行瀏覽">
                 <span class="material-symbols-outlined">swipe</span>
+                <span class="msp-label">瀏覽</span>
             </button>
             <div class="msp-divider"></div>
             <button class="msp-item msp-btn" id="mspFullscreenBtn" title="退出全螢幕">
                 <span class="material-symbols-outlined">fullscreen_exit</span>
             </button>
-            <button class="msp-item msp-btn" id="mspCloseBtn" title="離開課堂">
-                <span class="material-symbols-outlined">close</span>
+        </div>
+        <!-- 手機版右側功能面板 -->
+        <div id="mobileRightPanel" class="mobile-side-panel msp-right">
+            <button class="msp-item msp-btn" id="mspQABtn" title="提問">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="msp-label">提問</span>
+            </button>
+            <div class="msp-divider"></div>
+            <button class="msp-item msp-btn" id="mspLBBtn" title="排行榜">
+                <span class="material-symbols-outlined">leaderboard</span>
+                <span class="msp-label">排行</span>
             </button>
         </div>
         <!-- 進度條 -->
@@ -2003,9 +2014,15 @@
                 document.getElementById('studentFullscreenBtn')?.click();
             });
 
-            // 離開課堂
-            document.getElementById('mspCloseBtn')?.addEventListener('click', () => {
-                document.getElementById('studentCloseBtn')?.click();
+            // ── 右側面板：Q&A + 排行榜 ──
+            document.getElementById('mspQABtn')?.addEventListener('click', () => {
+                const popup = document.getElementById('studentQAPopup');
+                if (popup) popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+            });
+
+            document.getElementById('mspLBBtn')?.addEventListener('click', () => {
+                const lbPanel = document.getElementById('studentLeaderboard');
+                if (lbPanel) lbPanel.classList.toggle('open');
             });
         })();
 

@@ -869,40 +869,80 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   MOBILE SIDE PANEL (左側資訊面板)
+   MOBILE SIDE PANELS (左右資訊面板)
    ═══════════════════════════════════════════ */
 .mobile-side-panel {
     display: none;
     /* 桌面版隱藏 */
 }
 
-.student-presentation.immersive-mode .mobile-side-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    position: fixed;
-    left: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 300;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    border-radius: 14px;
-    padding: 8px 4px;
+/* ≤1024px 預設就顯示（不需要 immersive-mode） */
+@media (max-width: 1024px) {
+    .mobile-side-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 300;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border-radius: 14px;
+        padding: 8px 4px;
+    }
+
+    .msp-left {
+        left: 6px;
+    }
+
+    .msp-right {
+        right: 6px;
+    }
+
+    /* 手機橫放時，投影片左右箭頭移到螢幕最上方兩端 */
+    .student-presentation .slide-nav-arrow {
+        position: fixed !important;
+        top: 6px !important;
+        bottom: auto !important;
+        transform: none !important;
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        z-index: 310 !important;
+    }
+
+    .student-presentation .slide-nav-arrow.prev {
+        left: 50%;
+        margin-left: -36px;
+    }
+
+    .student-presentation .slide-nav-arrow.next {
+        left: 50%;
+        margin-left: 4px;
+    }
+
+    .student-presentation .slide-nav-arrow .material-symbols-outlined {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.6);
+    }
 }
 
 .msp-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: auto;
+    min-height: 28px;
 }
 
 .msp-live {
-    width: 32px;
+    width: 36px;
     height: 20px;
 }
 
@@ -921,25 +961,27 @@ body {
 }
 
 .msp-divider {
-    width: 18px;
+    width: 20px;
     height: 1px;
     background: rgba(255, 255, 255, 0.1);
     margin: 2px 0;
 }
 
 .msp-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    min-height: 36px;
     border: none;
     border-radius: 8px;
     background: transparent;
     color: rgba(255, 255, 255, 0.4);
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1px;
     transition: all 0.2s;
-    padding: 0;
+    padding: 4px 2px;
 }
 
 .msp-btn:hover,
@@ -955,6 +997,14 @@ body {
 
 .msp-btn .material-symbols-outlined {
     font-size: 18px;
+}
+
+.msp-label {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    opacity: 0.8;
 }
 
 @keyframes studentSlideIn {
@@ -1063,49 +1113,69 @@ body {
     display: none;
 }
 
-/* 沉浸模式中 Q&A 和排行榜 — 放到左右空白處 */
-.student-presentation.immersive-mode #studentQABtn {
-    display: flex !important;
-    position: fixed !important;
-    left: 8px !important;
-    right: auto !important;
-    top: 50% !important;
-    bottom: auto !important;
-    transform: translateY(-50%) !important;
-}
+/* ≤1024px 隱藏舊版 FAB（改用側面板按鈕） */
+@media (max-width: 1024px) {
 
-.student-presentation.immersive-mode #studentQAPopup {
-    left: 8px !important;
-    right: auto !important;
-    bottom: auto !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    max-height: 80vh;
-}
+    #studentQABtn,
+    #studentLbToggle,
+    #studentQRCode {
+        display: none !important;
+    }
 
-.student-presentation.immersive-mode #studentLbToggle {
-    display: flex !important;
-    position: fixed !important;
-    right: 8px !important;
-    left: auto !important;
-    top: 12px !important;
-    bottom: auto !important;
-    transform: none !important;
-}
+    /* Q&A 彈窗 — 置中 + 暗色主題 */
+    #studentQAPopup {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate(-50%, -50%) !important;
+        width: min(320px, 90vw) !important;
+        max-height: 80vh;
+        z-index: 400 !important;
+        border-radius: 16px !important;
+        background: rgba(30, 41, 59, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(16px) !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+    }
 
-.student-presentation.immersive-mode #studentLeaderboard {
-    right: 0 !important;
-    left: auto !important;
-    width: 200px !important;
-    max-height: 60vh;
-    overflow-y: auto;
-    top: 48px !important;
-    bottom: auto !important;
-    border-radius: 0 0 0 12px !important;
-}
+    #studentQAPopup span,
+    #studentQAPopup label {
+        color: #e2e8f0 !important;
+    }
 
-.student-presentation.immersive-mode #studentQRCode {
-    display: none !important;
+    #studentQAPopup textarea {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: #f1f5f9 !important;
+    }
+
+    #studentQAPopup #qaAttachImgLabel {
+        background: rgba(99, 102, 241, 0.15) !important;
+        color: #818cf8 !important;
+    }
+
+    #studentQAPopup #studentQACancel {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    #studentQAPopup #studentQASend {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        color: white !important;
+    }
+
+    /* 排行榜面板 — 縮窄 + 限高 */
+    #studentLeaderboard {
+        width: 200px !important;
+        max-height: 60vh;
+        overflow-y: auto;
+        top: 48px !important;
+        bottom: auto !important;
+        border-radius: 0 0 0 12px !important;
+    }
 }
 
 /* 沉浸模式提示 */
