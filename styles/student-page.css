@@ -975,11 +975,44 @@ body {
     display: none;
 }
 
-/* 沉浸模式隱藏非必要元素 */
-.student-presentation.immersive-mode #studentQRCode,
-.student-presentation.immersive-mode .student-qa-fab,
-.student-presentation.immersive-mode .student-lb-fab,
+/* 沉浸模式中 Q&A 和排行榜 — 放到左右空白處 */
+.student-presentation.immersive-mode #studentQABtn {
+    display: flex !important;
+    position: fixed !important;
+    left: 8px !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+}
+
+.student-presentation.immersive-mode #studentQAPopup {
+    left: 8px !important;
+    right: auto !important;
+    bottom: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    max-height: 80vh;
+}
+
+.student-presentation.immersive-mode #studentLbToggle {
+    display: flex !important;
+    position: fixed !important;
+    right: 8px !important;
+    left: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+}
+
 .student-presentation.immersive-mode #studentLeaderboard {
+    right: 8px !important;
+    left: auto !important;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.student-presentation.immersive-mode #studentQRCode {
     display: none !important;
 }
 
