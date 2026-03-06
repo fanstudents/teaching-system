@@ -949,6 +949,103 @@ body {
     }
 }
 
+/* ── 直式（Portrait）專用佈局 ── */
+@media (max-width: 1024px) and (orientation: portrait) {
+
+    /* 左側面板 → 頂部水平列 */
+    .msp-left {
+        flex-direction: row !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        padding: 6px 12px !important;
+        gap: 6px !important;
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    }
+
+    /* 右側面板 → 底部水平列 */
+    .msp-right {
+        flex-direction: row !important;
+        bottom: 0 !important;
+        top: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        padding: 6px 12px !important;
+        gap: 6px !important;
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: none !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        justify-content: center;
+    }
+
+    .msp-right .msp-btn {
+        flex-direction: row !important;
+        width: auto !important;
+        padding: 6px 14px !important;
+        gap: 6px !important;
+    }
+
+    .msp-right .msp-label {
+        font-size: 11px !important;
+    }
+
+    .msp-divider {
+        width: 1px !important;
+        height: 16px !important;
+        margin: 0 2px !important;
+    }
+
+    /* 箭頭在投影片正上方 */
+    .student-presentation .slide-nav-arrow {
+        top: 38px !important;
+    }
+
+    /* 投影片區域留出上下空間 */
+    .student-presentation .student-slide-wrapper {
+        padding-top: 36px !important;
+        padding-bottom: 44px !important;
+    }
+
+    /* 橫向瀏覽提示 */
+    .student-presentation::after {
+        content: '📱 建議橫向瀏覽以獲得最佳體驗';
+        position: fixed;
+        bottom: 48px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.45);
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 500;
+        z-index: 290;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    /* 穩定沉浸模式 — 避免畫面跳動 */
+    .student-presentation.immersive-mode {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 99999 !important;
+        background: #000 !important;
+        overflow: hidden !important;
+    }
+
+    .student-presentation.immersive-mode .student-slide-wrapper {
+        height: 100% !important;
+        padding-top: 36px !important;
+        padding-bottom: 44px !important;
+    }
+}
+
 .msp-item {
     display: flex;
     align-items: center;
