@@ -873,7 +873,41 @@ body {
    ═══════════════════════════════════════════ */
 .mobile-side-panel {
     display: none;
-    /* 桌面版隱藏 */
+    /* 預設隱藏 */
+}
+
+/* 桌面版也顯示側面板 */
+@media (min-width: 1025px) {
+    .student-presentation .mobile-side-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 300;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(8px);
+        border-radius: 14px;
+        padding: 8px 4px;
+        opacity: 0.4;
+        transition: opacity 0.3s;
+    }
+
+    .student-presentation .mobile-side-panel:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .student-presentation .msp-left {
+        left: 6px;
+    }
+
+    .student-presentation .msp-right {
+        right: 6px;
+    }
 }
 
 /* ≤1024px 預設就顯示（不需要 immersive-mode） */
@@ -902,7 +936,7 @@ body {
         right: 6px;
     }
 
-    /* 手機橫放時，投影片左右箭頭移到螢幕最上方兩端 */
+    /* 手機橫放時，投影片左右箭頭分散到左右兩側上方 */
     .student-presentation .slide-nav-arrow {
         position: fixed !important;
         top: 6px !important;
@@ -917,13 +951,13 @@ body {
     }
 
     .student-presentation .slide-nav-arrow.prev {
-        left: 50%;
-        margin-left: -36px;
+        left: 46px;
+        right: auto;
     }
 
     .student-presentation .slide-nav-arrow.next {
-        left: 50%;
-        margin-left: 4px;
+        right: 46px;
+        left: auto;
     }
 
     .student-presentation .slide-nav-arrow .material-symbols-outlined {

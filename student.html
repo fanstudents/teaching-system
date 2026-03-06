@@ -167,70 +167,71 @@
             </button>
             <div class="follow-banner" id="followBanner">📡 講師已切換到新頁面，點此跟隨</div>
         </div>
-    </div>
 
-    <!-- 排行榜 -->
-    <button class="student-lb-toggle" id="studentLbToggle" title="排行榜" style="
-        position:fixed;bottom:80px;right:12px;z-index:200;width:36px;height:36px;
-        border-radius:50%;border:none;background:rgba(99,102,241,0.85);
-        backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
-        align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(99,102,241,0.3);
-    "><span class="material-symbols-outlined" style="font-size:20px;">leaderboard</span></button>
-    <div class="pres-leaderboard" id="studentLeaderboard">
-        <div class="lb-header"><span class="lb-title">🏆 排行榜</span></div>
-        <div class="lb-list" id="studentLbList">
-            <div class="lb-empty">尚無學員互動</div>
-        </div>
-    </div>
-
-    <!-- 學員 Q&A 按鈕 + 彈窗 -->
-    <button id="studentQABtn" title="提問" style="
-        position:fixed;bottom:124px;right:12px;z-index:200;width:36px;height:36px;
-        border-radius:50%;border:none;background:rgba(234,88,12,0.85);
-        backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
-        align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(234,88,12,0.3);
-    "><span class="material-symbols-outlined" style="font-size:20px;">forum</span></button>
-
-    <div id="studentQAPopup" style="
-        position:fixed;bottom:170px;right:12px;z-index:300;width:320px;
-        background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:16px;
-        box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:0;display:none;flex-direction:column;
-        border:1px solid rgba(255,255,255,0.6);overflow:hidden;
-    ">
-        <div style="padding:14px 18px 10px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
-            <span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">chat</span>
-            <span style="font-size:15px;font-weight:700;color:#0f172a;">提出問題</span>
-        </div>
-        <div style="padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;">
-            <textarea id="studentQAInput" rows="3" placeholder="描述你的問題…" style="
-                width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;
-                font-size:14px;font-family:inherit;resize:none;outline:none;color:#1e293b;
-                transition:border-color 0.2s;background:#f8fafc;
-            " onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-            <!-- 圖片預覽 -->
-            <div id="qaImagePreview" style="display:none;position:relative;">
-                <img id="qaPreviewImg"
-                    style="max-width:100%;max-height:120px;border-radius:8px;border:1px solid #e2e8f0;" />
-                <button id="qaRemoveImg"
-                    style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+        <!-- 排行榜 (inside studentPresentation for z-index stacking) -->
+        <button class="student-lb-toggle" id="studentLbToggle" title="排行榜" style="
+            position:fixed;bottom:80px;right:12px;z-index:200;width:36px;height:36px;
+            border-radius:50%;border:none;background:rgba(99,102,241,0.85);
+            backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
+            align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(99,102,241,0.3);
+        "><span class="material-symbols-outlined" style="font-size:20px;">leaderboard</span></button>
+        <div class="pres-leaderboard" id="studentLeaderboard">
+            <div class="lb-header"><span class="lb-title">🏆 排行榜</span></div>
+            <div class="lb-list" id="studentLbList">
+                <div class="lb-empty">尚無學員互動</div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
-                <label id="qaAttachImgLabel"
-                    style="display:flex;align-items:center;gap:4px;font-size:12px;color:#6366f1;cursor:pointer;padding:4px 8px;border-radius:6px;background:#eef2ff;transition:background 0.2s;"
-                    title="附上圖片">
-                    <span class="material-symbols-outlined" style="font-size:16px;">image</span>附圖
-                    <input type="file" id="qaImageInput" accept="image/*" style="display:none;" />
-                </label>
-                <div style="display:flex;gap:8px;">
-                    <button id="studentQACancel" style="
-                        padding:7px 16px;border-radius:8px;border:1px solid #e2e8f0;
-                        background:white;color:#64748b;cursor:pointer;font-size:13px;font-family:inherit;
-                    ">取消</button>
-                    <button id="studentQASend" style="
-                        padding:7px 18px;border-radius:8px;border:none;
-                        background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;
-                        font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 2px 8px rgba(99,102,241,0.3);
-                    ">送出</button>
+        </div>
+
+        <!-- 學員 Q&A 按鈕 + 彈窗 (inside studentPresentation for z-index stacking) -->
+        <button id="studentQABtn" title="提問" style="
+            position:fixed;bottom:124px;right:12px;z-index:200;width:36px;height:36px;
+            border-radius:50%;border:none;background:rgba(234,88,12,0.85);
+            backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
+            align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(234,88,12,0.3);
+        "><span class="material-symbols-outlined" style="font-size:20px;">forum</span></button>
+
+        <div id="studentQAPopup" style="
+            position:fixed;bottom:170px;right:12px;z-index:300;width:320px;
+            background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-radius:16px;
+            box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:0;display:none;flex-direction:column;
+            border:1px solid rgba(255,255,255,0.6);overflow:hidden;
+        ">
+            <div
+                style="padding:14px 18px 10px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;">
+                <span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">chat</span>
+                <span style="font-size:15px;font-weight:700;color:#0f172a;">提出問題</span>
+            </div>
+            <div style="padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;">
+                <textarea id="studentQAInput" rows="3" placeholder="描述你的問題…" style="
+                    width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;
+                    font-size:14px;font-family:inherit;resize:none;outline:none;color:#1e293b;
+                    transition:border-color 0.2s;background:#f8fafc;
+                " onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                <!-- 圖片預覽 -->
+                <div id="qaImagePreview" style="display:none;position:relative;">
+                    <img id="qaPreviewImg"
+                        style="max-width:100%;max-height:120px;border-radius:8px;border:1px solid #e2e8f0;" />
+                    <button id="qaRemoveImg"
+                        style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.6);color:white;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">✕</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                    <label id="qaAttachImgLabel"
+                        style="display:flex;align-items:center;gap:4px;font-size:12px;color:#6366f1;cursor:pointer;padding:4px 8px;border-radius:6px;background:#eef2ff;transition:background 0.2s;"
+                        title="附上圖片">
+                        <span class="material-symbols-outlined" style="font-size:16px;">image</span>附圖
+                        <input type="file" id="qaImageInput" accept="image/*" style="display:none;" />
+                    </label>
+                    <div style="display:flex;gap:8px;">
+                        <button id="studentQACancel" style="
+                            padding:7px 16px;border-radius:8px;border:1px solid #e2e8f0;
+                            background:white;color:#64748b;cursor:pointer;font-size:13px;font-family:inherit;
+                        ">取消</button>
+                        <button id="studentQASend" style="
+                            padding:7px 18px;border-radius:8px;border:none;
+                            background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;cursor:pointer;
+                            font-size:13px;font-weight:600;font-family:inherit;box-shadow:0 2px 8px rgba(99,102,241,0.3);
+                        ">送出</button>
+                    </div>
                 </div>
             </div>
         </div>
