@@ -19,7 +19,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet">
     <link rel="stylesheet" href="styles/base.css?v=20260306">
-    <link rel="stylesheet" href="styles/student-page.css?v=20260306">
+    <link rel="stylesheet" href="styles/student-page.css?v=20260306b">
     <link rel="stylesheet" href="styles/interactive.css?v=20260306">
     <link rel="stylesheet" href="styles/interactive-theme.css?v=20260306">
     <link rel="stylesheet" href="styles/homework.css?v=20260306">
@@ -113,6 +113,11 @@
                 </button>
             </div>
         </div>
+        <!-- 手機版 header 切換鈕 -->
+        <button id="mobileHeaderToggle"
+            style="display:none;position:absolute;top:6px;left:6px;z-index:30;width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);cursor:pointer;align-items:center;justify-content:center;backdrop-filter:blur(8px);">
+            <span class="material-symbols-outlined" style="font-size:18px;">menu</span>
+        </button>
         <!-- 進度條 -->
         <div class="student-progress-bar" id="studentProgressBar"
             style="height:3px;background:#1e293b;position:relative;">
@@ -1938,6 +1943,35 @@
             slideEl.style.height = '540px';
         }
 
+        // ── 手機版 header 切換 ──
+        (function initMobileHeader() {
+            const toggle = document.getElementById('mobileHeaderToggle');
+            const header = document.querySelector('.student-header');
+            if (!toggle || !header) return;
+
+            function checkMobile() {
+                if (window.innerWidth <= 1024) {
+                    toggle.style.display = 'flex';
+                } else {
+                    toggle.style.display = 'none';
+                    header.classList.remove('mobile-visible');
+                }
+            }
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+
+            let hideTimer = null;
+            toggle.addEventListener('click', () => {
+                header.classList.toggle('mobile-visible');
+                if (header.classList.contains('mobile-visible')) {
+                    clearTimeout(hideTimer);
+                    hideTimer = setTimeout(() => {
+                        header.classList.remove('mobile-visible');
+                    }, 4000);
+                }
+            });
+        })();
+
         // ── 全螢幕 / 沉浸模式 ──
         (function initImmersive() {
             const btn = document.getElementById('studentFullscreenBtn');
@@ -2014,7 +2048,7 @@
                     if (e.target.closest('.interactive-element, button, input, textarea, select, a, .hw-card, .showcase-container')) return;
                     if (isImmersive) {
                         exitImmersive();
-                    } else if (window.innerWidth <= 768) {
+                    } else if (window.innerWidth <= 1024) {
                         // 只在手機上啟用點擊進入
                         enterImmersive();
                     }
