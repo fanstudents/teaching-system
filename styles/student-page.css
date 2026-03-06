@@ -922,3 +922,39 @@ body {
     color: #fff !important;
     background: rgba(255, 255, 255, 0.08) !important;
 }
+
+/* ═══════════════════════════════════════════
+   FULLSCREEN / IMMERSIVE MODE
+   ═══════════════════════════════════════════ */
+.student-presentation:fullscreen,
+.student-presentation:-webkit-full-screen {
+    background: #000;
+}
+
+.student-presentation:fullscreen .student-header,
+.student-presentation:-webkit-full-screen .student-header {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(16px);
+}
+
+.student-presentation:fullscreen .student-slide-wrapper,
+.student-presentation:-webkit-full-screen .student-slide-wrapper {
+    background: #000;
+}
+
+/* CSS fallback for iOS Safari (no Fullscreen API) */
+.student-presentation.immersive-mode {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: #000;
+}
+
+.student-presentation.immersive-mode .student-header {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(16px);
+}
+
+.student-presentation.immersive-mode .student-slide-wrapper {
+    background: #000;
+}

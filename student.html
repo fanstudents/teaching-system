@@ -105,6 +105,9 @@
                     <span class="material-symbols-outlined"
                         style="font-size:14px;color:#94a3b8;margin-left:2px;">edit</span>
                 </div>
+                <button class="student-close-btn" id="studentFullscreenBtn" title="全螢幕">
+                    <span class="material-symbols-outlined">fullscreen</span>
+                </button>
                 <button class="student-close-btn" id="studentCloseBtn" title="離開課堂">
                     <span class="material-symbols-outlined">close</span>
                 </button>
@@ -1914,7 +1917,6 @@
             const wh = wrapper.clientHeight - pad;
             const scale = Math.min(ww / 960, wh / 540, 1);
             slideEl.style.transform = `scale(${scale})`;
-            // 讓 wrapper 知道縮放後的實際尺寸（避免 overflow 裁切）
             slideEl.style.width = '960px';
             slideEl.style.height = '540px';
             slideEl.style.marginBottom = `-${540 - 540 * scale}px`;
@@ -1922,6 +1924,64 @@
                 slideEl.style.transformOrigin = 'top center';
             }
         }
+
+        // ── 全螢幕切換 ──
+        (function initFullscreen() {
+            const btn = document.getElementById('studentFullscreenBtn');
+            const pres = document.getElementById('studentPresentation');
+            if (!btn || !pres) return;
+
+            let isFullscreen = false;
+
+            btn.addEventListener('click', () => {
+                if (!isFullscreen) {
+                    // 嘗試原生全螢幕 API
+                    const el = pres;
+                    if (el.requestFullscreen) el.requestFullscreen();
+                    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                    else {
+                        // 降級：CSS 全螢幕模式
+                        pres.classList.add('immersive-mode');
+                        scaleSlide();
+                    }
+                    btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen_exit';
+                    btn.title = '退出全螢幕';
+                    isFullscreen = true;
+                } else {
+                    if (document.exitFullscreen) document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                    pres.classList.remove('immersive-mode');
+                    btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
+                    btn.title = '全螢幕';
+                    isFullscreen = false;
+                    scaleSlide();
+                }
+            });
+
+            // 監聽原生全螢幕退出（例如 ESC 鍵）
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    pres.classList.remove('immersive-mode');
+                    btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
+                    btn.title = '全螢幕';
+                    isFullscreen = false;
+                    scaleSlide();
+                } else {
+                    scaleSlide();
+                }
+            });
+            document.addEventListener('webkitfullscreenchange', () => {
+                if (!document.webkitFullscreenElement) {
+                    pres.classList.remove('immersive-mode');
+                    btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
+                    btn.title = '全螢幕';
+                    isFullscreen = false;
+                    scaleSlide();
+                } else {
+                    scaleSlide();
+                }
+            });
+        })();
     </script>
 
 </body>
