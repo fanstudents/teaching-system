@@ -44,170 +44,167 @@
                 </div>
             </div>
 
-            <!-- Tabs -->
-            <div class="main-tabs">
-                <button class="main-tab active" data-tab="projects">
-                    <span class="material-symbols-outlined">folder</span> 專案
-                </button>
-                <button class="main-tab" data-tab="sessions">
-                    <span class="material-symbols-outlined">event</span> 場次
-                </button>
-                <button class="main-tab" data-tab="students">
-                    <span class="material-symbols-outlined">group</span> 學員
-                </button>
-                <button class="main-tab" data-tab="assignments">
-                    <span class="material-symbols-outlined">assignment</span> 作業
-                </button>
-                <button class="main-tab" data-tab="purchases">
-                    <span class="material-symbols-outlined">receipt_long</span> 訂單
-                </button>
-            </div>
-
-            <!-- Tab: 專案 -->
-            <div class="tab-panel active" id="tab-projects">
-                <div class="filter-bar">
-                    <input type="text" id="projectSearch" placeholder="搜尋專案名稱…">
-                    <select id="projectCategoryFilter" class="filter-select">
-                        <option value="">全部分類</option>
-                        <option value="course">公開課程</option>
-                        <option value="corporate">企業內訓</option>
-                    </select>
-                    <button class="btn btn-dark" id="btnCreateProject">
-                        <span class="material-symbols-outlined">add</span> 建立專案
+            <!-- ═══════════ Level 1：專案列表 ═══════════ -->
+            <div id="level1">
+                <div class="level1-tabs">
+                    <button class="l1-tab active" data-l1tab="projects">
+                        <span class="material-symbols-outlined">folder</span> 專案
                     </button>
-                    <button class="btn btn-dark" id="btnRefreshProjects">
-                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    <button class="l1-tab" data-l1tab="purchases">
+                        <span class="material-symbols-outlined">receipt_long</span> 訂單
                     </button>
                 </div>
-                <div class="card-grid" id="projectGrid">
-                    <div class="empty-state">
-                        <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+
+                <!-- 專案列表面板 -->
+                <div class="l1-panel active" id="l1-projects">
+                    <div class="filter-bar">
+                        <input type="text" id="projectSearch" placeholder="搜尋專案名稱…">
+                        <select id="projectCategoryFilter" class="filter-select">
+                            <option value="">全部分類</option>
+                            <option value="course">公開課程</option>
+                            <option value="corporate">企業內訓</option>
+                        </select>
+                        <button class="btn btn-dark" id="btnCreateProject">
+                            <span class="material-symbols-outlined">add</span> 建立專案
+                        </button>
+                        <button class="btn btn-dark" id="btnRefreshProjects">
+                            <span class="material-symbols-outlined">refresh</span> 重新整理
+                        </button>
+                    </div>
+                    <div class="project-card-grid" id="projectGrid">
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 訂單面板 -->
+                <div class="l1-panel" id="l1-purchases">
+                    <div class="filter-bar">
+                        <input type="text" id="purchaseSearch" placeholder="搜尋 Email 或訂單編號…">
+                        <button class="btn" id="btnRefreshPurchases">
+                            <span class="material-symbols-outlined">refresh</span> 重新整理
+                        </button>
+                    </div>
+                    <div class="data-table-wrap">
+                        <table class="data-table" id="purchaseTable">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>姓名</th>
+                                    <th>訂單編號</th>
+                                    <th>金額</th>
+                                    <th>狀態</th>
+                                    <th>退款金額</th>
+                                    <th>已配對</th>
+                                    <th>時間</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchaseTableBody">
+                                <tr>
+                                    <td colspan="8" class="td-empty">載入中…</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab: 場次 -->
-            <div class="tab-panel" id="tab-sessions">
-                <div class="filter-bar">
-                    <input type="text" id="sessionSearch" placeholder="搜尋場次代碼或地點…">
-                    <button class="btn btn-dark" id="btnAddSession">
-                        <span class="material-symbols-outlined">add</span> 新增場次
-                    </button>
-                </div>
-                <div class="data-table-wrap">
-                    <table class="data-table" id="sessionTable">
-                        <thead>
-                            <tr>
-                                <th>專案</th>
-                                <th>場次代碼</th>
-                                <th>日期</th>
-                                <th>時間</th>
-                                <th>地點</th>
-                                <th>階段</th>
-                                <th>容量</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sessionTableBody">
-                            <tr>
-                                <td colspan="8" class="td-empty">載入中…</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- ═══════════ Level 2：專案詳情 ═══════════ -->
+            <div id="level2" style="display:none;">
+                <button class="breadcrumb-back" id="backToLevel1">
+                    <span class="material-symbols-outlined">arrow_back</span> 回到所有專案
+                </button>
 
-            <!-- Tab: 學員 -->
-            <div class="tab-panel" id="tab-students">
-                <div class="filter-bar">
-                    <input type="text" id="studentSearch" placeholder="搜尋姓名或 Email…">
-                    <select id="studentSessionFilter">
-                        <option value="">所有場次</option>
-                    </select>
-                    <select id="studentStatusFilter">
-                        <option value="">所有狀態</option>
-                        <option value="purchased">已購買</option>
-                        <option value="registered">已報名</option>
-                        <option value="attended">已出席</option>
-                    </select>
-                    <button class="btn" id="btnAddStudent">
-                        <span class="material-symbols-outlined">person_add</span> 新增學員
-                    </button>
-                    <button class="btn" id="btnRefreshStudents">
-                        <span class="material-symbols-outlined">refresh</span> 重新整理
-                    </button>
-                </div>
-                <div class="data-table-wrap">
-                    <table class="data-table" id="studentTable">
-                        <thead>
-                            <tr>
-                                <th>學員</th>
-                                <th>Email</th>
-                                <th>場次</th>
-                                <th>公司</th>
-                                <th>組別</th>
-                                <th>狀態</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-                            <tr>
-                                <td colspan="7" class="td-empty">載入中…</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <!-- 專案 Header -->
+                <div class="project-detail-header" id="projectDetailHeader"></div>
 
-            <!-- Tab: 作業 -->
-            <div class="tab-panel" id="tab-assignments">
-                <div class="filter-bar">
-                    <select id="assignmentSessionFilter">
-                        <option value="">所有場次</option>
-                    </select>
-                    <input type="text" id="assignmentSearch" placeholder="搜尋作業標題…">
-                    <button class="btn btn-dark" id="btnAddAssignment">
-                        <span class="material-symbols-outlined">add</span> 新增作業
+                <!-- Sub-tabs -->
+                <div class="sub-tabs" id="detailSubTabs">
+                    <button class="sub-tab active" data-subtab="sessions">
+                        <span class="material-symbols-outlined">event</span> 場次
                     </button>
-                    <button class="btn" id="btnRefreshAssignments">
-                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    <button class="sub-tab" data-subtab="students">
+                        <span class="material-symbols-outlined">group</span> 學員
+                    </button>
+                    <button class="sub-tab" data-subtab="assignments">
+                        <span class="material-symbols-outlined">assignment</span> 作業
                     </button>
                 </div>
-                <div class="assignment-cards" id="assignmentGrid">
-                    <div class="empty-state">
-                        <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+
+                <!-- Sub: 場次 -->
+                <div class="sub-panel active" id="sub-sessions">
+                    <div class="filter-bar">
+                        <button class="btn btn-dark" id="btnAddSessionDetail">
+                            <span class="material-symbols-outlined">add</span> 新增場次
+                        </button>
+                    </div>
+                    <div id="sessionDetailList">
+                        <div class="empty-state">尚無場次</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tab: 訂單 -->
-            <div class="tab-panel" id="tab-purchases">
-                <div class="filter-bar">
-                    <input type="text" id="purchaseSearch" placeholder="搜尋 Email 或訂單編號…">
-                    <button class="btn" id="btnRefreshPurchases">
-                        <span class="material-symbols-outlined">refresh</span> 重新整理
-                    </button>
+                <!-- Sub: 學員 -->
+                <div class="sub-panel" id="sub-students">
+                    <div class="filter-bar">
+                        <input type="text" id="studentSearch" placeholder="搜尋姓名或 Email…">
+                        <select id="studentSessionFilter">
+                            <option value="">所有場次</option>
+                        </select>
+                        <select id="studentStatusFilter">
+                            <option value="">所有狀態</option>
+                            <option value="purchased">已購買</option>
+                            <option value="registered">已報名</option>
+                            <option value="attended">已出席</option>
+                        </select>
+                        <button class="btn" id="btnAddStudent">
+                            <span class="material-symbols-outlined">person_add</span> 新增學員
+                        </button>
+                        <button class="btn" id="btnRefreshStudents">
+                            <span class="material-symbols-outlined">refresh</span> 重新整理
+                        </button>
+                    </div>
+                    <div class="data-table-wrap">
+                        <table class="data-table" id="studentTable">
+                            <thead>
+                                <tr>
+                                    <th>學員</th>
+                                    <th>Email</th>
+                                    <th>場次</th>
+                                    <th>公司</th>
+                                    <th>組別</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <tr>
+                                    <td colspan="7" class="td-empty">載入中…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="data-table-wrap">
-                    <table class="data-table" id="purchaseTable">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>姓名</th>
-                                <th>訂單編號</th>
-                                <th>金額</th>
-                                <th>狀態</th>
-                                <th>退款金額</th>
-                                <th>已配對</th>
-                                <th>時間</th>
-                            </tr>
-                        </thead>
-                        <tbody id="purchaseTableBody">
-                            <tr>
-                                <td colspan="8" class="td-empty">載入中…</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                <!-- Sub: 作業 -->
+                <div class="sub-panel" id="sub-assignments">
+                    <div class="filter-bar">
+                        <select id="assignmentSessionFilter">
+                            <option value="">所有場次</option>
+                        </select>
+                        <input type="text" id="assignmentSearch" placeholder="搜尋作業標題…">
+                        <button class="btn btn-dark" id="btnAddAssignment">
+                            <span class="material-symbols-outlined">add</span> 新增作業
+                        </button>
+                        <button class="btn" id="btnRefreshAssignments">
+                            <span class="material-symbols-outlined">refresh</span> 重新整理
+                        </button>
+                    </div>
+                    <div class="assignment-cards" id="assignmentGrid">
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -574,11 +571,12 @@
 
 
         // ── Init ──
+        let currentProjectId = null;
+
         async function init() {
-            bindTabs();
+            bindNavigation();
             bindModals();
 
-            // 先嘗試載入，如果全部失敗就重試一次
             let retries = 0;
             const maxRetries = 2;
 
@@ -594,7 +592,6 @@
 
             await loadAll();
 
-            // 如果所有都是空的，可能是網路延遲，重試一次
             if (projects.length === 0 && sessions.length === 0 && students.length === 0) {
                 retries++;
                 if (retries <= maxRetries) {
@@ -604,10 +601,7 @@
             }
 
             renderProjects();
-            renderSessionTable();
-            renderStudentTable();
             renderPurchaseTable();
-            renderAssignmentTable();
             updateStats();
         }
 
@@ -618,15 +612,38 @@
             document.getElementById('statPurchases').textContent = purchases.length;
         }
 
-        // ── Tabs ──
-        function bindTabs() {
-            document.querySelectorAll('.main-tab').forEach(tab => {
+        // ── Navigation (Level 1 tabs + Level 2 sub-tabs + back) ──
+        function bindNavigation() {
+            // Level 1 tabs (專案 / 訂單)
+            document.querySelectorAll('.l1-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    document.querySelectorAll('.l1-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.l1-panel').forEach(p => p.classList.remove('active'));
                     tab.classList.add('active');
-                    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                    document.getElementById(`l1-${tab.dataset.l1tab}`).classList.add('active');
                 });
+            });
+
+            // Level 2 sub-tabs (場次/學員/作業)
+            document.querySelectorAll('.sub-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`sub-${tab.dataset.subtab}`).classList.add('active');
+                });
+            });
+
+            // Back to Level 1
+            document.getElementById('backToLevel1').addEventListener('click', () => {
+                document.getElementById('level2').style.display = 'none';
+                document.getElementById('level1').style.display = '';
+                currentProjectId = null;
+            });
+
+            // Add session in Level 2
+            document.getElementById('btnAddSessionDetail').addEventListener('click', () => {
+                if (currentProjectId) window.openAddSession(currentProjectId);
             });
         }
 
@@ -659,111 +676,60 @@
             const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
             const catLabel = { 'course': '公開課程', 'corporate': '企業內訓' };
 
-            grid.className = 'project-tree';
+            grid.className = 'project-card-grid';
             grid.innerHTML = filtered.map(p => {
                 const projectSessions = sessions.filter(s => s.project_id === p.id);
-                // Phase 由場次推算：有任何 in-class → 進行中；全部 post-class → 已結束；否則課前
+                const projectStudents = students.filter(st => {
+                    const sessIds = projectSessions.map(s => s.id);
+                    return sessIds.includes(st.session_id);
+                });
                 const sessionPhases = projectSessions.map(s => s.current_phase || 'pre-class');
                 const phase = sessionPhases.includes('in-class') ? 'in-class'
                     : (sessionPhases.length > 0 && sessionPhases.every(ph => ph === 'post-class')) ? 'post-class'
                         : 'pre-class';
                 const pType = p.type || 'course';
                 const date = p.created_at ? new Date(p.created_at).toLocaleDateString('zh-TW') : '';
-                const onlineCount = projectSessions.filter(s => s.session_format === 'online').length;
-                const offlineCount = projectSessions.length - onlineCount;
-                const sessionSummary = projectSessions.length > 0
-                    ? [offlineCount > 0 ? `實體 ${offlineCount}` : '', onlineCount > 0 ? `直播 ${onlineCount}` : ''].filter(Boolean).join(' · ')
-                    : '尚無場次';
-
-                // Session sub-rows
-                const sessionRows = projectSessions.length > 0
-                    ? projectSessions.map(s => {
-                        const isOnline = s.session_format === 'online';
-                        const fmtTag = isOnline
-                            ? '<span class="fmt-tag fmt-online">直播</span>'
-                            : '<span class="fmt-tag fmt-offline">實體</span>';
-                        const loc = isOnline
-                            ? (s.stream_url ? `<a href="${s.stream_url}" target="_blank" class="stream-link">直播連結</a>` : '—')
-                            : (s.venue || '—');
-                        return `<div class="tree-session">
-                            <span class="session-dot ${s.current_phase || 'pre-class'}"></span>
-                            ${fmtTag}
-                            <span class="tree-session-date">${s.date || '未設定'} ${s.time || ''}</span>
-                            <span class="tree-session-loc">${loc}</span>
-                            <span class="tree-session-code">${s.session_code || ''}</span>
-                            <a class="btn btn-sm" href="preclass-dashboard.html?code=${p.join_code}&session=${s.session_code}" title="課前統計">
-                                <span class="material-symbols-outlined">bar_chart</span>
-                            </a>
-                            <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}&session=${s.session_code}" title="管理">
-                                <span class="material-symbols-outlined">settings</span>
-                            </a>
-                            <button class="btn btn-sm" title="複製問卷連結" onclick="event.stopPropagation();navigator.clipboard.writeText(location.origin+'/survey.html?session=${s.session_code}').then(()=>showToast('問卷連結已複製：'+location.origin+'/survey.html?session=${s.session_code}'))">
-                                <span class="material-symbols-outlined">assignment_turned_in</span>
-                            </button>
-                        </div>`;
-                    }).join('')
-                    : '<div class="tree-session tree-empty">尚無場次</div>';
 
                 return `
-                <div class="tree-project" data-id="${p.id}">
-                    <div class="tree-row">
-                        <button class="tree-toggle" data-target="children-${p.id}" title="展開場次">
-                            <span class="material-symbols-outlined">chevron_right</span>
-                        </button>
+                <div class="project-card" data-id="${p.id}">
+                    <div class="pcard-top">
                         <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
-                        <span class="tree-name">${p.name || '未命名'}</span>
                         <span class="card-phase ${phase}"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
-                        <span class="tree-meta">${sessionSummary}</span>
-                        <span class="card-code" data-code="${p.join_code}" title="點擊複製入口連結">${p.join_code}</span>
-                        <span class="tree-date">${date}</span>
-                        <div class="tree-actions">
-                            <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}" title="課前管理"><span class="material-symbols-outlined">assignment</span></a>
-                            <a class="btn btn-sm" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')" title="學習追蹤"><span class="material-symbols-outlined">mail</span></a>
-                            ${p.slide_mode === 'external' && p.course_link
-                        ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank" title="簡報"><span class="material-symbols-outlined">open_in_new</span></a>`
-                        : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="localStorage.setItem('current_project_id','${p.id}')" title="簡報"><span class="material-symbols-outlined">slideshow</span></a>`
-                    }
-                            <button class="btn btn-sm" data-edit="${p.id}" title="設定"><span class="material-symbols-outlined">edit</span></button>
-                            <button class="btn btn-sm" data-copy="${p.id}" title="複製專案"><span class="material-symbols-outlined">content_copy</span></button>
-                            <button class="btn btn-sm" onclick="openAddSession('${p.id}')" title="新增場次"><span class="material-symbols-outlined">add</span></button>
-                        </div>
                     </div>
-                    <div class="tree-children" id="children-${p.id}">
-                        ${sessionRows}
+                    <div class="pcard-name">${p.name || '未命名'}</div>
+                    ${p.description ? `<div class="pcard-desc">${p.description}</div>` : ''}
+                    <div class="pcard-stats">
+                        <span><span class="material-symbols-outlined">event</span> ${projectSessions.length} 場次</span>
+                        <span><span class="material-symbols-outlined">group</span> ${projectStudents.length} 學員</span>
+                        <span class="pcard-code" data-code="${p.join_code}" title="點擊複製入口連結">${p.join_code}</span>
+                    </div>
+                    <div class="pcard-date">${date}</div>
+                    <div class="pcard-actions">
+                        ${p.slide_mode === 'external' && p.course_link
+                        ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank" title="簡報" onclick="event.stopPropagation()"><span class="material-symbols-outlined">open_in_new</span></a>`
+                        : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="event.stopPropagation();localStorage.setItem('current_project_id','${p.id}')" title="簡報"><span class="material-symbols-outlined">slideshow</span></a>`
+                    }
+                        <button class="btn btn-sm" data-edit="${p.id}" title="設定" onclick="event.stopPropagation()"><span class="material-symbols-outlined">edit</span></button>
+                        <button class="btn btn-sm" data-copy="${p.id}" title="複製專案" onclick="event.stopPropagation()"><span class="material-symbols-outlined">content_copy</span></button>
                     </div>
                 </div>`;
             }).join('');
 
-            // Bind tree toggle
-            grid.querySelectorAll('.tree-toggle').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const target = document.getElementById(btn.dataset.target);
-                    const isOpen = target.classList.toggle('open');
-                    btn.classList.toggle('open', isOpen);
-                });
+            // Bind card click → open detail
+            grid.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('click', () => openProjectDetail(card.dataset.id));
             });
 
-            // Auto-expand first 3 projects
-            const toggleBtns = grid.querySelectorAll('.tree-toggle');
-            for (let i = 0; i < Math.min(3, toggleBtns.length); i++) {
-                const btn = toggleBtns[i];
-                const target = document.getElementById(btn.dataset.target);
-                if (target) {
-                    target.classList.add('open');
-                    btn.classList.add('open');
-                }
-            }
-
             // Bind card-code copy
-            grid.querySelectorAll('.card-code').forEach(el => {
+            grid.querySelectorAll('.pcard-code').forEach(el => {
                 el.addEventListener('click', e => {
                     e.stopPropagation();
                     const code = el.dataset.code;
                     const url = `${location.origin}/portal.html?code=${code}`;
                     navigator.clipboard.writeText(url).then(() => {
-                        el.classList.add('copied');
                         const orig = el.textContent;
                         el.textContent = '已複製';
+                        el.classList.add('copied');
                         showToast('入口連結已複製');
                         setTimeout(() => { el.classList.remove('copied'); el.textContent = orig; }, 1500);
                     });
@@ -772,37 +738,150 @@
 
             // Bind edit buttons
             grid.querySelectorAll('[data-edit]').forEach(btn => {
-                btn.addEventListener('click', () => openEdit(btn.dataset.edit));
+                btn.addEventListener('click', (e) => { e.stopPropagation(); openEdit(btn.dataset.edit); });
             });
 
             // Bind copy button
             grid.querySelectorAll('[data-copy]').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
-                    e.preventDefault();
                     e.stopPropagation();
-                    const id = btn.dataset.copy;
-                    const proj = projects.find(p => p.id === id);
-                    if (!proj) return;
-
-                    if (!confirm(`確定要複製專案「${proj.name}」嗎？\n(將會複製專案設定與簡報內容，場次與學員不會被複製)`)) return;
-
+                    const origProject = projects.find(p => p.id === btn.dataset.copy);
+                    if (!origProject) return;
+                    if (!confirm(`確定要複製「${origProject.name}」？`)) return;
                     try {
-                        // Create a clone excluding db-generated fields
-                        const { id: _id, created_at, updated_at, ...cloneData } = proj;
-                        cloneData.name = `[複製] ${proj.name}`;
-                        cloneData.join_code = generateCode(6);
-
-                        // Handle potential unique constraint errors on join_code? Let DB handle or trust random
-                        await db.insert('projects', cloneData);
-                        await loadProjects();
-                        renderProjects();
+                        const newData = { ...origProject };
+                        delete newData.id;
+                        delete newData.created_at;
+                        delete newData.updated_at;
+                        newData.name = origProject.name + '（複製）';
+                        newData.join_code = generateCode(6);
+                        await db.insert('projects', newData);
+                        await Promise.all([loadProjects(), loadSessions()]);
                         updateStats();
+                        renderProjects();
                         showToast('專案已複製');
                     } catch (e) {
                         showToast('複製失敗：' + e.message);
                     }
                 });
             });
+        }
+
+        // ── Level 2：專案詳情 ──
+        function openProjectDetail(projectId) {
+            currentProjectId = projectId;
+            const p = projects.find(x => x.id === projectId);
+            if (!p) return;
+
+            document.getElementById('level1').style.display = 'none';
+            document.getElementById('level2').style.display = '';
+
+            // Reset sub-tabs to 場次
+            document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.sub-panel').forEach(pp => pp.classList.remove('active'));
+            document.querySelector('.sub-tab[data-subtab="sessions"]').classList.add('active');
+            document.getElementById('sub-sessions').classList.add('active');
+
+            const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
+            const catLabel = { 'course': '公開課程', 'corporate': '企業內訓' };
+            const projectSessions = sessions.filter(s => s.project_id === projectId);
+            const sessionPhases = projectSessions.map(s => s.current_phase || 'pre-class');
+            const phase = sessionPhases.includes('in-class') ? 'in-class'
+                : (sessionPhases.length > 0 && sessionPhases.every(ph => ph === 'post-class')) ? 'post-class'
+                    : 'pre-class';
+            const pType = p.type || 'course';
+
+            document.getElementById('projectDetailHeader').innerHTML = `
+                <div class="pd-header-row">
+                    <div class="pd-info">
+                        <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
+                        <h2 class="pd-title">${p.name || '未命名'}</h2>
+                        <span class="card-phase ${phase}"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
+                    </div>
+                    <div class="pd-actions">
+                        <span class="pcard-code" data-code="${p.join_code}" title="複製入口連結" style="cursor:pointer;">${p.join_code}</span>
+                        ${p.slide_mode === 'external' && p.course_link
+                    ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank"><span class="material-symbols-outlined">open_in_new</span> 簡報</a>`
+                    : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="localStorage.setItem('current_project_id','${p.id}')"><span class="material-symbols-outlined">slideshow</span> 簡報</a>`
+                }
+                        <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}"><span class="material-symbols-outlined">assignment</span> 課前</a>
+                        <a class="btn btn-sm" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')"><span class="material-symbols-outlined">mail</span> 追蹤</a>
+                        <button class="btn btn-sm" onclick="openEdit('${p.id}')"><span class="material-symbols-outlined">settings</span> 設定</button>
+                    </div>
+                </div>
+                ${p.description ? `<div class="pd-desc">${p.description}</div>` : ''}
+            `;
+
+            // Bind code copy in header
+            document.querySelector('#projectDetailHeader .pcard-code')?.addEventListener('click', (e) => {
+                const code = e.target.dataset.code;
+                const url = `${location.origin}/portal.html?code=${code}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    e.target.textContent = '已複製';
+                    showToast('入口連結已複製');
+                    setTimeout(() => { e.target.textContent = code; }, 1500);
+                });
+            });
+
+            renderDetailSessions(projectId);
+            populateStudentSessionFilter(projectId);
+            populateAssignmentSessionFilter(projectId);
+            renderStudentTable(projectId);
+            renderAssignments(projectId);
+        }
+
+        // ── Detail: Sessions list ──
+        function renderDetailSessions(projectId) {
+            const container = document.getElementById('sessionDetailList');
+            const projectSessions = sessions.filter(s => s.project_id === projectId);
+            const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
+            const p = projects.find(x => x.id === projectId);
+
+            if (projectSessions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">event_busy</span>尚無場次，點擊上方按鈕新增</div>';
+                return;
+            }
+
+            container.innerHTML = projectSessions.map(s => {
+                const phase = s.current_phase || 'pre-class';
+                const isOnline = s.session_format === 'online';
+                const fmtTag = isOnline
+                    ? '<span class="fmt-tag fmt-online">直播</span>'
+                    : '<span class="fmt-tag fmt-offline">實體</span>';
+                const loc = isOnline
+                    ? (s.stream_url ? `<a href="${s.stream_url}" target="_blank" class="stream-link">直播連結</a>` : '—')
+                    : (s.venue || '—');
+                const studentCount = students.filter(st => st.session_id === s.id).length;
+
+                return `
+                <div class="session-card">
+                    <div class="sc-header">
+                        <span class="session-dot ${phase}"></span>
+                        ${fmtTag}
+                        <span class="sc-date">${s.date || '未設定'} ${s.time || ''}</span>
+                        <span class="card-phase ${phase}" style="margin-left:auto;"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
+                    </div>
+                    <div class="sc-body">
+                        <span class="sc-loc"><span class="material-symbols-outlined" style="font-size:14px;">location_on</span> ${loc}</span>
+                        <span class="sc-meta"><span class="material-symbols-outlined" style="font-size:14px;">group</span> ${studentCount} 學員</span>
+                        <span class="sc-meta"><span class="material-symbols-outlined" style="font-size:14px;">tag</span> ${s.session_code || ''}</span>
+                    </div>
+                    <div class="sc-actions">
+                        <a class="btn btn-sm" href="preclass-dashboard.html?code=${p?.join_code}&session=${s.session_code}" title="課前統計">
+                            <span class="material-symbols-outlined">bar_chart</span> 統計
+                        </a>
+                        <a class="btn btn-sm" href="admin-preclass.html?code=${p?.join_code}&session=${s.session_code}" title="管理">
+                            <span class="material-symbols-outlined">settings</span> 管理
+                        </a>
+                        <button class="btn btn-sm" title="複製問卷連結" onclick="navigator.clipboard.writeText(location.origin+'/survey.html?session=${s.session_code}').then(()=>showToast('問卷連結已複製'))">
+                            <span class="material-symbols-outlined">assignment_turned_in</span> 問卷
+                        </button>
+                        <button class="btn btn-sm" onclick="editSession('${s.id}')">
+                            <span class="material-symbols-outlined">edit</span> 編輯
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         // ── Sessions ──
@@ -817,43 +896,6 @@
             }
         }
 
-        function renderSessionTable(filter = '') {
-            const tbody = document.getElementById('sessionTableBody');
-            let filtered = sessions;
-            if (filter) {
-                const q = filter.toLowerCase();
-                filtered = sessions.filter(s =>
-                    (s.session_code || '').toLowerCase().includes(q) ||
-                    (s.venue || '').toLowerCase().includes(q)
-                );
-            }
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="td-empty">${filter ? '沒有符合的結果' : '尚無場次'}</td></tr>`;
-                return;
-            }
-
-            const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
-
-            tbody.innerHTML = filtered.map(s => {
-                const proj = projects.find(p => p.id === s.project_id);
-                const phase = s.current_phase || 'pre-class';
-                return `<tr>
-                    <td>${proj?.name || '-'}</td>
-                    <td><span class="session-code">${s.session_code || '-'}</span></td>
-                    <td>${s.date || '-'}</td>
-                    <td>${s.time || '-'}</td>
-                    <td>${s.venue || '-'}</td>
-                    <td><span class="status-badge ${phase === 'in-class' ? 'paid' : ''}">${phaseLabel[phase]}</span></td>
-                    <td>${s.max_capacity || '-'}</td>
-                    <td>
-                        <button class="btn btn-sm" onclick="editSession('${s.id}')">
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
 
         // ── Students ──
         async function loadStudents() {
@@ -900,12 +942,12 @@
             }
         }
 
-        function populateStudentSessionFilter() {
+        function populateStudentSessionFilter(projectId) {
             const sel = document.getElementById('studentSessionFilter');
             sel.innerHTML = '<option value="">所有場次</option>';
-            sessions.forEach(s => {
-                const proj = projects.find(p => p.id === s.project_id);
-                const label = `${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})`;
+            const scopedSessions = projectId ? sessions.filter(s => s.project_id === projectId) : sessions;
+            scopedSessions.forEach(s => {
+                const label = `${s.date || '未定'} ${s.venue || ''}`;
                 sel.innerHTML += `<option value="${s.id}">${label}</option>`;
             });
         }
@@ -922,13 +964,16 @@
             return student.session_code || '-';
         }
 
-        function renderStudentTable() {
+        function renderStudentTable(projectId) {
+            const pid = projectId || currentProjectId;
             const tbody = document.getElementById('studentTableBody');
             const searchVal = document.getElementById('studentSearch').value.toLowerCase();
             const sessionFilter = document.getElementById('studentSessionFilter').value;
             const statusFilter = document.getElementById('studentStatusFilter').value;
 
-            let filtered = students;
+            // Scope to project's sessions
+            const projectSessionIds = pid ? sessions.filter(s => s.project_id === pid).map(s => s.id) : null;
+            let filtered = pid ? students.filter(st => projectSessionIds.includes(st.session_id)) : students;
 
             if (searchVal) {
                 filtered = filtered.filter(s =>
@@ -1072,13 +1117,12 @@
 
         document.getElementById('projectSearch').addEventListener('input', e => renderProjects(e.target.value));
         document.getElementById('projectCategoryFilter').addEventListener('change', () => renderProjects(document.getElementById('projectSearch').value));
-        document.getElementById('sessionSearch').addEventListener('input', e => renderSessionTable(e.target.value));
-        document.getElementById('studentSearch').addEventListener('input', () => renderStudentTable());
-        document.getElementById('studentSessionFilter').addEventListener('change', () => renderStudentTable());
-        document.getElementById('studentStatusFilter').addEventListener('change', () => renderStudentTable());
+        document.getElementById('studentSearch').addEventListener('input', () => renderStudentTable(currentProjectId));
+        document.getElementById('studentSessionFilter').addEventListener('change', () => renderStudentTable(currentProjectId));
+        document.getElementById('studentStatusFilter').addEventListener('change', () => renderStudentTable(currentProjectId));
         document.getElementById('purchaseSearch').addEventListener('input', e => renderPurchaseTable(e.target.value));
-        document.getElementById('assignmentSearch').addEventListener('input', () => renderAssignments());
-        document.getElementById('assignmentSessionFilter').addEventListener('change', () => renderAssignments());
+        document.getElementById('assignmentSearch').addEventListener('input', () => renderAssignments(currentProjectId));
+        document.getElementById('assignmentSessionFilter').addEventListener('change', () => renderAssignments(currentProjectId));
 
         // Create Project
         document.getElementById('btnCreateProject').addEventListener('click', () => {
@@ -1139,9 +1183,9 @@
             document.getElementById('addStudentCompany').value = '';
             const sel = document.getElementById('addStudentSession');
             sel.innerHTML = '<option value="">不分配場次</option>';
-            sessions.forEach(s => {
-                const proj = projects.find(p => p.id === s.project_id);
-                sel.innerHTML += `<option value="${s.id}">${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})</option>`;
+            const scopeSessions = currentProjectId ? sessions.filter(s => s.project_id === currentProjectId) : sessions;
+            scopeSessions.forEach(s => {
+                sel.innerHTML += `<option value="${s.id}">${s.date || '未定'} ${s.venue || ''}</option>`;
             });
             document.getElementById('addStudentModal').classList.add('active');
         });
@@ -1200,22 +1244,25 @@
             }
         }
 
-        function populateAssignmentSessionFilter() {
+        function populateAssignmentSessionFilter(projectId) {
             const sel = document.getElementById('assignmentSessionFilter');
             sel.innerHTML = '<option value="">所有場次</option>';
-            sessions.forEach(s => {
-                const proj = projects.find(p => p.id === s.project_id);
-                const label = `${s.date || '未定'} ${s.venue || ''} (${proj?.name || ''})`;
+            const scopedSessions = projectId ? sessions.filter(s => s.project_id === projectId) : sessions;
+            scopedSessions.forEach(s => {
+                const label = `${s.date || '未定'} ${s.venue || ''}`;
                 sel.innerHTML += `<option value="${s.id}">${label}</option>`;
             });
         }
 
-        function renderAssignments() {
+        function renderAssignments(projectId) {
+            const pid = projectId || currentProjectId;
             const grid = document.getElementById('assignmentGrid');
             const searchVal = (document.getElementById('assignmentSearch').value || '').toLowerCase();
             const sessionFilter = document.getElementById('assignmentSessionFilter').value;
 
-            let filtered = assignments;
+            // Scope to project's sessions
+            const projectSessionIds = pid ? sessions.filter(s => s.project_id === pid).map(s => s.id) : null;
+            let filtered = pid ? assignments.filter(a => projectSessionIds.includes(a.session_id)) : assignments;
             if (searchVal) {
                 filtered = filtered.filter(a => (a.title || '').toLowerCase().includes(searchVal));
             }
@@ -1514,6 +1561,7 @@
                     const p = projects.find(x => x.id === id);
                     if (p) { Object.assign(p, { name, description, course_type, course_id, slide_mode, course_link }); }
                     renderProjects();
+                    if (currentProjectId) openProjectDetail(currentProjectId);
                     closeModal('editModal');
                     showToast('已儲存');
                 } catch (e) { showToast('儲存失敗'); }
@@ -1587,6 +1635,7 @@
                     }
                     await loadSessions();
                     renderProjects();
+                    if (currentProjectId) openProjectDetail(currentProjectId);
                     updateStats();
                     closeModal('sessionModal');
                 } catch (e) {
@@ -1620,15 +1669,13 @@
                     await db.delete('project_sessions', { id: `eq.${id}` });
                     await loadSessions();
                     renderProjects();
+                    if (currentProjectId) openProjectDetail(currentProjectId);
                     updateStats();
                     closeModal('sessionModal');
                     showToast('場次已刪除');
                 } catch (err) { showToast('刪除失敗'); }
             });
 
-            document.getElementById('btnAddSession').addEventListener('click', () => {
-                window.openAddSession(projects[0]?.id || '');
-            });
 
             // Assignment save
             document.getElementById('assignmentSave').addEventListener('click', async () => {
