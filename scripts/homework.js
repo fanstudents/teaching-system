@@ -293,20 +293,24 @@ export class HomeworkSubmission {
                 // 顯示提交中狀態
                 const submitBtn = overlay.querySelector('#homeworkSubmitBtn');
                 submitBtn.disabled = true;
-                submitBtn.textContent = '提交中...';
+                submitBtn.textContent = '上傳中…';
 
-                const submission = await this.submit(assignmentTitle, currentType, content, currentUser, assignmentId);
+                try {
+                    const submission = await this.submit(assignmentTitle, currentType, content, currentUser, assignmentId);
 
-                // ── 顯示提交後預覽 ──
-                this._showPostSubmitPreview(overlay, submission, uploadedData, promptText, () => {
-                    // 修改回調：重新開啟提交畫面
-                    overlay.remove();
-                    this.showSubmitDialog(assignmentOrTitle, submissionMode).then(resolve).catch(reject);
-                }, () => {
-                    // 完成回調
-                    overlay.remove();
-                    resolve(submission);
-                });
+                    // ── 顯示提交後預覽 ──
+                    this._showPostSubmitPreview(overlay, submission, uploadedData, promptText, () => {
+                        overlay.remove();
+                        this.showSubmitDialog(assignmentOrTitle, submissionMode).then(resolve).catch(reject);
+                    }, () => {
+                        overlay.remove();
+                        resolve(submission);
+                    });
+                } catch (err) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '提交作業';
+                    showToast('提交失敗，請重試', { type: 'error' });
+                }
             });
         });
     }
@@ -477,7 +481,28 @@ export class HomeworkSubmission {
         let fileUrl = null;
         let fileKey = null;
 
-        // 如果有檔案要上傳到 Supabase Storage
+        // ★ 統一處理：如果 content 包含 base64 data URL，先上傳到 Storage
+        const uploadBase64ToStorage = async (base64Str) => {
+            if (!base64Str || !base64Str.startsWith('data:')) return null;
+            const blob = await fetch(base64Str).then(r => r.blob());
+            const key = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+                    const { data, error } = await storage.upload('homework', key, blob);
+                    if (!error && data) {
+                        return data.url || storage.getPublicUrl('homework', key);
+                    }
+                    throw new Error(error?.message || 'Upload failed');
+                } catch (e) {
+                    console.warn(`[HW] Storage attempt ${attempt + 1} failed:`, e);
+                    if (attempt === 2) throw e;
+                }
+            }
+            return null;
+        };
+
+        // 如果有 _pendingFile，優先用原檔上傳
         if (this._pendingFile && (type === 'image' || type === 'video' || type === 'audio')) {
             try {
                 const ext = this._pendingFile.name.split('.').pop();
@@ -485,12 +510,35 @@ export class HomeworkSubmission {
                 const { data, error } = await storage.upload('homework', key, this._pendingFile);
                 if (!error && data) {
                     fileKey = data.key || key;
-                    fileUrl = storage.getPublicUrl('homework', fileKey);
+                    fileUrl = data.url || storage.getPublicUrl('homework', fileKey);
                 }
             } catch (e) {
-                console.warn('Storage upload failed, using DataURL fallback:', e);
+                console.warn('Storage upload failed:', e);
             }
             this._pendingFile = null;
+        }
+
+        // ★ 如果 content 裡有 base64 data URL，上傳到 Storage 並替換
+        if (type === 'image' && content) {
+            if (typeof content === 'object' && content.image && content.image.startsWith?.('data:')) {
+                const url = await uploadBase64ToStorage(content.image);
+                if (url) {
+                    content = { image: url, prompt: content.prompt };
+                    fileUrl = fileUrl || url;
+                }
+            } else if (typeof content === 'object' && content.data && content.data.startsWith?.('data:')) {
+                const url = await uploadBase64ToStorage(content.data);
+                if (url) {
+                    content = url;
+                    fileUrl = fileUrl || url;
+                }
+            } else if (typeof content === 'string' && content.startsWith('data:')) {
+                const url = await uploadBase64ToStorage(content);
+                if (url) {
+                    content = url;
+                    fileUrl = fileUrl || url;
+                }
+            }
         }
 
         const submission = {
@@ -508,34 +556,39 @@ export class HomeworkSubmission {
         this.submissions.push(submission);
         this.saveSubmissions();
 
-        // 寫入 Supabase DB（每次提交建立新記錄，保留版本歷史）
-        try {
-            const joinCode = new URLSearchParams(location.search).get('code')
-                || new URLSearchParams(location.search).get('session')
-                || '';
-            const versionTs = Date.now();
-            const row = {
-                student_name: user.name,
-                student_email: user.email || '',
-                assignment_title: assignmentTitle,
-                type,
-                content: submission.content,
-                file_url: fileUrl || '',
-                file_key: fileKey || '',
-                submitted_at: submission.submittedAt,
-                session_id: joinCode || null,
-                // 用 assignmentId__v{timestamp} 讓每次提交都是唯一記錄
-                element_id: assignmentId ? `${assignmentId}__v${versionTs}` : `hw__v${versionTs}`,
-                state: { version: versionTs, base_element_id: assignmentId || '' }
-            };
-            const result = await db.insert('submissions', row);
-            if (result.error) {
-                console.warn('[Homework] DB insert error:', result.error);
-            } else {
+        // ★ 寫入 Supabase DB（含重試）
+        const joinCode = new URLSearchParams(location.search).get('code')
+            || new URLSearchParams(location.search).get('session')
+            || '';
+        const versionTs = Date.now();
+        const row = {
+            student_name: user.name,
+            student_email: user.email || '',
+            assignment_title: assignmentTitle,
+            type,
+            content: submission.content,
+            file_url: fileUrl || '',
+            file_key: fileKey || '',
+            submitted_at: submission.submittedAt,
+            session_id: joinCode || null,
+            element_id: assignmentId ? `${assignmentId}__v${versionTs}` : `hw__v${versionTs}`,
+            state: { version: versionTs, base_element_id: assignmentId || '' }
+        };
+
+        let saved = false;
+        for (let attempt = 0; attempt < 3 && !saved; attempt++) {
+            try {
+                if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+                const result = await db.insert('submissions', row);
+                if (result.error) throw new Error(result.error.message || 'DB insert error');
                 console.log('[Homework] ✅ saved to DB');
+                saved = true;
+            } catch (e) {
+                console.warn(`[Homework] DB attempt ${attempt + 1} failed:`, e);
+                if (attempt === 2) {
+                    showToast('作業儲存失敗，請重試', { type: 'error' });
+                }
             }
-        } catch (e) {
-            console.warn('[Homework] DB insert failed:', e);
         }
 
         return submission;

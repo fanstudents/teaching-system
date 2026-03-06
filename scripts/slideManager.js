@@ -1483,7 +1483,7 @@ export class SlideManager {
                     // 提交
                     const submitBtn = el.querySelector('.hw-submit-btn');
                     if (submitBtn) {
-                        submitBtn.addEventListener('click', (e) => {
+                        submitBtn.addEventListener('click', async (e) => {
                             e.stopPropagation();
                             if (!window.app?.homework) return;
                             const hw = window.app.homework;
@@ -1523,10 +1523,61 @@ export class SlideManager {
                                     type = 'link';
                                 }
                             }
-                            hw.submit(element.title || '課堂作業', type, content, currentUser, element.id);
+
+                            // ★ Loading 狀態 — 防止重複提交
+                            submitBtn.disabled = true;
+                            const origText = submitBtn.innerHTML;
+                            submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;animation:spin 1s linear infinite;">progress_activity</span> 上傳中…';
+
+                            try {
+                                // ★ 圖片先上傳到 Storage，DB 只存 URL
+                                if (type === 'image' && content) {
+                                    const { storage } = await import('./supabase.js');
+                                    const base64Str = typeof content === 'object' ? content.image : content;
+                                    if (base64Str && base64Str.startsWith('data:')) {
+                                        const blob = await fetch(base64Str).then(r => r.blob());
+                                        const key = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+                                        let uploaded = false;
+                                        for (let attempt = 0; attempt < 3 && !uploaded; attempt++) {
+                                            try {
+                                                if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+                                                const { data, error } = await storage.upload('homework', key, blob);
+                                                if (!error && data) {
+                                                    const publicUrl = data.url || storage.getPublicUrl('homework', key);
+                                                    if (typeof content === 'object') {
+                                                        content = { image: publicUrl, prompt: content.prompt };
+                                                    } else {
+                                                        content = publicUrl;
+                                                    }
+                                                    uploaded = true;
+                                                } else {
+                                                    throw new Error(error?.message || 'Upload failed');
+                                                }
+                                            } catch (uploadErr) {
+                                                console.warn(`[HW] Storage upload attempt ${attempt + 1} failed:`, uploadErr);
+                                                if (attempt === 2) {
+                                                    showHwError('圖片上傳失敗，請重試');
+                                                    submitBtn.disabled = false;
+                                                    submitBtn.innerHTML = origText;
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                await hw.submit(element.title || '課堂作業', type, content, currentUser, element.id);
+                            } catch (submitErr) {
+                                console.error('[HW] submit failed:', submitErr);
+                                showHwError('提交失敗，請重試');
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = origText;
+                                return;
+                            }
+
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = origText;
                             el.querySelector('.hw-inline-form').style.display = 'none';
-
-
 
                             // 構建預覽內容
                             const badge = el.querySelector('.hw-submitted-badge');
@@ -1536,9 +1587,11 @@ export class SlideManager {
                             if (type === 'image') {
                                 let imgSrc = '';
                                 let promptVal = '';
-                                if (uploadedData && uploadedData.data) imgSrc = uploadedData.data;
+                                if (typeof content === 'string' && content.startsWith('http')) imgSrc = content;
+                                else if (uploadedData && uploadedData.data) imgSrc = uploadedData.data;
+                                else if (typeof uploadedData === 'string') imgSrc = uploadedData;
                                 if (typeof content === 'object' && content.image) {
-                                    imgSrc = imgSrc || content.image.data || content.image;
+                                    imgSrc = imgSrc || content.image;
                                     promptVal = content.prompt || '';
                                 }
                                 if (imgSrc) previewHtml += `<img src="${imgSrc}" style="max-width:100%;max-height:120px;object-fit:contain;border-radius:6px;display:block;margin:0 auto;">`;
