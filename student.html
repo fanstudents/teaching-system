@@ -966,7 +966,7 @@
                 return;
             }
             const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-            const audUrl = `${base}audience.html?code=${sessionCode}`;
+            const audUrl = `${base}student.html?code=${sessionCode}`;
             const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(audUrl)}&bgcolor=ffffff&color=4f46e5`;
             if (!qrEl) {
                 qrEl = document.createElement('div');
