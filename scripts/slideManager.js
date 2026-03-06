@@ -1533,10 +1533,13 @@ export class SlideManager {
                                 // ★ 圖片先上傳到 Storage，DB 只存 URL
                                 if (type === 'image' && content) {
                                     const { storage } = await import('./supabase.js');
+                                    const sessionCode = new URLSearchParams(location.search).get('code')
+                                        || new URLSearchParams(location.search).get('session') || 'default';
+                                    const folderPrefix = `${sessionCode}/${element.id || 'general'}`;
                                     const base64Str = typeof content === 'object' ? content.image : content;
                                     if (base64Str && base64Str.startsWith('data:')) {
                                         const blob = await fetch(base64Str).then(r => r.blob());
-                                        const key = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+                                        const key = `${folderPrefix}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
                                         let uploaded = false;
                                         for (let attempt = 0; attempt < 3 && !uploaded; attempt++) {
                                             try {

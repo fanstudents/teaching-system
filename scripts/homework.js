@@ -503,11 +503,16 @@ export class HomeworkSubmission {
         let fileUrl = null;
         let fileKey = null;
 
+        // ★ Storage 路徑：{session}/{assignmentId}/{timestamp}.jpg
+        const sessionCode = new URLSearchParams(location.search).get('code')
+            || new URLSearchParams(location.search).get('session') || 'default';
+        const folderPrefix = `${sessionCode}/${assignmentId || 'general'}`;
+
         // ★ 統一處理：如果 content 包含 base64 data URL，先上傳到 Storage
         const uploadBase64ToStorage = async (base64Str) => {
             if (!base64Str || !base64Str.startsWith('data:')) return null;
             const blob = await fetch(base64Str).then(r => r.blob());
-            const key = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+            const key = `${folderPrefix}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
             for (let attempt = 0; attempt < 3; attempt++) {
                 try {
                     if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
@@ -528,7 +533,7 @@ export class HomeworkSubmission {
         if (this._pendingFile && (type === 'image' || type === 'video' || type === 'audio')) {
             try {
                 const ext = this._pendingFile.name.split('.').pop();
-                const key = `${Date.now()}_${Math.random().toString(36).substr(2, 6)}.${ext}`;
+                const key = `${folderPrefix}/${Date.now()}_${Math.random().toString(36).substr(2, 6)}.${ext}`;
                 const { data, error } = await storage.upload('homework', key, this._pendingFile);
                 if (!error && data) {
                     fileKey = data.key || key;
