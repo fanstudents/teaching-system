@@ -178,7 +178,13 @@
             align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(99,102,241,0.3);
         "><span class="material-symbols-outlined" style="font-size:20px;">leaderboard</span></button>
         <div class="pres-leaderboard" id="studentLeaderboard">
-            <div class="lb-header"><span class="lb-title">🏆 排行榜</span></div>
+            <div class="lb-header">
+                <span class="lb-title">🏆 排行榜</span>
+                <button id="studentLbClose" style="
+                    background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.5);
+                    padding:4px;display:flex;align-items:center;margin-left:auto;
+                "><span class="material-symbols-outlined" style="font-size:20px;">close</span></button>
+            </div>
             <div class="lb-list" id="studentLbList">
                 <div class="lb-empty">尚無學員互動</div>
             </div>
@@ -2026,6 +2032,11 @@
             document.getElementById('mspLBBtn')?.addEventListener('click', () => {
                 const lbPanel = document.getElementById('studentLeaderboard');
                 if (lbPanel) lbPanel.classList.toggle('open');
+            });
+
+            // 排行榜關閉按鈕
+            document.getElementById('studentLbClose')?.addEventListener('click', () => {
+                document.getElementById('studentLeaderboard')?.classList.remove('open');
             });
         })();
 
