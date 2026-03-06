@@ -3016,6 +3016,17 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this.poll.handleVoteEvent(p);
             });
 
+            // ★ 監聽作業提交事件 — 更新計數器
+            realtime.on('hw_submitted', (msg) => {
+                const p = msg.payload || msg;
+                console.log('[Broadcast] hw_submitted:', p);
+                // 更新所有匹配的計數器
+                document.querySelectorAll(`.hw-counter-badge[data-element-id="${p.elementId}"]`).forEach(badge => {
+                    const num = badge.querySelector('.hw-counter-num');
+                    if (num) num.textContent = p.totalSubmitted || (parseInt(num.textContent) + 1);
+                });
+            });
+
             // 發送初始投影片資料
             this.slideManager.saveCurrentSlide();
             this.broadcastSlideData(0);

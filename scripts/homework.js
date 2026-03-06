@@ -2,7 +2,7 @@
  * 作業提交模組
  * 支援文字、圖片、影片、音檔、連結等多種格式
  */
-import { db, storage } from './supabase.js';
+import { db, storage, realtime } from './supabase.js';
 import { showToast } from './ui.js';
 
 
@@ -615,6 +615,34 @@ export class HomeworkSubmission {
                 if (attempt === 2) {
                     showToast('作業儲存失敗，請重試', { type: 'error' });
                 }
+            }
+        }
+
+        // ★ Realtime 廣播提交事件（讓講師端 + 其他學員更新計數器）
+        if (saved && sessionCode) {
+            try {
+                // 查詢當前這個作業的提交總數（用 base_element_id 查）
+                const baseId = assignmentId || '';
+                const countResult = await db.select('submissions', {
+                    filter: {
+                        session_id: `eq.${sessionCode}`,
+                        'state->>base_element_id': `eq.${baseId}`
+                    },
+                    columns: 'id'
+                });
+                const order = countResult.data?.length || 1;
+
+                realtime.publish(`session:${sessionCode}`, 'hw_submitted', {
+                    elementId: assignmentId,
+                    studentName: user.name,
+                    submittedAt: submission.submittedAt,
+                    order,
+                    totalSubmitted: order
+                });
+
+                submission.order = order;
+            } catch (e) {
+                console.warn('[Homework] broadcast failed:', e);
             }
         }
 

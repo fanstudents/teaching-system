@@ -131,7 +131,7 @@ export class Showcase {
             }
 
             // 比較資料是否有變化，沒變就不重新渲染（避免重設捲動位置）
-            const dataHash = JSON.stringify(data.map(s => s.id + (s.submitted_at || '')));
+            const dataHash = JSON.stringify(data.map(s => s.id + (s.submitted_at || '') + (s.instructor_score || '')));
             if (this._lastDataHash && this._lastDataHash[cid] === dataHash) {
                 return; // 資料沒變，跳過
             }
@@ -168,6 +168,7 @@ export class Showcase {
 
     render(container, submissions, assignmentTitle) {
         const count = submissions.length;
+        const isPresenter = this._isPresenter && this._broadcasting;
 
         const statusHtml = submissions.map(s => `
             <div class="showcase-status-chip" title="${s.student_name}">
@@ -178,6 +179,24 @@ export class Showcase {
 
         const cardsHtml = submissions.map((s, i) => {
             const preview = this.getPreview(s);
+            const existingScore = s.instructor_score;
+            const scoreHtml = isPresenter ? `
+                <div class="showcase-score-bar" data-sub-id="${s.id}" style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-top:1px solid #f1f5f9;background:#fafbfc;">
+                    <span class="material-symbols-outlined" style="font-size:14px;color:#f59e0b;">star</span>
+                    <span style="font-size:11px;color:#64748b;">評分</span>
+                    <div style="display:flex;gap:2px;flex:1;">
+                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `
+                            <button class="showcase-score-btn${existingScore === n ? ' active' : ''}" data-score="${n}" 
+                                style="width:22px;height:22px;border-radius:4px;border:1px solid ${existingScore === n ? '#6366f1' : '#e2e8f0'};background:${existingScore === n ? '#6366f1' : '#fff'};color:${existingScore === n ? '#fff' : '#64748b'};font-size:10px;cursor:pointer;padding:0;font-weight:600;transition:all 0.15s;">
+                                ${n}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <span class="showcase-score-saved" style="font-size:10px;color:#16a34a;display:none;">✓</span>
+                </div>` : (s.instructor_score ? `
+                <div style="padding:4px 10px;border-top:1px solid #f1f5f9;background:#fafbfc;font-size:11px;color:#f59e0b;display:flex;align-items:center;gap:4px;">
+                    <span class="material-symbols-outlined" style="font-size:13px;">star</span> ${s.instructor_score} 分
+                </div>` : '');
             return `
                 <div class="showcase-work-card" data-index="${i}">
                     <div class="showcase-work-header">
@@ -186,8 +205,10 @@ export class Showcase {
                             <div class="showcase-work-name">${s.student_name || '匿名'}</div>
                             <div style="font-size:10px;color:#94a3b8;">${this.formatTime(s.submitted_at || s.created_at)}</div>
                         </div>
+                        <div style="font-size:10px;color:#94a3b8;">#${i + 1}</div>
                     </div>
                     <div class="showcase-work-body">${preview}</div>
+                    ${scoreHtml}
                 </div>`;
         }).join('');
 
@@ -210,16 +231,65 @@ export class Showcase {
         `;
 
         container.querySelectorAll('.showcase-work-card').forEach(card => {
-            card.addEventListener('click', () => {
+            // 點擊作品區域 → 聚焦放大（不含評分列）
+            const bodyArea = card.querySelector('.showcase-work-body');
+            const headerArea = card.querySelector('.showcase-work-header');
+            const openFn = () => {
                 const idx = parseInt(card.dataset.index);
                 this.openFocus(submissions, idx, container);
-                // 講師端：廣播聚焦
-                if (this._isPresenter && this._broadcasting) {
+                if (isPresenter) {
                     realtime.publish(`session:${this.sessionCode}`, 'showcase_focus', {
                         title: assignmentTitle, index: idx
                     });
                 }
-            });
+            };
+            bodyArea?.addEventListener('click', openFn);
+            headerArea?.addEventListener('click', openFn);
+
+            // ★ 講師評分按鈕
+            if (isPresenter) {
+                card.querySelectorAll('.showcase-score-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const score = parseInt(btn.dataset.score);
+                        const subId = card.querySelector('.showcase-score-bar')?.dataset.subId;
+                        if (!subId) return;
+
+                        // UI 回饋
+                        card.querySelectorAll('.showcase-score-btn').forEach(b => {
+                            b.style.background = '#fff';
+                            b.style.color = '#64748b';
+                            b.style.borderColor = '#e2e8f0';
+                        });
+                        btn.style.background = '#6366f1';
+                        btn.style.color = '#fff';
+                        btn.style.borderColor = '#6366f1';
+
+                        try {
+                            await db.update('submissions', { instructor_score: score }, {
+                                filter: { id: `eq.${subId}` }
+                            });
+                            const saved = card.querySelector('.showcase-score-saved');
+                            if (saved) {
+                                saved.style.display = 'inline';
+                                setTimeout(() => saved.style.display = 'none', 2000);
+                            }
+
+                            // ★ 廣播評分（排行榜整合）
+                            const sub = submissions[parseInt(card.dataset.index)];
+                            if (sub && this.sessionCode) {
+                                realtime.publish(`session:${this.sessionCode}`, 'hw_scored', {
+                                    studentName: sub.student_name,
+                                    score,
+                                    assignmentTitle
+                                });
+                            }
+                        } catch (err) {
+                            console.warn('[Showcase] score save failed:', err);
+                        }
+                    });
+                });
+            }
         });
 
         // 講師端：廣播捲動位置

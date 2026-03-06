@@ -1286,7 +1286,13 @@ export class SlideManager {
                                         <div class="hw-card-mode"><span class="material-symbols-outlined" style="font-size:13px;">${modeIconName}</span> ${modeName}</div>
                                     </div>
                                 </div>
-                                ${userBadgeHtml}
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="hw-counter-badge" data-element-id="${element.id}" style="display:flex;align-items:center;gap:4px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:4px 10px;font-size:12px;color:#16a34a;font-weight:600;">
+                                        <span class="material-symbols-outlined" style="font-size:14px;">group</span>
+                                        <span class="hw-counter-num">0</span> 人已繳交
+                                    </div>
+                                    ${userBadgeHtml}
+                                </div>
                             </div>
                             ${element.description ? `<div class="hw-card-desc">${element.description}</div>` : ''}
                             ${exampleHtml}
@@ -1304,6 +1310,31 @@ export class SlideManager {
                             </div>
                         </div>
                     `;
+
+                    // ★ 即時計數器 — 監聽 hw_submitted 事件
+                    const counterBadge = el.querySelector('.hw-counter-badge');
+                    const counterNum = el.querySelector('.hw-counter-num');
+                    if (counterBadge && window.app?.realtime) {
+                        // 初始載入已提交數量
+                        (async () => {
+                            try {
+                                const { db } = await import('./supabase.js');
+                                const sessionCode = new URLSearchParams(location.search).get('code')
+                                    || new URLSearchParams(location.search).get('session') || '';
+                                if (sessionCode) {
+                                    const result = await db.select('submissions', {
+                                        filter: {
+                                            session_id: `eq.${sessionCode}`,
+                                            'state->>base_element_id': `eq.${element.id}`
+                                        },
+                                        columns: 'id'
+                                    });
+                                    const count = result.data?.length || 0;
+                                    counterNum.textContent = count;
+                                }
+                            } catch (e) { /* ignore */ }
+                        })();
+                    }
 
                     // helper: inline error msg (取代 alert)
                     const showHwError = (msg) => {
