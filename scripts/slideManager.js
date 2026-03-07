@@ -1022,8 +1022,8 @@ export class SlideManager {
                 el.classList.add('leaderboard-element');
                 el.style.overflow = 'hidden';
                 const title = element.lbTitle || '🏆 排行榜';
-                // 在編輯模式用假資料，播放/廣播時載入真實資料
-                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                // 判斷是否在廣播模式（不用 closest，因為此時元素尚未插入 DOM）
+                const hasSession = !!window.app?.sessionCode;
                 const placeholder = [
                     { name: '冠軍同學', totalPoints: 850 },
                     { name: '亞軍同學', totalPoints: 720 },
@@ -1031,9 +1031,9 @@ export class SlideManager {
                     { name: '同學 D', totalPoints: 550 },
                     { name: '同學 E', totalPoints: 420 },
                 ];
-                this._renderLeaderboardContent(el, title, placeholder);
+                this._renderLeaderboardContent(el, title, hasSession ? [] : placeholder);
 
-                if (isLive && window.app?.sessionCode) {
+                if (hasSession) {
                     const sessionCode = window.app.sessionCode;
                     const projectId = this.currentProjectId || null;
                     const self = this;
