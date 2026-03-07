@@ -1032,12 +1032,32 @@ export class SlideManager {
                     { name: '同學 E', totalPoints: 420 },
                 ];
                 this._renderLeaderboardContent(el, title, placeholder);
+
                 if (isLive && window.app?.sessionCode) {
-                    import('./interactive/stateManager.js').then(({ stateManager }) => {
-                        stateManager.getLeaderboard(window.app.sessionCode).then(data => {
-                            if (data.length > 0) this._renderLeaderboardContent(el, title, data);
+                    const sessionCode = window.app.sessionCode;
+                    const projectId = this.currentProjectId || null;
+                    const self = this;
+
+                    // 立即載入 + 5 秒輪詢
+                    const fetchAndRender = () => {
+                        import('./interactive/stateManager.js').then(({ stateManager }) => {
+                            stateManager.getLeaderboard(sessionCode, projectId).then(data => {
+                                if (data.length > 0) self._renderLeaderboardContent(el, title, data);
+                            });
                         });
+                    };
+
+                    fetchAndRender();
+                    const lbTimer = setInterval(fetchAndRender, 5000);
+
+                    // 清理：當元素被移除時停止輪詢
+                    const observer = new MutationObserver(() => {
+                        if (!document.contains(el)) {
+                            clearInterval(lbTimer);
+                            observer.disconnect();
+                        }
                     });
+                    observer.observe(document.body, { childList: true, subtree: true });
                 }
                 break;
             }

@@ -283,7 +283,7 @@ class InteractionState {
             // 自動查找 projectId（如果未提供）
             if (!projectId) {
                 try {
-                    const sessRaw = await db.select('sessions', {
+                    const sessRaw = await db.select('project_sessions', {
                         filter: { session_code: `eq.${sessionId}` },
                         select: 'project_id',
                         limit: 1,
