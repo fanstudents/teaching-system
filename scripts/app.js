@@ -3398,21 +3398,29 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 clone = slide.cloneNode(true);
                 clone.className = 'mag-clone';
                 clone.removeAttribute('id');
+                // Use slide's natural dimensions (before CSS scale), not the scaled rect
+                const slideW = slide.offsetWidth;
+                const slideH = slide.offsetHeight;
                 clone.style.cssText = `
                     position:absolute;pointer-events:none;
-                    width:${rect.width}px;height:${rect.height}px;
+                    width:${slideW}px;height:${slideH}px;
                     transform-origin:0 0;
+                    background:${slide.style.background || '#fff'};
                 `;
-                // copy background
-                clone.style.background = slide.style.background || '#fff';
                 mag.appendChild(clone);
                 this._magStale = false;
             }
 
+            // The slide is visually scaled by CSS transform
+            const slideScale = rect.width / slide.offsetWidth;
+            // Map cursor position back to unscaled coordinates
+            const unscaledX = relX / slideScale;
+            const unscaledY = relY / slideScale;
+
             // Scale and offset the clone so cursor point is at lens center
-            const scale = ZOOM;
-            const offsetX = MAG_SIZE / 2 - relX * scale;
-            const offsetY = MAG_SIZE / 2 - relY * scale;
+            const scale = ZOOM * slideScale;
+            const offsetX = MAG_SIZE / 2 - unscaledX * scale;
+            const offsetY = MAG_SIZE / 2 - unscaledY * scale;
             clone.style.transform = `scale(${scale})`;
             clone.style.left = `${offsetX}px`;
             clone.style.top = `${offsetY}px`;

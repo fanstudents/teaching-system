@@ -936,7 +936,24 @@ export class SlideManager {
 
             case 'image': {
                 const clipStyle = element.clipPath ? `clip-path:${element.clipPath};` : '';
-                el.innerHTML = `<img src="${element.src}" draggable="false" alt="" style="${clipStyle}width:100%;height:100%;object-fit:cover;">`;
+                const src = element.src || '';
+                // SVG data URI → inline 渲染（動畫重播 + 連結可點擊）
+                if (src.startsWith('data:image/svg+xml;base64,')) {
+                    try {
+                        const svgStr = decodeURIComponent(escape(atob(src.split(',')[1])));
+                        el.innerHTML = `<div style="${clipStyle}width:100%;height:100%;overflow:hidden;">${svgStr}</div>`;
+                        const svgEl = el.querySelector('svg');
+                        if (svgEl) {
+                            svgEl.setAttribute('width', '100%');
+                            svgEl.setAttribute('height', '100%');
+                            svgEl.style.display = 'block';
+                        }
+                    } catch (_) {
+                        el.innerHTML = `<img src="${src}" draggable="false" alt="" style="${clipStyle}width:100%;height:100%;object-fit:cover;">`;
+                    }
+                } else {
+                    el.innerHTML = `<img src="${src}" draggable="false" alt="" style="${clipStyle}width:100%;height:100%;object-fit:cover;">`;
+                }
                 break;
             }
 

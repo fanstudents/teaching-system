@@ -1120,9 +1120,22 @@
                     if (element.border) el.style.border = element.border;
                     break;
 
-                case 'image':
-                    el.innerHTML = `<img src="${element.src}" alt="" style="width:100%;height:100%;object-fit:${element.objectFit || 'contain'}" draggable="false">`;
+                case 'image': {
+                    const src = element.src || '';
+                    if (src.startsWith('data:image/svg+xml;base64,')) {
+                        try {
+                            const svgStr = decodeURIComponent(escape(atob(src.split(',')[1])));
+                            el.innerHTML = `<div style="width:100%;height:100%;overflow:hidden;">${svgStr}</div>`;
+                            const svgEl = el.querySelector('svg');
+                            if (svgEl) { svgEl.setAttribute('width', '100%'); svgEl.setAttribute('height', '100%'); svgEl.style.display = 'block'; }
+                        } catch (_) {
+                            el.innerHTML = `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:${element.objectFit || 'contain'}" draggable="false">`;
+                        }
+                    } else {
+                        el.innerHTML = `<img src="${src}" alt="" style="width:100%;height:100%;object-fit:${element.objectFit || 'contain'}" draggable="false">`;
+                    }
                     break;
+                }
 
                 case 'video':
                     if (element.embedUrl) {

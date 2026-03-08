@@ -463,6 +463,9 @@ export class DragDrop {
             let newTop = this.startTop;
 
             const handle = this.activeHandle;
+            const isCorner = ['nw', 'ne', 'sw', 'se'].includes(handle);
+            const isImage = this.activeElement.dataset.type === 'image';
+            const aspectRatio = this.startWidth / this.startHeight;
 
             // 根據 handle 位置計算新尺寸
             if (handle.includes('e')) {
@@ -478,6 +481,14 @@ export class DragDrop {
             if (handle.includes('n')) {
                 newHeight = Math.max(30, this.startHeight - dy);
                 newTop = this.startTop + (this.startHeight - newHeight);
+            }
+
+            // 圖片/素材 corner resize → 等比縮放
+            if (isImage && isCorner) {
+                newHeight = Math.round(newWidth / aspectRatio);
+                if (handle.includes('n')) {
+                    newTop = this.startTop + this.startHeight - newHeight;
+                }
             }
 
             this.activeElement.style.width = `${newWidth}px`;
