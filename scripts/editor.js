@@ -111,6 +111,38 @@ export class Editor {
     }
 
     /**
+     * 從素材庫插入 SVG 素材
+     */
+    addSvgAsset(svgContent, assetName) {
+        const encoded = btoa(unescape(encodeURIComponent(svgContent)));
+        const src = `data:image/svg+xml;base64,${encoded}`;
+
+        // Parse viewBox to get aspect ratio
+        const vbMatch = svgContent.match(/viewBox=["']([^"']+)["']/);
+        let width = 400, height = 300;
+        if (vbMatch) {
+            const parts = vbMatch[1].split(/\s+/).map(Number);
+            if (parts.length >= 4 && parts[2] > 0 && parts[3] > 0) {
+                const aspect = parts[2] / parts[3];
+                width = Math.min(500, Math.round(400 * aspect));
+                height = Math.round(width / aspect);
+            }
+        }
+
+        const element = {
+            type: 'image',
+            x: 60,
+            y: 40,
+            width,
+            height,
+            src,
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增形狀元素
      */
     addShape(shapeType) {

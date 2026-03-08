@@ -270,6 +270,105 @@ class App {
             this.editor.addLeaderboard();
         });
 
+        // ── 素材庫 ──
+        const assetOverlay = document.getElementById('assetLibOverlay');
+        if (assetOverlay) {
+            let _assetCache = null;
+            let _activeTag = '';
+
+            const openAssetLib = async () => {
+                assetOverlay.style.display = 'flex';
+                const grid = document.getElementById('assetLibGrid');
+                const tagsEl = document.getElementById('assetLibTags');
+
+                if (!_assetCache) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px;">載入中…</div>';
+                    try {
+                        const { data } = await window.db.select('assets', { order: 'created_at.desc' });
+                        _assetCache = data || [];
+                    } catch (e) {
+                        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef4444;padding:40px;">載入失敗</div>';
+                        return;
+                    }
+                }
+                renderAssetGrid();
+            };
+
+            const renderAssetGrid = () => {
+                const grid = document.getElementById('assetLibGrid');
+                const tagsEl = document.getElementById('assetLibTags');
+                const search = (document.getElementById('assetLibSearch')?.value || '').toLowerCase();
+
+                // Build tags
+                const tagSet = new Set();
+                (_assetCache || []).forEach(a => (a.tags || []).forEach(t => tagSet.add(t)));
+                tagsEl.innerHTML = '';
+                if (tagSet.size > 0) {
+                    const allChip = Object.assign(document.createElement('span'), {
+                        textContent: '全部',
+                        style: 'padding:3px 10px;border-radius:12px;font-size:0.72rem;cursor:pointer;' +
+                            (_activeTag === '' ? 'background:#eef2ff;color:#6366f1;border:1px solid #c7d2fe;' : 'background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')
+                    });
+                    allChip.onclick = () => { _activeTag = ''; renderAssetGrid(); };
+                    tagsEl.appendChild(allChip);
+                    [...tagSet].sort().forEach(tag => {
+                        const chip = Object.assign(document.createElement('span'), {
+                            textContent: tag,
+                            style: 'padding:3px 10px;border-radius:12px;font-size:0.72rem;cursor:pointer;' +
+                                (_activeTag === tag ? 'background:#eef2ff;color:#6366f1;border:1px solid #c7d2fe;' : 'background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')
+                        });
+                        chip.onclick = () => { _activeTag = tag; renderAssetGrid(); };
+                        tagsEl.appendChild(chip);
+                    });
+                }
+
+                // Filter
+                let items = (_assetCache || []).filter(a => {
+                    if (search && !a.name.toLowerCase().includes(search) && !(a.description || '').toLowerCase().includes(search)) return false;
+                    if (_activeTag && !(a.tags || []).includes(_activeTag)) return false;
+                    return true;
+                });
+
+                if (items.length === 0) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px;">沒有符合的素材</div>';
+                    return;
+                }
+
+                grid.innerHTML = items.map(a => `
+                    <div data-asset-id="${a.id}" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.15s;" 
+                         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';this.style.transform='translateY(-1px)'"
+                         onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+                        <div style="height:140px;background:#fafbfc;display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid #f1f5f9;padding:8px;">
+                            ${a.type === 'svg' || a.type === 'html' ? a.content.replace(/<script[\s\S]*?<\/script>/gi, '') : ''}
+                        </div>
+                        <div style="padding:10px 12px;">
+                            <div style="font-weight:600;font-size:0.82rem;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name}</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">${(a.tags || []).join(' · ')}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Bind click
+                grid.querySelectorAll('[data-asset-id]').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const id = card.dataset.assetId;
+                        const asset = (_assetCache || []).find(a => a.id === id);
+                        if (!asset) return;
+                        this.editor.addSvgAsset(asset.content, asset.name);
+                        assetOverlay.style.display = 'none';
+                    });
+                });
+            };
+
+            document.getElementById('openAssetLibBtn')?.addEventListener('click', openAssetLib);
+            document.getElementById('assetLibClose')?.addEventListener('click', () => { assetOverlay.style.display = 'none'; });
+            assetOverlay.addEventListener('click', (e) => { if (e.target === assetOverlay) assetOverlay.style.display = 'none'; });
+            document.getElementById('assetLibSearch')?.addEventListener('input', renderAssetGrid);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && assetOverlay.style.display === 'flex') assetOverlay.style.display = 'none';
+            });
+        }
+
         // 課後問卷設定（專案層級）
         document.getElementById('addSurveyBtn')?.addEventListener('click', () => {
             this.openSurveySettings();
