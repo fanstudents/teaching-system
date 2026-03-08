@@ -3129,39 +3129,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             }
         });
 
-        // ── 雷射筆 (Laser Pointer) ──
+        // ── 雷射筆（只在 presTopBar 上，由 startPresentation 綁定） ──
         this._laserActive = false;
         this._laserThrottleTimer = null;
-        document.getElementById('broadcastBarLaser')?.addEventListener('click', () => {
-            this._laserActive = !this._laserActive;
-            const btn = document.getElementById('broadcastBarLaser');
-            if (this._laserActive) {
-                btn.style.background = 'rgba(239,68,68,0.8)';
-                btn.style.color = '#fff';
-                this.showToast('🔴 雷射筆已開啟 — 學員可看到你的游標位置');
-                this._initLaserTracking();
-            } else {
-                btn.style.background = '';
-                btn.style.color = '';
-                this.showToast('雷射筆已關閉');
-                this._destroyLaserTracking();
-                // Send hide event
-                if (this.broadcasting && this.sessionCode) {
-                    realtime.publish(`session:${this.sessionCode}`, 'cursor_move', { visible: false });
-                }
-            }
-        });
 
-        // 廣播列：全螢幕 / 離開簡報
-        document.getElementById('broadcastBarFullscreen')?.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen?.();
-            } else {
-                document.exitFullscreen?.();
-            }
-        });
-        document.getElementById('broadcastBarExitPres')?.addEventListener('click', () => {
-            this.exitPresentation();
+        // 廣播列：重新進入簡報模式
+        document.getElementById('broadcastBarReenter')?.addEventListener('click', () => {
+            this.startPresentation();
         });
 
         // 排行榜 toggle

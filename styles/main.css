@@ -1405,11 +1405,6 @@ body {
     pointer-events: auto;
 }
 
-/* 簡報模式中隱藏綠色廣播列（presTopBar 已經整合了所有功能） */
-.presentation-mode.active~.broadcast-bar,
-body.broadcast-active .presentation-mode.active~.broadcast-bar {
-    display: none;
-}
 
 /* 排行榜開啟時，簡報往左偏移但保持原尺寸 */
 .presentation-mode.lb-active {
