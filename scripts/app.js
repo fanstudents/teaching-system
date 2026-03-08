@@ -3729,6 +3729,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (broadcastBar) broadcastBar.classList.remove('active');
             document.querySelector('.admin-main').style.marginTop = '';
 
+            // 強制 presTopBar 可見 + 可點擊（覆蓋 inline style）
+            const topBar = document.getElementById('presTopBar');
+            if (topBar) {
+                topBar.style.opacity = '1';
+                topBar.style.pointerEvents = 'auto';
+            }
+
             // 在 presTopBar 顯示廣播資訊
             if (presCode) { presCode.style.display = 'inline'; presCode.textContent = this.sessionCode; }
             if (presViewers) { presViewers.style.display = 'inline'; this.updateViewerCount(); }
