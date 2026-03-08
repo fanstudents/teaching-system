@@ -3660,36 +3660,44 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
             if (this._annotTool === 'text') {
                 const pos = getPos(e);
-                // Inline text input (avoid prompt() which breaks fullscreen)
                 const existing = document.getElementById('_annotTextInput');
                 if (existing) existing.remove();
-                const input = document.createElement('div');
+
+                const presMode = document.getElementById('presentationMode');
+                const pmRect = presMode.getBoundingClientRect();
+
+                const input = document.createElement('input');
                 input.id = '_annotTextInput';
-                input.contentEditable = 'true';
+                input.type = 'text';
+                input.placeholder = '輸入文字...';
                 Object.assign(input.style, {
-                    position: 'fixed',
-                    left: e.clientX + 'px',
-                    top: e.clientY + 'px',
-                    minWidth: '80px',
-                    padding: '4px 8px',
-                    background: 'rgba(0,0,0,0.7)',
+                    position: 'absolute',
+                    left: (e.clientX - pmRect.left) + 'px',
+                    top: (e.clientY - pmRect.top) + 'px',
+                    minWidth: '120px',
+                    padding: '6px 10px',
+                    background: 'rgba(0,0,0,0.85)',
                     color: this._annotColor,
                     border: `2px solid ${this._annotColor}`,
-                    borderRadius: '4px',
+                    borderRadius: '6px',
                     fontSize: '20px',
                     fontWeight: 'bold',
                     fontFamily: '"Noto Sans TC", sans-serif',
                     outline: 'none',
                     zIndex: '9999',
-                    whiteSpace: 'nowrap'
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
                 });
-                const container = document.getElementById('presentationMode') || document.body;
-                container.appendChild(input);
-                input.focus();
+
+                // Temporarily disable canvas so input can receive focus
+                canvas.style.pointerEvents = 'none';
+                presMode.appendChild(input);
+                setTimeout(() => input.focus(), 50);
 
                 const commitText = () => {
-                    const text = input.textContent.trim();
-                    input.remove();
+                    const text = input.value.trim();
+                    if (input.parentNode) input.remove();
+                    // Re-enable canvas
+                    canvas.style.pointerEvents = this._annotTool ? 'auto' : 'none';
                     if (text) {
                         this._annotStrokes.push({
                             type: 'text', text, x: pos.x, y: pos.y,
@@ -3700,9 +3708,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 };
                 input.addEventListener('keydown', (ev) => {
                     if (ev.key === 'Enter') { ev.preventDefault(); commitText(); }
-                    if (ev.key === 'Escape') { input.remove(); }
+                    if (ev.key === 'Escape') { input.remove(); canvas.style.pointerEvents = this._annotTool ? 'auto' : 'none'; }
                 });
-                input.addEventListener('blur', commitText);
+                input.addEventListener('blur', () => setTimeout(commitText, 100));
                 return;
             }
 
