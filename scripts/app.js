@@ -3330,6 +3330,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const bar = document.getElementById('broadcastBar');
             document.getElementById('broadcastBarCode').textContent = this.sessionCode;
             bar.classList.add('active');
+            document.body.classList.add('broadcast-active');
             document.querySelector('.admin-main').style.marginTop = '40px';
             this.updateViewerCount();
 
@@ -3414,6 +3415,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const bar = document.getElementById('broadcastBar');
         if (bar) {
             bar.classList.remove('active');
+            document.body.classList.remove('broadcast-active');
             bar.style.display = 'none';
             setTimeout(() => { bar.style.display = ''; }, 100);
         }

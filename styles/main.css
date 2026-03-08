@@ -1379,11 +1379,17 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    transition: padding-right 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: padding-right 0.4s cubic-bezier(0.32, 0.72, 0, 1), top 0.3s ease;
 }
 
 .presentation-mode.active {
     display: flex;
+}
+
+/* 廣播中時，簡報模式往下推 40px 讓綠色列可見 */
+/* 廣播中時，簡報模式往下推 40px 讓綠色列可見 */
+body.broadcast-active .presentation-mode.active {
+    top: 40px;
 }
 
 /* 排行榜開啟時，簡報往左偏移但保持原尺寸 */
