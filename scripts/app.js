@@ -3587,6 +3587,166 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (this._laserThrottleTimer) { clearTimeout(this._laserThrottleTimer); this._laserThrottleTimer = null; }
     }
 
+    /* ── 標記工具系統 ── */
+    _initAnnotation() {
+        const canvas = document.getElementById('presAnnotationCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        this._annotCtx = ctx;
+        this._annotCanvas = canvas;
+        this._annotTool = null; // 'pen' | 'highlight' | 'text' | null
+        this._annotStrokes = []; // for undo
+        this._annotDrawing = false;
+        this._annotColor = '#ef4444';
+
+        // Sync canvas resolution with slide
+        const syncSize = () => {
+            const slide = document.getElementById('presentationSlide');
+            if (!slide) return;
+            const rect = slide.getBoundingClientRect();
+            canvas.width = rect.width * devicePixelRatio;
+            canvas.height = rect.height * devicePixelRatio;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+            this._annotRedraw();
+        };
+        syncSize();
+        this._annotSyncSize = syncSize;
+        window.addEventListener('resize', syncSize);
+
+        // Tool buttons
+        const setTool = (tool) => {
+            this._annotTool = this._annotTool === tool ? null : tool;
+            canvas.style.pointerEvents = this._annotTool ? 'auto' : 'none';
+            canvas.style.cursor = this._annotTool === 'text' ? 'text' : this._annotTool ? 'crosshair' : 'default';
+            // Update button styles
+            ['presAnnotPen', 'presAnnotHighlight', 'presAnnotText'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    const isActive = (id === 'presAnnotPen' && this._annotTool === 'pen') ||
+                        (id === 'presAnnotHighlight' && this._annotTool === 'highlight') ||
+                        (id === 'presAnnotText' && this._annotTool === 'text');
+                    btn.style.opacity = isActive ? '1' : '0.6';
+                    btn.style.background = isActive ? 'rgba(255,255,255,0.2)' : 'none';
+                }
+            });
+        };
+
+        document.getElementById('presAnnotPen')?.addEventListener('click', () => setTool('pen'));
+        document.getElementById('presAnnotHighlight')?.addEventListener('click', () => setTool('highlight'));
+        document.getElementById('presAnnotText')?.addEventListener('click', () => setTool('text'));
+        document.getElementById('presAnnotColor')?.addEventListener('input', (e) => {
+            this._annotColor = e.target.value;
+        });
+        document.getElementById('presAnnotUndo')?.addEventListener('click', () => {
+            this._annotStrokes.pop();
+            this._annotRedraw();
+        });
+        document.getElementById('presAnnotClear')?.addEventListener('click', () => {
+            this._annotStrokes = [];
+            this._annotRedraw();
+        });
+
+        // Drawing handlers
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        };
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (!this._annotTool) return;
+
+            if (this._annotTool === 'text') {
+                const pos = getPos(e);
+                const text = prompt('輸入標記文字：');
+                if (text) {
+                    this._annotStrokes.push({
+                        type: 'text', text, x: pos.x, y: pos.y,
+                        color: this._annotColor, font: 'bold 20px "Noto Sans TC", sans-serif'
+                    });
+                    this._annotRedraw();
+                }
+                return;
+            }
+
+            this._annotDrawing = true;
+            const pos = getPos(e);
+            const stroke = {
+                type: this._annotTool,
+                color: this._annotColor,
+                lineWidth: this._annotTool === 'highlight' ? 20 : 3,
+                alpha: this._annotTool === 'highlight' ? 0.35 : 1,
+                points: [pos]
+            };
+            this._annotStrokes.push(stroke);
+            canvas.setPointerCapture(e.pointerId);
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!this._annotDrawing) return;
+            const pos = getPos(e);
+            const stroke = this._annotStrokes[this._annotStrokes.length - 1];
+            if (stroke && stroke.points) {
+                stroke.points.push(pos);
+                this._annotRedraw();
+            }
+        });
+
+        canvas.addEventListener('pointerup', () => { this._annotDrawing = false; });
+        canvas.addEventListener('pointercancel', () => { this._annotDrawing = false; });
+    }
+
+    _annotRedraw() {
+        const ctx = this._annotCtx;
+        const canvas = this._annotCanvas;
+        if (!ctx || !canvas) return;
+
+        ctx.clearRect(0, 0, canvas.width / devicePixelRatio, canvas.height / devicePixelRatio);
+
+        for (const stroke of this._annotStrokes) {
+            if (stroke.type === 'text') {
+                ctx.save();
+                ctx.font = stroke.font;
+                ctx.fillStyle = stroke.color;
+                ctx.globalAlpha = 1;
+                ctx.fillText(stroke.text, stroke.x, stroke.y);
+                ctx.restore();
+            } else if (stroke.points && stroke.points.length > 0) {
+                ctx.save();
+                ctx.strokeStyle = stroke.color;
+                ctx.lineWidth = stroke.lineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.globalAlpha = stroke.alpha;
+                ctx.beginPath();
+                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                for (let i = 1; i < stroke.points.length; i++) {
+                    ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+    }
+
+    _destroyAnnotation() {
+        if (this._annotSyncSize) {
+            window.removeEventListener('resize', this._annotSyncSize);
+            this._annotSyncSize = null;
+        }
+        this._annotStrokes = [];
+        this._annotTool = null;
+        this._annotDrawing = false;
+        const canvas = document.getElementById('presAnnotationCanvas');
+        if (canvas) {
+            canvas.style.pointerEvents = 'none';
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
     /* =========================================
        簡報模式
        ========================================= */
@@ -3797,6 +3957,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.scalePresentationSlide();
         this._resizeHandler = this.scalePresentationSlide.bind(this);
         window.addEventListener('resize', this._resizeHandler);
+
+        // 初始化標記工具
+        this._initAnnotation();
     }
 
     async _populatePresTopBar() {
@@ -4421,6 +4584,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 清除雷射筆狀態
         this._laserActive = false;
         this._destroyLaserTracking();
+        this._destroyAnnotation();
         const topBar = document.getElementById('presTopBar');
         if (topBar) {
             topBar.classList.remove('broadcast-locked', 'visible');
