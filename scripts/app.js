@@ -284,7 +284,7 @@ class App {
                 if (!_assetCache) {
                     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px;">載入中…</div>';
                     try {
-                        const { data } = await window.db.select('assets', { order: 'created_at.desc' });
+                        const { data } = await db.select('assets', { order: 'created_at.desc' });
                         _assetCache = data || [];
                     } catch (e) {
                         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef4444;padding:40px;">載入失敗</div>';
