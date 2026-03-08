@@ -23,8 +23,8 @@
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: #0f0f17;
-            color: #e8e8ed;
+            background: #f6f8fb;
+            color: #1e293b;
             min-height: 100vh;
         }
 
@@ -34,12 +34,12 @@
             align-items: center;
             justify-content: space-between;
             padding: 14px 28px;
-            background: rgba(15, 15, 23, 0.9);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(12px);
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .dash-topbar-left {
@@ -51,16 +51,16 @@
         .dash-topbar-left .brand {
             font-weight: 600;
             font-size: 1rem;
-            color: #a5b4fc;
+            color: #6366f1;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .dash-topbar-left .course-name {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.88rem;
+            color: #64748b;
+            border-left: 1px solid #e2e8f0;
             padding-left: 12px;
         }
 
@@ -74,11 +74,11 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 6px 14px;
+            padding: 7px 14px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.05);
-            color: #cbd5e1;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #475569;
             font-size: 0.82rem;
             font-family: inherit;
             cursor: pointer;
@@ -86,15 +86,15 @@
         }
 
         .btn-refresh:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f1f5f9;
+            border-color: #cbd5e1;
         }
 
         .btn-export {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 6px 14px;
+            padding: 7px 14px;
             border-radius: 8px;
             border: none;
             background: #6366f1;
@@ -106,7 +106,33 @@
         }
 
         .btn-export:hover {
-            background: #818cf8;
+            background: #4f46e5;
+        }
+
+        .btn-share {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid #c7d2fe;
+            background: #eef2ff;
+            color: #6366f1;
+            font-size: 0.82rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-share:hover {
+            background: #e0e7ff;
+        }
+
+        .btn-share.copied {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #16a34a;
         }
 
         /* ── Container ── */
@@ -116,21 +142,92 @@
             padding: 28px 24px;
         }
 
+        /* ── Overview Summary (NEW) ── */
+        .overview-summary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .overview-left {
+            flex: 1;
+        }
+
+        .overview-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .overview-desc {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            line-height: 1.5;
+        }
+
+        .overview-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .ov-ring {
+            text-align: center;
+        }
+
+        .ov-ring-label {
+            font-size: 0.72rem;
+            opacity: 0.8;
+            margin-bottom: 6px;
+        }
+
+        .ov-ring-circle {
+            width: 72px;
+            height: 72px;
+            position: relative;
+        }
+
+        .ov-ring-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .ov-ring-circle .ring-bg {
+            stroke: rgba(255, 255, 255, 0.2);
+        }
+
+        .ov-ring-circle .ring-fill {
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .ov-ring-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
         /* ── Stat Cards ── */
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
+            gap: 14px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
-            padding: 20px;
+            padding: 18px 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .stat-card::before {
@@ -143,40 +240,54 @@
             background: var(--accent, #6366f1);
         }
 
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
         .stat-label {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             color: #94a3b8;
             font-weight: 500;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: #fff;
+            color: #0f172a;
             line-height: 1;
         }
 
         .stat-value small {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 400;
             color: #94a3b8;
-            margin-left: 4px;
+            margin-left: 3px;
         }
 
         .stat-sub {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             color: #64748b;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         /* ── Section ── */
         .dash-section {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             padding: 24px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .dash-section-header {
@@ -190,13 +301,14 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
+            color: #1e293b;
         }
 
         .dash-section-title .material-symbols-rounded {
             font-size: 20px;
-            color: #a5b4fc;
+            color: #6366f1;
         }
 
         /* ── Student Table ── */
@@ -209,65 +321,67 @@
         .student-table th {
             text-align: left;
             padding: 10px 12px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 600;
-            color: #64748b;
+            color: #94a3b8;
             text-transform: uppercase;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            letter-spacing: 0.03em;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fafbfc;
         }
 
         .student-table td {
             padding: 10px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            color: #cbd5e1;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
         }
 
         .student-table tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
         }
 
         .badge-done {
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
+            background: #dcfce7;
+            color: #16a34a;
         }
 
         .badge-partial {
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            background: rgba(255, 183, 77, 0.15);
-            color: #ffb74d;
+            background: #fef3c7;
+            color: #d97706;
         }
 
         .badge-none {
             display: inline-flex;
             align-items: center;
             gap: 3px;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            background: rgba(255, 255, 255, 0.06);
-            color: #64748b;
+            background: #f1f5f9;
+            color: #94a3b8;
         }
 
         /* ── Survey Charts ── */
         .survey-q-card {
             padding: 18px;
             margin-bottom: 14px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #fafbfc;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
         }
 
@@ -283,20 +397,20 @@
             font-weight: 700;
             padding: 2px 8px;
             border-radius: 4px;
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
+            background: #eef2ff;
+            color: #6366f1;
         }
 
         .survey-q-text {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #e2e8f0;
+            color: #1e293b;
         }
 
         .survey-q-count {
             margin-left: auto;
             font-size: 0.78rem;
-            color: #64748b;
+            color: #94a3b8;
         }
 
         .bar-row {
@@ -307,24 +421,24 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.82rem;
-            color: #cbd5e1;
+            color: #475569;
             margin-bottom: 3px;
         }
 
         .bar-label .bar-stat {
-            color: #64748b;
+            color: #94a3b8;
         }
 
         .bar-track {
             height: 10px;
-            background: rgba(255, 255, 255, 0.06);
+            background: #f1f5f9;
             border-radius: 5px;
             overflow: hidden;
         }
 
         .bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #6366f1, #818cf8);
+            background: linear-gradient(90deg, #6366f1, #a78bfa);
             border-radius: 5px;
             transition: width 0.5s ease;
         }
@@ -338,16 +452,16 @@
         .text-resp-item {
             padding: 8px 12px;
             margin-bottom: 4px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             font-size: 0.82rem;
-            color: #cbd5e1;
+            color: #475569;
         }
 
         .text-resp-email {
             font-size: 0.72rem;
-            color: #64748b;
+            color: #94a3b8;
             margin-right: 8px;
         }
 
@@ -355,14 +469,14 @@
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #64748b;
+            color: #94a3b8;
             font-size: 0.9rem;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            color: #64748b;
+            color: #94a3b8;
         }
 
         /* ── Responsive ── */
@@ -386,6 +500,16 @@
                 display: block;
                 overflow-x: auto;
             }
+
+            .overview-summary {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .overview-right {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -400,6 +524,9 @@
             <div class="course-name" id="courseName"></div>
         </div>
         <div class="dash-topbar-right">
+            <button class="btn-share" id="btnShare" onclick="copyShareLink()">
+                <span class="material-symbols-rounded" style="font-size:16px;">link</span> 複製分享連結
+            </button>
             <button class="btn-refresh" onclick="loadAll()">
                 <span class="material-symbols-rounded" style="font-size:16px;">refresh</span> 重新整理
             </button>
@@ -410,23 +537,69 @@
     </div>
 
     <div class="dash-container">
+        <!-- Overview Summary -->
+        <div class="overview-summary" id="overviewSummary" style="display:none;">
+            <div class="overview-left">
+                <div class="overview-title" id="ovTitle">課前準備概覽</div>
+                <div class="overview-desc" id="ovDesc"></div>
+            </div>
+            <div class="overview-right">
+                <div class="ov-ring">
+                    <div class="ov-ring-label">事項完成率</div>
+                    <div class="ov-ring-circle">
+                        <svg width="72" height="72" viewBox="0 0 72 72">
+                            <circle class="ring-bg" cx="36" cy="36" r="30" fill="none" stroke-width="6" />
+                            <circle class="ring-fill" id="ringChecklist" cx="36" cy="36" r="30" fill="none"
+                                stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5"
+                                stroke-dashoffset="188.5" />
+                        </svg>
+                        <span class="ov-ring-value" id="ringChecklistVal">0%</span>
+                    </div>
+                </div>
+                <div class="ov-ring">
+                    <div class="ov-ring-label">問卷填答率</div>
+                    <div class="ov-ring-circle">
+                        <svg width="72" height="72" viewBox="0 0 72 72">
+                            <circle class="ring-bg" cx="36" cy="36" r="30" fill="none" stroke-width="6" />
+                            <circle class="ring-fill" id="ringSurvey" cx="36" cy="36" r="30" fill="none" stroke="#fff"
+                                stroke-width="6" stroke-linecap="round" stroke-dasharray="188.5"
+                                stroke-dashoffset="188.5" />
+                        </svg>
+                        <span class="ov-ring-value" id="ringSurveyVal">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Stat Cards -->
         <div class="stat-grid" id="statGrid">
             <div class="stat-card" style="--accent:#6366f1;">
+                <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">
+                    <span class="material-symbols-rounded">group</span>
+                </div>
                 <div class="stat-label">已登錄學員</div>
                 <div class="stat-value" id="statStudents">-</div>
             </div>
             <div class="stat-card" style="--accent:#22c55e;">
+                <div class="stat-icon" style="background:#dcfce7;color:#16a34a;">
+                    <span class="material-symbols-rounded">checklist</span>
+                </div>
                 <div class="stat-label">課前事項完成</div>
                 <div class="stat-value" id="statChecklist">-</div>
                 <div class="stat-sub" id="statChecklistSub"></div>
             </div>
             <div class="stat-card" style="--accent:#f59e0b;">
+                <div class="stat-icon" style="background:#fef3c7;color:#d97706;">
+                    <span class="material-symbols-rounded">quiz</span>
+                </div>
                 <div class="stat-label">問卷已填</div>
                 <div class="stat-value" id="statSurvey">-</div>
                 <div class="stat-sub" id="statSurveySub"></div>
             </div>
             <div class="stat-card" style="--accent:#ec4899;">
+                <div class="stat-icon" style="background:#fce7f3;color:#db2777;">
+                    <span class="material-symbols-rounded">task</span>
+                </div>
                 <div class="stat-label">課前事項數</div>
                 <div class="stat-value" id="statItems">-</div>
             </div>
@@ -490,11 +663,9 @@
                 if (pData?.[0]) {
                     projectName = pData[0].name;
                     document.getElementById('courseName').textContent = projectName + (sessionCode ? ` — ${sessionCode}` : '');
+                    document.title = `${projectName} — 課前統計`;
                 }
             }
-
-            // Determine filter key for session-scoped data
-            const sessionFilter = sessionCode ? { session_code: `eq.${sessionCode}` } : {};
 
             // Load students for this session
             const { data: sData } = await db.select('students', {
@@ -538,9 +709,52 @@
             }
 
             renderStats();
+            renderOverview();
             renderStudentTable();
             renderChecklistDetail();
             renderSurveyResults();
+        }
+
+        function renderOverview() {
+            const el = document.getElementById('overviewSummary');
+            if (students.length === 0) { el.style.display = 'none'; return; }
+            el.style.display = '';
+
+            // Checklist %
+            let checkPct = 0;
+            if (checklistItems.length > 0) {
+                const ciIds = new Set(checklistItems.map(c => c.id));
+                let fullComplete = 0;
+                students.forEach(s => {
+                    const done = checklistProgress.filter(cp =>
+                        cp.student_email === s.email && ciIds.has(cp.checklist_item_id) && cp.completed
+                    ).length;
+                    if (done >= checklistItems.length) fullComplete++;
+                });
+                checkPct = Math.round(fullComplete / students.length * 100);
+            }
+
+            // Survey %
+            let surveyPct = 0;
+            if (surveyQuestions.length > 0) {
+                const surveyEmails = new Set(surveyResponses.map(r => r.student_email));
+                const filled = students.filter(s => surveyEmails.has(s.email)).length;
+                surveyPct = Math.round(filled / students.length * 100);
+            }
+
+            // Update rings
+            const circumference = 188.5; // 2πr
+            document.getElementById('ringChecklist').style.strokeDashoffset = circumference * (1 - checkPct / 100);
+            document.getElementById('ringChecklistVal').textContent = checkPct + '%';
+            document.getElementById('ringSurvey').style.strokeDashoffset = circumference * (1 - surveyPct / 100);
+            document.getElementById('ringSurveyVal').textContent = surveyPct + '%';
+
+            // Summary text
+            const desc = [];
+            desc.push(`共 ${students.length} 位學員已登錄`);
+            if (checklistItems.length > 0) desc.push(`課前事項 ${checkPct}% 全數完成`);
+            if (surveyQuestions.length > 0) desc.push(`問卷填答率 ${surveyPct}%`);
+            document.getElementById('ovDesc').textContent = desc.join('，') + '。';
         }
 
         function renderStats() {
@@ -600,7 +814,6 @@
                     <th>課前事項</th>
                     <th>問卷</th>
                     <th>登錄時間</th>
-                    <th></th>
                 </tr></thead><tbody>`;
 
             students.forEach((s, i) => {
@@ -633,18 +846,11 @@
 
                 html += `<tr>
                     <td>${i + 1}</td>
-                    <td style="font-weight:500;color:#e2e8f0;">${s.name || '—'}</td>
-                    <td style="font-size:0.8rem;color:#94a3b8;">${s.email || '—'}</td>
+                    <td style="font-weight:500;color:#1e293b;">${s.name || '—'}</td>
+                    <td style="font-size:0.8rem;color:#64748b;">${s.email || '—'}</td>
                     <td>${checkBadge}</td>
                     <td>${surveyBadge}</td>
-                    <td style="font-size:0.78rem;color:#64748b;">${time}</td>
-                    <td><button onclick="deleteStudent('${s.id}','${(s.email || '').replace(/'/g, "\\'")}')"
-                        style="background:none;border:none;cursor:pointer;color:#64748b;padding:4px;border-radius:6px;transition:all 0.15s;"
-                        onmouseover="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.1)'"
-                        onmouseout="this.style.color='#64748b';this.style.background='none'"
-                        title="刪除此學員資料">
-                        <span class="material-symbols-rounded" style="font-size:18px;">delete</span>
-                    </button></td>
+                    <td style="font-size:0.78rem;color:#94a3b8;">${time}</td>
                 </tr>`;
             });
 
@@ -677,7 +883,7 @@
 
                 html += `<div class="bar-row" style="margin-bottom:12px;">`;
                 html += `<div class="bar-label"><span>${idx + 1}. ${item.title}</span><span class="bar-stat">${completed}/${students.length} (${pct}%)</span></div>`;
-                html += `<div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:linear-gradient(90deg,#22c55e,#4ade80);"></div></div>`;
+                html += `<div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:linear-gradient(90deg,#22c55e,#86efac);"></div></div>`;
                 html += `</div>`;
             });
 
@@ -686,20 +892,19 @@
             html += `<table class="student-table">`;
             html += `<thead><tr><th>#</th><th>姓名</th>`;
             checklistItems.forEach((item, idx) => {
-                const shortTitle = item.title.length > 8 ? item.title.substring(0, 8) + '…' : item.title;
                 html += `<th style="text-align:center;" title="${item.title}">${idx + 1}</th>`;
             });
             html += `</tr></thead><tbody>`;
 
             students.forEach((s, i) => {
-                html += `<tr><td>${i + 1}</td><td style="font-weight:500;color:#e2e8f0;white-space:nowrap;">${s.name || '—'}</td>`;
+                html += `<tr><td>${i + 1}</td><td style="font-weight:500;color:#1e293b;white-space:nowrap;">${s.name || '—'}</td>`;
                 checklistItems.forEach(item => {
                     const done = checklistProgress.some(cp =>
                         cp.student_email === s.email && cp.checklist_item_id === item.id && cp.completed
                     );
                     html += `<td style="text-align:center;">${done
-                        ? '<span style="color:#4ade80;font-weight:700;">✓</span>'
-                        : '<span style="color:#334155;">✗</span>'
+                        ? '<span style="color:#16a34a;font-weight:700;">✓</span>'
+                        : '<span style="color:#cbd5e1;">✗</span>'
                         }</td>`;
                 });
                 html += `</tr>`;
@@ -763,13 +968,13 @@
                 } else {
                     // fillblank
                     if (responses.length === 0) {
-                        html += `<div style="color:#64748b;font-size:0.82rem;">尚無回覆</div>`;
+                        html += `<div style="color:#94a3b8;font-size:0.82rem;">尚無回覆</div>`;
                     } else {
                         html += `<div class="text-responses">`;
                         responses.forEach(r => {
                             html += `<div class="text-resp-item">`;
                             html += `<span class="text-resp-email">${r.student_email}</span>`;
-                            html += `${r.answer || '<em style="color:#475569;">未填寫</em>'}`;
+                            html += `${r.answer || '<em style="color:#94a3b8;">未填寫</em>'}`;
                             html += `</div>`;
                         });
                         html += `</div>`;
@@ -782,17 +987,17 @@
             wrap.innerHTML = html;
         }
 
-        window.deleteStudent = async function (studentId, email) {
-            if (!confirm(`確定要刪除學員「${email}」的所有資料嗎？\n（包含課前事項勾選、問卷填答）`)) return;
-            try {
-                // Delete related data first
-                await db.delete('checklist_progress', { student_email: `eq.${email}` });
-                await db.delete('survey_responses', { student_email: `eq.${email}` });
-                await db.delete('students', { id: `eq.${studentId}` });
-                await loadAll();
-            } catch (err) {
-                alert('刪除失敗：' + err.message);
-            }
+        window.copyShareLink = function () {
+            const url = location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.getElementById('btnShare');
+                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px;">check</span> 已複製';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px;">link</span> 複製分享連結';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
         };
 
         window.exportCSV = function () {
