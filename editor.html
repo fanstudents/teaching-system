@@ -625,7 +625,7 @@
                     </div>
                     <div class="ribbon-separator"></div>
 
-                    <!-- 問卷驅動 + 說明 -->
+                    <!-- 問卷驅動 + 章節回顧 -->
                     <div class="ribbon-group" style="min-width:130px;">
                         <div class="ribbon-group-content" style="flex-direction:column;align-items:center;gap:5px;">
                             <button class="ai-phase-btn" id="aiSurveyAdjustBtn" title="根據課前問卷調整簡報內容"
@@ -634,10 +634,14 @@
                                     style="font-size:20px;color:#8b5cf6;">tune</span>
                                 <span class="ai-phase-label">問卷驅動</span>
                             </button>
-                            <div style="font-size:.6rem;color:#94a3b8;line-height:1.4;text-align:center;">
-                                可單獨執行任一階段<br>建議依序操作效果最佳</div>
+                            <button class="ai-phase-btn" id="aiChapterReviewBtn" title="AI 章節回顧 — 選取頁數生成重點回顧"
+                                style="border-color:#f59e0b;">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:20px;color:#f59e0b;">summarize</span>
+                                <span class="ai-phase-label">章節回顧</span>
+                            </button>
                         </div>
-                        <div class="ribbon-group-title">調整 / 說明</div>
+                        <div class="ribbon-group-title">調整 / 回顧</div>
                     </div>
                 </div>
             </div>
@@ -799,6 +803,62 @@
     <input type="file" id="imageUpload" accept="image/*" hidden>
     <input type="file" id="audioUpload" accept="audio/*" hidden>
     <input type="file" id="pdfUpload" accept="application/pdf" hidden>
+
+    <!-- 章節回顧 Modal -->
+    <div id="chapterReviewOverlay"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;backdrop-filter:blur(3px);align-items:center;justify-content:center;">
+        <div
+            style="background:#fff;border-radius:14px;width:90vw;max-width:860px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.2);">
+            <div
+                style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <span style="font-size:18px;font-weight:700;color:#1e293b;">📋 章節回顧</span>
+                    <span style="font-size:12px;color:#94a3b8;margin-left:8px;">勾選要回顧的投影片，AI 會整理重點</span>
+                </div>
+                <button id="chapterReviewClose"
+                    style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;">✕</button>
+            </div>
+            <div style="padding:16px 20px;overflow-y:auto;flex:1;">
+                <!-- 快速選取 -->
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                    <button id="crSelectAll"
+                        style="padding:4px 12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:12px;">全選</button>
+                    <button id="crDeselectAll"
+                        style="padding:4px 12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;cursor:pointer;font-size:12px;">全不選</button>
+                    <span id="crSelCount" style="font-size:12px;color:#64748b;">已選 0 頁</span>
+                    <div style="flex:1;"></div>
+                    <button id="crGenerateBtn"
+                        style="padding:8px 20px;border:none;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span>
+                        生成章節回顧
+                    </button>
+                </div>
+                <!-- 投影片格子 -->
+                <div id="crSlideGrid"
+                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px;">
+                </div>
+                <!-- 生成結果 -->
+                <div id="crResult" style="display:none;">
+                    <div style="border-top:1px solid #e2e8f0;padding-top:14px;margin-top:4px;">
+                        <div style="font-weight:600;font-size:15px;color:#1e293b;margin-bottom:8px;">✨ AI 章節回顧</div>
+                        <div id="crResultContent"
+                            style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;font-size:14px;line-height:1.8;color:#334155;white-space:pre-wrap;max-height:300px;overflow-y:auto;">
+                        </div>
+                        <div style="display:flex;gap:8px;margin-top:12px;">
+                            <button id="crInsertBtn"
+                                style="padding:8px 20px;border:none;border-radius:8px;background:#6366f1;color:#fff;font-weight:600;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:16px;">add_circle</span>
+                                插入新投影片
+                            </button>
+                            <button id="crRegenerateBtn"
+                                style="padding:8px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;">🔄
+                                重新生成</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 素材庫選取 Modal -->
     <div id="assetLibOverlay"

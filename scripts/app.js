@@ -455,6 +455,171 @@ class App {
             this.openAiQuizModal();
         });
 
+        // ── 章節回顧 ──
+        document.getElementById('aiChapterReviewBtn')?.addEventListener('click', () => {
+            const overlay = document.getElementById('chapterReviewOverlay');
+            const grid = document.getElementById('crSlideGrid');
+            const result = document.getElementById('crResult');
+            result.style.display = 'none';
+            overlay.style.display = 'flex';
+
+            // Render slide thumbnails
+            const slides = this.slideManager.slides;
+            grid.innerHTML = slides.map((s, i) => {
+                // Extract first text to show as label
+                const firstText = (s.elements || []).find(e => e.type === 'text')?.content?.replace(/<[^>]*>/g, '')?.substring(0, 30) || '';
+                const bg = (s.background && s.background !== '#ffffff') ? s.background : '#f1f5f9';
+                return `<label style="cursor:pointer;position:relative;">
+                    <input type="checkbox" class="cr-slide-check" data-idx="${i}" checked
+                        style="position:absolute;top:6px;left:6px;z-index:2;width:16px;height:16px;accent-color:#f59e0b;">
+                    <div style="width:100%;aspect-ratio:16/9;background:${bg};border-radius:8px;border:2px solid #e2e8f0;
+                        display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;overflow:hidden;
+                        transition:border-color .2s;">
+                        <div style="font-size:22px;font-weight:700;color:#94a3b8;">${i + 1}</div>
+                        <div style="font-size:9px;color:#64748b;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;margin-top:4px;">${firstText}</div>
+                    </div>
+                </label>`;
+            }).join('');
+
+            // Update count
+            const updateCount = () => {
+                const checked = grid.querySelectorAll('.cr-slide-check:checked').length;
+                document.getElementById('crSelCount').textContent = `已選 ${checked} 頁`;
+            };
+            grid.addEventListener('change', updateCount);
+            updateCount();
+
+            // Select/deselect all
+            document.getElementById('crSelectAll').onclick = () => { grid.querySelectorAll('.cr-slide-check').forEach(c => c.checked = true); updateCount(); };
+            document.getElementById('crDeselectAll').onclick = () => { grid.querySelectorAll('.cr-slide-check').forEach(c => c.checked = false); updateCount(); };
+
+            // Close
+            document.getElementById('chapterReviewClose').onclick = () => overlay.style.display = 'none';
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.style.display = 'none'; });
+
+            // Generate handler
+            const generateReview = async () => {
+                const checked = [...grid.querySelectorAll('.cr-slide-check:checked')].map(c => parseInt(c.dataset.idx));
+                if (checked.length === 0) { alert('請至少選擇一頁'); return; }
+
+                const btn = document.getElementById('crGenerateBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span> 生成中...';
+
+                try {
+                    // Extract content from selected slides
+                    const slideContents = checked.map(idx => {
+                        const slide = slides[idx];
+                        const texts = (slide.elements || [])
+                            .filter(e => ['text', 'quiz', 'poll', 'truefalse', 'fillblank', 'ordering'].includes(e.type))
+                            .map(e => {
+                                if (e.type === 'text') return (e.content || '').replace(/<[^>]*>/g, '');
+                                if (e.type === 'quiz') return `[選擇題] ${e.question} / 選項: ${(e.options || []).map(o => o.text).join(', ')}`;
+                                if (e.type === 'poll') return `[投票] ${e.question}`;
+                                if (e.type === 'truefalse') return `[是非題] ${e.statement || ''}`;
+                                if (e.type === 'fillblank') return `[填空] ${e.title || ''} ${e.content || ''}`;
+                                if (e.type === 'ordering') return `[排序] ${(e.steps || []).join(' → ')}`;
+                                return '';
+                            }).filter(Boolean);
+                        return `=== 第 ${idx + 1} 頁 ===\n${texts.join('\n')}`;
+                    }).join('\n\n');
+
+                    const prompt = `你是教學助理。以下是投影片內容，請幫我製作「章節回顧」：
+
+${slideContents}
+
+請用繁體中文產生重點回顧，格式如下：
+📌 本章重點
+• 列出 3~5 個關鍵概念（每點一句話）
+
+🔑 核心觀念
+• 用簡單的話，解釋本章最核心的 2~3 個觀念
+
+💡 重點提醒
+• 列出 2~3 個學員容易忽略或搞混的地方
+
+✅ 自我檢測
+• 列出 2~3 個問題讓學員自我檢視（不需給答案）
+
+注意：只輸出上述內容，不要加多餘的標頭或解釋。`;
+
+                    const reviewText = await ai.chat([{ role: 'user', content: prompt }], { maxTokens: 2048 });
+
+                    // Save to DB
+                    const projectId = new URLSearchParams(location.search).get('id');
+                    await db.insert('chapter_reviews', {
+                        project_id: projectId,
+                        slide_range: JSON.stringify(checked.map(i => i + 1)),
+                        content: reviewText,
+                        created_at: new Date().toISOString()
+                    });
+
+                    // Show result
+                    document.getElementById('crResultContent').textContent = reviewText;
+                    result.style.display = 'block';
+
+                    // Store for insert
+                    this._lastChapterReview = reviewText;
+                    this._lastChapterSlides = checked;
+                } catch (err) {
+                    alert('生成失敗: ' + err.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">auto_awesome</span> 生成章節回顧';
+                }
+            };
+
+            document.getElementById('crGenerateBtn').onclick = generateReview;
+            document.getElementById('crRegenerateBtn').onclick = generateReview;
+
+            // Insert as slide
+            document.getElementById('crInsertBtn').onclick = () => {
+                if (!this._lastChapterReview) return;
+                const slideRange = this._lastChapterSlides.map(i => i + 1).join(', ');
+                const gen = () => this.slideManager.generateId();
+
+                // Parse review into lines for layout
+                const lines = this._lastChapterReview.split('\n').filter(l => l.trim());
+                let htmlContent = '';
+                for (const line of lines) {
+                    if (line.startsWith('📌') || line.startsWith('🔑') || line.startsWith('💡') || line.startsWith('✅')) {
+                        htmlContent += `<b style="font-size:20px;color:#1e293b;">${line}</b><br>`;
+                    } else if (line.startsWith('•') || line.startsWith('-')) {
+                        htmlContent += `<span style="font-size:15px;color:#475569;">${line}</span><br>`;
+                    } else {
+                        htmlContent += `<span style="font-size:15px;color:#475569;">${line}</span><br>`;
+                    }
+                }
+
+                const newSlide = {
+                    id: gen(),
+                    background: 'linear-gradient(135deg, #fef3c7, #fff7ed)',
+                    elements: [
+                        {
+                            id: gen(), type: 'text', x: 40, y: 30, width: 880, height: 50,
+                            content: `<b style="font-size:28px;color:#92400e;">📋 章節回顧（第 ${slideRange} 頁）</b>`,
+                            fontSize: 28, bold: true
+                        },
+                        {
+                            id: gen(), type: 'text', x: 40, y: 90, width: 880, height: 440,
+                            content: htmlContent,
+                            fontSize: 15
+                        }
+                    ]
+                };
+
+                // Insert after current slide
+                const currentIdx = this.slideManager.currentSlideIndex;
+                this.slideManager.slides.splice(currentIdx + 1, 0, newSlide);
+                this.slideManager.switchSlide(currentIdx + 1);
+                this.slideManager.renderThumbnails();
+
+                // Close modal
+                overlay.style.display = 'none';
+                this.showToast('✅ 章節回顧已插入');
+            };
+        });
+
         // 背景音樂設定（上傳檔案）
         document.getElementById('bgmSettingBtn')?.addEventListener('click', async () => {
             const existing = await audioStore.load('bgm');
