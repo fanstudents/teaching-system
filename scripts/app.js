@@ -3561,7 +3561,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         }
 
         this._laserMoveHandler = (e) => {
-            if (!this._laserActive || !this.broadcasting) return;
+            if (!this._laserActive) return;
 
             const presSlide = document.getElementById('presentationSlide');
             if (!presSlide) return;
@@ -3569,13 +3569,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const x = (e.clientX - rect.left) / rect.width;
             const y = (e.clientY - rect.top) / rect.height;
 
-            // Show dot on presenter screen
+            // Show dot on presenter screen (always when laser active)
             dot.style.display = 'block';
             dot.style.left = (e.clientX - 8) + 'px';
             dot.style.top = (e.clientY - 8) + 'px';
 
-            // Only send if inside slide area
-            if (x >= -0.02 && x <= 1.02 && y >= -0.02 && y <= 1.02) {
+            // Only broadcast to students if actually broadcasting + inside slide area
+            if (this.broadcasting && this.sessionCode && x >= -0.02 && x <= 1.02 && y >= -0.02 && y <= 1.02) {
                 // Throttle to ~20fps (50ms)
                 if (!this._laserThrottleTimer) {
                     this._laserThrottleTimer = setTimeout(() => {

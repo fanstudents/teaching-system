@@ -1412,6 +1412,15 @@ body.broadcast-active .broadcast-bar {
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* 簡報圖片清晰度優化 */
+.presentation-slide img,
+.presentation-element img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
 /* ── 頂部浮動工具列 ── */
 .pres-toolbar {
     position: fixed;
