@@ -964,25 +964,39 @@
         // ── Render slide ──
         function renderSlide(slide, index, total) {
             if (!slide) return;
-            slideEl.innerHTML = '';
-            // 切頁時關閉作業牆展開的卡片
-            document.querySelector('.showcase-focus-overlay')?.remove();
 
-            // 背景
-            if (slide.background && slide.background !== '#ffffff') {
-                slideEl.style.background = slide.background;
-            } else {
-                slideEl.style.background = 'white';
-            }
+            // ── 過場動畫：淡出 → 替換 → 淡入 ──
+            slideEl.style.transition = 'opacity 0.2s ease, transform 0.25s ease';
+            slideEl.style.opacity = '0';
+            slideEl.style.transform = 'scale(0.98)';
 
-            // 元素
-            (slide.elements || []).forEach(element => {
-                const el = createElementNode(element);
-                if (el) {
-                    el.classList.add('presentation-element');
-                    slideEl.appendChild(el);
+            setTimeout(() => {
+                slideEl.innerHTML = '';
+                // 切頁時關閉作業牆展開的卡片
+                document.querySelector('.showcase-focus-overlay')?.remove();
+
+                // 背景
+                if (slide.background && slide.background !== '#ffffff') {
+                    slideEl.style.background = slide.background;
+                } else {
+                    slideEl.style.background = 'white';
                 }
-            });
+
+                // 元素
+                (slide.elements || []).forEach(element => {
+                    const el = createElementNode(element);
+                    if (el) {
+                        el.classList.add('presentation-element');
+                        slideEl.appendChild(el);
+                    }
+                });
+
+                // 淡入
+                requestAnimationFrame(() => {
+                    slideEl.style.opacity = '1';
+                    slideEl.style.transform = 'scale(1)';
+                });
+            }, 200);
 
             // 計數器
             document.getElementById('slideCounter').textContent =

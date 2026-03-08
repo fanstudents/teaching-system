@@ -3364,59 +3364,58 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             magEl = document.createElement('div');
             magEl.id = 'presMagnifier';
             magEl.style.cssText = `
-                position:fixed;width:220px;height:220px;border-radius:50%;border:3px solid rgba(99,102,241,0.6);
-                box-shadow:0 0 0 3px rgba(255,255,255,0.3),0 8px 32px rgba(0,0,0,0.4);pointer-events:none;
-                z-index:99999;display:none;overflow:hidden;backdrop-filter:none;transition:opacity .15s;
+                position:fixed;width:220px;height:220px;border-radius:50%;
+                border:3px solid rgba(99,102,241,0.6);
+                box-shadow:0 0 0 3px rgba(255,255,255,0.3),0 8px 32px rgba(0,0,0,0.4);
+                pointer-events:none;z-index:99999;display:none;overflow:hidden;
             `;
-            magEl.innerHTML = '<div id="presMagContent" style="position:absolute;inset:0;transform-origin:center center;"></div>';
             document.body.appendChild(magEl);
         }
         magEl.style.display = 'none';
 
         // 放大鏡滑鼠追蹤
         if (this._magMouseHandler) document.removeEventListener('mousemove', this._magMouseHandler);
+        const ZOOM = 2.5, MAG_SIZE = 220;
         this._magMouseHandler = (e) => {
             if (!this._magnifierActive) return;
             const mag = document.getElementById('presMagnifier');
             const slide = document.getElementById('presentationSlide');
             if (!mag || !slide) return;
 
-            const magSize = 220;
-            const zoom = 2.5;
             // Position lens centered on cursor
-            mag.style.left = `${e.clientX - magSize / 2}px`;
-            mag.style.top = `${e.clientY - magSize / 2}px`;
+            mag.style.left = `${e.clientX - MAG_SIZE / 2}px`;
+            mag.style.top = `${e.clientY - MAG_SIZE / 2}px`;
 
-            // Get slide bounds
+            // Get slide position and current scale
             const rect = slide.getBoundingClientRect();
-
-            // Calculate where cursor is relative to the slide
             const relX = e.clientX - rect.left;
             const relY = e.clientY - rect.top;
 
-            // Clone content if not present or stale
-            const content = document.getElementById('presMagContent');
-            if (content) {
-                content.innerHTML = slide.innerHTML;
-                content.style.cssText = `
-                    position:absolute;
+            // Clone slide into magnifier (reuse if exists)
+            let clone = mag.querySelector('.mag-clone');
+            if (!clone || this._magStale) {
+                mag.innerHTML = '';
+                clone = slide.cloneNode(true);
+                clone.className = 'mag-clone';
+                clone.removeAttribute('id');
+                clone.style.cssText = `
+                    position:absolute;pointer-events:none;
                     width:${rect.width}px;height:${rect.height}px;
-                    background:${slide.style.background || '#fff'};
-                    transform:scale(${zoom});
-                    transform-origin:${relX}px ${relY}px;
-                    left:${magSize / 2 - relX * zoom + (zoom - 1) * relX}px;
-                    top:${magSize / 2 - relY * zoom + (zoom - 1) * relY}px;
-                    pointer-events:none;
+                    transform-origin:0 0;
                 `;
-                // Copy child positions
-                const origEls = slide.children;
-                const cloneEls = content.children;
-                for (let i = 0; i < Math.min(origEls.length, cloneEls.length); i++) {
-                    if (origEls[i].style.cssText) {
-                        cloneEls[i].style.cssText = origEls[i].style.cssText;
-                    }
-                }
+                // copy background
+                clone.style.background = slide.style.background || '#fff';
+                mag.appendChild(clone);
+                this._magStale = false;
             }
+
+            // Scale and offset the clone so cursor point is at lens center
+            const scale = ZOOM;
+            const offsetX = MAG_SIZE / 2 - relX * scale;
+            const offsetY = MAG_SIZE / 2 - relY * scale;
+            clone.style.transform = `scale(${scale})`;
+            clone.style.left = `${offsetX}px`;
+            clone.style.top = `${offsetY}px`;
         };
         document.addEventListener('mousemove', this._magMouseHandler);
 
@@ -4150,6 +4149,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     }
 
     renderPresentationSlide() {
+        this._magStale = true; // 放大鏡需要重新 clone
         const slide = this.slideManager.slides[this.presentationIndex];
         const presentationSlide = document.getElementById('presentationSlide');
         if (!slide) return;
