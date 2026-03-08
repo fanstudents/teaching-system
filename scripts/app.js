@@ -3357,6 +3357,69 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         presentationMode.classList.add('active');
         document.body.style.overflow = 'hidden';
 
+        // ── 放大鏡初始化 ──
+        this._magnifierActive = false;
+        let magEl = document.getElementById('presMagnifier');
+        if (!magEl) {
+            magEl = document.createElement('div');
+            magEl.id = 'presMagnifier';
+            magEl.style.cssText = `
+                position:fixed;width:220px;height:220px;border-radius:50%;border:3px solid rgba(99,102,241,0.6);
+                box-shadow:0 0 0 3px rgba(255,255,255,0.3),0 8px 32px rgba(0,0,0,0.4);pointer-events:none;
+                z-index:99999;display:none;overflow:hidden;backdrop-filter:none;transition:opacity .15s;
+            `;
+            magEl.innerHTML = '<div id="presMagContent" style="position:absolute;inset:0;transform-origin:center center;"></div>';
+            document.body.appendChild(magEl);
+        }
+        magEl.style.display = 'none';
+
+        // 放大鏡滑鼠追蹤
+        if (this._magMouseHandler) document.removeEventListener('mousemove', this._magMouseHandler);
+        this._magMouseHandler = (e) => {
+            if (!this._magnifierActive) return;
+            const mag = document.getElementById('presMagnifier');
+            const slide = document.getElementById('presentationSlide');
+            if (!mag || !slide) return;
+
+            const magSize = 220;
+            const zoom = 2.5;
+            // Position lens centered on cursor
+            mag.style.left = `${e.clientX - magSize / 2}px`;
+            mag.style.top = `${e.clientY - magSize / 2}px`;
+
+            // Get slide bounds
+            const rect = slide.getBoundingClientRect();
+
+            // Calculate where cursor is relative to the slide
+            const relX = e.clientX - rect.left;
+            const relY = e.clientY - rect.top;
+
+            // Clone content if not present or stale
+            const content = document.getElementById('presMagContent');
+            if (content) {
+                content.innerHTML = slide.innerHTML;
+                content.style.cssText = `
+                    position:absolute;
+                    width:${rect.width}px;height:${rect.height}px;
+                    background:${slide.style.background || '#fff'};
+                    transform:scale(${zoom});
+                    transform-origin:${relX}px ${relY}px;
+                    left:${magSize / 2 - relX * zoom + (zoom - 1) * relX}px;
+                    top:${magSize / 2 - relY * zoom + (zoom - 1) * relY}px;
+                    pointer-events:none;
+                `;
+                // Copy child positions
+                const origEls = slide.children;
+                const cloneEls = content.children;
+                for (let i = 0; i < Math.min(origEls.length, cloneEls.length); i++) {
+                    if (origEls[i].style.cssText) {
+                        cloneEls[i].style.cssText = origEls[i].style.cssText;
+                    }
+                }
+            }
+        };
+        document.addEventListener('mousemove', this._magMouseHandler);
+
         // ★ 簡報模式自動存檔（每 30 秒）
         if (this._presAutoSave) clearInterval(this._presAutoSave);
         this._presAutoSave = setInterval(() => {
@@ -4035,6 +4098,15 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         }
         clearTimeout(this._presTopBarTimer);
 
+        // ── 放大鏡清除 ──
+        this._magnifierActive = false;
+        const mag = document.getElementById('presMagnifier');
+        if (mag) mag.style.display = 'none';
+        if (this._magMouseHandler) {
+            document.removeEventListener('mousemove', this._magMouseHandler);
+            this._magMouseHandler = null;
+        }
+
         // 清除 showcase polling timers
         if (this.showcase) this.showcase.destroy();
 
@@ -4367,6 +4439,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     this.renderPresentationSlide();
                     this.broadcastSlideData(this.presentationIndex);
                 }
+            } else if (e.key === 'z' || e.key === 'Z') {
+                // ── 放大鏡切換 ──
+                if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+                this._magnifierActive = !this._magnifierActive;
+                const mag = document.getElementById('presMagnifier');
+                if (mag) mag.style.display = this._magnifierActive ? 'block' : 'none';
+                // Show hint
+                this.showToast(this._magnifierActive ? '🔍 放大鏡已開啟（再按 Z 關閉）' : '放大鏡已關閉');
             }
         });
     }
