@@ -3129,6 +3129,29 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             }
         });
 
+        // ── 雷射筆 (Laser Pointer) ──
+        this._laserActive = false;
+        this._laserThrottleTimer = null;
+        document.getElementById('broadcastBarLaser')?.addEventListener('click', () => {
+            this._laserActive = !this._laserActive;
+            const btn = document.getElementById('broadcastBarLaser');
+            if (this._laserActive) {
+                btn.style.background = 'rgba(239,68,68,0.8)';
+                btn.style.color = '#fff';
+                this.showToast('🔴 雷射筆已開啟 — 學員可看到你的游標位置');
+                this._initLaserTracking();
+            } else {
+                btn.style.background = '';
+                btn.style.color = '';
+                this.showToast('雷射筆已關閉');
+                this._destroyLaserTracking();
+                // Send hide event
+                if (this.broadcasting && this.sessionCode) {
+                    realtime.publish(`session:${this.sessionCode}`, 'cursor_move', { visible: false });
+                }
+            }
+        });
+
         // 排行榜 toggle
         document.getElementById('lbToggle')?.addEventListener('click', async () => {
             const lb = document.getElementById('presLeaderboard');
@@ -3366,6 +3389,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         realtime.disconnect();
 
         this.broadcasting = false;
+        this._laserActive = false;
+        this._destroyLaserTracking();
+        const laserBtn = document.getElementById('broadcastBarLaser');
+        if (laserBtn) { laserBtn.style.background = ''; laserBtn.style.color = ''; }
         this.onlineStudents = new Map();
 
         // 停止排行榜輪詢
@@ -3506,6 +3533,72 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 同步 DB
         db.update('sessions', { current_slide: String(index) },
             { session_code: `eq.${this.sessionCode}` });
+    }
+
+    /* ── 雷射筆：滑鼠追蹤 ── */
+    _initLaserTracking() {
+        // Create presenter-side laser dot
+        let dot = document.getElementById('presLaserDot');
+        if (!dot) {
+            dot = document.createElement('div');
+            dot.id = 'presLaserDot';
+            dot.style.cssText = 'position:fixed;width:16px;height:16px;border-radius:50%;background:rgba(239,68,68,0.9);box-shadow:0 0 12px 4px rgba(239,68,68,0.5),0 0 24px 8px rgba(239,68,68,0.2);pointer-events:none;z-index:99999;display:none;transition:left 0.03s linear,top 0.03s linear;';
+            document.body.appendChild(dot);
+        }
+
+        this._laserMoveHandler = (e) => {
+            if (!this._laserActive || !this.broadcasting) return;
+
+            const presSlide = document.getElementById('presSlide');
+            if (!presSlide) return;
+            const rect = presSlide.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+
+            // Show dot on presenter screen
+            dot.style.display = 'block';
+            dot.style.left = (e.clientX - 8) + 'px';
+            dot.style.top = (e.clientY - 8) + 'px';
+
+            // Only send if inside slide area
+            if (x >= -0.02 && x <= 1.02 && y >= -0.02 && y <= 1.02) {
+                // Throttle to ~20fps (50ms)
+                if (!this._laserThrottleTimer) {
+                    this._laserThrottleTimer = setTimeout(() => {
+                        this._laserThrottleTimer = null;
+                        realtime.publish(`session:${this.sessionCode}`, 'cursor_move', {
+                            x: Math.max(0, Math.min(1, x)),
+                            y: Math.max(0, Math.min(1, y)),
+                            visible: true
+                        });
+                    }, 50);
+                }
+            }
+        };
+
+        this._laserLeaveHandler = () => {
+            dot.style.display = 'none';
+            if (this.broadcasting && this.sessionCode) {
+                realtime.publish(`session:${this.sessionCode}`, 'cursor_move', { visible: false });
+            }
+        };
+
+        document.addEventListener('mousemove', this._laserMoveHandler);
+        document.getElementById('presentationMode')?.addEventListener('mouseleave', this._laserLeaveHandler);
+    }
+
+    _destroyLaserTracking() {
+        if (this._laserMoveHandler) {
+            document.removeEventListener('mousemove', this._laserMoveHandler);
+            this._laserMoveHandler = null;
+        }
+        if (this._laserLeaveHandler) {
+            document.getElementById('presentationMode')?.removeEventListener('mouseleave', this._laserLeaveHandler);
+            this._laserLeaveHandler = null;
+        }
+        const dot = document.getElementById('presLaserDot');
+        if (dot) dot.style.display = 'none';
+        if (this._laserThrottleTimer) { clearTimeout(this._laserThrottleTimer); this._laserThrottleTimer = null; }
     }
 
     /* =========================================

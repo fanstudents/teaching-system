@@ -674,6 +674,62 @@
                     }
                 });
 
+                // ── 雷射筆：講師游標同步 ──
+                let laserDot = null;
+                let laserHideTimer = null;
+                function ensureLaserDot() {
+                    if (laserDot) return laserDot;
+                    laserDot = document.createElement('div');
+                    laserDot.id = 'instructorLaser';
+                    laserDot.style.cssText = `
+                        position:absolute;width:18px;height:18px;border-radius:50%;
+                        background:radial-gradient(circle, rgba(239,68,68,0.95) 30%, rgba(239,68,68,0.3) 70%, transparent 100%);
+                        box-shadow:0 0 14px 5px rgba(239,68,68,0.45), 0 0 28px 10px rgba(239,68,68,0.15);
+                        pointer-events:none;z-index:9999;display:none;
+                        transition:left 0.06s linear, top 0.06s linear, opacity 0.3s ease;
+                        animation: laserPulse 1.2s ease-in-out infinite;
+                    `;
+                    slideEl.style.position = 'relative';
+                    slideEl.appendChild(laserDot);
+
+                    // Add pulse animation
+                    if (!document.getElementById('laserPulseStyle')) {
+                        const style = document.createElement('style');
+                        style.id = 'laserPulseStyle';
+                        style.textContent = `
+                            @keyframes laserPulse {
+                                0%, 100% { transform: scale(1); box-shadow: 0 0 14px 5px rgba(239,68,68,0.45), 0 0 28px 10px rgba(239,68,68,0.15); }
+                                50% { transform: scale(1.3); box-shadow: 0 0 20px 8px rgba(239,68,68,0.6), 0 0 36px 14px rgba(239,68,68,0.2); }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                    return laserDot;
+                }
+
+                realtime.on('cursor_move', (msg) => {
+                    const p = msg.payload || msg;
+                    const dot = ensureLaserDot();
+
+                    if (!p.visible) {
+                        dot.style.display = 'none';
+                        return;
+                    }
+
+                    // Position relative to slide (960x540)
+                    dot.style.display = 'block';
+                    dot.style.opacity = '1';
+                    dot.style.left = (p.x * 960 - 9) + 'px';
+                    dot.style.top = (p.y * 540 - 9) + 'px';
+
+                    // Auto-hide after 2s of no updates
+                    if (laserHideTimer) clearTimeout(laserHideTimer);
+                    laserHideTimer = setTimeout(() => {
+                        dot.style.opacity = '0';
+                        setTimeout(() => { dot.style.display = 'none'; }, 300);
+                    }, 2000);
+                });
+
                 // ★ 監聽作業提交事件 — 即時更新計數器
                 realtime.on('hw_submitted', (msg) => {
                     const p = msg.payload || msg;
@@ -995,6 +1051,8 @@
                 requestAnimationFrame(() => {
                     slideEl.style.opacity = '1';
                     slideEl.style.transform = 'scale(1)';
+                    // Re-attach laser pointer dot if it exists
+                    if (laserDot) slideEl.appendChild(laserDot);
                 });
             }, 200);
 
