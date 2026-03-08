@@ -3378,8 +3378,6 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.broadcasting = false;
         this._laserActive = false;
         this._destroyLaserTracking();
-        const laserBtn = document.getElementById('broadcastBarLaser');
-        if (laserBtn) { laserBtn.style.background = ''; laserBtn.style.color = ''; }
         this.onlineStudents = new Map();
 
         // 停止排行榜輪詢
