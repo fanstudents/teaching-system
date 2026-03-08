@@ -1386,14 +1386,13 @@ body {
     display: flex;
 }
 
-/* 廣播中時，簡報模式往下推 40px 讓綠色列可見 */
-/* 廣播中時，簡報模式往下推 40px 讓綠色列可見 */
-body.broadcast-active .presentation-mode.active {
-    top: 40px;
+/* 廣播中 + 簡報模式：黑色列常駐顯示（不只 hover），綠色列隱藏 */
+body.broadcast-active #presTopBar {
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
-/* 廣播中時，隱藏簡報黑色頂部列（功能已在綠色廣播列） */
-body.broadcast-active #presTopBar {
+body.broadcast-active .broadcast-bar {
     display: none !important;
 }
 

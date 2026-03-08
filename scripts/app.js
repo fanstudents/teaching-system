@@ -3749,6 +3749,32 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     if (presCopyBtn) presCopyBtn.style.display = 'none';
                     if (presStopBtn) presStopBtn.style.display = 'none';
                     if (dashBtn) dashBtn.style.display = 'none';
+                    const plb = document.getElementById('presLaserBtn');
+                    if (plb) plb.style.display = 'none';
+                };
+            }
+            // 雷射筆按鈕
+            const presLaserBtn = document.getElementById('presLaserBtn');
+            if (presLaserBtn) {
+                presLaserBtn.style.display = 'flex';
+                presLaserBtn.onclick = () => {
+                    this._laserActive = !this._laserActive;
+                    if (this._laserActive) {
+                        presLaserBtn.style.background = 'rgba(239,68,68,0.6)';
+                        presLaserBtn.style.borderColor = 'rgba(239,68,68,0.8)';
+                        presLaserBtn.style.color = '#fff';
+                        this.showToast('🔴 雷射筆已開啟 — 學員可看到你的游標位置');
+                        this._initLaserTracking();
+                    } else {
+                        presLaserBtn.style.background = 'rgba(255,255,255,0.12)';
+                        presLaserBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+                        presLaserBtn.style.color = 'rgba(255,255,255,0.85)';
+                        this.showToast('雷射筆已關閉');
+                        this._destroyLaserTracking();
+                        if (this.broadcasting && this.sessionCode) {
+                            realtime.publish(`session:${this.sessionCode}`, 'cursor_move', { visible: false });
+                        }
+                    }
                 };
             }
         } else {
@@ -3756,6 +3782,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (presViewers) presViewers.style.display = 'none';
             if (presCopyBtn) presCopyBtn.style.display = 'none';
             if (presStopBtn) presStopBtn.style.display = 'none';
+            const plb2 = document.getElementById('presLaserBtn');
+            if (plb2) plb2.style.display = 'none';
         }
 
         // 顯示場次資訊
@@ -4408,7 +4436,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // 隱藏 presTopBar 廣播元素
         ['presInstructorBadge', 'presBroadcastCode', 'presBroadcastViewers',
-            'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn'].forEach(id => {
+            'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn', 'presLaserBtn'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
