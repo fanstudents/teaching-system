@@ -21,6 +21,121 @@
             box-sizing: border-box;
         }
 
+        /* ── PIN Overlay ── */
+        .pin-overlay {
+            position: fixed;
+            inset: 0;
+            background: #f6f8fb;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pin-overlay.hidden {
+            display: none;
+        }
+
+        .pin-box {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 380px;
+            width: 90vw;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .pin-box .pin-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #eef2ff;
+            color: #6366f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .pin-box h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .pin-box p {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-family: inherit;
+            text-align: center;
+            letter-spacing: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .pin-input:focus {
+            border-color: #6366f1;
+        }
+
+        .pin-input.error {
+            border-color: #ef4444;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            75% {
+                transform: translateX(6px);
+            }
+        }
+
+        .pin-submit {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 10px;
+            background: #6366f1;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background 0.15s;
+        }
+
+        .pin-submit:hover {
+            background: #4f46e5;
+        }
+
+        .pin-error-msg {
+            font-size: 0.78rem;
+            color: #ef4444;
+            margin-top: 8px;
+            min-height: 1.2em;
+        }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background: #f6f8fb;
@@ -515,6 +630,21 @@
 </head>
 
 <body>
+    <!-- PIN Protection Overlay -->
+    <div class="pin-overlay" id="pinOverlay">
+        <div class="pin-box">
+            <div class="pin-icon">
+                <span class="material-symbols-rounded" style="font-size:28px;">lock</span>
+            </div>
+            <h2>需要驗證碼</h2>
+            <p>請輸入儀表板存取碼以查看課前統計</p>
+            <input type="password" class="pin-input" id="pinInput" placeholder="••••" maxlength="20"
+                onkeydown="if(event.key==='Enter')verifyPin()">
+            <button class="pin-submit" onclick="verifyPin()">驗證</button>
+            <div class="pin-error-msg" id="pinError"></div>
+        </div>
+    </div>
+
     <div class="dash-topbar">
         <div class="dash-topbar-left">
             <div class="brand">
@@ -1046,7 +1176,55 @@
         };
 
         window.loadAll = loadAll;
-        loadAll();
+
+        // ── PIN Protection Logic ──
+        let projectData = null;
+
+        async function initWithPin() {
+            // First, fetch project to check if PIN is set
+            if (code) {
+                const { data: pData } = await db.select('projects', {
+                    filter: { join_code: `eq.${code}` },
+                    select: 'id,name,dashboard_pin',
+                    limit: 1
+                });
+                projectData = pData?.[0] || null;
+            }
+
+            const pin = projectData?.dashboard_pin;
+            if (!pin) {
+                // No PIN set — auto-load
+                document.getElementById('pinOverlay').classList.add('hidden');
+                await loadAll();
+            }
+            // else: show PIN overlay (default visible)
+        }
+
+        window.verifyPin = function () {
+            const input = document.getElementById('pinInput').value.trim();
+            const errorEl = document.getElementById('pinError');
+            if (!input) { errorEl.textContent = '請輸入驗證碼'; return; }
+            if (input !== projectData?.dashboard_pin) {
+                errorEl.textContent = '驗證碼錯誤';
+                document.getElementById('pinInput').classList.add('error');
+                setTimeout(() => document.getElementById('pinInput').classList.remove('error'), 400);
+                return;
+            }
+            // Correct PIN
+            document.getElementById('pinOverlay').classList.add('hidden');
+            errorEl.textContent = '';
+            // Save to sessionStorage so refresh doesn't re-prompt
+            sessionStorage.setItem(`dash_pin_${code}`, 'ok');
+            loadAll();
+        };
+
+        // Check if already verified this session
+        if (sessionStorage.getItem(`dash_pin_${code}`) === 'ok') {
+            document.getElementById('pinOverlay').classList.add('hidden');
+            loadAll();
+        } else {
+            initWithPin();
+        }
     </script>
 </body>
 
