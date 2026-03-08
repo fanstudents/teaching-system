@@ -1386,14 +1386,29 @@ body {
     display: flex;
 }
 
-/* 廣播中 + 簡報模式：黑色列常駐顯示（不只 hover），綠色列隱藏 */
-body.broadcast-active #presTopBar {
-    opacity: 1 !important;
-    pointer-events: auto !important;
+/* ── presTopBar 狀態管理 ── */
+.pres-top-bar {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
 }
 
-body.broadcast-active .broadcast-bar {
-    display: none !important;
+/* 滑鼠移動時顯示（JS 加 .visible class） */
+.pres-top-bar.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 廣播中：常駐顯示，不自動隱藏 */
+.pres-top-bar.broadcast-locked {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 簡報模式中隱藏綠色廣播列（presTopBar 已經整合了所有功能） */
+.presentation-mode.active~.broadcast-bar,
+body.broadcast-active .presentation-mode.active~.broadcast-bar {
+    display: none;
 }
 
 /* 排行榜開啟時，簡報往左偏移但保持原尺寸 */

@@ -3729,13 +3729,6 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (broadcastBar) broadcastBar.classList.remove('active');
             document.querySelector('.admin-main').style.marginTop = '';
 
-            // 強制 presTopBar 可見 + 可點擊（覆蓋 inline style）
-            const topBar = document.getElementById('presTopBar');
-            if (topBar) {
-                topBar.style.opacity = '1';
-                topBar.style.pointerEvents = 'auto';
-            }
-
             // 在 presTopBar 顯示廣播資訊
             if (presCode) { presCode.style.display = 'inline'; presCode.textContent = this.sessionCode; }
             if (presViewers) { presViewers.style.display = 'inline'; this.updateViewerCount(); }
@@ -3796,14 +3789,25 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 顯示場次資訊
         this._populatePresTopBar();
 
-        // Top bar 滑鼠移動顯示
+        // Top bar 顯示邏輯（用 CSS class 管理）
         this._presTopBarTimer = null;
+        const topBar = document.getElementById('presTopBar');
+
+        if (this.broadcasting && topBar) {
+            // 廣播中：常駐顯示，不自動隱藏
+            topBar.classList.add('broadcast-locked');
+            topBar.classList.add('visible');
+        }
+
         this._presMouseHandler = () => {
-            const bar = document.getElementById('presTopBar');
-            if (bar) { bar.style.opacity = '1'; bar.style.pointerEvents = 'auto'; }
+            if (!topBar) return;
+            // 廣播中由 broadcast-locked 控制，不需要 timer
+            if (topBar.classList.contains('broadcast-locked')) return;
+
+            topBar.classList.add('visible');
             clearTimeout(this._presTopBarTimer);
             this._presTopBarTimer = setTimeout(() => {
-                if (bar) { bar.style.opacity = '0'; bar.style.pointerEvents = 'none'; }
+                topBar.classList.remove('visible');
             }, 3000);
         };
         presentationMode.addEventListener('mousemove', this._presMouseHandler);
@@ -4441,7 +4445,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             document.querySelector('.admin-main').style.marginTop = '40px';
         }
 
-        // 隱藏 presTopBar 廣播元素
+        // 隱藏 presTopBar 廣播元素 + 清除 class
+        const topBar = document.getElementById('presTopBar');
+        if (topBar) {
+            topBar.classList.remove('broadcast-locked', 'visible');
+        }
         ['presInstructorBadge', 'presBroadcastCode', 'presBroadcastViewers',
             'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn', 'presLaserBtn'].forEach(id => {
                 const el = document.getElementById(id);
