@@ -3660,14 +3660,48 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
             if (this._annotTool === 'text') {
                 const pos = getPos(e);
-                const text = prompt('輸入標記文字：');
-                if (text) {
-                    this._annotStrokes.push({
-                        type: 'text', text, x: pos.x, y: pos.y,
-                        color: this._annotColor, font: 'bold 20px "Noto Sans TC", sans-serif'
-                    });
-                    this._annotRedraw();
-                }
+                // Inline text input (avoid prompt() which breaks fullscreen)
+                const existing = document.getElementById('_annotTextInput');
+                if (existing) existing.remove();
+                const input = document.createElement('div');
+                input.id = '_annotTextInput';
+                input.contentEditable = 'true';
+                Object.assign(input.style, {
+                    position: 'fixed',
+                    left: e.clientX + 'px',
+                    top: e.clientY + 'px',
+                    minWidth: '80px',
+                    padding: '4px 8px',
+                    background: 'rgba(0,0,0,0.7)',
+                    color: this._annotColor,
+                    border: `2px solid ${this._annotColor}`,
+                    borderRadius: '4px',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                    fontFamily: '"Noto Sans TC", sans-serif',
+                    outline: 'none',
+                    zIndex: '9999',
+                    whiteSpace: 'nowrap'
+                });
+                document.body.appendChild(input);
+                input.focus();
+
+                const commitText = () => {
+                    const text = input.textContent.trim();
+                    input.remove();
+                    if (text) {
+                        this._annotStrokes.push({
+                            type: 'text', text, x: pos.x, y: pos.y,
+                            color: this._annotColor, font: 'bold 20px "Noto Sans TC", sans-serif'
+                        });
+                        this._annotRedraw();
+                    }
+                };
+                input.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') { ev.preventDefault(); commitText(); }
+                    if (ev.key === 'Escape') { input.remove(); }
+                });
+                input.addEventListener('blur', commitText);
                 return;
             }
 
