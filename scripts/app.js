@@ -3152,6 +3152,18 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             }
         });
 
+        // 廣播列：全螢幕 / 離開簡報
+        document.getElementById('broadcastBarFullscreen')?.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen?.();
+            } else {
+                document.exitFullscreen?.();
+            }
+        });
+        document.getElementById('broadcastBarExitPres')?.addEventListener('click', () => {
+            this.exitPresentation();
+        });
+
         // 排行榜 toggle
         document.getElementById('lbToggle')?.addEventListener('click', async () => {
             const lb = document.getElementById('presLeaderboard');

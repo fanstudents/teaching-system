@@ -1392,6 +1392,11 @@ body.broadcast-active .presentation-mode.active {
     top: 40px;
 }
 
+/* 廣播中時，隱藏簡報黑色頂部列（功能已在綠色廣播列） */
+body.broadcast-active #presTopBar {
+    display: none !important;
+}
+
 /* 排行榜開啟時，簡報往左偏移但保持原尺寸 */
 .presentation-mode.lb-active {
     padding-right: 260px;
