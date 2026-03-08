@@ -3585,7 +3585,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             this._laserLeaveHandler = null;
         }
         const dot = document.getElementById('presLaserDot');
-        if (dot) dot.style.display = 'none';
+        if (dot) dot.remove();
         if (this._laserThrottleTimer) { clearTimeout(this._laserThrottleTimer); this._laserThrottleTimer = null; }
     }
 
@@ -4420,6 +4420,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         }
 
         // 隱藏 presTopBar 廣播元素 + 清除 class
+        // 清除雷射筆狀態
+        this._laserActive = false;
+        this._destroyLaserTracking();
         const topBar = document.getElementById('presTopBar');
         if (topBar) {
             topBar.classList.remove('broadcast-locked', 'visible');
