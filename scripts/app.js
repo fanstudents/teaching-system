@@ -3683,7 +3683,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     zIndex: '9999',
                     whiteSpace: 'nowrap'
                 });
-                document.body.appendChild(input);
+                const container = document.getElementById('presentationMode') || document.body;
+                container.appendChild(input);
                 input.focus();
 
                 const commitText = () => {
