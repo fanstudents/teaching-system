@@ -3563,7 +3563,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this._laserMoveHandler = (e) => {
             if (!this._laserActive || !this.broadcasting) return;
 
-            const presSlide = document.getElementById('presSlide');
+            const presSlide = document.getElementById('presentationSlide');
             if (!presSlide) return;
             const rect = presSlide.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width;
