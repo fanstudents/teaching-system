@@ -1021,10 +1021,9 @@
         function renderSlide(slide, index, total) {
             if (!slide) return;
 
-            // ── 過場動畫：淡出 → 替換 → 淡入 ──
-            slideEl.style.transition = 'opacity 0.2s ease, transform 0.25s ease';
+            // ── 過場動畫：淡出 → 替換 → 淡入（不碰 transform，避免覆蓋 scaleSlide）──
+            slideEl.style.transition = 'opacity 0.2s ease';
             slideEl.style.opacity = '0';
-            slideEl.style.transform = 'scale(0.98)';
 
             setTimeout(() => {
                 slideEl.innerHTML = '';
@@ -1047,10 +1046,10 @@
                     }
                 });
 
-                // 淡入
+                // 淡入 + 重新縮放
                 requestAnimationFrame(() => {
                     slideEl.style.opacity = '1';
-                    slideEl.style.transform = 'scale(1)';
+                    scaleSlide(); // 確保手機版正確縮放
                     // Re-attach laser pointer dot if it exists
                     if (laserDot) slideEl.appendChild(laserDot);
                 });
@@ -2047,8 +2046,20 @@
                 !!document.fullscreenElement || !!document.webkitFullscreenElement;
             const isMobile = window.innerWidth <= 1024;
 
-            if (isImmersive) {
-                // 沉浸模式：用整個視窗大小，置中
+            // 確保 960x540 固定尺寸
+            slideEl.style.width = '960px';
+            slideEl.style.height = '540px';
+
+            if (isMobile) {
+                // 手機版：slide 是 absolute + top:50% left:50%
+                // 用 translate(-50%,-50%) 居中 + scale 縮放
+                const ww = wrapper.clientWidth;
+                const wh = wrapper.clientHeight;
+                const scale = Math.min(ww / 960, wh / 540, 1);
+                slideEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                slideEl.style.transformOrigin = 'top left';
+                slideEl.style.marginBottom = '0';
+            } else if (isImmersive) {
                 const vw = window.innerWidth;
                 const vh = window.innerHeight;
                 const scale = Math.min(vw / 960, vh / 540, 1);
@@ -2056,18 +2067,14 @@
                 slideEl.style.transformOrigin = 'center center';
                 slideEl.style.marginBottom = '0';
             } else {
-                // 一般模式
-                const pad = isMobile ? 0 : 40;
+                const pad = 40;
                 const ww = wrapper.clientWidth - pad;
                 const wh = wrapper.clientHeight - pad;
                 const scale = Math.min(ww / 960, wh / 540, 1);
                 slideEl.style.transform = `scale(${scale})`;
-                // 手機版也用 center center，配合 flex center 居中
                 slideEl.style.transformOrigin = 'center center';
                 slideEl.style.marginBottom = '0';
             }
-            slideEl.style.width = '960px';
-            slideEl.style.height = '540px';
         }
 
         // ── 手機版側面板 ──
