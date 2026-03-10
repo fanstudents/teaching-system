@@ -462,6 +462,9 @@ class InteractionState {
      * 顯示加分動畫
      */
     showScorePopup(points) {
+        // 掛載到 presentation-mode 容器（避免被 fullscreen 壓住）
+        const mountTarget = document.querySelector('.presentation-mode.active') || document.body;
+
         const popup = document.createElement('div');
         popup.className = 'score-popup';
         popup.innerHTML = `
@@ -470,7 +473,7 @@ class InteractionState {
                 +${points} 分
             </div>
         `;
-        document.body.appendChild(popup);
+        mountTarget.appendChild(popup);
 
         // JS 煙火粒子
         const colors = ['#fbbf24', '#f59e0b', '#d97706', '#6366f1', '#ec4899', '#22c55e'];
@@ -481,7 +484,7 @@ class InteractionState {
                 border-radius:50%;pointer-events:none;z-index:10001;
                 background:${colors[i % colors.length]};
             `;
-            document.body.appendChild(p);
+            mountTarget.appendChild(p);
             const angle = (i / 16) * Math.PI * 2;
             const dist = 60 + Math.random() * 80;
             p.animate([

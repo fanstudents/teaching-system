@@ -1113,6 +1113,17 @@
    作品展示牆 - Showcase
    ======================================== */
 
+/* 作業牆容器 */
+.showcase-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+}
+
 /* 編輯模式 placeholder */
 .showcase-placeholder {
     display: flex;
