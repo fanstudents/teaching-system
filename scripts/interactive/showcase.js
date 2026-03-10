@@ -285,24 +285,62 @@ export class Showcase {
                         btn.style.borderColor = '#6366f1';
 
                         try {
-                            await db.update('submissions', { instructor_score: score }, {
+                            // 1. 先讀取此 submission 的現有 state（避免覆蓋學員互動記錄）
+                            let existingState = {};
+                            try {
+                                const { data: rows } = await db.select('submissions', {
+                                    filter: { id: `eq.${subId}` },
+                                    select: 'state'
+                                });
+                                if (rows && rows[0]) {
+                                    let st = rows[0].state;
+                                    if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                                    existingState = st || {};
+                                }
+                            } catch { /* 讀取失敗不影響寫入 */ }
+
+                            // 2. 合併：更新 instructor_score + state._awarded
+                            const mergedState = {
+                                ...existingState,
+                                _awarded: score,
+                                _maxPts: score,
+                                _instructorScored: true,
+                                _scoredAt: new Date().toISOString()
+                            };
+
+                            await db.update('submissions', {
+                                instructor_score: score,
+                                state: mergedState
+                            }, {
                                 filter: { id: `eq.${subId}` }
                             });
+
+                            // 3. UI 回饋 — 已儲存標示
                             const saved = card.querySelector('.showcase-score-saved');
                             if (saved) {
                                 saved.style.display = 'inline';
                                 setTimeout(() => saved.style.display = 'none', 2000);
                             }
 
-                            // ★ 廣播評分（排行榜整合）
+                            // 4. 廣播評分（排行榜 + 學員端即時更新）
                             const sub = submissions[parseInt(card.dataset.index)];
                             if (sub && this.sessionCode) {
                                 realtime.publish(`session:${this.sessionCode}`, 'hw_scored', {
                                     studentName: sub.student_name,
+                                    studentEmail: sub.student_email || '',
                                     score,
                                     assignmentTitle
                                 });
+                                // 廣播排行榜更新事件
+                                realtime.publish(`session:${this.sessionCode}`, 'leaderboard_update', {
+                                    studentName: sub.student_name,
+                                    studentEmail: sub.student_email || '',
+                                    pointsAdded: score,
+                                    source: 'instructor_score'
+                                });
                             }
+
+                            console.log(`[Showcase] scored ${sub?.student_name}: ${score}pts (state._awarded updated)`);
                         } catch (err) {
                             console.warn('[Showcase] score save failed:', err);
                         }

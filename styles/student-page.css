@@ -801,16 +801,14 @@ body {
 
     /* ── 投影片撐滿寬度 ── */
     .student-slide-wrapper {
-        padding: 2px 0 0;
-        align-items: flex-start;
-        justify-content: flex-start;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
     }
 
     .student-slide {
-        transform-origin: top center;
+        transform-origin: center center;
         flex-shrink: 0;
         border-radius: 0;
     }
@@ -952,37 +950,36 @@ body {
 /* ── 直式（Portrait）專用佈局 ── */
 @media (max-width: 1024px) and (orientation: portrait) {
 
-    /* 左側面板 → 頂部水平列（保留） */
+    /* 左側面板 → 頂部水平列 */
     .msp-left {
         flex-direction: row !important;
-        top: 0 !important;
+        top: env(safe-area-inset-top, 0px) !important;
         left: 0 !important;
         right: 0 !important;
         transform: none !important;
         border-radius: 0 !important;
         padding: 4px 10px !important;
         gap: 6px !important;
-        background: rgba(15, 23, 42, 0.85) !important;
+        background: rgba(15, 23, 42, 0.92) !important;
         border: none !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        height: 36px;
     }
 
-    /* 右側面板 → 懸浮在投影片上方（橫向風格） */
+    /* 右側面板 → 底部水平列 */
     .msp-right {
         flex-direction: row !important;
         top: auto !important;
-        bottom: auto !important;
+        bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
         left: 50% !important;
         right: auto !important;
         transform: translateX(-50%) !important;
-        /* 投影片大約在螢幕 45% 位置，放在它上方一點 */
         position: fixed !important;
-        top: calc(env(safe-area-inset-top, 0px) + 38px) !important;
-        border-radius: 14px !important;
-        padding: 4px 8px !important;
+        border-radius: 20px !important;
+        padding: 4px 12px !important;
         gap: 4px !important;
-        background: rgba(255, 255, 255, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: rgba(15, 23, 42, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         backdrop-filter: blur(12px) !important;
     }
 
@@ -1003,37 +1000,33 @@ body {
         margin: 0 2px !important;
     }
 
-    /* 箭頭懸浮在上方黑色區域 — 分散兩旁 */
+    /* 箭頭在投影片兩側 — 垂直居中 */
     .student-presentation .slide-nav-arrow {
-        top: calc(env(safe-area-inset-top, 0px) + 38px) !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
     }
 
     .student-presentation .slide-nav-arrow.prev {
-        left: 6px !important;
+        left: 4px !important;
         right: auto !important;
     }
 
     .student-presentation .slide-nav-arrow.next {
-        right: 6px !important;
+        right: 4px !important;
         left: auto !important;
     }
 
-    /* 橫向瀏覽提示 — 在投影片下方 */
+    /* 投影片容器居中 */
+    .student-slide-wrapper {
+        padding-top: 40px !important; /* 為頂部面板留空間 */
+        padding-bottom: 50px !important; /* 為底部面板留空間 */
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* 橫向瀏覽提示 — 隱藏，避免遮擋 */
     .student-presentation::after {
-        content: '📱 建議橫向瀏覽以獲得最佳體驗';
-        position: fixed;
-        bottom: max(12px, env(safe-area-inset-bottom, 0px));
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.45);
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 500;
-        z-index: 290;
-        white-space: nowrap;
-        pointer-events: none;
+        content: none;
     }
 
     /* 穩定沉浸模式 */
@@ -1217,7 +1210,7 @@ body {
 
 .student-presentation.immersive-mode .student-slide-wrapper {
     background: #000;
-    padding: 0;
+    padding: 0 !important;
     align-items: center;
     justify-content: center;
     overflow: hidden;
@@ -1225,6 +1218,17 @@ body {
 
 .student-presentation.immersive-mode .student-progress-bar {
     display: none;
+}
+
+/* 沉浸模式下 side panels 半透明不遮擋 */
+.student-presentation.immersive-mode .mobile-side-panel {
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+.student-presentation.immersive-mode .mobile-side-panel:hover,
+.student-presentation.immersive-mode .mobile-side-panel:active {
+    opacity: 1;
 }
 
 /* ≤1024px 隱藏舊版 FAB（改用側面板按鈕） */

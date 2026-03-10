@@ -2045,6 +2045,7 @@
             const pres = document.getElementById('studentPresentation');
             const isImmersive = pres?.classList.contains('immersive-mode') ||
                 !!document.fullscreenElement || !!document.webkitFullscreenElement;
+            const isMobile = window.innerWidth <= 1024;
 
             if (isImmersive) {
                 // 沉浸模式：用整個視窗大小，置中
@@ -2056,13 +2057,14 @@
                 slideEl.style.marginBottom = '0';
             } else {
                 // 一般模式
-                const pad = window.innerWidth <= 1024 ? 0 : 40;
+                const pad = isMobile ? 0 : 40;
                 const ww = wrapper.clientWidth - pad;
                 const wh = wrapper.clientHeight - pad;
                 const scale = Math.min(ww / 960, wh / 540, 1);
                 slideEl.style.transform = `scale(${scale})`;
-                slideEl.style.transformOrigin = window.innerWidth <= 1024 ? 'top left' : 'center center';
-                slideEl.style.marginBottom = window.innerWidth <= 1024 ? `-${540 - 540 * scale}px` : '0';
+                // 手機版也用 center center，配合 flex center 居中
+                slideEl.style.transformOrigin = 'center center';
+                slideEl.style.marginBottom = '0';
             }
             slideEl.style.width = '960px';
             slideEl.style.height = '540px';

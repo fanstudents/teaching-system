@@ -471,7 +471,32 @@ class InteractionState {
             </div>
         `;
         document.body.appendChild(popup);
-        setTimeout(() => popup.remove(), 2000);
+
+        // JS 煙火粒子
+        const colors = ['#fbbf24', '#f59e0b', '#d97706', '#6366f1', '#ec4899', '#22c55e'];
+        for (let i = 0; i < 16; i++) {
+            const p = document.createElement('div');
+            p.style.cssText = `
+                position:fixed;top:50%;left:50%;width:6px;height:6px;
+                border-radius:50%;pointer-events:none;z-index:10001;
+                background:${colors[i % colors.length]};
+            `;
+            document.body.appendChild(p);
+            const angle = (i / 16) * Math.PI * 2;
+            const dist = 60 + Math.random() * 80;
+            p.animate([
+                { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px)) scale(0)`, opacity: 0 }
+            ], {
+                duration: 700 + Math.random() * 400,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                fill: 'forwards',
+                delay: 100 + Math.random() * 150
+            });
+            setTimeout(() => p.remove(), 1300);
+        }
+
+        setTimeout(() => popup.remove(), 2500);
     }
 }
 
