@@ -3,7 +3,6 @@
  * 自動從 DB 拉取提交，渲染繳交狀態 + 作品 grid
  */
 import { db, realtime } from '../supabase.js';
-import { stateManager } from './stateManager.js';
 
 export class Showcase {
     constructor() {
@@ -323,15 +322,12 @@ export class Showcase {
                                 filter: { id: `eq.${subId}` }
                             });
 
-                            // 3. UI 回饋 + 加分動畫
+                            // 3. UI 回饋
                             const saved = card.querySelector('.showcase-score-saved');
                             if (saved) {
                                 saved.style.display = 'inline';
                                 setTimeout(() => saved.style.display = 'none', 2000);
                             }
-
-                            // ★ 觸發加分動畫
-                            try { stateManager.showScorePopup(score); } catch { }
 
                             // 4. 廣播
                             const sub = submissions[parseInt(card.dataset.index)];
@@ -349,6 +345,52 @@ export class Showcase {
                                     source: 'instructor_score'
                                 });
                             }
+
+                            // ★ 排行榜加分動畫 — 找到對應的 row 並動畫 +N
+                            setTimeout(() => {
+                                // 先強制更新排行榜
+                                if (window.app?.updateLeaderboard) window.app.updateLeaderboard();
+
+                                setTimeout(() => {
+                                    const email = sub?.student_email || '';
+                                    const name = sub?.student_name || '';
+                                    // 以 email 或 name 找到排行榜 row
+                                    const rows = document.querySelectorAll('#lbList .lb-row');
+                                    let targetRow = null;
+                                    rows.forEach(r => {
+                                        if (email && r.dataset.email === email) targetRow = r;
+                                        else if (r.querySelector('.lb-name')?.textContent === name) targetRow = r;
+                                    });
+                                    if (targetRow) {
+                                        // 高亮閃動 row
+                                        targetRow.style.transition = 'background 0.3s';
+                                        targetRow.style.background = 'rgba(250,204,21,0.15)';
+                                        setTimeout(() => targetRow.style.background = '', 1500);
+
+                                        // "+N分" 浮動標籤
+                                        const ptsEl = targetRow.querySelector('.lb-pts');
+                                        if (ptsEl) {
+                                            const badge = document.createElement('span');
+                                            badge.className = 'lb-score-anim';
+                                            badge.textContent = `+${score}`;
+                                            badge.style.cssText = `
+                                                position:absolute;right:-8px;top:-4px;
+                                                color:#f59e0b;font-weight:800;font-size:14px;
+                                                pointer-events:none;white-space:nowrap;
+                                                text-shadow:0 0 6px rgba(245,158,11,0.4);
+                                            `;
+                                            ptsEl.style.position = 'relative';
+                                            ptsEl.appendChild(badge);
+                                            badge.animate([
+                                                { opacity: 1, transform: 'translateY(0)' },
+                                                { opacity: 0, transform: 'translateY(-20px)' }
+                                            ], { duration: 1200, easing: 'ease-out', fill: 'forwards' });
+                                            setTimeout(() => badge.remove(), 1500);
+                                        }
+                                    }
+                                }, 600); // 等排行榜更新完
+                            }, 100);
+
                             console.log(`[Showcase] scored ${sub?.student_name}: ${score}pts`);
                         } catch (err) {
                             console.warn('[Showcase] score save failed:', err);
