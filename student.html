@@ -2251,6 +2251,51 @@
                     scaleSlide();
                 }, 300);
             }
+
+            // ── 手機版 SVG 觸控 tooltip ──
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                let currentTooltip = null;
+                let lastTouched = null;
+
+                document.addEventListener('click', (e) => {
+                    const svgEl = e.target.closest('svg [cursor="pointer"], svg [style*="cursor"], svg .flow-box, svg g[class], svg rect[class]');
+                    // 移除舊 tooltip
+                    if (currentTooltip) { currentTooltip.remove(); currentTooltip = null; }
+                    if (lastTouched) { lastTouched.classList.remove('svg-touched'); lastTouched = null; }
+
+                    if (!svgEl) return;
+
+                    // 觸發 hover class
+                    svgEl.classList.add('svg-touched');
+                    lastTouched = svgEl;
+
+                    // 找到 SVG <title> 元素
+                    const titleEl = svgEl.querySelector('title') || svgEl.closest('[data-tooltip]');
+                    const tooltipText = titleEl?.textContent || svgEl.dataset?.tooltip;
+                    if (!tooltipText) return;
+
+                    // 建立自訂 tooltip
+                    const rect = svgEl.getBoundingClientRect();
+                    const tip = document.createElement('div');
+                    tip.className = 'svg-mobile-tooltip';
+                    tip.textContent = tooltipText;
+                    tip.style.cssText = `
+                        position:fixed;z-index:10001;
+                        left:${rect.left + rect.width/2}px;top:${rect.top - 8}px;
+                        transform:translate(-50%,-100%);
+                        background:#1e293b;color:#f1f5f9;
+                        padding:6px 12px;border-radius:6px;
+                        font-size:13px;line-height:1.4;
+                        max-width:260px;text-align:center;
+                        box-shadow:0 4px 12px rgba(0,0,0,0.3);
+                        pointer-events:none;
+                        animation:fadeIn 0.15s ease;
+                    `;
+                    document.body.appendChild(tip);
+                    currentTooltip = tip;
+                    setTimeout(() => { if (tip.parentNode) tip.remove(); }, 3000);
+                });
+            }
         })();
     </script>
 
