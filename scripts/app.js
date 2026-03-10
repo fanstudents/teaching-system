@@ -3313,11 +3313,6 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             label.textContent = '廣播中';
 
             // UI 更新 — 狀態列
-            const bar = document.getElementById('broadcastBar');
-            document.getElementById('broadcastBarCode').textContent = this.sessionCode;
-            bar.classList.add('active');
-            document.body.classList.add('broadcast-active');
-            document.querySelector('.admin-main').style.marginTop = '40px';
             this.updateViewerCount();
 
             this.showToast(`🟢 廣播已開始！課堂代碼：${this.sessionCode}`);
@@ -3523,13 +3518,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     /* ── 雷射筆：滑鼠追蹤 ── */
     _initLaserTracking() {
-        // Create presenter-side laser dot
+        // Create presenter-side laser dot inside presentationMode (must be inside fullscreen element)
+        const presMode = document.getElementById('presentationMode');
         let dot = document.getElementById('presLaserDot');
         if (!dot) {
             dot = document.createElement('div');
             dot.id = 'presLaserDot';
             dot.style.cssText = 'position:fixed;width:16px;height:16px;border-radius:50%;background:rgba(239,68,68,0.9);box-shadow:0 0 12px 4px rgba(239,68,68,0.5),0 0 24px 8px rgba(239,68,68,0.2);pointer-events:none;z-index:99999;display:none;transition:left 0.03s linear,top 0.03s linear;';
-            document.body.appendChild(dot);
+            presMode.appendChild(dot);
         }
 
         this._laserMoveHandler = (e) => {
@@ -3674,18 +3670,21 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     position: 'absolute',
                     left: (e.clientX - pmRect.left) + 'px',
                     top: (e.clientY - pmRect.top) + 'px',
-                    minWidth: '120px',
-                    padding: '6px 10px',
-                    background: 'rgba(0,0,0,0.85)',
+                    minWidth: '140px',
+                    padding: '4px 2px',
+                    background: 'transparent',
                     color: this._annotColor,
-                    border: `2px solid ${this._annotColor}`,
-                    borderRadius: '6px',
+                    borderTop: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
+                    borderBottom: `2px solid ${this._annotColor}`,
+                    borderRadius: '0',
                     fontSize: '20px',
                     fontWeight: 'bold',
                     fontFamily: '"Noto Sans TC", sans-serif',
                     outline: 'none',
                     zIndex: '9999',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                    caretColor: this._annotColor
                 });
 
                 // Temporarily disable canvas so input can receive focus
@@ -5041,9 +5040,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 }
             }
 
-            // Ctrl/Cmd + V 貼上投影片（無選取元素時）
+            // Ctrl/Cmd + V 貼上投影片（無選取元素時，且 dragDrop 沒有已複製元素）
             if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !e.shiftKey) {
-                if (!this.editor?.selectedElement && this._copiedSlide) {
+                // 如果 dragDrop 有已複製的元素資料，讓 dragDrop 處理，避免重複貼上
+                const hasCopiedElements = this.dragDrop?._copiedElements?.length > 0;
+                if (!this.editor?.selectedElement && this._copiedSlide && !hasCopiedElements) {
                     e.preventDefault();
                     const dup = JSON.parse(JSON.stringify(this._copiedSlide));
                     dup.id = this.slideManager.generateId();

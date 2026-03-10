@@ -40,11 +40,14 @@ export class Showcase {
     async setupContainer(container) {
         const title = container.dataset.assignmentTitle || '';
         console.log('[Showcase] setupContainer title:', title, 'sessionCode:', this.sessionCode);
-        if (!title) return;
+        if (!title) {
+            container.innerHTML = `<div class="showcase-error"><span class="material-symbols-outlined">error</span> 未設定作業名稱</div>`;
+            return;
+        }
 
-        // 偵測是否為講師端
-        this._isPresenter = !!container.closest('.presentation-slide');
-        this._broadcasting = !!window.app?.broadcasting;
+        // 偵測是否為講師端 — 存在 container 上，避免多容器互相覆蓋
+        container._showcaseIsPresenter = !!container.closest('.presentation-slide');
+        container._showcaseBroadcasting = !!window.app?.broadcasting;
 
         // 每個容器有唯一 ID，避免多個同 title 容器互相覆蓋 hash
         if (!container._showcaseId) {
@@ -61,7 +64,12 @@ export class Showcase {
                 <span>載入作品中…</span>
             </div>`;
 
-        await this.fetchAndRender(container, title);
+        try {
+            await this.fetchAndRender(container, title);
+        } catch (e) {
+            console.error('[Showcase] setupContainer failed:', e);
+            this.renderError(container, '載入失敗');
+        }
 
         if (this.pollingTimers[cid]) clearInterval(this.pollingTimers[cid]);
         const timerId = setInterval(() => this.fetchAndRender(container, title), 5000);
@@ -93,15 +101,25 @@ export class Showcase {
     async fetchAndRender(container, assignmentTitle) {
         const cid = container._showcaseId || assignmentTitle;
         try {
-            let { data, error } = await db.select('submissions', {
+            // 加入 timeout 保護（10秒）
+            const fetchWithTimeout = (table, opts) => {
+                return Promise.race([
+                    db.select(table, opts),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Query timeout')), 10000))
+                ]);
+            };
+
+            let { data, error } = await fetchWithTimeout('submissions', {
                 filter: { assignment_title: `eq.${assignmentTitle}` },
                 order: 'submitted_at.asc'
             });
 
+            console.log('[Showcase] query result for', assignmentTitle, ':', data?.length, 'rows, error:', error);
+
             // 如果精確匹配無結果，且有 sessionCode，用 session_id 回撈（僅作業類型）
             if ((!data || data.length === 0) && this.sessionCode) {
                 console.log('[Showcase] title match empty, trying session_id:', this.sessionCode);
-                const fallback = await db.select('submissions', {
+                const fallback = await fetchWithTimeout('submissions', {
                     filter: {
                         session_id: `eq.${this.sessionCode}`,
                         type: 'in.(text,image,video,audio,link)'
@@ -116,13 +134,14 @@ export class Showcase {
             }
 
             if (error || !data) {
+                console.error('[Showcase] query error:', error);
                 this.renderError(container, '無法載入作品');
                 return;
             }
 
             if (this.sessionCode) {
                 try {
-                    const { data: students } = await db.select('students', {
+                    const { data: students } = await fetchWithTimeout('students', {
                         filter: { session_code: `eq.${this.sessionCode}` },
                         select: 'id'
                     });
@@ -139,7 +158,7 @@ export class Showcase {
             this._lastDataHash[cid] = dataHash;
 
             this.cache[assignmentTitle] = data;
-            console.log('[Showcase] submissions for', assignmentTitle, data);
+            console.log('[Showcase] submissions for', assignmentTitle, ':', data.length, 'items');
 
             // 保存捲動位置
             const grid = container.querySelector('.showcase-grid');
@@ -155,11 +174,11 @@ export class Showcase {
                 }
             });
         } catch (e) {
-            console.warn('[Showcase] fetch error:', e);
+            console.error('[Showcase] fetch error:', e);
             if (this.cache[assignmentTitle]) {
                 this.render(container, this.cache[assignmentTitle], assignmentTitle);
             } else {
-                this.renderError(container, '連線失敗');
+                this.renderError(container, '連線失敗，請稍後重試');
             }
         }
     }
@@ -168,7 +187,7 @@ export class Showcase {
 
     render(container, submissions, assignmentTitle) {
         const count = submissions.length;
-        const isPresenter = this._isPresenter && this._broadcasting;
+        const isPresenter = container._showcaseIsPresenter && container._showcaseBroadcasting;
 
         const statusHtml = submissions.map(s => `
             <div class="showcase-status-chip" title="${s.student_name}">
@@ -294,7 +313,7 @@ export class Showcase {
 
         // 講師端：廣播捲動位置
         const grid = container.querySelector('.showcase-grid');
-        if (grid && this._isPresenter && this._broadcasting) {
+        if (grid && container._showcaseIsPresenter && container._showcaseBroadcasting) {
             let scrollThrottle = null;
             grid.addEventListener('scroll', () => {
                 if (scrollThrottle) return;
