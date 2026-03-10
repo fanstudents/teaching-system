@@ -2051,12 +2051,16 @@
             slideEl.style.height = '540px';
 
             if (isMobile) {
-                // 手機版：slide 是 absolute + top:50% left:50%
-                // 用 translate(-50%,-50%) 居中 + scale 縮放
+                // 手機版：slide 是 absolute + top:0 left:0
+                // 手動計算偏移量精確居中
                 const ww = wrapper.clientWidth;
                 const wh = wrapper.clientHeight;
                 const scale = Math.min(ww / 960, wh / 540, 1);
-                slideEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                const scaledW = 960 * scale;
+                const scaledH = 540 * scale;
+                const offsetX = (ww - scaledW) / 2;
+                const offsetY = (wh - scaledH) / 2;
+                slideEl.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
                 slideEl.style.transformOrigin = 'top left';
                 slideEl.style.marginBottom = '0';
             } else if (isImmersive) {
