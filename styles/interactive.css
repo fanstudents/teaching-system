@@ -1118,10 +1118,14 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 10px;
     background: #fff;
     border: 1px solid #e2e8f0;
+    /* 強制 GPU compositing（修復 iOS Safari 在 transform:scale 內不渲染 overflow 子元素） */
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 /* 編輯模式 placeholder */
@@ -1169,6 +1173,7 @@
     color: #f1f5f9;
     border-radius: 8px 8px 0 0;
     flex-shrink: 0;
+    -webkit-transform: translateZ(0);
 }
 
 .showcase-header-left {
@@ -1249,6 +1254,7 @@
     background: #fff;
     border-radius: 0 0 8px 8px;
     -webkit-overflow-scrolling: touch;
+    -webkit-transform: translateZ(0);
 }
 
 .showcase-grid::-webkit-scrollbar {
