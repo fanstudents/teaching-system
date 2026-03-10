@@ -1052,32 +1052,31 @@
                     scaleSlide(); // 確保手機版正確縮放
                     // Re-attach laser pointer dot if it exists
                     if (laserDot) slideEl.appendChild(laserDot);
+
+                    // 初始化互動元件（必須在 DOM 建立後）
+                    setTimeout(() => {
+                        matchingGame.init();
+                        fillBlank.init();
+                        orderingGame.init();
+                        showcase.init();
+                        quizGame.init();
+                        pollGame.init();
+                        trueFalse.init();
+                        openText.init();
+                        scale.init();
+                        buzzer.init();
+                        wordCloud.init();
+                        hotspot.init();
+                        if (countdown.observeNewElements) countdown.observeNewElements();
+                    }, 50);
                 });
             }, 200);
 
-            // 計數器
+            // 計數器（不需等待 DOM，立即更新）
             document.getElementById('slideCounter').textContent =
                 `${(index || 0) + 1} / ${total || '—'}`;
-            // 更新進度條
             const pFill = document.getElementById('studentProgressFill');
             if (pFill && total > 0) pFill.style.width = `${((index + 1) / total) * 100}%`;
-
-            // 初始化互動元件
-            setTimeout(() => {
-                matchingGame.init();
-                fillBlank.init();
-                orderingGame.init();
-                showcase.init();
-                quizGame.init();
-                pollGame.init();
-                trueFalse.init();
-                openText.init();
-                scale.init();
-                buzzer.init();
-                wordCloud.init();
-                hotspot.init();
-                if (countdown.observeNewElements) countdown.observeNewElements();
-            }, 100);
 
             // QR Code
             updateStudentQR(slide);
