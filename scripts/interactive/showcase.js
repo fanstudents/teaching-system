@@ -76,7 +76,7 @@ export class Showcase {
         this.pollingTimers[cid] = timerId;
 
         // 學員端：監聽講師捲動同步
-        if (!this._isPresenter) {
+        if (!container._showcaseIsPresenter) {
             realtime.on('showcase_scroll', (msg) => {
                 const p = msg.payload || msg;
                 if (p.title !== title) return;
@@ -199,22 +199,24 @@ export class Showcase {
         const cardsHtml = submissions.map((s, i) => {
             const preview = this.getPreview(s);
             const existingScore = s.instructor_score;
+            // 5 星評分（每星 = 2 分，共 10 分）
             const scoreHtml = isPresenter ? `
-                <div class="showcase-score-bar" data-sub-id="${s.id}" style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-top:1px solid #f1f5f9;background:#fafbfc;">
-                    <span class="material-symbols-outlined" style="font-size:14px;color:#f59e0b;">star</span>
-                    <span style="font-size:11px;color:#64748b;">評分</span>
-                    <div style="display:flex;gap:2px;flex:1;">
-                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `
-                            <button class="showcase-score-btn${existingScore === n ? ' active' : ''}" data-score="${n}" 
-                                style="width:22px;height:22px;border-radius:4px;border:1px solid ${existingScore === n ? '#6366f1' : '#e2e8f0'};background:${existingScore === n ? '#6366f1' : '#fff'};color:${existingScore === n ? '#fff' : '#64748b'};font-size:10px;cursor:pointer;padding:0;font-weight:600;transition:all 0.15s;">
-                                ${n}
-                            </button>
-                        `).join('')}
+                <div class="showcase-score-bar" data-sub-id="${s.id}">
+                    <div class="showcase-score-stars">
+                        ${[2, 4, 6, 8, 10].map((n, idx) => {
+                            const filled = existingScore >= n;
+                            const half = existingScore === n - 1;
+                            return `<button class="showcase-star-btn${filled ? ' filled' : ''}${half ? ' half' : ''}" data-score="${n}" title="${n} 分">
+                                <span class="material-symbols-outlined">${filled ? 'star' : half ? 'star_half' : 'star'}</span>
+                            </button>`;
+                        }).join('')}
                     </div>
-                    <span class="showcase-score-saved" style="font-size:10px;color:#16a34a;display:none;">✓</span>
+                    <span class="showcase-score-value">${existingScore ? existingScore + ' 分' : ''}</span>
+                    <span class="showcase-score-saved" style="display:none;">✓ 已存</span>
                 </div>` : (s.instructor_score ? `
-                <div style="padding:4px 10px;border-top:1px solid #f1f5f9;background:#fafbfc;font-size:11px;color:#f59e0b;display:flex;align-items:center;gap:4px;">
-                    <span class="material-symbols-outlined" style="font-size:13px;">star</span> ${s.instructor_score} 分
+                <div class="showcase-score-display">
+                    <span class="material-symbols-outlined">star</span>
+                    <span>${s.instructor_score} 分</span>
                 </div>` : '');
             return `
                 <div class="showcase-work-card" data-index="${i}">
@@ -265,27 +267,33 @@ export class Showcase {
             bodyArea?.addEventListener('click', openFn);
             headerArea?.addEventListener('click', openFn);
 
-            // ★ 講師評分按鈕
+            // ★ 講師評分按鈕（5 星制）
             if (isPresenter) {
-                card.querySelectorAll('.showcase-score-btn').forEach(btn => {
+                card.querySelectorAll('.showcase-star-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         e.stopPropagation();
                         const score = parseInt(btn.dataset.score);
                         const subId = card.querySelector('.showcase-score-bar')?.dataset.subId;
                         if (!subId) return;
 
-                        // UI 回饋
-                        card.querySelectorAll('.showcase-score-btn').forEach(b => {
-                            b.style.background = '#fff';
-                            b.style.color = '#64748b';
-                            b.style.borderColor = '#e2e8f0';
+                        // UI 回饋 — 星星填滿
+                        card.querySelectorAll('.showcase-star-btn').forEach(b => {
+                            const bScore = parseInt(b.dataset.score);
+                            const icon = b.querySelector('.material-symbols-outlined');
+                            if (bScore <= score) {
+                                b.classList.add('filled');
+                                b.classList.remove('half');
+                                icon.textContent = 'star';
+                            } else {
+                                b.classList.remove('filled', 'half');
+                                icon.textContent = 'star';
+                            }
                         });
-                        btn.style.background = '#6366f1';
-                        btn.style.color = '#fff';
-                        btn.style.borderColor = '#6366f1';
+                        const valueEl = card.querySelector('.showcase-score-value');
+                        if (valueEl) valueEl.textContent = score + ' 分';
 
                         try {
-                            // 1. 先讀取此 submission 的現有 state（避免覆蓋學員互動記錄）
+                            // 1. 先讀取此 submission 的現有 state
                             let existingState = {};
                             try {
                                 const { data: rows } = await db.select('submissions', {
@@ -297,7 +305,7 @@ export class Showcase {
                                     if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
                                     existingState = st || {};
                                 }
-                            } catch { /* 讀取失敗不影響寫入 */ }
+                            } catch { }
 
                             // 2. 合併：更新 instructor_score + state._awarded
                             const mergedState = {
@@ -315,14 +323,14 @@ export class Showcase {
                                 filter: { id: `eq.${subId}` }
                             });
 
-                            // 3. UI 回饋 — 已儲存標示
+                            // 3. UI 回饋
                             const saved = card.querySelector('.showcase-score-saved');
                             if (saved) {
                                 saved.style.display = 'inline';
                                 setTimeout(() => saved.style.display = 'none', 2000);
                             }
 
-                            // 4. 廣播評分（排行榜 + 學員端即時更新）
+                            // 4. 廣播
                             const sub = submissions[parseInt(card.dataset.index)];
                             if (sub && this.sessionCode) {
                                 realtime.publish(`session:${this.sessionCode}`, 'hw_scored', {
@@ -331,7 +339,6 @@ export class Showcase {
                                     score,
                                     assignmentTitle
                                 });
-                                // 廣播排行榜更新事件
                                 realtime.publish(`session:${this.sessionCode}`, 'leaderboard_update', {
                                     studentName: sub.student_name,
                                     studentEmail: sub.student_email || '',
@@ -339,8 +346,7 @@ export class Showcase {
                                     source: 'instructor_score'
                                 });
                             }
-
-                            console.log(`[Showcase] scored ${sub?.student_name}: ${score}pts (state._awarded updated)`);
+                            console.log(`[Showcase] scored ${sub?.student_name}: ${score}pts`);
                         } catch (err) {
                             console.warn('[Showcase] score save failed:', err);
                         }
@@ -496,7 +502,9 @@ export class Showcase {
             </div>
         `;
 
-        document.body.appendChild(overlay);
+        // 附加到 presentation-mode 容器內（避免被廣播 z-index 壓住）
+        const presMode = document.querySelector('.presentation-mode.active') || document.body;
+        presMode.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('active'));
 
         overlay.querySelector('.showcase-focus-btn.close').onclick = () => {
@@ -579,10 +587,6 @@ export class Showcase {
         container.innerHTML = `<div class="showcase-error"><span class="material-symbols-outlined">error</span> ${msg}</div>`;
     }
 
-    destroy() {
-        Object.values(this.pollingTimers).forEach(id => clearInterval(id));
-        this.pollingTimers = {};
-    }
 
     escapeHtml(str) {
         const d = document.createElement('div');

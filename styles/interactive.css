@@ -1402,6 +1402,98 @@
     color: #94a3b8;
 }
 
+/* ── 星級評分列 ── */
+.showcase-score-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.showcase-score-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.showcase-star-btn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: #d1d5db;
+    transition: color 0.15s, transform 0.15s;
+    line-height: 1;
+}
+
+.showcase-star-btn .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0;
+}
+
+.showcase-star-btn:hover {
+    color: #f59e0b;
+    transform: scale(1.15);
+}
+
+.showcase-star-btn:hover ~ .showcase-star-btn {
+    color: #d1d5db;
+}
+
+.showcase-score-stars:hover .showcase-star-btn {
+    color: #f59e0b;
+}
+
+.showcase-score-stars:hover .showcase-star-btn:hover ~ .showcase-star-btn {
+    color: #d1d5db;
+}
+
+.showcase-star-btn.filled {
+    color: #f59e0b;
+}
+
+.showcase-star-btn.filled .material-symbols-outlined,
+.showcase-star-btn.half .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+}
+
+.showcase-star-btn.half {
+    color: #fbbf24;
+}
+
+.showcase-score-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f59e0b;
+    min-width: 30px;
+}
+
+.showcase-score-saved {
+    font-size: 11px;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+/* ── 學員端評分展示 ── */
+.showcase-score-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-top: 1px solid #f1f5f9;
+    background: #fffbeb;
+    font-size: 12px;
+    font-weight: 600;
+    color: #b45309;
+}
+
+.showcase-score-display .material-symbols-outlined {
+    font-size: 14px;
+    color: #f59e0b;
+    font-variation-settings: 'FILL' 1;
+}
+
 /* ========================================
    展示聚焦 Overlay
    ======================================== */
