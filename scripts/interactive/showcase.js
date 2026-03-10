@@ -3,6 +3,7 @@
  * 自動從 DB 拉取提交，渲染繳交狀態 + 作品 grid
  */
 import { db, realtime } from '../supabase.js';
+import { stateManager } from './stateManager.js';
 
 export class Showcase {
     constructor() {
@@ -199,15 +200,14 @@ export class Showcase {
         const cardsHtml = submissions.map((s, i) => {
             const preview = this.getPreview(s);
             const existingScore = s.instructor_score;
-            // 5 星評分（每星 = 2 分，共 10 分）
+            // 5 星評分（每星 = 1 分，滿分 5 分）
             const scoreHtml = isPresenter ? `
                 <div class="showcase-score-bar" data-sub-id="${s.id}">
                     <div class="showcase-score-stars">
-                        ${[2, 4, 6, 8, 10].map((n, idx) => {
+                        ${[1, 2, 3, 4, 5].map(n => {
                             const filled = existingScore >= n;
-                            const half = existingScore === n - 1;
-                            return `<button class="showcase-star-btn${filled ? ' filled' : ''}${half ? ' half' : ''}" data-score="${n}" title="${n} 分">
-                                <span class="material-symbols-outlined">${filled ? 'star' : half ? 'star_half' : 'star'}</span>
+                            return `<button class="showcase-star-btn${filled ? ' filled' : ''}" data-score="${n}" title="${n} 分">
+                                <span class="material-symbols-outlined">${filled ? 'star' : 'star'}</span>
                             </button>`;
                         }).join('')}
                     </div>
@@ -311,7 +311,7 @@ export class Showcase {
                             const mergedState = {
                                 ...existingState,
                                 _awarded: score,
-                                _maxPts: score,
+                                _maxPts: 5,
                                 _instructorScored: true,
                                 _scoredAt: new Date().toISOString()
                             };
@@ -323,12 +323,15 @@ export class Showcase {
                                 filter: { id: `eq.${subId}` }
                             });
 
-                            // 3. UI 回饋
+                            // 3. UI 回饋 + 加分動畫
                             const saved = card.querySelector('.showcase-score-saved');
                             if (saved) {
                                 saved.style.display = 'inline';
                                 setTimeout(() => saved.style.display = 'none', 2000);
                             }
+
+                            // ★ 觸發加分動畫
+                            try { stateManager.showScorePopup(score); } catch { }
 
                             // 4. 廣播
                             const sub = submissions[parseInt(card.dataset.index)];
