@@ -310,9 +310,11 @@ export class LiveCaptions {
         const mount = document.querySelector('.presentation-mode.active') || document.body;
         this._createUI(mount);
         this._bar.classList.add('visible');
+        this._lastResultTime = Date.now();
         try {
             this.recognition.start();
             this.active = true;
+            this._startWatchdog();
             console.log('[LiveCaptions] started');
         } catch (e) {
             console.warn('[LiveCaptions] start failed:', e);
@@ -324,6 +326,7 @@ export class LiveCaptions {
         this.active = false;
         clearTimeout(this._restartTimer);
         clearTimeout(this._fadeTimer);
+        this._stopWatchdog();
         try { this.recognition.stop(); } catch { }
         if (this.realtime && this.channel) {
             this.realtime.publish(this.channel, 'subtitle', { text: '', isFinal: true, stopped: true });
@@ -356,6 +359,7 @@ export class LiveCaptions {
 
         // 只顯示完整句子，不顯示辨識中的逐字文字
         if (!final) return;
+        this._lastResultTime = Date.now();
 
         // ★ 後處理
         let processed = this._processor.process(final, true);
@@ -405,23 +409,68 @@ export class LiveCaptions {
 
     _onError(event) {
         console.warn('[LiveCaptions] error:', event.error);
-        if (event.error === 'aborted') return;
         if (event.error === 'not-allowed') {
             if (this._textEl) {
                 this._textEl.textContent = '⚠️ 請允許麥克風權限';
                 this._textEl.classList.remove('interim');
             }
             this.active = false;
+            return;
+        }
+        // no-speech / aborted / network 等錯誤 → 自動重啟
+        if (this.active) {
+            this._scheduleRestart(200);
         }
     }
 
     _onEnd() {
         if (!this.active) return;
+        // 辨識引擎結束 → 立即重啟
+        this._scheduleRestart(100);
+    }
+
+    /**
+     * 排程重啟辨識器，避免重複觸發
+     */
+    _scheduleRestart(delay = 100) {
+        clearTimeout(this._restartTimer);
         this._restartTimer = setTimeout(() => {
-            if (this.active) {
-                try { this.recognition.start(); } catch { }
+            if (!this.active) return;
+            try {
+                this.recognition.start();
+            } catch (e) {
+                // 如果 start 失敗（可能還在 running），等一下再試
+                setTimeout(() => {
+                    if (this.active) {
+                        try { this.recognition.start(); } catch { }
+                    }
+                }, 500);
             }
-        }, 300);
+        }, delay);
+    }
+
+    /**
+     * 啟動 watchdog — 每 5 秒確認辨識器還活著
+     */
+    _startWatchdog() {
+        this._stopWatchdog();
+        this._watchdog = setInterval(() => {
+            if (!this.active) return;
+            // 記錄上次收到結果的時間，超過 8 秒沒結果就強制重啟
+            const now = Date.now();
+            if (this._lastResultTime && (now - this._lastResultTime) > 8000) {
+                console.log('[LiveCaptions] watchdog: no result for 8s, restarting');
+                try { this.recognition.stop(); } catch { }
+                this._scheduleRestart(200);
+            }
+        }, 5000);
+    }
+
+    _stopWatchdog() {
+        if (this._watchdog) {
+            clearInterval(this._watchdog);
+            this._watchdog = null;
+        }
     }
 
     /**
