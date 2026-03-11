@@ -3970,6 +3970,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                             presCaptionBtn.title = active ? '關閉即時字幕' : '即時字幕（語音辨識）';
                             this.showToast(active ? '🎤 即時字幕已開啟' : '字幕已關閉');
                         };
+                        // 設定按鈕
+                        const settingsBtn = document.getElementById('presCaptionSettingsBtn');
+                        if (settingsBtn) {
+                            settingsBtn.style.display = 'flex';
+                            settingsBtn.onclick = () => this._liveCaptions.toggleSettings();
+                        }
                     } else {
                         presCaptionBtn.style.display = 'flex';
                         presCaptionBtn.classList.add('unsupported');
@@ -4664,7 +4670,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             topBar.classList.remove('broadcast-locked', 'visible');
         }
         ['presInstructorBadge', 'presBroadcastCode', 'presBroadcastViewers',
-            'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn', 'presLaserBtn', 'presCaptionBtn'].forEach(id => {
+            'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn', 'presLaserBtn', 'presCaptionBtn', 'presCaptionSettingsBtn'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
