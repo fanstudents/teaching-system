@@ -103,7 +103,7 @@ async function loadSessions() {
         }
         allSessions.forEach(s => {
             const code = s.session_code || '';
-            const label = (s.title || '') + (s.date ? ' \u00B7 ' + s.date : '') + (s.status === 'active' ? ' \uD83D\uDFE2' : '');
+            const label = (s.title || '') + (s.date ? ' \u00B7 ' + s.date : '') + (s.status === 'active' ? ' [LIVE]' : '');
             const opt = document.createElement('option');
             opt.value = code;
             opt.textContent = label || code;
@@ -325,10 +325,10 @@ function renderScoreBody(el) {
         const r = subs[email];
         const name = studentNames[email] || email.split('@')[0];
         let cls, icon, score;
-        if (!r) { cls = 'status-pending'; icon = '\u23F3'; score = ''; }
+        if (!r) { cls = 'status-pending'; icon = '\u00B7'; score = ''; }
         else if (isCorrectTrue(r.is_correct)) { cls = 'status-correct'; icon = '\u2713'; score = r.content || ''; }
         else if (isCorrectFalse(r.is_correct)) { cls = 'status-wrong'; icon = '\u2717'; score = r.content || ''; }
-        else { cls = 'status-voted'; icon = '\uD83D\uDCDD'; score = r.content || ''; }
+        else { cls = 'status-voted'; icon = '\u2713'; score = r.content || ''; }
         html += '<div class="dash-student"><div class="dash-student-status ' + cls + '">' + icon + '</div><div class="dash-student-name">' + esc(name) + '</div>' + (score ? '<div class="dash-student-score">' + esc(score) + '</div>' : '') + '</div>';
     });
     return html + '</div>';
@@ -353,7 +353,7 @@ function renderPollBody(el) {
     [...onlineStudents].forEach(e => {
         const name = studentNames[e] || e.split('@')[0];
         const voted = votedEmails.has(e);
-        voters += '<span class="dash-poll-voter ' + (voted ? '' : 'not-voted') + '">' + (voted ? '\u2713' : '\u23F3') + ' ' + esc(name) + '</span>';
+        voters += '<span class="dash-poll-voter ' + (voted ? '' : 'not-voted') + '">' + (voted ? '\u2713' : '\u00B7') + ' ' + esc(name) + '</span>';
     });
     return '<div class="dash-poll-bars">' + bars + '</div>' + (voters ? '<div class="dash-poll-voters">' + voters + '</div>' : '');
 }
@@ -397,7 +397,7 @@ function renderMatrixView() {
                     row += '<td class="matrix-cell matrix-voted" title="' + esc(name) + ': ' + esc(pollContent) + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2713</td>';
                     answered++;
                 } else {
-                    row += '<td class="matrix-cell matrix-pending">\u23F3</td>';
+                    row += '<td class="matrix-cell matrix-pending">\u2014</td>';
                 }
             } else if (sub) {
                 answered++;
@@ -406,7 +406,7 @@ function renderMatrixView() {
                 if (isCorrectTrue(sub.is_correct)) { correct++; graded++; row += '<td class="matrix-cell matrix-correct" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2713</td>'; }
                 else if (isCorrectFalse(sub.is_correct)) { graded++; row += '<td class="matrix-cell matrix-wrong" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2717</td>'; }
                 else { row += '<td class="matrix-cell matrix-voted" title="' + tip + '" data-student="' + esc(email) + '" data-el="' + el.id + '">\u2713</td>'; }
-            } else { row += '<td class="matrix-cell matrix-pending">\u23F3</td>'; }
+            } else { row += '<td class="matrix-cell matrix-pending">\u2014</td>'; }
         });
         const rate = graded > 0 ? Math.round(correct / graded * 100) + '%' : '-';
         row += '<td class="matrix-summary">' + answered + '/' + allEls.length + '<br>' + rate + '</td></tr>';
@@ -524,7 +524,7 @@ async function renderCompareView() {
     let thead = '<tr><th style="text-align:left;">\u984C\u76EE</th><th>\u985E\u578B</th>';
     sessionData.forEach(sd => {
         const cur = sd.code === currentSessionCode;
-        thead += '<th' + (cur ? ' style="background:#eef4ff;"' : '') + '>' + esc(sd.date) + (sd.status === 'active' ? ' \uD83D\uDFE2' : '') + '<br><span style="font-weight:400;font-size:0.65rem;color:#8b949e;">' + sd.studentCount + '\u4EBA</span></th>';
+        thead += '<th' + (cur ? ' style="background:#eef4ff;"' : '') + '>' + esc(sd.date) + (sd.status === 'active' ? ' <span style="color:#16a34a;font-weight:700;font-size:0.6rem;">LIVE</span>' : '') + '<br><span style="font-weight:400;font-size:0.65rem;color:#8b949e;">' + sd.studentCount + '\u4EBA</span></th>';
     });
     thead += '</tr>';
 
@@ -729,7 +729,7 @@ function renderTrailView() {
             const vars = Object.entries(item.state.variables).map(([k, v]) => `${k}: ${v}`).join('、');
             return esc(vars || c).slice(0, 120);
         }
-        if (c.startsWith('data:image')) return '📷 圖片';
+        if (c.startsWith('data:image')) return '(圖片)';
         if (c.startsWith('http')) return `<a href="${esc(c)}" target="_blank" style="color:#6366f1;">${esc(c.slice(0, 60))}</a>`;
         return esc(c).slice(0, 120);
     };

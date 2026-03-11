@@ -638,8 +638,8 @@ export class Showcase {
     _flyStarToLeaderboard(starBtn, delta) {
         const isPositive = delta > 0;
         const absDelta = Math.abs(delta);
-        const color = isPositive ? '#fbbf24' : '#ef4444';
-        const bgColor = isPositive ? 'rgba(251, 191, 36, 0.06)' : 'rgba(239, 68, 68, 0.06)';
+        const color = isPositive ? '#f59e0b' : '#dc2626';
+        const bgColor = isPositive ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.35)';
 
         // 找到對應學員名字
         const card = starBtn.closest('.showcase-card');
@@ -680,21 +680,22 @@ export class Showcase {
         const nameEl = document.createElement('div');
         nameEl.textContent = studentName;
         nameEl.style.cssText = `
-            color: rgba(255,255,255,0.7);
-            font-size: 18px;
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
             font-weight: 600;
             font-family: 'Noto Sans TC', sans-serif;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
         `;
 
         // 大數字
         const bigNum = document.createElement('div');
         bigNum.textContent = `${isPositive ? '+' : ''}${delta}`;
         bigNum.style.cssText = `
-            font-size: 80px;
+            font-size: 72px;
             font-weight: 900;
             color: ${color};
-            text-shadow: 0 0 40px ${color}, 0 0 80px ${color}40;
+            text-shadow: 0 0 30px ${color}80, 0 4px 12px rgba(0,0,0,0.3);
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
             line-height: 1;
             font-variant-numeric: tabular-nums;
