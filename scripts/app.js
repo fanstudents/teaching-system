@@ -3418,6 +3418,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     async updateLeaderboard() {
         if (!this.sessionCode) return;
+        if (!this._lbScoreCache) this._lbScoreCache = new Map(); // email → { pts, rank }
         try {
             const { stateManager } = await import('./interactive/stateManager.js');
             const board = await stateManager.getLeaderboard(this.sessionCode, this.slideManager.currentProjectId);
@@ -3436,24 +3437,26 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const existingMap = new Map();
             existingRows.forEach(row => existingMap.set(row.dataset.email, row));
 
-            // Remove empty placeholder
             list.querySelector('.lb-empty')?.remove();
 
             const newEmails = new Set(board.map(s => s.email));
-
-            // Remove rows that no longer exist
             existingRows.forEach(row => {
                 if (!newEmails.has(row.dataset.email)) row.remove();
             });
 
-            // Update or create rows
             board.forEach((s, i) => {
                 const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
                 const barPct = maxPts > 0 ? Math.round((s.totalPoints / maxPts) * 100) : 0;
                 let row = existingMap.get(s.email);
 
+                // 偵測分數變化
+                const cached = this._lbScoreCache.get(s.email);
+                const prevPts = cached ? cached.pts : 0;
+                const prevRank = cached ? cached.rank : -1;
+                const scoreDiff = s.totalPoints - prevPts;
+                const rankUp = prevRank >= 0 && i < prevRank;
+
                 if (row) {
-                    // Update existing row in place (smooth)
                     const rankEl = row.querySelector('.lb-rank');
                     if (rankEl) {
                         rankEl.textContent = i + 1;
@@ -3465,8 +3468,19 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     if (ptsEl) ptsEl.textContent = s.totalPoints;
                     const barEl = row.querySelector('.lb-bar');
                     if (barEl) barEl.style.width = barPct + '%';
+
+                    // ★ 加分動畫
+                    if (scoreDiff > 0 && cached) {
+                        this._showScorePopup(row, scoreDiff);
+                    }
+                    // ★ 排名上升閃爍
+                    if (rankUp) {
+                        row.classList.remove('rank-up');
+                        void row.offsetWidth; // 強制 reflow
+                        row.classList.add('rank-up');
+                        setTimeout(() => row.classList.remove('rank-up'), 700);
+                    }
                 } else {
-                    // Create new row
                     row = document.createElement('div');
                     row.className = 'lb-row';
                     row.dataset.email = s.email;
@@ -3479,13 +3493,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         <div class="lb-bar-wrap"><div class="lb-bar" style="width:0%"></div></div>
                     `;
                     list.appendChild(row);
-                    // Animate bar in
                     requestAnimationFrame(() => {
                         row.querySelector('.lb-bar').style.width = barPct + '%';
                     });
                 }
 
-                // Ensure correct order
+                // 更新快取
+                this._lbScoreCache.set(s.email, { pts: s.totalPoints, rank: i });
+
                 const currentRows = list.querySelectorAll('.lb-row');
                 if (currentRows[i] !== row) {
                     list.insertBefore(row, currentRows[i] || null);
@@ -3494,6 +3509,17 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         } catch (e) {
             console.warn('[Leaderboard] update failed:', e);
         }
+    }
+
+    /**
+     * 在排行榜 row 上方顯示 +N 加分動畫
+     */
+    _showScorePopup(row, diff) {
+        const popup = document.createElement('span');
+        popup.className = 'lb-score-popup';
+        popup.textContent = `+${diff}`;
+        row.appendChild(popup);
+        popup.addEventListener('animationend', () => popup.remove());
     }
 
     _escHtml(str) {
