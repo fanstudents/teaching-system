@@ -362,13 +362,14 @@ export class Showcase {
 
                             // 5. ★ 星星飛到排行榜的動畫 + 排行榜加分動畫
                             if (delta !== 0) {
-                                // 星星飛行動畫
                                 this._flyStarToLeaderboard(btn, delta);
 
-                                // 等一下讓排行榜更新，然後高亮
-                                setTimeout(() => {
-                                    if (window.app?.updateLeaderboard) window.app.updateLeaderboard();
-                                }, 200);
+                                // 立即更新排行榜（DB 已寫入）
+                                if (window.app?.updateLeaderboard) {
+                                    window.app.updateLeaderboard();
+                                    // 動畫結束後再更新一次確保同步
+                                    setTimeout(() => window.app.updateLeaderboard(), 1800);
+                                }
                             }
 
                             console.log(`[Showcase] scored ${sub?.student_name}: ${oldScore} → ${score} (delta: ${delta > 0 ? '+' : ''}${delta})`);

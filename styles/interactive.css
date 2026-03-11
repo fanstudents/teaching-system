@@ -3293,27 +3293,31 @@
 /* 排行榜打開時，投影片容器改為雙欄佈局 */
 
 
+/* ═══════════════════════════════════
+   排行榜 — 可愛風
+   ═══════════════════════════════════ */
 .pres-leaderboard {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     width: 280px;
-    background: linear-gradient(180deg, #0c1222 0%, #0f172a 40%, #131b2e 100%);
-    border-left: 1px solid rgba(99, 102, 241, 0.1);
+    background: linear-gradient(180deg, #1a1025 0%, #1e1233 30%, #1a1028 100%);
+    border-left: 1px solid rgba(199, 120, 255, 0.12);
     z-index: 180;
     display: flex;
     flex-direction: column;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
     overflow: hidden;
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+    box-shadow: -8px 0 40px rgba(139, 92, 246, 0.15);
 }
 
 .pres-leaderboard.open {
     transform: translateX(0);
 }
 
+/* ── 標題區 ── */
 .lb-header {
     display: flex;
     align-items: center;
@@ -3321,41 +3325,43 @@
     padding: 18px 20px;
     font-size: 15px;
     font-weight: 700;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(199, 120, 255, 0.1);
     flex-shrink: 0;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.04));
-    color: #fbbf24;
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.08));
+    color: #f0abfc;
     letter-spacing: 0.5px;
 }
 
 .lb-header .material-symbols-outlined {
     font-size: 22px;
-    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.4));
+    color: #f0abfc;
+    filter: drop-shadow(0 0 6px rgba(240, 171, 252, 0.5));
 }
 
+/* ── 列表區 ── */
 .lb-list {
     flex: 1;
     overflow-y: auto;
     padding: 8px 10px;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: rgba(168, 85, 247, 0.2) transparent;
 }
 
 .lb-list::-webkit-scrollbar { width: 4px; }
 .lb-list::-webkit-scrollbar-track { background: transparent; }
-.lb-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+.lb-list::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.25); border-radius: 2px; }
 
 .lb-empty {
     padding: 40px 18px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.25);
+    color: rgba(240, 171, 252, 0.3);
     font-size: 13px;
 }
 
 /* ── 每一列 ── */
 .lb-row {
     padding: 10px 14px;
-    border-radius: 12px;
+    border-radius: 14px;
     margin-bottom: 4px;
     transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
     position: relative;
@@ -3365,25 +3371,28 @@
 }
 
 .lb-row:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.08);
-    transform: scale(1.02);
+    background: rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.15);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
 }
 
-/* 前三名特殊卡片光暈 */
+/* 🥇 第一名 */
 .lb-row:nth-child(1) {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(251, 191, 36, 0.03));
-    border-color: rgba(251, 191, 36, 0.15);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(236, 72, 153, 0.06));
+    border-color: rgba(251, 191, 36, 0.2);
 }
 
+/* 🥈 第二名 */
 .lb-row:nth-child(2) {
-    background: linear-gradient(135deg, rgba(192, 192, 220, 0.06), rgba(192, 192, 220, 0.02));
-    border-color: rgba(192, 192, 220, 0.1);
+    background: linear-gradient(135deg, rgba(199, 210, 254, 0.08), rgba(168, 85, 247, 0.04));
+    border-color: rgba(199, 210, 254, 0.12);
 }
 
+/* 🥉 第三名 */
 .lb-row:nth-child(3) {
-    background: linear-gradient(135deg, rgba(217, 119, 6, 0.06), rgba(217, 119, 6, 0.02));
-    border-color: rgba(217, 119, 6, 0.1);
+    background: linear-gradient(135deg, rgba(251, 146, 60, 0.08), rgba(236, 72, 153, 0.04));
+    border-color: rgba(251, 146, 60, 0.12);
 }
 
 .lb-row-top {
@@ -3393,11 +3402,11 @@
     margin-bottom: 6px;
 }
 
-/* ── 名次徽章 ── */
+/* ── 名次 / 頭像圈 ── */
 .lb-rank {
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3405,34 +3414,39 @@
     font-weight: 800;
     flex-shrink: 0;
     color: rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(168, 85, 247, 0.12);
+    border: 1.5px solid rgba(168, 85, 247, 0.2);
     transition: all 0.3s;
 }
 
 .lb-rank.gold {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #78350f;
-    box-shadow: 0 2px 12px rgba(251, 191, 36, 0.35);
-    font-size: 13px;
+    background: linear-gradient(135deg, #fbbf24, #ec4899);
+    color: #fff;
+    border-color: rgba(251, 191, 36, 0.5);
+    box-shadow: 0 2px 12px rgba(251, 191, 36, 0.35),
+                0 0 20px rgba(236, 72, 153, 0.15);
+    font-size: 14px;
 }
 
 .lb-rank.silver {
-    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
-    color: #334155;
-    box-shadow: 0 2px 10px rgba(148, 163, 184, 0.25);
+    background: linear-gradient(135deg, #c7d2fe, #a78bfa);
+    color: #312e81;
+    border-color: rgba(167, 139, 250, 0.4);
+    box-shadow: 0 2px 10px rgba(167, 139, 250, 0.25);
 }
 
 .lb-rank.bronze {
-    background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
-    color: #fef3c7;
-    box-shadow: 0 2px 10px rgba(217, 119, 6, 0.25);
+    background: linear-gradient(135deg, #fb923c, #ec4899);
+    color: #fff;
+    border-color: rgba(251, 146, 60, 0.4);
+    box-shadow: 0 2px 10px rgba(236, 72, 153, 0.2);
 }
 
 /* ── 名字 ── */
 .lb-name {
     flex: 1;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.6);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3440,7 +3454,7 @@
 }
 
 .lb-row:nth-child(-n+3) .lb-name {
-    color: #fff;
+    color: #f5d0fe;
     font-weight: 700;
     font-size: 13.5px;
 }
@@ -3449,7 +3463,7 @@
 .lb-pts {
     font-size: 14px;
     font-weight: 800;
-    color: #fbbf24;
+    color: #f0abfc;
     flex-shrink: 0;
     min-width: 32px;
     text-align: right;
@@ -3457,16 +3471,20 @@
     position: relative;
 }
 
+.lb-row:nth-child(1) .lb-pts {
+    color: #fbbf24;
+}
+
 .lb-row:nth-child(n+4) .lb-pts {
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(199, 120, 255, 0.5);
     font-weight: 700;
     font-size: 13px;
 }
 
-/* ── 長條圖 ── */
+/* ── 進度條 ── */
 .lb-bar-wrap {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.06);
+    height: 5px;
+    background: rgba(168, 85, 247, 0.1);
     border-radius: 3px;
     overflow: hidden;
 }
@@ -3479,22 +3497,22 @@
 }
 
 .lb-row:nth-child(1) .lb-bar {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-    box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+    background: linear-gradient(90deg, #fbbf24, #ec4899);
+    box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
 }
 
 .lb-row:nth-child(2) .lb-bar {
-    background: linear-gradient(90deg, #cbd5e1, #94a3b8);
-    box-shadow: 0 0 6px rgba(148, 163, 184, 0.3);
+    background: linear-gradient(90deg, #c7d2fe, #a78bfa);
+    box-shadow: 0 0 6px rgba(167, 139, 250, 0.3);
 }
 
 .lb-row:nth-child(3) .lb-bar {
-    background: linear-gradient(90deg, #f59e0b, #d97706);
-    box-shadow: 0 0 6px rgba(217, 119, 6, 0.3);
+    background: linear-gradient(90deg, #fb923c, #ec4899);
+    box-shadow: 0 0 6px rgba(236, 72, 153, 0.3);
 }
 
 .lb-row:nth-child(n+4) .lb-bar {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.5), rgba(139, 92, 246, 0.35));
+    background: linear-gradient(90deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.25));
 }
 
 /* ── 加分動畫 ── */
@@ -3502,63 +3520,43 @@
     position: absolute;
     right: 14px;
     top: 0;
-    color: #4ade80;
-    font-size: 14px;
+    color: #f0abfc;
+    font-size: 15px;
     font-weight: 800;
     pointer-events: none;
     animation: lbScorePopup 1.2s ease-out forwards;
-    text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+    text-shadow: 0 0 10px rgba(240, 171, 252, 0.6);
     z-index: 10;
 }
 
 @keyframes lbScorePopup {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    30% {
-        opacity: 1;
-        transform: translateY(-12px) scale(1.3);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-32px) scale(0.8);
-    }
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    30% { opacity: 1; transform: translateY(-14px) scale(1.4); }
+    100% { opacity: 0; transform: translateY(-36px) scale(0.8); }
 }
 
-/* 排名上升閃爍 */
 .lb-row.rank-up {
     animation: lbRankUp 0.6s ease;
 }
 
 @keyframes lbRankUp {
     0%, 100% { background: inherit; }
-    50% { background: rgba(74, 222, 128, 0.12); border-color: rgba(74, 222, 128, 0.2); }
+    50% { background: rgba(236, 72, 153, 0.12); border-color: rgba(236, 72, 153, 0.25); }
 }
 
-/* 扣分（負分）版本 */
 .lb-score-popup.lb-score-negative {
-    color: #f87171;
-    text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+    color: #fb7185;
+    text-shadow: 0 0 8px rgba(251, 113, 133, 0.5);
     animation: lbScorePopupDown 1.2s ease-out forwards;
 }
 
 @keyframes lbScorePopupDown {
-    0% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    30% {
-        opacity: 1;
-        transform: translateY(8px) scale(1.2);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(24px) scale(0.8);
-    }
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    30% { opacity: 1; transform: translateY(8px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(24px) scale(0.8); }
 }
 
-/* ── Toggle button ── */
+/* ── Toggle 按鈕 ── */
 .lb-toggle {
     position: fixed;
     right: 12px;
@@ -3566,11 +3564,11 @@
     z-index: 190;
     width: 38px;
     height: 38px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 12px;
+    background: rgba(30, 18, 51, 0.8);
     backdrop-filter: blur(8px);
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(240, 171, 252, 0.6);
     cursor: pointer;
     display: none;
     align-items: center;
@@ -3579,10 +3577,10 @@
 }
 
 .lb-toggle:hover {
-    background: rgba(15, 23, 42, 0.95);
-    color: #fbbf24;
-    border-color: rgba(251, 191, 36, 0.25);
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.15);
+    background: rgba(30, 18, 51, 0.95);
+    color: #f0abfc;
+    border-color: rgba(236, 72, 153, 0.3);
+    box-shadow: 0 0 16px rgba(236, 72, 153, 0.15);
 }
 
 .lb-toggle .material-symbols-outlined {
