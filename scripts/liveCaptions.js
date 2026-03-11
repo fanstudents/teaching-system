@@ -346,23 +346,19 @@ export class LiveCaptions {
      * 每次只顯示最新的 ≤15 字，像電影字幕一段一段出現
      */
     _onResult(event) {
-        let interim = '';
         let final = '';
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-                final += transcript;
-            } else {
-                interim += transcript;
+                final += event.results[i][0].transcript;
             }
         }
 
-        const isFinal = !!final;
-        const rawText = final || interim;
+        // 只顯示完整句子，不顯示辨識中的逐字文字
+        if (!final) return;
 
         // ★ 後處理
-        let processed = this._processor.process(rawText, isFinal);
+        let processed = this._processor.process(final, true);
         if (!processed) return;
 
         // ★ 電影字幕式斷句：最多 MAX_CHARS 字
@@ -373,9 +369,7 @@ export class LiveCaptions {
         if (chars.length <= MAX_CHARS) {
             displayText = processed;
         } else {
-            // 從尾部往前找自然斷點（逗號、句號、「的」「了」「是」等）
             let cutPos = chars.length - MAX_CHARS;
-            // 在 cutPos 附近找最佳斷點（往後找最近的逗號或虛詞）
             for (let i = cutPos; i < Math.min(cutPos + 6, chars.length); i++) {
                 if ('，。、！？的了是在有'.includes(chars[i])) {
                     cutPos = i + 1;
@@ -387,27 +381,25 @@ export class LiveCaptions {
 
         if (this._textEl) {
             this._textEl.textContent = displayText;
-            this._textEl.classList.toggle('interim', !isFinal);
+            this._textEl.classList.remove('interim');
             clearTimeout(this._fadeTimer);
-            if (isFinal) {
-                this._fadeTimer = setTimeout(() => {
-                    if (this._textEl) {
-                        this._textEl.style.transition = 'opacity 0.6s ease';
-                        this._textEl.style.opacity = '0';
-                        setTimeout(() => {
-                            if (this._textEl) {
-                                this._textEl.textContent = '';
-                                this._textEl.style.opacity = '';
-                                this._textEl.style.transition = '';
-                            }
-                        }, 600);
-                    }
-                }, 2500);
-            }
+            this._fadeTimer = setTimeout(() => {
+                if (this._textEl) {
+                    this._textEl.style.transition = 'opacity 0.6s ease';
+                    this._textEl.style.opacity = '0';
+                    setTimeout(() => {
+                        if (this._textEl) {
+                            this._textEl.textContent = '';
+                            this._textEl.style.opacity = '';
+                            this._textEl.style.transition = '';
+                        }
+                    }, 600);
+                }
+            }, 2500);
         }
 
         if (this.realtime && this.channel) {
-            this.realtime.publish(this.channel, 'subtitle', { text: displayText, isFinal });
+            this.realtime.publish(this.channel, 'subtitle', { text: displayText, isFinal: true });
         }
     }
 
