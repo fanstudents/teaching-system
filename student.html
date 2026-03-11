@@ -270,7 +270,6 @@
         import { HomeworkSubmission } from './scripts/homework.js';
         import { stateManager } from './scripts/interactive/stateManager.js';
         import { DocumentViewer } from './scripts/interactive/documentViewer.js';
-        import { CaptionReceiver } from './scripts/liveCaptions.js';
 
         const matchingGame = new MatchingGame();
         const fillBlank = new FillBlank();
@@ -729,13 +728,6 @@
                         dot.style.opacity = '0';
                         setTimeout(() => { dot.style.display = 'none'; }, 300);
                     }, 2000);
-                });
-
-                // ── 即時字幕接收 ──
-                const captionReceiver = new CaptionReceiver();
-                realtime.on('subtitle', (msg) => {
-                    const p = msg.payload || msg;
-                    captionReceiver.handleSubtitle(p);
                 });
 
                 // ★ 監聽作業提交事件 — 即時更新計數器

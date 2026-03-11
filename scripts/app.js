@@ -3955,20 +3955,20 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 };
             }
 
-            // ── 即時字幕按鈕 ──
+            // ── 逐字稿錄製按鈕 ──
             const presCaptionBtn = document.getElementById('presCaptionBtn');
             if (presCaptionBtn) {
                 import('./liveCaptions.js').then(({ LiveCaptions }) => {
                     if (!this._liveCaptions) {
-                        this._liveCaptions = new LiveCaptions(realtime, `session:${this.sessionCode}`);
+                        this._liveCaptions = new LiveCaptions(db, this.sessionCode);
                     }
                     if (this._liveCaptions.supported) {
                         presCaptionBtn.style.display = 'flex';
                         presCaptionBtn.onclick = () => {
                             const active = this._liveCaptions.toggle();
                             presCaptionBtn.classList.toggle('active', active);
-                            presCaptionBtn.title = active ? '關閉即時字幕' : '即時字幕（語音辨識）';
-                            this.showToast(active ? '🎤 即時字幕已開啟' : '字幕已關閉');
+                            presCaptionBtn.title = active ? '停止錄製逐字稿' : '開始錄製逐字稿';
+                            this.showToast(active ? '🎤 逐字稿錄製中...' : '逐字稿已停止並儲存');
                         };
                         // 設定按鈕
                         const settingsBtn = document.getElementById('presCaptionSettingsBtn');
