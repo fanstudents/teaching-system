@@ -644,6 +644,12 @@ export class Showcase {
         const card = starBtn.closest('.showcase-card');
         const studentName = card?.querySelector('.showcase-name')?.textContent || '';
 
+        // ═══ 找到正確的掛載容器（全螢幕模式下必須掛在 fullscreenElement 內） ═══
+        const mountTarget = document.fullscreenElement
+            || document.webkitFullscreenElement
+            || document.querySelector('.presentation-mode.active')
+            || document.body;
+
         // ═══ 全螢幕覆蓋層 ═══
         const overlay = document.createElement('div');
         overlay.style.cssText = `
@@ -658,7 +664,7 @@ export class Showcase {
             background: ${bgColor};
             animation: lbOverlayIn 0.2s ease-out;
         `;
-
+        mountTarget.appendChild(overlay);
         // ═══ 中央大型分數 ═══
         const scoreBox = document.createElement('div');
         scoreBox.style.cssText = `
@@ -714,7 +720,6 @@ export class Showcase {
         scoreBox.appendChild(bigNum);
         scoreBox.appendChild(starsRow);
         overlay.appendChild(scoreBox);
-        document.body.appendChild(overlay);
 
         // ═══ 爆發粒子 ═══
         const cx = window.innerWidth / 2;
