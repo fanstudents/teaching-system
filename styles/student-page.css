@@ -1345,54 +1345,42 @@ body {
    ======================================== */
 .live-caption-bar {
     position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: rgba(0, 0, 0, 0.78);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 10px;
-    color: #f1f5f9;
-    font-size: 15px;
-    line-height: 1.5;
-    max-width: 90%;
-    min-width: 120px;
+    justify-content: center;
+    padding: 10px 32px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
     z-index: 5000;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    transform: translateX(-50%) translateY(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: opacity 0.3s ease;
+    text-align: center;
 }
 
 .live-caption-bar.visible {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
 }
 
 .live-caption-mic {
-    display: flex;
-    align-items: center;
-    color: #60a5fa;
-    flex-shrink: 0;
-}
-
-.live-caption-mic .material-symbols-outlined {
-    font-size: 16px;
+    display: none;
 }
 
 .live-caption-text {
-    flex: 1;
-    min-width: 0;
+    max-width: 90%;
     word-break: break-word;
-    max-height: 3em;
+    max-height: 3.2em;
     overflow: hidden;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .live-caption-text.interim {
-    color: rgba(241, 245, 249, 0.6);
+    color: rgba(255, 255, 255, 0.55);
 }
