@@ -630,106 +630,159 @@ export class Showcase {
     }
 
     /**
-     * 星星從評分區飛向排行榜的動畫
+     * 全螢幕加分/扣分動畫
      * @param {HTMLElement} starBtn - 被點擊的星星按鈕
      * @param {number} delta - 分數差值（正=加分，負=扣分）
      */
     _flyStarToLeaderboard(starBtn, delta) {
-        const lbToggle = document.getElementById('lbToggle');
-        if (!lbToggle) return;
-
-        const startRect = starBtn.getBoundingClientRect();
-        const endRect = lbToggle.getBoundingClientRect();
-
         const isPositive = delta > 0;
-        const particleCount = Math.min(Math.abs(delta), 5);
+        const absDelta = Math.abs(delta);
         const color = isPositive ? '#fbbf24' : '#ef4444';
-        const iconName = isPositive ? 'star' : 'star_half';
+        const bgColor = isPositive ? 'rgba(251, 191, 36, 0.06)' : 'rgba(239, 68, 68, 0.06)';
+
+        // 找到對應學員名字
+        const card = starBtn.closest('.showcase-card');
+        const studentName = card?.querySelector('.showcase-name')?.textContent || '';
+
+        // ═══ 全螢幕覆蓋層 ═══
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: ${bgColor};
+            animation: lbOverlayIn 0.2s ease-out;
+        `;
+
+        // ═══ 中央大型分數 ═══
+        const scoreBox = document.createElement('div');
+        scoreBox.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: lbScoreBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        `;
+
+        // 學員名字
+        const nameEl = document.createElement('div');
+        nameEl.textContent = studentName;
+        nameEl.style.cssText = `
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Noto Sans TC', sans-serif;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        `;
+
+        // 大數字
+        const bigNum = document.createElement('div');
+        bigNum.textContent = `${isPositive ? '+' : ''}${delta}`;
+        bigNum.style.cssText = `
+            font-size: 80px;
+            font-weight: 900;
+            color: ${color};
+            text-shadow: 0 0 40px ${color}, 0 0 80px ${color}40;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        `;
+
+        // 星星圖示列
+        const starsRow = document.createElement('div');
+        starsRow.style.cssText = 'display:flex;gap:4px;';
+        for (let i = 0; i < 5; i++) {
+            const s = document.createElement('span');
+            s.className = 'material-symbols-outlined';
+            s.textContent = 'star';
+            const filled = i < absDelta;
+            s.style.cssText = `
+                font-size: 28px;
+                color: ${filled ? color : 'rgba(255,255,255,0.15)'};
+                ${filled ? `filter: drop-shadow(0 0 6px ${color});` : ''}
+                transition: all 0.3s ${i * 0.08}s;
+            `;
+            starsRow.appendChild(s);
+        }
+
+        scoreBox.appendChild(nameEl);
+        scoreBox.appendChild(bigNum);
+        scoreBox.appendChild(starsRow);
+        overlay.appendChild(scoreBox);
+        document.body.appendChild(overlay);
+
+        // ═══ 爆發粒子 ═══
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const particleCount = 15 + absDelta * 3;
 
         for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.innerHTML = `<span class="material-symbols-outlined" style="font-size:20px;color:${color};">${iconName}</span>`;
-            particle.style.cssText = `
+            const p = document.createElement('span');
+            p.className = 'material-symbols-outlined';
+            p.textContent = isPositive ? 'star' : 'star_half';
+            const size = 16 + Math.random() * 20;
+            const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+            const dist = 150 + Math.random() * 300;
+            const dx = Math.cos(angle) * dist;
+            const dy = Math.sin(angle) * dist;
+            const rot = (Math.random() - 0.5) * 720;
+
+            p.style.cssText = `
                 position: fixed;
-                z-index: 99999;
+                left: ${cx - size / 2}px;
+                top: ${cy - size / 2}px;
+                font-size: ${size}px;
+                color: ${color};
+                filter: drop-shadow(0 0 4px ${color});
                 pointer-events: none;
-                left: ${startRect.left + startRect.width / 2 - 10}px;
-                top: ${startRect.top + startRect.height / 2 - 10}px;
-                filter: drop-shadow(0 0 6px ${color});
-                transition: none;
+                z-index: 100000;
             `;
-            document.body.appendChild(particle);
+            overlay.appendChild(p);
 
-            const delay = i * 80;
-            const dx = endRect.left + endRect.width / 2 - 10 - (startRect.left + startRect.width / 2 - 10);
-            const dy = endRect.top + endRect.height / 2 - 10 - (startRect.top + startRect.height / 2 - 10);
-
-            // 隨機曲線偏移
-            const curveX = (Math.random() - 0.5) * 80;
-            const curveY = -40 - Math.random() * 60;
-
+            const delay = Math.random() * 200;
             setTimeout(() => {
-                particle.animate([
-                    {
-                        transform: 'scale(1) rotate(0deg)',
-                        opacity: 1,
-                        offset: 0
-                    },
-                    {
-                        transform: `translate(${curveX}px, ${curveY}px) scale(1.4) rotate(${isPositive ? 180 : -180}deg)`,
-                        opacity: 1,
-                        offset: 0.4
-                    },
-                    {
-                        transform: `translate(${dx}px, ${dy}px) scale(0.4) rotate(${isPositive ? 360 : -360}deg)`,
-                        opacity: 0.6,
-                        offset: 1
-                    }
+                p.animate([
+                    { transform: 'translate(0,0) scale(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(${dx * 0.3}px,${dy * 0.3}px) scale(1.3) rotate(${rot * 0.4}deg)`, opacity: 1, offset: 0.25 },
+                    { transform: `translate(${dx}px,${dy}px) scale(0.3) rotate(${rot}deg)`, opacity: 0 }
                 ], {
-                    duration: 700 + i * 50,
-                    easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+                    duration: 900 + Math.random() * 400,
+                    easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
                     fill: 'forwards'
                 });
-
-                setTimeout(() => {
-                    particle.remove();
-                }, 800 + i * 50);
             }, delay);
         }
 
-        // 飛行結束後在 toggle 按鈕上顯示 +N/-N
-        setTimeout(() => {
-            const badge = document.createElement('span');
-            badge.textContent = `${delta > 0 ? '+' : ''}${delta}`;
-            badge.style.cssText = `
-                position: absolute;
-                top: -8px;
-                right: -8px;
-                background: ${isPositive ? '#22c55e' : '#ef4444'};
-                color: #fff;
-                font-size: 11px;
-                font-weight: 800;
-                padding: 2px 6px;
-                border-radius: 10px;
-                pointer-events: none;
-                z-index: 99999;
-                box-shadow: 0 2px 8px ${isPositive ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)'};
+        // ═══ 注入 keyframes（如果尚未注入） ═══
+        if (!document.getElementById('lb-anim-styles')) {
+            const style = document.createElement('style');
+            style.id = 'lb-anim-styles';
+            style.textContent = `
+                @keyframes lbOverlayIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes lbScoreBounce {
+                    0% { transform: scale(0.3); opacity: 0; }
+                    50% { transform: scale(1.1); opacity: 1; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
             `;
-            lbToggle.style.position = 'relative';
-            lbToggle.appendChild(badge);
-            badge.animate([
-                { opacity: 1, transform: 'translateY(0) scale(1)' },
-                { opacity: 1, transform: 'translateY(-4px) scale(1.2)' },
-                { opacity: 0, transform: 'translateY(-16px) scale(0.8)' }
-            ], { duration: 1400, easing: 'ease-out', fill: 'forwards' });
-            setTimeout(() => badge.remove(), 1500);
+            document.head.appendChild(style);
+        }
 
-            // 讓 toggle 按鈕閃一下
-            lbToggle.animate([
-                { transform: 'scale(1)' },
-                { transform: 'scale(1.2)' },
-                { transform: 'scale(1)' }
-            ], { duration: 400, easing: 'ease-out' });
-        }, particleCount * 80 + 600);
+        // ═══ 1.5 秒後淡出移除 ═══
+        setTimeout(() => {
+            overlay.animate([
+                { opacity: 1 },
+                { opacity: 0 }
+            ], { duration: 500, fill: 'forwards' });
+            setTimeout(() => overlay.remove(), 550);
+        }, 1500);
     }
 }
