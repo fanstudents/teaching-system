@@ -278,7 +278,8 @@ export class LiveCaptions {
     }
 
     /**
-     * 語音辨識結果 → 後處理 → 顯示 → 廣播
+     * 語音辨識結果 → 後處理 → 電影字幕式顯示 → 廣播
+     * 每次只顯示最新的 ≤15 字，像電影字幕一段一段出現
      */
     _onResult(event) {
         let interim = '';
@@ -296,10 +297,29 @@ export class LiveCaptions {
         const isFinal = !!final;
         const rawText = final || interim;
 
-        // ★ 後處理：過濾語助詞 + 自動標點 + 專有名詞校正
-        const displayText = this._processor.process(rawText, isFinal);
+        // ★ 後處理
+        let processed = this._processor.process(rawText, isFinal);
+        if (!processed) return;
 
-        if (!displayText) return;
+        // ★ 電影字幕式斷句：最多 MAX_CHARS 字
+        const MAX_CHARS = 15;
+        const chars = [...processed];
+        let displayText;
+
+        if (chars.length <= MAX_CHARS) {
+            displayText = processed;
+        } else {
+            // 從尾部往前找自然斷點（逗號、句號、「的」「了」「是」等）
+            let cutPos = chars.length - MAX_CHARS;
+            // 在 cutPos 附近找最佳斷點（往後找最近的逗號或虛詞）
+            for (let i = cutPos; i < Math.min(cutPos + 6, chars.length); i++) {
+                if ('，。、！？的了是在有'.includes(chars[i])) {
+                    cutPos = i + 1;
+                    break;
+                }
+            }
+            displayText = chars.slice(cutPos).join('');
+        }
 
         if (this._textEl) {
             this._textEl.textContent = displayText;
@@ -308,17 +328,17 @@ export class LiveCaptions {
             if (isFinal) {
                 this._fadeTimer = setTimeout(() => {
                     if (this._textEl) {
-                        this._textEl.style.transition = 'opacity 0.8s ease';
-                        this._textEl.style.opacity = '0.3';
+                        this._textEl.style.transition = 'opacity 0.6s ease';
+                        this._textEl.style.opacity = '0';
                         setTimeout(() => {
                             if (this._textEl) {
                                 this._textEl.textContent = '';
                                 this._textEl.style.opacity = '';
                                 this._textEl.style.transition = '';
                             }
-                        }, 800);
+                        }, 600);
                     }
-                }, 4000);
+                }, 2500);
             }
         }
 
