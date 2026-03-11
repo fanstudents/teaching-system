@@ -42,6 +42,9 @@ class TextProcessor {
     process(text, isFinal) {
         if (!text) return text;
 
+        // 0. 同音錯字替換（最優先）
+        text = this._applyCommonFixes(text);
+
         // 1. 過濾語助詞（只對 final 結果做，interim 不做避免閃爍）
         if (isFinal) {
             text = this._removeFillers(text);
@@ -159,13 +162,74 @@ class TextProcessor {
     }
 
     /**
-     * 載入專有名詞（從 localStorage）
+     * 常見同音錯字直接替換表
+     * key: 語音辨識常見錯誤, value: 正確寫法
+     */
+    static COMMON_FIXES = {
+        '欸批愛': 'API',
+        '愛批愛': 'API',
+        '誒批愛': 'API',
+        '西一歐': 'SEO',
+        '欸斯一歐': 'SEO',
+        '差吉批替': 'ChatGPT',
+        '差及批替': 'ChatGPT',
+        '茶居批替': 'ChatGPT',
+        '雞皮替': 'GPT',
+        '批替': 'GPT',
+        '接米乃': 'Gemini',
+        '間米尼': 'Gemini',
+        '黃仁訓': '黃仁勳',
+        '黃人訓': '黃仁勳',
+        '恩為地雅': 'NVIDIA',
+        '特斯拉': 'Tesla',
+        '阿爾法': 'Alpha',
+        '優圖': 'YouTube',
+        'IG': 'IG',
+        '臉書': 'Facebook',
+        '谷歌': 'Google',
+        '連結': '連結',
+        '轉換率': '轉換率',
+        '關鍵字': '關鍵字',
+        '流量': '流量',
+        '演算法': '演算法',
+    };
+
+    /**
+     * 預設專有名詞列表（語音辨識常出錯的）
+     */
+    static DEFAULT_GLOSSARY = [
+        'AI', 'API', 'SEO', 'SEM', 'GPT', 'ChatGPT', 'Gemini', 'Claude',
+        'Google', 'Meta', 'Facebook', 'Instagram', 'YouTube', 'TikTok', 'LINE',
+        'NVIDIA', 'OpenAI', 'Transformer', 'LLM',
+        'Python', 'JavaScript', 'React', 'CSS', 'HTML',
+        'Canva', 'Figma', 'Notion', 'Slack', 'Zoom',
+        'CRM', 'KPI', 'ROI', 'CTR', 'CPC', 'CPM', 'ROAS',
+        'GA4', 'GTM', 'Search Console',
+    ];
+
+    /**
+     * 套用同音錯字替換
+     */
+    _applyCommonFixes(text) {
+        for (const [wrong, right] of Object.entries(TextProcessor.COMMON_FIXES)) {
+            if (text.includes(wrong)) {
+                text = text.replaceAll(wrong, right);
+            }
+        }
+        return text;
+    }
+
+    /**
+     * 載入專有名詞（localStorage + 預設名詞合併）
      */
     _loadGlossary() {
         try {
             const raw = localStorage.getItem('caption_glossary');
-            return raw ? JSON.parse(raw) : [];
-        } catch { return []; }
+            const userTerms = raw ? JSON.parse(raw) : [];
+            // 合併預設 + 使用者自訂，去重
+            const all = [...new Set([...TextProcessor.DEFAULT_GLOSSARY, ...userTerms])];
+            return all;
+        } catch { return [...TextProcessor.DEFAULT_GLOSSARY]; }
     }
 
     /**

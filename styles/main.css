@@ -2107,20 +2107,20 @@ body {
    ======================================== */
 .live-caption-bar {
     position: absolute;
-    bottom: 40px;
+    bottom: 48px;
     left: 0;
     right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0;
-    padding: 14px 40px;
-    background: rgba(0, 0, 0, 0.85);
+    padding: 16px 40px;
+    background: rgba(0, 0, 0, 0.88);
     color: #fff;
-    font-size: 28px;
-    font-weight: 500;
-    line-height: 1.6;
-    letter-spacing: 0.5px;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 1px;
     z-index: 5000;
     pointer-events: none;
     opacity: 0;
@@ -2137,22 +2137,22 @@ body {
 }
 
 .live-caption-text {
-    max-width: 85%;
+    max-width: 90%;
     word-break: break-word;
     max-height: 3.2em;
     overflow: hidden;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 255, 255, 0.15);
 }
 
 .live-caption-text.interim {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.5);
 }
 
 /* 學員端字幕條 */
 .student-caption {
-    font-size: 22px;
-    padding: 12px 32px;
-    bottom: 32px;
+    font-size: 36px;
+    padding: 14px 32px;
+    bottom: 36px;
 }
 
 .student-caption .live-caption-mic {
