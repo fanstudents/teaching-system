@@ -1101,220 +1101,91 @@
         </button>
 
         <!-- 頂部統一資訊列 -->
-        <div id="presTopBar" class="pres-top-bar" style="
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            height: 40px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            color: #fff;
-            font-family: 'Noto Sans TC', sans-serif;
-        ">
-            <!-- 左：狀態 · 課程 -->
-            <div style="display:flex;align-items:center;gap:8px;font-size:12px;min-width:0;">
-                <span id="presInstructorBadge" style="
-                    display: none;
-                    align-items: center;
-                    gap: 4px;
-                    color: #86efac;
-                    font-size: 11px;
-                    font-weight: 600;
-                    white-space: nowrap;
-                ">
-                    <span
-                        style="width:6px;height:6px;background:#86efac;border-radius:50%;animation:broadcastPulse 1.2s ease-in-out infinite;"></span>
+        <div id="presTopBar" class="pres-top-bar">
+            <!-- 左: 廣播狀態 -->
+            <div class="pres-bar-group">
+                <span id="presInstructorBadge" class="pres-broadcast-badge" style="display:none;">
+                    <span class="pres-broadcast-dot"></span>
                     廣播中
                 </span>
-                <span id="presBroadcastCode" style="
-                    display: none;
-                    font-family: 'Courier New', monospace;
-                    font-size: 12px;
-                    font-weight: 700;
-                    background: rgba(255,255,255,0.15);
-                    padding: 2px 8px;
-                    border-radius: 4px;
-                    letter-spacing: 1px;
-                "></span>
-                <span id="presBroadcastViewers" style="
-                    display: none;
-                    font-size: 11px;
-                    opacity: 0.7;
-                "></span>
-                <span id="presInfoText"
-                    style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0.7;font-size:12px;"></span>
+                <span id="presBroadcastCode" class="pres-broadcast-code" style="display:none;"></span>
+                <span id="presBroadcastViewers" class="pres-broadcast-viewers" style="display:none;"></span>
+                <span id="presInfoText" class="pres-info-text"></span>
             </div>
 
-            <!-- 中：追隨 / 自主 切換 -->
-            <div id="presFollowToggle" style="
-                display: flex;
-                background: rgba(255,255,255,0.12);
-                border-radius: 6px;
-                padding: 2px;
-                pointer-events: auto;
-            ">
-                <button id="presFollowBtn" class="pres-follow-btn active" onclick="window._setPresMode('follow')" style="
-                    padding: 3px 12px;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-family: inherit;
-                    transition: all 0.2s;
-                    display: flex;
-                    align-items: center;
-                    gap: 3px;
-                    background: #fff;
-                    color: #1e293b;
-                ">
-                    <span class="material-symbols-outlined" style="font-size:13px;">sync</span>
+            <!-- 中左: 跟隨/自由 切換 -->
+            <div id="presFollowToggle" class="pres-follow-toggle">
+                <button id="presFollowBtn" class="pres-follow-btn active" onclick="window._setPresMode('follow')">
+                    <span class="material-symbols-outlined">sync</span>
                     跟隨講師
                 </button>
-                <button id="presBrowseBtn" class="pres-follow-btn" onclick="window._setPresMode('browse')" style="
-                    padding: 3px 12px;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-family: inherit;
-                    transition: all 0.2s;
-                    display: flex;
-                    align-items: center;
-                    gap: 3px;
-                    background: transparent;
-                    color: rgba(255,255,255,0.5);
-                ">
-                    <span class="material-symbols-outlined" style="font-size:13px;">explore</span>
+                <button id="presBrowseBtn" class="pres-follow-btn" onclick="window._setPresMode('browse')">
+                    <span class="material-symbols-outlined">explore</span>
                     自由瀏覽
                 </button>
             </div>
 
-            <!-- 標記工具列 -->
-            <div id="presAnnotationTools" style="display:flex;align-items:center;gap:4px;pointer-events:auto;">
-                <button class="pres-tool-btn" id="presAnnotPen" title="畫筆"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.6;padding:4px;border-radius:4px;transition:all .2s;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">draw</span>
+            <!-- 中右: 教學工具 -->
+            <div class="pres-bar-group">
+                <!-- 標記工具 -->
+                <div id="presAnnotationTools" class="pres-bar-group" style="gap:2px;">
+                    <button class="pres-icon-btn" id="presAnnotPen" title="畫筆">
+                        <span class="material-symbols-outlined">draw</span>
+                    </button>
+                    <button class="pres-icon-btn" id="presAnnotHighlight" title="螢光筆">
+                        <span class="material-symbols-outlined">ink_highlighter</span>
+                    </button>
+                    <button class="pres-icon-btn" id="presAnnotText" title="文字標記">
+                        <span class="material-symbols-outlined">text_fields</span>
+                    </button>
+                    <input type="color" id="presAnnotColor" value="#ef4444" title="標記顏色" class="pres-color-input">
+                    <button class="pres-icon-btn" id="presAnnotUndo" title="復原">
+                        <span class="material-symbols-outlined">undo</span>
+                    </button>
+                    <button class="pres-icon-btn" id="presAnnotClear" title="清除所有標記">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+
+                <span class="pres-bar-divider"></span>
+
+                <!-- 廣播專用工具 -->
+                <button id="presLaserBtn" class="pres-bar-btn" title="雷射筆" style="display:none;">
+                    <span class="material-symbols-outlined">point_scan</span>
+                    雷射筆
                 </button>
-                <button class="pres-tool-btn" id="presAnnotHighlight" title="螢光筆"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.6;padding:4px;border-radius:4px;transition:all .2s;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">ink_highlighter</span>
+                <button id="presCaptionBtn" class="pres-bar-btn" title="錄製逐字稿" style="display:none;">
+                    <span class="material-symbols-outlined">mic</span>
+                    錄音
                 </button>
-                <button class="pres-tool-btn" id="presAnnotText" title="文字標記"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.6;padding:4px;border-radius:4px;transition:all .2s;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">text_fields</span>
+                <button id="presCaptionSettingsBtn" class="pres-bar-btn" title="專有名詞設定" style="display:none;">
+                    <span class="material-symbols-outlined">dictionary</span>
                 </button>
-                <input type="color" id="presAnnotColor" value="#ef4444" title="標記顏色"
-                    style="width:24px;height:24px;border:none;padding:0;cursor:pointer;border-radius:4px;background:none;">
-                <button class="pres-tool-btn" id="presAnnotUndo" title="復原"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.6;padding:4px;border-radius:4px;transition:all .2s;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">undo</span>
+                <button id="presDashboardBtn" class="pres-bar-btn" title="儀表板" style="display:none;">
+                    <span class="material-symbols-outlined">bar_chart</span>
+                    儀表板
                 </button>
-                <button class="pres-tool-btn" id="presAnnotClear" title="清除所有標記"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.6;padding:4px;border-radius:4px;transition:all .2s;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+                <button id="presCopyCodeBtn" class="pres-bar-btn" title="複製課堂代碼" style="display:none;">
+                    <span class="material-symbols-outlined">content_copy</span>
+                    複製代碼
                 </button>
             </div>
 
-            <!-- 右：儀表板 · 頁碼 · 全螢幕 · 關閉 -->
-            <div style="display:flex;align-items:center;gap:6px;pointer-events:auto;">
-                <button id="presDashboardBtn" title="開啟即時儀表板" style="
-                    display: none;
-                    align-items: center;
-                    gap: 3px;
-                    background: rgba(255,255,255,0.12);
-                    border: 1px solid rgba(255,255,255,0.2);
-                    color: rgba(255,255,255,0.85);
-                    padding: 3px 10px;
-                    border-radius: 5px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-family: inherit;
-                    white-space: nowrap;
-                ">
-                    <span class="material-symbols-outlined" style="font-size:13px;">bar_chart</span>
-                    儀表板
-                </button>
-                <button id="presCopyCodeBtn" title="複製課堂代碼" style="
-                    display: none;
-                    align-items: center;
-                    gap: 3px;
-                    background: rgba(255,255,255,0.12);
-                    border: 1px solid rgba(255,255,255,0.2);
-                    color: rgba(255,255,255,0.85);
-                    padding: 3px 10px;
-                    border-radius: 5px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-family: inherit;
-                    white-space: nowrap;
-                ">
-                    <span class="material-symbols-outlined" style="font-size:13px;">content_copy</span>
-                    複製代碼
-                </button>
-                <button id="presLaserBtn" title="雷射筆（學員可見游標）" style="
-                    display: none;
-                    align-items: center;
-                    gap: 3px;
-                    background: rgba(255,255,255,0.12);
-                    border: 1px solid rgba(255,255,255,0.2);
-                    color: rgba(255,255,255,0.85);
-                    padding: 3px 10px;
-                    border-radius: 5px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-family: inherit;
-                    white-space: nowrap;
-                    transition: background 0.2s, border-color 0.2s;
-                ">
-                    <span class="material-symbols-outlined" style="font-size:13px;">point_scan</span>
-                    雷射筆
-                </button>
-                <button id="presCaptionBtn" class="pres-caption-btn" title="即時字幕（語音辨識）" style="display:none;">
-                    <span class="material-symbols-outlined" style="font-size:16px;">mic</span>
-                </button>
-                <button id="presCaptionSettingsBtn" class="pres-caption-btn" title="字幕設定（專有名詞）" style="display:none;">
-                    <span class="material-symbols-outlined" style="font-size:16px;">dictionary</span>
-                </button>
-                <button id="presStopBroadcastBtn" title="停止廣播" style="
-                    display: none;
-                    align-items: center;
-                    gap: 3px;
-                    background: rgba(239,68,68,0.2);
-                    border: 1px solid rgba(239,68,68,0.4);
-                    color: #fca5a5;
-                    padding: 3px 10px;
-                    border-radius: 5px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-family: inherit;
-                    white-space: nowrap;
-                ">
-                    <span class="material-symbols-outlined" style="font-size:13px;">stop_circle</span>
+            <!-- 右: 系統控制 -->
+            <div class="pres-bar-group">
+                <button id="presStopBroadcastBtn" class="pres-bar-btn pres-btn-danger" title="停止廣播" style="display:none;">
+                    <span class="material-symbols-outlined">stop_circle</span>
                     停止廣播
                 </button>
-                <span id="presCounterTop" style="font-size:11px;opacity:0.5;"></span>
-                <button class="pres-tool-btn" id="presForceSync" title="強制同步所有學員到目前頁面"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.5;padding:3px;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">cell_tower</span>
+                <span id="presCounterTop" class="pres-info-text"></span>
+                <button class="pres-icon-btn" id="presForceSync" title="強制同步所有學員">
+                    <span class="material-symbols-outlined">cell_tower</span>
                 </button>
-                <button class="pres-tool-btn" id="presFullscreenToggle" title="全螢幕"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.5;padding:3px;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">fullscreen</span>
+                <button class="pres-icon-btn" id="presFullscreenToggle" title="全螢幕">
+                    <span class="material-symbols-outlined">fullscreen</span>
                 </button>
-                <button class="pres-tool-btn" id="exitPresentation" title="離開簡報"
-                    style="background:none;border:none;color:#fff;cursor:pointer;opacity:0.5;padding:3px;">
-                    <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+                <button class="pres-icon-btn" id="exitPresentation" title="離開簡報">
+                    <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
         </div>

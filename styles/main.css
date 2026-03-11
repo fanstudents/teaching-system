@@ -1385,24 +1385,218 @@ body {
 .presentation-mode.active {
     display: flex;
 }
-
-/* ── presTopBar 狀態管理 ── */
+/* ── presTopBar ── */
 .pres-top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    height: 42px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #fff;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s;
 }
 
-/* 滑鼠移動時顯示（JS 加 .visible class） */
 .pres-top-bar.visible {
     opacity: 1;
     pointer-events: auto;
 }
 
-/* 廣播中：常駐顯示，不自動隱藏 */
 .pres-top-bar.broadcast-locked {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* 群組容器 */
+.pres-bar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: auto;
+}
+
+/* 分隔線 */
+.pres-bar-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+}
+
+/* ── 廣播狀態 ── */
+.pres-broadcast-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #86efac;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pres-broadcast-dot {
+    width: 6px;
+    height: 6px;
+    background: #86efac;
+    border-radius: 50%;
+    animation: broadcastPulse 1.2s ease-in-out infinite;
+}
+
+.pres-broadcast-code {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.pres-broadcast-viewers {
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+.pres-info-text {
+    font-size: 11px;
+    opacity: 0.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── 跟隨/自由 切換 ── */
+.pres-follow-toggle {
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 2px;
+    pointer-events: auto;
+}
+
+.pres-follow-btn {
+    padding: 3px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.pres-follow-btn .material-symbols-outlined {
+    font-size: 13px;
+}
+
+.pres-follow-btn.active {
+    background: #fff;
+    color: #1e293b;
+}
+
+/* ── 文字按鈕（統一樣式） ── */
+.pres-bar-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.pres-bar-btn .material-symbols-outlined {
+    font-size: 14px;
+}
+
+.pres-bar-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.pres-bar-btn.active {
+    background: rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.5);
+    color: #c7d2fe;
+}
+
+.pres-bar-btn.unsupported {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* 危險按鈕（停止廣播） */
+.pres-btn-danger {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.pres-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #fecaca;
+}
+
+/* ── 純圖示按鈕 ── */
+.pres-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.pres-icon-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.pres-icon-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pres-icon-btn.active {
+    color: #fff;
+    background: rgba(99, 102, 241, 0.35);
+}
+
+/* 顏色選擇器 */
+.pres-color-input {
+    width: 22px;
+    height: 22px;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    background: none;
 }
 
 
@@ -2157,37 +2351,6 @@ body {
 
 .student-caption .live-caption-mic {
     display: none;
-}
-
-/* presTopBar 字幕按鈕 */
-.pres-caption-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.pres-caption-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-}
-
-.pres-caption-btn.active {
-    background: #ef4444;
-    color: #fff;
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
-}
-
-.pres-caption-btn.unsupported {
-    opacity: 0.3;
-    cursor: not-allowed;
 }
 
 /* 專有名詞設定面板 */
