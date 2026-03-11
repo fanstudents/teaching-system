@@ -2101,3 +2101,115 @@ body {
 .link-card-arrow .material-symbols-outlined {
     font-size: 18px;
 }
+
+/* ========================================
+   即時語音字幕
+   ======================================== */
+.live-caption-bar {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    color: #f1f5f9;
+    font-size: 18px;
+    line-height: 1.5;
+    max-width: 80%;
+    min-width: 200px;
+    z-index: 5000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    transform: translateX(-50%) translateY(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.live-caption-bar.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.live-caption-mic {
+    display: flex;
+    align-items: center;
+    color: #ef4444;
+    animation: captionPulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.live-caption-mic .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.live-caption-text {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+    max-height: 3em;
+    overflow: hidden;
+}
+
+.live-caption-text.interim {
+    color: rgba(241, 245, 249, 0.6);
+}
+
+/* 學員端字幕條 — 稍微小一點 */
+.student-caption {
+    font-size: 15px;
+    padding: 8px 16px;
+    bottom: 16px;
+    max-width: 90%;
+    border-radius: 10px;
+}
+
+.student-caption .live-caption-mic {
+    color: #60a5fa;
+    animation: none;
+}
+
+.student-caption .live-caption-mic .material-symbols-outlined {
+    font-size: 16px;
+}
+
+/* presTopBar 字幕按鈕 */
+.pres-caption-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pres-caption-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.pres-caption-btn.active {
+    background: #ef4444;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.pres-caption-btn.unsupported {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+@keyframes captionPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}

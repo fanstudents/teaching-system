@@ -1339,3 +1339,60 @@ body {
         opacity: 0;
     }
 }
+
+/* ========================================
+   即時字幕（學員端）
+   ======================================== */
+.live-caption-bar {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 10px;
+    color: #f1f5f9;
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 90%;
+    min-width: 120px;
+    z-index: 5000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    transform: translateX(-50%) translateY(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.live-caption-bar.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.live-caption-mic {
+    display: flex;
+    align-items: center;
+    color: #60a5fa;
+    flex-shrink: 0;
+}
+
+.live-caption-mic .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.live-caption-text {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+    max-height: 3em;
+    overflow: hidden;
+}
+
+.live-caption-text.interim {
+    color: rgba(241, 245, 249, 0.6);
+}

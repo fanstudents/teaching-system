@@ -3925,6 +3925,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     if (dashBtn) dashBtn.style.display = 'none';
                     const plb = document.getElementById('presLaserBtn');
                     if (plb) plb.style.display = 'none';
+                    const pcb = document.getElementById('presCaptionBtn');
+                    if (pcb) { pcb.style.display = 'none'; pcb.classList.remove('active'); }
+                    if (this._liveCaptions) this._liveCaptions.stop();
                 };
             }
             // 雷射筆按鈕
@@ -3950,6 +3953,29 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         }
                     }
                 };
+            }
+
+            // ── 即時字幕按鈕 ──
+            const presCaptionBtn = document.getElementById('presCaptionBtn');
+            if (presCaptionBtn) {
+                import('./liveCaptions.js').then(({ LiveCaptions }) => {
+                    if (!this._liveCaptions) {
+                        this._liveCaptions = new LiveCaptions(realtime, `session:${this.sessionCode}`);
+                    }
+                    if (this._liveCaptions.supported) {
+                        presCaptionBtn.style.display = 'flex';
+                        presCaptionBtn.onclick = () => {
+                            const active = this._liveCaptions.toggle();
+                            presCaptionBtn.classList.toggle('active', active);
+                            presCaptionBtn.title = active ? '關閉即時字幕' : '即時字幕（語音辨識）';
+                            this.showToast(active ? '🎤 即時字幕已開啟' : '字幕已關閉');
+                        };
+                    } else {
+                        presCaptionBtn.style.display = 'flex';
+                        presCaptionBtn.classList.add('unsupported');
+                        presCaptionBtn.title = '您的瀏覽器不支援語音辨識';
+                    }
+                });
             }
         } else {
             if (presCode) presCode.style.display = 'none';
@@ -4627,12 +4653,18 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this._laserActive = false;
         this._destroyLaserTracking();
         this._destroyAnnotation();
+
+        // 清除即時字幕
+        if (this._liveCaptions) {
+            this._liveCaptions.destroy();
+            this._liveCaptions = null;
+        }
         const topBar = document.getElementById('presTopBar');
         if (topBar) {
             topBar.classList.remove('broadcast-locked', 'visible');
         }
         ['presInstructorBadge', 'presBroadcastCode', 'presBroadcastViewers',
-            'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn', 'presLaserBtn'].forEach(id => {
+            'presCopyCodeBtn', 'presStopBroadcastBtn', 'presDashboardBtn', 'presLaserBtn', 'presCaptionBtn'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
             });
