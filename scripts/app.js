@@ -3471,12 +3471,16 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
                     // ★ 加分動畫
                     if (scoreDiff > 0 && cached) {
-                        this._showScorePopup(row, scoreDiff);
+                        this._showScorePopup(row, scoreDiff, true);
+                    }
+                    // ★ 扣分動畫
+                    if (scoreDiff < 0 && cached) {
+                        this._showScorePopup(row, scoreDiff, false);
                     }
                     // ★ 排名上升閃爍
                     if (rankUp) {
                         row.classList.remove('rank-up');
-                        void row.offsetWidth; // 強制 reflow
+                        void row.offsetWidth;
                         row.classList.add('rank-up');
                         setTimeout(() => row.classList.remove('rank-up'), 700);
                     }
@@ -3512,12 +3516,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     }
 
     /**
-     * 在排行榜 row 上方顯示 +N 加分動畫
+     * 在排行榜 row 上方顯示 +N/-N 加分/扣分動畫
      */
-    _showScorePopup(row, diff) {
+    _showScorePopup(row, diff, isPositive = true) {
         const popup = document.createElement('span');
-        popup.className = 'lb-score-popup';
-        popup.textContent = `+${diff}`;
+        popup.className = `lb-score-popup ${isPositive ? '' : 'lb-score-negative'}`;
+        popup.textContent = `${diff > 0 ? '+' : ''}${diff}`;
         row.appendChild(popup);
         popup.addEventListener('animationend', () => popup.remove());
     }

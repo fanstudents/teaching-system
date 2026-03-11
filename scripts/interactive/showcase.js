@@ -275,6 +275,22 @@ export class Showcase {
                         const subId = card.querySelector('.showcase-score-bar')?.dataset.subId;
                         if (!subId) return;
 
+                        // 1. 先讀取舊的 _awarded 分數
+                        let oldScore = 0;
+                        try {
+                            const { data: rows } = await db.select('submissions', {
+                                filter: { id: `eq.${subId}` },
+                                select: 'state'
+                            });
+                            if (rows && rows[0]) {
+                                let st = rows[0].state;
+                                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                                oldScore = parseInt(st?._awarded) || 0;
+                            }
+                        } catch { }
+
+                        const delta = score - oldScore;
+
                         // UI 回饋 — 星星填滿
                         card.querySelectorAll('.showcase-star-btn').forEach(b => {
                             const bScore = parseInt(b.dataset.score);
@@ -282,17 +298,16 @@ export class Showcase {
                             if (bScore <= score) {
                                 b.classList.add('filled');
                                 b.classList.remove('half');
-                                icon.textContent = 'star';
                             } else {
                                 b.classList.remove('filled', 'half');
-                                icon.textContent = 'star';
                             }
+                            icon.textContent = 'star';
                         });
                         const valueEl = card.querySelector('.showcase-score-value');
                         if (valueEl) valueEl.textContent = score + ' 分';
 
                         try {
-                            // 1. 先讀取此 submission 的現有 state
+                            // 2. 讀取完整 state 並合併更新
                             let existingState = {};
                             try {
                                 const { data: rows } = await db.select('submissions', {
@@ -306,7 +321,6 @@ export class Showcase {
                                 }
                             } catch { }
 
-                            // 2. 合併：更新 instructor_score + state._awarded
                             const mergedState = {
                                 ...existingState,
                                 _awarded: score,
@@ -329,7 +343,7 @@ export class Showcase {
                                 setTimeout(() => saved.style.display = 'none', 2000);
                             }
 
-                            // 4. 廣播
+                            // 4. 廣播（帶正確差值）
                             const sub = submissions[parseInt(card.dataset.index)];
                             if (sub && this.sessionCode) {
                                 realtime.publish(`session:${this.sessionCode}`, 'hw_scored', {
@@ -341,57 +355,23 @@ export class Showcase {
                                 realtime.publish(`session:${this.sessionCode}`, 'leaderboard_update', {
                                     studentName: sub.student_name,
                                     studentEmail: sub.student_email || '',
-                                    pointsAdded: score,
+                                    pointsAdded: delta,
                                     source: 'instructor_score'
                                 });
                             }
 
-                            // ★ 排行榜加分動畫 — 找到對應的 row 並動畫 +N
-                            setTimeout(() => {
-                                // 先強制更新排行榜
-                                if (window.app?.updateLeaderboard) window.app.updateLeaderboard();
+                            // 5. ★ 星星飛到排行榜的動畫 + 排行榜加分動畫
+                            if (delta !== 0) {
+                                // 星星飛行動畫
+                                this._flyStarToLeaderboard(btn, delta);
 
+                                // 等一下讓排行榜更新，然後高亮
                                 setTimeout(() => {
-                                    const email = sub?.student_email || '';
-                                    const name = sub?.student_name || '';
-                                    // 以 email 或 name 找到排行榜 row
-                                    const rows = document.querySelectorAll('#lbList .lb-row');
-                                    let targetRow = null;
-                                    rows.forEach(r => {
-                                        if (email && r.dataset.email === email) targetRow = r;
-                                        else if (r.querySelector('.lb-name')?.textContent === name) targetRow = r;
-                                    });
-                                    if (targetRow) {
-                                        // 高亮閃動 row
-                                        targetRow.style.transition = 'background 0.3s';
-                                        targetRow.style.background = 'rgba(250,204,21,0.15)';
-                                        setTimeout(() => targetRow.style.background = '', 1500);
+                                    if (window.app?.updateLeaderboard) window.app.updateLeaderboard();
+                                }, 200);
+                            }
 
-                                        // "+N分" 浮動標籤
-                                        const ptsEl = targetRow.querySelector('.lb-pts');
-                                        if (ptsEl) {
-                                            const badge = document.createElement('span');
-                                            badge.className = 'lb-score-anim';
-                                            badge.textContent = `+${score}`;
-                                            badge.style.cssText = `
-                                                position:absolute;right:-8px;top:-4px;
-                                                color:#f59e0b;font-weight:800;font-size:14px;
-                                                pointer-events:none;white-space:nowrap;
-                                                text-shadow:0 0 6px rgba(245,158,11,0.4);
-                                            `;
-                                            ptsEl.style.position = 'relative';
-                                            ptsEl.appendChild(badge);
-                                            badge.animate([
-                                                { opacity: 1, transform: 'translateY(0)' },
-                                                { opacity: 0, transform: 'translateY(-20px)' }
-                                            ], { duration: 1200, easing: 'ease-out', fill: 'forwards' });
-                                            setTimeout(() => badge.remove(), 1500);
-                                        }
-                                    }
-                                }, 600); // 等排行榜更新完
-                            }, 100);
-
-                            console.log(`[Showcase] scored ${sub?.student_name}: ${score}pts`);
+                            console.log(`[Showcase] scored ${sub?.student_name}: ${oldScore} → ${score} (delta: ${delta > 0 ? '+' : ''}${delta})`);
                         } catch (err) {
                             console.warn('[Showcase] score save failed:', err);
                         }
@@ -647,5 +627,109 @@ export class Showcase {
         if (!iso) return '';
         const d = new Date(iso);
         return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    /**
+     * 星星從評分區飛向排行榜的動畫
+     * @param {HTMLElement} starBtn - 被點擊的星星按鈕
+     * @param {number} delta - 分數差值（正=加分，負=扣分）
+     */
+    _flyStarToLeaderboard(starBtn, delta) {
+        const lbToggle = document.getElementById('lbToggle');
+        if (!lbToggle) return;
+
+        const startRect = starBtn.getBoundingClientRect();
+        const endRect = lbToggle.getBoundingClientRect();
+
+        const isPositive = delta > 0;
+        const particleCount = Math.min(Math.abs(delta), 5);
+        const color = isPositive ? '#fbbf24' : '#ef4444';
+        const iconName = isPositive ? 'star' : 'star_half';
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.innerHTML = `<span class="material-symbols-outlined" style="font-size:20px;color:${color};">${iconName}</span>`;
+            particle.style.cssText = `
+                position: fixed;
+                z-index: 99999;
+                pointer-events: none;
+                left: ${startRect.left + startRect.width / 2 - 10}px;
+                top: ${startRect.top + startRect.height / 2 - 10}px;
+                filter: drop-shadow(0 0 6px ${color});
+                transition: none;
+            `;
+            document.body.appendChild(particle);
+
+            const delay = i * 80;
+            const dx = endRect.left + endRect.width / 2 - 10 - (startRect.left + startRect.width / 2 - 10);
+            const dy = endRect.top + endRect.height / 2 - 10 - (startRect.top + startRect.height / 2 - 10);
+
+            // 隨機曲線偏移
+            const curveX = (Math.random() - 0.5) * 80;
+            const curveY = -40 - Math.random() * 60;
+
+            setTimeout(() => {
+                particle.animate([
+                    {
+                        transform: 'scale(1) rotate(0deg)',
+                        opacity: 1,
+                        offset: 0
+                    },
+                    {
+                        transform: `translate(${curveX}px, ${curveY}px) scale(1.4) rotate(${isPositive ? 180 : -180}deg)`,
+                        opacity: 1,
+                        offset: 0.4
+                    },
+                    {
+                        transform: `translate(${dx}px, ${dy}px) scale(0.4) rotate(${isPositive ? 360 : -360}deg)`,
+                        opacity: 0.6,
+                        offset: 1
+                    }
+                ], {
+                    duration: 700 + i * 50,
+                    easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
+                    fill: 'forwards'
+                });
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 800 + i * 50);
+            }, delay);
+        }
+
+        // 飛行結束後在 toggle 按鈕上顯示 +N/-N
+        setTimeout(() => {
+            const badge = document.createElement('span');
+            badge.textContent = `${delta > 0 ? '+' : ''}${delta}`;
+            badge.style.cssText = `
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background: ${isPositive ? '#22c55e' : '#ef4444'};
+                color: #fff;
+                font-size: 11px;
+                font-weight: 800;
+                padding: 2px 6px;
+                border-radius: 10px;
+                pointer-events: none;
+                z-index: 99999;
+                box-shadow: 0 2px 8px ${isPositive ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)'};
+            `;
+            lbToggle.style.position = 'relative';
+            lbToggle.appendChild(badge);
+            badge.animate([
+                { opacity: 1, transform: 'translateY(0) scale(1)' },
+                { opacity: 1, transform: 'translateY(-4px) scale(1.2)' },
+                { opacity: 0, transform: 'translateY(-16px) scale(0.8)' }
+            ], { duration: 1400, easing: 'ease-out', fill: 'forwards' });
+            setTimeout(() => badge.remove(), 1500);
+
+            // 讓 toggle 按鈕閃一下
+            lbToggle.animate([
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.2)' },
+                { transform: 'scale(1)' }
+            ], { duration: 400, easing: 'ease-out' });
+        }, particleCount * 80 + 600);
     }
 }

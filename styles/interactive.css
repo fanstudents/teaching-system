@@ -3536,6 +3536,28 @@
     50% { background: rgba(74, 222, 128, 0.12); border-color: rgba(74, 222, 128, 0.2); }
 }
 
+/* 扣分（負分）版本 */
+.lb-score-popup.lb-score-negative {
+    color: #f87171;
+    text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+    animation: lbScorePopupDown 1.2s ease-out forwards;
+}
+
+@keyframes lbScorePopupDown {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    30% {
+        opacity: 1;
+        transform: translateY(8px) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(24px) scale(0.8);
+    }
+}
+
 /* ── Toggle button ── */
 .lb-toggle {
     position: fixed;
