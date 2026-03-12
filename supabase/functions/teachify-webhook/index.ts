@@ -239,6 +239,34 @@ serve(async (req) => {
                             }
                         }
 
+                        // 3) Auto-create session if none found (首次有人報名)
+                        if (!session && plan_id) {
+                            const lineitem = d.lineitems?.[0] || {};
+                            const sessionCode = generateCode(6);
+                            const sessionName = lineitem.name || '新場次';
+                            const today = new Date().toISOString().slice(0, 10);
+
+                            const { data: newSessions, error: createErr } = await supabase
+                                .from('project_sessions')
+                                .insert([{
+                                    project_id: project.id,
+                                    session_code: sessionCode,
+                                    join_code: project.join_code || sessionCode,
+                                    venue: sessionName,
+                                    date: today,
+                                    current_phase: 'pre-class',
+                                    teachify_plan_id: plan_id,
+                                    max_capacity: 50,
+                                    session_format: 'onsite'
+                                }])
+                                .select('*');
+
+                            if (!createErr && newSessions?.length > 0) {
+                                session = newSessions[0];
+                                console.log(`[webhook] Auto-created session: ${sessionCode} for plan ${plan_id}`);
+                            }
+                        }
+
                         if (session) {
                             syncedSession = session;
 
