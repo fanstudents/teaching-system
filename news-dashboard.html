@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新聞總覽 — AI 教學素材</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/s79-theme.css">
+    <style>
+        /* ── S79 Corporate Clean Design Tokens ── */
+        :root {
+            --bg-primary: #F4F4F4;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #4A4A4A;
+            --text-muted: #757575;
+            --brand-primary: #0F62FE;
+            --brand-accent: #0043CE;
+            --border-strong: #C6C6C6;
+            --border-subtle: #E0E0E0;
+            --state-success: #24A148;
+            --state-warning: #F1C21B;
+            --state-error: #DA1E28;
+            --focus-ring: #0F62FE;
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.08);
+            --duration-fast: 100ms;
+            --duration-normal: 150ms;
+            --container: 1120px;
+            --gutter: 24px;
+            --spacing: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 24px;
+            padding-left: 220px;
+        }
+
+        @media (max-width: 768px) { body { padding-left: 0; } }
+        body.sidebar-closed { padding-left: 56px; }
+
+        /* ── Topbar ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--gutter);
+            height: 48px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .topbar-brand .material-symbols-rounded {
+            font-size: 18px;
+            color: var(--brand-primary);
+        }
+
+        .topbar-divider {
+            width: 1px;
+            height: 16px;
+            background: var(--border-subtle);
+            margin: 0 12px;
+        }
+
+        .topbar-sub {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 16px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background var(--duration-fast) ease;
+            border: 1px solid transparent;
+            min-height: 32px;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--focus-ring);
+            outline-offset: 2px;
+        }
+
+        .btn-primary {
+            background: var(--brand-primary);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--brand-accent); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border-color: var(--border-subtle);
+        }
+        .btn-ghost:hover { background: #f0f0f0; }
+
+        .btn .material-symbols-rounded { font-size: 16px; }
+
+        /* ── Stats Row ── */
+        .stats-row {
+            display: flex;
+            gap: 1px;
+            background: var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .stat-cell {
+            flex: 1;
+            background: var(--bg-secondary);
+            padding: 16px var(--gutter);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .stat-value.brand { color: var(--brand-primary); }
+
+        /* ── Container ── */
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 24px var(--gutter);
+        }
+
+        /* ── Filter Bar ── */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-width: 150px;
+            height: 32px;
+            outline: none;
+            transition: border-color var(--duration-fast) ease;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: var(--brand-primary);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 6px 12px 6px 32px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg-secondary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23757575' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") 10px center no-repeat;
+            color: var(--text-primary);
+            height: 32px;
+            outline: none;
+        }
+
+        .search-box:focus { border-color: var(--brand-primary); }
+
+        /* ── Tabs ── */
+        .tab-row {
+            display: flex;
+            border-bottom: 2px solid var(--border-subtle);
+            margin-bottom: 16px;
+            gap: 0;
+        }
+
+        .tab-item {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all var(--duration-fast) ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .tab-item:hover { color: var(--text-primary); }
+
+        .tab-item.active {
+            color: var(--brand-primary);
+            border-bottom-color: var(--brand-primary);
+            font-weight: 600;
+        }
+
+        .tab-count {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+        }
+
+        .tab-item.active .tab-count {
+            background: #EBF0FF;
+            color: var(--brand-primary);
+        }
+
+        /* ── Layout ── */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .content-layout { grid-template-columns: 1fr; }
+            .source-panel { display: none; }
+        }
+
+        /* ── Source Panel ── */
+        .source-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 64px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+        }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background var(--duration-fast) ease;
+            color: var(--text-secondary);
+        }
+
+        .source-item:hover { background: var(--bg-primary); }
+        .source-item.active {
+            background: #EBF0FF;
+            color: var(--brand-primary);
+            font-weight: 500;
+        }
+
+        .source-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .source-dot.cat-A { background: var(--brand-primary); }
+        .source-dot.cat-B { background: var(--state-warning); }
+        .source-dot.cat-C { background: var(--state-success); }
+
+        .source-count {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ── Article List ── */
+        .article-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--border-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .date-divider {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-primary);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .article-row {
+            background: var(--bg-secondary);
+            padding: 16px 20px;
+            transition: background var(--duration-fast) ease;
+        }
+
+        .article-row:hover { background: #FAFAFA; }
+
+        .article-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .article-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-A { background: #EBF0FF; color: var(--brand-primary); }
+        .badge-B { background: #FFF8E1; color: #B8860B; }
+        .badge-C { background: #E8F5E9; color: var(--state-success); }
+
+        .article-lang-tag {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            color: var(--text-muted);
+        }
+
+        .article-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .article-title-zh {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+
+        .article-original-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .article-summary {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .article-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--brand-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .article-link:hover { text-decoration: underline; }
+
+        .article-tags {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 1px 8px;
+            border-radius: 2px;
+            background: var(--bg-primary);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* ── Empty / Loading ── */
+        .empty-state {
+            background: var(--bg-secondary);
+            text-align: center;
+            padding: 64px 20px;
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+        }
+
+        .empty-state .material-symbols-rounded {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-subtle);
+            border-top-color: var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 0.5s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Pagination ── */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 16px;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            transition: all var(--duration-fast) ease;
+        }
+
+        .page-btn:hover { background: var(--bg-primary); }
+        .page-btn.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+        .page-btn:disabled { opacity: 0.3; cursor: default; }
+
+        .page-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0 8px;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            background: var(--text-primary);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            z-index: 999;
+            animation: toastIn 0.15s ease;
+        }
+
+        @keyframes toastIn { from { transform: translateY(8px); opacity: 0; } }
+
+        /* ── Month Chips ── */
+        .month-row {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .month-chip {
+            padding: 3px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all var(--duration-fast) ease;
+        }
+
+        .month-chip.active { background: #EBF0FF; color: var(--brand-primary); border-color: var(--brand-primary); }
+        .month-chip:hover:not(.active) { background: var(--bg-primary); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .stats-row { flex-wrap: wrap; }
+            .stat-cell { min-width: calc(50% - 1px); }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Topbar -->
+    <header class="topbar">
+        <div style="display:flex;align-items:center;">
+            <div class="topbar-brand">
+                <span class="material-symbols-rounded">newspaper</span>
+                新聞總覽
+            </div>
+            <div class="topbar-divider"></div>
+            <span class="topbar-sub">AI 教學新聞監測</span>
+        </div>
+        <div class="topbar-right">
+            <span class="topbar-meta" id="lastUpdate"></span>
+            <button class="btn btn-ghost" onclick="refreshData()">
+                <span class="material-symbols-rounded">refresh</span>
+                重新載入
+            </button>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-row" id="statsBar">
+        <div class="stat-cell">
+            <div class="stat-label">Total articles</div>
+            <div class="stat-value brand" id="statTotal">—</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">Sources</div>
+            <div class="stat-value" id="statSources">—</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">官方服務商</div>
+            <div class="stat-value" id="statA">—</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">台灣媒體</div>
+            <div class="stat-value" id="statB">—</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">國際研究</div>
+            <div class="stat-value" id="statC">—</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filter -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span class="filter-label">Date</span>
+                <input type="date" class="filter-input" id="filterDate" onchange="applyFilters()">
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Month</span>
+                <select class="filter-select" id="filterMonth" onchange="applyFilters()">
+                    <option value="">All months</option>
+                </select>
+            </div>
+            <div class="filter-group" style="flex:1;">
+                <span class="filter-label">Search</span>
+                <input type="text" class="search-box" id="searchBox" placeholder="搜尋新聞標題或內容..." oninput="applyFilters()">
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-row" id="tabRow">
+            <div class="tab-item active" data-cat="all" onclick="setCat('all')">全部<span class="tab-count" id="badgeAll">0</span></div>
+            <div class="tab-item" data-cat="A" onclick="setCat('A')">官方服務商<span class="tab-count" id="badgeA">0</span></div>
+            <div class="tab-item" data-cat="B" onclick="setCat('B')">台灣媒體<span class="tab-count" id="badgeB">0</span></div>
+            <div class="tab-item" data-cat="C" onclick="setCat('C')">國際研究<span class="tab-count" id="badgeC">0</span></div>
+        </div>
+
+        <!-- Month chips -->
+        <div class="month-row" id="monthRow"></div>
+
+        <!-- Content -->
+        <div class="content-layout">
+            <aside class="source-panel" id="sourcePanel">
+                <div class="panel-title">Sources</div>
+            </aside>
+            <main>
+                <div class="article-list" id="articleList">
+                    <div class="empty-state">
+                        <span class="material-symbols-rounded">sync</span>
+                        <p>載入中...</p>
+                    </div>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        let allArticles = [];
+        let filteredArticles = [];
+        let currentCat = 'all';
+        let currentSource = '';
+        let currentPage = 1;
+        const PAGE_SIZE = 25;
+
+        // ── Init ──
+        async function init() {
+            await loadFromDB();
+            if (allArticles.length === 0) await loadFromLocalDigest();
+            applyFilters();
+        }
+
+        // ── Load from DB ──
+        async function loadFromDB() {
+            try {
+                const { data, error } = await db.select('news_articles', {
+                    order: 'digest_date.desc,fetched_at.desc',
+                    limit: 1000,
+                });
+                if (data && data.length > 0) {
+                    allArticles = data;
+                    document.getElementById('lastUpdate').textContent = `${allArticles.length} articles from database`;
+                }
+            } catch (e) {
+                console.warn('DB load failed, trying local:', e);
+            }
+        }
+
+        // ── Load from local digest ──
+        async function loadFromLocalDigest() {
+            const articles = [];
+            for (let i = 0; i < 14; i++) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                try {
+                    const res = await fetch(`data/news-digest/${dateStr}.json`);
+                    if (!res.ok) continue;
+                    const digest = await res.json();
+                    for (const a of (digest.articles || [])) {
+                        const key = `${a.source_id}-${a.original_title || a.title_zh || a.title}`;
+                        if (articles.some(x => `${x.source_id}-${x.original_title || x.title_zh}` === key)) continue;
+                        articles.push({
+                            ...a,
+                            digest_date: a.digest_date || dateStr,
+                            title_zh: a.title_zh || a.title || '',
+                            summary_zh: a.summary_zh || a.summary || '',
+                            original_title: a.original_title || a.title || '',
+                        });
+                    }
+                } catch { /* skip */ }
+            }
+            if (articles.length > 0) {
+                allArticles = articles;
+                document.getElementById('lastUpdate').textContent = `${allArticles.length} articles from local`;
+            }
+        }
+
+        // ── Filters ──
+        window.applyFilters = function() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const dateVal = document.getElementById('filterDate').value;
+            const monthVal = document.getElementById('filterMonth').value;
+
+            filteredArticles = allArticles.filter(a => {
+                if (currentCat !== 'all' && a.category !== currentCat) return false;
+                if (currentSource && a.source_id !== currentSource) return false;
+                if (dateVal && a.digest_date !== dateVal) return false;
+                if (monthVal && !a.digest_date?.startsWith(monthVal)) return false;
+                if (search) {
+                    const h = [a.title_zh, a.summary_zh, a.original_title, a.source_name]
+                        .filter(Boolean).join(' ').toLowerCase();
+                    if (!h.includes(search)) return false;
+                }
+                return true;
+            });
+
+            currentPage = 1;
+            updateStats();
+            renderSources();
+            renderMonths();
+            renderArticles();
+            renderPagination();
+        };
+
+        window.setCat = function(cat) {
+            currentCat = cat;
+            currentSource = '';
+            document.querySelectorAll('.tab-item').forEach(t =>
+                t.classList.toggle('active', t.dataset.cat === cat));
+            applyFilters();
+        };
+
+        window.setSource = function(id) {
+            currentSource = currentSource === id ? '' : id;
+            document.querySelectorAll('.source-item').forEach(s =>
+                s.classList.toggle('active', s.dataset.source === currentSource));
+            applyFilters();
+        };
+
+        window.setMonth = function(m) {
+            document.getElementById('filterMonth').value = m;
+            applyFilters();
+        };
+
+        window.refreshData = async function() {
+            showToast('重新載入中...');
+            allArticles = [];
+            await loadFromDB();
+            if (allArticles.length === 0) await loadFromLocalDigest();
+            applyFilters();
+            showToast(`已載入 ${allArticles.length} 篇文章`);
+        };
+
+        // ── Stats ──
+        function updateStats() {
+            document.getElementById('statTotal').textContent = filteredArticles.length;
+            document.getElementById('statSources').textContent = new Set(filteredArticles.map(a => a.source_id)).size;
+            const cats = { A: 0, B: 0, C: 0 };
+            filteredArticles.forEach(a => { if (cats[a.category] !== undefined) cats[a.category]++; });
+            document.getElementById('statA').textContent = cats.A;
+            document.getElementById('statB').textContent = cats.B;
+            document.getElementById('statC').textContent = cats.C;
+
+            // Tab badges
+            const all = { all: allArticles.length, A: 0, B: 0, C: 0 };
+            allArticles.forEach(a => { if (all[a.category] !== undefined) all[a.category]++; });
+            document.getElementById('badgeAll').textContent = all.all;
+            document.getElementById('badgeA').textContent = all.A;
+            document.getElementById('badgeB').textContent = all.B;
+            document.getElementById('badgeC').textContent = all.C;
+
+            // Month dropdown
+            const months = new Set();
+            allArticles.forEach(a => { if (a.digest_date) months.add(a.digest_date.substring(0, 7)); });
+            const sel = document.getElementById('filterMonth');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">All months</option>';
+            [...months].sort().reverse().forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                sel.appendChild(opt);
+            });
+            sel.value = cur;
+        }
+
+        // ── Sources ──
+        function renderSources() {
+            const panel = document.getElementById('sourcePanel');
+            const counts = {};
+            const target = currentCat === 'all' ? allArticles : allArticles.filter(a => a.category === currentCat);
+
+            target.forEach(a => {
+                if (!counts[a.source_id])
+                    counts[a.source_id] = { name: a.source_name, count: 0, cat: a.category };
+                counts[a.source_id].count++;
+            });
+
+            const sorted = Object.entries(counts).sort((a, b) => b[1].count - a[1].count);
+
+            panel.innerHTML = '<div class="panel-title">Sources</div>' +
+                `<div class="source-item ${!currentSource ? 'active' : ''}" data-source="" onclick="setSource('')">
+                    <span class="source-dot" style="background:var(--text-muted);"></span>
+                    全部
+                    <span class="source-count">${target.length}</span>
+                </div>` +
+                sorted.map(([id, info]) => `
+                    <div class="source-item ${currentSource === id ? 'active' : ''}" data-source="${id}" onclick="setSource('${id}')">
+                        <span class="source-dot cat-${info.cat}"></span>
+                        ${esc(info.name)}
+                        <span class="source-count">${info.count}</span>
+                    </div>
+                `).join('');
+        }
+
+        // ── Months ──
+        function renderMonths() {
+            const months = new Set();
+            allArticles.forEach(a => { if (a.digest_date) months.add(a.digest_date.substring(0, 7)); });
+            const val = document.getElementById('filterMonth').value;
+            document.getElementById('monthRow').innerHTML = [...months].sort().reverse()
+                .map(m => `<span class="month-chip ${val === m ? 'active' : ''}" onclick="setMonth('${m}')">${m}</span>`)
+                .join('');
+        }
+
+        // ── Articles ──
+        function renderArticles() {
+            const list = document.getElementById('articleList');
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const page = filteredArticles.slice(start, start + PAGE_SIZE);
+
+            if (page.length === 0) {
+                list.innerHTML = `<div class="empty-state">
+                    <span class="material-symbols-rounded">inbox</span>
+                    <p style="font-size:14px;">${allArticles.length === 0 ? '尚無新聞資料。請先執行 daily-news.js 抓取新聞。' : '沒有符合條件的文章'}</p>
+                </div>`;
+                return;
+            }
+
+            // Group by date
+            const grouped = {};
+            page.forEach(a => {
+                const d = a.digest_date || 'other';
+                if (!grouped[d]) grouped[d] = [];
+                grouped[d].push(a);
+            });
+
+            let html = '';
+            for (const [date, articles] of Object.entries(grouped)) {
+                html += `<div class="date-divider">${date}</div>`;
+                for (const a of articles) {
+                    const badgeClass = `badge-${a.category || 'A'}`;
+                    const isEn = a.lang !== 'zh-TW' && a.original_title && a.original_title !== a.title_zh;
+
+                    html += `<div class="article-row" style="cursor:pointer;" onclick="window.location.href='news-reader.html?id=${a.id}'">
+                        <div class="article-header">
+                            <span class="article-badge ${badgeClass}">${esc(a.source_name || '')}</span>
+                            ${isEn ? `<span class="article-lang-tag">EN → 中文</span>` : ''}
+                            <span class="article-time">${a.digest_date || ''}</span>
+                        </div>
+                        <div class="article-title-zh">${esc(a.title_zh || a.original_title || '')}</div>`;
+
+                    if (isEn && a.original_title) {
+                        html += `<div class="article-original-title">${esc(a.original_title)}</div>`;
+                    }
+
+                    if (a.summary_zh) {
+                        html += `<div class="article-summary">${esc(a.summary_zh)}</div>`;
+                    }
+
+                    html += `<div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                        <a class="article-link" href="news-reader.html?id=${a.id}" onclick="event.stopPropagation();">
+                            <span class="material-symbols-rounded" style="font-size:14px;">article</span>
+                            閱讀全文
+                        </a>`;
+
+                    if (a.url) {
+                        html += `<a class="article-link" href="${esc(a.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--text-muted);">
+                            原文連結
+                            <span class="material-symbols-rounded" style="font-size:14px;">open_in_new</span>
+                        </a>`;
+                    }
+
+                    html += `</div>`;
+
+                    if (a.tags && a.tags.length > 0) {
+                        html += `<div class="article-tags">${a.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>`;
+                    }
+
+                    html += `</div>`;
+                }
+            }
+
+            list.innerHTML = html;
+        }
+
+        function esc(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ── Pagination ──
+        function renderPagination() {
+            const total = filteredArticles.length;
+            const pages = Math.ceil(total / PAGE_SIZE);
+            const pag = document.getElementById('pagination');
+            if (pages <= 1) { pag.innerHTML = ''; return; }
+            pag.innerHTML = `
+                <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})">Previous</button>
+                <span class="page-info">${currentPage} / ${pages} (${total})</span>
+                <button class="page-btn" ${currentPage === pages ? 'disabled' : ''} onclick="goPage(${currentPage + 1})">Next</button>`;
+        }
+
+        window.goPage = function(p) {
+            currentPage = p;
+            renderArticles();
+            renderPagination();
+            window.scrollTo({ top: 200, behavior: 'smooth' });
+        };
+
+        // ── Toast ──
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+        window.showToast = showToast;
+
+        init();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

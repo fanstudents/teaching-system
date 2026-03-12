@@ -441,3 +441,30 @@ END $$;
 -- 也給 homework storage bucket
 INSERT INTO storage.buckets (id, name, public) VALUES ('homework', 'homework', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- ── 新聞文章表 (news aggregator) ──
+CREATE TABLE IF NOT EXISTS news_articles (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  source_id TEXT NOT NULL,
+  source_name TEXT NOT NULL,
+  category CHAR(1) NOT NULL CHECK (category IN ('A', 'B', 'C')),
+  title TEXT NOT NULL,
+  title_zh TEXT,
+  url TEXT,
+  summary TEXT,
+  summary_zh TEXT,
+  published_at DATE,
+  fetched_at TIMESTAMPTZ DEFAULT now(),
+  tags TEXT[] DEFAULT '{}',
+  lang TEXT DEFAULT 'en',
+  digest_date DATE NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE INDEX IF NOT EXISTS idx_news_articles_source ON news_articles(source_id);
+CREATE INDEX IF NOT EXISTS idx_news_articles_date ON news_articles(digest_date DESC);
+CREATE INDEX IF NOT EXISTS idx_news_articles_category ON news_articles(category);
+
+-- Allow anonymous read
+ALTER TABLE news_articles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "news_articles_read" ON news_articles FOR SELECT USING (true);
+CREATE POLICY "news_articles_write" ON news_articles FOR ALL USING (true);

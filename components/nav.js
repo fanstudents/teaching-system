@@ -70,6 +70,13 @@ const NAV_ITEMS = [
         ]
     },
     {
+        group: '素材與新聞',
+        items: [
+            { label: '新聞總覽', icon: 'newspaper', href: 'news-dashboard.html' },
+            { label: '素材庫', icon: 'palette', href: 'assets.html' },
+        ]
+    },
+    {
         group: '合作管理',
         items: [
             { label: '聯盟行銷', icon: 'campaign', href: 'partners.html#affiliates' },
