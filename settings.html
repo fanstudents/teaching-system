@@ -14,13 +14,43 @@
     <link rel="stylesheet" href="styles/admin-layout.css">
     <link rel="stylesheet" href="styles/s79-theme.css">
     <style>
+        /* ── Top Tabs ── */
+        .settings-tabs {
+            display: flex;
+            gap: 0;
+            padding: 0 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .settings-tab {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: color .15s, border-color .15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .settings-tab:hover { color: #1e293b; }
+        .settings-tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .settings-tab .material-symbols-outlined { font-size: 18px; }
+
+        /* ── Prompts ── */
         .settings-container {
             display: flex;
             gap: 24px;
             padding: 24px;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 130px);
         }
 
+        /* tab pane display must come AFTER settings-container to override display */
+        .tab-pane, .tab-pane.settings-container, .tab-pane.webhook-container { display: none; }
+        .tab-pane.active { display: flex; }
         .prompt-list {
             width: 280px;
             flex-shrink: 0;
@@ -29,7 +59,6 @@
             border: 1px solid #e2e8f0;
             overflow-y: auto;
         }
-
         .prompt-list-header {
             padding: 16px 20px;
             font-weight: 600;
@@ -40,30 +69,23 @@
             align-items: center;
             gap: 8px;
         }
-
         .prompt-item {
             padding: 14px 20px;
             cursor: pointer;
             border-bottom: 1px solid #f1f5f9;
             transition: background .15s;
         }
-
-        .prompt-item:hover {
-            background: #f8fafc;
-        }
-
+        .prompt-item:hover { background: #f8fafc; }
         .prompt-item.active {
             background: #eff6ff;
             border-left: 3px solid #2563eb;
         }
-
         .prompt-item-name {
             font-size: 14px;
             font-weight: 500;
             color: #1e293b;
             margin-bottom: 4px;
         }
-
         .prompt-item-desc {
             font-size: 12px;
             color: #94a3b8;
@@ -71,7 +93,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
         .prompt-editor {
             flex: 1;
             background: #fff;
@@ -80,7 +101,6 @@
             display: flex;
             flex-direction: column;
         }
-
         .prompt-editor-header {
             padding: 16px 24px;
             border-bottom: 1px solid #e2e8f0;
@@ -88,33 +108,20 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .prompt-editor-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .prompt-editor-desc {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
+        .prompt-editor-title { font-size: 18px; font-weight: 600; color: #1e293b; }
+        .prompt-editor-desc { font-size: 13px; color: #64748b; margin-top: 4px; }
         .prompt-editor-body {
             flex: 1;
             padding: 20px 24px;
             display: flex;
             flex-direction: column;
         }
-
         .prompt-editor-body label {
             font-size: 13px;
             font-weight: 500;
             color: #475569;
             margin-bottom: 8px;
         }
-
         .prompt-textarea {
             flex: 1;
             width: 100%;
@@ -129,11 +136,7 @@
             outline: none;
             transition: border-color .2s;
         }
-
-        .prompt-textarea:focus {
-            border-color: #2563eb;
-        }
-
+        .prompt-textarea:focus { border-color: #2563eb; }
         .prompt-editor-footer {
             padding: 16px 24px;
             border-top: 1px solid #e2e8f0;
@@ -141,20 +144,9 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .save-status {
-            font-size: 13px;
-            color: #94a3b8;
-        }
-
-        .save-status.saved {
-            color: #16a34a;
-        }
-
-        .save-status.saving {
-            color: #d97706;
-        }
-
+        .save-status { font-size: 13px; color: #94a3b8; }
+        .save-status.saved { color: #16a34a; }
+        .save-status.saving { color: #d97706; }
         .btn-save {
             padding: 8px 24px;
             background: #2563eb;
@@ -166,16 +158,8 @@
             cursor: pointer;
             transition: background .15s;
         }
-
-        .btn-save:hover {
-            background: #1d4ed8;
-        }
-
-        .btn-save:disabled {
-            opacity: .5;
-            cursor: default;
-        }
-
+        .btn-save:hover { background: #1d4ed8; }
+        .btn-save:disabled { opacity: .5; cursor: default; }
         .empty-state {
             flex: 1;
             display: flex;
@@ -184,7 +168,6 @@
             color: #94a3b8;
             font-size: 15px;
         }
-
         .variable-hint {
             margin-top: 12px;
             padding: 12px 16px;
@@ -194,12 +177,173 @@
             color: #64748b;
             line-height: 1.8;
         }
-
         .variable-hint code {
             background: #e2e8f0;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 11px;
+        }
+
+        /* ── Webhook Tab ── */
+        .webhook-container {
+            padding: 24px;
+            flex-direction: column;
+            gap: 24px;
+            height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        .wh-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .wh-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .wh-card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+        .wh-card-header h3 .material-symbols-outlined { font-size: 18px; color: #64748b; }
+        .wh-card-body { padding: 20px; }
+        .wh-endpoint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .wh-endpoint-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            width: 100px;
+            flex-shrink: 0;
+        }
+        .wh-endpoint-url {
+            flex: 1;
+            font-family: monospace;
+            font-size: 12px;
+            color: #1e293b;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .wh-copy-btn {
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            color: #475569;
+            transition: background .15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .wh-copy-btn:hover { background: #e2e8f0; }
+        .wh-copy-btn .material-symbols-outlined { font-size: 14px; }
+
+        .wh-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .wh-log-table th {
+            text-align: left;
+            padding: 10px 14px;
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .wh-log-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            vertical-align: middle;
+        }
+        .wh-log-table tr:hover td { background: #f8fafc; }
+        .wh-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .wh-badge.paid { background: #dcfce7; color: #16a34a; }
+        .wh-badge.refunded { background: #fef2f2; color: #dc2626; }
+        .wh-badge.unknown { background: #f1f5f9; color: #64748b; }
+        .wh-badge.synced { background: #dbeafe; color: #2563eb; }
+        .wh-badge.notsync { background: #f1f5f9; color: #94a3b8; }
+        .wh-detail-btn {
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .wh-detail-btn:hover { background: #f1f5f9; }
+
+        /* raw data modal */
+        .wh-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .wh-modal-overlay.active { display: flex; }
+        .wh-modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 680px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wh-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wh-modal-header h3 { margin: 0; font-size: 15px; }
+        .wh-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .wh-modal-body pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -215,7 +359,20 @@
             </div>
         </div>
 
-        <div class="settings-container">
+        <!-- Tab Navigation -->
+        <div class="settings-tabs">
+            <div class="settings-tab active" data-tab="prompts">
+                <span class="material-symbols-outlined">psychology</span>
+                AI 提示詞管理
+            </div>
+            <div class="settings-tab" data-tab="webhook">
+                <span class="material-symbols-outlined">webhook</span>
+                Webhook 設定
+            </div>
+        </div>
+
+        <!-- Tab: AI Prompts -->
+        <div class="tab-pane settings-container active" id="tab-prompts">
             <div class="prompt-list">
                 <div class="prompt-list-header">
                     <span class="material-symbols-outlined" style="font-size:18px;">psychology</span>
@@ -253,11 +410,97 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tab: Webhook -->
+        <div class="tab-pane webhook-container" id="tab-webhook">
+            <!-- Endpoints -->
+            <div class="wh-card">
+                <div class="wh-card-header">
+                    <h3><span class="material-symbols-outlined">link</span> Webhook 端點</h3>
+                </div>
+                <div class="wh-card-body">
+                    <div class="wh-endpoint">
+                        <span class="wh-endpoint-label">Teachify</span>
+                        <div class="wh-endpoint-url" id="whUrlTeachify">https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/teachify-webhook</div>
+                        <button class="wh-copy-btn" onclick="copyUrl('whUrlTeachify')">
+                            <span class="material-symbols-outlined">content_copy</span> 複製
+                        </button>
+                    </div>
+                    <div class="wh-endpoint">
+                        <span class="wh-endpoint-label">通用購買</span>
+                        <div class="wh-endpoint-url" id="whUrlPurchase">https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/purchase-webhook</div>
+                        <button class="wh-copy-btn" onclick="copyUrl('whUrlPurchase')">
+                            <span class="material-symbols-outlined">content_copy</span> 複製
+                        </button>
+                    </div>
+                    <div style="margin-top:8px;font-size:12px;color:#94a3b8;">
+                        在 Teachify 後台的 Webhook 設定中，貼上以上 URL，並在 Header 中加入 <code>x-webhook-secret</code>。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Logs -->
+            <div class="wh-card" style="flex:1;display:flex;flex-direction:column;">
+                <div class="wh-card-header">
+                    <h3><span class="material-symbols-outlined">receipt_long</span> 最近接收紀錄</h3>
+                    <button class="wh-copy-btn" onclick="loadWebhookLogs()">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div style="overflow-y:auto;flex:1;">
+                    <table class="wh-log-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px;">狀態</th>
+                                <th>事件</th>
+                                <th>Email</th>
+                                <th>訂單號</th>
+                                <th>金額</th>
+                                <th>同步</th>
+                                <th>時間</th>
+                                <th style="width:50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="webhookLogBody">
+                            <tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:40px;">載入中…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Raw Data Modal -->
+        <div class="wh-modal-overlay" id="whRawModal" onclick="if(event.target===this)this.classList.remove('active')">
+            <div class="wh-modal">
+                <div class="wh-modal-header">
+                    <h3>Webhook 原始資料</h3>
+                    <button class="wh-copy-btn" onclick="document.getElementById('whRawModal').classList.remove('active')">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="wh-modal-body">
+                    <pre id="whRawContent"></pre>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { db } from './scripts/supabase.js';
 
+        // ── Tab Switching ──
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                const target = tab.dataset.tab;
+                document.getElementById(`tab-${target}`).classList.add('active');
+                if (target === 'webhook') loadWebhookLogs();
+            });
+        });
+
+        // ── Prompts ──
         let prompts = [];
         let currentPromptId = null;
 
@@ -326,7 +569,83 @@
             btn.disabled = false;
         };
 
+        // ── Webhook Logs ──
+        let webhookLogs = [];
+
+        window.loadWebhookLogs = async function () {
+            const tbody = document.getElementById('webhookLogBody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:40px;">載入中…</td></tr>';
+            try {
+                const { data, error } = await db.select('purchases', {
+                    order: 'created_at.desc',
+                    limit: 50
+                });
+                if (error) throw new Error(error.message || 'Load failed');
+                webhookLogs = data || [];
+                renderWebhookLogs();
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#dc2626;padding:40px;">${e.message}</td></tr>`;
+            }
+        };
+
+        function renderWebhookLogs() {
+            const tbody = document.getElementById('webhookLogBody');
+            if (webhookLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:40px;">尚無紀錄</td></tr>';
+                return;
+            }
+
+            const stateLabel = { paid: '已付款', refunded: '已退款' };
+            const stateClass = { paid: 'paid', refunded: 'refunded' };
+
+            tbody.innerHTML = webhookLogs.map((p, i) => {
+                const state = p.payment_state || 'unknown';
+                const eventType = p.raw_data?.type || state;
+                const amount = Number(p.amount || 0);
+                const time = p.created_at
+                    ? new Date(p.created_at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '-';
+                const syncBadge = p.synced_to_session
+                    ? '<span class="wh-badge synced">已同步</span>'
+                    : '<span class="wh-badge notsync">未同步</span>';
+
+                return `<tr>
+                    <td><span class="wh-badge ${stateClass[state] || 'unknown'}">${stateLabel[state] || state}</span></td>
+                    <td style="font-size:12px;font-family:monospace;">${eventType}</td>
+                    <td>${p.email || '-'}</td>
+                    <td style="font-family:monospace;font-size:11px;">${p.order_id || '-'}</td>
+                    <td>$${amount.toLocaleString()}</td>
+                    <td>${syncBadge}</td>
+                    <td style="font-size:12px;">${time}</td>
+                    <td><button class="wh-detail-btn" onclick="showRawData(${i})">JSON</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.showRawData = function (index) {
+            const p = webhookLogs[index];
+            if (!p) return;
+            document.getElementById('whRawContent').textContent = JSON.stringify(p.raw_data || {}, null, 2);
+            document.getElementById('whRawModal').classList.add('active');
+        };
+
+        window.copyUrl = function (elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById(elementId).parentElement.querySelector('.wh-copy-btn');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> 已複製';
+                setTimeout(() => { btn.innerHTML = orig; }, 1500);
+            });
+        };
+
+        // ── Init ──
         loadPrompts();
+
+        // Check URL hash for direct webhook tab access
+        if (location.hash === '#webhook') {
+            document.querySelector('.settings-tab[data-tab="webhook"]').click();
+        }
     </script>
     <script src="components/nav.js"></script>
 </body>

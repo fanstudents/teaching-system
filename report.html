@@ -202,7 +202,7 @@
                         db.select('checklist_progress'),
                         db.select('survey_questions', { filter: jcFilter }),
                         db.select('survey_responses'),
-                        db.select('submissions', { filter: sidFilter }),
+                        db.select('submissions', { select: 'id,student_email,student_name,element_id,type,content,is_correct,score,submitted_at,created_at,session_id', filter: sidFilter }),
                         db.select('email_drafts'),
                         db.select('exam_responses', { filter: pidFilter }),
                         db.select('satisfaction_responses', { filter: pidFilter })
@@ -443,22 +443,22 @@
                 let html = '';
 
                 // ── Stats Row ──
-                const pctColor = clPct >= 80 ? '#10b981' : clPct >= 50 ? '#f59e0b' : '#ef4444';
+                const pctColor = clPct >= 80 ? 'var(--s79-success)' : clPct >= 50 ? 'var(--s79-primary)' : 'var(--s79-error)';
                 html += `<div class="dash-stats">
                     <div class="dash-stat">
                         <div class="dash-stat-num" style="color:${pctColor}">${clPct}%</div>
                         <div class="dash-stat-label">課前準備</div>
                     </div>
                     <div class="dash-stat">
-                        <div class="dash-stat-num" style="color:${surveyComplete ? '#10b981' : '#f59e0b'}">${surveyComplete ? '完成' : d.surveyDone + '/' + d.surveyTotal}</div>
+                        <div class="dash-stat-num" style="color:${surveyComplete ? 'var(--s79-success)' : 'var(--s79-primary)'}">${surveyComplete ? '完成' : d.surveyDone + '/' + d.surveyTotal}</div>
                         <div class="dash-stat-label">課前問卷</div>
                     </div>
                     <div class="dash-stat">
-                        <div class="dash-stat-num" style="color:#6366f1">${d.homework.length}</div>
+                        <div class="dash-stat-num" style="color:var(--s79-primary)">${d.homework.length}</div>
                         <div class="dash-stat-label">繳交作業</div>
                     </div>
                     <div class="dash-stat">
-                        <div class="dash-stat-num" style="color:${avgScore >= 70 ? '#10b981' : avgScore >= 0 ? '#f59e0b' : '#9ca3af'}">${avgScore >= 0 ? avgScore + '分' : '—'}</div>
+                        <div class="dash-stat-num" style="color:${avgScore >= 70 ? 'var(--s79-success)' : avgScore >= 0 ? 'var(--s79-primary)' : 'var(--s79-text-muted)'}">${avgScore >= 0 ? avgScore + '分' : '—'}</div>
                         <div class="dash-stat-label">互動成績</div>
                     </div>
                 </div>`;
@@ -477,7 +477,7 @@
                     checklistItems.forEach(item => {
                         const done = clDoneIds.has(item.id);
                         html += `<div class="dash-check-item ${done ? 'done' : ''}">
-                            <span class="material-symbols-rounded" style="font-size:16px;color:${done ? '#10b981' : '#d1d5db'}">${done ? 'check_circle' : 'radio_button_unchecked'}</span>
+                            <span class="material-symbols-rounded" style="font-size:16px;color:${done ? 'var(--s79-success)' : 'var(--s79-border)'}">${done ? 'check_circle' : 'radio_button_unchecked'}</span>
                             ${item.title}
                         </div>`;
                     });
@@ -524,7 +524,7 @@
                         html += `<div class="dash-score-item">
                             <div class="dash-score-type">${typeLabel}</div>
                             <div class="dash-score-title">${s.assignment_title}</div>
-                            <div class="dash-score-val" style="color:${correct ? '#10b981' : '#ef4444'}">${s.score || '—'} 分</div>
+                            <div class="dash-score-val" style="color:${correct ? 'var(--s79-success)' : 'var(--s79-error)'}">${s.score || '—'} 分</div>
                         </div>`;
                     });
                     html += `</div></div>`;

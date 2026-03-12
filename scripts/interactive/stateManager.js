@@ -2,7 +2,7 @@
  * 互動狀態管理器 — 統一快取 + DB 持久化
  * 各互動模組共用，負責 save / load 學員互動記錄
  */
-import { db } from '../supabase.js';
+import { db, realtime } from '../supabase.js';
 
 class InteractionState {
     constructor() {
@@ -151,6 +151,17 @@ class InteractionState {
                     await db.insert('submissions', dbRecord);
                 }
                 saved = true;
+
+                // 通知儀表板即時更新
+                try {
+                    if (realtime.isConnected && sessionId) {
+                        realtime.publish(`session:${sessionId}`, 'submission_saved', {
+                            element_id: elementId,
+                            student_email: email,
+                            type: data.type,
+                        });
+                    }
+                } catch { /* ignore */ }
             } catch (e) {
                 console.warn(`[stateManager] save attempt ${attempt + 1}/${MAX_RETRIES + 1} failed:`, e);
                 if (attempt === MAX_RETRIES) {

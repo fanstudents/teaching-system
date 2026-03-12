@@ -11,9 +11,8 @@ body {
 
 /* ── Container ── */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 32px;
+    /* no max-width — fill available space */
+    padding: 20px 32px;
 }
 
 /* ── Stats ── */
@@ -21,7 +20,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 18px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .stats-row .stat-value {
@@ -40,7 +39,7 @@ body {
 .filters {
     display: flex;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
     align-items: center;
 }
@@ -128,7 +127,7 @@ body {
 
 .batch-progress-fill {
     height: 100%;
-    background: var(--gradient-dark);
+    background: var(--s79-primary);
     border-radius: 4px;
     transition: width .3s;
     width: 0%;
@@ -172,7 +171,7 @@ body {
     padding: 14px 20px;
     align-items: center;
     background: var(--bg-secondary);
-    border-bottom: 1px solid #f0f2f5;
+    border-bottom: 1px solid var(--s79-border);
     font-size: 0.88rem;
     transition: background .1s;
 }
@@ -235,8 +234,8 @@ body {
 }
 
 .list-status-badge.partial {
-    background: var(--accent-warning-bg);
-    color: var(--accent-warning);
+    background: var(--s79-primary-light);
+    color: var(--s79-primary);
 }
 
 .list-status-badge.none {
@@ -316,7 +315,7 @@ body {
 
 .card-header {
     padding: 18px 20px;
-    border-bottom: 1px solid #f0f2f5;
+    border-bottom: 1px solid var(--s79-border);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -355,7 +354,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 8px 0;
-    border-bottom: 1px solid #f8f9fa;
+    border-bottom: 1px solid var(--s79-border);
     font-size: 0.88rem;
 }
 
@@ -383,7 +382,7 @@ body {
 }
 
 .metric-value.warn {
-    color: var(--accent-warning);
+    color: var(--s79-primary);
 }
 
 .metric-value.bad {
@@ -404,12 +403,12 @@ body {
 .progress-mini-fill {
     height: 100%;
     border-radius: 3px;
-    background: var(--accent-success);
+    background: var(--s79-primary);
 }
 
 .card-actions {
     padding: 12px 20px;
-    border-top: 1px solid #f0f2f5;
+    border-top: 1px solid var(--s79-border);
     display: flex;
     gap: 8px;
 }
@@ -461,7 +460,7 @@ body {
 
 .modal-header {
     padding: 20px 24px;
-    border-bottom: 1px solid #f0f2f5;
+    border-bottom: 1px solid var(--s79-border);
 }
 
 .modal-header h3 {
@@ -501,7 +500,7 @@ body {
     letter-spacing: 0.5px;
     margin-bottom: 10px;
     padding-bottom: 6px;
-    border-bottom: 2px solid #f0f2f5;
+    border-bottom: 2px solid var(--s79-border);
 }
 
 .detail-item {
@@ -540,7 +539,7 @@ body {
 /* ── Email Draft ── */
 .email-draft {
     padding: 20px 24px;
-    border-top: 1px solid #f0f2f5;
+    border-top: 1px solid var(--s79-border);
 }
 
 .email-textarea {
@@ -786,7 +785,7 @@ body {
 
 .dash-qa {
     padding: 8px 0;
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--s79-border);
 }
 
 .dash-qa:last-child {

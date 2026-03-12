@@ -348,6 +348,10 @@
                     <input type="number" id="sessionCapacity" value="30" min="1">
                 </div>
                 <div class="form-group">
+                    <label>Teachify 方案 ID <span style="color:#94a3b8;font-weight:400;font-size:0.78rem;">（用於 Webhook 自動配對場次）</span></label>
+                    <input type="text" id="sessionTeachifyPlanId" placeholder="例：bccd76c0-9311-45bf-b0af-5721322f3904">
+                </div>
+                <div class="form-group">
                     <label>課程狀態</label>
                     <select id="sessionPhase">
                         <option value="pre-class">課前</option>
@@ -1465,6 +1469,7 @@
             document.getElementById('sessionGroupUrl').value = '';
             document.getElementById('sessionGroupLabel').value = '';
             document.getElementById('sessionCapacity').value = '30';
+            document.getElementById('sessionTeachifyPlanId').value = '';
             document.getElementById('sessionPhase').value = 'pre-class';
             document.getElementById('sessionDeleteWrap').classList.add('hidden');
 
@@ -1496,6 +1501,7 @@
             document.getElementById('sessionGroupUrl').value = s.group_link_url || '';
             document.getElementById('sessionGroupLabel').value = s.group_link_label || '';
             document.getElementById('sessionCapacity').value = s.max_capacity || 30;
+            document.getElementById('sessionTeachifyPlanId').value = s.teachify_plan_id || '';
             document.getElementById('sessionPhase').value = s.current_phase || 'pre-class';
             document.getElementById('sessionDeleteWrap').classList.remove('hidden');
             // 重設兩段式確認狀態
@@ -1602,6 +1608,7 @@
                 const group_link_url = document.getElementById('sessionGroupUrl').value.trim();
                 const group_link_label = document.getElementById('sessionGroupLabel').value.trim();
                 const current_phase = document.getElementById('sessionPhase').value;
+                const teachify_plan_id = document.getElementById('sessionTeachifyPlanId').value.trim();
 
                 if (!projectId) { showToast('請選擇專案'); return; }
 
@@ -1610,6 +1617,7 @@
                     date, time, venue, venue_address, max_capacity,
                     session_format, stream_url,
                     current_phase,
+                    teachify_plan_id,
                     transport_info,
                     reminders: reminders_val,
                     group_link_url,

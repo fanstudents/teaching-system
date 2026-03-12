@@ -5,9 +5,9 @@
  * - 場次比較檢視
  * - 每 5 秒自動輪詢
  */
-import { db } from './supabase.js';
+import { db, realtime } from './supabase.js';
 
-const POLL_INTERVAL = 5000;
+const POLL_INTERVAL = 30000;
 const TYPE_ICONS = { quiz: 'quiz', poll: 'how_to_vote', matching: 'drag_indicator', ordering: 'format_list_numbered', fillblank: 'edit_note', truefalse: 'check_circle', opentext: 'chat', scale: 'linear_scale', buzzer: 'notifications_active', wordcloud: 'cloud', hotspot: 'my_location' };
 const TYPE_LABELS = { quiz: '\u9078\u64C7\u984C', poll: '\u6295\u7968', matching: '\u9023\u9023\u770B', ordering: '\u6392\u5217\u9806\u5E8F', fillblank: '\u586B\u7A7A\u984C', truefalse: '\u662F\u975E\u984C', opentext: '\u958B\u653E\u554F\u7B54', scale: '\u91CF\u8868\u8A55\u5206', buzzer: '\u6436\u7B54', wordcloud: '\u6587\u5B57\u96F2', hotspot: '\u5716\u7247\u6A19\u8A3B' };
 
@@ -212,9 +212,11 @@ function extractInteractiveElements() {
 // ══════════════════════
 async function fetchSubmissions() {
     try {
+        const subColumns = 'id,element_id,student_email,student_name,content,is_correct,score,type,assignment_title,submitted_at,created_at,session_id';
+        const pollColumns = 'id,element_id,student_email,student_name,option_index,option_text,created_at,session_code';
         const [subRes, pollRes] = await Promise.all([
-            db.select('submissions', { filter: { session_id: 'eq.' + currentSessionCode }, order: 'submitted_at.asc' }),
-            db.select('poll_votes', { filter: { session_code: 'eq.' + currentSessionCode }, order: 'created_at.asc' }),
+            db.select('submissions', { select: subColumns, filter: { session_id: 'eq.' + currentSessionCode }, order: 'submitted_at.asc' }),
+            db.select('poll_votes', { select: pollColumns, filter: { session_code: 'eq.' + currentSessionCode }, order: 'created_at.asc' }),
         ]);
 
         submissionsMap = {};
@@ -258,6 +260,20 @@ function startPolling() {
         await fetchSubmissions();
         renderAll();
     }, POLL_INTERVAL);
+
+    // Realtime 即時推送：學生交作答或投票時立刻更新（debounce 500ms 防連續觸發）
+    if (currentSessionCode) {
+        let _rtTimer = null;
+        const onRealtimeUpdate = () => {
+            if (_rtTimer) clearTimeout(_rtTimer);
+            _rtTimer = setTimeout(async () => {
+                await fetchSubmissions();
+                renderAll();
+            }, 500);
+        };
+        realtime.on('submission_saved', onRealtimeUpdate);
+        realtime.on('poll_vote', onRealtimeUpdate);
+    }
 }
 
 window._dashRefresh = async function () {
@@ -493,8 +509,8 @@ async function renderCompareView() {
         if (!code) continue;
         try {
             const [subRes, pollRes, studRes] = await Promise.all([
-                db.select('submissions', { filter: { session_id: 'eq.' + code } }),
-                db.select('poll_votes', { filter: { session_code: 'eq.' + code } }),
+                db.select('submissions', { select: 'id,element_id,student_email,content,is_correct,score,type,assignment_title,submitted_at', filter: { session_id: 'eq.' + code } }),
+                db.select('poll_votes', { select: 'id,element_id,student_email,option_index,option_text,created_at', filter: { session_code: 'eq.' + code } }),
                 db.select('students', { filter: { session_code: 'eq.' + code }, select: 'email' }),
             ]);
             sessionData.push({ code, date: s.date || code, status: s.status, studentCount: (studRes?.data || []).length, subs: subRes?.data || [], polls: pollRes?.data || [] });

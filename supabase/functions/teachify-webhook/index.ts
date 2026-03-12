@@ -174,8 +174,10 @@ serve(async (req) => {
                 const amount = d.amount || 0;
 
                 let course_id = '';
+                let plan_id = '';
                 if (d.lineitems?.length > 0) {
                     course_id = d.lineitems[0].product_id || d.lineitems[0].item_slug || '';
+                    plan_id = d.lineitems[0].item_id || '';
                 }
 
                 if (!email && !order_id) {
@@ -209,15 +211,35 @@ serve(async (req) => {
 
                     if (projects?.length > 0) {
                         const project = projects[0];
-                        const { data: sessions } = await supabase
-                            .from('project_sessions')
-                            .select('*')
-                            .eq('project_id', project.id)
-                            .in('current_phase', ['pre-class', 'in-class'])
-                            .order('date', { ascending: true });
 
-                        if (sessions?.length > 0) {
-                            const session = sessions[0];
+                        // 1) Try exact match by teachify_plan_id
+                        let session = null;
+                        if (plan_id) {
+                            const { data: exactMatch } = await supabase
+                                .from('project_sessions')
+                                .select('*')
+                                .eq('project_id', project.id)
+                                .eq('teachify_plan_id', plan_id)
+                                .in('current_phase', ['pre-class', 'in-class']);
+                            if (exactMatch?.length > 0) {
+                                session = exactMatch[0];
+                            }
+                        }
+
+                        // 2) Fallback: first active session
+                        if (!session) {
+                            const { data: sessions } = await supabase
+                                .from('project_sessions')
+                                .select('*')
+                                .eq('project_id', project.id)
+                                .in('current_phase', ['pre-class', 'in-class'])
+                                .order('date', { ascending: true });
+                            if (sessions?.length > 0) {
+                                session = sessions[0];
+                            }
+                        }
+
+                        if (session) {
                             syncedSession = session;
 
                             await supabase.from('students').insert([{
@@ -245,7 +267,8 @@ serve(async (req) => {
                     action: 'purchase_created',
                     purchase_id: purchase?.id,
                     synced_to_session: !!syncedSession,
-                    session_id: syncedSession?.id || null
+                    session_id: syncedSession?.id || null,
+                    matched_by: syncedSession ? (plan_id ? 'plan_id' : 'fallback') : null
                 });
             }
 

@@ -73,12 +73,11 @@ body {
     color: var(--s79-text);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
-    padding-left: var(--sidebar-w);
     margin: 0;
 }
 
 @media (max-width: 768px) {
-    body { padding-left: 0 !important; }
+    body { padding-left: 0; }
 }
 
 body.sidebar-closed {
