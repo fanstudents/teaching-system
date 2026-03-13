@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程規劃大綱 — AI 辦公室應用實戰班</title>
+    <meta name="description" content="時代基金會 × AI 辦公室應用實戰班 — 課程規劃大綱">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link rel="stylesheet" href="styles/course-outline-page.css">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     LOGIN OVERLAY
+     ════════════════════════════════════════ -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+        <img class="login-logo client-logo" src="assets/images/clients/epoch-foundation.png" alt="時代基金會">
+        <div class="login-icon">
+            <span class="material-symbols-outlined">lock</span>
+        </div>
+        <h2 id="loginTitle">課程大綱登入</h2>
+        <p class="login-sub" id="loginSubtext">請輸入您的 Email 與密碼以查看課程規劃內容</p>
+        <form id="loginForm" onsubmit="return false">
+            <div class="login-field" id="fieldEmail">
+                <span class="material-symbols-outlined">mail</span>
+                <input type="text" id="loginUser" placeholder="Email" autocomplete="off" required>
+            </div>
+            <div class="login-field" id="fieldPassword">
+                <span class="material-symbols-outlined">key</span>
+                <input type="password" id="loginPass" placeholder="密碼" required>
+            </div>
+            <button type="submit" class="login-btn">登入查看</button>
+            <div class="login-error" id="loginError"></div>
+        </form>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MAIN PAGE CONTENT
+     ════════════════════════════════════════ -->
+<div class="page-content" id="pageContent" style="display:none">
+
+    <!-- Topbar -->
+    <header class="outline-topbar">
+        <div class="outline-topbar-left">
+            <div class="outline-topbar-icon">
+                <span class="material-symbols-outlined">description</span>
+            </div>
+            <div class="outline-topbar-title">
+                課程規劃大綱
+                <span>— 企業內訓專案</span>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+            <div class="topbar-user" id="topbarUser"></div>
+            <button class="btn btn-outline" onclick="outlineLogout()" style="padding:6px 12px;font-size:0.78rem">
+                <span class="material-symbols-outlined" style="font-size:14px">logout</span> 登出
+            </button>
+        </div>
+    </header>
+
+    <!-- ══════ STUDENT VIEW ══════ -->
+    <div id="studentView">
+
+        <!-- Hero -->
+        <section class="outline-hero">
+            <div class="outline-hero-content">
+                <div class="client-logo-wrap">
+                    <img class="client-logo" src="assets/images/clients/epoch-foundation.png" alt="時代基金會">
+                </div>
+                <div class="outline-hero-badge" id="heroBadge">
+                    <span class="material-symbols-outlined" style="font-size:14px">school</span>
+                    時代基金會 · 企業內部培訓
+                </div>
+                <h1 id="heroTitle">AI 辦公室應用實戰班</h1>
+                <p class="outline-hero-sub">從 ChatGPT 到 Notion，掌握五大 AI 工具在日常辦公中的應用技巧，全面提升工作效率與產出品質</p>
+                <div class="hero-meta">
+                    <div class="hero-meta-item"><span class="material-symbols-outlined">schedule</span>4 小時（含休息）</div>
+                    <div class="hero-meta-item"><span class="material-symbols-outlined">groups</span>建議 20–40 人</div>
+                    <div class="hero-meta-item"><span class="material-symbols-outlined">laptop_mac</span>需自備筆電</div>
+                    <div class="hero-meta-item"><span class="material-symbols-outlined">location_on</span>現場實體授課</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="outline-container">
+
+            <!-- ═══ 1. 教學架構大綱 ═══ -->
+            <div class="outline-section">
+                <div class="section-header">
+                    <div class="section-icon"><span class="material-symbols-outlined">view_timeline</span></div>
+                    <div><div class="section-title">教學架構大綱</div><div class="section-desc">4 小時的完整課程時間規劃</div></div>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-block">
+                        <div class="timeline-time">09:00 – 09:20（20 分鐘）</div>
+                        <div class="timeline-title">開場：AI 趨勢與辦公應用概覽</div>
+                        <div class="timeline-desc">介紹 2025–2026 年 AI 辦公趨勢，說明 AI 如何改變日常工作流程。透過情境案例讓學員理解為何現在就該開始導入 AI 工具。</div>
+                        <div class="timeline-topics"><span class="topic-tag">AI 辦公趨勢</span><span class="topic-tag">生成式 AI 概念</span><span class="topic-tag">案例分享</span></div>
+                    </div>
+                    <div class="timeline-block">
+                        <div class="timeline-time">09:20 – 10:10（50 分鐘）</div>
+                        <div class="timeline-title">模組一：ChatGPT — AI 文字助手</div>
+                        <div class="timeline-desc">學習 ChatGPT 的核心功能與 prompt 設計技巧。涵蓋文件撰寫、Email 修潤、會議議程生成、資料彙整與分析等辦公常見場景，搭配實作練習讓學員即刻上手。</div>
+                        <div class="timeline-topics"><span class="topic-tag highlight">ChatGPT</span><span class="topic-tag">Prompt 結構化技巧</span><span class="topic-tag">文件撰寫</span><span class="topic-tag">Email 修潤</span><span class="topic-tag">資料分析</span></div>
+                    </div>
+                    <div class="timeline-block">
+                        <div class="timeline-time">10:10 – 10:50（40 分鐘）</div>
+                        <div class="timeline-title">模組二：Gemini — Google 生態系 AI 整合</div>
+                        <div class="timeline-desc">探索 Google Gemini 在 Gmail、Docs、Sheets、Slides 中的整合應用。學習如何利用 Gemini 進行跨平台協作，包含自動摘要、表格數據分析和簡報內容生成。</div>
+                        <div class="timeline-topics"><span class="topic-tag highlight">Gemini</span><span class="topic-tag">Google Workspace 整合</span><span class="topic-tag">自動摘要</span><span class="topic-tag">表格分析</span></div>
+                    </div>
+                    <div class="timeline-block break-block">
+                        <div class="timeline-time">10:50 – 11:00（10 分鐘）</div>
+                        <div class="timeline-title" style="color:var(--accent)">☕ 中場休息</div>
+                        <div class="timeline-desc">稍作休息，準備下半場的學習。</div>
+                    </div>
+                    <div class="timeline-block">
+                        <div class="timeline-time">11:00 – 11:40（40 分鐘）</div>
+                        <div class="timeline-title">模組三：NotebookLM — AI 知識庫與研究助手</div>
+                        <div class="timeline-desc">學習如何將公司內部文件、報告上傳至 NotebookLM，建立專屬知識庫。實作文件問答、重點摘要、交叉比對等功能，掌握 AI 輔助閱讀與研究的高效方法。</div>
+                        <div class="timeline-topics"><span class="topic-tag highlight">NotebookLM</span><span class="topic-tag">知識庫建構</span><span class="topic-tag">文件問答</span><span class="topic-tag">內容摘要</span></div>
+                    </div>
+                    <div class="timeline-block">
+                        <div class="timeline-time">11:40 – 12:20（40 分鐘）</div>
+                        <div class="timeline-title">模組四：Gamma — AI 簡報設計</div>
+                        <div class="timeline-desc">體驗 Gamma 的 AI 自動簡報生成功能。從主題輸入到完整簡報產出，學習如何快速製作專業的提案簡報、工作報告和教育訓練材料，大幅縮短準備時間。</div>
+                        <div class="timeline-topics"><span class="topic-tag highlight">Gamma</span><span class="topic-tag">AI 簡報設計</span><span class="topic-tag">提案報告</span><span class="topic-tag">視覺化呈現</span></div>
+                    </div>
+                    <div class="timeline-block">
+                        <div class="timeline-time">12:20 – 12:50（30 分鐘）</div>
+                        <div class="timeline-title">模組五：Notion — AI 會議記錄與專案管理</div>
+                        <div class="timeline-desc">運用 Notion AI 進行會議記錄整理、待辦事項追蹤和團隊知識管理。學習如何透過 AI 自動生成會議摘要、行動項目和跟進追蹤。</div>
+                        <div class="timeline-topics"><span class="topic-tag highlight">Notion</span><span class="topic-tag">會議記錄</span><span class="topic-tag">專案管理</span><span class="topic-tag">團隊協作</span></div>
+                    </div>
+                    <div class="timeline-block">
+                        <div class="timeline-time">12:50 – 13:00（10 分鐘）</div>
+                        <div class="timeline-title">總結與 Q&A</div>
+                        <div class="timeline-desc">回顧課程重點，提供工具選擇建議與延伸學習資源。開放學員提問，針對各自工作場景給予個別化建議。</div>
+                        <div class="timeline-topics"><span class="topic-tag">課程回顧</span><span class="topic-tag">Q&A</span><span class="topic-tag">延伸資源</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ 2. 使用工具清單 ═══ -->
+            <div class="outline-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0ea5e9"><span class="material-symbols-outlined">build</span></div>
+                    <div><div class="section-title">使用工具清單</div><div class="section-desc">課程中會使用到的 AI 應用工具</div></div>
+                </div>
+                <div class="tool-grid">
+                    <div class="tool-card">
+                        <img class="tool-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT" onerror="this.style.display='none'">
+                        <div class="tool-name">ChatGPT</div>
+                        <div class="tool-purpose">文字生成、文件撰寫、資料分析、Email 修潤</div>
+                        <a class="tool-url" href="https://chat.openai.com" target="_blank">chat.openai.com →</a>
+                    </div>
+                    <div class="tool-card">
+                        <img class="tool-logo" src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg" alt="Gemini" onerror="this.style.display='none'">
+                        <div class="tool-name">Gemini</div>
+                        <div class="tool-purpose">Google 生態系 AI 助手、跨平台文件協作</div>
+                        <a class="tool-url" href="https://gemini.google.com" target="_blank">gemini.google.com →</a>
+                    </div>
+                    <div class="tool-card">
+                        <img class="tool-logo" src="https://notebooklm.google.com/favicon.ico" alt="NotebookLM" onerror="this.style.display='none'">
+                        <div class="tool-name">NotebookLM</div>
+                        <div class="tool-purpose">文件知識庫建構、AI 輔助閱讀與研究</div>
+                        <a class="tool-url" href="https://notebooklm.google.com" target="_blank">notebooklm.google.com →</a>
+                    </div>
+                    <div class="tool-card">
+                        <img class="tool-logo" src="https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg" alt="Gamma" onerror="this.style.display='none'">
+                        <div class="tool-name">Gamma</div>
+                        <div class="tool-purpose">AI 驅動的簡報、文件與網頁自動設計</div>
+                        <a class="tool-url" href="https://gamma.app" target="_blank">gamma.app →</a>
+                    </div>
+                    <div class="tool-card">
+                        <img class="tool-logo" src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" alt="Notion" onerror="this.style.display='none'" style="height:36px">
+                        <div class="tool-name">Notion</div>
+                        <div class="tool-purpose">AI 會議記錄、專案管理、團隊知識庫</div>
+                        <a class="tool-url" href="https://www.notion.so" target="_blank">notion.so →</a>
+                    </div>
+                </div>
+                <div class="note-callout">
+                    <span class="material-symbols-outlined">info</span>
+                    <p>以上工具皆提供免費版本可供課程期間使用。建議學員於課前先完成各平台帳號註冊，以利課堂順利進行。</p>
+                </div>
+            </div>
+
+            <!-- ═══ 3. 講師介紹 ═══ -->
+            <div class="outline-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#f59e0b"><span class="material-symbols-outlined">school</span></div>
+                    <div><div class="section-title">講師介紹</div><div class="section-desc">課程講師個人檔案</div></div>
+                </div>
+                <div id="instructorContent">
+                    <!-- Default fallback: hardcoded instructor -->
+                    <div class="instructor-card">
+                        <div class="instructor-main">
+                            <div class="instructor-photo-placeholder">
+                                <span class="material-symbols-outlined">person</span>
+                            </div>
+                            <div class="instructor-info">
+                                <div class="instructor-name">樊松蒲</div>
+                                <div class="instructor-title-text">AI 數位教學設計師 / TBR.Digital 創辦人</div>
+                                <div class="instructor-bio">專注於 AI 工具導入企業培訓、互動式簡報設計與數位轉型課程規劃。累計授課超過 200+ 場企業內訓與公開班，服務涵蓋科技、金融、製造與非營利組織等多元產業。</div>
+                                <div class="instructor-tags">
+                                    <span class="instructor-tag">AI 工具導入</span>
+                                    <span class="instructor-tag">企業培訓</span>
+                                    <span class="instructor-tag">互動式簡報</span>
+                                    <span class="instructor-tag">數位轉型</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TA Section -->
+                <div class="ta-card">
+                    <div class="ta-card-header">
+                        <div class="ta-card-icon" style="background:#0ea5e9"><span class="material-symbols-outlined">support_agent</span></div>
+                        <div class="ta-card-label">助教配置</div>
+                    </div>
+                    <ul class="info-list">
+                        <li><span class="material-symbols-outlined">group</span><div>建議配置 <strong>1–2 位</strong>現場助教</div></li>
+                        <li><span class="material-symbols-outlined">laptop_mac</span><div>負責協助學員操作工具、排除技術問題</div></li>
+                        <li><span class="material-symbols-outlined">chat</span><div>即時回答學員在實作練習中的問題</div></li>
+                        <li><span class="material-symbols-outlined">note_alt</span><div>協助發放課程講義與學習資源</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ═══ 4. 設備需求 ═══ -->
+            <div class="outline-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#ef4444"><span class="material-symbols-outlined">devices</span></div>
+                    <div><div class="section-title">設備需求</div><div class="section-desc">場地與設備準備清單</div></div>
+                </div>
+                <div class="equip-grid">
+                    <div class="equip-item"><div class="equip-icon"><span class="material-symbols-outlined">laptop_mac</span></div><div><div class="equip-label">學員筆電</div><div class="equip-detail">每人 1 台，需可上網</div></div></div>
+                    <div class="equip-item"><div class="equip-icon"><span class="material-symbols-outlined">wifi</span></div><div><div class="equip-label">穩定網路</div><div class="equip-detail">建議頻寬 ≥ 100Mbps</div></div></div>
+                    <div class="equip-item"><div class="equip-icon"><span class="material-symbols-outlined">tv</span></div><div><div class="equip-label">投影設備</div><div class="equip-detail">大螢幕 / 投影機 × 1</div></div></div>
+                    <div class="equip-item"><div class="equip-icon"><span class="material-symbols-outlined">mic</span></div><div><div class="equip-label">擴音設備</div><div class="equip-detail">無線麥克風 × 1</div></div></div>
+                    <div class="equip-item"><div class="equip-icon"><span class="material-symbols-outlined">power</span></div><div><div class="equip-label">電源供應</div><div class="equip-detail">充足插座 / 延長線</div></div></div>
+                    <div class="equip-item"><div class="equip-icon"><span class="material-symbols-outlined">meeting_room</span></div><div><div class="equip-label">教室座位</div><div class="equip-detail">課桌式，需有桌面</div></div></div>
+                </div>
+                <div class="note-callout" style="margin-top:20px">
+                    <span class="material-symbols-outlined">tips_and_updates</span>
+                    <p><strong>課前準備提醒：</strong>請學員於課前完成以下帳號註冊 — ChatGPT、Google（Gemini/NotebookLM）、Gamma、Notion。建議使用 Chrome 瀏覽器以獲得最佳體驗。</p>
+                </div>
+            </div>
+
+            <!-- ═══ 5. 工作附件上傳 ═══ -->
+            <div class="outline-section file-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#8b5cf6"><span class="material-symbols-outlined">upload_file</span></div>
+                    <div><div class="section-title">工作附件上傳</div><div class="section-desc">上傳課堂練習所需的工作文件</div></div>
+                </div>
+                <div class="file-upload-zone" onclick="triggerFileUpload()">
+                    <span class="material-symbols-outlined">cloud_upload</span>
+                    <p>點擊或拖放檔案至此處上傳</p>
+                    <div class="hint">支援 PPT、Word、Excel、PDF、Visio 等格式，單檔上限 50MB</div>
+                </div>
+                <input type="file" id="fileUploadInput" style="display:none" multiple
+                    accept=".ppt,.pptx,.doc,.docx,.pdf,.vsdx,.vsd,.xls,.xlsx,.txt"
+                    onchange="handleFileUpload(this)">
+                <div class="file-list" id="fileList"></div>
+                <div class="note-callout" style="margin-top:16px">
+                    <span class="material-symbols-outlined">warning</span>
+                    <p><strong>隱私提醒：</strong>上傳文件前，請確認已移除機密或敏感資訊，避免資料外洩風險。</p>
+                </div>
+            </div>
+
+        </div><!-- /outline-container -->
+
+        <!-- CTA -->
+        <div class="outline-cta">
+            <h2>對課程有任何問題？</h2>
+            <p>歡迎聯繫我們討論課程客製化需求或報名相關事宜</p>
+            <a href="mailto:contact@tbr.digital" class="cta-btn">
+                <span class="material-symbols-outlined" style="font-size:18px">mail</span>聯繫講師團隊
+            </a>
+        </div>
+        <footer class="outline-footer">
+            由 <a href="https://tbr.digital" target="_blank">數位簡報室 TBR.Digital</a> 製作 · 課程內容僅供授權對象閱覽
+        </footer>
+    </div><!-- /studentView -->
+
+    <!-- ══════ ADMIN PANEL ══════ -->
+    <div class="admin-panel" id="adminPanel">
+
+        <!-- Student Management -->
+        <div class="admin-section">
+            <div class="admin-section-title">
+                <span class="material-symbols-outlined">groups</span>
+                學員名單管理
+                <span style="font-weight:400;font-size:0.82rem;color:var(--text-3);margin-left:auto" id="studentCount">0</span>
+            </div>
+            <div class="admin-toolbar">
+                <button class="btn btn-primary" onclick="openAddStudentModal()">
+                    <span class="material-symbols-outlined">person_add</span> 新增學員
+                </button>
+                <button class="btn btn-success" onclick="openImportModal()">
+                    <span class="material-symbols-outlined">upload_file</span> CSV 匯入
+                </button>
+                <button class="btn btn-outline" onclick="downloadTemplate()">
+                    <span class="material-symbols-outlined">download</span> 下載範本
+                </button>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="admin-table">
+                    <thead><tr><th>姓名</th><th>Email</th><th>部門</th><th>職稱</th><th>密碼</th><th></th></tr></thead>
+                    <tbody id="studentTableBody">
+                        <tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:32px">尚無學員資料</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Instructor Selector -->
+        <div class="admin-section">
+            <div class="admin-section-title">
+                <span class="material-symbols-outlined">school</span>
+                講師選擇
+            </div>
+            <div class="form-group">
+                <label class="form-label">選擇講師（從後台資料庫載入）</label>
+                <select class="form-input" id="instructorSelect" onchange="onInstructorSelected(this)">
+                    <option value="">— 載入中... —</option>
+                </select>
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-3)">講師的照片、經歷和授課照片會從後台資料庫自動載入。如需新增或編輯講師資料，請前往<a href="partners#instructors" style="color:var(--accent)">合作夥伴管理</a>。</p>
+        </div>
+
+        <!-- Client / Organization Management -->
+        <div class="admin-section">
+            <div class="admin-section-title">
+                <span class="material-symbols-outlined">business</span>
+                客戶管理
+            </div>
+            <div class="admin-toolbar">
+                <button class="btn btn-primary" onclick="openOrgModal()">
+                    <span class="material-symbols-outlined">add_business</span> 新增客戶
+                </button>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="admin-table">
+                    <thead><tr><th>客戶名稱</th><th>聯絡人</th><th>電話</th><th>報價</th><th></th></tr></thead>
+                    <tbody id="orgTableBody">
+                        <tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:32px">載入中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-3);margin-top:12px">
+                <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">info</span>
+                獨立大綱網址：<code>course-outline.html?session=場次代碼</code>，不同客戶使用不同場次代碼即可產生獨立頁面。
+            </p>
+        </div>
+
+    </div><!-- /adminPanel -->
+
+</div><!-- /pageContent -->
+
+<!-- ══════ MODALS ══════ -->
+
+<!-- Add Student Modal -->
+<div class="modal-overlay" id="addStudentModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:var(--accent)">person_add</span> 新增學員</h3>
+            <button class="modal-close" onclick="closeAddStudentModal()"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="addStudentForm" onsubmit="return false">
+                <div class="form-group"><label class="form-label">姓名 *</label><input class="form-input" id="addName" required></div>
+                <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="addEmail" type="email" required></div>
+                <div class="form-group"><label class="form-label">部門</label><input class="form-input" id="addDept"></div>
+                <div class="form-group"><label class="form-label">職稱</label><input class="form-input" id="addTitle"></div>
+                <div class="form-group"><label class="form-label">登入密碼（留空自動產生）</label><input class="form-input" id="addPass" placeholder="自動產生隨機密碼"></div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeAddStudentModal()">取消</button>
+            <button class="btn btn-primary" onclick="submitAddStudent()">
+                <span class="material-symbols-outlined" style="font-size:16px">check</span> 新增
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Import CSV Modal -->
+<div class="modal-overlay" id="importModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:#059669">upload_file</span> CSV 匯入學員</h3>
+            <button class="modal-close" onclick="closeImportModal()"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="modal-body">
+            <div class="drop-zone" onclick="document.getElementById('csvFileInput').click()">
+                <span class="material-symbols-outlined">cloud_upload</span>
+                <div class="drop-zone-text">拖放 CSV 檔案到這裡，或點擊選擇</div>
+                <div class="drop-zone-hint">欄位：姓名, Email, 部門, 職稱, 密碼</div>
+            </div>
+            <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="handleImportFile(this)">
+            <div class="import-preview" id="importPreview"></div>
+        </div>
+        <div class="modal-footer" id="importFooter" style="display:none">
+            <button class="btn btn-outline" onclick="closeImportModal()">取消</button>
+            <button class="btn btn-success" id="btnConfirmImport" onclick="doImport()">
+                <span class="material-symbols-outlined" style="font-size:16px">upload</span> 確認匯入
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Organization Modal -->
+<div class="modal-overlay" id="orgModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="orgModalTitle"><span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:var(--accent)">business</span> 新增客戶</h3>
+            <button class="modal-close" onclick="closeOrgModal()"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="orgForm" onsubmit="return false">
+                <input type="hidden" id="orgId">
+                <div class="form-group">
+                    <label class="form-label">客戶名稱 *</label>
+                    <input class="form-input" id="orgName" required placeholder="例：時代基金會">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Logo（網址或上傳）</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input class="form-input" id="orgLogo" placeholder="貼上圖片 URL" style="flex:1">
+                        <label class="btn btn-outline" style="cursor:pointer;padding:6px 12px;font-size:0.82rem;white-space:nowrap">
+                            <span class="material-symbols-outlined" style="font-size:16px">upload</span> 上傳
+                            <input type="file" accept="image/*" style="display:none" onchange="handleOrgLogoUpload(this)">
+                        </label>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group"><label class="form-label">聯絡人</label><input class="form-input" id="orgContact" placeholder="姓名"></div>
+                    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="orgEmail" type="email" placeholder="contact@example.com"></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                    <div class="form-group"><label class="form-label">電話</label><input class="form-input" id="orgPhone" placeholder="02-xxxx-xxxx"></div>
+                    <div class="form-group"><label class="form-label">報價</label><input class="form-input" id="orgPricing" placeholder="例：NT$60,000"></div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeOrgModal()">取消</button>
+            <button class="btn btn-primary" onclick="submitOrg()">
+                <span class="material-symbols-outlined" style="font-size:16px">check</span> 儲存
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="scripts/courseOutline.js"></script>
+
+</body>
+</html>

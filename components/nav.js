@@ -66,6 +66,7 @@ const NAV_ITEMS = [
         group: '教學管理',
         items: [
             { label: '專案管理', icon: 'space_dashboard', href: 'manage.html' },
+            { label: '課程大綱', icon: 'description', href: 'course-outline.html?admin=1' },
             { label: '開課單位', icon: 'apartment', href: 'organizations.html' },
         ]
     },
