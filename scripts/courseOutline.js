@@ -23,14 +23,25 @@ async function init() {
     const params = new URLSearchParams(location.search);
     isAdmin = params.get('admin') === '1';
     const sessionCode = params.get('session') || '';
+    const projectId = params.get('project') || '';
 
     // Load session → project → org chain
     if (sessionCode) {
         await loadSessionChain(sessionCode);
+    } else if (projectId) {
+        await loadProjectDirect(projectId);
     }
 
     // Apply dynamic data to page
     renderDynamicContent();
+
+    // Admin auto-login: if already authenticated in admin system, skip password
+    if (isAdmin && (localStorage.getItem('_at') || sessionStorage.getItem('_at'))) {
+        currentUser = { name: '管理員', _isAdmin: true };
+        sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+        enterPage();
+        return;
+    }
 
     // Check saved session
     const saved = sessionStorage.getItem('outline_user');
@@ -42,6 +53,22 @@ async function init() {
         } catch(e) { /* ignore */ }
     }
     setupLoginForm();
+}
+
+async function loadProjectDirect(projectId) {
+    // Load project directly by ID
+    const { data: projects } = await db.select('projects', `id=eq.${encodeURIComponent(projectId)}&select=*`);
+    if (projects?.length) {
+        projectData = projects[0];
+        // Load organization if bound
+        if (projectData.organization_id) {
+            const { data: orgs } = await db.select('organizations', `id=eq.${projectData.organization_id}&select=*`);
+            if (orgs?.length) orgData = orgs[0];
+        }
+        // Try to load first session for this project
+        const { data: sess } = await db.select('project_sessions', `project_id=eq.${projectId}&order=date.asc&limit=1&select=*`);
+        if (sess?.length) sessionData = sess[0];
+    }
 }
 
 async function loadSessionChain(code) {

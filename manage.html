@@ -264,6 +264,12 @@
                     <label>Teachify Course ID</label>
                     <input type="text" id="editCourseId" placeholder="自動帶入或手動填寫">
                 </div>
+                <div class="form-group" id="editClientGroup" style="display:none;">
+                    <label>綁定客戶</label>
+                    <select id="editClient">
+                        <option value="">— 不綁定 —</option>
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger" id="editDelete">刪除課程</button>
@@ -552,6 +558,13 @@
                     <label>Teachify Course ID</label>
                     <input type="text" id="createCourseId" placeholder="選填">
                 </div>
+                <div class="form-group" id="createClientGroup" style="display:none;">
+                    <label>綁定客戶</label>
+                    <select id="createClient">
+                        <option value="">— 不綁定 —</option>
+                    </select>
+                    <p style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">企業內訓專案可綁定客戶，課程大綱將顯示客戶 Logo 與名稱</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <div></div>
@@ -599,6 +612,8 @@
             }
 
             await loadAll();
+            // Load client list for project binding
+            await loadClientOptions();
 
             if (projects.length === 0 && sessions.length === 0 && students.length === 0) {
                 retries++;
@@ -618,6 +633,20 @@
             document.getElementById('statSessions').textContent = sessions.length;
             document.getElementById('statStudents').textContent = students.length;
             document.getElementById('statPurchases').textContent = purchases.length;
+        }
+
+        // ── Load Client Options (for project binding) ──
+        async function loadClientOptions() {
+            try {
+                const { data } = await db.select('organizations', 'select=id,name,logo_url&order=name.asc');
+                const orgs = data || [];
+                const optionsHtml = '<option value="">— 不綁定 —</option>' +
+                    orgs.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+                ['createClient', 'editClient'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = optionsHtml;
+                });
+            } catch (e) { console.warn('loadClientOptions error', e); }
         }
 
         // ── Navigation (Level 1 tabs + Level 2 sub-tabs + back) ──
@@ -1147,9 +1176,15 @@
             // Show/hide course_id based on category
             const catSel = document.getElementById('createProjectCategory');
             const courseIdGroup = document.getElementById('createCourseId')?.closest('.form-group');
-            const updateCourseIdVis = () => { if (courseIdGroup) courseIdGroup.style.display = catSel.value === 'corporate' ? 'none' : ''; };
-            catSel.onchange = updateCourseIdVis;
-            updateCourseIdVis();
+            const createClientGroup = document.getElementById('createClientGroup');
+            const updateCreateVis = () => {
+                const isCorp = catSel.value === 'corporate';
+                if (courseIdGroup) courseIdGroup.style.display = isCorp ? 'none' : '';
+                if (createClientGroup) createClientGroup.style.display = isCorp ? '' : 'none';
+            };
+            catSel.onchange = updateCreateVis;
+            updateCreateVis();
+            document.getElementById('createClient').value = '';
             document.getElementById('createProjectModal').classList.add('active');
         });
 
@@ -1165,7 +1200,8 @@
             const join_code = generateCode(6);
             try {
                 const projectCategory = document.getElementById('createProjectCategory').value;
-                await db.insert('projects', { name, description, course_type, instructor, course_id: projectCategory === 'corporate' ? '' : course_id, slide_mode, course_link, join_code, current_phase: 'pre-class', type: projectCategory });
+                const organization_id = projectCategory === 'corporate' ? (document.getElementById('createClient').value || null) : null;
+                await db.insert('projects', { name, description, course_type, instructor, course_id: projectCategory === 'corporate' ? '' : course_id, slide_mode, course_link, join_code, current_phase: 'pre-class', type: projectCategory, organization_id });
                 await Promise.all([loadProjects(), loadSessions()]);
                 updateStats();
                 closeModal('createProjectModal');
@@ -1444,9 +1480,13 @@
             document.getElementById('editDesc').value = p.description || '';
             document.getElementById('editType').value = p.course_type || 'ai-workplace';
             document.getElementById('editCourseId').value = p.course_id || '';
-            // Hide course_id for corporate mode
+            // Hide course_id for corporate mode, show client selector
+            const isCorp = p.type === 'corporate';
             const editCourseGroup = document.getElementById('editCourseId')?.closest('.form-group');
-            if (editCourseGroup) editCourseGroup.style.display = (p.type === 'corporate') ? 'none' : '';
+            const editClientGroup = document.getElementById('editClientGroup');
+            if (editCourseGroup) editCourseGroup.style.display = isCorp ? 'none' : '';
+            if (editClientGroup) editClientGroup.style.display = isCorp ? '' : 'none';
+            document.getElementById('editClient').value = p.organization_id || '';
 
             // Slide mode
             const mode = p.slide_mode || 'internal';
@@ -1567,11 +1607,12 @@
                 const course_id = document.getElementById('editCourseId').value.trim();
                 const slide_mode = document.querySelector('input[name="editSlideMode"]:checked')?.value || 'internal';
                 const course_link = document.getElementById('editCourseLink').value.trim();
+                const organization_id = document.getElementById('editClient').value || null;
                 if (!name) { showToast('請輸入名稱'); return; }
                 try {
-                    await db.update('projects', { name, description, course_type, course_id, slide_mode, course_link }, { id: `eq.${id}` });
+                    await db.update('projects', { name, description, course_type, course_id, slide_mode, course_link, organization_id }, { id: `eq.${id}` });
                     const p = projects.find(x => x.id === id);
-                    if (p) { Object.assign(p, { name, description, course_type, course_id, slide_mode, course_link }); }
+                    if (p) { Object.assign(p, { name, description, course_type, course_id, slide_mode, course_link, organization_id }); }
                     renderProjects();
                     if (currentProjectId) openProjectDetail(currentProjectId);
                     closeModal('editModal');
