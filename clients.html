@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客戶管理 — 教學系統</title>
+    <meta name="description" content="企業內訓客戶管理介面">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/s79-theme.css">
+    <style>
+        .client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+
+        .client-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+
+        .client-card:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.08);
+        }
+
+        .client-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .client-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .client-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .client-logo .material-symbols-outlined {
+            font-size: 24px;
+            color: #94a3b8;
+        }
+
+        .client-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+        .client-meta {
+            font-size: 0.82rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .client-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 16px;
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+
+        .client-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .client-info-item .material-symbols-outlined {
+            font-size: 16px;
+            color: #94a3b8;
+        }
+
+        .client-info-label {
+            color: #94a3b8;
+        }
+
+        .client-card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .client-projects {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .client-project-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            background: #f0f4ff;
+            color: #4f46e5;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .modal-header h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            transition: border-color 0.15s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-hint {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-error {
+            display: none;
+            color: #ef4444;
+            font-size: 0.82rem;
+            padding: 8px 12px;
+            background: #fef2f2;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .logo-upload-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .logo-upload-row .form-input {
+            flex: 1;
+        }
+
+        .logo-upload-btn {
+            cursor: pointer;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            z-index: 9000;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Confirm dialog */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1100;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirm-overlay.active {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 28px;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .confirm-box p {
+            margin-bottom: 20px;
+            font-size: 0.92rem;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 48px;
+            opacity: 0.4;
+        }
+
+        @media (max-width: 768px) {
+            .client-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .client-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">客戶管理</div>
+            <div class="admin-header-actions">
+                <button class="btn btn-dark" id="addClientBtn">
+                    <span class="material-symbols-outlined">add_business</span>
+                    新增客戶
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div id="clientGrid" class="client-grid">
+                <div class="empty-state">
+                    <span class="material-symbols-outlined">business</span>
+                    <p>尚未建立任何客戶</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Modal -->
+        <div class="modal-overlay" id="clientModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="clientModalTitle">
+                        <span class="material-symbols-outlined" style="font-size:20px;color:#4f46e5">business</span>
+                        新增客戶
+                    </h3>
+                    <button class="modal-close" id="clientModalClose">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">客戶名稱 *</label>
+                        <input type="text" class="form-input" id="clientName" placeholder="例：時代基金會">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Logo</label>
+                        <div class="logo-upload-row">
+                            <input type="text" class="form-input" id="clientLogo" placeholder="貼上圖片 URL">
+                            <label class="btn logo-upload-btn">
+                                <span class="material-symbols-outlined" style="font-size:16px">upload</span> 上傳
+                                <input type="file" accept="image/*" style="display:none"
+                                    onchange="handleLogoUpload(this)">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">聯絡人</label>
+                            <input type="text" class="form-input" id="clientContact" placeholder="姓名">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="clientEmail" placeholder="contact@example.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">電話</label>
+                            <input type="text" class="form-input" id="clientPhone" placeholder="02-xxxx-xxxx">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">報價</label>
+                            <input type="text" class="form-input" id="clientPricing" placeholder="例：NT$60,000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">備註</label>
+                        <input type="text" class="form-input" id="clientNotes" placeholder="其他備註（選填）">
+                    </div>
+                    <div class="form-error" id="clientFormError"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" id="clientModalCancel">取消</button>
+                    <button class="btn btn-dark" id="clientModalSubmit">新增</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Dialog -->
+        <div class="confirm-overlay" id="confirmOverlay">
+            <div class="confirm-box">
+                <p id="confirmMessage">確定要刪除此客戶？</p>
+                <div class="confirm-actions">
+                    <button class="btn" id="confirmCancel">取消</button>
+                    <button class="btn btn-danger" id="confirmOk">刪除</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+    </div><!-- /admin-main -->
+
+    <script type="module">
+        import { db, storage } from './scripts/supabase.js';
+
+        let clients = [];
+        let projectsByOrg = {};
+        let editingId = null;
+
+        async function init() {
+            await loadData();
+            render();
+            bindEvents();
+        }
+
+        async function loadData() {
+            const [cRes, pRes] = await Promise.all([
+                db.select('organizations', 'select=*&order=created_at.desc'),
+                db.select('projects', 'select=id,name,organization_id,type')
+            ]);
+            clients = cRes.data || [];
+            const projects = pRes.data || [];
+            projectsByOrg = {};
+            for (const p of projects) {
+                if (p.organization_id) {
+                    if (!projectsByOrg[p.organization_id]) projectsByOrg[p.organization_id] = [];
+                    projectsByOrg[p.organization_id].push(p);
+                }
+            }
+        }
+
+        function render() {
+            const grid = document.getElementById('clientGrid');
+            if (clients.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">business</span><p>尚未建立任何客戶</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = clients.map(c => {
+                const projects = projectsByOrg[c.id] || [];
+                const projectTags = projects.map(p =>
+                    `<span class="client-project-tag"><span class="material-symbols-outlined" style="font-size:12px">slideshow</span>${esc(p.name)}</span>`
+                ).join('');
+
+                return `
+                <div class="client-card" data-id="${c.id}">
+                    <div class="client-card-header">
+                        <div class="client-logo">
+                            ${c.logo_url ? `<img src="${esc(c.logo_url)}" alt="">` : '<span class="material-symbols-outlined">business</span>'}
+                        </div>
+                        <div>
+                            <div class="client-name">${esc(c.name)}</div>
+                            <div class="client-meta">${projects.length} 個關聯專案</div>
+                        </div>
+                    </div>
+                    <div class="client-info-grid">
+                        <div class="client-info-item">
+                            <span class="material-symbols-outlined">person</span>
+                            ${c.contact_person || '—'}
+                        </div>
+                        <div class="client-info-item">
+                            <span class="material-symbols-outlined">mail</span>
+                            ${c.contact_email || '—'}
+                        </div>
+                        <div class="client-info-item">
+                            <span class="material-symbols-outlined">call</span>
+                            ${c.phone || '—'}
+                        </div>
+                        <div class="client-info-item">
+                            <span class="material-symbols-outlined">payments</span>
+                            ${c.pricing || '—'}
+                        </div>
+                    </div>
+                    ${projects.length > 0 ? `<div class="client-projects">${projectTags}</div>` : ''}
+                    <div class="client-card-actions">
+                        <button class="btn btn-sm" data-action="edit" data-id="${c.id}" title="編輯">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                        <button class="btn btn-sm btn-danger" data-action="delete" data-id="${c.id}" title="刪除">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Bind card actions
+            grid.querySelectorAll('[data-action="edit"]').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    openEditModal(btn.dataset.id);
+                });
+            });
+            grid.querySelectorAll('[data-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    confirmDelete(btn.dataset.id);
+                });
+            });
+        }
+
+        // ── Modal ──
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('clientModalTitle').innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:#4f46e5">add_business</span> 新增客戶';
+            document.getElementById('clientModalSubmit').textContent = '新增';
+            clearForm();
+            document.getElementById('clientModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const c = clients.find(x => x.id === id);
+            if (!c) return;
+            editingId = id;
+            document.getElementById('clientModalTitle').innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:#4f46e5">edit</span> 編輯客戶';
+            document.getElementById('clientModalSubmit').textContent = '儲存';
+            document.getElementById('clientName').value = c.name || '';
+            document.getElementById('clientLogo').value = c.logo_url || '';
+            document.getElementById('clientContact').value = c.contact_person || '';
+            document.getElementById('clientEmail').value = c.contact_email || '';
+            document.getElementById('clientPhone').value = c.phone || '';
+            document.getElementById('clientPricing').value = c.pricing || '';
+            document.getElementById('clientNotes').value = c.notes || '';
+            document.getElementById('clientFormError').style.display = 'none';
+            document.getElementById('clientModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('clientModal').classList.remove('active');
+            editingId = null;
+        }
+
+        function clearForm() {
+            ['clientName', 'clientLogo', 'clientContact', 'clientEmail', 'clientPhone', 'clientPricing', 'clientNotes'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('clientFormError').style.display = 'none';
+        }
+
+        async function submitModal() {
+            const name = document.getElementById('clientName').value.trim();
+            const errorEl = document.getElementById('clientFormError');
+            if (!name) {
+                errorEl.textContent = '請填寫客戶名稱';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const payload = {
+                name,
+                logo_url: document.getElementById('clientLogo').value.trim(),
+                contact_person: document.getElementById('clientContact').value.trim(),
+                contact_email: document.getElementById('clientEmail').value.trim(),
+                phone: document.getElementById('clientPhone').value.trim(),
+                pricing: document.getElementById('clientPricing').value.trim(),
+                updated_at: new Date().toISOString()
+            };
+
+            document.getElementById('clientModalSubmit').disabled = true;
+            try {
+                if (editingId) {
+                    await db.update('organizations', payload, { id: `eq.${editingId}` });
+                    showToast('已更新客戶資料');
+                } else {
+                    await db.insert('organizations', payload);
+                    showToast('已新增客戶');
+                }
+                closeModal();
+                await loadData();
+                render();
+            } catch (err) {
+                errorEl.textContent = '操作失敗：' + err.message;
+                errorEl.style.display = 'block';
+            } finally {
+                document.getElementById('clientModalSubmit').disabled = false;
+            }
+        }
+
+        // ── Delete ──
+        let pendingDeleteId = null;
+
+        function confirmDelete(id) {
+            const c = clients.find(x => x.id === id);
+            const projects = projectsByOrg[id] || [];
+            pendingDeleteId = id;
+            const msg = projects.length > 0
+                ? `確定要刪除客戶「${c?.name}」？旗下 ${projects.length} 個專案的客戶關聯將被清除。`
+                : `確定要刪除客戶「${c?.name}」？`;
+            document.getElementById('confirmMessage').textContent = msg;
+            document.getElementById('confirmOverlay').classList.add('active');
+        }
+
+        async function executeDelete() {
+            if (!pendingDeleteId) return;
+            try {
+                const projects = projectsByOrg[pendingDeleteId] || [];
+                for (const p of projects) {
+                    await db.update('projects', { organization_id: null, organization: '' }, { id: `eq.${p.id}` });
+                }
+                await db.delete('organizations', { id: `eq.${pendingDeleteId}` });
+                showToast('已刪除客戶');
+                await loadData();
+                render();
+            } catch (err) {
+                showToast('刪除失敗：' + err.message);
+            } finally {
+                pendingDeleteId = null;
+                document.getElementById('confirmOverlay').classList.remove('active');
+            }
+        }
+
+        // ── Logo Upload ──
+        window.handleLogoUpload = async (input) => {
+            const file = input.files[0];
+            if (!file) return;
+            const key = `client-logos/${Date.now()}_${file.name}`;
+            try {
+                const { data, error } = await storage.upload('outline-files', key, file);
+                if (error) throw error;
+                document.getElementById('clientLogo').value = data.url || storage.getPublicUrl('outline-files', key);
+                showToast('Logo 已上傳');
+            } catch (err) {
+                showToast('上傳失敗');
+            }
+            input.value = '';
+        };
+
+        // ── Events ──
+        function bindEvents() {
+            document.getElementById('addClientBtn').addEventListener('click', openAddModal);
+            document.getElementById('clientModalClose').addEventListener('click', closeModal);
+            document.getElementById('clientModalCancel').addEventListener('click', closeModal);
+            document.getElementById('clientModalSubmit').addEventListener('click', submitModal);
+            document.getElementById('clientModal').addEventListener('click', e => {
+                if (e.target === e.currentTarget) closeModal();
+            });
+            document.getElementById('confirmCancel').addEventListener('click', () => {
+                document.getElementById('confirmOverlay').classList.remove('active');
+                pendingDeleteId = null;
+            });
+            document.getElementById('confirmOk').addEventListener('click', executeDelete);
+        }
+
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str || '';
+            return d.innerHTML;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        init();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

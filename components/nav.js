@@ -11,7 +11,7 @@
 (function () {
     const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_RRbhQpB2zcqeHc6Cds8fgA_jVWyvdyF';
-    const PUBLIC_PAGES = ['login', 'affiliate-register', 'portal', 'student', 'index', 'pre-class', 'post-class'];
+    const PUBLIC_PAGES = ['login', 'affiliate-register', 'portal', 'student', 'index', 'pre-class', 'post-class', 'course-outline'];
     const page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '');
     if (PUBLIC_PAGES.includes(page)) return;
 
@@ -66,7 +66,7 @@ const NAV_ITEMS = [
         group: '教學管理',
         items: [
             { label: '專案管理', icon: 'space_dashboard', href: 'manage.html' },
-            { label: '課程大綱', icon: 'description', href: 'course-outline.html?admin=1' },
+            { label: '客戶管理', icon: 'business', href: 'clients.html' },
             { label: '開課單位', icon: 'apartment', href: 'organizations.html' },
         ]
     },

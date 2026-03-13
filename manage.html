@@ -717,6 +717,7 @@
                         ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank" title="簡報" onclick="event.stopPropagation()"><span class="material-symbols-outlined">open_in_new</span></a>`
                         : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="event.stopPropagation();localStorage.setItem('current_project_id','${p.id}')" title="簡報"><span class="material-symbols-outlined">slideshow</span></a>`
                     }
+                        ${pType === 'corporate' ? `<a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" title="課程大綱" onclick="event.stopPropagation()"><span class="material-symbols-outlined">description</span></a>` : ''}
                         <button class="btn btn-sm" data-edit="${p.id}" title="設定" onclick="event.stopPropagation()"><span class="material-symbols-outlined">edit</span></button>
                         <button class="btn btn-sm" data-copy="${p.id}" title="複製專案" onclick="event.stopPropagation()"><span class="material-symbols-outlined">content_copy</span></button>
                     </div>
@@ -812,6 +813,7 @@
                     ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank"><span class="material-symbols-outlined">open_in_new</span> 簡報</a>`
                     : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="localStorage.setItem('current_project_id','${p.id}')"><span class="material-symbols-outlined">slideshow</span> 簡報</a>`
                 }
+                        ${pType === 'corporate' ? `<a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" style="background:#f0f4ff;color:#4f46e5"><span class="material-symbols-outlined">description</span> 大綱</a>` : ''}
                         <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}"><span class="material-symbols-outlined">assignment</span> 課前</a>
                         <a class="btn btn-sm" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')"><span class="material-symbols-outlined">mail</span> 追蹤</a>
                         <button class="btn btn-sm" onclick="openEdit('${p.id}')"><span class="material-symbols-outlined">settings</span> 設定</button>
