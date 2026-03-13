@@ -127,7 +127,6 @@ function enterPage() {
 
     if (isAdmin && currentUser._isAdmin) {
         document.getElementById('adminPanel').classList.add('show');
-        document.getElementById('studentView').style.display = 'none';
         loadStudents();
         loadInstructors();
         loadOrganizations();
