@@ -16,10 +16,14 @@
     <link rel="stylesheet" href="styles/admin-layout.css">
     <link rel="stylesheet" href="styles/s79-theme.css">
     <style>
+        .container {
+            padding: 20px 24px;
+        }
+
         .client-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
         }
 
         .client-card {
@@ -44,8 +48,8 @@
         }
 
         .client-logo {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 10px;
             background: #f1f5f9;
             display: flex;
@@ -53,6 +57,7 @@
             justify-content: center;
             overflow: hidden;
             flex-shrink: 0;
+            padding: 4px;
         }
 
         .client-logo img {
@@ -81,9 +86,10 @@
         .client-info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px 16px;
+            gap: 10px 20px;
             font-size: 0.82rem;
             color: #64748b;
+            margin-top: 4px;
         }
 
         .client-info-item {
