@@ -1927,13 +1927,16 @@
                 return;
             }
             dd.innerHTML = instructorsList.map(inst => {
-                const checked = window._createSelectedInstructors.find(s => s.id === inst.id);
-                return `<label style="display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;font-size:0.85rem;transition:background 0.15s;border-bottom:1px solid #f1f5f9" onmouseenter="this.style.background='#f8fafc'" onmouseleave="this.style.background=''">
-                    <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCreateInstructor('${inst.id}','${(inst.name||'').replace(/'/g,"\\'")}')">
-                    ${inst.photo_url ? `<img src="${inst.photo_url}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">` : '<span class="material-symbols-outlined" style="font-size:20px;color:#94a3b8">person</span>'}
-                    <span style="font-weight:500">${inst.name || ''}</span>
-                    ${inst.title ? `<span style="font-size:0.75rem;color:#94a3b8">${inst.title}</span>` : ''}
-                </label>`;
+                const isSelected = window._createSelectedInstructors.find(s => s.id === inst.id);
+                const bg = isSelected ? '#eef2ff' : '';
+                const icon = isSelected ? 'check_circle' : 'radio_button_unchecked';
+                const iconColor = isSelected ? 'var(--accent)' : '#cbd5e1';
+                return `<div onclick="toggleCreateInstructor('${inst.id}','${(inst.name||'').replace(/'/g,"\\\\'")}')" style="display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;padding:10px 14px;cursor:pointer;font-size:0.85rem;border-bottom:1px solid #f1f5f9;background:${bg};transition:background 0.15s" onmouseenter="this.style.background='${isSelected ? '#e0e7ff' : '#f8fafc'}'" onmouseleave="this.style.background='${bg}'">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:${iconColor};flex-shrink:0">${icon}</span>
+                    ${inst.photo_url ? `<img src="${inst.photo_url}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">` : `<span class="material-symbols-outlined" style="font-size:24px;color:#94a3b8;flex-shrink:0">person</span>`}
+                    <span style="font-weight:600;flex-shrink:0">${inst.name || ''}</span>
+                    ${inst.title ? `<span style="font-size:0.75rem;color:#94a3b8;margin-left:auto">${inst.title}</span>` : ''}
+                </div>`;
             }).join('');
         }
 
@@ -1945,6 +1948,7 @@
                 window._createSelectedInstructors.push({ id, name });
             }
             renderCreateInstructorPicker();
+            populateCreateInstructorDropdown();
         };
 
         function renderCreateInstructorPicker() {
