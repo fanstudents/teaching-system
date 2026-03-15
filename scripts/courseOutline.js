@@ -316,6 +316,11 @@ function enterPage() {
         if (previewBtn && projectData?.id) {
             previewBtn.href = `${location.origin}/course-outline.html?project=${projectData.id}`;
         }
+        // Set back to project button
+        const backBtn = document.getElementById('btnBackToProject');
+        if (backBtn && projectData?.id) {
+            backBtn.href = `/manage.html#project-${projectData.id}`;
+        }
     } else {
         loadUploadedFiles();
     }
