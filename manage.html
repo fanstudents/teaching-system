@@ -1544,7 +1544,7 @@
         };
 
         // ── Edit Project ──
-        function openEdit(id) {
+        window.openEdit = function(id) {
             const p = projects.find(x => x.id === id);
             if (!p) return;
             document.getElementById('editId').value = id;
