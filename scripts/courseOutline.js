@@ -6,46 +6,15 @@
  */
 
 import { db, storage, ai } from './supabase.js';
+import { getToolLogo, AI_TOOLS_REGISTRY } from './aiToolsRegistry.js';
 
 // ── State ──
 let sessionData = null;   // project_sessions record
 let projectData = null;   // projects record
 let orgData = null;       // organizations record
 
-// Known AI tool logo URLs (shared between rendering and AI generation)
-const KNOWN_LOGOS = {
-    'chatgpt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-    'gemini': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
-    'notebooklm': 'https://upload.wikimedia.org/wikipedia/commons/5/58/NotebookLM_icon.svg',
-    'gamma': 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg',
-    'notion': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
-    'canva': 'https://static.canva.com/web/images/12487a1e0770d29571e580e0e3f9e839.svg',
-    'copilot': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Microsoft_365_Copilot_Icon.svg',
-    'claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg',
-    'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg',
-    'midjourney': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png',
-    'lovable': '/assets/images/lovable-icon.png',
-    'cursor': 'https://cursor.sh/apple-touch-icon.png',
-    'v0': 'https://v0.dev/apple-touch-icon.png',
-    'googleaistudio': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
-    'aistudio': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
-    'geminicanvas': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
-    'visualstudiocode': 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg',
-    'vscode': 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg',
-    'heygen': 'https://heygen.com/favicon.ico',
-    'napkinai': 'https://napkin.ai/apple-touch-icon.png',
-    'napkin': 'https://napkin.ai/apple-touch-icon.png',
-    'suno': 'https://suno.com/apple-touch-icon.png',
-    'runway': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Runway_AI_logo.svg',
-    'dall-e': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-    'dalle': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-};
-
-function _resolveToolLogo(toolName, existingLogo) {
-    if (existingLogo) return existingLogo;
-    const key = toolName.toLowerCase().replace(/[\s.-]+/g, '');
-    return KNOWN_LOGOS[key] || '';
-}
+// Alias for backward compat
+const _resolveToolLogo = (name, existing) => getToolLogo(name, existing);
 let currentUser = null;   // logged-in student or admin
 let isAdmin = false;
 let students = [];
@@ -222,14 +191,17 @@ function renderOutlineFromDB() {
 
         const metaEl = document.getElementById('heroMeta');
         if (metaEl) {
-            // Build schedule text from schedule array
+            // Build schedule text — compute from schedule array or hero
             let scheduleText = '';
             if (od.schedule?.length > 1) {
-                scheduleText = od.schedule.map(s => `Day ${s.day}：${s.hours || '?'} 小時`).join(' / ');
-            } else if (od.schedule?.length === 1) {
-                scheduleText = `${od.schedule[0].hours || ''} 小時`;
-            } else if (od.hero.days) {
-                scheduleText = `${od.hero.days} 天` + (od.hero.duration ? ` — ${od.hero.duration}` : '');
+                const totalH = od.schedule.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
+                scheduleText = totalH ? `${od.schedule.length} 天 / 共 ${totalH} 小時` : `${od.schedule.length} 天`;
+            } else if (od.schedule?.length === 1 && od.schedule[0].hours) {
+                scheduleText = `${od.schedule[0].hours} 小時`;
+            } else if (od.hero?.duration) {
+                scheduleText = od.hero.duration;
+            } else if (od.hero?.days && od.hero.days !== '1') {
+                scheduleText = `${od.hero.days} 天`;
             }
             const items = [
                 { icon: 'schedule', text: scheduleText },
@@ -285,7 +257,9 @@ function renderOutlineFromDB() {
                 const tags = (block.tags || []).map((t, i) =>
                     `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
                 ).join('');
+                const dept = block.dept && block.dept !== '全部門' ? `<div class="timeline-dept-badge dept-custom"><span class="material-symbols-outlined" style="font-size:12px">group</span>${block.dept}</div>` : '';
                 return `<div class="timeline-block">
+                    ${dept}
                     <div class="timeline-header">
                         ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
                         <div class="timeline-title">${block.title || ''}</div>
@@ -673,6 +647,7 @@ window.addTimelineBlock = function(data = {}) {
             <div class="oe-field" style="max-width:90px"><label>天數</label><select data-key="day">${dayOptions}</select></div>
             <div class="oe-field" style="max-width:100px"><label>時長</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="60 分鐘"></div>
             <div class="oe-field"><label>標題</label><input type="text" data-key="title" value="${_esc(data.title || '')}" placeholder="模組名稱"></div>
+            <div class="oe-field" style="max-width:140px"><label>部門</label><input type="text" data-key="dept" value="${_esc(data.dept || '全部門')}" placeholder="全部門"></div>
         </div>
         <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
         <div class="oe-field" style="margin-top:8px"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
@@ -750,16 +725,21 @@ function collectOutlineData() {
         time: el.querySelector('[data-key="time"]').value.trim(),
         title: el.querySelector('[data-key="title"]').value.trim(),
         desc: el.querySelector('[data-key="desc"]').value.trim(),
+        dept: el.querySelector('[data-key="dept"]')?.value.trim() || '全部門',
         tags: el.querySelector('[data-key="tags"]').value.split(',').map(s => s.trim()).filter(Boolean)
     }));
 
-    // Tools
-    od.tools = [...document.querySelectorAll('#oeToolsList .oe-list-item')].map(el => ({
-        name: el.querySelector('[data-key="name"]').value.trim(),
-        url: el.querySelector('[data-key="url"]').value.trim(),
-        purpose: el.querySelector('[data-key="purpose"]').value.trim(),
-        logo: el.querySelector('[data-key="logo"]').value.trim()
-    }));
+    // Tools — auto-resolve logos from registry
+    od.tools = [...document.querySelectorAll('#oeToolsList .oe-list-item')].map(el => {
+        const name = el.querySelector('[data-key="name"]').value.trim();
+        const manualLogo = el.querySelector('[data-key="logo"]').value.trim();
+        return {
+            name,
+            url: el.querySelector('[data-key="url"]').value.trim(),
+            purpose: el.querySelector('[data-key="purpose"]').value.trim(),
+            logo: manualLogo || _resolveToolLogo(name, '')
+        };
+    });
     od.toolsNote = document.getElementById('oeToolsNote').value.trim();
 
     // Equipment
