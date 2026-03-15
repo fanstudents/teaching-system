@@ -185,19 +185,69 @@ function renderOutlineFromDB() {
     if (!od) return; // Keep hardcoded HTML as fallback
 
     // Hero subtitle & meta
+    // ── Build corrected schedule (shared by hero + timeline) ──
+    let schedule = od.schedule ? [...od.schedule] : [];
+    if (od.timeline?.length > 0) {
+        const uniqueDays = [...new Set(od.timeline.map(b => b.day || 1))].sort((a, b) => a - b);
+        // Auto-detect multi-day from timeline blocks
+        if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
+            schedule = uniqueDays.map(d => {
+                const existing = schedule.find(s => s.day === d);
+                if (existing) return existing;
+                const dayBlocks = od.timeline.filter(b => (b.day || 1) === d);
+                let totalMin = 0;
+                dayBlocks.forEach(b => {
+                    const m = (b.time || '').match(/(\d+)\s*分鐘/);
+                    if (m) totalMin += parseInt(m[1]);
+                });
+                return { day: d, hours: totalMin ? String(Math.round(totalMin / 60 * 10) / 10) : '', topic: '' };
+            });
+        }
+        // Aggressive fallback: scan timeline text for "Day 2" markers when all blocks are day:1
+        if (uniqueDays.length === 1 && uniqueDays[0] === 1) {
+            let currentDay = 1;
+            const maxScanDay = Math.max(parseInt(od.hero?.days) || 1, schedule.length, 5);
+            od.timeline.forEach(b => {
+                const text = `${b.title || ''} ${b.time || ''} ${b.desc || ''}`.toLowerCase();
+                for (let d = 2; d <= maxScanDay; d++) {
+                    if (text.includes(`day ${d}`) || text.includes(`day${d}`) || text.includes(`第${['','一','二','三','四','五'][d]}天`)) {
+                        currentDay = d;
+                    }
+                }
+                b.day = currentDay;
+            });
+            const fixedDays = [...new Set(od.timeline.map(b => b.day))].sort((a, b) => a - b);
+            if (fixedDays.length > 1) {
+                schedule = fixedDays.map(d => {
+                    const existing = schedule.find(s => s.day === d);
+                    if (existing) return existing;
+                    const dayBlocks = od.timeline.filter(b => (b.day || 1) === d);
+                    let totalMin = 0;
+                    dayBlocks.forEach(b => {
+                        const m = (b.time || '').match(/(\d+)\s*分鐘/);
+                        if (m) totalMin += parseInt(m[1]);
+                    });
+                    return { day: d, hours: totalMin ? String(Math.round(totalMin / 60 * 10) / 10) : '', topic: '' };
+                });
+            }
+        }
+        if (!schedule.length) schedule = [{ day: 1, hours: '', topic: '' }];
+    }
+
+    // Hero subtitle & meta
     if (od.hero) {
         const heroSub = document.getElementById('heroSub');
         if (heroSub && od.hero.subtitle) heroSub.textContent = od.hero.subtitle;
 
         const metaEl = document.getElementById('heroMeta');
         if (metaEl) {
-            // Build schedule text — compute from schedule array or hero
+            // Build schedule text from corrected schedule
             let scheduleText = '';
-            if (od.schedule?.length > 1) {
-                const totalH = od.schedule.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
-                scheduleText = totalH ? `${od.schedule.length} 天 / 共 ${totalH} 小時` : `${od.schedule.length} 天`;
-            } else if (od.schedule?.length === 1 && od.schedule[0].hours) {
-                scheduleText = `${od.schedule[0].hours} 小時`;
+            if (schedule.length > 1) {
+                const totalH = schedule.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
+                scheduleText = totalH ? `${schedule.length} 天 / 共 ${totalH} 小時` : `${schedule.length} 天`;
+            } else if (schedule.length === 1 && schedule[0].hours) {
+                scheduleText = `${schedule[0].hours} 小時`;
             } else if (od.hero?.duration) {
                 scheduleText = od.hero.duration;
             } else if (od.hero?.days && od.hero.days !== '1') {
@@ -216,49 +266,10 @@ function renderOutlineFromDB() {
         }
     }
 
-    // Timeline — grouped by day
+    // Timeline — grouped by day (schedule already corrected above)
     if (od.timeline?.length > 0) {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
-            let schedule = od.schedule || [];
-            // Auto-detect days from timeline blocks if schedule is incomplete
-            const uniqueDays = [...new Set(od.timeline.map(b => b.day || 1))].sort((a, b) => a - b);
-            if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
-                schedule = uniqueDays.map(d => {
-                    const existing = schedule.find(s => s.day === d);
-                    if (existing) return existing;
-                    // Auto-compute hours from blocks
-                    const dayBlocks = od.timeline.filter(b => (b.day || 1) === d && !b.isBreak);
-                    let totalMin = 0;
-                    dayBlocks.forEach(b => {
-                        const m = (b.time || '').match(/(\d+)\s*分鐘/);
-                        if (m) totalMin += parseInt(m[1]);
-                    });
-                    return { day: d, hours: totalMin ? String(Math.round(totalMin / 60 * 10) / 10) : '', topic: '' };
-                });
-            }
-
-            // Aggressive fallback: scan timeline text for "Day 2"/"第二天" markers when all blocks are day:1
-            if (uniqueDays.length === 1 && uniqueDays[0] === 1) {
-                let currentDay = 1;
-                const maxScanDay = Math.max(parseInt(od.hero?.days) || 1, schedule.length, 5);
-                od.timeline.forEach(b => {
-                    const text = `${b.title || ''} ${b.time || ''} ${b.desc || ''}`.toLowerCase();
-                    for (let d = 2; d <= maxScanDay; d++) {
-                        if (text.includes(`day ${d}`) || text.includes(`day${d}`) || text.includes(`第${['','一','二','三','四','五'][d]}天`)) {
-                            currentDay = d;
-                        }
-                    }
-                    b.day = currentDay;
-                });
-                // Rebuild schedule from corrected days
-                const fixedDays = [...new Set(od.timeline.map(b => b.day))].sort((a, b) => a - b);
-                if (fixedDays.length > 1) {
-                    schedule = fixedDays.map(d => schedule.find(s => s.day === d) || { day: d, hours: '', topic: '' });
-                }
-            }
-
-            if (!schedule.length) schedule = [{ day: 1, hours: '', topic: '' }];
             const isMultiDay = schedule.length > 1;
 
             const renderBlocks = (blocks) => blocks.map(block => {
@@ -1229,8 +1240,25 @@ function initHrEmail() {
     const joinCode = sessionData?.session_code || '';
     const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
 
-    // Schedule from schedule array
-    const schedule = od.schedule || [];
+    // Schedule — auto-detect days from timeline (same logic as render)
+    const timeline = od.timeline || [];
+    let schedule = od.schedule ? [...od.schedule] : [];
+    if (timeline.length > 0) {
+        const uniqueDays = [...new Set(timeline.map(b => b.day || 1))].sort((a, b) => a - b);
+        if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
+            schedule = uniqueDays.map(d => {
+                const existing = schedule.find(s => s.day === d);
+                if (existing) return existing;
+                const dayBlocks = timeline.filter(b => (b.day || 1) === d);
+                let totalMin = 0;
+                dayBlocks.forEach(b => {
+                    const m = (b.time || '').match(/(\d+)\s*分鐘/);
+                    if (m) totalMin += parseInt(m[1]);
+                });
+                return { day: d, hours: totalMin ? String(Math.round(totalMin / 60 * 10) / 10) : '', topic: '' };
+            });
+        }
+    }
     let scheduleText = '';
     if (schedule.length > 1) {
         const totalH = schedule.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
@@ -1242,7 +1270,6 @@ function initHrEmail() {
     }
 
     // Timeline summary grouped by day — items only, no times, with dept
-    const timeline = od.timeline || [];
     const _isBreak = b => b.isBreak || /休息|午餐|break/i.test(b.title || '');
     let moduleSummary = '';
     if (schedule.length > 1) {
