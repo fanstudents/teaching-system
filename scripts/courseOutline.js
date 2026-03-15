@@ -1517,8 +1517,19 @@ function renderFileList() {
 
 window.removeFile = async (idx) => {
     const file = uploadedFiles[idx];
-    if (file?.id) {
-        await db.delete('project_files', file.id);
+    if (!file) return;
+    if (!confirm(`確定要刪除「${file.file_name || file.name || '此檔案'}」？`)) return;
+    try {
+        // Delete from database
+        if (file.id) {
+            await db.delete('project_files', { id: `eq.${file.id}` });
+        }
+        // Try to delete from storage if path exists
+        if (file.storage_path) {
+            try { await storage.remove('project-files', [file.storage_path]); } catch(e) { /* ignore */ }
+        }
+    } catch(e) {
+        console.error('Delete file error:', e);
     }
     uploadedFiles.splice(idx, 1);
     renderFileList();
