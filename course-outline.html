@@ -294,6 +294,80 @@
     <!-- ══════ ADMIN PANEL ══════ -->
     <div class="admin-panel" id="adminPanel">
 
+        <!-- ═══ Course Content Editor ═══ -->
+        <div class="admin-section">
+            <div class="admin-section-title">
+                <span class="material-symbols-outlined">edit_note</span>
+                課程內容編輯
+                <div style="margin-left:auto;display:flex;gap:8px">
+                    <button class="btn" id="btnAiGenOutline" style="padding:4px 12px;font-size:0.78rem;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff">
+                        <span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span> AI 生成課綱
+                    </button>
+                    <button class="btn btn-outline" id="btnImportDefaults" style="padding:4px 10px;font-size:0.78rem">
+                        <span class="material-symbols-outlined" style="font-size:14px">download</span> 匯入預設值
+                    </button>
+                    <button class="btn btn-primary" id="btnSaveOutline" style="padding:4px 12px;font-size:0.78rem">
+                        <span class="material-symbols-outlined" style="font-size:14px">save</span> 儲存大綱
+                    </button>
+                </div>
+            </div>
+            <div id="outlineSaveStatus" style="font-size:0.78rem;color:var(--accent);margin-bottom:8px;display:none"></div>
+
+            <!-- Hero 設定 -->
+            <details class="outline-edit-group" open>
+                <summary><span class="material-symbols-outlined" style="font-size:16px">info</span> 課程基本資訊</summary>
+                <div class="oe-fields">
+                    <div class="oe-field"><label>課程副標題</label><input type="text" id="oeHeroSubtitle" placeholder="從 ChatGPT 到 Notion，掌握五大 AI 工具..."></div>
+                    <div class="oe-row">
+                        <div class="oe-field"><label>時數</label><input type="text" id="oeHeroDuration" placeholder="4 小時（含休息）"></div>
+                        <div class="oe-field"><label>人數</label><input type="text" id="oeHeroGroupSize" placeholder="建議 20–40 人"></div>
+                    </div>
+                    <div class="oe-row">
+                        <div class="oe-field"><label>設備</label><input type="text" id="oeHeroDevice" placeholder="需自備筆電"></div>
+                        <div class="oe-field"><label>授課方式</label><input type="text" id="oeHeroLocation" placeholder="現場實體授課"></div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- 時間表 -->
+            <details class="outline-edit-group" open>
+                <summary><span class="material-symbols-outlined" style="font-size:16px">view_timeline</span> 教學架構大綱</summary>
+                <div id="oeTimelineList" class="oe-list"></div>
+                <button class="btn btn-outline oe-add-btn" onclick="addTimelineBlock()">
+                    <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增時段
+                </button>
+            </details>
+
+            <!-- 工具 -->
+            <details class="outline-edit-group">
+                <summary><span class="material-symbols-outlined" style="font-size:16px">build</span> 使用工具清單</summary>
+                <div id="oeToolsList" class="oe-list"></div>
+                <button class="btn btn-outline oe-add-btn" onclick="addToolBlock()">
+                    <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增工具
+                </button>
+                <div class="oe-field" style="margin-top:8px"><label>工具備註</label><input type="text" id="oeToolsNote" placeholder="以上工具皆提供免費版本..."></div>
+            </details>
+
+            <!-- 設備 -->
+            <details class="outline-edit-group">
+                <summary><span class="material-symbols-outlined" style="font-size:16px">devices</span> 設備需求</summary>
+                <div id="oeEquipList" class="oe-list"></div>
+                <button class="btn btn-outline oe-add-btn" onclick="addEquipBlock()">
+                    <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增設備
+                </button>
+                <div class="oe-field" style="margin-top:8px"><label>設備備註</label><input type="text" id="oeEquipNote" placeholder="請學員於課前完成帳號註冊..."></div>
+            </details>
+
+            <!-- 助教 -->
+            <details class="outline-edit-group">
+                <summary><span class="material-symbols-outlined" style="font-size:16px">support_agent</span> 助教配置</summary>
+                <div class="oe-fields">
+                    <div class="oe-field"><label>建議人數</label><input type="text" id="oeTaCount" placeholder="1–2 位"></div>
+                    <div class="oe-field"><label>職責（每行一項）</label><textarea id="oeTaDuties" rows="3" placeholder="負責協助學員操作工具&#10;即時回答學員問題&#10;協助發放講義"></textarea></div>
+                </div>
+            </details>
+        </div>
+
         <!-- Student Management -->
         <div class="admin-section">
             <div class="admin-section-title">
@@ -457,6 +531,81 @@
             <button class="btn btn-primary" onclick="submitOrg()">
                 <span class="material-symbols-outlined" style="font-size:16px">check</span> 儲存
             </button>
+        </div>
+    </div>
+</div>
+<!-- ═══ AI 生成課綱 Modal ═══ -->
+<div class="modal-overlay" id="aiOutlineModal">
+    <div class="modal-card" style="width:600px">
+        <div class="modal-header">
+            <h3 style="display:flex;align-items:center;gap:8px">
+                <span class="material-symbols-outlined" style="font-size:20px;color:#f59e0b">auto_awesome</span>
+                AI 智慧生成課綱
+            </h3>
+            <button class="modal-close" onclick="closeAiOutlineModal()"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+            <div style="padding:10px 14px;background:#fffbeb;border-radius:8px;font-size:0.8rem;color:#92400e;margin-bottom:16px;line-height:1.6">
+                <strong>說明：</strong>輸入客戶資料與需求描述，AI 會自動產生完整課綱（時間表、工具、設備等），填入編輯器供您調整後儲存。以下欄位皆為選填，資訊越多產出越精準。
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">客戶 / 公司名稱</label>
+                <input class="form-input" type="text" id="aiOlClient" placeholder="例：台積電、鴻海精密">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                    <label class="form-label">產業類型</label>
+                    <input class="form-input" type="text" id="aiOlIndustry" placeholder="例：半導體、金融、零售">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">學員部門</label>
+                    <input class="form-input" type="text" id="aiOlDepts" placeholder="例：行銷部、人資部（多部門逗號分隔）">
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="form-group">
+                    <label class="form-label">天數</label>
+                    <select class="form-input" id="aiOlDays">
+                        <option value="">自動決定</option>
+                        <option value="0.5">半天</option>
+                        <option value="1" selected>1 天</option>
+                        <option value="2">2 天</option>
+                        <option value="3">3 天</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">每天時數</label>
+                    <select class="form-input" id="aiOlHours">
+                        <option value="">自動決定</option>
+                        <option value="2">2 小時</option>
+                        <option value="3">3 小時</option>
+                        <option value="4" selected>4 小時</option>
+                        <option value="6">6 小時</option>
+                        <option value="8">8 小時</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">指定工具（選填，逗號分隔）</label>
+                <input class="form-input" type="text" id="aiOlTools" placeholder="例：ChatGPT, Gemini, NotebookLM, Gamma, Notion">
+            </div>
+            <div class="form-group">
+                <label class="form-label">學員程度</label>
+                <select class="form-input" id="aiOlLevel">
+                    <option value="初級（完全新手）">初級（完全新手）</option>
+                    <option value="中級（有基本概念）" selected>中級（有基本概念）</option>
+                    <option value="進階（有使用經驗）">進階（有使用經驗）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">客戶需求 / 訪談稿 / 補充說明 <span style="color:var(--text-3);font-weight:400">（核心輸入）</span></label>
+                <textarea class="form-textarea" id="aiOlTranscript" rows="6" placeholder="貼上與客戶的訪談紀錄、需求描述、學員痛點等任何有用的資訊...&#10;&#10;例：客戶希望員工能用 AI 提升行銷文案品質，目前團隊對 AI 完全沒經驗，想安排 4 小時的體驗課..." style="min-height:120px"></textarea>
+            </div>
+            <button class="btn btn-primary" id="btnStartAiGen" onclick="startAiOutlineGeneration()" style="width:100%;justify-content:center;padding:12px;background:linear-gradient(135deg,#f59e0b,#d97706)">
+                <span class="material-symbols-outlined" style="font-size:16px">auto_awesome</span> 開始生成課綱
+            </button>
+            <div id="aiOlStatus" style="font-size:0.82rem;color:var(--text-3);text-align:center;margin-top:10px;min-height:20px"></div>
         </div>
     </div>
 </div>

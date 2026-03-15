@@ -1,10 +1,11 @@
 /**
  * Course Outline — Client-side Logic
  * 動態架構：URL ?session=xxx → 從 DB 載入 session → project → organization
- * Admin: ?admin=1 → 管理面板（學員、講師、客戶）
+ * Admin: ?admin=1 → 管理面板（學員、講師、客戶、課程內容編輯）
+ * CMS: outline_data JSONB 存入 projects 表，學員端動態渲染
  */
 
-import { db, storage } from './supabase.js';
+import { db, storage, ai } from './supabase.js';
 
 // ── State ──
 let sessionData = null;   // project_sessions record
@@ -56,33 +57,27 @@ async function init() {
 }
 
 async function loadProjectDirect(projectId) {
-    // Load project directly by ID
-    const { data: projects } = await db.select('projects', `id=eq.${encodeURIComponent(projectId)}&select=*`);
+    const { data: projects } = await db.select('projects', { filter: { id: `eq.${projectId}` } });
     if (projects?.length) {
         projectData = projects[0];
-        // Load organization if bound
         if (projectData.organization_id) {
-            const { data: orgs } = await db.select('organizations', `id=eq.${projectData.organization_id}&select=*`);
+            const { data: orgs } = await db.select('organizations', { filter: { id: `eq.${projectData.organization_id}` } });
             if (orgs?.length) orgData = orgs[0];
         }
-        // Try to load first session for this project
-        const { data: sess } = await db.select('project_sessions', `project_id=eq.${projectId}&order=date.asc&limit=1&select=*`);
+        const { data: sess } = await db.select('project_sessions', { filter: { project_id: `eq.${projectId}` }, order: 'date.asc', limit: 1 });
         if (sess?.length) sessionData = sess[0];
     }
 }
 
 async function loadSessionChain(code) {
-    // 1. Load session
-    const { data: sessions } = await db.select('project_sessions', `session_code=eq.${encodeURIComponent(code)}&select=*`);
+    const { data: sessions } = await db.select('project_sessions', { filter: { session_code: `eq.${code}` } });
     if (sessions?.length) {
         sessionData = sessions[0];
-        // 2. Load project
-        const { data: projects } = await db.select('projects', `id=eq.${sessionData.project_id}&select=*`);
+        const { data: projects } = await db.select('projects', { filter: { id: `eq.${sessionData.project_id}` } });
         if (projects?.length) {
             projectData = projects[0];
-            // 3. Load organization
             if (projectData.organization_id) {
-                const { data: orgs } = await db.select('organizations', `id=eq.${projectData.organization_id}&select=*`);
+                const { data: orgs } = await db.select('organizations', { filter: { id: `eq.${projectData.organization_id}` } });
                 if (orgs?.length) orgData = orgs[0];
             }
         }
@@ -116,6 +111,121 @@ function renderDynamicContent() {
         document.getElementById('fieldPassword').style.display = 'none';
         document.getElementById('loginPass').removeAttribute('required');
     }
+
+    // Render outline from DB if available
+    renderOutlineFromDB();
+}
+
+// ══════════════════════════════════════
+// DYNAMIC OUTLINE RENDERING (CMS)
+// ══════════════════════════════════════
+
+function getOutlineData() {
+    const od = projectData?.outline_data;
+    if (!od || typeof od !== 'object' || Object.keys(od).length === 0) return null;
+    return od;
+}
+
+function renderOutlineFromDB() {
+    const od = getOutlineData();
+    if (!od) return; // Keep hardcoded HTML as fallback
+
+    // Hero subtitle & meta
+    if (od.hero) {
+        const heroSub = document.querySelector('.outline-hero-sub');
+        if (heroSub && od.hero.subtitle) heroSub.textContent = od.hero.subtitle;
+
+        const metaEl = document.querySelector('.hero-meta');
+        if (metaEl) {
+            const items = [
+                { icon: 'schedule', text: od.hero.duration },
+                { icon: 'groups', text: od.hero.groupSize },
+                { icon: 'laptop_mac', text: od.hero.device },
+                { icon: 'location_on', text: od.hero.location }
+            ].filter(i => i.text);
+            if (items.length > 0) {
+                metaEl.innerHTML = items.map(i =>
+                    `<div class="hero-meta-item"><span class="material-symbols-outlined">${i.icon}</span>${i.text}</div>`
+                ).join('');
+            }
+        }
+    }
+
+    // Timeline
+    if (od.timeline?.length > 0) {
+        const timelineEl = document.querySelector('.timeline');
+        if (timelineEl) {
+            timelineEl.innerHTML = od.timeline.map(block => {
+                const breakClass = block.isBreak ? ' break-block' : '';
+                const titleStyle = block.isBreak ? ' style="color:var(--accent)"' : '';
+                const titlePrefix = block.isBreak ? '☕ ' : '';
+                const tags = (block.tags || []).map(t =>
+                    `<span class="topic-tag${block.isBreak ? '' : (block.tags.indexOf(t) === 0 ? ' highlight' : '')}">${t}</span>`
+                ).join('');
+                return `<div class="timeline-block${breakClass}">
+                    <div class="timeline-time">${block.time || ''}</div>
+                    <div class="timeline-title"${titleStyle}>${titlePrefix}${block.title || ''}</div>
+                    <div class="timeline-desc">${block.desc || ''}</div>
+                    ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // Tools
+    if (od.tools?.length > 0) {
+        const toolGrid = document.querySelector('.tool-grid');
+        if (toolGrid) {
+            toolGrid.innerHTML = od.tools.map(t =>
+                `<div class="tool-card">
+                    ${t.logo ? `<img class="tool-logo" src="${t.logo}" alt="${t.name}" onerror="this.style.display='none'">` : ''}
+                    <div class="tool-name">${t.name || ''}</div>
+                    <div class="tool-purpose">${t.purpose || ''}</div>
+                    ${t.url ? `<a class="tool-url" href="${t.url}" target="_blank">${t.url.replace(/^https?:\/\//, '')} →</a>` : ''}
+                </div>`
+            ).join('');
+        }
+        // Tools note
+        const toolsNoteEl = document.querySelector('.tool-grid + .note-callout');
+        if (toolsNoteEl && od.toolsNote) {
+            toolsNoteEl.querySelector('p').textContent = od.toolsNote;
+        }
+    }
+
+    // Equipment
+    if (od.equipment?.length > 0) {
+        const equipGrid = document.querySelector('.equip-grid');
+        if (equipGrid) {
+            equipGrid.innerHTML = od.equipment.map(e =>
+                `<div class="equip-item">
+                    <div class="equip-icon"><span class="material-symbols-outlined">${e.icon || 'devices'}</span></div>
+                    <div><div class="equip-label">${e.label || ''}</div><div class="equip-detail">${e.detail || ''}</div></div>
+                </div>`
+            ).join('');
+        }
+        // Equip note
+        const equipNoteEl = document.querySelector('.equip-grid + .note-callout');
+        if (equipNoteEl && od.equipNote) {
+            equipNoteEl.querySelector('p').innerHTML = `<strong>課前準備提醒：</strong>${od.equipNote}`;
+        }
+    }
+
+    // TA Config
+    if (od.taConfig) {
+        const taCard = document.querySelector('.ta-card');
+        if (taCard) {
+            const countText = od.taConfig.count || '1–2 位';
+            const duties = od.taConfig.duties || [];
+            const dutyIcons = ['group', 'laptop_mac', 'chat', 'note_alt'];
+            const listHtml = [
+                `<li><span class="material-symbols-outlined">group</span><div>建議配置 <strong>${countText}</strong>現場助教</div></li>`,
+                ...duties.map((d, i) =>
+                    `<li><span class="material-symbols-outlined">${dutyIcons[i + 1] || 'check'}</span><div>${d}</div></li>`
+                )
+            ].join('');
+            taCard.querySelector('.info-list').innerHTML = listHtml;
+        }
+    }
 }
 
 function enterPage() {
@@ -130,6 +240,7 @@ function enterPage() {
         loadStudents();
         loadInstructors();
         loadOrganizations();
+        initOutlineEditor();
     } else {
         loadUploadedFiles();
     }
@@ -155,9 +266,9 @@ function setupLoginForm() {
         } else {
             const email = document.getElementById('loginUser').value.trim().toLowerCase();
             const pass = document.getElementById('loginPass').value;
-            let query = `email=eq.${encodeURIComponent(email)}&login_password=eq.${encodeURIComponent(pass)}&select=name,email,department,job_title`;
-            if (sessionData) query += `&session_code=eq.${encodeURIComponent(sessionData.session_code)}`;
-            const { data } = await db.select('students', query);
+            const filter = { email: `eq.${email}`, login_password: `eq.${pass}` };
+            if (sessionData) filter.session_code = `eq.${sessionData.session_code}`;
+            const { data } = await db.select('students', { filter, select: 'name,email,department,job_title' });
             if (data?.length) {
                 currentUser = data[0];
                 sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
@@ -180,12 +291,267 @@ function updateTopbar() {
 }
 
 // ══════════════════════════════════════
+// ADMIN: Outline Content Editor (CMS)
+// ══════════════════════════════════════
+
+function initOutlineEditor() {
+    const od = getOutlineData();
+
+    // Populate hero fields
+    if (od?.hero) {
+        _v('oeHeroSubtitle', od.hero.subtitle);
+        _v('oeHeroDuration', od.hero.duration);
+        _v('oeHeroGroupSize', od.hero.groupSize);
+        _v('oeHeroDevice', od.hero.device);
+        _v('oeHeroLocation', od.hero.location);
+    }
+
+    // Populate timeline
+    if (od?.timeline?.length > 0) {
+        od.timeline.forEach(block => addTimelineBlock(block));
+    }
+
+    // Populate tools
+    if (od?.tools?.length > 0) {
+        od.tools.forEach(tool => addToolBlock(tool));
+    }
+    if (od?.toolsNote) _v('oeToolsNote', od.toolsNote);
+
+    // Populate equipment
+    if (od?.equipment?.length > 0) {
+        od.equipment.forEach(eq => addEquipBlock(eq));
+    }
+    if (od?.equipNote) _v('oeEquipNote', od.equipNote);
+
+    // Populate TA
+    if (od?.taConfig) {
+        _v('oeTaCount', od.taConfig.count);
+        _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
+    }
+
+    // Bind buttons
+    document.getElementById('btnSaveOutline').addEventListener('click', saveOutlineData);
+    document.getElementById('btnImportDefaults').addEventListener('click', importDefaults);
+    document.getElementById('btnAiGenOutline').addEventListener('click', () => document.getElementById('aiOutlineModal').classList.add('show'));
+}
+
+function _v(id, val) {
+    const el = document.getElementById(id);
+    if (el && val) el.value = val;
+}
+
+// ── Timeline Block ──
+let _tlCounter = 0;
+window.addTimelineBlock = function(data = {}) {
+    const list = document.getElementById('oeTimelineList');
+    const idx = _tlCounter++;
+    const isBreak = data.isBreak || false;
+    const div = document.createElement('div');
+    div.className = `oe-list-item${isBreak ? ' is-break' : ''}`;
+    div.dataset.idx = idx;
+    div.innerHTML = `
+        <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
+        <div class="oe-row">
+            <div class="oe-field"><label>時間</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="09:00 – 09:20（20 分鐘）"></div>
+            <div class="oe-field"><label>標題</label><input type="text" data-key="title" value="${_esc(data.title || '')}" placeholder="模組名稱"></div>
+        </div>
+        <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
+        <div class="oe-row" style="margin-top:8px">
+            <div class="oe-field"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
+            <div class="oe-field"><label>類型</label><select data-key="isBreak" onchange="this.closest('.oe-list-item').classList.toggle('is-break', this.value==='true')">
+                <option value="false"${!isBreak ? ' selected' : ''}>教學模組</option>
+                <option value="true"${isBreak ? ' selected' : ''}>休息時間</option>
+            </select></div>
+        </div>
+    `;
+    list.appendChild(div);
+};
+
+// ── Tool Block ──
+let _toolCounter = 0;
+window.addToolBlock = function(data = {}) {
+    const list = document.getElementById('oeToolsList');
+    const div = document.createElement('div');
+    div.className = 'oe-list-item';
+    div.innerHTML = `
+        <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
+        <div class="oe-row">
+            <div class="oe-field"><label>工具名稱</label><input type="text" data-key="name" value="${_esc(data.name || '')}" placeholder="ChatGPT"></div>
+            <div class="oe-field"><label>網址</label><input type="text" data-key="url" value="${_esc(data.url || '')}" placeholder="https://chat.openai.com"></div>
+        </div>
+        <div class="oe-field" style="margin-top:8px"><label>用途</label><input type="text" data-key="purpose" value="${_esc(data.purpose || '')}" placeholder="文字生成、文件撰寫..."></div>
+        <div class="oe-field" style="margin-top:8px"><label>Logo URL</label><input type="text" data-key="logo" value="${_esc(data.logo || '')}" placeholder="https://...svg"></div>
+    `;
+    list.appendChild(div);
+};
+
+// ── Equipment Block ──
+let _eqCounter = 0;
+window.addEquipBlock = function(data = {}) {
+    const list = document.getElementById('oeEquipList');
+    const div = document.createElement('div');
+    div.className = 'oe-list-item';
+    div.innerHTML = `
+        <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
+        <div class="oe-row">
+            <div class="oe-field"><label>圖示</label><input type="text" data-key="icon" value="${_esc(data.icon || '')}" placeholder="laptop_mac"></div>
+            <div class="oe-field"><label>名稱</label><input type="text" data-key="label" value="${_esc(data.label || '')}" placeholder="學員筆電"></div>
+        </div>
+        <div class="oe-field" style="margin-top:8px"><label>說明</label><input type="text" data-key="detail" value="${_esc(data.detail || '')}" placeholder="每人 1 台，需可上網"></div>
+    `;
+    list.appendChild(div);
+};
+
+function _esc(str) {
+    return (str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// ── Collect Form Data ──
+function collectOutlineData() {
+    const od = {};
+
+    // Hero
+    od.hero = {
+        subtitle: document.getElementById('oeHeroSubtitle').value.trim(),
+        duration: document.getElementById('oeHeroDuration').value.trim(),
+        groupSize: document.getElementById('oeHeroGroupSize').value.trim(),
+        device: document.getElementById('oeHeroDevice').value.trim(),
+        location: document.getElementById('oeHeroLocation').value.trim()
+    };
+
+    // Timeline
+    od.timeline = [...document.querySelectorAll('#oeTimelineList .oe-list-item')].map(el => ({
+        time: el.querySelector('[data-key="time"]').value.trim(),
+        title: el.querySelector('[data-key="title"]').value.trim(),
+        desc: el.querySelector('[data-key="desc"]').value.trim(),
+        tags: el.querySelector('[data-key="tags"]').value.split(',').map(s => s.trim()).filter(Boolean),
+        isBreak: el.querySelector('[data-key="isBreak"]').value === 'true'
+    }));
+
+    // Tools
+    od.tools = [...document.querySelectorAll('#oeToolsList .oe-list-item')].map(el => ({
+        name: el.querySelector('[data-key="name"]').value.trim(),
+        url: el.querySelector('[data-key="url"]').value.trim(),
+        purpose: el.querySelector('[data-key="purpose"]').value.trim(),
+        logo: el.querySelector('[data-key="logo"]').value.trim()
+    }));
+    od.toolsNote = document.getElementById('oeToolsNote').value.trim();
+
+    // Equipment
+    od.equipment = [...document.querySelectorAll('#oeEquipList .oe-list-item')].map(el => ({
+        icon: el.querySelector('[data-key="icon"]').value.trim(),
+        label: el.querySelector('[data-key="label"]').value.trim(),
+        detail: el.querySelector('[data-key="detail"]').value.trim()
+    }));
+    od.equipNote = document.getElementById('oeEquipNote').value.trim();
+
+    // TA
+    od.taConfig = {
+        count: document.getElementById('oeTaCount').value.trim(),
+        duties: document.getElementById('oeTaDuties').value.split('\n').map(s => s.trim()).filter(Boolean)
+    };
+
+    return od;
+}
+
+// ── Save ──
+async function saveOutlineData() {
+    if (!projectData?.id) { alert('無法儲存：找不到專案 ID'); return; }
+    const btn = document.getElementById('btnSaveOutline');
+    const statusEl = document.getElementById('outlineSaveStatus');
+    btn.disabled = true;
+    btn.textContent = '儲存中...';
+    try {
+        const outline_data = collectOutlineData();
+        const { error } = await db.update('projects', { outline_data }, { id: `eq.${projectData.id}` });
+        if (error) throw new Error(JSON.stringify(error));
+        projectData.outline_data = outline_data;
+        renderOutlineFromDB();
+        statusEl.textContent = `✓ 已儲存（${new Date().toLocaleTimeString('zh-TW')})`;
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#059669';
+        setTimeout(() => statusEl.style.display = 'none', 3000);
+    } catch (e) {
+        statusEl.textContent = `✗ 儲存失敗：${e.message}`;
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#ef4444';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">save</span> 儲存大綱';
+    }
+}
+
+// ── Import Defaults (from hardcoded HTML) ──
+function importDefaults() {
+    if (document.querySelectorAll('#oeTimelineList .oe-list-item').length > 0) {
+        if (!confirm('目前表單已有資料，匯入預設值會覆蓋。確定要匯入嗎？')) return;
+    }
+    // Clear existing
+    document.getElementById('oeTimelineList').innerHTML = '';
+    document.getElementById('oeToolsList').innerHTML = '';
+    document.getElementById('oeEquipList').innerHTML = '';
+    _tlCounter = 0; _toolCounter = 0; _eqCounter = 0;
+
+    // Hero defaults
+    _v('oeHeroSubtitle', '從 ChatGPT 到 Notion，掌握五大 AI 工具在日常辦公中的應用技巧，全面提升工作效率與產出品質');
+    _v('oeHeroDuration', '4 小時（含休息）');
+    _v('oeHeroGroupSize', '建議 20–40 人');
+    _v('oeHeroDevice', '需自備筆電');
+    _v('oeHeroLocation', '現場實體授課');
+
+    // Default timeline
+    const defaultTimeline = [
+        { time: '09:00 – 09:20（20 分鐘）', title: '開場：AI 趨勢與辦公應用概覽', desc: '介紹 2025–2026 年 AI 辦公趨勢，說明 AI 如何改變日常工作流程。透過情境案例讓學員理解為何現在就該開始導入 AI 工具。', tags: ['AI 辦公趨勢', '生成式 AI 概念', '案例分享'] },
+        { time: '09:20 – 10:10（50 分鐘）', title: '模組一：ChatGPT — AI 文字助手', desc: '學習 ChatGPT 的核心功能與 prompt 設計技巧。涵蓋文件撰寫、Email 修潤、會議議程生成、資料彙整與分析等辦公常見場景，搭配實作練習讓學員即刻上手。', tags: ['ChatGPT', 'Prompt 結構化技巧', '文件撰寫', 'Email 修潤', '資料分析'] },
+        { time: '10:10 – 10:50（40 分鐘）', title: '模組二：Gemini — Google 生態系 AI 整合', desc: '探索 Google Gemini 在 Gmail、Docs、Sheets、Slides 中的整合應用。學習如何利用 Gemini 進行跨平台協作，包含自動摘要、表格數據分析和簡報內容生成。', tags: ['Gemini', 'Google Workspace 整合', '自動摘要', '表格分析'] },
+        { time: '10:50 – 11:00（10 分鐘）', title: '中場休息', desc: '稍作休息，準備下半場的學習。', tags: [], isBreak: true },
+        { time: '11:00 – 11:40（40 分鐘）', title: '模組三：NotebookLM — AI 知識庫與研究助手', desc: '學習如何將公司內部文件、報告上傳至 NotebookLM，建立專屬知識庫。實作文件問答、重點摘要、交叉比對等功能，掌握 AI 輔助閱讀與研究的高效方法。', tags: ['NotebookLM', '知識庫建構', '文件問答', '內容摘要'] },
+        { time: '11:40 – 12:20（40 分鐘）', title: '模組四：Gamma — AI 簡報設計', desc: '體驗 Gamma 的 AI 自動簡報生成功能。從主題輸入到完整簡報產出，學習如何快速製作專業的提案簡報、工作報告和教育訓練材料，大幅縮短準備時間。', tags: ['Gamma', 'AI 簡報設計', '提案報告', '視覺化呈現'] },
+        { time: '12:20 – 12:50（30 分鐘）', title: '模組五：Notion — AI 會議記錄與專案管理', desc: '運用 Notion AI 進行會議記錄整理、待辦事項追蹤和團隊知識管理。學習如何透過 AI 自動生成會議摘要、行動項目和跟進追蹤。', tags: ['Notion', '會議記錄', '專案管理', '團隊協作'] },
+        { time: '12:50 – 13:00（10 分鐘）', title: '總結與 Q&A', desc: '回顧課程重點，提供工具選擇建議與延伸學習資源。開放學員提問，針對各自工作場景給予個別化建議。', tags: ['課程回顧', 'Q&A', '延伸資源'] },
+    ];
+    defaultTimeline.forEach(b => addTimelineBlock(b));
+
+    // Default tools
+    const defaultTools = [
+        { name: 'ChatGPT', purpose: '文字生成、文件撰寫、資料分析、Email 修潤', url: 'https://chat.openai.com', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' },
+        { name: 'Gemini', purpose: 'Google 生態系 AI 助手、跨平台文件協作', url: 'https://gemini.google.com', logo: 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg' },
+        { name: 'NotebookLM', purpose: '文件知識庫建構、AI 輔助閱讀與研究', url: 'https://notebooklm.google.com', logo: 'https://notebooklm.google.com/favicon.ico' },
+        { name: 'Gamma', purpose: 'AI 驅動的簡報、文件與網頁自動設計', url: 'https://gamma.app', logo: 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg' },
+        { name: 'Notion', purpose: 'AI 會議記錄、專案管理、團隊知識庫', url: 'https://www.notion.so', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png' },
+    ];
+    defaultTools.forEach(t => addToolBlock(t));
+    _v('oeToolsNote', '以上工具皆提供免費版本可供課程期間使用。建議學員於課前先完成各平台帳號註冊，以利課堂順利進行。');
+
+    // Default equipment
+    const defaultEquip = [
+        { icon: 'laptop_mac', label: '學員筆電', detail: '每人 1 台，需可上網' },
+        { icon: 'wifi', label: '穩定網路', detail: '建議頻寬 ≥ 100Mbps' },
+        { icon: 'tv', label: '投影設備', detail: '大螢幕 / 投影機 × 1' },
+        { icon: 'mic', label: '擴音設備', detail: '無線麥克風 × 1' },
+        { icon: 'power', label: '電源供應', detail: '充足插座 / 延長線' },
+        { icon: 'meeting_room', label: '教室座位', detail: '課桌式，需有桌面' },
+    ];
+    defaultEquip.forEach(e => addEquipBlock(e));
+    _v('oeEquipNote', '請學員於課前完成以下帳號註冊 — ChatGPT、Google（Gemini/NotebookLM）、Gamma、Notion。建議使用 Chrome 瀏覽器以獲得最佳體驗。');
+
+    // Default TA
+    _v('oeTaCount', '1–2 位');
+    _v('oeTaDuties', '負責協助學員操作工具、排除技術問題\n即時回答學員在實作練習中的問題\n協助發放課程講義與學習資源');
+
+    const statusEl = document.getElementById('outlineSaveStatus');
+    statusEl.textContent = '✓ 已匯入預設值，請編輯後按「儲存大綱」';
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--accent)';
+}
+
+// ══════════════════════════════════════
 // ADMIN: Students
 // ══════════════════════════════════════
 async function loadStudents() {
-    let q = 'select=id,name,email,department,job_title,login_password,created_at&order=created_at.desc';
-    if (sessionData) q += `&session_code=eq.${encodeURIComponent(sessionData.session_code)}`;
-    const { data } = await db.select('students', q);
+    let opts = { select: 'id,name,email,department,job_title,login_password,created_at', order: 'created_at.desc' };
+    if (sessionData) opts.filter = { session_code: `eq.${sessionData.session_code}` };
+    const { data } = await db.select('students', opts);
     students = data || [];
     renderStudentTable();
 }
@@ -313,7 +679,7 @@ window.downloadTemplate = () => {
 let instructors = [];
 
 async function loadInstructors() {
-    const { data } = await db.select('instructors', 'select=*&order=created_at.desc');
+    const { data } = await db.select('instructors', { order: 'created_at.desc' });
     instructors = data || [];
     const sel = document.getElementById('instructorSelect');
     if (!sel) return;
@@ -341,7 +707,7 @@ window.onInstructorSelected = (selectEl) => {
 let organizations = [];
 
 async function loadOrganizations() {
-    const { data } = await db.select('organizations', 'select=*&order=created_at.desc');
+    const { data } = await db.select('organizations', { order: 'created_at.desc' });
     organizations = data || [];
     renderOrgTable();
 }
@@ -467,3 +833,220 @@ function renderFileList() {
 
 window.removeFile = (idx) => { uploadedFiles.splice(idx,1); renderFileList(); };
 window.outlineLogout = () => { sessionStorage.removeItem('outline_user'); location.reload(); };
+
+// ══════════════════════════════════════
+// AI OUTLINE GENERATION
+// ══════════════════════════════════════
+
+window.closeAiOutlineModal = () => document.getElementById('aiOutlineModal').classList.remove('show');
+
+window.startAiOutlineGeneration = async function() {
+    const statusEl = document.getElementById('aiOlStatus');
+    const btn = document.getElementById('btnStartAiGen');
+    const transcript = document.getElementById('aiOlTranscript').value.trim();
+
+    if (!transcript && !document.getElementById('aiOlClient').value.trim()) {
+        statusEl.textContent = '⚠️ 請至少填寫客戶名稱或需求描述';
+        statusEl.style.color = '#ef4444';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;animation:spin 1s linear infinite">progress_activity</span> AI 生成中...';
+    statusEl.textContent = '正在分析需求並生成課綱，約需 15-30 秒...';
+    statusEl.style.color = 'var(--text-3)';
+
+    // Collect inputs
+    const client = document.getElementById('aiOlClient').value.trim();
+    const industry = document.getElementById('aiOlIndustry').value.trim();
+    const depts = document.getElementById('aiOlDepts').value.trim();
+    const days = document.getElementById('aiOlDays').value;
+    const hours = document.getElementById('aiOlHours').value;
+    const tools = document.getElementById('aiOlTools').value.trim();
+    const level = document.getElementById('aiOlLevel').value;
+
+    // Build context
+    let context = '';
+    if (client) context += `客戶公司：${client}\n`;
+    if (industry) context += `產業類型：${industry}\n`;
+    if (depts) context += `學員部門：${depts}\n`;
+    if (days) context += `課程天數：${days} 天\n`;
+    if (hours) context += `每天時數：${hours} 小時\n`;
+    if (tools) context += `指定使用工具：${tools}\n`;
+    if (level) context += `學員程度：${level}\n`;
+    if (transcript) context += `\n客戶需求 / 訪談內容：\n${transcript}\n`;
+
+    const prompt = `你是一位專業的 AI 培訓課程設計師。請根據以下客戶資訊，生成一份完整的 AI 辦公應用培訓課程大綱。
+
+${context}
+
+請回傳嚴格的 JSON 格式（不要包含 markdown 標記），結構如下：
+{
+  "hero": {
+    "subtitle": "課程的一句話副標題描述",
+    "duration": "總時數描述，如「4 小時（含休息）」",
+    "groupSize": "建議人數，如「建議 20–40 人」",
+    "device": "設備需求，如「需自備筆電」",
+    "location": "授課方式，如「現場實體授課」"
+  },
+  "timeline": [
+    {
+      "time": "開始時間 – 結束時間（分鐘數）",
+      "title": "模組標題",
+      "desc": "2-3 句模組說明，包含具體學習內容",
+      "tags": ["關鍵字1", "關鍵字2", "關鍵字3"],
+      "isBreak": false
+    }
+  ],
+  "tools": [
+    {
+      "name": "工具名稱",
+      "purpose": "用途說明",
+      "url": "工具網址",
+      "logo": "Logo 圖片 URL（如果知道的話，否則留空字串）"
+    }
+  ],
+  "equipment": [
+    { "icon": "Material Symbol icon 名稱", "label": "設備名稱", "detail": "規格說明" }
+  ],
+  "toolsNote": "工具使用備註",
+  "equipNote": "課前準備提醒",
+  "taConfig": {
+    "count": "建議助教人數",
+    "duties": ["職責1", "職責2", "職責3"]
+  }
+}
+
+重要規則：
+1. timeline 要包含合理的休息時間（isBreak: true），一般每 60-90 分鐘安排 10 分鐘休息
+2. 每個模組的 time 要用實際時間格式，例如「09:00 – 09:20（20 分鐘）」
+3. 如果是多天課程，請在 timeline 中用休息 block 標示「Day 1 結束」、「Day 2 開始」等
+4. 如果指定了工具，以指定工具為主；沒指定則根據需求選擇最合適的 AI 工具
+5. tools 中的 logo URL 請使用知名 AI 工具的真實圖片，如果不確定就留空字串
+6. equipment 中的 icon 請使用 Google Material Symbols 的 icon 名稱
+7. tags 從課程內容中提取 2-5 個關鍵字
+8. 根據學員部門調整案例和應用場景（例如行銷部側重文案生成，HR 側重招聘流程）
+9. 根據學員程度調整教學深度和節奏
+10. 輸出純 JSON，不要任何額外文字或 markdown`;
+
+    try {
+        const result = await ai.chat([{ role: 'user', content: prompt }], {
+            maxTokens: 8192,
+            temperature: 0.6
+        });
+
+        // Parse JSON from response (handle possible markdown wrapping)
+        let json;
+        try {
+            json = JSON.parse(result);
+        } catch {
+            // Try extracting from markdown code block
+            const match = result.match(/```(?:json)?\s*([\s\S]*?)```/);
+            if (match) {
+                json = JSON.parse(match[1].trim());
+            } else {
+                // Try finding first { to last }
+                const firstBrace = result.indexOf('{');
+                const lastBrace = result.lastIndexOf('}');
+                if (firstBrace !== -1 && lastBrace > firstBrace) {
+                    json = JSON.parse(result.substring(firstBrace, lastBrace + 1));
+                } else {
+                    throw new Error('無法解析 AI 回傳的 JSON');
+                }
+            }
+        }
+
+        // Populate editor forms
+        populateEditorFromAI(json);
+
+        statusEl.textContent = '✓ 課綱已生成！請檢查並調整後按「儲存大綱」。';
+        statusEl.style.color = '#059669';
+
+        // Close modal
+        setTimeout(() => {
+            document.getElementById('aiOutlineModal').classList.remove('show');
+        }, 1500);
+
+    } catch (e) {
+        console.error('[AI Outline]', e);
+        statusEl.textContent = `✗ 生成失敗：${e.message}`;
+        statusEl.style.color = '#ef4444';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">auto_awesome</span> 開始生成課綱';
+    }
+};
+
+function populateEditorFromAI(data) {
+    // Clear existing items
+    document.getElementById('oeTimelineList').innerHTML = '';
+    document.getElementById('oeToolsList').innerHTML = '';
+    document.getElementById('oeEquipList').innerHTML = '';
+    _tlCounter = 0; _toolCounter = 0; _eqCounter = 0;
+
+    // Hero
+    if (data.hero) {
+        _v('oeHeroSubtitle', data.hero.subtitle);
+        _v('oeHeroDuration', data.hero.duration);
+        _v('oeHeroGroupSize', data.hero.groupSize);
+        _v('oeHeroDevice', data.hero.device);
+        _v('oeHeroLocation', data.hero.location);
+    }
+
+    // Timeline
+    if (data.timeline?.length) {
+        data.timeline.forEach(block => addTimelineBlock(block));
+    }
+
+    // Tools — inject known logos if missing
+    const knownLogos = {
+        'chatgpt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+        'gemini': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
+        'notebooklm': 'https://notebooklm.google.com/favicon.ico',
+        'gamma': 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg',
+        'notion': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
+        'canva': 'https://static.canva.com/web/images/12487a1e0770d29571e580e0e3f9e839.svg',
+        'copilot': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Microsoft_365_Copilot_Icon.svg',
+        'claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg',
+        'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg',
+        'midjourney': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png',
+    };
+    if (data.tools?.length) {
+        data.tools.forEach(tool => {
+            if (!tool.logo) {
+                const key = tool.name.toLowerCase().replace(/\s+/g, '');
+                if (knownLogos[key]) tool.logo = knownLogos[key];
+            }
+            addToolBlock(tool);
+        });
+    }
+    if (data.toolsNote) _v('oeToolsNote', data.toolsNote);
+
+    // Equipment
+    if (data.equipment?.length) {
+        data.equipment.forEach(eq => addEquipBlock(eq));
+    }
+    if (data.equipNote) _v('oeEquipNote', data.equipNote);
+
+    // TA
+    if (data.taConfig) {
+        _v('oeTaCount', data.taConfig.count);
+        _v('oeTaDuties', (data.taConfig.duties || []).join('\n'));
+    }
+
+    // Scroll to editor
+    document.querySelector('.outline-edit-group')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const statusEl = document.getElementById('outlineSaveStatus');
+    statusEl.textContent = '✓ AI 課綱已填入，請檢查後按「儲存大綱」';
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--accent)';
+}
+
+// Spin animation for loading
+if (!document.getElementById('_spinStyle')) {
+    const s = document.createElement('style');
+    s.id = '_spinStyle';
+    s.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+}

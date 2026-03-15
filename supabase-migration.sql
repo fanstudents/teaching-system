@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS public.projects (
   type text NOT NULL DEFAULT 'course',
   transcript text DEFAULT '',
   summary_content jsonb DEFAULT '{}',
-  login_fields jsonb
+  login_fields jsonb,
+  outline_data jsonb DEFAULT '{}'
 );
 CREATE INDEX IF NOT EXISTS idx_projects_course_id ON public.projects(course_id) WHERE course_id <> '';
 CREATE INDEX IF NOT EXISTS idx_projects_type ON public.projects(type);
