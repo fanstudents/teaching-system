@@ -300,7 +300,7 @@ async function loadStudentInstructors(ids) {
     }).join('');
 }
 
-function enterPage() {
+async function enterPage() {
     const overlay = document.getElementById('loginOverlay');
     const content = document.getElementById('pageContent');
     overlay.classList.add('fade-out');
