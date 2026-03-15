@@ -303,6 +303,9 @@
                 <span class="material-symbols-outlined">edit_note</span>
                 課程內容編輯
                 <div style="margin-left:auto;display:flex;gap:8px">
+                    <a class="btn btn-outline" id="btnPreviewOutline" href="#" target="_blank" style="padding:4px 10px;font-size:0.78rem">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility</span> 預覽
+                    </a>
                     <button class="btn" id="btnAiGenOutline" style="padding:4px 12px;font-size:0.78rem;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff">
                         <span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span> AI 生成課綱
                     </button>
@@ -331,19 +334,8 @@
                                 <option value="5">5 天</option>
                             </select>
                         </div>
-                        <div class="oe-field"><label>總時數</label>
-                            <select id="oeHeroDuration">
-                                <option value="2">2 小時</option>
-                                <option value="3">3 小時</option>
-                                <option value="4">4 小時</option>
-                                <option value="6">6 小時</option>
-                                <option value="7">7 小時</option>
-                                <option value="8">8 小時</option>
-                                <option value="10">10 小時</option>
-                                <option value="12">12 小時</option>
-                                <option value="14">14 小時</option>
-                                <option value="16">16 小時</option>
-                            </select>
+                        <div class="oe-field"><label>時數說明</label>
+                            <input type="text" id="oeHeroDuration" placeholder="例：第一天 7 小時、第二天 4 小時">
                         </div>
                     </div>
                     <div class="oe-row">

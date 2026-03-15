@@ -138,7 +138,7 @@ function renderOutlineFromDB() {
         const metaEl = document.querySelector('.hero-meta');
         if (metaEl) {
             const items = [
-                { icon: 'schedule', text: od.hero.days && od.hero.duration ? `${od.hero.days} 天 / 共 ${od.hero.duration} 小時` : od.hero.duration ? `${od.hero.duration} 小時` : '' },
+                { icon: 'schedule', text: od.hero.days ? `${od.hero.days} 天` + (od.hero.duration ? ` — ${od.hero.duration}` : '') : od.hero.duration || '' },
                 { icon: 'groups', text: od.hero.groupSize },
                 { icon: 'location_on', text: od.hero.location }
             ].filter(i => i.text);
@@ -242,10 +242,19 @@ function enterPage() {
             panel.appendChild(tpl.content.cloneNode(true));
         }
         panel.classList.add('show');
+        // Hide student preview in admin mode — pure editor
+        const sv = document.getElementById('studentView');
+        if (sv) sv.style.display = 'none';
         loadStudents();
         loadInstructors();
         loadOrganizations();
         initOutlineEditor();
+
+        // Set preview button href
+        const previewBtn = document.getElementById('btnPreviewOutline');
+        if (previewBtn && projectData?.id) {
+            previewBtn.href = `${location.origin}/course-outline.html?project=${projectData.id}`;
+        }
     } else {
         loadUploadedFiles();
     }
@@ -322,7 +331,7 @@ function initOutlineEditor() {
     if (od?.hero) {
         _v('oeHeroSubtitle', od.hero.subtitle);
         _v('oeHeroDays', od.hero.days || '1');
-        _v('oeHeroDuration', od.hero.duration || '4');
+        _v('oeHeroDuration', od.hero.duration || '');
         _v('oeHeroGroupSize', od.hero.groupSize || '20–30 人');
         _v('oeHeroLocation', od.hero.location || '現場實體授課');
     }
@@ -442,7 +451,7 @@ function collectOutlineData() {
     od.hero = {
         subtitle: document.getElementById('oeHeroSubtitle').value.trim(),
         days: document.getElementById('oeHeroDays').value,
-        duration: document.getElementById('oeHeroDuration').value,
+        duration: document.getElementById('oeHeroDuration').value.trim(),
         groupSize: document.getElementById('oeHeroGroupSize').value,
         location: document.getElementById('oeHeroLocation').value
     };
@@ -526,7 +535,7 @@ function importDefaults() {
     // Hero defaults
     _v('oeHeroSubtitle', '從 ChatGPT 到 Notion，掌握五大 AI 工具在日常辦公中的應用技巧，全面提升工作效率與產出品質');
     _v('oeHeroDays', '1');
-    _v('oeHeroDuration', '4');
+    _v('oeHeroDuration', '7 小時（含休息）');
     _v('oeHeroGroupSize', '20–30 人');
     _v('oeHeroLocation', '現場實體授課');
 
@@ -1105,7 +1114,7 @@ function populateEditorFromAI(data) {
     if (data.hero) {
         _v('oeHeroSubtitle', data.hero.subtitle);
         _v('oeHeroDays', data.hero.days || '1');
-        _v('oeHeroDuration', data.hero.duration || '4');
+        _v('oeHeroDuration', data.hero.duration || '');
         _v('oeHeroGroupSize', data.hero.groupSize || '20–30 人');
         _v('oeHeroLocation', data.hero.location || '現場實體授課');
     }
