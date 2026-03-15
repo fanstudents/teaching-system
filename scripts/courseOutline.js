@@ -465,6 +465,8 @@ function initOutlineEditor() {
     document.getElementById('btnAiGenOutline').addEventListener('click', () => {
         const modal = document.getElementById('aiOutlineModal');
         modal.classList.add('show');
+        // Render tool checkboxes for current day count
+        updateAiToolInputs();
         // Restore previous AI form values
         const saved = localStorage.getItem(`aiOlForm_${projectData?.id}`);
         if (saved) {
@@ -477,16 +479,34 @@ function initOutlineEditor() {
                 _v('aiOlHours', f.hours);
                 _v('aiOlLevel', f.level);
                 _v('aiOlTranscript', f.transcript);
-                // Trigger per-day tool update then fill
+                // Re-render tools with saved selections
                 if (typeof updateAiToolInputs === 'function') updateAiToolInputs();
+                // Restore checkbox selections
                 if (f.dayTools?.length) {
                     f.dayTools.forEach(dt => {
-                        const inp = document.querySelector(`.ai-day-tools[data-day="${dt.day}"]`);
-                        if (inp) inp.value = dt.value;
+                        const prefix = `aiOlDay${dt.day}`;
+                        const knownTools = (dt.tools || []).filter(t => AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
+                        const otherTools = (dt.tools || []).filter(t => !AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
+                        knownTools.forEach(t => {
+                            const cb = document.querySelector(`.${prefix}-tool-cb[value="${AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase()) || t}"]`);
+                            if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+                        });
+                        if (otherTools.length) {
+                            const otherEl = document.querySelector(`.${prefix}-tool-other`);
+                            if (otherEl) otherEl.value = otherTools.join(', ');
+                        }
                     });
-                } else if (f.tools) {
-                    const singleInput = document.getElementById('aiOlTools');
-                    if (singleInput) singleInput.value = f.tools;
+                } else if (Array.isArray(f.tools) && f.tools.length) {
+                    const knownTools = f.tools.filter(t => AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
+                    const otherTools = f.tools.filter(t => !AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
+                    knownTools.forEach(t => {
+                        const cb = document.querySelector(`.aiOlSingle-tool-cb[value="${AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase()) || t}"]`);
+                        if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+                    });
+                    if (otherTools.length) {
+                        const otherEl = document.querySelector('.aiOlSingle-tool-other');
+                        if (otherEl) otherEl.value = otherTools.join(', ');
+                    }
                 }
             } catch(e) {}
         }
@@ -1342,6 +1362,31 @@ window.outlineLogout = () => { sessionStorage.removeItem('outline_user'); locati
 
 window.closeAiOutlineModal = () => document.getElementById('aiOutlineModal').classList.remove('show');
 
+// Common AI tools list for checkbox selection
+const AI_TOOL_OPTIONS = [
+    'ChatGPT', 'Gemini', 'Claude', 'Copilot', 'Perplexity',
+    'NotebookLM', 'Gamma', 'Notion', 'Canva', 'Lovable',
+    'Cursor', 'v0', 'Midjourney', 'Napkin AI', 'HeyGen'
+];
+
+function _renderToolCheckboxes(prefix, selectedTools = []) {
+    const selected = selectedTools.map(t => t.trim().toLowerCase());
+    let html = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">';
+    AI_TOOL_OPTIONS.forEach(tool => {
+        const checked = selected.includes(tool.toLowerCase()) ? 'checked' : '';
+        html += `<label style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;border:1px solid ${checked ? 'var(--accent)' : 'var(--border)'};background:${checked ? 'var(--accent-light)' : '#fff'};cursor:pointer;font-size:0.78rem;font-weight:500;transition:all .15s;user-select:none" 
+            onmouseover="this.style.borderColor='var(--accent)'" onmouseout="if(!this.querySelector('input').checked)this.style.borderColor='var(--border)'">
+            <input type="checkbox" class="${prefix}-tool-cb" value="${tool}" ${checked} 
+                onchange="this.parentElement.style.borderColor=this.checked?'var(--accent)':'var(--border)';this.parentElement.style.background=this.checked?'var(--accent-light)':'#fff'"
+                style="width:14px;height:14px;accent-color:var(--accent)">
+            ${tool}
+        </label>`;
+    });
+    html += '</div>';
+    html += `<input class="form-input ${prefix}-tool-other" type="text" placeholder="其他工具（逗號分隔）" style="margin-top:6px;font-size:0.78rem">`;
+    return html;
+}
+
 // Dynamic per-day tool inputs
 window.updateAiToolInputs = function() {
     const daysVal = document.getElementById('aiOlDays').value;
@@ -1349,14 +1394,13 @@ window.updateAiToolInputs = function() {
     const group = document.getElementById('aiOlToolsGroup');
     if (!group) return;
     if (numDays <= 1) {
-        group.innerHTML = `<label class="form-label">指定工具（選填，逗號分隔）</label>
-            <input class="form-input" type="text" id="aiOlTools" placeholder="例：ChatGPT, Gemini, NotebookLM, Gamma, Notion">`;
+        group.innerHTML = `<label class="form-label">指定工具（選填，可複選）</label>` + _renderToolCheckboxes('aiOlSingle');
     } else {
-        let html = '<label class="form-label">每日指定工具（選填，逗號分隔）</label>';
+        let html = '<label class="form-label">每日指定工具（選填，可複選）</label>';
         for (let d = 1; d <= numDays; d++) {
-            html += `<div style="display:flex;align-items:center;gap:8px;margin-top:${d > 1 ? '6' : '0'}px">
-                <span style="font-size:0.78rem;font-weight:600;color:var(--accent);white-space:nowrap;min-width:44px">Day ${d}</span>
-                <input class="form-input ai-day-tools" data-day="${d}" type="text" placeholder="例：ChatGPT, Gemini" style="flex:1">
+            html += `<div style="margin-top:${d > 1 ? '10' : '0'}px;padding:8px 12px;background:#fafbfc;border-radius:8px;border:1px solid var(--border)">
+                <div style="font-size:0.78rem;font-weight:600;color:var(--accent);margin-bottom:4px">Day ${d}</div>
+                ${_renderToolCheckboxes(`aiOlDay${d}`)}
             </div>`;
         }
         group.innerHTML = html;
@@ -1387,28 +1431,39 @@ window.startAiOutlineGeneration = async function() {
     const hours = document.getElementById('aiOlHours').value;
     const level = document.getElementById('aiOlLevel').value;
 
+    // Helper: get checked tools + other text for a prefix
+    function _getCheckedTools(prefix) {
+        const checked = Array.from(document.querySelectorAll(`.${prefix}-tool-cb:checked`)).map(cb => cb.value);
+        const other = document.querySelector(`.${prefix}-tool-other`)?.value.trim();
+        if (other) checked.push(...other.split(',').map(s => s.trim()).filter(Boolean));
+        return checked;
+    }
+
     // Save form values for next time
-    const dayToolInputs = document.querySelectorAll('.ai-day-tools');
+    const numDays = Math.ceil(parseFloat(days) || 1);
     const formData = { client, industry, depts, days, hours, level, transcript };
-    if (dayToolInputs.length > 0) {
-        formData.dayTools = Array.from(dayToolInputs).map(inp => ({ day: inp.dataset.day, value: inp.value.trim() }));
+    if (numDays > 1) {
+        formData.dayTools = [];
+        for (let d = 1; d <= numDays; d++) {
+            formData.dayTools.push({ day: String(d), tools: _getCheckedTools(`aiOlDay${d}`) });
+        }
     } else {
-        formData.tools = document.getElementById('aiOlTools')?.value.trim() || '';
+        formData.tools = _getCheckedTools('aiOlSingle');
     }
     if (projectData?.id) localStorage.setItem(`aiOlForm_${projectData.id}`, JSON.stringify(formData));
 
-    // Collect per-day or single tool inputs
+    // Collect per-day or single tool info for prompt
     let toolsInfo = '';
-    if (dayToolInputs.length > 0) {
+    if (numDays > 1) {
         const parts = [];
-        dayToolInputs.forEach(inp => {
-            const v = inp.value.trim();
-            if (v) parts.push(`Day ${inp.dataset.day}：${v}`);
-        });
+        for (let d = 1; d <= numDays; d++) {
+            const tools = _getCheckedTools(`aiOlDay${d}`);
+            if (tools.length) parts.push(`Day ${d}：${tools.join(', ')}`);
+        }
         if (parts.length) toolsInfo = parts.join('\n');
     } else {
-        const singleTools = document.getElementById('aiOlTools');
-        if (singleTools) toolsInfo = singleTools.value.trim();
+        const tools = _getCheckedTools('aiOlSingle');
+        if (tools.length) toolsInfo = tools.join(', ');
     }
 
     // Build context
