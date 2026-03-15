@@ -451,29 +451,15 @@
             <p style="font-size:0.82rem;color:var(--text-3)">講師的照片、經歷和授課照片會從後台資料庫自動載入。如需新增或編輯講師資料，請前往<a href="partners#instructors" style="color:var(--accent)">合作夥伴管理</a>。</p>
         </div>
 
-        <!-- Client / Organization Management -->
-        <div class="admin-section">
+        <!-- Client / Organization (dynamic based on binding) -->
+        <div class="admin-section" id="orgSectionContainer">
             <div class="admin-section-title">
                 <span class="material-symbols-outlined">business</span>
-                客戶管理
+                客戶資訊
             </div>
-            <div class="admin-toolbar">
-                <button class="btn btn-primary" onclick="openOrgModal()">
-                    <span class="material-symbols-outlined">add_business</span> 新增客戶
-                </button>
+            <div id="orgSectionContent">
+                <div style="text-align:center;color:var(--text-3);padding:32px">載入中...</div>
             </div>
-            <div style="overflow-x:auto">
-                <table class="admin-table">
-                    <thead><tr><th>客戶名稱</th><th>聯絡人</th><th>電話</th><th>報價</th><th></th></tr></thead>
-                    <tbody id="orgTableBody">
-                        <tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:32px">載入中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <p style="font-size:0.82rem;color:var(--text-3);margin-top:12px">
-                <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">info</span>
-                獨立大綱網址：<code>course-outline.html?session=場次代碼</code>，不同客戶使用不同場次代碼即可產生獨立頁面。
-            </p>
         </div>
 
     </template><!-- /adminPanelContent -->

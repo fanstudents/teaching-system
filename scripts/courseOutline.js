@@ -729,23 +729,67 @@ async function loadOrganizations() {
 }
 
 function renderOrgTable() {
-    const tbody = document.getElementById('orgTableBody');
-    if (!tbody) return;
-    if (!organizations.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:32px">尚無客戶資料</td></tr>';
+    const container = document.getElementById('orgSectionContent');
+    if (!container) return;
+
+    // Check if project is already bound to an org
+    const boundOrg = projectData?.organization_id
+        ? organizations.find(o => o.id === projectData.organization_id)
+        : null;
+
+    if (boundOrg) {
+        // Show compact bound client info card
+        container.innerHTML = `
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:200px">
+                    ${boundOrg.logo_url ? `<img src="${boundOrg.logo_url}" style="height:36px;width:auto;object-fit:contain;border-radius:8px">` : '<span class="material-symbols-outlined" style="font-size:32px;color:var(--text-3)">business</span>'}
+                    <div>
+                        <div style="font-weight:700;font-size:1rem">${boundOrg.name}</div>
+                        <div style="font-size:0.78rem;color:var(--text-3)">${[boundOrg.contact_person, boundOrg.contact_email, boundOrg.phone].filter(Boolean).join(' · ') || '—'}</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button class="btn btn-outline" style="font-size:0.78rem" onclick="editOrg('${boundOrg.id}')">
+                        <span class="material-symbols-outlined" style="font-size:14px">edit</span> 編輯
+                    </button>
+                </div>
+            </div>
+        `;
         return;
     }
-    tbody.innerHTML = organizations.map(o => `<tr>
-        <td><div style="display:flex;align-items:center;gap:10px">
-            ${o.logo_url ? `<img src="${o.logo_url}" style="height:28px;width:auto;object-fit:contain;border-radius:4px">` : '<span class="material-symbols-outlined" style="font-size:20px;color:var(--text-3)">business</span>'}
-            <strong>${o.name}</strong></div></td>
-        <td>${o.contact_person || o.contact_email || '—'}</td>
-        <td>${o.phone || '—'}</td>
-        <td>${o.pricing || '—'}</td>
-        <td style="white-space:nowrap">
-            <button class="btn btn-outline" style="padding:4px 8px;font-size:0.78rem" onclick="editOrg('${o.id}')"><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
-            <button class="btn btn-outline" style="padding:4px 8px;font-size:0.78rem;margin-left:4px" onclick="deleteOrg('${o.id}')"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button>
-        </td></tr>`).join('');
+
+    // Not bound — show full management table
+    container.innerHTML = `
+        <div class="admin-toolbar">
+            <button class="btn btn-primary" onclick="openOrgModal()">
+                <span class="material-symbols-outlined">add_business</span> 新增客戶
+            </button>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="admin-table">
+                <thead><tr><th>客戶名稱</th><th>聯絡人</th><th>電話</th><th>報價</th><th></th></tr></thead>
+                <tbody id="orgTableBody">
+                    ${!organizations.length
+                        ? '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:32px">尚無客戶資料</td></tr>'
+                        : organizations.map(o => `<tr>
+                            <td><div style="display:flex;align-items:center;gap:10px">
+                                ${o.logo_url ? `<img src="${o.logo_url}" style="height:28px;width:auto;object-fit:contain;border-radius:4px">` : '<span class="material-symbols-outlined" style="font-size:20px;color:var(--text-3)">business</span>'}
+                                <strong>${o.name}</strong></div></td>
+                            <td>${o.contact_person || o.contact_email || '—'}</td>
+                            <td>${o.phone || '—'}</td>
+                            <td>${o.pricing || '—'}</td>
+                            <td style="white-space:nowrap">
+                                <button class="btn btn-outline" style="padding:4px 8px;font-size:0.78rem" onclick="editOrg('${o.id}')"><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
+                                <button class="btn btn-outline" style="padding:4px 8px;font-size:0.78rem;margin-left:4px" onclick="deleteOrg('${o.id}')"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button>
+                            </td></tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-3);margin-top:12px">
+            <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">info</span>
+            新增客戶後，請到專案設定中綁定。
+        </p>
+    `;
 }
 
 window.openOrgModal = (editId) => {
