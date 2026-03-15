@@ -36,6 +36,15 @@ async function init() {
     // Apply dynamic data to page
     renderDynamicContent();
 
+    // Admin preview mode: skip login when coming from editor preview button
+    const isPreview = params.get('preview') === 'admin';
+    if (isPreview && (localStorage.getItem('_at') || localStorage.getItem('_rt'))) {
+        currentUser = { name: '預覽模式', email: 'admin@preview', _isClient: true };
+        sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+        enterPage();
+        return;
+    }
+
     // Admin auto-login: if already authenticated in admin system, skip password
     if (isAdmin) {
         let hasToken = localStorage.getItem('_at') || sessionStorage.getItem('_at');
@@ -323,10 +332,10 @@ async function enterPage() {
         await loadOrganizations();
         initOutlineEditor();
 
-        // Set preview button href
+        // Set preview button href — with auto-login preview token
         const previewBtn = document.getElementById('btnPreviewOutline');
         if (previewBtn && projectData?.id) {
-            previewBtn.href = `${location.origin}/course-outline.html?project=${projectData.id}`;
+            previewBtn.href = `${location.origin}/course-outline.html?project=${projectData.id}&preview=admin`;
         }
         // Set back to project button
         const backBtn = document.getElementById('btnBackToProject');
