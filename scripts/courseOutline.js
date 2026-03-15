@@ -87,13 +87,6 @@ async function init() {
             return;
         } catch(e) { /* ignore */ }
     }
-    // Set login page logo from organization
-    const loginLogo = document.getElementById('loginClientLogo');
-    if (loginLogo && orgData?.logo_url) {
-        loginLogo.src = orgData.logo_url;
-        loginLogo.alt = orgData.name || '';
-        loginLogo.style.display = '';
-    }
     setupLoginForm();
 }
 
@@ -140,6 +133,17 @@ function renderDynamicContent() {
     }
     if (topbarTitle && clientName) {
         topbarTitle.innerHTML = `${clientName}<span> — 企業內訓規劃課綱</span>`;
+    }
+
+    // Login page: client logo (replaces lock icon)
+    const loginLogo = document.getElementById('loginClientLogo');
+    if (loginLogo && orgData?.logo_url) {
+        loginLogo.src = orgData.logo_url;
+        loginLogo.alt = clientName;
+        loginLogo.style.display = '';
+        // Hide the lock icon when logo is present
+        const lockIcon = document.querySelector('.login-icon');
+        if (lockIcon) lockIcon.style.display = 'none';
     }
 
     // Hero badge (no logo, just text)
