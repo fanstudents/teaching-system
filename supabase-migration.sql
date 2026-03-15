@@ -123,7 +123,8 @@ CREATE TABLE IF NOT EXISTS public.students (
   registration_status text NOT NULL DEFAULT 'registered',
   registered_at timestamptz,
   attended_at timestamptz,
-  session_id uuid REFERENCES public.project_sessions(id) ON DELETE SET NULL
+  session_id uuid REFERENCES public.project_sessions(id) ON DELETE SET NULL,
+  login_password text NOT NULL DEFAULT ''
 );
 CREATE UNIQUE INDEX IF NOT EXISTS students_email_project_key ON public.students(email, project_id);
 CREATE UNIQUE INDEX IF NOT EXISTS students_email_session_key ON public.students(email, session_code);
