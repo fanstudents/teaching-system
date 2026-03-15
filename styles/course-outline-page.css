@@ -658,3 +658,56 @@ body {
 
 /* Break block indicator */
 .oe-list-item.is-break { border-left: 3px solid var(--accent); background: var(--accent-light); }
+
+/* ══════════════════════════════════════
+   Print / PDF Export Styles
+   ══════════════════════════════════════ */
+@media print {
+    /* Hide UI controls */
+    .outline-topbar,
+    .admin-panel,
+    .login-overlay,
+    #btnExportPdf,
+    .topbar-user,
+    button[onclick*="logout"],
+    .ai-outline-modal,
+    .file-section { display: none !important; }
+
+    /* Reset page layout */
+    body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page-content { padding: 0 !important; }
+    #studentView { max-width: 100% !important; padding: 0 20px !important; }
+
+    /* Hero — lighter for print */
+    .outline-hero {
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%) !important;
+        color: var(--text) !important;
+        padding: 32px 24px !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    .outline-hero h1 { color: var(--text) !important; font-size: 1.6rem !important; }
+    .outline-hero-sub { color: var(--text-2) !important; }
+    .hero-meta-item { color: var(--text-2) !important; }
+    .outline-hero-badge { background: rgba(99,102,241,0.12) !important; color: var(--accent) !important; }
+
+    /* Sections */
+    .outline-section { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+
+    /* Timeline blocks */
+    .timeline-block { break-inside: avoid; page-break-inside: avoid; }
+    .timeline-day-col { break-inside: avoid; }
+
+    /* Tool cards */
+    .tool-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+
+    /* Grid layout — force single column on narrow paper */
+    .timeline-grid { display: block !important; }
+    .timeline-day-col { margin-bottom: 16px; }
+
+    /* Tags */
+    .topic-tag { border: 1px solid #cbd5e1 !important; }
+
+    /* Page margins */
+    @page { margin: 15mm 12mm; }
+}
