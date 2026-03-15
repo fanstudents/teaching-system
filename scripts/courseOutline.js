@@ -440,6 +440,41 @@ async function enterPage() {
     initHrEmail();
 }
 
+// ── Copy Project Info for CTA ──
+window.copyProjectInfo = function() {
+    const od = getOutlineData() || {};
+    const courseName = projectData?.name || '課程名稱';
+    const clientName = orgData?.name || '';
+    const schedule = od.schedule || [];
+    let scheduleText = '';
+    if (schedule.length > 1) {
+        const totalH = schedule.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
+        scheduleText = totalH ? `${schedule.length} 天 / 共 ${totalH} 小時` : `${schedule.length} 天`;
+    } else if (schedule.length === 1 && schedule[0].hours) {
+        scheduleText = `${schedule[0].hours} 小時`;
+    }
+    const lines = [
+        `📋 課程專案資訊`,
+        ``,
+        `課程名稱：${courseName}`,
+        clientName ? `客戶單位：${clientName}` : '',
+        scheduleText ? `授課時數：${scheduleText}` : '',
+        od.hero?.groupSize ? `預計人數：${od.hero.groupSize}` : '',
+        od.hero?.location ? `授課方式：${od.hero.location}` : '',
+        ``,
+        `課程大綱連結：${location.href}`,
+    ].filter(Boolean).join('\n');
+
+    navigator.clipboard.writeText(lines).then(() => {
+        const btn = document.getElementById('btnCopyProjectInfo');
+        if (btn) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">check</span>已複製';
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        }
+    });
+};
+
 function setupLoginForm() {
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
