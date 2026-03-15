@@ -158,17 +158,20 @@ function renderOutlineFromDB() {
     if (od.timeline?.length > 0) {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
-            timelineEl.innerHTML = od.timeline.filter(b => !b.isBreak).map(block => {
+            const blocks = od.timeline.filter(b => !b.isBreak).map(block => {
                 const tags = (block.tags || []).map((t, i) =>
                     `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
                 ).join('');
                 return `<div class="timeline-block">
-                    <div class="timeline-time">${block.time || ''}</div>
-                    <div class="timeline-title">${block.title || ''}</div>
+                    <div class="timeline-header">
+                        ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
+                        <div class="timeline-title">${block.title || ''}</div>
+                    </div>
                     <div class="timeline-desc">${block.desc || ''}</div>
                     ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
                 </div>`;
             }).join('');
+            timelineEl.innerHTML = blocks + `<div class="timeline-note">※ 以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</div>`;
         }
     }
 
