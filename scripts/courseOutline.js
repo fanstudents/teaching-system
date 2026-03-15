@@ -115,14 +115,23 @@ async function loadSessionChain(code) {
 }
 
 function renderDynamicContent() {
-    // Client logo & badge
-    const logoWrap = document.getElementById('clientLogoWrap');
+    // Client logo in topbar + badge in hero
+    const topbarLogo = document.getElementById('topbarClientLogo');
+    const topbarTitle = document.getElementById('topbarTitle');
     const badgeEl = document.getElementById('heroBadge');
     const clientName = orgData?.name || '';
-    if (logoWrap && orgData?.logo_url) {
-        logoWrap.innerHTML = `<img src="${orgData.logo_url}" alt="${clientName}" style="max-height:48px;object-fit:contain">`;
-        logoWrap.style.display = '';
+
+    // Topbar: client logo + title
+    if (topbarLogo && orgData?.logo_url) {
+        topbarLogo.src = orgData.logo_url;
+        topbarLogo.alt = clientName;
+        topbarLogo.style.display = '';
     }
+    if (topbarTitle && clientName) {
+        topbarTitle.innerHTML = `${clientName}<span> — 企業內訓規劃課綱</span>`;
+    }
+
+    // Hero badge (no logo, just text)
     if (badgeEl && clientName) {
         const projectType = projectData?.type === 'corporate' ? '企業內部培訓' : '課程規劃';
         badgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">school</span> ${clientName} · ${projectType}`;
@@ -270,6 +279,19 @@ function renderOutlineFromDB() {
             if (unmatchedBlocks.length) html += renderBlocks(unmatchedBlocks);
 
             timelineEl.innerHTML = html + `<div class="timeline-note"><span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:1px">info</span><span>以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</span></div>`;
+
+            // Dynamic section description
+            const descEl = document.getElementById('timelineSectionDesc');
+            if (descEl) {
+                const totalHours = schedule.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0);
+                if (isMultiDay && totalHours) {
+                    descEl.textContent = `${schedule.length} 天共 ${totalHours} 小時的完整課程時間規劃`;
+                } else if (totalHours) {
+                    descEl.textContent = `${totalHours} 小時的完整課程時間規劃`;
+                } else if (od.hero?.duration) {
+                    descEl.textContent = `${od.hero.duration}的完整課程時間規劃`;
+                }
+            }
         }
     }
 
