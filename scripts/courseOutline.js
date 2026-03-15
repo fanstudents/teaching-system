@@ -85,14 +85,18 @@ async function loadSessionChain(code) {
 }
 
 function renderDynamicContent() {
-    // Client logo
-    const clientLogo = orgData?.logo_url || 'assets/images/clients/epoch-foundation.png';
-    const clientName = orgData?.name || '時代基金會';
-    document.querySelectorAll('.client-logo').forEach(el => { el.src = clientLogo; el.alt = clientName; });
-
-    // Hero badge
+    // Client logo & badge
+    const logoWrap = document.getElementById('clientLogoWrap');
     const badgeEl = document.getElementById('heroBadge');
-    if (badgeEl) badgeEl.textContent = `${clientName} · 企業內部培訓`;
+    const clientName = orgData?.name || '';
+    if (logoWrap && orgData?.logo_url) {
+        logoWrap.innerHTML = `<img src="${orgData.logo_url}" alt="${clientName}" style="max-height:48px;object-fit:contain">`;
+        logoWrap.style.display = '';
+    }
+    if (badgeEl && clientName) {
+        const projectType = projectData?.type === 'corporate' ? '企業內部培訓' : '課程規劃';
+        badgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">school</span> ${clientName} · ${projectType}`;
+    }
 
     // Course name
     const courseName = projectData?.name || 'AI 辦公室應用實戰班';
@@ -206,22 +210,33 @@ function renderOutlineFromDB() {
         }
     }
 
-    // TA Config
-    if (od.taConfig) {
-        const taCard = document.querySelector('.ta-card');
-        if (taCard) {
-            const countText = od.taConfig.count || '1–2 位';
-            const duties = od.taConfig.duties || [];
-            const dutyIcons = ['group', 'laptop_mac', 'chat', 'note_alt'];
-            const listHtml = [
-                `<li><span class="material-symbols-outlined">group</span><div>建議配置 <strong>${countText}</strong>現場助教</div></li>`,
-                ...duties.map((d, i) =>
-                    `<li><span class="material-symbols-outlined">${dutyIcons[i + 1] || 'check'}</span><div>${d}</div></li>`
-                )
-            ].join('');
-            taCard.querySelector('.info-list').innerHTML = listHtml;
-        }
+    // TA Config — hide entirely
+    const taSection = document.querySelector('.ta-card')?.closest('.outline-section');
+    if (taSection) taSection.style.display = 'none';
+
+    // Instructors — load from saved IDs
+    if (od.instructorIds?.length) {
+        loadStudentInstructors(od.instructorIds);
     }
+}
+
+async function loadStudentInstructors(ids) {
+    if (!ids?.length) return;
+    const { data } = await db.select('instructors');
+    if (!data) return;
+    const selected = ids.map(id => data.find(i => i.id === id)).filter(Boolean);
+    if (!selected.length) return;
+    const el = document.getElementById('instructorContent');
+    if (!el) return;
+    el.innerHTML = selected.map(inst => {
+        const photo = inst.photo_url
+            ? `<img class="instructor-photo" src="${inst.photo_url}" alt="${inst.name}">`
+            : '<div class="instructor-photo-placeholder"><span class="material-symbols-outlined">person</span></div>';
+        const specs = (inst.specialties||[]).map(s=>`<span class="instructor-tag">${s}</span>`).join('');
+        const gallery = (inst.teaching_photos||[]);
+        const galleryHtml = gallery.length ? `<div class="instructor-gallery"><div class="instructor-gallery-title">📸 授課紀錄</div><div class="instructor-gallery-grid">${gallery.map(u=>`<img src="${u}" alt="授課照片" loading="lazy">`).join('')}</div></div>` : '';
+        return `<div class="instructor-card"><div class="instructor-main">${photo}<div class="instructor-info"><div class="instructor-name">${inst.name}</div><div class="instructor-title-text">${inst.title||''}</div><div class="instructor-bio">${inst.bio||''}</div><div class="instructor-tags">${specs}</div></div></div>${galleryHtml}</div>`;
+    }).join('');
 }
 
 function enterPage() {
