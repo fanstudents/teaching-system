@@ -11,6 +11,41 @@ import { db, storage, ai } from './supabase.js';
 let sessionData = null;   // project_sessions record
 let projectData = null;   // projects record
 let orgData = null;       // organizations record
+
+// Known AI tool logo URLs (shared between rendering and AI generation)
+const KNOWN_LOGOS = {
+    'chatgpt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+    'gemini': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
+    'notebooklm': 'https://upload.wikimedia.org/wikipedia/commons/5/58/NotebookLM_icon.svg',
+    'gamma': 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg',
+    'notion': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
+    'canva': 'https://static.canva.com/web/images/12487a1e0770d29571e580e0e3f9e839.svg',
+    'copilot': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Microsoft_365_Copilot_Icon.svg',
+    'claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg',
+    'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg',
+    'midjourney': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png',
+    'lovable': '/assets/images/lovable-icon.png',
+    'cursor': 'https://cursor.sh/apple-touch-icon.png',
+    'v0': 'https://v0.dev/apple-touch-icon.png',
+    'googleaistudio': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
+    'aistudio': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
+    'geminicanvas': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
+    'visualstudiocode': 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg',
+    'vscode': 'https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg',
+    'heygen': 'https://heygen.com/favicon.ico',
+    'napkinai': 'https://napkin.ai/apple-touch-icon.png',
+    'napkin': 'https://napkin.ai/apple-touch-icon.png',
+    'suno': 'https://suno.com/apple-touch-icon.png',
+    'runway': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Runway_AI_logo.svg',
+    'dall-e': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+    'dalle': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+};
+
+function _resolveToolLogo(toolName, existingLogo) {
+    if (existingLogo) return existingLogo;
+    const key = toolName.toLowerCase().replace(/[\s.-]+/g, '');
+    return KNOWN_LOGOS[key] || '';
+}
 let currentUser = null;   // logged-in student or admin
 let isAdmin = false;
 let students = [];
@@ -82,6 +117,13 @@ async function init() {
             enterPage();
             return;
         } catch(e) { /* ignore */ }
+    }
+    // Set login page logo from organization
+    const loginLogo = document.getElementById('loginClientLogo');
+    if (loginLogo && orgData?.logo_url) {
+        loginLogo.src = orgData.logo_url;
+        loginLogo.alt = orgData.name || '';
+        loginLogo.style.display = '';
     }
     setupLoginForm();
 }
@@ -216,14 +258,13 @@ function renderOutlineFromDB() {
                 });
             }
 
-            // Aggressive fallback: if hero says multi-day but all blocks are day:1
-            const expectedDays = parseInt(od.hero?.days) || schedule.length || 1;
-            if (expectedDays > 1 && uniqueDays.length === 1) {
-                // Try to find "Day 2" / "第二天" markers in titles or time fields
+            // Aggressive fallback: scan timeline text for "Day 2"/"第二天" markers when all blocks are day:1
+            if (uniqueDays.length === 1 && uniqueDays[0] === 1) {
                 let currentDay = 1;
+                const maxScanDay = Math.max(parseInt(od.hero?.days) || 1, schedule.length, 5);
                 od.timeline.forEach(b => {
-                    const text = `${b.title || ''} ${b.time || ''}`.toLowerCase();
-                    for (let d = 2; d <= expectedDays; d++) {
+                    const text = `${b.title || ''} ${b.time || ''} ${b.desc || ''}`.toLowerCase();
+                    for (let d = 2; d <= maxScanDay; d++) {
                         if (text.includes(`day ${d}`) || text.includes(`day${d}`) || text.includes(`第${['','一','二','三','四','五'][d]}天`)) {
                             currentDay = d;
                         }
@@ -299,14 +340,15 @@ function renderOutlineFromDB() {
     if (od.tools?.length > 0) {
         const toolGrid = document.querySelector('.tool-grid');
         if (toolGrid) {
-            toolGrid.innerHTML = od.tools.map(t =>
-                `<div class="tool-card">
-                    ${t.logo ? `<img class="tool-logo" src="${t.logo}" alt="${t.name}" onerror="this.style.display='none'">` : ''}
+            toolGrid.innerHTML = od.tools.map(t => {
+                const logo = _resolveToolLogo(t.name, t.logo);
+                return `<div class="tool-card">
+                    ${logo ? `<img class="tool-logo" src="${logo}" alt="${t.name}" onerror="this.style.display='none'">` : ''}
                     <div class="tool-name">${t.name || ''}</div>
                     <div class="tool-purpose">${t.purpose || ''}</div>
                     ${t.url ? `<a class="tool-url" href="${t.url}" target="_blank">${t.url.replace(/^https?:\/\//, '')} →</a>` : ''}
-                </div>`
-            ).join('');
+                </div>`;
+            }).join('');
         }
         // Tools note
         const toolsNoteEl = document.querySelector('.tool-grid + .note-callout');
@@ -1659,28 +1701,9 @@ function populateEditorFromAI(data) {
         data.timeline.forEach(block => addTimelineBlock(block));
     }
 
-    // Tools — inject known logos if missing
-    const knownLogos = {
-        'chatgpt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
-        'gemini': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
-        'notebooklm': 'https://upload.wikimedia.org/wikipedia/commons/5/58/NotebookLM_icon.svg',
-        'gamma': 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg',
-        'notion': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
-        'canva': 'https://static.canva.com/web/images/12487a1e0770d29571e580e0e3f9e839.svg',
-        'copilot': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Microsoft_365_Copilot_Icon.svg',
-        'claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg',
-        'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg',
-        'midjourney': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png',
-        'lovable': '/assets/images/lovable-icon.png',
-        'cursor': 'https://cursor.sh/apple-touch-icon.png',
-        'v0': 'https://v0.dev/apple-touch-icon.png',
-    };
     if (data.tools?.length) {
         data.tools.forEach(tool => {
-            if (!tool.logo) {
-                const key = tool.name.toLowerCase().replace(/\s+/g, '');
-                if (knownLogos[key]) tool.logo = knownLogos[key];
-            }
+            if (!tool.logo) tool.logo = _resolveToolLogo(tool.name, '');
             addToolBlock(tool);
         });
     }
