@@ -462,7 +462,7 @@ window.copyProjectInfo = function() {
         od.hero?.groupSize ? `預計人數：${od.hero.groupSize}` : '',
         od.hero?.location ? `授課方式：${od.hero.location}` : '',
         ``,
-        `課程大綱連結：${location.href}`,
+        `課程大綱連結：${location.origin}/course-outline.html?project=${projectData?.id || ''}`,
     ].filter(Boolean).join('\n');
 
     navigator.clipboard.writeText(lines).then(() => {
