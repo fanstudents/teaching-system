@@ -1296,6 +1296,27 @@ window.outlineLogout = () => { sessionStorage.removeItem('outline_user'); locati
 
 window.closeAiOutlineModal = () => document.getElementById('aiOutlineModal').classList.remove('show');
 
+// Dynamic per-day tool inputs
+window.updateAiToolInputs = function() {
+    const daysVal = document.getElementById('aiOlDays').value;
+    const numDays = Math.ceil(parseFloat(daysVal) || 1);
+    const group = document.getElementById('aiOlToolsGroup');
+    if (!group) return;
+    if (numDays <= 1) {
+        group.innerHTML = `<label class="form-label">指定工具（選填，逗號分隔）</label>
+            <input class="form-input" type="text" id="aiOlTools" placeholder="例：ChatGPT, Gemini, NotebookLM, Gamma, Notion">`;
+    } else {
+        let html = '<label class="form-label">每日指定工具（選填，逗號分隔）</label>';
+        for (let d = 1; d <= numDays; d++) {
+            html += `<div style="display:flex;align-items:center;gap:8px;margin-top:${d > 1 ? '6' : '0'}px">
+                <span style="font-size:0.78rem;font-weight:600;color:var(--accent);white-space:nowrap;min-width:44px">Day ${d}</span>
+                <input class="form-input ai-day-tools" data-day="${d}" type="text" placeholder="例：ChatGPT, Gemini" style="flex:1">
+            </div>`;
+        }
+        group.innerHTML = html;
+    }
+};
+
 window.startAiOutlineGeneration = async function() {
     const statusEl = document.getElementById('aiOlStatus');
     const btn = document.getElementById('btnStartAiGen');
@@ -1318,8 +1339,22 @@ window.startAiOutlineGeneration = async function() {
     const depts = document.getElementById('aiOlDepts').value.trim();
     const days = document.getElementById('aiOlDays').value;
     const hours = document.getElementById('aiOlHours').value;
-    const tools = document.getElementById('aiOlTools').value.trim();
     const level = document.getElementById('aiOlLevel').value;
+
+    // Collect per-day or single tool inputs
+    const dayToolInputs = document.querySelectorAll('.ai-day-tools');
+    let toolsInfo = '';
+    if (dayToolInputs.length > 0) {
+        const parts = [];
+        dayToolInputs.forEach(inp => {
+            const v = inp.value.trim();
+            if (v) parts.push(`Day ${inp.dataset.day}：${v}`);
+        });
+        if (parts.length) toolsInfo = parts.join('\n');
+    } else {
+        const singleTools = document.getElementById('aiOlTools');
+        if (singleTools) toolsInfo = singleTools.value.trim();
+    }
 
     // Build context
     let context = '';
@@ -1328,7 +1363,7 @@ window.startAiOutlineGeneration = async function() {
     if (depts) context += `學員部門：${depts}\n`;
     if (days) context += `課程天數：${days} 天\n`;
     if (hours) context += `每天時數：${hours} 小時\n`;
-    if (tools) context += `指定使用工具：${tools}\n`;
+    if (toolsInfo) context += `指定使用工具：\n${toolsInfo}\n`;
     if (level) context += `學員程度：${level}\n`;
     if (transcript) context += `\n客戶需求 / 訪談內容：\n${transcript}\n`;
 

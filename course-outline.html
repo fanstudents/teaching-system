@@ -595,7 +595,7 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div class="form-group">
                     <label class="form-label">天數</label>
-                    <select class="form-input" id="aiOlDays">
+                    <select class="form-input" id="aiOlDays" onchange="updateAiToolInputs()">
                         <option value="">自動決定</option>
                         <option value="0.5">半天</option>
                         <option value="1" selected>1 天</option>
@@ -619,7 +619,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="aiOlToolsGroup">
                 <label class="form-label">指定工具（選填，逗號分隔）</label>
                 <input class="form-input" type="text" id="aiOlTools" placeholder="例：ChatGPT, Gemini, NotebookLM, Gamma, Notion">
             </div>
