@@ -206,6 +206,28 @@ function renderOutlineFromDB() {
                     return existing || { day: d, hours: '', topic: '' };
                 });
             }
+
+            // Aggressive fallback: if hero says multi-day but all blocks are day:1
+            const expectedDays = parseInt(od.hero?.days) || schedule.length || 1;
+            if (expectedDays > 1 && uniqueDays.length === 1) {
+                // Try to find "Day 2" / "第二天" markers in titles or time fields
+                let currentDay = 1;
+                od.timeline.forEach(b => {
+                    const text = `${b.title || ''} ${b.time || ''}`.toLowerCase();
+                    for (let d = 2; d <= expectedDays; d++) {
+                        if (text.includes(`day ${d}`) || text.includes(`day${d}`) || text.includes(`第${['','一','二','三','四','五'][d]}天`)) {
+                            currentDay = d;
+                        }
+                    }
+                    b.day = currentDay;
+                });
+                // Rebuild schedule from corrected days
+                const fixedDays = [...new Set(od.timeline.map(b => b.day))].sort((a, b) => a - b);
+                if (fixedDays.length > 1) {
+                    schedule = fixedDays.map(d => schedule.find(s => s.day === d) || { day: d, hours: '', topic: '' });
+                }
+            }
+
             if (!schedule.length) schedule = [{ day: 1, hours: '', topic: '' }];
             const isMultiDay = schedule.length > 1;
 
