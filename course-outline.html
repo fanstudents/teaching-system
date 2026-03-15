@@ -322,12 +322,49 @@
                 <div class="oe-fields">
                     <div class="oe-field"><label>課程副標題</label><input type="text" id="oeHeroSubtitle" placeholder="從 ChatGPT 到 Notion，掌握五大 AI 工具..."></div>
                     <div class="oe-row">
-                        <div class="oe-field"><label>時數</label><input type="text" id="oeHeroDuration" placeholder="4 小時（含休息）"></div>
-                        <div class="oe-field"><label>人數</label><input type="text" id="oeHeroGroupSize" placeholder="建議 20–40 人"></div>
+                        <div class="oe-field"><label>天數</label>
+                            <select id="oeHeroDays">
+                                <option value="1">1 天</option>
+                                <option value="2">2 天</option>
+                                <option value="3">3 天</option>
+                                <option value="4">4 天</option>
+                                <option value="5">5 天</option>
+                            </select>
+                        </div>
+                        <div class="oe-field"><label>總時數</label>
+                            <select id="oeHeroDuration">
+                                <option value="2">2 小時</option>
+                                <option value="3">3 小時</option>
+                                <option value="4">4 小時</option>
+                                <option value="6">6 小時</option>
+                                <option value="7">7 小時</option>
+                                <option value="8">8 小時</option>
+                                <option value="10">10 小時</option>
+                                <option value="12">12 小時</option>
+                                <option value="14">14 小時</option>
+                                <option value="16">16 小時</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="oe-row">
-                        <div class="oe-field"><label>設備</label><input type="text" id="oeHeroDevice" placeholder="需自備筆電"></div>
-                        <div class="oe-field"><label>授課方式</label><input type="text" id="oeHeroLocation" placeholder="現場實體授課"></div>
+                        <div class="oe-field"><label>人數</label>
+                            <select id="oeHeroGroupSize">
+                                <option value="10–20 人">10–20 人</option>
+                                <option value="20–30 人" selected>20–30 人</option>
+                                <option value="30–40 人">30–40 人</option>
+                                <option value="40–50 人">40–50 人</option>
+                                <option value="50–80 人">50–80 人</option>
+                                <option value="80–100 人">80–100 人</option>
+                                <option value="100 人以上">100 人以上</option>
+                            </select>
+                        </div>
+                        <div class="oe-field"><label>授課方式</label>
+                            <select id="oeHeroLocation">
+                                <option value="現場實體授課">現場實體授課</option>
+                                <option value="線上授課">線上授課</option>
+                                <option value="混合式（實體+線上）">混合式（實體+線上）</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </details>
