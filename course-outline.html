@@ -65,6 +65,9 @@
         </div>
     </header>
 
+    <!-- ══════ ADMIN PANEL (moved before student view so it's visible immediately) ══════ -->
+    <div class="admin-panel" id="adminPanel"></div>
+
     <!-- ══════ STUDENT VIEW ══════ -->
     <div id="studentView">
 
@@ -291,8 +294,8 @@
         </footer>
     </div><!-- /studentView -->
 
-    <!-- ══════ ADMIN PANEL ══════ -->
-    <div class="admin-panel" id="adminPanel">
+    <!-- Admin panel content (rendered into #adminPanel above) -->
+    <template id="adminPanelContent">
 
         <!-- ═══ Course Content Editor ═══ -->
         <div class="admin-section">
@@ -388,9 +391,9 @@
             </div>
             <div style="overflow-x:auto">
                 <table class="admin-table">
-                    <thead><tr><th>姓名</th><th>Email</th><th>部門</th><th>職稱</th><th>密碼</th><th></th></tr></thead>
+                    <thead><tr><th>姓名</th><th>Email</th><th>密碼</th><th></th></tr></thead>
                     <tbody id="studentTableBody">
-                        <tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:32px">尚無學員資料</td></tr>
+                        <tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px">尚無學員資料</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -436,7 +439,7 @@
             </p>
         </div>
 
-    </div><!-- /adminPanel -->
+    </template><!-- /adminPanelContent -->
 
 </div><!-- /pageContent -->
 

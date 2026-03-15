@@ -236,7 +236,13 @@ function enterPage() {
     setTimeout(() => overlay.style.display = 'none', 400);
 
     if (isAdmin && currentUser._isAdmin) {
-        document.getElementById('adminPanel').classList.add('show');
+        // Move admin content from template into the visible adminPanel div
+        const tpl = document.getElementById('adminPanelContent');
+        const panel = document.getElementById('adminPanel');
+        if (tpl && panel) {
+            panel.appendChild(tpl.content.cloneNode(true));
+        }
+        panel.classList.add('show');
         loadStudents();
         loadInstructors();
         loadOrganizations();
@@ -268,7 +274,7 @@ function setupLoginForm() {
             const pass = document.getElementById('loginPass').value;
             const filter = { email: `eq.${email}`, login_password: `eq.${pass}` };
             if (sessionData) filter.session_code = `eq.${sessionData.session_code}`;
-            const { data } = await db.select('students', { filter, select: 'name,email,department,job_title' });
+            const { data } = await db.select('students', { filter, select: 'name,email' });
             if (data?.length) {
                 currentUser = data[0];
                 sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
@@ -549,7 +555,7 @@ function importDefaults() {
 // ADMIN: Students
 // ══════════════════════════════════════
 async function loadStudents() {
-    let opts = { select: 'id,name,email,department,job_title,login_password,created_at', order: 'created_at.desc' };
+    let opts = { select: 'id,name,email,login_password,created_at', order: 'created_at.desc' };
     if (sessionData) opts.filter = { session_code: `eq.${sessionData.session_code}` };
     const { data } = await db.select('students', opts);
     students = data || [];
@@ -565,7 +571,6 @@ function renderStudentTable() {
     }
     tbody.innerHTML = students.map(s => `<tr>
         <td><strong>${s.name||'—'}</strong></td><td>${s.email}</td>
-        <td>${s.department||'—'}</td><td>${s.job_title||'—'}</td>
         <td style="font-family:monospace;font-size:0.8rem;color:var(--text-3)">${s.login_password||'—'}</td>
         <td><button class="btn btn-outline" style="padding:4px 8px;font-size:0.78rem" onclick="deleteStudent('${s.id}')"><span class="material-symbols-outlined" style="font-size:14px">delete</span></button></td>
     </tr>`).join('');
@@ -587,8 +592,6 @@ window.submitAddStudent = async () => {
     if (!name || !email) { alert('姓名與 Email 為必填'); return; }
     const record = {
         name, email,
-        department: document.getElementById('addDept').value.trim(),
-        job_title: document.getElementById('addTitle').value.trim(),
         login_password: document.getElementById('addPass').value.trim() || genPwd(),
         session_code: sessionData?.session_code || '',
         session_id: sessionData?.id || null,
