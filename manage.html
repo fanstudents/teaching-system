@@ -575,8 +575,11 @@
                     <input type="url" id="createCourseLink" placeholder="https://...">
                 </div>
                 <div class="form-group">
-                    <label>講師</label>
-                    <input type="text" id="createInstructor" placeholder="選填">
+                    <label>講師（可複選）</label>
+                    <div id="createInstructorPicker" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:1px solid var(--border);border-radius:8px;min-height:38px;background:#fafbfc;cursor:pointer" onclick="document.getElementById('createInstructorDropdown').style.display=document.getElementById('createInstructorDropdown').style.display==='none'?'block':'none'">
+                        <span id="createInstructorPlaceholder" style="font-size:0.82rem;color:#94a3b8">點擊選擇講師...</span>
+                    </div>
+                    <div id="createInstructorDropdown" style="display:none;border:1px solid var(--border);border-radius:8px;margin-top:4px;max-height:200px;overflow-y:auto;background:var(--surface);box-shadow:0 4px 12px rgba(0,0,0,0.08)"></div>
                 </div>
                 <div class="form-group">
                     <label>Teachify Course ID</label>
@@ -1264,8 +1267,11 @@
             document.getElementById('createName').value = '';
             document.getElementById('createDesc').value = '';
             document.getElementById('createType').value = 'ai-workplace';
-            document.getElementById('createInstructor').value = '';
             document.getElementById('createCourseId').value = '';
+            // Reset instructor picker
+            window._createSelectedInstructors = [];
+            renderCreateInstructorPicker();
+            populateCreateInstructorDropdown();
             // Pre-select category from current filter
             const catFilter = document.getElementById('projectCategoryFilter')?.value;
             if (catFilter) document.getElementById('createProjectCategory').value = catFilter;
@@ -1289,7 +1295,8 @@
             if (!name) { showToast('請輸入課程名稱'); return; }
             const description = document.getElementById('createDesc').value.trim();
             const course_type = document.getElementById('createType').value;
-            const instructor = document.getElementById('createInstructor').value.trim();
+            const selectedInsts = window._createSelectedInstructors || [];
+            const instructor = selectedInsts.map(i => i.name).join('、');
             const course_id = document.getElementById('createCourseId').value.trim();
             const slide_mode = document.querySelector('input[name="createSlideMode"]:checked')?.value || 'internal';
             const course_link = document.getElementById('createCourseLink').value.trim();
@@ -1905,6 +1912,56 @@
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // ══════════════════════════════════════
+        // CREATE PROJECT — INSTRUCTOR PICKER
+        // ══════════════════════════════════════
+        window._createSelectedInstructors = [];
+
+        function populateCreateInstructorDropdown() {
+            const dd = document.getElementById('createInstructorDropdown');
+            if (!dd) return;
+            if (!instructorsList.length) {
+                dd.innerHTML = '<div style="padding:12px;font-size:0.82rem;color:#94a3b8;text-align:center">尚無講師資料，請先至講師管理頁新增</div>';
+                return;
+            }
+            dd.innerHTML = instructorsList.map(inst => {
+                const checked = window._createSelectedInstructors.find(s => s.id === inst.id);
+                return `<label style="display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;font-size:0.85rem;transition:background 0.15s;border-bottom:1px solid #f1f5f9" onmouseenter="this.style.background='#f8fafc'" onmouseleave="this.style.background=''">
+                    <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCreateInstructor('${inst.id}','${(inst.name||'').replace(/'/g,"\\'")}')">
+                    ${inst.photo_url ? `<img src="${inst.photo_url}" style="width:28px;height:28px;border-radius:50%;object-fit:cover">` : '<span class="material-symbols-outlined" style="font-size:20px;color:#94a3b8">person</span>'}
+                    <span style="font-weight:500">${inst.name || ''}</span>
+                    ${inst.title ? `<span style="font-size:0.75rem;color:#94a3b8">${inst.title}</span>` : ''}
+                </label>`;
+            }).join('');
+        }
+
+        window.toggleCreateInstructor = function(id, name) {
+            const idx = window._createSelectedInstructors.findIndex(s => s.id === id);
+            if (idx >= 0) {
+                window._createSelectedInstructors.splice(idx, 1);
+            } else {
+                window._createSelectedInstructors.push({ id, name });
+            }
+            renderCreateInstructorPicker();
+        };
+
+        function renderCreateInstructorPicker() {
+            const picker = document.getElementById('createInstructorPicker');
+            const ph = document.getElementById('createInstructorPlaceholder');
+            if (!picker) return;
+            // Remove old chips
+            picker.querySelectorAll('.inst-chip').forEach(c => c.remove());
+            const selected = window._createSelectedInstructors;
+            if (ph) ph.style.display = selected.length ? 'none' : '';
+            selected.forEach(inst => {
+                const chip = document.createElement('span');
+                chip.className = 'inst-chip';
+                chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--accent);color:#fff;border-radius:14px;font-size:0.78rem;font-weight:600;white-space:nowrap';
+                chip.innerHTML = `${inst.name} <span class="material-symbols-outlined" style="font-size:13px;cursor:pointer;opacity:0.8" onclick="event.stopPropagation();toggleCreateInstructor('${inst.id}','${inst.name.replace(/'/g,"\\'")}');populateCreateInstructorDropdown()">close</span>`;
+                picker.appendChild(chip);
+            });
         }
 
         // ══════════════════════════════════════
