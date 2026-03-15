@@ -54,6 +54,9 @@
                     <a class="l1-tab" href="assets.html" style="text-decoration:none;color:inherit;">
                         <span class="material-symbols-outlined">palette</span> 素材庫
                     </a>
+                    <button class="l1-tab" data-l1tab="instructors">
+                        <span class="material-symbols-outlined">school</span> 講師
+                    </button>
                     <button class="l1-tab" data-l1tab="purchases">
                         <span class="material-symbols-outlined">receipt_long</span> 訂單
                     </button>
@@ -79,6 +82,19 @@
                         <div class="empty-state">
                             <span class="material-symbols-outlined">hourglass_empty</span> 載入中
                         </div>
+                    </div>
+                </div>
+
+                <!-- 講師管理面板 -->
+                <div class="l1-panel" id="l1-instructors">
+                    <div class="filter-bar">
+                        <input type="text" id="instructorSearch" placeholder="搜尋講師姓名…">
+                        <button class="btn btn-dark" id="btnAddInstructor">
+                            <span class="material-symbols-outlined">add</span> 新增講師
+                        </button>
+                    </div>
+                    <div class="project-card-grid" id="instructorGrid">
+                        <div class="empty-state"><span class="material-symbols-outlined">school</span>尚無講師資料</div>
                     </div>
                 </div>
 
@@ -1815,6 +1831,193 @@
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2000);
         }
+
+        // ══════════════════════════════════════
+        // INSTRUCTOR MANAGEMENT
+        // ══════════════════════════════════════
+        let instructorsList = [];
+
+        async function loadInstructorsList() {
+            try {
+                const { data } = await db.select('instructors', { order: 'created_at.desc' });
+                instructorsList = data || [];
+            } catch (e) { console.error('loadInstructors', e); instructorsList = []; }
+            renderInstructorGrid();
+        }
+
+        function renderInstructorGrid(filter = '') {
+            const grid = document.getElementById('instructorGrid');
+            if (!grid) return;
+            let filtered = instructorsList;
+            if (filter) filtered = filtered.filter(i => (i.name || '').toLowerCase().includes(filter.toLowerCase()));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">school</span>${filter ? '沒有符合的結果' : '尚無講師資料'}</div>`;
+                return;
+            }
+
+            grid.className = 'project-card-grid';
+            grid.innerHTML = filtered.map(i => {
+                const specs = (i.specialties || []).map(s => `<span class="cat-tag" style="font-size:0.68rem;padding:2px 6px;background:#eff6ff;color:#3b82f6">${s}</span>`).join('');
+                return `
+                <div class="project-card" style="cursor:pointer" onclick="openInstructorModal('${i.id}')">
+                    <div class="pcard-top">
+                        <span class="cat-tag cat-course">講師</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
+                        ${i.photo_url
+                            ? `<img src="${i.photo_url}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">`
+                            : '<div style="width:48px;height:48px;border-radius:50%;background:var(--surface-alt);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="color:var(--text-3)">person</span></div>'}
+                        <div>
+                            <div class="pcard-name" style="margin:0;font-size:0.92rem">${i.name || '未命名'}</div>
+                            <div style="font-size:0.75rem;color:var(--text-2)">${i.title || ''}</div>
+                        </div>
+                    </div>
+                    ${i.bio ? `<div class="pcard-desc" style="font-size:0.78rem;-webkit-line-clamp:2">${i.bio}</div>` : ''}
+                    ${specs ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${specs}</div>` : ''}
+                    <div class="pcard-stats" style="margin-top:8px">
+                        <span>${i.email || ''}</span>
+                    </div>
+                    <div class="pcard-actions">
+                        <button class="btn btn-sm" onclick="event.stopPropagation();openInstructorModal('${i.id}')" title="編輯"><span class="material-symbols-outlined">edit</span></button>
+                        <button class="btn btn-sm" onclick="event.stopPropagation();deleteInstructor('${i.id}')" title="刪除"><span class="material-symbols-outlined">delete</span></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.openInstructorModal = function(editId) {
+            let modal = document.getElementById('instructorModal');
+            if (!modal) {
+                // Create modal dynamically
+                modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.id = 'instructorModal';
+                modal.innerHTML = `
+                <div class="modal-card" style="width:600px">
+                    <div class="modal-header">
+                        <h3 id="instructorModalTitle">新增講師</h3>
+                        <button class="modal-close" onclick="closeInstructorModal()"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                    <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+                        <input type="hidden" id="instEditId">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                            <div class="form-group"><label class="form-label">姓名 *</label><input class="form-input" id="instName" required></div>
+                            <div class="form-group"><label class="form-label">Email *</label><input class="form-input" id="instEmail" type="email" required></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                            <div class="form-group"><label class="form-label">職稱</label><input class="form-input" id="instTitle" placeholder="例：AI 數位教學設計師"></div>
+                            <div class="form-group"><label class="form-label">照片 URL</label><input class="form-input" id="instPhoto" placeholder="https://..."></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">簡介</label><textarea class="form-textarea" id="instBio" rows="3" placeholder="講師經歷、背景介紹..."></textarea></div>
+                        <div class="form-group"><label class="form-label">專長標籤（逗號分隔）</label><input class="form-input" id="instSpecialties" placeholder="例：AI 教學, 簡報設計, 數位轉型"></div>
+                        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+                        <details style="margin-bottom:12px">
+                            <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--text-2)">💳 匯款資訊（選填）</summary>
+                            <div style="margin-top:12px">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                                    <div class="form-group"><label class="form-label">銀行名稱</label><input class="form-input" id="instBankName"></div>
+                                    <div class="form-group"><label class="form-label">戶名</label><input class="form-input" id="instAccountHolder"></div>
+                                </div>
+                                <div class="form-group"><label class="form-label">帳號</label><input class="form-input" id="instBankAccount" placeholder="銀行帳號"></div>
+                            </div>
+                        </details>
+                        <div class="form-group"><label class="form-label">備註</label><textarea class="form-textarea" id="instNotes" rows="2"></textarea></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="closeInstructorModal()">取消</button>
+                        <button class="btn btn-dark" onclick="saveInstructor()"><span class="material-symbols-outlined" style="font-size:16px">check</span> 儲存</button>
+                    </div>
+                </div>`;
+                document.body.appendChild(modal);
+            }
+
+            // Reset
+            document.getElementById('instEditId').value = '';
+            document.getElementById('instName').value = '';
+            document.getElementById('instEmail').value = '';
+            document.getElementById('instTitle').value = '';
+            document.getElementById('instPhoto').value = '';
+            document.getElementById('instBio').value = '';
+            document.getElementById('instSpecialties').value = '';
+            document.getElementById('instBankName').value = '';
+            document.getElementById('instAccountHolder').value = '';
+            document.getElementById('instBankAccount').value = '';
+            document.getElementById('instNotes').value = '';
+            document.getElementById('instructorModalTitle').textContent = '新增講師';
+
+            if (editId) {
+                const inst = instructorsList.find(i => i.id === editId);
+                if (inst) {
+                    document.getElementById('instructorModalTitle').textContent = '編輯講師';
+                    document.getElementById('instEditId').value = inst.id;
+                    document.getElementById('instName').value = inst.name || '';
+                    document.getElementById('instEmail').value = inst.email || '';
+                    document.getElementById('instTitle').value = inst.title || '';
+                    document.getElementById('instPhoto').value = inst.photo_url || '';
+                    document.getElementById('instBio').value = inst.bio || '';
+                    document.getElementById('instSpecialties').value = (inst.specialties || []).join(', ');
+                    document.getElementById('instBankName').value = inst.bank_name || '';
+                    document.getElementById('instAccountHolder').value = inst.account_holder || '';
+                    document.getElementById('instBankAccount').value = inst.bank_account || '';
+                    document.getElementById('instNotes').value = inst.notes || '';
+                }
+            }
+
+            modal.classList.add('active');
+        };
+
+        window.closeInstructorModal = () => document.getElementById('instructorModal')?.classList.remove('active');
+
+        window.saveInstructor = async function() {
+            const name = document.getElementById('instName').value.trim();
+            const email = document.getElementById('instEmail').value.trim();
+            if (!name || !email) { alert('姓名與 Email 為必填'); return; }
+
+            const record = {
+                name, email,
+                title: document.getElementById('instTitle').value.trim(),
+                photo_url: document.getElementById('instPhoto').value.trim(),
+                bio: document.getElementById('instBio').value.trim(),
+                specialties: document.getElementById('instSpecialties').value.split(',').map(s => s.trim()).filter(Boolean),
+                bank_name: document.getElementById('instBankName').value.trim(),
+                account_holder: document.getElementById('instAccountHolder').value.trim(),
+                bank_account: document.getElementById('instBankAccount').value.trim(),
+                notes: document.getElementById('instNotes').value.trim()
+            };
+
+            const editId = document.getElementById('instEditId').value;
+            try {
+                if (editId) {
+                    await db.update('instructors', record, { id: `eq.${editId}` });
+                } else {
+                    await db.insert('instructors', record);
+                }
+                closeInstructorModal();
+                await loadInstructorsList();
+                showToast(editId ? '講師已更新' : '講師已新增');
+            } catch (e) {
+                alert('儲存失敗：' + (e.message || JSON.stringify(e)));
+            }
+        };
+
+        window.deleteInstructor = async function(id) {
+            if (!confirm('確定刪除此講師？')) return;
+            try {
+                await db.delete('instructors', { id: `eq.${id}` });
+                await loadInstructorsList();
+                showToast('講師已刪除');
+            } catch (e) {
+                alert('刪除失敗：' + (e.message || JSON.stringify(e)));
+            }
+        };
+
+        // Bind instructor search & add button
+        document.getElementById('instructorSearch')?.addEventListener('input', (e) => renderInstructorGrid(e.target.value));
+        document.getElementById('btnAddInstructor')?.addEventListener('click', () => openInstructorModal());
+
+        // Load instructors on init
+        loadInstructorsList();
 
         init();
     </script>
