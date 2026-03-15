@@ -654,8 +654,6 @@ function parseCSV(text) {
     pendingImport = rows.map(r => ({
         name: r['姓名'] || r.name || '',
         email: r['Email'] || r.email || r['信箱'] || '',
-        department: r['部門'] || r.department || '',
-        job_title: r['職稱'] || r.job_title || r['職位'] || '',
         login_password: r['密碼'] || r.password || r.login_password || genPwd(),
         session_code: sessionData?.session_code || '',
         session_id: sessionData?.id || null,
@@ -665,9 +663,9 @@ function parseCSV(text) {
 
     document.getElementById('importPreview').innerHTML = `
         <p style="font-size:0.85rem;margin-bottom:8px">共解析 <strong>${pendingImport.length}</strong> 筆學員</p>
-        <table><thead><tr><th>姓名</th><th>Email</th><th>部門</th><th>職稱</th><th>密碼</th></tr></thead>
-        <tbody>${pendingImport.slice(0,15).map(r=>`<tr><td>${r.name}</td><td>${r.email}</td><td>${r.department}</td><td>${r.job_title}</td><td>${r.login_password}</td></tr>`).join('')}
-        ${pendingImport.length>15?`<tr><td colspan="5" style="text-align:center;color:#94a3b8">... 還有 ${pendingImport.length-15} 筆</td></tr>`:''}</tbody></table>`;
+        <table><thead><tr><th>姓名</th><th>Email</th><th>密碼</th></tr></thead>
+        <tbody>${pendingImport.slice(0,15).map(r=>`<tr><td>${r.name}</td><td>${r.email}</td><td>${r.login_password}</td></tr>`).join('')}
+        ${pendingImport.length>15?`<tr><td colspan="3" style="text-align:center;color:#94a3b8">... 還有 ${pendingImport.length-15} 筆</td></tr>`:''}</tbody></table>`;
     document.getElementById('importFooter').style.display = 'flex';
 }
 
@@ -686,7 +684,7 @@ window.doImport = async () => {
 };
 
 window.downloadTemplate = () => {
-    const csv = '姓名,Email,部門,職稱,密碼\n王小明,ming@example.com,行銷部,專員,abc123\n李小華,hua@example.com,研發部,工程師,xyz789';
+    const csv = '姓名,Email,密碼\n王小明,ming@example.com,abc123\n李小華,hua@example.com,xyz789';
     const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'students_template.csv';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
