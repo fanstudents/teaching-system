@@ -1394,12 +1394,17 @@ ${context}
   "hero": {
     "subtitle": "課程的一句話副標題描述",
     "duration": "總時數描述，如「4 小時（含休息）」",
+    "days": "總天數數字字串，如 \"1\" 或 \"2\"",
     "groupSize": "建議人數，如「建議 20–40 人」",
     "device": "設備需求，如「需自備筆電」",
     "location": "授課方式，如「現場實體授課」"
   },
+  "schedule": [
+    { "day": 1, "hours": "每天時數（數字字串）", "topic": "該天主題" }
+  ],
   "timeline": [
     {
+      "day": 1,
       "time": "開始時間 – 結束時間（分鐘數）",
       "title": "模組標題",
       "desc": "2-3 句模組說明，包含具體學習內容",
@@ -1429,14 +1434,16 @@ ${context}
 重要規則：
 1. timeline 要包含合理的休息時間（isBreak: true），一般每 60-90 分鐘安排 10 分鐘休息
 2. 每個模組的 time 要用實際時間格式，例如「09:00 – 09:20（20 分鐘）」
-3. 如果是多天課程，請在 timeline 中用休息 block 標示「Day 1 結束」、「Day 2 開始」等
-4. 如果指定了工具，以指定工具為主；沒指定則根據需求選擇最合適的 AI 工具
-5. tools 中的 logo URL 請使用知名 AI 工具的真實圖片，如果不確定就留空字串
-6. equipment 中的 icon 請使用 Google Material Symbols 的 icon 名稱
-7. tags 從課程內容中提取 2-5 個關鍵字
-8. 根據學員部門調整案例和應用場景（例如行銷部側重文案生成，HR 側重招聘流程）
-9. 根據學員程度調整教學深度和節奏
-10. 輸出純 JSON，不要任何額外文字或 markdown`;
+3. 【關鍵】多天課程時，timeline 中每個 block 必須設定正確的 "day" 值（Day 1 的模組 day=1，Day 2 的模組 day=2）
+4. 【關鍵】多天課程時，schedule 陣列必須包含每天的項目，例如 2 天課程：[{"day":1,"hours":"7","topic":"Day1主題"},{"day":2,"hours":"7","topic":"Day2主題"}]
+5. hero.days 必須設為正確的天數字串（如 "2"），不要永遠設 "1"
+6. 如果指定了工具，以指定工具為主；沒指定則根據需求選擇最合適的 AI 工具
+7. tools 中的 logo URL 請使用知名 AI 工具的真實圖片，如果不確定就留空字串
+8. equipment 中的 icon 請使用 Google Material Symbols 的 icon 名稱
+9. tags 從課程內容中提取 2-5 個關鍵字
+10. 根據學員部門調整案例和應用場景（例如行銷部側重文案生成，HR 側重招聘流程）
+11. 根據學員程度調整教學深度和節奏
+12. 輸出純 JSON，不要任何額外文字或 markdown`;
 
     try {
         const result = await ai.chat([{ role: 'user', content: prompt }], {
