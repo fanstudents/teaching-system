@@ -154,16 +154,13 @@ function renderOutlineFromDB() {
     if (od.timeline?.length > 0) {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
-            timelineEl.innerHTML = od.timeline.map(block => {
-                const breakClass = block.isBreak ? ' break-block' : '';
-                const titleStyle = block.isBreak ? ' style="color:var(--accent)"' : '';
-                const titlePrefix = block.isBreak ? '☕ ' : '';
-                const tags = (block.tags || []).map(t =>
-                    `<span class="topic-tag${block.isBreak ? '' : (block.tags.indexOf(t) === 0 ? ' highlight' : '')}">${t}</span>`
+            timelineEl.innerHTML = od.timeline.filter(b => !b.isBreak).map(block => {
+                const tags = (block.tags || []).map((t, i) =>
+                    `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
                 ).join('');
-                return `<div class="timeline-block${breakClass}">
+                return `<div class="timeline-block">
                     <div class="timeline-time">${block.time || ''}</div>
-                    <div class="timeline-title"${titleStyle}>${titlePrefix}${block.title || ''}</div>
+                    <div class="timeline-title">${block.title || ''}</div>
                     <div class="timeline-desc">${block.desc || ''}</div>
                     ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
                 </div>`;
@@ -382,24 +379,17 @@ let _tlCounter = 0;
 window.addTimelineBlock = function(data = {}) {
     const list = document.getElementById('oeTimelineList');
     const idx = _tlCounter++;
-    const isBreak = data.isBreak || false;
     const div = document.createElement('div');
-    div.className = `oe-list-item${isBreak ? ' is-break' : ''}`;
+    div.className = 'oe-list-item';
     div.dataset.idx = idx;
     div.innerHTML = `
         <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
         <div class="oe-row">
-            <div class="oe-field"><label>時間</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="09:00 – 09:20（20 分鐘）"></div>
+            <div class="oe-field" style="max-width:120px"><label>時長</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="60 分鐘"></div>
             <div class="oe-field"><label>標題</label><input type="text" data-key="title" value="${_esc(data.title || '')}" placeholder="模組名稱"></div>
         </div>
         <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
-        <div class="oe-row" style="margin-top:8px">
-            <div class="oe-field"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
-            <div class="oe-field"><label>類型</label><select data-key="isBreak" onchange="this.closest('.oe-list-item').classList.toggle('is-break', this.value==='true')">
-                <option value="false"${!isBreak ? ' selected' : ''}>教學模組</option>
-                <option value="true"${isBreak ? ' selected' : ''}>休息時間</option>
-            </select></div>
-        </div>
+        <div class="oe-field" style="margin-top:8px"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
     `;
     list.appendChild(div);
 };
@@ -541,14 +531,13 @@ function importDefaults() {
 
     // Default timeline
     const defaultTimeline = [
-        { time: '09:00 – 09:20（20 分鐘）', title: '開場：AI 趨勢與辦公應用概覽', desc: '介紹 2025–2026 年 AI 辦公趨勢，說明 AI 如何改變日常工作流程。透過情境案例讓學員理解為何現在就該開始導入 AI 工具。', tags: ['AI 辦公趨勢', '生成式 AI 概念', '案例分享'] },
-        { time: '09:20 – 10:10（50 分鐘）', title: '模組一：ChatGPT — AI 文字助手', desc: '學習 ChatGPT 的核心功能與 prompt 設計技巧。涵蓋文件撰寫、Email 修潤、會議議程生成、資料彙整與分析等辦公常見場景，搭配實作練習讓學員即刻上手。', tags: ['ChatGPT', 'Prompt 結構化技巧', '文件撰寫', 'Email 修潤', '資料分析'] },
-        { time: '10:10 – 10:50（40 分鐘）', title: '模組二：Gemini — Google 生態系 AI 整合', desc: '探索 Google Gemini 在 Gmail、Docs、Sheets、Slides 中的整合應用。學習如何利用 Gemini 進行跨平台協作，包含自動摘要、表格數據分析和簡報內容生成。', tags: ['Gemini', 'Google Workspace 整合', '自動摘要', '表格分析'] },
-        { time: '10:50 – 11:00（10 分鐘）', title: '中場休息', desc: '稍作休息，準備下半場的學習。', tags: [], isBreak: true },
-        { time: '11:00 – 11:40（40 分鐘）', title: '模組三：NotebookLM — AI 知識庫與研究助手', desc: '學習如何將公司內部文件、報告上傳至 NotebookLM，建立專屬知識庫。實作文件問答、重點摘要、交叉比對等功能，掌握 AI 輔助閱讀與研究的高效方法。', tags: ['NotebookLM', '知識庫建構', '文件問答', '內容摘要'] },
-        { time: '11:40 – 12:20（40 分鐘）', title: '模組四：Gamma — AI 簡報設計', desc: '體驗 Gamma 的 AI 自動簡報生成功能。從主題輸入到完整簡報產出，學習如何快速製作專業的提案簡報、工作報告和教育訓練材料，大幅縮短準備時間。', tags: ['Gamma', 'AI 簡報設計', '提案報告', '視覺化呈現'] },
-        { time: '12:20 – 12:50（30 分鐘）', title: '模組五：Notion — AI 會議記錄與專案管理', desc: '運用 Notion AI 進行會議記錄整理、待辦事項追蹤和團隊知識管理。學習如何透過 AI 自動生成會議摘要、行動項目和跟進追蹤。', tags: ['Notion', '會議記錄', '專案管理', '團隊協作'] },
-        { time: '12:50 – 13:00（10 分鐘）', title: '總結與 Q&A', desc: '回顧課程重點，提供工具選擇建議與延伸學習資源。開放學員提問，針對各自工作場景給予個別化建議。', tags: ['課程回顧', 'Q&A', '延伸資源'] },
+        { time: '20 分鐘', title: '開場：AI 趨勢與辦公應用概覽', desc: '介紹 AI 辦公趨勢，說明 AI 如何改變日常工作流程。', tags: ['AI 趨勢', '案例分享'] },
+        { time: '50 分鐘', title: '模組一：ChatGPT — AI 文字助手', desc: '核心功能與 Prompt 設計技巧，涵蓋文件撰寫、Email 修潤、資料分析。', tags: ['ChatGPT', 'Prompt 工程'] },
+        { time: '40 分鐘', title: '模組二：Gemini — Google 生態系 AI 整合', desc: '在 Gmail、Docs、Sheets 中串聯 AI，學習跨平台協作。', tags: ['Gemini', 'Google 協作'] },
+        { time: '40 分鐘', title: '模組三：NotebookLM — AI 知識庫與研究助手', desc: '將內部文件上傳建立專屬知識庫，實作文件問答與重點摘要。', tags: ['NotebookLM', '知識庫建構'] },
+        { time: '40 分鐘', title: '模組四：Gamma — AI 簡報設計', desc: 'AI 自動簡報生成，快速製作專業提案簡報。', tags: ['Gamma', 'AI 簡報'] },
+        { time: '30 分鐘', title: '模組五：Notion — AI 會議記錄與專案管理', desc: '會議記錄整理、待辦追蹤和團隊知識管理。', tags: ['Notion', '專案管理'] },
+        { time: '10 分鐘', title: '總結與 Q&A', desc: '回顧課程重點，開放提問。', tags: ['Q&A'] },
     ];
     defaultTimeline.forEach(b => addTimelineBlock(b));
 

@@ -205,40 +205,50 @@ body {
 .section-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
 .section-desc { font-size: 0.85rem; color: var(--text-3); margin-top: 2px; }
 
-/* ── Timeline ── */
-.timeline { position: relative; padding-left: 28px; }
-.timeline::before {
-    content: ''; position: absolute; left: 11px; top: 0; bottom: 0;
-    width: 2px; background: var(--border); border-radius: 1px;
+/* -- Timeline (Professional Enterprise Style) -- */
+.timeline {
+    display: flex; flex-direction: column; gap: 2px;
+    counter-reset: timeline-counter;
 }
 .timeline-block {
-    position: relative; margin-bottom: 28px; padding: 24px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    padding: 22px 24px 22px 60px;
+    background: var(--surface);
+    border-left: 3px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    counter-increment: timeline-counter;
 }
-.timeline-block:hover { box-shadow: var(--shadow-md); border-color: rgba(99,102,241,0.15); }
+.timeline-block:hover {
+    background: #f8fafc;
+    border-left-color: var(--accent);
+}
 .timeline-block::before {
-    content: ''; position: absolute; left: -22px; top: 30px;
-    width: 12px; height: 12px; border-radius: 50%;
-    background: var(--accent); border: 3px solid var(--bg); z-index: 1;
+    content: counter(timeline-counter, decimal-leading-zero);
+    position: absolute; left: 16px; top: 24px;
+    font-size: 0.72rem; font-weight: 700; color: var(--text-3);
+    font-variant-numeric: tabular-nums;
 }
-.timeline-block.break-block { background: var(--accent-light); border-color: rgba(99,102,241,0.15); }
-
 .timeline-time {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 0.75rem; font-weight: 600; color: var(--accent);
-    background: var(--accent-light); padding: 3px 10px; border-radius: 4px; margin-bottom: 10px;
+    display: inline-block;
+    font-size: 0.72rem; font-weight: 600;
+    color: var(--accent); letter-spacing: 0.02em;
+    margin-bottom: 4px;
 }
-.timeline-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
-.timeline-desc { font-size: 0.88rem; color: var(--text-2); line-height: 1.7; margin-bottom: 14px; }
-.timeline-topics { display: flex; flex-wrap: wrap; gap: 6px; }
+.timeline-title {
+    font-size: 0.95rem; font-weight: 700; margin-bottom: 6px;
+    letter-spacing: -0.01em; color: var(--text-1);
+}
+.timeline-desc {
+    font-size: 0.82rem; color: var(--text-2); line-height: 1.7;
+    margin-bottom: 10px;
+}
+.timeline-topics { display: flex; flex-wrap: wrap; gap: 5px; }
 .topic-tag {
-    font-size: 0.75rem; padding: 3px 10px; border-radius: 4px;
-    background: var(--surface-alt); color: var(--text-2);
-    border: 1px solid var(--border); font-weight: 500;
+    font-size: 0.7rem; padding: 2px 8px; border-radius: 3px;
+    background: #f1f5f9; color: #475569;
+    font-weight: 500; letter-spacing: 0.01em;
 }
-.topic-tag.highlight { background: #fefce8; color: #92400e; border-color: #fde68a; }
+.topic-tag.highlight { background: #eff6ff; color: #1e40af; }
 
 /* ── Tool Cards ── */
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
