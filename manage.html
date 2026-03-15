@@ -857,27 +857,51 @@
                     : 'pre-class';
             const pType = p.type || 'course';
 
+            const clientName = pType === 'corporate' && p.organization_id && clientMap[p.organization_id] ? clientMap[p.organization_id] : '';
+            const slideLink = p.slide_mode === 'external' && p.course_link
+                ? { href: p.course_link, target: '_blank', icon: 'open_in_new' }
+                : { href: `editor.html?id=${p.id}#id=${p.id}`, onclick: `localStorage.setItem('current_project_id','${p.id}')`, icon: 'slideshow' };
+
             document.getElementById('projectDetailHeader').innerHTML = `
-                <div class="pd-header-row">
-                    <div class="pd-info">
-                        <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
-                        ${pType === 'corporate' && p.organization_id && clientMap[p.organization_id] ? `<span style="font-size:0.8rem;color:var(--text-2);display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span class="material-symbols-outlined" style="font-size:14px">business</span>${clientMap[p.organization_id]}</span>` : ''}
-                        <h2 class="pd-title">${p.name || '未命名'}</h2>
+                <!-- Title Row -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <h2 style="margin:0;font-size:1.35rem;font-weight:700">${p.name || '未命名'}</h2>
                         <span class="card-phase ${phase}"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
                     </div>
-                    <div class="pd-actions">
-                        <span class="pcard-code" data-code="${p.join_code}" title="複製入口連結" style="cursor:pointer;">${p.join_code}</span>
-                        ${p.slide_mode === 'external' && p.course_link
-                    ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank"><span class="material-symbols-outlined">open_in_new</span> 簡報</a>`
-                    : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="localStorage.setItem('current_project_id','${p.id}')"><span class="material-symbols-outlined">slideshow</span> 簡報</a>`
-                }
-                        ${pType === 'corporate' ? `<a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" style="background:#f0f4ff;color:#4f46e5"><span class="material-symbols-outlined">description</span> 大綱</a>` : ''}
-                        <a class="btn btn-sm" href="admin-preclass.html?code=${p.join_code}"><span class="material-symbols-outlined">assignment</span> 課前</a>
-                        <a class="btn btn-sm" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')"><span class="material-symbols-outlined">mail</span> 追蹤</a>
-                        <button class="btn btn-sm" onclick="openEdit('${p.id}')"><span class="material-symbols-outlined">settings</span> 設定</button>
-                    </div>
+                    <button class="btn btn-sm" onclick="openEdit('${p.id}')" style="flex-shrink:0">
+                        <span class="material-symbols-outlined" style="font-size:16px">settings</span> 設定
+                    </button>
                 </div>
-                ${p.description ? `<div class="pd-desc">${p.description}</div>` : ''}
+
+                <!-- Meta Row -->
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+                    <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
+                    ${clientName ? `<span style="font-size:0.8rem;color:var(--text-2);display:inline-flex;align-items:center;gap:4px"><span class="material-symbols-outlined" style="font-size:14px">business</span>${clientName}</span>` : ''}
+                    <span class="pcard-code" data-code="${p.join_code}" title="點擊複製入口連結" style="cursor:pointer;font-size:0.78rem">${p.join_code}</span>
+                    ${p.description ? `<span style="font-size:0.8rem;color:var(--text-3)">${p.description}</span>` : ''}
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px">
+                    <a class="pd-action-card" href="${slideLink.href}" ${slideLink.target?`target="${slideLink.target}"`:''}${slideLink.onclick?` onclick="${slideLink.onclick}"`:''}>
+                        <span class="material-symbols-outlined" style="color:#6366f1">slideshow</span>
+                        <span>簡報</span>
+                    </a>
+                    <a class="pd-action-card" href="admin-preclass.html?code=${p.join_code}">
+                        <span class="material-symbols-outlined" style="color:#0891b2">assignment</span>
+                        <span>課前</span>
+                    </a>
+                    <a class="pd-action-card" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')">
+                        <span class="material-symbols-outlined" style="color:#059669">mail</span>
+                        <span>追蹤</span>
+                    </a>
+                    ${pType === 'corporate' ? `
+                    <a class="pd-action-card" href="course-outline.html?admin=1&project=${p.id}">
+                        <span class="material-symbols-outlined" style="color:#d97706">description</span>
+                        <span>大綱</span>
+                    </a>` : ''}
+                </div>
             `;
 
             // Show/hide corporate sub-tab
