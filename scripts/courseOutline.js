@@ -735,7 +735,25 @@ function importDefaults() {
 // ══════════════════════════════════════
 async function loadStudents() {
     let opts = { select: 'id,name,email,login_password,created_at', order: 'created_at.desc' };
-    if (sessionData) opts.filter = { session_code: `eq.${sessionData.session_code}` };
+    if (sessionData) {
+        opts.filter = { session_code: `eq.${sessionData.session_code}` };
+    } else if (projectData?.id) {
+        // No session loaded — try to find all sessions for this project
+        const { data: allSess } = await db.select('project_sessions', { filter: { project_id: `eq.${projectData.id}` }, select: 'session_code' });
+        const codes = (allSess || []).map(s => s.session_code).filter(Boolean);
+        if (codes.length) {
+            opts.filter = { session_code: `in.(${codes.join(',')})` };
+        } else {
+            // No sessions → no students
+            students = [];
+            renderStudentTable();
+            return;
+        }
+    } else {
+        students = [];
+        renderStudentTable();
+        return;
+    }
     const { data } = await db.select('students', opts);
     students = data || [];
     renderStudentTable();
