@@ -1526,9 +1526,17 @@
 
             // Populate project dropdown
             const sel = document.getElementById('sessionProjectId');
-            sel.innerHTML = projects.map(p =>
-                `<option value="${p.id}" ${p.id === projectId ? 'selected' : ''}>${p.name || '未命名'}</option>`
-            ).join('');
+            if (projectId) {
+                // Lock to this project
+                const p = projects.find(x => x.id === projectId);
+                sel.innerHTML = `<option value="${projectId}" selected>${p?.name || '未命名'}</option>`;
+                sel.disabled = true;
+            } else {
+                sel.disabled = false;
+                sel.innerHTML = projects.map(p =>
+                    `<option value="${p.id}">${p.name || '未命名'}</option>`
+                ).join('');
+            }
 
             document.getElementById('sessionModal').classList.add('active');
         };
