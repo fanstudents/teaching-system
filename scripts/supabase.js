@@ -216,9 +216,6 @@ export const storage = {
      * @param {File|Blob} file
      */
     async upload(bucket, objectKey, file) {
-        const formData = new FormData();
-        formData.append('', file); // Supabase expects empty key
-
         // Use user token if available, fallback to anon key
         const token = localStorage.getItem('_at') || sessionStorage.getItem('_at') || SUPABASE_ANON_KEY;
 
@@ -228,13 +225,16 @@ export const storage = {
                 method: 'POST',
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': file.type || 'application/octet-stream',
+                    'x-upsert': 'true'
                 },
-                body: formData
+                body: file
             }
         );
         const data = await res.json().catch(() => null);
         if (!res.ok) {
+            console.error('Storage upload error:', data);
             return { data: null, error: data || { message: `Upload failed: ${res.status}` } };
         }
         // Build public URL
