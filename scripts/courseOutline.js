@@ -6,7 +6,7 @@
  */
 
 import { db, storage, ai } from './supabase.js';
-import { getToolLogo, AI_TOOLS_REGISTRY } from './aiToolsRegistry.js';
+import { getToolLogo, getToolUrl, AI_TOOLS_REGISTRY } from './aiToolsRegistry.js';
 
 // ── State ──
 let sessionData = null;   // project_sessions record
@@ -322,11 +322,12 @@ function renderOutlineFromDB() {
         if (toolGrid) {
             toolGrid.innerHTML = od.tools.map(t => {
                 const logo = _resolveToolLogo(t.name, t.logo);
+                const url = getToolUrl(t.name, t.url);
                 return `<div class="tool-card">
                     ${logo ? `<img class="tool-logo" src="${logo}" alt="${t.name}" onerror="this.style.display='none'">` : ''}
                     <div class="tool-name">${t.name || ''}</div>
                     <div class="tool-purpose">${t.purpose || ''}</div>
-                    ${t.url ? `<a class="tool-url" href="${t.url}" target="_blank">${t.url.replace(/^https?:\/\//, '')} →</a>` : ''}
+                    ${url ? `<a class="tool-url" href="${url}" target="_blank">${url.replace(/^https?:\/\//, '').split('/')[0]} →</a>` : ''}
                 </div>`;
             }).join('');
         }

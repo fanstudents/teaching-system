@@ -82,3 +82,21 @@ export function getToolInfo(toolName) {
         t.name.toLowerCase().replace(/[\s.\-]+/g, '') === key
     ) || null;
 }
+
+/**
+ * Get URL for a tool, respecting custom overrides (affiliate links)
+ * @param {string} toolName
+ * @param {string} [fallback] - existing URL to use if found
+ * @returns {string}
+ */
+export function getToolUrl(toolName, fallback = '') {
+    if (!toolName) return fallback;
+    const info = getToolInfo(toolName);
+    if (!info) return fallback;
+    // Check localStorage overrides
+    try {
+        const overrides = JSON.parse(localStorage.getItem('ai_tool_overrides') || '{}');
+        if (overrides[info.slug]?.url) return overrides[info.slug].url;
+    } catch (e) { /* ignore */ }
+    return fallback || info.url || '';
+}

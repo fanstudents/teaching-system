@@ -345,6 +345,52 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
+        /* ── AI Tools Tab ── */
+        .tools-container {
+            padding: 24px;
+            flex-direction: column;
+            gap: 16px;
+            height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+        .tools-container.active { display: flex !important; }
+        .tools-toolbar {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .tools-search {
+            flex: 1; padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 13px; outline: none; transition: border-color .2s;
+        }
+        .tools-search:focus { border-color: #2563eb; }
+        .tools-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;
+        }
+        .tool-mgmt-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px;
+            display: flex; flex-direction: column; gap: 10px; transition: border-color .2s, box-shadow .2s;
+        }
+        .tool-mgmt-card:hover { border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+        .tool-mgmt-top { display: flex; align-items: center; gap: 12px; }
+        .tool-mgmt-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 6px; flex-shrink: 0; background: #f8fafc; }
+        .tool-mgmt-logo-empty { width: 36px; height: 36px; border-radius: 6px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .tool-mgmt-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+        .tool-mgmt-cat { font-size: 11px; color: #94a3b8; }
+        .tool-mgmt-field { display: flex; flex-direction: column; gap: 3px; }
+        .tool-mgmt-field label { font-size: 11px; font-weight: 500; color: #94a3b8; }
+        .tool-mgmt-field input {
+            padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+            font-size: 12px; outline: none; transition: border-color .2s;
+        }
+        .tool-mgmt-field input:focus { border-color: #2563eb; }
+        .tool-mgmt-field input.modified { border-color: #f59e0b; background: #fffbeb; }
+        .tool-mgmt-actions { display: flex; gap: 6px; }
+        .tool-mgmt-actions button {
+            padding: 4px 10px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc;
+            font-size: 11px; cursor: pointer; color: #475569; transition: background .15s;
+            display: flex; align-items: center; gap: 3px;
+        }
+        .tool-mgmt-actions button:hover { background: #e2e8f0; }
+        .tool-mgmt-actions button .material-symbols-outlined { font-size: 13px; }
     </style>
 </head>
 
@@ -359,11 +405,14 @@
             </div>
         </div>
 
-        <!-- Tab Navigation -->
         <div class="settings-tabs">
             <div class="settings-tab active" data-tab="prompts">
                 <span class="material-symbols-outlined">psychology</span>
                 AI 提示詞管理
+            </div>
+            <div class="settings-tab" data-tab="tools">
+                <span class="material-symbols-outlined">build</span>
+                AI 工具庫
             </div>
             <div class="settings-tab" data-tab="webhook">
                 <span class="material-symbols-outlined">webhook</span>
@@ -409,6 +458,20 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Tab: AI Tools -->
+        <div class="tab-pane tools-container" id="tab-tools">
+            <div class="tools-toolbar">
+                <input type="text" class="tools-search" id="toolsSearch" placeholder="搜尋工具名稱...">
+                <button class="wh-copy-btn" id="btnSaveToolOverrides" onclick="saveToolOverrides()">
+                    <span class="material-symbols-outlined">save</span> 儲存自訂連結
+                </button>
+                <button class="wh-copy-btn" onclick="resetToolOverrides()">
+                    <span class="material-symbols-outlined">restart_alt</span> 重設全部
+                </button>
+            </div>
+            <div class="tools-grid" id="toolsGrid"></div>
         </div>
 
         <!-- Tab: Webhook -->
@@ -487,6 +550,7 @@
 
     <script type="module">
         import { db } from './scripts/supabase.js';
+        import { AI_TOOLS_REGISTRY } from './scripts/aiToolsRegistry.js';
 
         // ── Tab Switching ──
         document.querySelectorAll('.settings-tab').forEach(tab => {
@@ -497,6 +561,7 @@
                 const target = tab.dataset.tab;
                 document.getElementById(`tab-${target}`).classList.add('active');
                 if (target === 'webhook') loadWebhookLogs();
+                if (target === 'tools') renderToolsGrid();
             });
         });
 
@@ -639,12 +704,90 @@
             });
         };
 
+        // ── AI Tools Management ──
+        let toolOverrides = JSON.parse(localStorage.getItem('ai_tool_overrides') || '{}');
+
+        function renderToolsGrid(filter = '') {
+            const grid = document.getElementById('toolsGrid');
+            const q = filter.toLowerCase();
+            const filtered = q ? AI_TOOLS_REGISTRY.filter(t => t.name.toLowerCase().includes(q) || t.category.includes(q)) : AI_TOOLS_REGISTRY;
+            grid.innerHTML = filtered.map(t => {
+                const customUrl = toolOverrides[t.slug]?.url;
+                const isModified = customUrl && customUrl !== t.url;
+                return `<div class="tool-mgmt-card">
+                    <div class="tool-mgmt-top">
+                        ${t.logo ? `<img class="tool-mgmt-logo" src="${t.logo}" alt="${t.name}" onerror="this.style.display='none'">` : `<div class="tool-mgmt-logo-empty"><span class="material-symbols-outlined" style="font-size:18px;color:#cbd5e1">smart_toy</span></div>`}
+                        <div>
+                            <div class="tool-mgmt-name">${t.name}</div>
+                            <div class="tool-mgmt-cat">${t.category}</div>
+                        </div>
+                    </div>
+                    <div class="tool-mgmt-field">
+                        <label>連結（可修改為聯盟行銷連結）</label>
+                        <input type="text" data-slug="${t.slug}" data-default="${t.url}" value="${customUrl || t.url}" class="${isModified ? 'modified' : ''}" oninput="this.classList.toggle('modified', this.value !== this.dataset.default)">
+                    </div>
+                    <div class="tool-mgmt-actions">
+                        <button onclick="copyText('${t.logo}')" title="複製 Logo URL"><span class="material-symbols-outlined">image</span> 複製 Logo</button>
+                        <button onclick="copyText(this.closest('.tool-mgmt-card').querySelector('input').value)" title="複製連結"><span class="material-symbols-outlined">link</span> 複製連結</button>
+                        ${isModified ? `<button onclick="resetSingleTool(this, '${t.slug}', '${t.url}')" style="color:#f59e0b"><span class="material-symbols-outlined">undo</span> 還原</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        document.getElementById('toolsSearch').addEventListener('input', (e) => renderToolsGrid(e.target.value));
+
+        window.saveToolOverrides = function() {
+            const inputs = document.querySelectorAll('#toolsGrid input[data-slug]');
+            inputs.forEach(inp => {
+                const slug = inp.dataset.slug;
+                const val = inp.value.trim();
+                const def = inp.dataset.default;
+                if (val && val !== def) {
+                    toolOverrides[slug] = { url: val };
+                } else {
+                    delete toolOverrides[slug];
+                }
+            });
+            localStorage.setItem('ai_tool_overrides', JSON.stringify(toolOverrides));
+            const btn = document.getElementById('btnSaveToolOverrides');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined">check</span> 已儲存';
+            setTimeout(() => { btn.innerHTML = orig; }, 1500);
+            renderToolsGrid(document.getElementById('toolsSearch').value);
+        };
+
+        window.resetToolOverrides = function() {
+            if (!confirm('確定要重設所有自訂連結？')) return;
+            toolOverrides = {};
+            localStorage.setItem('ai_tool_overrides', '{}');
+            renderToolsGrid(document.getElementById('toolsSearch').value);
+        };
+
+        window.resetSingleTool = function(btn, slug, defaultUrl) {
+            delete toolOverrides[slug];
+            localStorage.setItem('ai_tool_overrides', JSON.stringify(toolOverrides));
+            const card = btn.closest('.tool-mgmt-card');
+            const inp = card.querySelector('input');
+            inp.value = defaultUrl;
+            inp.classList.remove('modified');
+            renderToolsGrid(document.getElementById('toolsSearch').value);
+        };
+
+        window.copyText = function(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Brief flash
+            });
+        };
+
         // ── Init ──
         loadPrompts();
 
-        // Check URL hash for direct webhook tab access
+        // Check URL hash for direct tab access
         if (location.hash === '#webhook') {
             document.querySelector('.settings-tab[data-tab="webhook"]').click();
+        } else if (location.hash === '#tools') {
+            document.querySelector('.settings-tab[data-tab="tools"]').click();
         }
     </script>
     <script src="components/nav.js"></script>
