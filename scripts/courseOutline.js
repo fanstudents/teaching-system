@@ -197,7 +197,16 @@ function renderOutlineFromDB() {
     if (od.timeline?.length > 0) {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
-            const schedule = od.schedule || [{ day: 1, hours: '', topic: '' }];
+            let schedule = od.schedule || [];
+            // Auto-detect days from timeline blocks if schedule is incomplete
+            const uniqueDays = [...new Set(od.timeline.map(b => b.day || 1))].sort((a, b) => a - b);
+            if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
+                schedule = uniqueDays.map(d => {
+                    const existing = schedule.find(s => s.day === d);
+                    return existing || { day: d, hours: '', topic: '' };
+                });
+            }
+            if (!schedule.length) schedule = [{ day: 1, hours: '', topic: '' }];
             const isMultiDay = schedule.length > 1;
 
             const renderBlocks = (blocks) => blocks.map(block => {
