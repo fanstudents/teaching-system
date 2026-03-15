@@ -264,6 +264,7 @@ function enterPage() {
         loadInstructors();
         loadOrganizations();
         initOutlineEditor();
+        initHrEmail();
 
         // Set preview button href
         const previewBtn = document.getElementById('btnPreviewOutline');
@@ -926,6 +927,110 @@ window.handleOrgLogoUpload = async (input) => {
     document.getElementById('orgLogo').value = data.url;
     input.value = '';
 };
+
+// ══════════════════════════════════════
+// HR NOTIFICATION EMAIL TEMPLATE
+// ══════════════════════════════════════
+function initHrEmail() {
+    const genBtn = document.getElementById('btnGenEmail');
+    const copyBtn = document.getElementById('btnCopyEmail');
+    if (!genBtn) return;
+
+    genBtn.addEventListener('click', () => {
+        const od = getOutlineData() || {};
+        const hero = od.hero || {};
+        const courseName = projectData?.name || '課程名稱';
+        const clientName = orgData?.name || '貴公司';
+        const joinCode = sessionData?.session_code || '';
+        const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
+
+        // Schedule
+        const days = hero.days || '1';
+        const duration = hero.duration || '';
+        const scheduleText = duration ? `${days} 天（${duration}）` : `${days} 天`;
+
+        // Timeline summary
+        const timeline = (od.timeline || []).filter(b => !b.isBreak);
+        const moduleSummary = timeline.map((b, i) =>
+            `  ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`
+        ).join('\n');
+
+        // Prep items from equipment
+        const equipItems = (od.equipment || []).map(e =>
+            `  ✓ ${e.label}${e.detail ? `：${e.detail}` : ''}`
+        ).join('\n');
+        const equipNote = od.equipNote || '';
+
+        // Tools
+        const toolNames = (od.tools || []).map(t => t.name).join('、');
+
+        const email = `各位同仁好：
+
+公司將舉辦「${courseName}」教育訓練，誠摯邀請您參加。以下為課程相關資訊，請詳閱並預做準備。
+
+
+━━━━━━━━━━━━━━━━━━━━
+📋 課程簡介
+━━━━━━━━━━━━━━━━━━━━
+
+課程名稱：${courseName}
+${hero.subtitle ? `課程說明：${hero.subtitle}` : ''}
+授課時數：${scheduleText}
+人　　數：${hero.groupSize || ''}
+授課方式：${hero.location || '現場實體授課'}
+${toolNames ? `使用工具：${toolNames}` : ''}
+
+課程模組：
+${moduleSummary || '  （請於管理端編輯課綱後再產生信件）'}
+
+
+━━━━━━━━━━━━━━━━━━━━
+🔗 學員登入入口
+━━━━━━━━━━━━━━━━━━━━
+
+請於課前使用以下連結登入課程系統：
+${loginUrl}
+${joinCode ? `\n課程代碼：${joinCode}` : ''}
+
+登入方式：輸入您的 Email 與課程代碼即可進入。
+
+
+━━━━━━━━━━━━━━━━━━━━
+📝 課前準備事項
+━━━━━━━━━━━━━━━━━━━━
+
+${equipItems || '  ✓ 請自備筆電，需可連接網路'}
+${equipNote ? `\n⚠️ ${equipNote}` : ''}
+
+
+━━━━━━━━━━━━━━━━━━━━
+📅 上課時間與地點
+━━━━━━━━━━━━━━━━━━━━
+
+日　　期：【請填入上課日期，如 2026/4/15（二）】
+時　　間：【請填入上課時間，如 09:00 – 17:00】
+地　　點：【請填入上課地點】
+
+
+如有任何問題，請洽人力資源部。
+期待您的參與！
+
+${clientName} 人力資源部 敬上`;
+
+        document.getElementById('hrEmailContent').textContent = email;
+        document.getElementById('hrEmailPreview').style.display = '';
+        copyBtn.style.display = '';
+    });
+
+    copyBtn.addEventListener('click', () => {
+        const content = document.getElementById('hrEmailContent').innerText;
+        navigator.clipboard.writeText(content).then(() => {
+            const orig = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已複製';
+            setTimeout(() => { copyBtn.innerHTML = orig; }, 2000);
+        });
+    });
+}
 
 // ══════════════════════════════════════
 // FILE UPLOAD
