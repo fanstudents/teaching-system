@@ -238,7 +238,7 @@ function renderOutlineFromDB() {
             const unmatchedBlocks = od.timeline.filter(b => !schedule.find(s => s.day === (b.day || 1)));
             if (unmatchedBlocks.length) html += renderBlocks(unmatchedBlocks);
 
-            timelineEl.innerHTML = html + `<div class="timeline-note">※ 以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</div>`;
+            timelineEl.innerHTML = html + `<div class="timeline-note"><span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:1px">info</span><span>以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</span></div>`;
         }
     }
 
@@ -1466,6 +1466,9 @@ function populateEditorFromAI(data) {
         'claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg',
         'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg',
         'midjourney': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png',
+        'lovable': 'https://lovable.dev/favicon.ico',
+        'cursor': 'https://cursor.sh/apple-touch-icon.png',
+        'v0': 'https://v0.dev/apple-touch-icon.png',
     };
     if (data.tools?.length) {
         data.tools.forEach(tool => {
