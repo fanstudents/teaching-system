@@ -37,11 +37,32 @@ async function init() {
     renderDynamicContent();
 
     // Admin auto-login: if already authenticated in admin system, skip password
-    if (isAdmin && (localStorage.getItem('_at') || sessionStorage.getItem('_at'))) {
-        currentUser = { name: '管理員', _isAdmin: true };
-        sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
-        enterPage();
-        return;
+    if (isAdmin) {
+        let hasToken = localStorage.getItem('_at') || sessionStorage.getItem('_at');
+        // Try refresh if access token missing but refresh token exists
+        if (!hasToken) {
+            const rt = localStorage.getItem('_rt') || sessionStorage.getItem('_rt');
+            if (rt) {
+                try {
+                    const res = await fetch('https://wsaknnhjgiqmkendeyrj.supabase.co/auth/v1/token?grant_type=refresh_token', {
+                        method: 'POST',
+                        headers: { 'apikey': 'sb_publishable_RRbhQpB2zcqeHc6Cds8fgA_jVWyvdyF', 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ refresh_token: rt })
+                    });
+                    if (res.ok) {
+                        const d = await res.json();
+                        if (d.access_token) { localStorage.setItem('_at', d.access_token); sessionStorage.setItem('_at', d.access_token); hasToken = d.access_token; }
+                        if (d.refresh_token) { localStorage.setItem('_rt', d.refresh_token); sessionStorage.setItem('_rt', d.refresh_token); }
+                    }
+                } catch(e) { /* ignore */ }
+            }
+        }
+        if (hasToken) {
+            currentUser = { name: '管理員', _isAdmin: true };
+            sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+            enterPage();
+            return;
+        }
     }
 
     // Check saved session
