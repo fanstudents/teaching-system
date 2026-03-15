@@ -1230,23 +1230,34 @@ function initHrEmail() {
 
     // Schedule from schedule array
     const schedule = od.schedule || [];
-    const scheduleText = schedule.length
-        ? schedule.map(s => `Day ${s.day}：${s.hours || '?'} 小時`).join(' / ')
-        : (hero.duration || '');
+    let scheduleText = '';
+    if (schedule.length > 1) {
+        const totalH = schedule.reduce((s, d) => s + (parseFloat(d.hours) || 0), 0);
+        scheduleText = totalH ? `${schedule.length} 天 / 共 ${totalH} 小時` : `${schedule.length} 天`;
+    } else if (schedule.length === 1 && schedule[0].hours) {
+        scheduleText = `${schedule[0].hours} 小時`;
+    } else {
+        scheduleText = hero.duration || '';
+    }
 
-    // Timeline summary grouped by day
+    // Timeline summary grouped by day — items only, no times, with dept
     const timeline = od.timeline || [];
     let moduleSummary = '';
     if (schedule.length > 1) {
         moduleSummary = schedule.map(s => {
-            const dayBlocks = timeline.filter(b => (b.day || 1) === s.day);
-            const items = dayBlocks.map((b, i) => `    ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`).join('\n');
-            return `  【Day ${s.day}${s.topic ? ` — ${s.topic}` : ''}】\n${items || '    （尚未設定）'}`;
+            const dayBlocks = timeline.filter(b => (b.day || 1) === s.day && !b.isBreak);
+            const items = dayBlocks.map((b, i) => {
+                const deptTag = (b.dept && b.dept !== '全部門') ? `【${b.dept}】` : '';
+                return `    ${i + 1}. ${b.title}${deptTag}`;
+            }).join('\n');
+            return `  【Day ${s.day}${s.hours ? ` — ${s.hours} 小時` : ''}${s.topic ? ` ${s.topic}` : ''}】\n${items || '    （尚未設定）'}`;
         }).join('\n\n');
     } else {
-        moduleSummary = timeline.map((b, i) =>
-            `  ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`
-        ).join('\n');
+        const nonBreak = timeline.filter(b => !b.isBreak);
+        moduleSummary = nonBreak.map((b, i) => {
+            const deptTag = (b.dept && b.dept !== '全部門') ? `【${b.dept}】` : '';
+            return `  ${i + 1}. ${b.title}${deptTag}`;
+        }).join('\n');
     }
 
     // Prep items from equipment
@@ -1274,8 +1285,17 @@ ${hero.subtitle ? `課程說明：${hero.subtitle}` : ''}
 授課方式：${hero.location || '現場實體授課'}
 ${toolNames ? `使用工具：${toolNames}` : ''}
 
-課程模組：
+課程大綱：
 ${moduleSummary || '  （尚未設定課程模組）'}
+
+
+━━━━━━━━━━━━━━━━━━━━
+📌 課程須知
+━━━━━━━━━━━━━━━━━━━━
+
+  1. 本課程屬於數位課程，不提供實體講義。
+  2. 本次課程簡報採用特別開發的互動式簡報，上課當天可透過「課前準備頁」進入簡報連結，進行課堂互動。
+  3. 講師將進行螢幕錄影（原檔交付不剪輯）。若需實體拍攝請自行安排。若錄影因設備意外中斷，將提供課程逐字稿摘要供後續參考。
 
 
 ━━━━━━━━━━━━━━━━━━━━
