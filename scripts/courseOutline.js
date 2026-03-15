@@ -136,13 +136,20 @@ function renderOutlineFromDB() {
 
     // Hero subtitle & meta
     if (od.hero) {
-        const heroSub = document.querySelector('.outline-hero-sub');
+        const heroSub = document.getElementById('heroSub');
         if (heroSub && od.hero.subtitle) heroSub.textContent = od.hero.subtitle;
 
-        const metaEl = document.querySelector('.hero-meta');
+        const metaEl = document.getElementById('heroMeta');
         if (metaEl) {
+            // Build schedule text from schedule array
+            let scheduleText = '';
+            if (od.schedule?.length) {
+                scheduleText = od.schedule.map(s => `Day ${s.day}：${s.hours || '?'} 小時`).join(' / ');
+            } else if (od.hero.days) {
+                scheduleText = `${od.hero.days} 天` + (od.hero.duration ? ` — ${od.hero.duration}` : '');
+            }
             const items = [
-                { icon: 'schedule', text: od.hero.days ? `${od.hero.days} 天` + (od.hero.duration ? ` — ${od.hero.duration}` : '') : od.hero.duration || '' },
+                { icon: 'schedule', text: scheduleText },
                 { icon: 'groups', text: od.hero.groupSize },
                 { icon: 'location_on', text: od.hero.location }
             ].filter(i => i.text);
@@ -154,24 +161,58 @@ function renderOutlineFromDB() {
         }
     }
 
-    // Timeline
+    // Timeline — grouped by day
     if (od.timeline?.length > 0) {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
-            const blocks = od.timeline.filter(b => !b.isBreak).map(block => {
-                const tags = (block.tags || []).map((t, i) =>
-                    `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
-                ).join('');
-                return `<div class="timeline-block">
-                    <div class="timeline-header">
-                        ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
-                        <div class="timeline-title">${block.title || ''}</div>
-                    </div>
-                    <div class="timeline-desc">${block.desc || ''}</div>
-                    ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
+            const schedule = od.schedule || [{ day: 1, hours: '', topic: '' }];
+            let html = '';
+
+            schedule.forEach(dayInfo => {
+                const dayBlocks = od.timeline.filter(b => (b.day || 1) === dayInfo.day);
+                if (!dayBlocks.length) return;
+
+                // Day header
+                html += `<div class="timeline-day-header">
+                    <span class="timeline-day-badge">Day ${dayInfo.day}</span>
+                    <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
                 </div>`;
-            }).join('');
-            timelineEl.innerHTML = blocks + `<div class="timeline-note">※ 以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</div>`;
+
+                // Blocks for this day
+                html += dayBlocks.map(block => {
+                    const tags = (block.tags || []).map((t, i) =>
+                        `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
+                    ).join('');
+                    return `<div class="timeline-block">
+                        <div class="timeline-header">
+                            ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
+                            <div class="timeline-title">${block.title || ''}</div>
+                        </div>
+                        <div class="timeline-desc">${block.desc || ''}</div>
+                        ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
+                    </div>`;
+                }).join('');
+            });
+
+            // Also render blocks with no day match (legacy data)
+            const unmatchedBlocks = od.timeline.filter(b => !schedule.find(s => s.day === (b.day || 1)));
+            if (unmatchedBlocks.length) {
+                html += unmatchedBlocks.map(block => {
+                    const tags = (block.tags || []).map((t, i) =>
+                        `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
+                    ).join('');
+                    return `<div class="timeline-block">
+                        <div class="timeline-header">
+                            ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
+                            <div class="timeline-title">${block.title || ''}</div>
+                        </div>
+                        <div class="timeline-desc">${block.desc || ''}</div>
+                        ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
+                    </div>`;
+                }).join('');
+            }
+
+            timelineEl.innerHTML = html + `<div class="timeline-note">※ 以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</div>`;
         }
     }
 
@@ -346,10 +387,15 @@ function initOutlineEditor() {
     // Populate hero fields
     if (od?.hero) {
         _v('oeHeroSubtitle', od.hero.subtitle);
-        _v('oeHeroDays', od.hero.days || '1');
-        _v('oeHeroDuration', od.hero.duration || '');
         _v('oeHeroGroupSize', od.hero.groupSize || '20–30 人');
         _v('oeHeroLocation', od.hero.location || '現場實體授課');
+    }
+
+    // Populate schedule (Day 1, Day 2...)
+    if (od?.schedule?.length > 0) {
+        od.schedule.forEach(s => addScheduleDay(s));
+    } else {
+        addScheduleDay({ day: 1, hours: '7', topic: '' });
     }
 
     // Restore selected instructors
@@ -393,23 +439,71 @@ function _v(id, val) {
     if (el && val) el.value = val;
 }
 
+// ── Schedule Day Builder ──
+let _schCounter = 0;
+window.addScheduleDay = function(data = {}) {
+    const list = document.getElementById('oeScheduleList');
+    if (!list) return;
+    const idx = _schCounter++;
+    const dayNum = data.day || (list.children.length + 1);
+    const div = document.createElement('div');
+    div.className = 'oe-schedule-day';
+    div.style.cssText = 'display:flex;gap:8px;align-items:center;padding:6px 10px;background:#f8fafc;border:1px solid var(--border);border-radius:6px';
+    div.innerHTML = `
+        <span style="font-size:0.78rem;font-weight:700;color:var(--accent);white-space:nowrap">Day ${dayNum}</span>
+        <input type="hidden" data-key="day" value="${dayNum}">
+        <input type="text" data-key="hours" value="${_esc(data.hours || '')}" placeholder="時數 (如 7)" style="width:70px;font-size:0.82rem">
+        <span style="font-size:0.78rem;color:var(--text-3)">小時</span>
+        <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日主題" style="flex:1;font-size:0.82rem">
+        <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays()" style="position:static;width:24px;height:24px"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
+    `;
+    list.appendChild(div);
+};
+
+window.renumberScheduleDays = function() {
+    document.querySelectorAll('#oeScheduleList .oe-schedule-day').forEach((el, i) => {
+        el.querySelector('span').textContent = `Day ${i + 1}`;
+        el.querySelector('[data-key="day"]').value = i + 1;
+    });
+};
+
+function getScheduleDays() {
+    return [...document.querySelectorAll('#oeScheduleList .oe-schedule-day')].map(el => ({
+        day: parseInt(el.querySelector('[data-key="day"]').value),
+        hours: el.querySelector('[data-key="hours"]').value.trim(),
+        topic: el.querySelector('[data-key="topic"]').value.trim()
+    }));
+}
+
+function getScheduleOptions() {
+    const days = getScheduleDays();
+    return days.map(d => `<option value="${d.day}">Day ${d.day}</option>`).join('');
+}
+
 // ── Timeline Block ──
 let _tlCounter = 0;
 window.addTimelineBlock = function(data = {}) {
     const list = document.getElementById('oeTimelineList');
     const idx = _tlCounter++;
+    const dayOptions = getScheduleOptions();
     const div = document.createElement('div');
     div.className = 'oe-list-item';
     div.dataset.idx = idx;
     div.innerHTML = `
         <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
         <div class="oe-row">
-            <div class="oe-field" style="max-width:120px"><label>時長</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="60 分鐘"></div>
+            <div class="oe-field" style="max-width:90px"><label>天數</label><select data-key="day">${dayOptions}</select></div>
+            <div class="oe-field" style="max-width:100px"><label>時長</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="60 分鐘"></div>
             <div class="oe-field"><label>標題</label><input type="text" data-key="title" value="${_esc(data.title || '')}" placeholder="模組名稱"></div>
         </div>
         <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
         <div class="oe-field" style="margin-top:8px"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
     `;
+    // Set day value after appending
+    if (data.day) {
+        const sel = div.querySelector('[data-key="day"]');
+        sel.value = data.day;
+    }
     list.appendChild(div);
 };
 
@@ -459,22 +553,26 @@ function collectOutlineData() {
     // Hero
     od.hero = {
         subtitle: document.getElementById('oeHeroSubtitle').value.trim(),
-        days: document.getElementById('oeHeroDays').value,
-        duration: document.getElementById('oeHeroDuration').value.trim(),
         groupSize: document.getElementById('oeHeroGroupSize').value,
         location: document.getElementById('oeHeroLocation').value
     };
+
+    // Schedule (Day 1, Day 2...)
+    od.schedule = getScheduleDays();
+    // Backwards compat: also set hero.days/duration from schedule
+    od.hero.days = String(od.schedule.length);
+    od.hero.duration = od.schedule.map(s => `Day ${s.day}：${s.hours || '?'} 小時`).join('、');
 
     // Instructor IDs
     od.instructorIds = [...selectedInstructorIds];
 
     // Timeline
     od.timeline = [...document.querySelectorAll('#oeTimelineList .oe-list-item')].map(el => ({
+        day: parseInt(el.querySelector('[data-key="day"]')?.value || '1'),
         time: el.querySelector('[data-key="time"]').value.trim(),
         title: el.querySelector('[data-key="title"]').value.trim(),
         desc: el.querySelector('[data-key="desc"]').value.trim(),
-        tags: el.querySelector('[data-key="tags"]').value.split(',').map(s => s.trim()).filter(Boolean),
-        isBreak: el.querySelector('[data-key="isBreak"]').value === 'true'
+        tags: el.querySelector('[data-key="tags"]').value.split(',').map(s => s.trim()).filter(Boolean)
     }));
 
     // Tools
@@ -548,15 +646,19 @@ function importDefaults() {
     _v('oeHeroGroupSize', '20–30 人');
     _v('oeHeroLocation', '現場實體授課');
 
+    // Default schedule
+    document.getElementById('oeScheduleList').innerHTML = '';
+    addScheduleDay({ day: 1, hours: '7', topic: 'AI 辦公應用實戰' });
+
     // Default timeline
     const defaultTimeline = [
-        { time: '20 分鐘', title: '開場：AI 趨勢與辦公應用概覽', desc: '介紹 AI 辦公趨勢，說明 AI 如何改變日常工作流程。', tags: ['AI 趨勢', '案例分享'] },
-        { time: '50 分鐘', title: '模組一：ChatGPT — AI 文字助手', desc: '核心功能與 Prompt 設計技巧，涵蓋文件撰寫、Email 修潤、資料分析。', tags: ['ChatGPT', 'Prompt 工程'] },
-        { time: '40 分鐘', title: '模組二：Gemini — Google 生態系 AI 整合', desc: '在 Gmail、Docs、Sheets 中串聯 AI，學習跨平台協作。', tags: ['Gemini', 'Google 協作'] },
-        { time: '40 分鐘', title: '模組三：NotebookLM — AI 知識庫與研究助手', desc: '將內部文件上傳建立專屬知識庫，實作文件問答與重點摘要。', tags: ['NotebookLM', '知識庫建構'] },
-        { time: '40 分鐘', title: '模組四：Gamma — AI 簡報設計', desc: 'AI 自動簡報生成，快速製作專業提案簡報。', tags: ['Gamma', 'AI 簡報'] },
-        { time: '30 分鐘', title: '模組五：Notion — AI 會議記錄與專案管理', desc: '會議記錄整理、待辦追蹤和團隊知識管理。', tags: ['Notion', '專案管理'] },
-        { time: '10 分鐘', title: '總結與 Q&A', desc: '回顧課程重點，開放提問。', tags: ['Q&A'] },
+        { day: 1, time: '20 分鐘', title: '開場：AI 趨勢與辦公應用概覽', desc: '介紹 AI 辦公趨勢，說明 AI 如何改變日常工作流程。', tags: ['AI 趨勢', '案例分享'] },
+        { day: 1, time: '50 分鐘', title: '模組一：ChatGPT — AI 文字助手', desc: '核心功能與 Prompt 設計技巧，涵蓋文件撰寫、Email 修潤、資料分析。', tags: ['ChatGPT', 'Prompt 工程'] },
+        { day: 1, time: '40 分鐘', title: '模組二：Gemini — Google 生態系 AI 整合', desc: '在 Gmail、Docs、Sheets 中串聯 AI，學習跨平台協作。', tags: ['Gemini', 'Google 協作'] },
+        { day: 1, time: '40 分鐘', title: '模組三：NotebookLM — AI 知識庫與研究助手', desc: '將內部文件上傳建立專屬知識庫，實作文件問答與重點摘要。', tags: ['NotebookLM', '知識庫建構'] },
+        { day: 1, time: '40 分鐘', title: '模組四：Gamma — AI 簡報設計', desc: 'AI 自動簡報生成，快速製作專業提案簡報。', tags: ['Gamma', 'AI 簡報'] },
+        { day: 1, time: '30 分鐘', title: '模組五：Notion — AI 會議記錄與專案管理', desc: '會議記錄整理、待辦追蹤和團隊知識管理。', tags: ['Notion', '專案管理'] },
+        { day: 1, time: '10 分鐘', title: '總結與 Q&A', desc: '回顧課程重點，開放提問。', tags: ['Q&A'] },
     ];
     defaultTimeline.forEach(b => addTimelineBlock(b));
 
@@ -944,16 +1046,26 @@ function initHrEmail() {
     const joinCode = sessionData?.session_code || '';
     const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
 
-    // Schedule
-    const days = hero.days || '1';
-    const duration = hero.duration || '';
-    const scheduleText = duration ? `${days} 天（${duration}）` : `${days} 天`;
+    // Schedule from schedule array
+    const schedule = od.schedule || [];
+    const scheduleText = schedule.length
+        ? schedule.map(s => `Day ${s.day}：${s.hours || '?'} 小時`).join(' / ')
+        : (hero.duration || '');
 
-    // Timeline summary
-    const timeline = (od.timeline || []).filter(b => !b.isBreak);
-    const moduleSummary = timeline.map((b, i) =>
-        `  ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`
-    ).join('\n');
+    // Timeline summary grouped by day
+    const timeline = od.timeline || [];
+    let moduleSummary = '';
+    if (schedule.length > 1) {
+        moduleSummary = schedule.map(s => {
+            const dayBlocks = timeline.filter(b => (b.day || 1) === s.day);
+            const items = dayBlocks.map((b, i) => `    ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`).join('\n');
+            return `  【Day ${s.day}${s.topic ? ` — ${s.topic}` : ''}】\n${items || '    （尚未設定）'}`;
+        }).join('\n\n');
+    } else {
+        moduleSummary = timeline.map((b, i) =>
+            `  ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`
+        ).join('\n');
+    }
 
     // Prep items from equipment
     const equipItems = (od.equipment || []).map(e =>

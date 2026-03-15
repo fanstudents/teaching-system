@@ -337,19 +337,13 @@
                 <summary><span class="material-symbols-outlined" style="font-size:16px">info</span> 課程基本資訊</summary>
                 <div class="oe-fields">
                     <div class="oe-field"><label>課程副標題</label><input type="text" id="oeHeroSubtitle" placeholder="從 ChatGPT 到 Notion，掌握五大 AI 工具..."></div>
-                    <div class="oe-row">
-                        <div class="oe-field"><label>天數</label>
-                            <select id="oeHeroDays">
-                                <option value="1">1 天</option>
-                                <option value="2">2 天</option>
-                                <option value="3">3 天</option>
-                                <option value="4">4 天</option>
-                                <option value="5">5 天</option>
-                            </select>
-                        </div>
-                        <div class="oe-field"><label>時數說明</label>
-                            <input type="text" id="oeHeroDuration" placeholder="例：第一天 7 小時、第二天 4 小時">
-                        </div>
+                    <!-- 天數排程 -->
+                    <div style="margin-top:8px">
+                        <label style="font-size:0.78rem;font-weight:600;color:var(--text-2);margin-bottom:6px;display:block">授課天數排程</label>
+                        <div id="oeScheduleList" style="display:flex;flex-direction:column;gap:6px"></div>
+                        <button class="oe-add-btn" onclick="addScheduleDay()" style="margin-top:6px">
+                            <span class="material-symbols-outlined">add</span> 新增天數
+                        </button>
                     </div>
                     <div class="oe-row">
                         <div class="oe-field"><label>人數</label>
