@@ -285,6 +285,29 @@ body {
     font-size: 0.88rem; font-weight: 600; color: var(--text-1);
 }
 
+/* Multi-day side-by-side grid */
+.timeline-grid {
+    display: grid; gap: 24px;
+}
+.timeline-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.timeline-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.timeline-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.timeline-day-col {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+}
+.timeline-day-col .timeline-day-header {
+    margin-top: 0;
+}
+.timeline-day-col .timeline-block {
+    padding: 12px 14px;
+}
+@media (max-width: 768px) {
+    .timeline-grid-2, .timeline-grid-3, .timeline-grid-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ── Tool Cards ── */
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
 .tool-card {

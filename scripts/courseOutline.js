@@ -168,54 +168,45 @@ function renderOutlineFromDB() {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
             const schedule = od.schedule || [{ day: 1, hours: '', topic: '' }];
-            const showDayHeaders = schedule.length > 1;
+            const isMultiDay = schedule.length > 1;
+
+            const renderBlocks = (blocks) => blocks.map(block => {
+                const tags = (block.tags || []).map((t, i) =>
+                    `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
+                ).join('');
+                return `<div class="timeline-block">
+                    <div class="timeline-header">
+                        ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
+                        <div class="timeline-title">${block.title || ''}</div>
+                    </div>
+                    <div class="timeline-desc">${block.desc || ''}</div>
+                    ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
+                </div>`;
+            }).join('');
+
             let html = '';
-
-            schedule.forEach(dayInfo => {
-                const dayBlocks = od.timeline.filter(b => (b.day || 1) === dayInfo.day);
-                if (!dayBlocks.length) return;
-
-                // Day header — only show when multi-day
-                if (showDayHeaders) {
-                    html += `<div class="timeline-day-header">
-                        <span class="timeline-day-badge">Day ${dayInfo.day}</span>
-                        <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
-                    </div>`;
-                }
-
-                // Blocks for this day
-                html += dayBlocks.map(block => {
-                    const tags = (block.tags || []).map((t, i) =>
-                        `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
-                    ).join('');
-                    return `<div class="timeline-block">
-                        <div class="timeline-header">
-                            ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
-                            <div class="timeline-title">${block.title || ''}</div>
+            if (isMultiDay) {
+                // Side-by-side grid columns
+                const cols = schedule.map(dayInfo => {
+                    const dayBlocks = od.timeline.filter(b => (b.day || 1) === dayInfo.day);
+                    return `<div class="timeline-day-col">
+                        <div class="timeline-day-header">
+                            <span class="timeline-day-badge">Day ${dayInfo.day}</span>
+                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
                         </div>
-                        <div class="timeline-desc">${block.desc || ''}</div>
-                        ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
+                        ${renderBlocks(dayBlocks)}
                     </div>`;
                 }).join('');
-            });
-
-            // Also render blocks with no day match (legacy data)
-            const unmatchedBlocks = od.timeline.filter(b => !schedule.find(s => s.day === (b.day || 1)));
-            if (unmatchedBlocks.length) {
-                html += unmatchedBlocks.map(block => {
-                    const tags = (block.tags || []).map((t, i) =>
-                        `<span class="topic-tag${i === 0 ? ' highlight' : ''}">${t}</span>`
-                    ).join('');
-                    return `<div class="timeline-block">
-                        <div class="timeline-header">
-                            ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
-                            <div class="timeline-title">${block.title || ''}</div>
-                        </div>
-                        <div class="timeline-desc">${block.desc || ''}</div>
-                        ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
-                    </div>`;
-                }).join('');
+                html = `<div class="timeline-grid timeline-grid-${Math.min(schedule.length, 4)}">${cols}</div>`;
+            } else {
+                // Single day — flat
+                const dayBlocks = od.timeline.filter(b => (b.day || 1) === 1);
+                html = renderBlocks(dayBlocks);
             }
+
+            // Legacy unmatched blocks
+            const unmatchedBlocks = od.timeline.filter(b => !schedule.find(s => s.day === (b.day || 1)));
+            if (unmatchedBlocks.length) html += renderBlocks(unmatchedBlocks);
 
             timelineEl.innerHTML = html + `<div class="timeline-note">※ 以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</div>`;
         }
@@ -307,8 +298,8 @@ function enterPage() {
         const sv = document.getElementById('studentView');
         if (sv) sv.style.display = 'none';
         loadStudents();
-        loadInstructors();
-        loadOrganizations();
+        await loadInstructors();
+        await loadOrganizations();
         initOutlineEditor();
 
         // Set preview button href
