@@ -462,7 +462,35 @@ function initOutlineEditor() {
     // Bind buttons
     document.getElementById('btnSaveOutline').addEventListener('click', saveOutlineData);
     document.getElementById('btnImportDefaults').addEventListener('click', importDefaults);
-    document.getElementById('btnAiGenOutline').addEventListener('click', () => document.getElementById('aiOutlineModal').classList.add('show'));
+    document.getElementById('btnAiGenOutline').addEventListener('click', () => {
+        const modal = document.getElementById('aiOutlineModal');
+        modal.classList.add('show');
+        // Restore previous AI form values
+        const saved = localStorage.getItem(`aiOlForm_${projectData?.id}`);
+        if (saved) {
+            try {
+                const f = JSON.parse(saved);
+                _v('aiOlClient', f.client);
+                _v('aiOlIndustry', f.industry);
+                _v('aiOlDepts', f.depts);
+                _v('aiOlDays', f.days);
+                _v('aiOlHours', f.hours);
+                _v('aiOlLevel', f.level);
+                _v('aiOlTranscript', f.transcript);
+                // Trigger per-day tool update then fill
+                if (typeof updateAiToolInputs === 'function') updateAiToolInputs();
+                if (f.dayTools?.length) {
+                    f.dayTools.forEach(dt => {
+                        const inp = document.querySelector(`.ai-day-tools[data-day="${dt.day}"]`);
+                        if (inp) inp.value = dt.value;
+                    });
+                } else if (f.tools) {
+                    const singleInput = document.getElementById('aiOlTools');
+                    if (singleInput) singleInput.value = f.tools;
+                }
+            } catch(e) {}
+        }
+    });
 }
 
 function _v(id, val) {
@@ -1359,8 +1387,17 @@ window.startAiOutlineGeneration = async function() {
     const hours = document.getElementById('aiOlHours').value;
     const level = document.getElementById('aiOlLevel').value;
 
-    // Collect per-day or single tool inputs
+    // Save form values for next time
     const dayToolInputs = document.querySelectorAll('.ai-day-tools');
+    const formData = { client, industry, depts, days, hours, level, transcript };
+    if (dayToolInputs.length > 0) {
+        formData.dayTools = Array.from(dayToolInputs).map(inp => ({ day: inp.dataset.day, value: inp.value.trim() }));
+    } else {
+        formData.tools = document.getElementById('aiOlTools')?.value.trim() || '';
+    }
+    if (projectData?.id) localStorage.setItem(`aiOlForm_${projectData.id}`, JSON.stringify(formData));
+
+    // Collect per-day or single tool inputs
     let toolsInfo = '';
     if (dayToolInputs.length > 0) {
         const parts = [];
