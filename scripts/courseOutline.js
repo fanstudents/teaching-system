@@ -1047,9 +1047,20 @@ window.handleFileUpload = async (input) => {
         if (file.size > 50*1024*1024) { alert('檔案上限 50MB'); continue; }
         const key = `outlines/${sessionData?.session_code||'default'}/${currentUser?.email||'anon'}/${Date.now()}_${file.name}`;
         const { data, error } = await storage.upload('outline-files', key, file);
-        if (error) { alert('上傳失敗'); } else {
+        if (error) { alert('上傳失敗：' + (error.message || '未知錯誤')); } else {
             uploadedFiles.push({ name: file.name, size: file.size, url: data.url, key });
             renderFileList();
+            // Toast notification
+            const toast = document.createElement('div');
+            toast.textContent = `✓ ${file.name} 上傳成功`;
+            Object.assign(toast.style, {
+                position:'fixed',bottom:'24px',right:'24px',background:'#059669',color:'#fff',
+                padding:'10px 20px',borderRadius:'8px',fontSize:'0.85rem',fontWeight:'600',
+                boxShadow:'0 4px 16px rgba(0,0,0,0.15)',zIndex:'9999',
+                animation:'fadeIn 0.3s ease'
+            });
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 2500);
         }
     }
     input.value = '';
