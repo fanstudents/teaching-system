@@ -588,6 +588,7 @@
         let sessions = [];
         let students = [];
         let purchases = [];
+        let clientMap = {}; // org id → name
         let assignments = [];
 
 
@@ -638,8 +639,10 @@
         // ── Load Client Options (for project binding) ──
         async function loadClientOptions() {
             try {
-                const { data } = await db.select('organizations', 'select=id,name,logo_url&order=name.asc');
+                const { data } = await db.select('organizations', { select: 'id,name,logo_url', order: 'name.asc' });
                 const orgs = data || [];
+                clientMap = {};
+                orgs.forEach(o => clientMap[o.id] = o.name);
                 const optionsHtml = '<option value="">— 不綁定 —</option>' +
                     orgs.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
                 ['createClient', 'editClient'].forEach(id => {
@@ -731,6 +734,7 @@
                 <div class="project-card" data-id="${p.id}">
                     <div class="pcard-top">
                         <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
+                        ${pType === 'corporate' && p.organization_id && clientMap[p.organization_id] ? `<span style="font-size:0.72rem;color:var(--text-2);display:flex;align-items:center;gap:3px"><span class="material-symbols-outlined" style="font-size:13px">business</span>${clientMap[p.organization_id]}</span>` : ''}
                         <span class="card-phase ${phase}"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
                     </div>
                     <div class="pcard-name">${p.name || '未命名'}</div>
@@ -833,6 +837,7 @@
                 <div class="pd-header-row">
                     <div class="pd-info">
                         <span class="cat-tag cat-${pType}">${catLabel[pType] || pType}</span>
+                        ${pType === 'corporate' && p.organization_id && clientMap[p.organization_id] ? `<span style="font-size:0.8rem;color:var(--text-2);display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span class="material-symbols-outlined" style="font-size:14px">business</span>${clientMap[p.organization_id]}</span>` : ''}
                         <h2 class="pd-title">${p.name || '未命名'}</h2>
                         <span class="card-phase ${phase}"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
                     </div>
