@@ -327,6 +327,13 @@ function initOutlineEditor() {
         _v('oeHeroLocation', od.hero.location || '現場實體授課');
     }
 
+    // Restore selected instructors
+    if (od?.instructorIds?.length) {
+        selectedInstructorIds = od.instructorIds;
+        renderSelectedInstructors();
+        renderStudentInstructors();
+    }
+
     // Populate timeline
     if (od?.timeline?.length > 0) {
         od.timeline.forEach(block => addTimelineBlock(block));
@@ -439,6 +446,9 @@ function collectOutlineData() {
         groupSize: document.getElementById('oeHeroGroupSize').value,
         location: document.getElementById('oeHeroLocation').value
     };
+
+    // Instructor IDs
+    od.instructorIds = [...selectedInstructorIds];
 
     // Timeline
     od.timeline = [...document.querySelectorAll('#oeTimelineList .oe-list-item')].map(el => ({
@@ -703,19 +713,66 @@ async function loadInstructors() {
         instructors.map(i => `<option value="${i.id}">${i.name}（${i.email}）</option>`).join('');
 }
 
-window.onInstructorSelected = (selectEl) => {
-    const inst = instructors.find(i => i.id === selectEl.value);
-    if (!inst) return;
+// Track selected instructor IDs
+let selectedInstructorIds = [];
+
+window.addInstructorToList = (selectEl) => {
+    const id = selectEl.value;
+    if (!id || selectedInstructorIds.includes(id)) { selectEl.value = ''; return; }
+    selectedInstructorIds.push(id);
+    selectEl.value = '';
+    renderSelectedInstructors();
+    renderStudentInstructors();
+};
+
+window.removeInstructorFromList = (id) => {
+    selectedInstructorIds = selectedInstructorIds.filter(x => x !== id);
+    renderSelectedInstructors();
+    renderStudentInstructors();
+};
+
+function renderSelectedInstructors() {
+    const container = document.getElementById('selectedInstructorsList');
+    if (!container) return;
+    if (!selectedInstructorIds.length) {
+        container.innerHTML = '<div style="color:var(--text-3);font-size:0.82rem;padding:12px 0">尚未選擇講師</div>';
+        return;
+    }
+    container.innerHTML = selectedInstructorIds.map(id => {
+        const inst = instructors.find(i => i.id === id);
+        if (!inst) return '';
+        const photo = inst.photo_url
+            ? `<img src="${inst.photo_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">`
+            : '<span class="material-symbols-outlined" style="font-size:20px;color:var(--text-3)">person</span>';
+        return `<div style="display:flex;align-items:center;gap:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px">
+            ${photo}
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:0.88rem">${inst.name}</div>
+                <div style="font-size:0.75rem;color:var(--text-3)">${inst.title || inst.email}</div>
+            </div>
+            <button class="btn btn-outline" style="padding:4px 6px;font-size:0.75rem" onclick="removeInstructorFromList('${id}')">
+                <span class="material-symbols-outlined" style="font-size:14px">close</span>
+            </button>
+        </div>`;
+    }).join('');
+}
+
+function renderStudentInstructors() {
     const el = document.getElementById('instructorContent');
     if (!el) return;
-    const photo = inst.photo_url
-        ? `<img class="instructor-photo" src="${inst.photo_url}" alt="${inst.name}">`
-        : '<div class="instructor-photo-placeholder"><span class="material-symbols-outlined">person</span></div>';
-    const specs = (inst.specialties||[]).map(s=>`<span class="instructor-tag">${s}</span>`).join('');
-    const gallery = (inst.teaching_photos||[]);
-    const galleryHtml = gallery.length ? `<div class="instructor-gallery"><div class="instructor-gallery-title">📸 授課紀錄</div><div class="instructor-gallery-grid">${gallery.map(u=>`<img src="${u}" alt="授課照片" loading="lazy">`).join('')}</div></div>` : '';
-    el.innerHTML = `<div class="instructor-card"><div class="instructor-main">${photo}<div class="instructor-info"><div class="instructor-name">${inst.name}</div><div class="instructor-title-text">${inst.title||'AI 數位教學設計師'}</div><div class="instructor-bio">${inst.bio||''}</div><div class="instructor-tags">${specs}</div></div></div>${galleryHtml}</div>`;
-};
+    if (!selectedInstructorIds.length) { el.innerHTML = ''; return; }
+    el.innerHTML = selectedInstructorIds.map(id => {
+        const inst = instructors.find(i => i.id === id);
+        if (!inst) return '';
+        const photo = inst.photo_url
+            ? `<img class="instructor-photo" src="${inst.photo_url}" alt="${inst.name}">`
+            : '<div class="instructor-photo-placeholder"><span class="material-symbols-outlined">person</span></div>';
+        const specs = (inst.specialties||[]).map(s=>`<span class="instructor-tag">${s}</span>`).join('');
+        const gallery = (inst.teaching_photos||[]);
+        const galleryHtml = gallery.length ? `<div class="instructor-gallery"><div class="instructor-gallery-title">📸 授課紀錄</div><div class="instructor-gallery-grid">${gallery.map(u=>`<img src="${u}" alt="授課照片" loading="lazy">`).join('')}</div></div>` : '';
+        return `<div class="instructor-card"><div class="instructor-main">${photo}<div class="instructor-info"><div class="instructor-name">${inst.name}</div><div class="instructor-title-text">${inst.title||''}</div><div class="instructor-bio">${inst.bio||''}</div><div class="instructor-tags">${specs}</div></div></div>${galleryHtml}</div>`;
+    }).join('');
+}
 
 // ══════════════════════════════════════
 // ADMIN: Organization / Client Management

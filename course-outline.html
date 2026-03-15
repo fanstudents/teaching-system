@@ -436,19 +436,20 @@
             </div>
         </div>
 
-        <!-- Instructor Selector -->
+        <!-- Instructor Selector (Multi) -->
         <div class="admin-section">
             <div class="admin-section-title">
                 <span class="material-symbols-outlined">school</span>
                 講師選擇
             </div>
             <div class="form-group">
-                <label class="form-label">選擇講師（從後台資料庫載入）</label>
-                <select class="form-input" id="instructorSelect" onchange="onInstructorSelected(this)">
-                    <option value="">— 載入中... —</option>
+                <label class="form-label">新增講師（可選多位）</label>
+                <select class="form-input" id="instructorSelect" onchange="addInstructorToList(this)">
+                    <option value="">— 選擇講師 —</option>
                 </select>
             </div>
-            <p style="font-size:0.82rem;color:var(--text-3)">講師的照片、經歷和授課照片會從後台資料庫自動載入。如需新增或編輯講師資料，請前往<a href="partners#instructors" style="color:var(--accent)">合作夥伴管理</a>。</p>
+            <div id="selectedInstructorsList" style="display:flex;flex-direction:column;gap:8px;margin-top:8px"></div>
+            <p style="font-size:0.82rem;color:var(--text-3);margin-top:12px">如需新增或編輯講師資料，請前往<a href="manage.html" style="color:var(--accent)">講師管理</a>。</p>
         </div>
 
         <!-- Client / Organization (dynamic based on binding) -->
