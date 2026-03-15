@@ -701,7 +701,7 @@ function importDefaults() {
     const defaultTools = [
         { name: 'ChatGPT', purpose: '文字生成、文件撰寫、資料分析、Email 修潤', url: 'https://chat.openai.com', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' },
         { name: 'Gemini', purpose: 'Google 生態系 AI 助手、跨平台文件協作', url: 'https://gemini.google.com', logo: 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg' },
-        { name: 'NotebookLM', purpose: '文件知識庫建構、AI 輔助閱讀與研究', url: 'https://notebooklm.google.com', logo: 'https://notebooklm.google.com/favicon.ico' },
+        { name: 'NotebookLM', purpose: '文件知識庫建構、AI 輔助閱讀與研究', url: 'https://notebooklm.google.com', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/58/NotebookLM_icon.svg' },
         { name: 'Gamma', purpose: 'AI 驅動的簡報、文件與網頁自動設計', url: 'https://gamma.app', logo: 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg' },
         { name: 'Notion', purpose: 'AI 會議記錄、專案管理、團隊知識庫', url: 'https://www.notion.so', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png' },
     ];
@@ -1493,7 +1493,7 @@ function populateEditorFromAI(data) {
     const knownLogos = {
         'chatgpt': 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
         'gemini': 'https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690b6.svg',
-        'notebooklm': 'https://notebooklm.google.com/favicon.ico',
+        'notebooklm': 'https://upload.wikimedia.org/wikipedia/commons/5/58/NotebookLM_icon.svg',
         'gamma': 'https://assets-global.website-files.com/6537a67c83a22a5e41e9d55c/6537a67c83a22a5e41e9d639_Gamma_V2_Logo.svg',
         'notion': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
         'canva': 'https://static.canva.com/web/images/12487a1e0770d29571e580e0e3f9e839.svg',
@@ -1501,7 +1501,7 @@ function populateEditorFromAI(data) {
         'claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_logo.svg',
         'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/1/1d/Perplexity_AI_logo.svg',
         'midjourney': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Midjourney_Emblem.png',
-        'lovable': 'https://lovable.dev/favicon.ico',
+        'lovable': '/assets/images/lovable-icon.png',
         'cursor': 'https://cursor.sh/apple-touch-icon.png',
         'v0': 'https://v0.dev/apple-touch-icon.png',
     };
