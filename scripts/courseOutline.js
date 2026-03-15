@@ -591,44 +591,59 @@ function initOutlineEditor() {
     document.getElementById('btnAiGenOutline').addEventListener('click', () => {
         const modal = document.getElementById('aiOutlineModal');
         modal.classList.add('show');
-        // Render tool checkboxes for current day count
-        updateAiToolInputs();
+
+        // Pre-fill from project/org data as defaults
+        if (orgData?.name) _v('aiOlClient', orgData.name);
+        if (orgData?.industry) _v('aiOlIndustry', orgData.industry);
+
         // Restore previous AI form values
         const saved = localStorage.getItem(`aiOlForm_${projectData?.id}`);
         if (saved) {
             try {
                 const f = JSON.parse(saved);
-                _v('aiOlClient', f.client);
-                _v('aiOlIndustry', f.industry);
-                _v('aiOlDepts', f.depts);
-                _v('aiOlDays', f.days);
-                _v('aiOlHours', f.hours);
-                _v('aiOlLevel', f.level);
-                _v('aiOlTranscript', f.transcript);
-                // Re-render tools with saved selections
-                if (typeof updateAiToolInputs === 'function') updateAiToolInputs();
-                // Restore checkbox selections
-                if (f.dayTools?.length) {
+                if (f.client) _v('aiOlClient', f.client);
+                if (f.industry) _v('aiOlIndustry', f.industry);
+                if (f.depts) _v('aiOlDepts', f.depts);
+                if (f.days) _v('aiOlDays', f.days);
+                if (f.hours) _v('aiOlHours', f.hours);
+                if (f.level) _v('aiOlLevel', f.level);
+                if (f.transcript) _v('aiOlTranscript', f.transcript);
+            } catch(e) { console.warn('AI form restore error:', e); }
+        }
+
+        // Render tool checkboxes AFTER days is set
+        updateAiToolInputs();
+
+        // Restore tool checkboxes from saved data
+        if (saved) {
+            try {
+                const f = JSON.parse(saved);
+                const numDays = Math.ceil(parseFloat(f.days) || 1);
+                if (numDays > 1 && f.dayTools?.length) {
                     f.dayTools.forEach(dt => {
                         const prefix = `aiOlDay${dt.day}`;
-                        const knownTools = (dt.tools || []).filter(t => AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
-                        const otherTools = (dt.tools || []).filter(t => !AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
-                        knownTools.forEach(t => {
-                            const cb = document.querySelector(`.${prefix}-tool-cb[value="${AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase()) || t}"]`);
-                            if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+                        (dt.tools || []).forEach(t => {
+                            const isKnown = AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase());
+                            if (isKnown) {
+                                const cb = document.querySelector(`.${prefix}-tool-cb[value="${isKnown}"]`);
+                                if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+                            }
                         });
+                        const otherTools = (dt.tools || []).filter(t => !AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase()));
                         if (otherTools.length) {
                             const otherEl = document.querySelector(`.${prefix}-tool-other`);
                             if (otherEl) otherEl.value = otherTools.join(', ');
                         }
                     });
                 } else if (Array.isArray(f.tools) && f.tools.length) {
-                    const knownTools = f.tools.filter(t => AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
-                    const otherTools = f.tools.filter(t => !AI_TOOL_OPTIONS.map(o => o.toLowerCase()).includes(t.toLowerCase()));
-                    knownTools.forEach(t => {
-                        const cb = document.querySelector(`.aiOlSingle-tool-cb[value="${AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase()) || t}"]`);
-                        if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+                    f.tools.forEach(t => {
+                        const isKnown = AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase());
+                        if (isKnown) {
+                            const cb = document.querySelector(`.aiOlSingle-tool-cb[value="${isKnown}"]`);
+                            if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+                        }
                     });
+                    const otherTools = f.tools.filter(t => !AI_TOOL_OPTIONS.find(o => o.toLowerCase() === t.toLowerCase()));
                     if (otherTools.length) {
                         const otherEl = document.querySelector('.aiOlSingle-tool-other');
                         if (otherEl) otherEl.value = otherTools.join(', ');
