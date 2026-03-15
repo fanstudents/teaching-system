@@ -264,7 +264,6 @@ function enterPage() {
         loadInstructors();
         loadOrganizations();
         initOutlineEditor();
-        initHrEmail();
 
         // Set preview button href
         const previewBtn = document.getElementById('btnPreviewOutline');
@@ -275,6 +274,7 @@ function enterPage() {
         loadUploadedFiles();
     }
     updateTopbar();
+    initHrEmail();
 }
 
 function setupLoginForm() {
