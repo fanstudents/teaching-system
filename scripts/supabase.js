@@ -216,8 +216,8 @@ export const storage = {
      * @param {File|Blob} file
      */
     async upload(bucket, objectKey, file) {
-        // Use user token if available, fallback to anon key
-        const token = localStorage.getItem('_at') || sessionStorage.getItem('_at') || SUPABASE_ANON_KEY;
+        // Always use anon key for public bucket uploads (avoids expired JWT issues)
+        const token = SUPABASE_ANON_KEY;
 
         const res = await fetch(
             `${SUPABASE_URL}/storage/v1/object/${bucket}/${objectKey}`,

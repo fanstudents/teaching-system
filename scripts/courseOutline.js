@@ -1033,7 +1033,7 @@ ${clientName} 人力資源部 敬上`;
 }
 
 // ══════════════════════════════════════
-// FILE UPLOAD
+// FILE UPLOAD (with DB persistence)
 // ══════════════════════════════════════
 window.triggerFileUpload = () => document.getElementById('fileUploadInput').click();
 
@@ -1041,46 +1041,108 @@ window.handleFileUpload = async (input) => {
     const files = input.files;
     if (!files.length) return;
     const allowed = ['.ppt','.pptx','.doc','.docx','.pdf','.vsdx','.vsd','.xls','.xlsx','.txt'];
+    const progressEl = document.getElementById('uploadProgress');
+
     for (const file of files) {
         const ext = '.'+file.name.split('.').pop().toLowerCase();
         if (!allowed.includes(ext)) { alert(`不支援的格式：${ext}`); continue; }
         if (file.size > 50*1024*1024) { alert('檔案上限 50MB'); continue; }
-        const key = `outlines/${sessionData?.session_code||'default'}/${currentUser?.email||'anon'}/${Date.now()}_${file.name}`;
+
+        // Show progress
+        if (progressEl) {
+            progressEl.style.display = 'block';
+            progressEl.innerHTML = `
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);animation:spin 1s linear infinite">sync</span>
+                    <div style="flex:1">
+                        <div style="font-size:0.82rem;font-weight:600;margin-bottom:4px">正在上傳 ${file.name}...</div>
+                        <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden">
+                            <div style="height:100%;width:60%;background:var(--accent);border-radius:2px;animation:progressPulse 1.5s ease-in-out infinite"></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        const projectId = projectData?.id || 'default';
+        const key = `projects/${projectId}/${Date.now()}_${file.name}`;
         const { data, error } = await storage.upload('outline-files', key, file);
-        if (error) { alert('上傳失敗：' + (error.message || '未知錯誤')); } else {
-            uploadedFiles.push({ name: file.name, size: file.size, url: data.url, key });
+
+        if (error) {
+            if (progressEl) progressEl.style.display = 'none';
+            alert('上傳失敗：' + (error.message || '未知錯誤'));
+        } else {
+            // Save to DB
+            const fileRecord = {
+                project_id: projectId,
+                file_name: file.name,
+                file_size: file.size,
+                file_url: data.url,
+                storage_key: key,
+                uploaded_by: currentUser?.email || currentUser?.name || 'anonymous'
+            };
+            await db.insert('project_files', fileRecord);
+            uploadedFiles.push(fileRecord);
             renderFileList();
-            // Toast notification
-            const toast = document.createElement('div');
-            toast.textContent = `✓ ${file.name} 上傳成功`;
-            Object.assign(toast.style, {
-                position:'fixed',bottom:'24px',right:'24px',background:'#059669',color:'#fff',
-                padding:'10px 20px',borderRadius:'8px',fontSize:'0.85rem',fontWeight:'600',
-                boxShadow:'0 4px 16px rgba(0,0,0,0.15)',zIndex:'9999',
-                animation:'fadeIn 0.3s ease'
-            });
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 2500);
+
+            // Update progress to success
+            if (progressEl) {
+                progressEl.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:#059669">check_circle</span>
+                        <span style="font-size:0.82rem;font-weight:600;color:#059669">${file.name} 上傳完成</span>
+                    </div>`;
+                setTimeout(() => { progressEl.style.display = 'none'; }, 2500);
+            }
         }
     }
     input.value = '';
 };
 
-function loadUploadedFiles() { renderFileList(); }
+async function loadUploadedFiles() {
+    const projectId = projectData?.id;
+    if (!projectId) { renderFileList(); return; }
+    const { data } = await db.select('project_files', { project_id: projectId });
+    if (data?.length) {
+        uploadedFiles = data.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+    renderFileList();
+}
 
 function renderFileList() {
     const list = document.getElementById('fileList');
     if (!list || !uploadedFiles.length) { if(list) list.innerHTML=''; return; }
-    const icons = { ppt:'slideshow',pptx:'slideshow',doc:'article',docx:'article',xls:'table_chart',xlsx:'table_chart',pdf:'picture_as_pdf',vsd:'schema',vsdx:'schema' };
+    const icons = { ppt:'slideshow',pptx:'slideshow',doc:'article',docx:'article',xls:'table_chart',xlsx:'table_chart',pdf:'picture_as_pdf',vsd:'schema',vsdx:'schema',txt:'description' };
     list.innerHTML = uploadedFiles.map((f,i) => {
-        const ext = f.name.split('.').pop().toLowerCase();
+        const ext = (f.file_name||f.name||'').split('.').pop().toLowerCase();
         const icon = icons[ext] || 'description';
-        const size = f.size < 1024 ? f.size+'B' : f.size < 1048576 ? (f.size/1024).toFixed(1)+'KB' : (f.size/1048576).toFixed(1)+'MB';
-        return `<div class="file-item"><div class="file-item-left"><span class="material-symbols-outlined">${icon}</span><div><div class="file-item-name">${f.name}</div><div class="file-item-size">${size}</div></div></div><button class="file-delete-btn" onclick="removeFile(${i})"><span class="material-symbols-outlined">close</span></button></div>`;
+        const name = f.file_name || f.name;
+        const bytes = f.file_size || f.size || 0;
+        const size = bytes < 1024 ? bytes+'B' : bytes < 1048576 ? (bytes/1024).toFixed(1)+'KB' : (bytes/1048576).toFixed(1)+'MB';
+        const url = f.file_url || f.url || '#';
+        return `<div class="file-item">
+            <div class="file-item-left">
+                <span class="material-symbols-outlined">${icon}</span>
+                <div>
+                    <div class="file-item-name"><a href="${url}" target="_blank" style="color:inherit;text-decoration:none" title="點擊下載">${name}</a></div>
+                    <div class="file-item-size">${size}${f.uploaded_by ? ' · ' + f.uploaded_by : ''}</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:4px;align-items:center">
+                <a href="${url}" target="_blank" style="color:var(--accent);display:flex;align-items:center" title="下載"><span class="material-symbols-outlined" style="font-size:18px">download</span></a>
+                <button class="file-delete-btn" onclick="removeFile(${i})"><span class="material-symbols-outlined">close</span></button>
+            </div>
+        </div>`;
     }).join('');
 }
 
-window.removeFile = (idx) => { uploadedFiles.splice(idx,1); renderFileList(); };
+window.removeFile = async (idx) => {
+    const file = uploadedFiles[idx];
+    if (file?.id) {
+        await db.delete('project_files', file.id);
+    }
+    uploadedFiles.splice(idx, 1);
+    renderFileList();
+};
 window.outlineLogout = () => { sessionStorage.removeItem('outline_user'); location.reload(); };
 
 // ══════════════════════════════════════

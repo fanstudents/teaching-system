@@ -254,6 +254,10 @@
                     <div class="section-icon" style="background:#8b5cf6"><span class="material-symbols-outlined">upload_file</span></div>
                     <div><div class="section-title">工作附件上傳</div><div class="section-desc">上傳課堂練習所需的工作文件</div></div>
                 </div>
+                <div class="note-callout" style="margin-bottom:16px;background:#f0fdf4;border-color:#bbf7d0">
+                    <span class="material-symbols-outlined" style="color:#16a34a">lightbulb</span>
+                    <p>上傳您實際工作中使用的文件（如簡報、報告、表格等），講師將根據這些素材，在課程中設計<strong>客製化範例</strong>。讓學員能以真實工作情境進行練習，學完即可直接應用在日常工作上。</p>
+                </div>
                 <div class="file-upload-zone" onclick="triggerFileUpload()">
                     <span class="material-symbols-outlined">cloud_upload</span>
                     <p>點擊或拖放檔案至此處上傳</p>
@@ -262,6 +266,7 @@
                 <input type="file" id="fileUploadInput" style="display:none" multiple
                     accept=".ppt,.pptx,.doc,.docx,.pdf,.vsdx,.vsd,.xls,.xlsx,.txt"
                     onchange="handleFileUpload(this)">
+                <div id="uploadProgress" style="display:none;margin-top:12px"></div>
                 <div class="file-list" id="fileList"></div>
                 <div class="note-callout" style="margin-top:16px">
                     <span class="material-symbols-outlined">warning</span>

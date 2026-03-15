@@ -131,7 +131,22 @@ CREATE UNIQUE INDEX IF NOT EXISTS students_email_session_key ON public.students(
 CREATE INDEX IF NOT EXISTS idx_students_session_id ON public.students(session_id);
 
 -- ══════════════════════════════════════
--- 6. submissions
+-- 5b. project_files (course attachments)
+-- ══════════════════════════════════════
+CREATE TABLE IF NOT EXISTS public.project_files (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id uuid REFERENCES public.projects(id) ON DELETE CASCADE,
+  file_name text NOT NULL,
+  file_size bigint DEFAULT 0,
+  file_url text NOT NULL,
+  storage_key text,
+  uploaded_by text DEFAULT '',
+  created_at timestamptz DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_project_files_project ON public.project_files(project_id);
+
+-- ══════════════════════════════════════
+-- -- 6. submissions
 -- ══════════════════════════════════════
 CREATE TABLE IF NOT EXISTS public.submissions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
