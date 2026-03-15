@@ -271,7 +271,9 @@ function setupLoginForm() {
             }
         } else {
             const email = document.getElementById('loginUser').value.trim().toLowerCase();
-            const pass = document.getElementById('loginPass').value;
+            const pass = document.getElementById('loginPass').value.trim();
+
+            // 1) Try student login (email + password)
             const filter = { email: `eq.${email}`, login_password: `eq.${pass}` };
             if (sessionData) filter.session_code = `eq.${sessionData.session_code}`;
             const { data } = await db.select('students', { filter, select: 'name,email' });
@@ -279,10 +281,27 @@ function setupLoginForm() {
                 currentUser = data[0];
                 sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
                 enterPage();
-            } else {
-                errorEl.textContent = '帳號或密碼錯誤，請確認後重試';
-                errorEl.style.display = 'block';
+                return;
             }
+
+            // 2) Try client login (email + project join_code)
+            if (projectData?.join_code && pass === projectData.join_code) {
+                // Check if email matches org contact_email
+                if (orgData?.contact_email?.toLowerCase() === email) {
+                    currentUser = { name: orgData.contact_person || orgData.name || email, email, _isClient: true };
+                    sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+                    enterPage();
+                    return;
+                }
+                // Or just allow any email with correct join_code
+                currentUser = { name: email.split('@')[0], email, _isClient: true };
+                sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+                enterPage();
+                return;
+            }
+
+            errorEl.textContent = '帳號或密碼錯誤，請確認後重試';
+            errorEl.style.display = 'block';
         }
     });
 }
