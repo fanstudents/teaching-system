@@ -226,7 +226,15 @@ function renderOutlineFromDB() {
             if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
                 schedule = uniqueDays.map(d => {
                     const existing = schedule.find(s => s.day === d);
-                    return existing || { day: d, hours: '', topic: '' };
+                    if (existing) return existing;
+                    // Auto-compute hours from blocks
+                    const dayBlocks = od.timeline.filter(b => (b.day || 1) === d && !b.isBreak);
+                    let totalMin = 0;
+                    dayBlocks.forEach(b => {
+                        const m = (b.time || '').match(/(\d+)\s*分鐘/);
+                        if (m) totalMin += parseInt(m[1]);
+                    });
+                    return { day: d, hours: totalMin ? String(Math.round(totalMin / 60 * 10) / 10) : '', topic: '' };
                 });
             }
 
@@ -260,10 +268,8 @@ function renderOutlineFromDB() {
                 const dept = block.dept && block.dept !== '全部門' ? `<div class="timeline-dept-badge dept-custom"><span class="material-symbols-outlined" style="font-size:12px">group</span>${block.dept}</div>` : '';
                 return `<div class="timeline-block">
                     ${dept}
-                    <div class="timeline-header">
-                        ${block.time ? `<div class="timeline-time">${block.time}</div>` : ''}
-                        <div class="timeline-title">${block.title || ''}</div>
-                    </div>
+                    ${block.time ? `<div class="timeline-time" style="margin-bottom:6px">${block.time}</div>` : ''}
+                    <div class="timeline-title">${block.title || ''}</div>
                     <div class="timeline-desc">${block.desc || ''}</div>
                     ${tags ? `<div class="timeline-topics">${tags}</div>` : ''}
                 </div>`;
