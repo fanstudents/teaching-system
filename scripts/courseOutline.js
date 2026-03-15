@@ -1243,10 +1243,11 @@ function initHrEmail() {
 
     // Timeline summary grouped by day — items only, no times, with dept
     const timeline = od.timeline || [];
+    const _isBreak = b => b.isBreak || /休息|午餐|break/i.test(b.title || '');
     let moduleSummary = '';
     if (schedule.length > 1) {
         moduleSummary = schedule.map(s => {
-            const dayBlocks = timeline.filter(b => (b.day || 1) === s.day && !b.isBreak);
+            const dayBlocks = timeline.filter(b => (b.day || 1) === s.day && !_isBreak(b));
             const items = dayBlocks.map((b, i) => {
                 const deptTag = (b.dept && b.dept !== '全部門') ? `【${b.dept}】` : '';
                 return `    ${i + 1}. ${b.title}${deptTag}`;
@@ -1254,7 +1255,7 @@ function initHrEmail() {
             return `  【Day ${s.day}${s.hours ? ` — ${s.hours} 小時` : ''}${s.topic ? ` ${s.topic}` : ''}】\n${items || '    （尚未設定）'}`;
         }).join('\n\n');
     } else {
-        const nonBreak = timeline.filter(b => !b.isBreak);
+        const nonBreak = timeline.filter(b => !_isBreak(b));
         moduleSummary = nonBreak.map((b, i) => {
             const deptTag = (b.dept && b.dept !== '全部門') ? `【${b.dept}】` : '';
             return `  ${i + 1}. ${b.title}${deptTag}`;
