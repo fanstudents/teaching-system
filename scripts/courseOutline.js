@@ -143,8 +143,10 @@ function renderOutlineFromDB() {
         if (metaEl) {
             // Build schedule text from schedule array
             let scheduleText = '';
-            if (od.schedule?.length) {
+            if (od.schedule?.length > 1) {
                 scheduleText = od.schedule.map(s => `Day ${s.day}：${s.hours || '?'} 小時`).join(' / ');
+            } else if (od.schedule?.length === 1) {
+                scheduleText = `${od.schedule[0].hours || ''} 小時`;
             } else if (od.hero.days) {
                 scheduleText = `${od.hero.days} 天` + (od.hero.duration ? ` — ${od.hero.duration}` : '');
             }
@@ -166,17 +168,20 @@ function renderOutlineFromDB() {
         const timelineEl = document.querySelector('.timeline');
         if (timelineEl) {
             const schedule = od.schedule || [{ day: 1, hours: '', topic: '' }];
+            const showDayHeaders = schedule.length > 1;
             let html = '';
 
             schedule.forEach(dayInfo => {
                 const dayBlocks = od.timeline.filter(b => (b.day || 1) === dayInfo.day);
                 if (!dayBlocks.length) return;
 
-                // Day header
-                html += `<div class="timeline-day-header">
-                    <span class="timeline-day-badge">Day ${dayInfo.day}</span>
-                    <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
-                </div>`;
+                // Day header — only show when multi-day
+                if (showDayHeaders) {
+                    html += `<div class="timeline-day-header">
+                        <span class="timeline-day-badge">Day ${dayInfo.day}</span>
+                        <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
+                    </div>`;
+                }
 
                 // Blocks for this day
                 html += dayBlocks.map(block => {
@@ -448,21 +453,25 @@ window.addScheduleDay = function(data = {}) {
     const dayNum = data.day || (list.children.length + 1);
     const div = document.createElement('div');
     div.className = 'oe-schedule-day';
-    div.style.cssText = 'display:flex;gap:8px;align-items:center;padding:6px 10px;background:#f8fafc;border:1px solid var(--border);border-radius:6px';
+    div.style.cssText = 'display:flex;gap:10px;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid #e0e7ff;border-radius:10px;transition:box-shadow 0.2s';
+    div.onmouseenter = () => div.style.boxShadow = '0 2px 8px rgba(99,102,241,0.08)';
+    div.onmouseleave = () => div.style.boxShadow = 'none';
     div.innerHTML = `
-        <span style="font-size:0.78rem;font-weight:700;color:var(--accent);white-space:nowrap">Day ${dayNum}</span>
+        <span class="oe-day-badge" style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:4px 10px;border-radius:6px;background:var(--accent);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;white-space:nowrap">Day ${dayNum}</span>
         <input type="hidden" data-key="day" value="${dayNum}">
-        <input type="text" data-key="hours" value="${_esc(data.hours || '')}" placeholder="時數 (如 7)" style="width:70px;font-size:0.82rem">
-        <span style="font-size:0.78rem;color:var(--text-3)">小時</span>
-        <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日主題" style="flex:1;font-size:0.82rem">
-        <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays()" style="position:static;width:24px;height:24px"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
+        <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 8px">
+            <input type="text" data-key="hours" value="${_esc(data.hours || '')}" placeholder="7" style="width:36px;font-size:0.85rem;border:none;outline:none;text-align:center;background:transparent;font-weight:600">
+            <span style="font-size:0.75rem;color:var(--text-3);white-space:nowrap">小時</span>
+        </div>
+        <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日課程主題" style="flex:1;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
+        <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
     `;
     list.appendChild(div);
 };
 
 window.renumberScheduleDays = function() {
     document.querySelectorAll('#oeScheduleList .oe-schedule-day').forEach((el, i) => {
-        el.querySelector('span').textContent = `Day ${i + 1}`;
+        el.querySelector('.oe-day-badge').textContent = `Day ${i + 1}`;
         el.querySelector('[data-key="day"]').value = i + 1;
     });
 };
