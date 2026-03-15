@@ -932,39 +932,39 @@ window.handleOrgLogoUpload = async (input) => {
 // HR NOTIFICATION EMAIL TEMPLATE
 // ══════════════════════════════════════
 function initHrEmail() {
-    const genBtn = document.getElementById('btnGenEmail');
+    const contentEl = document.getElementById('hrEmailContent');
     const copyBtn = document.getElementById('btnCopyEmail');
-    if (!genBtn) return;
+    if (!contentEl) return;
 
-    genBtn.addEventListener('click', () => {
-        const od = getOutlineData() || {};
-        const hero = od.hero || {};
-        const courseName = projectData?.name || '課程名稱';
-        const clientName = orgData?.name || '貴公司';
-        const joinCode = sessionData?.session_code || '';
-        const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
+    // Auto-generate email content
+    const od = getOutlineData() || {};
+    const hero = od.hero || {};
+    const courseName = projectData?.name || '課程名稱';
+    const clientName = orgData?.name || '貴公司';
+    const joinCode = sessionData?.session_code || '';
+    const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
 
-        // Schedule
-        const days = hero.days || '1';
-        const duration = hero.duration || '';
-        const scheduleText = duration ? `${days} 天（${duration}）` : `${days} 天`;
+    // Schedule
+    const days = hero.days || '1';
+    const duration = hero.duration || '';
+    const scheduleText = duration ? `${days} 天（${duration}）` : `${days} 天`;
 
-        // Timeline summary
-        const timeline = (od.timeline || []).filter(b => !b.isBreak);
-        const moduleSummary = timeline.map((b, i) =>
-            `  ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`
-        ).join('\n');
+    // Timeline summary
+    const timeline = (od.timeline || []).filter(b => !b.isBreak);
+    const moduleSummary = timeline.map((b, i) =>
+        `  ${i + 1}. ${b.title}${b.time ? `（${b.time}）` : ''}`
+    ).join('\n');
 
-        // Prep items from equipment
-        const equipItems = (od.equipment || []).map(e =>
-            `  ✓ ${e.label}${e.detail ? `：${e.detail}` : ''}`
-        ).join('\n');
-        const equipNote = od.equipNote || '';
+    // Prep items from equipment
+    const equipItems = (od.equipment || []).map(e =>
+        `  ✓ ${e.label}${e.detail ? `：${e.detail}` : ''}`
+    ).join('\n');
+    const equipNote = od.equipNote || '';
 
-        // Tools
-        const toolNames = (od.tools || []).map(t => t.name).join('、');
+    // Tools
+    const toolNames = (od.tools || []).map(t => t.name).join('、');
 
-        const email = `各位同仁好：
+    contentEl.textContent = `各位同仁好：
 
 公司將舉辦「${courseName}」教育訓練，誠摯邀請您參加。以下為課程相關資訊，請詳閱並預做準備。
 
@@ -981,7 +981,7 @@ ${hero.subtitle ? `課程說明：${hero.subtitle}` : ''}
 ${toolNames ? `使用工具：${toolNames}` : ''}
 
 課程模組：
-${moduleSummary || '  （請於管理端編輯課綱後再產生信件）'}
+${moduleSummary || '  （尚未設定課程模組）'}
 
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -1007,8 +1007,8 @@ ${equipNote ? `\n⚠️ ${equipNote}` : ''}
 📅 上課時間與地點
 ━━━━━━━━━━━━━━━━━━━━
 
-日　　期：【請填入上課日期，如 2026/4/15（二）】
-時　　間：【請填入上課時間，如 09:00 – 17:00】
+日　　期：【請填入上課日期】
+時　　間：【請填入上課時間】
 地　　點：【請填入上課地點】
 
 
@@ -1017,19 +1017,17 @@ ${equipNote ? `\n⚠️ ${equipNote}` : ''}
 
 ${clientName} 人力資源部 敬上`;
 
-        document.getElementById('hrEmailContent').textContent = email;
-        document.getElementById('hrEmailPreview').style.display = '';
-        copyBtn.style.display = '';
-    });
-
-    copyBtn.addEventListener('click', () => {
-        const content = document.getElementById('hrEmailContent').innerText;
-        navigator.clipboard.writeText(content).then(() => {
-            const orig = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已複製';
-            setTimeout(() => { copyBtn.innerHTML = orig; }, 2000);
+    // Copy button
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const text = contentEl.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已複製';
+                setTimeout(() => { copyBtn.innerHTML = orig; }, 2000);
+            });
         });
-    });
+    }
 }
 
 // ══════════════════════════════════════
