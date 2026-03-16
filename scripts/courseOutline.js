@@ -295,18 +295,18 @@ function renderDynamicContent() {
         // Extract dominant color from logo and apply to brand panel
         extractDominantColor(orgData.logo_url);
     }
-    // Update brand panel title — NO client name to avoid cross-project leaks
-    if (true) {
+    // Update brand panel title — show client name on page, OG/meta stays generic
+    if (clientName) {
         const brandTitle = document.getElementById('loginBrandTitle');
-        if (brandTitle) brandTitle.textContent = '數位簡報室課程規劃';
+        if (brandTitle) brandTitle.textContent = clientName;
         const brandSub = document.getElementById('loginBrandSub');
         if (brandSub) brandSub.textContent = '數位簡報室 - 為企業打造數位人才';
     }
 
     // Hero badge (no logo, just text)
-    if (badgeEl) {
+    if (badgeEl && clientName) {
         const projectType = projectData?.type === 'corporate' ? '企業內部培訓' : '課程規劃';
-        badgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">school</span> 數位簡報室 · ${projectType}`;
+        badgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">school</span> ${clientName} · ${projectType}`;
     }
 
     // Course name
@@ -763,6 +763,7 @@ function initOutlineEditor() {
     // Bind buttons
     document.getElementById('btnSaveOutline').addEventListener('click', saveOutlineData);
     document.getElementById('btnImportDefaults').addEventListener('click', importDefaults);
+    document.getElementById('btnImportProject')?.addEventListener('click', importFromProject);
 
     // Init drag-and-drop after all items are populated
     setTimeout(() => initDragAndDrop(), 0);
