@@ -323,12 +323,11 @@ function renderDynamicContent() {
         if (brandTitle) brandTitle.textContent = '課程管理後台';
         const brandSub = document.getElementById('loginBrandSub');
         if (brandSub) brandSub.textContent = '編輯課綱 · 管理學員 · 設定內容';
+        document.getElementById('labelUser').textContent = '管理密碼';
         const userField = document.getElementById('loginUser');
         userField.placeholder = '管理密碼';
         userField.type = 'password';
-        document.querySelector('#fieldEmail .material-symbols-outlined').textContent = 'key';
-        document.getElementById('fieldPassword').style.display = 'none';
-        document.getElementById('loginPass').removeAttribute('required');
+        document.querySelector('#fieldEmail .material-symbols-outlined').textContent = 'lock';
     }
 
     // Render outline from DB if available
@@ -661,34 +660,17 @@ function setupLoginForm() {
                 errorEl.style.display = 'block';
             }
         } else {
-            const email = document.getElementById('loginUser').value.trim().toLowerCase();
-            const pass = document.getElementById('loginPass').value.trim();
+            const code = document.getElementById('loginUser').value.trim();
 
-            // 1) Try student login (email + password)
-            const filter = { email: `eq.${email}`, login_password: `eq.${pass}` };
-            if (sessionData) filter.session_code = `eq.${sessionData.session_code}`;
-            const { data } = await db.select('students', { filter, select: 'name,email' });
-            if (data?.length) {
-                currentUser = data[0];
+            // Match join_code from project
+            if (projectData?.join_code && code === projectData.join_code) {
+                currentUser = { name: '訪客', _isClient: true };
                 sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
                 enterPage();
                 return;
             }
 
-            // 2) Try client login (email + project join_code)
-            if (projectData?.join_code && pass === projectData.join_code) {
-                // Check if email is in org's contact_email list (comma-separated)
-                const allowedEmails = (orgData?.contact_email || '')
-                    .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
-                if (allowedEmails.includes(email)) {
-                    currentUser = { name: orgData.contact_person || orgData.name || email, email, _isClient: true };
-                    sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
-                    enterPage();
-                    return;
-                }
-            }
-
-            errorEl.textContent = '帳號或密碼錯誤，請確認後重試';
+            errorEl.textContent = '專案代碼錯誤，請確認後重試';
             errorEl.style.display = 'block';
         }
     });

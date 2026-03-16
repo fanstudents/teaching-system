@@ -509,7 +509,7 @@ body {
     transition: all 0.2s ease; box-shadow: var(--shadow-sm);
 }
 .tool-card:hover { box-shadow: var(--shadow-md); border-color: rgba(99,102,241,0.15); transform: translateY(-2px); }
-.tool-logo { height: 40px; width: auto; margin-bottom: 14px; object-fit: contain; display: block; }
+.tool-logo { height: 36px; max-height: 36px; max-width: 120px; margin-bottom: 14px; object-fit: contain; display: block; }
 .tool-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
 .tool-purpose { font-size: 0.82rem; color: var(--text-2); line-height: 1.6; margin-bottom: 10px; }
 .tool-url { font-size: 0.75rem; color: var(--accent); text-decoration: none; }

@@ -50,21 +50,21 @@
             <div class="login-form-header">
                 <img src="favicon.png" alt="Logo" class="login-form-logo">
                 <h1 id="loginTitle">課程大綱查閱</h1>
-                <p id="loginSubtext">請輸入您的 Email 與密碼以查看課程規劃內容</p>
+                <p id="loginSubtext">請輸入專案代碼以查看課程規劃內容</p>
             </div>
             <form id="loginForm" onsubmit="return false">
                 <div class="login-field-group">
-                    <label for="loginUser">電子郵件</label>
+                    <label for="loginUser" id="labelUser">專案代碼</label>
                     <div class="login-field" id="fieldEmail">
-                        <span class="material-symbols-outlined">mail</span>
-                        <input type="text" id="loginUser" placeholder="name@company.com" autocomplete="off" required>
+                        <span class="material-symbols-outlined">key</span>
+                        <input type="text" id="loginUser" placeholder="請輸入專案代碼" autocomplete="off" required>
                     </div>
                 </div>
-                <div class="login-field-group">
-                    <label for="loginPass">密碼 / 專案代碼</label>
+                <div class="login-field-group" id="fieldPasswordGroup" style="display:none">
+                    <label for="loginPass">密碼</label>
                     <div class="login-field" id="fieldPassword">
-                        <span class="material-symbols-outlined">key</span>
-                        <input type="password" id="loginPass" placeholder="請輸入密碼或專案代碼" required>
+                        <span class="material-symbols-outlined">lock</span>
+                        <input type="password" id="loginPass" placeholder="請輸入密碼">
                     </div>
                 </div>
                 <button type="submit" class="login-btn">
