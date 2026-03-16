@@ -661,8 +661,9 @@ function setupLoginForm() {
             }
         } else {
             const code = document.getElementById('loginUser').value.trim().toUpperCase();
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '驗證中...'; }
+            const submitBtn = form.querySelector('button');
+            const origHTML = submitBtn?.innerHTML || '';
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '驗證中...'; }
 
             try {
                 // 1) Match join_code from currently loaded project
@@ -675,7 +676,7 @@ function setupLoginForm() {
 
                 // 2) Search all projects for matching join_code
                 const { data: matchedProjects } = await db.select('projects', {
-                    filter: { join_code: `ilike.${code}` },
+                    filter: { join_code: `eq.${code}` },
                     limit: 1
                 });
                 if (matchedProjects?.length) {
@@ -696,7 +697,7 @@ function setupLoginForm() {
 
                 // 3) Search project_sessions for matching session_code
                 const { data: matchedSessions } = await db.select('project_sessions', {
-                    filter: { session_code: `ilike.${code}` },
+                    filter: { session_code: `eq.${code}` },
                     limit: 1
                 });
                 if (matchedSessions?.length) {
@@ -712,10 +713,10 @@ function setupLoginForm() {
                 errorEl.style.display = 'block';
             } catch(err) {
                 console.error('Login error:', err);
-                errorEl.textContent = '驗證失敗，請稍後重試';
+                errorEl.textContent = '驗證失敗：' + (err.message || '未知錯誤');
                 errorEl.style.display = 'block';
             } finally {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '登入查看'; }
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = origHTML; }
             }
         }
     });
