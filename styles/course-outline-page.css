@@ -760,26 +760,225 @@ body {
     text-decoration-color: rgba(0,0,0,0.12); text-underline-offset: 3px;
 }
 
-/* ── Responsive ── */
-@media (max-width: 640px) {
-    .outline-hero h1 { font-size: 1.5rem; }
-    .hero-meta { gap: 16px; }
-    .tool-grid { grid-template-columns: 1fr; }
-    .outline-container { padding: 32px 16px; }
-    .timeline { padding-left: 20px; }
-    .login-card { padding: 32px 24px; }
-    .instructor-main { flex-direction: column; align-items: center; text-align: center; }
-    .instructor-tags { justify-content: center; }
-    .equip-grid { grid-template-columns: 1fr 1fr; }
-    .instructor-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-    .admin-panel { padding: 16px; }
-    .admin-section { padding: 20px; }
-    .admin-table { font-size: 0.78rem; }
-    .outline-topbar { padding: 0 16px; }
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+    /* Topbar: two-row layout */
+    .outline-topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    .outline-topbar-left {
+        flex: 1;
+        min-width: 0; /* allow text truncation */
+    }
+    .outline-topbar-title {
+        font-size: 0.82rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .outline-topbar-title span {
+        display: none; /* hide "— 企業內訓專案" subtitle on mobile */
+    }
+    .outline-topbar-logo {
+        height: 22px !important;
+    }
+    .outline-topbar > div:last-child {
+        gap: 8px !important;
+    }
+    .outline-topbar .btn {
+        padding: 4px 8px !important;
+        font-size: 0.72rem !important;
+    }
+    .outline-topbar .btn .material-symbols-outlined {
+        font-size: 13px !important;
+    }
+    .topbar-user {
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+
+    /* Hero: tighter on mobile */
+    .outline-hero {
+        padding: 32px 20px 28px;
+    }
+    .outline-hero h1 {
+        font-size: 1.35rem;
+        line-height: 1.3;
+    }
+    .outline-hero-sub {
+        font-size: 0.82rem;
+        line-height: 1.6;
+    }
+    .outline-hero-badge {
+        font-size: 0.7rem;
+        padding: 4px 12px;
+    }
+    .hero-meta {
+        gap: 12px;
+        margin-top: 20px;
+    }
+    .hero-meta-item {
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+    .hero-meta-item .material-symbols-outlined {
+        font-size: 14px;
+    }
+    .client-logo-wrap {
+        padding: 8px 20px;
+        margin-bottom: 16px;
+    }
+    .client-logo-wrap img {
+        max-height: 40px;
+    }
+
+    /* Container */
+    .outline-container {
+        padding: 28px 16px;
+    }
+
+    /* Sections */
+    .outline-section {
+        margin-bottom: 36px;
+    }
+    .section-header {
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .section-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+    }
+    .section-icon .material-symbols-outlined {
+        font-size: 17px;
+    }
+    .section-title {
+        font-size: 1.05rem;
+    }
+    .section-desc {
+        font-size: 0.78rem;
+    }
+
+    /* Timeline */
+    .timeline {
+        padding-left: 20px;
+    }
+    .timeline::before {
+        left: 10px;
+    }
+    .timeline-block {
+        padding: 0 0 24px 18px;
+    }
+    .timeline-block::before {
+        left: -18px !important;
+        width: 10px !important;
+        height: 10px !important;
+    }
+    .timeline-time {
+        font-size: 0.72rem;
+    }
+    .timeline-title {
+        font-size: 0.9rem;
+    }
+    .timeline-desc {
+        font-size: 0.78rem;
+        line-height: 1.55;
+    }
+    .timeline-tags {
+        gap: 4px;
+    }
+    .timeline-tag {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+    }
+
+    /* Tool grid */
+    .tool-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .tool-card {
+        padding: 16px;
+    }
+    .tool-name {
+        font-size: 0.88rem;
+    }
+    .tool-purpose {
+        font-size: 0.78rem;
+    }
+
+    /* Equipment */
+    .equip-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .equip-card {
+        padding: 14px;
+    }
+
+    /* Instructor */
+    .instructor-main {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        gap: 16px;
+    }
+    .instructor-photo {
+        width: 100px;
+        height: 100px;
+    }
+    .instructor-tags {
+        justify-content: center;
+    }
+    .instructor-gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    /* Admin panel */
+    .admin-panel {
+        padding: 12px;
+    }
+    .admin-section {
+        padding: 16px;
+    }
+    .admin-table {
+        font-size: 0.75rem;
+    }
+
+    /* Schedule day header */
+    .schedule-day-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
 }
+
 @media (max-width: 480px) {
-    .equip-grid { grid-template-columns: 1fr; }
-    .hero-meta { flex-direction: column; align-items: center; gap: 10px; }
+    /* Even smaller screens */
+    .outline-hero h1 {
+        font-size: 1.2rem;
+    }
+    .hero-meta {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .equip-grid {
+        grid-template-columns: 1fr;
+    }
+    .outline-topbar .topbar-user span:not(.material-symbols-outlined) {
+        display: none; /* hide user name text, keep icon */
+    }
+    #btnExportPdf span:not(.material-symbols-outlined) {
+        display: none; /* hide "匯出 PDF" text, keep icon */
+    }
+    .outline-topbar .btn:last-child span:not(.material-symbols-outlined) {
+        display: none; /* hide "登出" text, keep icon */
+    }
 }
 
 @media print {
