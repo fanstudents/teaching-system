@@ -1370,6 +1370,131 @@ function importDefaults() {
     statusEl.style.color = 'var(--accent)';
 }
 
+// ── Import From Other Project ──
+async function importFromProject() {
+    const btn = document.getElementById('btnImportProject');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">hourglass_top</span> 載入中...';
+
+    try {
+        const { data: allProjects } = await db.select('projects', {
+            select: 'id,name,outline_data',
+            order: 'updated_at.desc'
+        });
+
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">content_copy</span> 導入其他專案';
+
+        if (!allProjects?.length) { alert('目前沒有其他專案可供導入'); return; }
+
+        const available = allProjects.filter(p =>
+            p.id !== projectData?.id && p.outline_data && Object.keys(p.outline_data).length > 0
+        );
+        if (!available.length) { alert('沒有其他含課綱資料的專案'); return; }
+
+        // Modal
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+        const modal = document.createElement('div');
+        modal.style.cssText = 'background:#fff;border-radius:16px;padding:28px 32px;max-width:480px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
+
+        let html = '<h3 style="margin:0 0 8px;font-size:1.1rem">導入其他專案課綱</h3>';
+        html += '<p style="font-size:0.82rem;color:#64748b;margin:0 0 20px">選擇一個專案，其課綱內容將覆蓋目前的編輯內容</p>';
+        html += '<div style="display:flex;flex-direction:column;gap:8px">';
+
+        available.forEach(p => {
+            const tl = p.outline_data?.timeline || [];
+            const tools = p.outline_data?.tools || [];
+            const moduleCount = tl.filter(b => !b.isBreak).length;
+            const subtitle = p.outline_data?.hero?.subtitle || '';
+            const meta = [];
+            if (moduleCount) meta.push(moduleCount + ' 個模組');
+            if (tools.length) meta.push(tools.length + ' 個工具');
+            const metaStr = meta.length ? meta.join(' · ') : '尚無內容';
+
+            html += '<button class="import-proj-item" data-id="' + p.id + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
+            html += '<div style="font-weight:700;font-size:0.92rem;margin-bottom:4px">' + (p.name || '未命名專案') + '</div>';
+            if (subtitle) html += '<div style="font-size:0.78rem;color:#64748b;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px">' + subtitle + '</div>';
+            html += '<div style="font-size:0.72rem;color:#94a3b8">' + metaStr + '</div>';
+            html += '</button>';
+        });
+
+        html += '</div>';
+        html += '<button id="importProjCancel" style="margin-top:16px;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:0.85rem;font-family:inherit;color:#64748b">取消</button>';
+        modal.innerHTML = html;
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Hover
+        modal.querySelectorAll('.import-proj-item').forEach(b => {
+            b.addEventListener('mouseenter', () => { b.style.borderColor = '#6366f1'; b.style.background = '#f5f3ff'; });
+            b.addEventListener('mouseleave', () => { b.style.borderColor = '#e2e8f0'; b.style.background = '#fff'; });
+        });
+
+        // Close
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('importProjCancel').addEventListener('click', () => overlay.remove());
+
+        // Select
+        modal.querySelectorAll('.import-proj-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const selected = available.find(p => p.id === item.dataset.id);
+                if (!selected) return;
+                if (!confirm('確定要導入「' + (selected.name || '未命名') + '」的課綱嗎？\n目前的編輯內容將被覆蓋。')) return;
+                overlay.remove();
+                _applyOutlineData(selected.outline_data);
+            });
+        });
+    } catch(err) {
+        console.error('Import error:', err);
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">content_copy</span> 導入其他專案';
+        alert('載入失敗：' + err.message);
+    }
+}
+
+function _applyOutlineData(od) {
+    if (!od) return;
+    document.getElementById('oeTimelineList').innerHTML = '';
+    document.getElementById('oeToolsList').innerHTML = '';
+    document.getElementById('oeEquipList').innerHTML = '';
+    _tlCounter = 0; _toolCounter = 0; _eqCounter = 0;
+
+    const _v = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+
+    if (od.hero) {
+        _v('oeHeroSubtitle', od.hero.subtitle);
+        _v('oeHeroDays', od.hero.days);
+        _v('oeHeroDuration', od.hero.duration);
+        _v('oeHeroGroupSize', od.hero.groupSize);
+        _v('oeHeroLocation', od.hero.location);
+    }
+
+    document.getElementById('oeScheduleList').innerHTML = '';
+    (od.schedule || []).forEach(s => addScheduleDay(s));
+    if (!od.schedule?.length) addScheduleDay({ day: 1, hours: '', topic: '' });
+
+    (od.timeline || []).forEach(b => addTimelineBlock(b));
+    (od.tools || []).forEach(t => addToolBlock(t));
+    (od.equipment || []).forEach(e => addEquipBlock(e));
+    _v('oeEquipNote', od.equipNote);
+
+    if (od.taConfig) {
+        _v('oeTaCount', od.taConfig.count);
+        _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
+    }
+
+    initDragAndDrop();
+    if (typeof _updateTimelineTimeRanges === 'function') _updateTimelineTimeRanges();
+
+    const status = document.getElementById('outlineSaveStatus');
+    if (status) {
+        status.textContent = '✓ 已成功導入課綱，請記得按「儲存」';
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 5000);
+    }
+}
+
 // ══════════════════════════════════════
 // ADMIN: Students
 // ══════════════════════════════════════
