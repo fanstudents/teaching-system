@@ -660,18 +660,63 @@ function setupLoginForm() {
                 errorEl.style.display = 'block';
             }
         } else {
-            const code = document.getElementById('loginUser').value.trim();
+            const code = document.getElementById('loginUser').value.trim().toUpperCase();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '驗證中...'; }
 
-            // Match join_code from project
-            if (projectData?.join_code && code === projectData.join_code) {
-                currentUser = { name: '訪客', _isClient: true };
-                sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
-                enterPage();
-                return;
+            try {
+                // 1) Match join_code from currently loaded project
+                if (projectData?.join_code && code === projectData.join_code.toUpperCase()) {
+                    currentUser = { name: '訪客', _isClient: true };
+                    sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+                    enterPage();
+                    return;
+                }
+
+                // 2) Search all projects for matching join_code
+                const { data: matchedProjects } = await db.select('projects', {
+                    filter: { join_code: `ilike.${code}` },
+                    limit: 1
+                });
+                if (matchedProjects?.length) {
+                    projectData = matchedProjects[0];
+                    if (projectData.organization_id) {
+                        const { data: orgs } = await db.select('organizations', { filter: { id: `eq.${projectData.organization_id}` } });
+                        if (orgs?.length) orgData = orgs[0];
+                    }
+                    const { data: sess } = await db.select('project_sessions', { filter: { project_id: `eq.${projectData.id}` }, order: 'date.asc', limit: 1 });
+                    if (sess?.length) sessionData = sess[0];
+
+                    renderDynamicContent();
+                    currentUser = { name: '訪客', _isClient: true };
+                    sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+                    enterPage();
+                    return;
+                }
+
+                // 3) Search project_sessions for matching session_code
+                const { data: matchedSessions } = await db.select('project_sessions', {
+                    filter: { session_code: `ilike.${code}` },
+                    limit: 1
+                });
+                if (matchedSessions?.length) {
+                    await loadSessionChain(matchedSessions[0].session_code);
+                    renderDynamicContent();
+                    currentUser = { name: '訪客', _isClient: true };
+                    sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+                    enterPage();
+                    return;
+                }
+
+                errorEl.textContent = '專案代碼錯誤，請確認後重試';
+                errorEl.style.display = 'block';
+            } catch(err) {
+                console.error('Login error:', err);
+                errorEl.textContent = '驗證失敗，請稍後重試';
+                errorEl.style.display = 'block';
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '登入查看'; }
             }
-
-            errorEl.textContent = '專案代碼錯誤，請確認後重試';
-            errorEl.style.display = 'block';
         }
     });
 }
