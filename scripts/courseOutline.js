@@ -295,25 +295,25 @@ function renderDynamicContent() {
         // Extract dominant color from logo and apply to brand panel
         extractDominantColor(orgData.logo_url);
     }
-    // Update brand panel title with client name
-    if (clientName) {
+    // Update brand panel title — NO client name to avoid cross-project leaks
+    if (true) {
         const brandTitle = document.getElementById('loginBrandTitle');
-        if (brandTitle) brandTitle.textContent = clientName;
+        if (brandTitle) brandTitle.textContent = '數位簡報室課程規劃';
         const brandSub = document.getElementById('loginBrandSub');
-        if (brandSub) brandSub.textContent = '企業內訓課程規劃';
+        if (brandSub) brandSub.textContent = '數位簡報室 - 為企業打造數位人才';
     }
 
     // Hero badge (no logo, just text)
-    if (badgeEl && clientName) {
+    if (badgeEl) {
         const projectType = projectData?.type === 'corporate' ? '企業內部培訓' : '課程規劃';
-        badgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">school</span> ${clientName} · ${projectType}`;
+        badgeEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">school</span> 數位簡報室 · ${projectType}`;
     }
 
     // Course name
     const courseName = projectData?.name || 'AI 辦公室應用實戰班';
     const heroTitle = document.getElementById('heroTitle');
     if (heroTitle) heroTitle.textContent = courseName;
-    document.title = `課程規劃大綱 — ${courseName}`;
+    document.title = `數位簡報室課程規劃 — ${courseName}`;
 
     // Admin mode adjustments
     if (isAdmin) {
