@@ -878,7 +878,7 @@ function getScheduleOptions() {
 
 // ── Timeline Block ──
 let _tlCounter = 0;
-window.addTimelineBlock = function(data = {}) {
+window.addTimelineBlock = function(data = {}, afterEl = null) {
     const list = document.getElementById('oeTimelineList');
     const idx = _tlCounter++;
     const dayOptions = getScheduleOptions();
@@ -896,18 +896,21 @@ window.addTimelineBlock = function(data = {}) {
         <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
         <div class="oe-field" style="margin-top:8px"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
     `;
-    // Set day value after appending
     if (data.day) {
         const sel = div.querySelector('[data-key="day"]');
         sel.value = data.day;
     }
-    list.appendChild(div);
+    if (afterEl && afterEl.parentNode === list) {
+        list.insertBefore(div, afterEl.nextSibling);
+    } else {
+        list.appendChild(div);
+    }
     _makeDraggable(div);
 };
 
 // ── Tool Block ──
 let _toolCounter = 0;
-window.addToolBlock = function(data = {}) {
+window.addToolBlock = function(data = {}, afterEl = null) {
     const list = document.getElementById('oeToolsList');
     const div = document.createElement('div');
     div.className = 'oe-list-item';
@@ -920,13 +923,17 @@ window.addToolBlock = function(data = {}) {
         <div class="oe-field" style="margin-top:8px"><label>用途</label><input type="text" data-key="purpose" value="${_esc(data.purpose || '')}" placeholder="文字生成、文件撰寫..."></div>
         <div class="oe-field" style="margin-top:8px"><label>Logo URL</label><input type="text" data-key="logo" value="${_esc(data.logo || '')}" placeholder="https://...svg"></div>
     `;
-    list.appendChild(div);
+    if (afterEl && afterEl.parentNode === list) {
+        list.insertBefore(div, afterEl.nextSibling);
+    } else {
+        list.appendChild(div);
+    }
     _makeDraggable(div);
 };
 
 // ── Equipment Block ──
 let _eqCounter = 0;
-window.addEquipBlock = function(data = {}) {
+window.addEquipBlock = function(data = {}, afterEl = null) {
     const list = document.getElementById('oeEquipList');
     const div = document.createElement('div');
     div.className = 'oe-list-item';
@@ -938,7 +945,11 @@ window.addEquipBlock = function(data = {}) {
         </div>
         <div class="oe-field" style="margin-top:8px"><label>說明</label><input type="text" data-key="detail" value="${_esc(data.detail || '')}" placeholder="每人 1 台，需可上網"></div>
     `;
-    list.appendChild(div);
+    if (afterEl && afterEl.parentNode === list) {
+        list.insertBefore(div, afterEl.nextSibling);
+    } else {
+        list.appendChild(div);
+    }
     _makeDraggable(div);
 };
 
@@ -961,13 +972,26 @@ function _makeDraggable(el) {
         handle.setAttribute('draggable', 'true');
         el.insertBefore(handle, el.firstChild);
 
+        // Insert-below button
+        const insertBtn = document.createElement('button');
+        insertBtn.className = 'oe-insert-btn';
+        insertBtn.title = '在此下方插入新項目';
+        insertBtn.innerHTML = '<span class="material-symbols-outlined">add</span>';
+        insertBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const listId = el.closest('.oe-list')?.id;
+            if (listId === 'oeTimelineList') addTimelineBlock({}, el);
+            else if (listId === 'oeToolsList') addToolBlock({}, el);
+            else if (listId === 'oeEquipList') addEquipBlock({}, el);
+        });
+        el.appendChild(insertBtn);
+
         // Drag events on the handle
         handle.addEventListener('dragstart', (e) => {
             _dragItem = el;
             el.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', '');
-            // Use the whole card as drag image
             const rect = el.getBoundingClientRect();
             e.dataTransfer.setDragImage(el, rect.width / 2, 20);
         });
