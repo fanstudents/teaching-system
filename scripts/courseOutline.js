@@ -1903,7 +1903,7 @@ function _generateEmailText() {
     const courseName = projectData?.name || '課程名稱';
     const clientName = orgData?.name || '貴公司';
     const joinCode = projectData?.join_code || sessionData?.session_code || '';
-    const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
+    const loginUrl = joinCode ? `${location.origin}/portal.html?code=${joinCode}` : `${location.origin}/portal.html`;
 
     // Schedule — auto-detect days from timeline (same logic as render)
     const timeline = od.timeline || [];
