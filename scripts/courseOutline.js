@@ -661,7 +661,7 @@ function setupLoginForm() {
             }
         } else {
             const code = document.getElementById('loginUser').value.trim().toUpperCase();
-            const submitBtn = form.querySelector('button');
+            const submitBtn = e.target.querySelector('button');
             const origHTML = submitBtn?.innerHTML || '';
             if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '驗證中...'; }
 
