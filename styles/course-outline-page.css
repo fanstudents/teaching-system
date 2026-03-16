@@ -789,67 +789,165 @@ body {
     .file-section, .admin-panel { display: none !important; }
 }
 
-/* ══════════════════════════════════
-   OUTLINE CONTENT EDITOR
-   ══════════════════════════════════ */
+/* ══════════════════════════════════════
+   OUTLINE CONTENT EDITOR (Enhanced)
+   ══════════════════════════════════════ */
 .outline-edit-group {
-    border: 1px solid var(--border); border-radius: var(--radius-md);
-    margin-bottom: 12px; overflow: hidden;
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    margin-bottom: 16px; overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease;
 }
+.outline-edit-group:hover { box-shadow: var(--shadow-md); }
 .outline-edit-group summary {
-    padding: 12px 16px; font-size: 0.88rem; font-weight: 600;
+    padding: 14px 20px; font-size: 0.9rem; font-weight: 700;
     cursor: pointer; user-select: none; list-style: none;
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface-alt); transition: background 0.15s;
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--surface-alt) 0%, #eef2ff 100%);
+    transition: background 0.2s;
+    letter-spacing: -0.01em;
 }
-.outline-edit-group summary:hover { background: var(--border-light); }
+.outline-edit-group summary:hover { background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); }
 .outline-edit-group summary::before {
-    content: '▸'; font-size: 0.7rem; color: var(--text-3);
-    transition: transform 0.2s; flex-shrink: 0;
+    content: '▸'; font-size: 0.75rem; color: var(--accent);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); flex-shrink: 0;
+    width: 16px; text-align: center;
 }
 .outline-edit-group[open] summary::before { transform: rotate(90deg); }
-.outline-edit-group summary .material-symbols-outlined { color: var(--accent); }
+.outline-edit-group summary .material-symbols-outlined { color: var(--accent); font-size: 18px; }
 
-.oe-fields { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-.oe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.oe-field { display: flex; flex-direction: column; gap: 4px; }
-.oe-field label { font-size: 0.75rem; font-weight: 600; color: var(--text-2); }
-.oe-field input, .oe-field textarea, .oe-field select {
-    padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 0.82rem; font-family: inherit; background: white; color: var(--text);
-    outline: none; transition: border 0.15s;
+/* Open state inner glow */
+.outline-edit-group[open] {
+    border-color: rgba(99,102,241,0.2);
+    box-shadow: 0 4px 20px rgba(99,102,241,0.06);
 }
-.oe-field input:focus, .oe-field textarea:focus { border-color: var(--accent); }
-.oe-field textarea { resize: vertical; min-height: 60px; }
 
-.oe-list { padding: 8px 16px; display: flex; flex-direction: column; gap: 8px; }
+.oe-fields { padding: 20px; display: flex; flex-direction: column; gap: 14px; background: #fafbfe; }
+.oe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.oe-field { display: flex; flex-direction: column; gap: 5px; }
+.oe-field label {
+    font-size: 0.73rem; font-weight: 700; color: var(--text-2);
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.oe-field input, .oe-field textarea, .oe-field select {
+    padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 0.85rem; font-family: inherit; background: white; color: var(--text);
+    outline: none; transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.oe-field input:focus, .oe-field textarea:focus, .oe-field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.08);
+    background: white;
+}
+.oe-field input::placeholder, .oe-field textarea::placeholder {
+    color: #b0b8c9;
+}
+.oe-field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+
+/* ── List Container ── */
+.oe-list {
+    padding: 16px 20px; display: flex; flex-direction: column; gap: 10px;
+    background: #fafbfe;
+    counter-reset: oe-item;
+}
 .oe-list:empty::after {
     content: '尚無項目，點擊下方按鈕新增';
-    display: block; text-align: center; padding: 16px;
-    font-size: 0.8rem; color: var(--text-3);
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 16px;
+    font-size: 0.82rem; color: var(--text-3);
+    border: 2px dashed var(--border); border-radius: var(--radius-md);
+    background: white;
 }
 
+/* ── List Item Card ── */
 .oe-list-item {
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 12px; background: white; position: relative;
+    border: 1.5px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 16px 16px 48px; background: white; position: relative;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    border-left: 3px solid var(--accent);
+    counter-increment: oe-item;
 }
+.oe-list-item:hover {
+    box-shadow: 0 4px 16px rgba(99,102,241,0.08);
+    border-color: rgba(99,102,241,0.25);
+    transform: translateY(-1px);
+}
+
+/* Sequence number badge */
+.oe-list-item::after {
+    content: counter(oe-item);
+    position: absolute; left: 14px; top: 16px;
+    width: 24px; height: 24px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent) 0%, #818cf8 100%);
+    color: white; font-size: 0.72rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+}
+
+/* Delete button */
 .oe-list-item .oe-delete {
-    position: absolute; top: 8px; right: 8px;
+    position: absolute; top: 10px; right: 10px;
     background: none; border: none; cursor: pointer; color: var(--text-3);
-    padding: 2px; border-radius: 4px; transition: all 0.15s;
+    padding: 4px; border-radius: 8px; transition: all 0.2s;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0.4;
 }
+.oe-list-item:hover .oe-delete { opacity: 1; }
 .oe-list-item .oe-delete:hover { color: var(--danger); background: #fef2f2; }
 .oe-list-item .oe-delete .material-symbols-outlined { font-size: 16px; }
 
-.oe-list-item .oe-row { margin-top: 8px; }
+/* ── Drag Handle ── */
+.oe-drag-handle {
+    position: absolute; left: -2px; top: 0; bottom: 0; width: 42px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: grab; color: var(--text-3);
+    opacity: 0; transition: opacity 0.2s;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    z-index: 2;
+}
+.oe-drag-handle .material-symbols-outlined { font-size: 18px; pointer-events: none; }
+.oe-list-item:hover .oe-drag-handle { opacity: 0.5; }
+.oe-drag-handle:hover { opacity: 1 !important; color: var(--accent); background: rgba(99,102,241,0.04); }
+.oe-drag-handle:active { cursor: grabbing; }
+
+/* ── Drag States ── */
+.oe-list-item.dragging {
+    opacity: 0.35; transform: scale(0.97);
+    box-shadow: none; border-style: dashed;
+}
+.oe-list-item.drag-over {
+    border-top: 3px solid var(--accent) !important;
+    margin-top: -1px;
+    transition: none;
+}
+.oe-list-item.drag-over-bottom {
+    border-bottom: 3px solid var(--accent) !important;
+    margin-bottom: -1px;
+    transition: none;
+}
+
+.oe-list-item .oe-row { margin-top: 10px; }
 .oe-list-item .oe-field { margin-bottom: 0; }
 
+/* ── Add Button ── */
 .oe-add-btn {
-    margin: 0 16px 12px; font-size: 0.78rem !important; padding: 6px 12px !important;
+    margin: 4px 20px 16px; font-size: 0.8rem !important; padding: 8px 16px !important;
+    border-radius: 10px !important;
+    border: 2px dashed var(--border) !important;
+    color: var(--text-2) !important;
+    transition: all 0.2s !important;
+    justify-content: center;
+}
+.oe-add-btn:hover {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    background: rgba(99,102,241,0.04) !important;
 }
 
 /* Break block indicator */
-.oe-list-item.is-break { border-left: 3px solid var(--accent); background: var(--accent-light); }
+.oe-list-item.is-break { border-left: 3px solid var(--warning); background: #fffbeb; }
 
 /* ══════════════════════════════════════
    Print / PDF Export Styles

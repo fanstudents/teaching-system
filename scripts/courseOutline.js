@@ -757,6 +757,9 @@ function initOutlineEditor() {
     // Bind buttons
     document.getElementById('btnSaveOutline').addEventListener('click', saveOutlineData);
     document.getElementById('btnImportDefaults').addEventListener('click', importDefaults);
+
+    // Init drag-and-drop after all items are populated
+    setTimeout(() => initDragAndDrop(), 0);
     document.getElementById('btnAiGenOutline').addEventListener('click', () => {
         const modal = document.getElementById('aiOutlineModal');
         modal.classList.add('show');
@@ -899,6 +902,7 @@ window.addTimelineBlock = function(data = {}) {
         sel.value = data.day;
     }
     list.appendChild(div);
+    _makeDraggable(div);
 };
 
 // ── Tool Block ──
@@ -917,6 +921,7 @@ window.addToolBlock = function(data = {}) {
         <div class="oe-field" style="margin-top:8px"><label>Logo URL</label><input type="text" data-key="logo" value="${_esc(data.logo || '')}" placeholder="https://...svg"></div>
     `;
     list.appendChild(div);
+    _makeDraggable(div);
 };
 
 // ── Equipment Block ──
@@ -934,10 +939,115 @@ window.addEquipBlock = function(data = {}) {
         <div class="oe-field" style="margin-top:8px"><label>說明</label><input type="text" data-key="detail" value="${_esc(data.detail || '')}" placeholder="每人 1 台，需可上網"></div>
     `;
     list.appendChild(div);
+    _makeDraggable(div);
 };
 
 function _esc(str) {
     return (str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// ══════════════════════════════════════
+// DRAG AND DROP — Reorder List Items
+// ══════════════════════════════════════
+
+let _dragItem = null;
+
+function _makeDraggable(el) {
+    // Inject drag handle if not present
+    if (!el.querySelector('.oe-drag-handle')) {
+        const handle = document.createElement('div');
+        handle.className = 'oe-drag-handle';
+        handle.innerHTML = '<span class="material-symbols-outlined">drag_indicator</span>';
+        handle.setAttribute('draggable', 'true');
+        el.insertBefore(handle, el.firstChild);
+
+        // Drag events on the handle
+        handle.addEventListener('dragstart', (e) => {
+            _dragItem = el;
+            el.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', '');
+            // Use the whole card as drag image
+            const rect = el.getBoundingClientRect();
+            e.dataTransfer.setDragImage(el, rect.width / 2, 20);
+        });
+
+        handle.addEventListener('dragend', () => {
+            if (_dragItem) _dragItem.classList.remove('dragging');
+            _dragItem = null;
+            // Clean up all drag-over states
+            document.querySelectorAll('.oe-list-item.drag-over').forEach(i => i.classList.remove('drag-over'));
+        });
+    }
+}
+
+function initDragAndDrop() {
+    const lists = ['oeTimelineList', 'oeToolsList', 'oeEquipList'];
+    lists.forEach(id => {
+        const list = document.getElementById(id);
+        if (!list) return;
+        _setupDropZone(list);
+    });
+}
+
+function _setupDropZone(list) {
+    list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        const target = _getDropTarget(e, list);
+        // Clear previous indicators
+        list.querySelectorAll('.oe-list-item.drag-over').forEach(i => i.classList.remove('drag-over'));
+        if (target && target !== _dragItem) {
+            target.classList.add('drag-over');
+        }
+    });
+
+    list.addEventListener('dragleave', (e) => {
+        // Only clear if leaving the list entirely
+        if (!list.contains(e.relatedTarget)) {
+            list.querySelectorAll('.oe-list-item.drag-over').forEach(i => i.classList.remove('drag-over'));
+        }
+    });
+
+    list.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!_dragItem) return;
+
+        const target = _getDropTarget(e, list);
+        if (target && target !== _dragItem) {
+            // Determine if we insert before or after based on mouse position
+            const rect = target.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                list.insertBefore(_dragItem, target);
+            } else {
+                list.insertBefore(_dragItem, target.nextSibling);
+            }
+        }
+
+        // Clean up
+        list.querySelectorAll('.oe-list-item.drag-over').forEach(i => i.classList.remove('drag-over'));
+        if (_dragItem) _dragItem.classList.remove('dragging');
+        _dragItem = null;
+    });
+}
+
+function _getDropTarget(e, list) {
+    const items = [...list.querySelectorAll('.oe-list-item:not(.dragging)')];
+    // Find closest item to cursor
+    let closest = null;
+    let closestDist = Infinity;
+    for (const item of items) {
+        const rect = item.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const dist = Math.abs(e.clientY - midY);
+        if (dist < closestDist) {
+            closestDist = dist;
+            closest = item;
+        }
+    }
+    return closest;
 }
 
 // ── Collect Form Data ──
