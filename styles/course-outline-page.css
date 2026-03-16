@@ -762,42 +762,55 @@ body {
 
 /* ── Mobile Responsive ── */
 @media (max-width: 768px) {
-    /* Topbar: two-row layout */
+    /* Topbar: compact, no overflow */
     .outline-topbar {
-        flex-wrap: wrap;
         height: auto;
-        padding: 10px 16px;
-        gap: 8px;
+        padding: 8px 12px;
+        gap: 6px;
+        overflow: hidden;
     }
     .outline-topbar-left {
-        flex: 1;
-        min-width: 0; /* allow text truncation */
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 40%;
     }
     .outline-topbar-title {
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .outline-topbar-title span {
-        display: none; /* hide "— 企業內訓專案" subtitle on mobile */
+        display: none;
     }
     .outline-topbar-logo {
-        height: 22px !important;
+        height: 20px !important;
     }
     .outline-topbar > div:last-child {
-        gap: 8px !important;
+        gap: 6px !important;
+        flex-shrink: 0;
+    }
+    /* Hide button text, keep icons only */
+    #btnExportPdf span:not(.material-symbols-outlined) {
+        display: none;
     }
     .outline-topbar .btn {
-        padding: 4px 8px !important;
-        font-size: 0.72rem !important;
+        padding: 6px !important;
+        font-size: 0 !important;
+        min-width: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
     .outline-topbar .btn .material-symbols-outlined {
-        font-size: 13px !important;
+        font-size: 16px !important;
     }
     .topbar-user {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         gap: 4px;
+    }
+    .topbar-user span:not(.material-symbols-outlined) {
+        display: none;
     }
 
     /* Hero: tighter on mobile */
@@ -958,9 +971,8 @@ body {
 }
 
 @media (max-width: 480px) {
-    /* Even smaller screens */
     .outline-hero h1 {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
     }
     .hero-meta {
         flex-direction: column;
@@ -969,15 +981,6 @@ body {
     }
     .equip-grid {
         grid-template-columns: 1fr;
-    }
-    .outline-topbar .topbar-user span:not(.material-symbols-outlined) {
-        display: none; /* hide user name text, keep icon */
-    }
-    #btnExportPdf span:not(.material-symbols-outlined) {
-        display: none; /* hide "匯出 PDF" text, keep icon */
-    }
-    .outline-topbar .btn:last-child span:not(.material-symbols-outlined) {
-        display: none; /* hide "登出" text, keep icon */
     }
 }
 
