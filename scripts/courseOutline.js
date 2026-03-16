@@ -840,17 +840,21 @@ window.addScheduleDay = function(data = {}) {
     const dayNum = data.day || (list.children.length + 1);
     const div = document.createElement('div');
     div.className = 'oe-schedule-day';
-    div.style.cssText = 'display:flex;gap:10px;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid #e0e7ff;border-radius:10px;transition:box-shadow 0.2s';
+    div.style.cssText = 'display:flex;gap:10px;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid #e0e7ff;border-radius:10px;transition:box-shadow 0.2s;flex-wrap:wrap';
     div.onmouseenter = () => div.style.boxShadow = '0 2px 8px rgba(99,102,241,0.08)';
     div.onmouseleave = () => div.style.boxShadow = 'none';
     div.innerHTML = `
         <span class="oe-day-badge" style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:4px 10px;border-radius:6px;background:var(--accent);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;white-space:nowrap">Day ${dayNum}</span>
         <input type="hidden" data-key="day" value="${dayNum}">
         <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 8px">
-            <input type="text" data-key="hours" value="${_esc(data.hours || '')}" placeholder="7" style="width:36px;font-size:0.85rem;border:none;outline:none;text-align:center;background:transparent;font-weight:600">
-            <span style="font-size:0.75rem;color:var(--text-3);white-space:nowrap">小時</span>
+            <input type="time" data-key="startTime" value="${_esc(data.startTime || '09:00')}" style="width:80px;font-size:0.85rem;border:none;outline:none;background:transparent;font-weight:600" onchange="_updateTimelineTimeRanges()">
+            <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">開始</span>
         </div>
-        <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日課程主題" style="flex:1;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
+        <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 8px">
+            <input type="text" data-key="hours" value="${_esc(data.hours || '')}" placeholder="7" style="width:36px;font-size:0.85rem;border:none;outline:none;text-align:center;background:transparent;font-weight:600">
+            <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">小時</span>
+        </div>
+        <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日課程主題" style="flex:1;min-width:120px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
         <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
     `;
     list.appendChild(div);
@@ -867,6 +871,7 @@ function getScheduleDays() {
     return [...document.querySelectorAll('#oeScheduleList .oe-schedule-day')].map(el => ({
         day: parseInt(el.querySelector('[data-key="day"]').value),
         hours: el.querySelector('[data-key="hours"]').value.trim(),
+        startTime: el.querySelector('[data-key="startTime"]')?.value || '09:00',
         topic: el.querySelector('[data-key="topic"]').value.trim()
     }));
 }
@@ -882,17 +887,34 @@ window.addTimelineBlock = function(data = {}, afterEl = null) {
     const list = document.getElementById('oeTimelineList');
     const idx = _tlCounter++;
     const dayOptions = getScheduleOptions();
+    // Parse duration from existing data.time (may be "09:00 – 10:10（50 分鐘）" or "50 分鐘" or just a number)
+    let durationMin = data.duration || 0;
+    if (!durationMin && data.time) {
+        const m = data.time.match(/(\d+)\s*分鐘/);
+        if (m) durationMin = parseInt(m[1]);
+    }
+    const durationOpts = [10,15,20,30,40,50,60,90,120].map(v =>
+        `<option value="${v}"${v === durationMin ? ' selected' : ''}>${v} 分鐘</option>`
+    ).join('');
     const div = document.createElement('div');
     div.className = 'oe-list-item';
     div.dataset.idx = idx;
     div.innerHTML = `
-        <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
-        <div class="oe-row">
-            <div class="oe-field" style="max-width:90px"><label>天數</label><select data-key="day">${dayOptions}</select></div>
-            <div class="oe-field" style="max-width:100px"><label>時長</label><input type="text" data-key="time" value="${_esc(data.time || '')}" placeholder="60 分鐘"></div>
+        <button class="oe-delete" onclick="this.closest('.oe-list-item').remove();_updateTimelineTimeRanges()"><span class="material-symbols-outlined">close</span></button>
+        <div class="oe-row" style="grid-template-columns:80px 120px 1fr 120px">
+            <div class="oe-field"><label>天數</label><select data-key="day" onchange="_updateTimelineTimeRanges()">${dayOptions}</select></div>
+            <div class="oe-field"><label>時長</label>
+                <select data-key="duration" onchange="_updateTimelineTimeRanges()">
+                    <option value="">選擇</option>
+                    ${durationOpts}
+                    <option value="custom"${durationMin && ![10,15,20,30,40,50,60,90,120].includes(durationMin) ? ' selected' : ''}>自訂...</option>
+                </select>
+                <input type="number" data-key="customDuration" value="${durationMin && ![10,15,20,30,40,50,60,90,120].includes(durationMin) ? durationMin : ''}" placeholder="分鐘" min="5" max="300" style="display:${durationMin && ![10,15,20,30,40,50,60,90,120].includes(durationMin) ? 'block' : 'none'};margin-top:4px" onchange="_updateTimelineTimeRanges()">
+            </div>
             <div class="oe-field"><label>標題</label><input type="text" data-key="title" value="${_esc(data.title || '')}" placeholder="模組名稱"></div>
-            <div class="oe-field" style="max-width:140px"><label>部門</label><input type="text" data-key="dept" value="${_esc(data.dept || '全部門')}" placeholder="全部門"></div>
+            <div class="oe-field"><label>部門</label><input type="text" data-key="dept" value="${_esc(data.dept || '全部門')}" placeholder="全部門"></div>
         </div>
+        <div class="oe-time-range-badge" style="display:none"></div>
         <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
         <div class="oe-field" style="margin-top:8px"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
     `;
@@ -900,12 +922,21 @@ window.addTimelineBlock = function(data = {}, afterEl = null) {
         const sel = div.querySelector('[data-key="day"]');
         sel.value = data.day;
     }
+    // Show/hide custom duration input
+    const durSel = div.querySelector('[data-key="duration"]');
+    const customInput = div.querySelector('[data-key="customDuration"]');
+    durSel.addEventListener('change', () => {
+        customInput.style.display = durSel.value === 'custom' ? 'block' : 'none';
+        if (durSel.value !== 'custom') customInput.value = '';
+    });
     if (afterEl && afterEl.parentNode === list) {
         list.insertBefore(div, afterEl.nextSibling);
     } else {
         list.appendChild(div);
     }
     _makeDraggable(div);
+    // Trigger time range recalc
+    setTimeout(() => _updateTimelineTimeRanges(), 0);
 };
 
 // ── Tool Block ──
@@ -1054,6 +1085,8 @@ function _setupDropZone(list) {
         list.querySelectorAll('.oe-list-item.drag-over').forEach(i => i.classList.remove('drag-over'));
         if (_dragItem) _dragItem.classList.remove('dragging');
         _dragItem = null;
+        // Recalculate time ranges after reorder
+        if (list.id === 'oeTimelineList') _updateTimelineTimeRanges();
     });
 }
 
@@ -1073,6 +1106,76 @@ function _getDropTarget(e, list) {
     }
     return closest;
 }
+
+// ══════════════════════════════════════
+// LIVE TIME RANGE CALCULATOR
+// ══════════════════════════════════════
+
+window._updateTimelineTimeRanges = function() {
+    const schedule = getScheduleDays();
+    const scheduleMap = {};
+    schedule.forEach(s => { scheduleMap[s.day] = s; });
+
+    const dayAccum = {};
+    const items = document.querySelectorAll('#oeTimelineList .oe-list-item');
+    let totalMinAll = 0;
+
+    items.forEach(el => {
+        const day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+        const durSel = el.querySelector('[data-key="duration"]');
+        const customDur = el.querySelector('[data-key="customDuration"]');
+        let mins = 0;
+        if (durSel) {
+            mins = durSel.value === 'custom' ? (parseInt(customDur?.value) || 0) : (parseInt(durSel.value) || 0);
+        }
+
+        const badge = el.querySelector('.oe-time-range-badge');
+        if (!badge) return;
+
+        if (!mins) {
+            badge.style.display = 'none';
+            return;
+        }
+
+        const startTime = scheduleMap[day]?.startTime || '09:00';
+        const [sh, sm] = startTime.split(':').map(Number);
+        const baseMin = (sh * 60 + sm) + (dayAccum[day] || 0);
+        dayAccum[day] = (dayAccum[day] || 0) + mins;
+        totalMinAll += mins;
+
+        const startH = Math.floor(baseMin / 60), startM = baseMin % 60;
+        const endMin = baseMin + mins;
+        const endH = Math.floor(endMin / 60), endM = endMin % 60;
+        const pad = n => String(n).padStart(2, '0');
+
+        badge.style.display = 'flex';
+        badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">schedule</span>${pad(startH)}:${pad(startM)} – ${pad(endH)}:${pad(endM)}`;
+    });
+
+    // Update total summary
+    let summaryEl = document.getElementById('oeTimelineSummary');
+    if (!summaryEl) {
+        const list = document.getElementById('oeTimelineList');
+        if (list) {
+            summaryEl = document.createElement('div');
+            summaryEl.id = 'oeTimelineSummary';
+            summaryEl.style.cssText = 'padding:8px 20px;font-size:0.78rem;color:var(--text-2);display:flex;gap:16px;align-items:center;flex-wrap:wrap';
+            list.parentNode.insertBefore(summaryEl, list.nextSibling);
+        }
+    }
+    if (summaryEl && totalMinAll > 0) {
+        const hrs = Math.floor(totalMinAll / 60);
+        const remainMin = totalMinAll % 60;
+        const perDay = {};
+        Object.entries(dayAccum).forEach(([d, m]) => { perDay[d] = m; });
+        const dayBreakdown = Object.entries(perDay).map(([d, m]) =>
+            `Day ${d}: ${Math.floor(m/60)}h${m%60 ? m%60 + 'm' : ''}`
+        ).join('　');
+        summaryEl.innerHTML = `<span style="font-weight:700;color:var(--accent)">⏱ 總計 ${hrs}h${remainMin ? remainMin + 'm' : ''}</span><span style="color:var(--text-3)">${dayBreakdown}</span>`;
+    } else if (summaryEl) {
+        summaryEl.innerHTML = '';
+    }
+};
 
 // ── Collect Form Data ──
 function collectOutlineData() {
@@ -1094,15 +1197,41 @@ function collectOutlineData() {
     // Instructor IDs
     od.instructorIds = [...selectedInstructorIds];
 
-    // Timeline
-    od.timeline = [...document.querySelectorAll('#oeTimelineList .oe-list-item')].map(el => ({
-        day: parseInt(el.querySelector('[data-key="day"]')?.value || '1'),
-        time: el.querySelector('[data-key="time"]').value.trim(),
-        title: el.querySelector('[data-key="title"]').value.trim(),
-        desc: el.querySelector('[data-key="desc"]').value.trim(),
-        dept: el.querySelector('[data-key="dept"]')?.value.trim() || '全部門',
-        tags: el.querySelector('[data-key="tags"]').value.split(',').map(s => s.trim()).filter(Boolean)
-    }));
+    // Timeline — auto-format time ranges
+    const scheduleMap = {};
+    od.schedule.forEach(s => { scheduleMap[s.day] = s; });
+    const dayAccum = {}; // accumulated minutes per day
+    od.timeline = [...document.querySelectorAll('#oeTimelineList .oe-list-item')].map(el => {
+        const day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+        const durSel = el.querySelector('[data-key="duration"]');
+        const customDur = el.querySelector('[data-key="customDuration"]');
+        let mins = 0;
+        if (durSel) {
+            mins = durSel.value === 'custom' ? (parseInt(customDur?.value) || 0) : (parseInt(durSel.value) || 0);
+        }
+        // Compute formatted time
+        const startTime = scheduleMap[day]?.startTime || '09:00';
+        const [sh, sm] = startTime.split(':').map(Number);
+        const baseMin = (sh * 60 + sm) + (dayAccum[day] || 0);
+        dayAccum[day] = (dayAccum[day] || 0) + mins;
+        let timeStr = mins ? `${mins} 分鐘` : '';
+        if (mins) {
+            const startH = Math.floor(baseMin / 60), startM = baseMin % 60;
+            const endMin = baseMin + mins;
+            const endH = Math.floor(endMin / 60), endM = endMin % 60;
+            const pad = n => String(n).padStart(2, '0');
+            timeStr = `${pad(startH)}:${pad(startM)} – ${pad(endH)}:${pad(endM)}（${mins} 分鐘）`;
+        }
+        return {
+            day,
+            time: timeStr,
+            duration: mins,
+            title: el.querySelector('[data-key="title"]').value.trim(),
+            desc: el.querySelector('[data-key="desc"]').value.trim(),
+            dept: el.querySelector('[data-key="dept"]')?.value.trim() || '全部門',
+            tags: el.querySelector('[data-key="tags"]').value.split(',').map(s => s.trim()).filter(Boolean)
+        };
+    });
 
     // Tools — auto-resolve logos from registry
     od.tools = [...document.querySelectorAll('#oeToolsList .oe-list-item')].map(el => {

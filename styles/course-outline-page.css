@@ -949,6 +949,16 @@ body {
 /* Break block indicator */
 .oe-list-item.is-break { border-left: 3px solid var(--warning); background: #fffbeb; }
 
+/* ── Time Range Badge ── */
+.oe-time-range-badge {
+    display: none; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 5px 12px;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    border-radius: 8px; font-size: 0.78rem; font-weight: 700;
+    color: var(--accent); width: fit-content;
+    border: 1px solid rgba(99,102,241,0.12);
+}
+
 /* ── Insert Below Button ── */
 .oe-insert-btn {
     position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
