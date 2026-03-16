@@ -555,7 +555,17 @@
         async function loadChecklist() {
             const container = document.getElementById('checklistContainer');
             try {
-                const filter = sessionParam ? { session_code: `eq.${sessionParam}` } : {};
+                // Determine session code: use param, or find first session from project
+                let filterCode = sessionParam;
+                if (!filterCode && project?.id) {
+                    const { data: sessions } = await db.select('project_sessions', {
+                        filter: { project_id: `eq.${project.id}` },
+                        order: 'date.asc', limit: 1, select: 'session_code'
+                    });
+                    if (sessions?.length) filterCode = sessions[0].session_code;
+                }
+
+                const filter = filterCode ? { session_code: `eq.${filterCode}` } : {};
                 const { data: items } = await db.select('checklist_items', { order: 'sort_order.asc', filter });
                 checklistItems = items || [];
 
@@ -649,7 +659,17 @@
         async function loadSurvey() {
             const container = document.getElementById('surveyContainer');
             try {
-                const filter = sessionParam ? { session_code: `eq.${sessionParam}` } : {};
+                // Use same session resolution as checklist
+                let filterCode = sessionParam;
+                if (!filterCode && project?.id) {
+                    const { data: sessions } = await db.select('project_sessions', {
+                        filter: { project_id: `eq.${project.id}` },
+                        order: 'date.asc', limit: 1, select: 'session_code'
+                    });
+                    if (sessions?.length) filterCode = sessions[0].session_code;
+                }
+
+                const filter = filterCode ? { session_code: `eq.${filterCode}` } : {};
                 const { data: questions } = await db.select('survey_questions', { order: 'sort_order.asc', filter });
                 surveyQuestions = questions || [];
 
