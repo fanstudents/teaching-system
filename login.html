@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登入 — 教學系統</title>
+    <title>登入 — 數位簡報室 - 互動教學系統</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet">
@@ -21,207 +21,643 @@
         }
 
         body {
-            font-family: 'Noto Sans TC', -apple-system, sans-serif;
-            background: #fafafa;
+            font-family: 'Inter', 'Noto Sans TC', -apple-system, system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: #0a0a0f;
+            overflow: hidden;
+        }
+
+        /* ── Left Panel — Brand Side ── */
+        .login-brand {
+            flex: 1;
+            background: linear-gradient(160deg, #0a0a1a 0%, #0f1029 40%, #161638 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient glow orbs */
+        .login-brand::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+            top: -100px;
+            left: -150px;
+            pointer-events: none;
+        }
+
+        .login-brand::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+            bottom: -80px;
+            right: -100px;
+            pointer-events: none;
+        }
+
+        /* Grid pattern overlay */
+        .brand-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* Floating geometric shapes */
+        .brand-shapes {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .brand-shape {
+            position: absolute;
+            border: 1px solid rgba(99, 102, 241, 0.08);
+            border-radius: 4px;
+            animation: floatShape 20s ease-in-out infinite;
+        }
+
+        .brand-shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 15%;
+            left: 10%;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .brand-shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+            border-radius: 50%;
+            border-color: rgba(139, 92, 246, 0.06);
+            animation-delay: -7s;
+            animation-duration: 25s;
+        }
+
+        .brand-shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            bottom: 20%;
+            left: 25%;
+            transform: rotate(15deg);
+            border-color: rgba(99, 102, 241, 0.05);
+            animation-delay: -12s;
+        }
+
+        .brand-shape:nth-child(4) {
+            width: 40px;
+            height: 40px;
+            top: 30%;
+            right: 30%;
+            border-radius: 50%;
+            border-color: rgba(168, 85, 247, 0.07);
+            animation-delay: -4s;
+            animation-duration: 18s;
+        }
+
+        @keyframes floatShape {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            25% { transform: translateY(-20px) rotate(5deg); opacity: 1; }
+            50% { transform: translateY(-10px) rotate(-3deg); opacity: 0.7; }
+            75% { transform: translateY(-25px) rotate(8deg); opacity: 0.9; }
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+            max-width: 480px;
+            text-align: center;
+        }
+
+        .brand-icon {
+            width: 96px;
+            height: 96px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
-            -webkit-font-smoothing: antialiased;
+            margin-bottom: 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
 
-        body::before {
-            display: none;
+        .brand-icon img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            filter: brightness(1.15) drop-shadow(0 2px 12px rgba(99, 102, 241, 0.4));
         }
 
-        .login-container {
-            width: 100%;
-            max-width: 400px;
+        .brand-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 30%, #a5b4fc 60%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .brand-subtitle {
+            font-size: 1rem;
+            color: rgba(165, 180, 252, 0.5);
+            line-height: 1.7;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+        }
+
+        /* Feature highlights */
+        .brand-features {
+            display: flex;
+            gap: 32px;
+            margin-top: 56px;
             position: relative;
-            z-index: 1;
-            animation: slideUp 0.25s ease-out;
+            z-index: 2;
         }
 
-        @keyframes slideUp {
+        .brand-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(165, 180, 252, 0.35);
+            font-size: 0.82rem;
+            font-weight: 400;
+        }
+
+        .brand-feature .material-symbols-outlined {
+            font-size: 18px;
+            color: rgba(129, 140, 248, 0.4);
+        }
+
+        /* ── Right Panel — Form Side ── */
+        .login-form-side {
+            width: 520px;
+            min-width: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        /* Subtle top accent line */
+        .login-form-side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+        }
+
+        .login-form-wrapper {
+            width: 100%;
+            max-width: 360px;
+            animation: formFadeIn 0.5s ease-out;
+        }
+
+        @keyframes formFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(12px);
+                transform: translateY(16px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 28px;
+        .form-header {
+            margin-bottom: 40px;
         }
 
-        .login-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: #6366f1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
+        .form-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 20px;
         }
 
-        .login-logo .material-symbols-outlined {
-            font-size: 24px;
-            color: #fff;
-        }
-
-        .login-header h1 {
-            font-size: 1.3rem;
+        .form-header h1 {
+            font-size: 1.6rem;
             font-weight: 700;
             color: #0f172a;
             letter-spacing: -0.03em;
+            margin-bottom: 8px;
         }
 
-        .login-header p {
-            font-size: 0.82rem;
-            color: #94a3b8;
-            margin-top: 4px;
-        }
-
-        .login-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #334155;
-            letter-spacing: -0.01em;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
+        .form-header p {
             font-size: 0.88rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Form Elements */
+        .login-form-group {
+            margin-bottom: 24px;
+        }
+
+        .login-form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .material-symbols-outlined {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #94a3b8;
+            transition: color 0.2s ease;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 13px 16px 13px 46px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
             font-family: inherit;
             color: #0f172a;
             outline: none;
-            transition: all 0.15s ease;
-            background: #fff;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #f8fafc;
         }
 
-        .form-group input::placeholder {
+        .input-wrapper input::placeholder {
             color: #94a3b8;
+            font-weight: 400;
         }
 
-        .form-group input:focus {
+        .input-wrapper input:focus {
             border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
         }
 
+        .input-wrapper input:focus ~ .material-symbols-outlined {
+            color: #6366f1;
+        }
+
+        /* Password toggle */
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s ease;
+        }
+
+        .password-toggle:hover {
+            color: #64748b;
+        }
+
+        .password-toggle .material-symbols-outlined {
+            font-size: 20px;
+            position: static;
+            transform: none;
+        }
+
+        /* Login Button */
         .btn-login {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            padding: 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 8px;
-            box-shadow: 0 1px 3px rgba(99, 102, 241, 0.2);
             letter-spacing: -0.01em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
         }
 
         .btn-login:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(99, 102, 241, 0.4), 0 4px 10px -5px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-login:hover::before {
+            opacity: 1;
         }
 
         .btn-login:active {
             transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
         }
 
         .btn-login:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
-        .login-error {
-            background: #fef2f2;
-            border: 1px solid rgba(239, 68, 68, 0.15);
-            color: #dc2626;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            margin-bottom: 16px;
+        .btn-login-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Loading spinner */
+        .btn-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
             display: none;
         }
 
-        .login-error.show {
-            display: block;
-            animation: shake 0.4s ease;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        @keyframes shake {
+        .btn-login.loading .btn-spinner {
+            display: block;
+        }
 
-            0%,
-            100% {
-                transform: translateX(0);
+        .btn-login.loading .btn-text {
+            display: none;
+        }
+
+        /* Error Alert */
+        .login-error {
+            background: #fef2f2;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-left: 3px solid #ef4444;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .login-error .material-symbols-outlined {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .login-error.show {
+            display: flex;
+            animation: errorSlide 0.3s ease-out;
+        }
+
+        @keyframes errorSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Divider */
+        .login-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 32px 0;
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        /* Footer */
+        .login-footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            line-height: 1.6;
+        }
+
+        .login-footer a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Bottom branding */
+        .login-bottom-brand {
+            position: absolute;
+            bottom: 32px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.72rem;
+            color: #cbd5e1;
+            letter-spacing: 0.02em;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
+            .login-brand {
+                display: none;
             }
 
-            25% {
-                transform: translateX(-4px);
+            .login-form-side {
+                width: 100%;
+                min-width: unset;
+                background: linear-gradient(180deg, #f8fafc 0%, #ffffff 30%);
             }
 
-            75% {
-                transform: translateX(4px);
+            .login-form-side::before {
+                height: 4px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-form-side {
+                padding: 40px 24px;
+            }
+
+            .form-header h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* ── Reduced Motion ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <div class="login-logo">
-                <span class="material-symbols-outlined">school</span>
-            </div>
-            <h1>教學系統後台</h1>
-            <p>請輸入帳號密碼登入</p>
+    <!-- Brand Panel -->
+    <div class="login-brand">
+        <div class="brand-grid"></div>
+        <div class="brand-shapes">
+            <div class="brand-shape"></div>
+            <div class="brand-shape"></div>
+            <div class="brand-shape"></div>
+            <div class="brand-shape"></div>
         </div>
 
-        <div class="login-card">
-            <div class="login-error" id="loginError"></div>
+        <div class="brand-content">
+            <div class="brand-icon">
+                <img src="favicon.png" alt="企業 Logo">
+            </div>
+            <h2 class="brand-title">數位簡報室</h2>
+            <p class="brand-subtitle">
+                互動教學系統<br>
+                打造沉浸式企業培訓體驗
+            </p>
+
+            <div class="brand-features">
+                <div class="brand-feature">
+                    <span class="material-symbols-outlined">slideshow</span>
+                    <span>互動簡報</span>
+                </div>
+                <div class="brand-feature">
+                    <span class="material-symbols-outlined">school</span>
+                    <span>即時教學</span>
+                </div>
+                <div class="brand-feature">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    <span>AI 驅動</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="login-form-side">
+        <div class="login-form-wrapper">
+            <div class="form-header">
+                <img src="favicon.png" alt="Logo" class="form-logo">
+                <h1>歡迎回來</h1>
+                <p>請輸入您的帳號密碼登入系統</p>
+            </div>
+
+            <div class="login-error" id="loginError">
+                <span class="material-symbols-outlined">error</span>
+                <span id="loginErrorText"></span>
+            </div>
+
             <form id="loginForm">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="your@email.com" required autofocus>
+                <div class="login-form-group">
+                    <label for="loginEmail">電子郵件</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="loginEmail" placeholder="name@company.com" required autofocus autocomplete="email">
+                        <span class="material-symbols-outlined">mail</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>密碼</label>
-                    <input type="password" id="loginPassword" placeholder="請輸入密碼" required>
+                <div class="login-form-group">
+                    <label for="loginPassword">密碼</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" placeholder="請輸入密碼" required autocomplete="current-password">
+                        <span class="material-symbols-outlined">lock</span>
+                        <button type="button" class="password-toggle" id="togglePassword" tabindex="-1" aria-label="切換密碼顯示">
+                            <span class="material-symbols-outlined">visibility_off</span>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="btn-login" id="loginBtn">登入</button>
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-login-content">
+                        <span class="btn-text">登入</span>
+                        <span class="btn-spinner"></span>
+                    </span>
+                </button>
             </form>
+
+            <div class="login-footer">
+                如有帳號問題，請聯繫系統管理員
+            </div>
+        </div>
+
+        <div class="login-bottom-brand">
+            Powered by TBR Digital
         </div>
     </div>
 
@@ -235,13 +671,24 @@
             location.replace(redirect);
         }
 
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('loginPassword');
+        toggleBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleBtn.querySelector('.material-symbols-outlined').textContent =
+                isPassword ? 'visibility' : 'visibility_off';
+        });
+
+        // Form submit
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
             const errorEl = document.getElementById('loginError');
             errorEl.classList.remove('show');
             btn.disabled = true;
-            btn.textContent = '登入中…';
+            btn.classList.add('loading');
 
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -249,10 +696,10 @@
             const { data, error } = await auth.signIn(email, password);
 
             if (error) {
-                errorEl.textContent = error.message || '帳號或密碼錯誤';
+                document.getElementById('loginErrorText').textContent = error.message || '帳號或密碼錯誤';
                 errorEl.classList.add('show');
                 btn.disabled = false;
-                btn.textContent = '登入';
+                btn.classList.remove('loading');
                 return;
             }
 

@@ -118,6 +118,154 @@ async function loadSessionChain(code) {
     }
 }
 
+// ── Extract dominant color from logo and apply to brand panel ──
+function extractDominantColor(logoUrl) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        try {
+            const canvas = document.createElement('canvas');
+            const size = 64;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(img, 0, 0, size, size);
+            const data = ctx.getImageData(0, 0, size, size).data;
+
+            // Bucket colors, skip near-white/black/grey
+            const buckets = {};
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+                if (a < 128) continue; // skip transparent
+                const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                const lum = (max + min) / 2;
+                const sat = max === min ? 0 : (max - min) / (lum > 127 ? (510 - max - min) : (max + min));
+                if (lum > 240 || lum < 15) continue; // skip near-white/black
+                if (sat < 0.15) continue; // skip grey
+                // Round to bucket
+                const br = Math.round(r / 32) * 32;
+                const bg = Math.round(g / 32) * 32;
+                const bb = Math.round(b / 32) * 32;
+                const key = `${br},${bg},${bb}`;
+                buckets[key] = (buckets[key] || 0) + 1;
+            }
+
+            // Find the most frequent vibrant bucket
+            let bestKey = null, bestCount = 0;
+            for (const [key, count] of Object.entries(buckets)) {
+                if (count > bestCount) { bestCount = count; bestKey = key; }
+            }
+            if (!bestKey) return;
+
+            const [cr, cg, cb] = bestKey.split(',').map(Number);
+            const hsl = rgbToHsl(cr, cg, cb);
+            applyBrandColor(hsl);
+        } catch (e) {
+            // CORS or canvas tainted — silently ignore
+            console.warn('Color extraction failed:', e.message);
+        }
+    };
+    img.onerror = () => {}; // silently ignore
+    img.src = logoUrl;
+}
+
+function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) { h = s = 0; }
+    else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+            case g: h = ((b - r) / d + 2) / 6; break;
+            case b: h = ((r - g) / d + 4) / 6; break;
+        }
+    }
+    return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+function applyBrandColor({ h, s, l }) {
+    // Clamp saturation to look nice
+    const sat = Math.max(s, 40);
+    const overlay = document.getElementById('loginOverlay');
+    if (!overlay) return;
+
+    // Set CSS custom properties on the overlay
+    overlay.style.setProperty('--brand-h', h);
+    overlay.style.setProperty('--brand-s', `${sat}%`);
+    overlay.style.setProperty('--brand-l', `${Math.min(l, 55)}%`);
+
+    // Apply dynamic colors to brand panel elements
+    const panel = overlay.querySelector('.login-brand-panel');
+    if (panel) {
+        panel.style.background = `linear-gradient(160deg, hsl(${h}, ${sat * 0.2}%, 4%) 0%, hsl(${h}, ${sat * 0.4}%, 8%) 40%, hsl(${h}, ${sat * 0.3}%, 14%) 100%)`;
+        panel.style.setProperty('--glow-color', `hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.12)`);
+    }
+
+    // Ambient orbs via pseudo-elements (use CSS variables)
+    const style = document.createElement('style');
+    style.textContent = `
+        .login-brand-panel::before {
+            background: radial-gradient(circle, hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.15) 0%, transparent 70%) !important;
+        }
+        .login-brand-panel::after {
+            background: radial-gradient(circle, hsla(${h}, ${Math.max(sat - 10, 30)}%, ${Math.min(l + 10, 60)}%, 0.10) 0%, transparent 70%) !important;
+        }
+        .login-brand-shape {
+            border-color: hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.08) !important;
+        }
+        .login-brand-shape:nth-child(2) {
+            border-color: hsla(${h}, ${Math.max(sat - 15, 25)}%, ${Math.min(l + 10, 60)}%, 0.06) !important;
+        }
+        .login-brand-shape:nth-child(4) {
+            border-color: hsla(${h}, ${Math.max(sat - 5, 30)}%, ${Math.min(l + 5, 58)}%, 0.07) !important;
+        }
+        .login-brand-title {
+            background: linear-gradient(135deg,
+                hsl(${h}, ${Math.min(sat + 10, 100)}%, 88%) 0%,
+                hsl(${h}, ${sat}%, 80%) 30%,
+                hsl(${h}, ${sat}%, 70%) 60%,
+                hsl(${h}, ${sat}%, 60%) 100%) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+        }
+        .login-brand-sub {
+            color: hsla(${h}, ${Math.min(sat, 60)}%, 75%, 0.5) !important;
+        }
+        .login-brand-feature {
+            color: hsla(${h}, ${Math.min(sat, 60)}%, 75%, 0.35) !important;
+        }
+        .login-brand-feature .material-symbols-outlined {
+            color: hsla(${h}, ${sat}%, 65%, 0.4) !important;
+        }
+        .login-brand-icon-wrap {
+            box-shadow: 0 8px 32px hsla(${h}, ${sat}%, 20%, 0.3), 0 0 40px hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.15) !important;
+        }
+        .login-form-panel::before {
+            background: linear-gradient(90deg,
+                hsl(${h}, ${sat}%, ${Math.min(l, 55)}%),
+                hsl(${(h + 20) % 360}, ${Math.max(sat - 10, 30)}%, ${Math.min(l + 5, 58)}%),
+                hsl(${(h + 40) % 360}, ${Math.max(sat - 15, 25)}%, ${Math.min(l + 10, 60)}%)) !important;
+        }
+        .login-btn {
+            background: linear-gradient(135deg,
+                hsl(${h}, ${sat}%, ${Math.min(l, 55)}%) 0%,
+                hsl(${(h + 15) % 360}, ${Math.max(sat - 5, 35)}%, ${Math.min(l - 5, 45)}%) 100%) !important;
+        }
+        .login-btn:hover {
+            box-shadow: 0 8px 25px -5px hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.4),
+                        0 4px 10px -5px hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.2) !important;
+        }
+        .login-field input:focus {
+            border-color: hsl(${h}, ${sat}%, ${Math.min(l, 55)}%) !important;
+            box-shadow: 0 0 0 4px hsla(${h}, ${sat}%, ${Math.min(l, 55)}%, 0.08) !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 function renderDynamicContent() {
     // Client logo in topbar + badge in hero
     const topbarLogo = document.getElementById('topbarClientLogo');
@@ -141,9 +289,18 @@ function renderDynamicContent() {
         loginLogo.src = orgData.logo_url;
         loginLogo.alt = clientName;
         loginLogo.style.display = '';
-        // Hide the lock icon when logo is present
-        const lockIcon = document.querySelector('.login-icon');
+        // Hide the default icon when logo is present
+        const lockIcon = document.getElementById('loginBrandIconDefault');
         if (lockIcon) lockIcon.style.display = 'none';
+        // Extract dominant color from logo and apply to brand panel
+        extractDominantColor(orgData.logo_url);
+    }
+    // Update brand panel title with client name
+    if (clientName) {
+        const brandTitle = document.getElementById('loginBrandTitle');
+        if (brandTitle) brandTitle.textContent = clientName;
+        const brandSub = document.getElementById('loginBrandSub');
+        if (brandSub) brandSub.textContent = '企業內訓課程規劃';
     }
 
     // Hero badge (no logo, just text)
@@ -162,6 +319,10 @@ function renderDynamicContent() {
     if (isAdmin) {
         document.getElementById('loginTitle').textContent = '管理端登入';
         document.getElementById('loginSubtext').textContent = '輸入管理密碼以進入管理面板';
+        const brandTitle = document.getElementById('loginBrandTitle');
+        if (brandTitle) brandTitle.textContent = '課程管理後台';
+        const brandSub = document.getElementById('loginBrandSub');
+        if (brandSub) brandSub.textContent = '編輯課綱 · 管理學員 · 設定內容';
         const userField = document.getElementById('loginUser');
         userField.placeholder = '管理密碼';
         userField.type = 'password';
@@ -195,9 +356,15 @@ function renderOutlineFromDB() {
         const uniqueDays = [...new Set(od.timeline.map(b => b.day || 1))].sort((a, b) => a - b);
         // Auto-detect multi-day from timeline blocks
         if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
+            // Use first existing schedule entry's hours as default for missing days
+            const defaultHours = schedule[0]?.hours || '';
             schedule = uniqueDays.map(d => {
                 const existing = schedule.find(s => s.day === d);
                 if (existing) return existing;
+                // Inherit hours from Day 1 if set; otherwise compute from blocks
+                if (defaultHours) {
+                    return { day: d, hours: defaultHours, topic: '' };
+                }
                 const dayBlocks = od.timeline.filter(b => (b.day || 1) === d);
                 let totalMin = 0;
                 dayBlocks.forEach(b => {
@@ -222,9 +389,11 @@ function renderOutlineFromDB() {
             });
             const fixedDays = [...new Set(od.timeline.map(b => b.day))].sort((a, b) => a - b);
             if (fixedDays.length > 1) {
+                const defaultH = schedule[0]?.hours || '';
                 schedule = fixedDays.map(d => {
                     const existing = schedule.find(s => s.day === d);
                     if (existing) return existing;
+                    if (defaultH) return { day: d, hours: defaultH, topic: '' };
                     const dayBlocks = od.timeline.filter(b => (b.day || 1) === d);
                     let totalMin = 0;
                     dayBlocks.forEach(b => {
@@ -1300,9 +1469,11 @@ function initHrEmail() {
     if (timeline.length > 0) {
         const uniqueDays = [...new Set(timeline.map(b => b.day || 1))].sort((a, b) => a - b);
         if (uniqueDays.length > 1 && schedule.length < uniqueDays.length) {
+            const defaultHours = schedule[0]?.hours || '';
             schedule = uniqueDays.map(d => {
                 const existing = schedule.find(s => s.day === d);
                 if (existing) return existing;
+                if (defaultHours) return { day: d, hours: defaultHours, topic: '' };
                 const dayBlocks = timeline.filter(b => (b.day || 1) === d);
                 let totalMin = 0;
                 dayBlocks.forEach(b => {
