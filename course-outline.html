@@ -484,6 +484,23 @@
                     <div class="oe-field"><label>職責（每行一項）</label><textarea id="oeTaDuties" rows="3" placeholder="負責協助學員操作工具&#10;即時回答學員問題&#10;協助發放講義"></textarea></div>
                 </div>
             </details>
+
+            <!-- 課前通知信範本 -->
+            <details class="outline-edit-group" open>
+                <summary><span class="material-symbols-outlined" style="font-size:16px">mail</span> 課前通知信範本</summary>
+                <div style="padding:16px 20px">
+                    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                        <button class="btn btn-primary" id="btnRegenEmail" style="font-size:0.78rem;padding:6px 14px">
+                            <span class="material-symbols-outlined" style="font-size:14px">autorenew</span> 依課綱重新生成
+                        </button>
+                        <button class="btn btn-outline" id="btnCopyEmailAdmin" style="font-size:0.78rem;padding:6px 14px">
+                            <span class="material-symbols-outlined" style="font-size:14px">content_copy</span> 複製全文
+                        </button>
+                    </div>
+                    <div id="oeEmailTemplate" contenteditable="true" style="background:#fafbfc;border:1.5px solid var(--border);border-radius:10px;padding:24px 28px;font-size:0.84rem;line-height:1.85;color:#1e293b;min-height:200px;outline:none;white-space:pre-wrap;font-family:inherit;transition:border-color 0.2s"></div>
+                    <p style="font-size:0.72rem;color:var(--text-3);margin-top:8px">可直接編輯上方內容，儲存後會保留修改。按「依課綱重新生成」會根據目前課綱資料重新產生範本。</p>
+                </div>
+            </details>
         </div>
 
         <!-- Student Management -->

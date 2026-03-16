@@ -736,6 +736,30 @@ function initOutlineEditor() {
         _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
     }
 
+    // Populate Email Template
+    const emailTemplEl = document.getElementById('oeEmailTemplate');
+    if (emailTemplEl) {
+        if (od?.email_template) {
+            emailTemplEl.textContent = od.email_template;
+        } else {
+            emailTemplEl.textContent = _generateEmailText();
+        }
+        document.getElementById('btnRegenEmail')?.addEventListener('click', () => {
+            if (confirm('確定要依目前課綱資料重新生成通知信範本嗎？\n現有內容將被覆蓋。')) {
+                emailTemplEl.textContent = _generateEmailText();
+            }
+        });
+        document.getElementById('btnCopyEmailAdmin')?.addEventListener('click', () => {
+            const text = emailTemplEl.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('btnCopyEmailAdmin');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已複製';
+                setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            });
+        });
+    }
+
     // Bind buttons
     document.getElementById('btnSaveOutline').addEventListener('click', saveOutlineData);
     document.getElementById('btnImportDefaults').addEventListener('click', importDefaults);
@@ -1242,6 +1266,12 @@ function collectOutlineData() {
         duties: document.getElementById('oeTaDuties').value.split('\n').map(s => s.trim()).filter(Boolean)
     };
 
+    // Email Template
+    const emailEl = document.getElementById('oeEmailTemplate');
+    if (emailEl) {
+        od.email_template = emailEl.innerText.trim();
+    }
+
     return od;
 }
 
@@ -1695,17 +1725,12 @@ window.handleOrgLogoUpload = async (input) => {
 // ══════════════════════════════════════
 // HR NOTIFICATION EMAIL TEMPLATE
 // ══════════════════════════════════════
-function initHrEmail() {
-    const contentEl = document.getElementById('hrEmailContent');
-    const copyBtn = document.getElementById('btnCopyEmail');
-    if (!contentEl) return;
-
-    // Auto-generate email content
+function _generateEmailText() {
     const od = getOutlineData() || {};
     const hero = od.hero || {};
     const courseName = projectData?.name || '課程名稱';
     const clientName = orgData?.name || '貴公司';
-    const joinCode = sessionData?.session_code || '';
+    const joinCode = projectData?.join_code || sessionData?.session_code || '';
     const loginUrl = `${location.origin}/course-outline.html?project=${projectData?.id || ''}`;
 
     // Schedule — auto-detect days from timeline (same logic as render)
@@ -1768,7 +1793,7 @@ function initHrEmail() {
     // Tools
     const toolNames = (od.tools || []).map(t => t.name).join('、');
 
-    contentEl.textContent = `各位同仁好：
+    return `各位同仁好：
 
 公司將舉辦「${courseName}」教育訓練，誠摯邀請您參加。以下為課程相關資訊，請詳閱並預做準備。
 
@@ -1798,14 +1823,14 @@ ${moduleSummary || '  （尚未設定課程模組）'}
 
 
 ━━━━━━━━━━━━━━━━━━━━
-🔗 學員登入入口
+🔗 課程查看入口
 ━━━━━━━━━━━━━━━━━━━━
 
-請於課前使用以下連結登入課程系統：
+請於課前使用以下連結查看課程資訊：
 ${loginUrl}
-${joinCode ? `\n課程代碼：${joinCode}` : ''}
+${joinCode ? `\n專案代碼：${joinCode}` : ''}
 
-登入方式：輸入您的 Email 與課程代碼即可進入。
+登入方式：輸入專案代碼即可進入。
 
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -1829,6 +1854,21 @@ ${equipNote ? `\n⚠️ ${equipNote}` : ''}
 期待您的參與！
 
 ${clientName} 人力資源部 敬上`;
+
+}
+
+function initHrEmail() {
+    const contentEl = document.getElementById('hrEmailContent');
+    const copyBtn = document.getElementById('btnCopyEmail');
+    if (!contentEl) return;
+
+    // Use saved template if available, otherwise generate
+    const od = getOutlineData() || {};
+    if (od.email_template) {
+        contentEl.textContent = od.email_template;
+    } else {
+        contentEl.textContent = _generateEmailText();
+    }
 
     // Copy button
     if (copyBtn) {
