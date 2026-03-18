@@ -62,6 +62,13 @@ export class DragDrop {
         // 雙擊編輯文字
         this.canvasContentEl.addEventListener('dblclick', safe(this.handleDoubleClick));
 
+        // 右鍵選單
+        this.canvasContentEl.addEventListener('contextmenu', safe(this.handleContextMenu));
+        document.addEventListener('click', () => this._removeContextMenu());
+        document.addEventListener('contextmenu', (e) => {
+            if (!this.canvasContentEl.contains(e.target)) this._removeContextMenu();
+        });
+
         // 點擊空白處取消選取（但跳過框選後的 click）
         document.getElementById('slideCanvas').addEventListener('click', (e) => {
             if (this._justMarqueed) {
@@ -78,6 +85,216 @@ export class DragDrop {
 
         // 縮圖被點擊時，取消選取畫布元素
         window.addEventListener('thumbnailClicked', () => this.editor.deselectAll());
+    }
+
+    // ── 右鍵選單 ──
+    _removeContextMenu() {
+        document.querySelectorAll('.editor-context-menu').forEach(m => m.remove());
+    }
+
+    handleContextMenu(e) {
+        e.preventDefault();
+        this._removeContextMenu();
+
+        const element = e.target.closest('.editable-element');
+        const hasSelection = this.editor.selectedElements.size > 0;
+        const hasCopied = this._copiedElements?.length > 0;
+        const isMulti = this.editor.selectedElements.size > 1;
+
+        // 如果右鍵點的元素不在選取中，先選取它
+        if (element && !this.editor.selectedElements.has(element)) {
+            this.editor.selectElement(element);
+        }
+
+        const selectedId = this.editor.selectedElement?.dataset?.id;
+        const slide = this.slideManager.getCurrentSlide();
+        const elData = selectedId && slide ? slide.elements.find(d => d.id === selectedId) : null;
+        const hasGroup = elData?.groupId;
+
+        // 建立選單項目
+        const items = [];
+
+        if (element || hasSelection) {
+            items.push({ icon: 'content_copy', label: '複製', shortcut: '⌘C', action: 'copy' });
+            items.push({ icon: 'content_paste', label: '貼上', shortcut: '⌘V', action: 'paste', disabled: !hasCopied });
+            items.push({ icon: 'content_copy', label: '快速複製', shortcut: '⌘D', action: 'duplicate' });
+            items.push('---');
+            if (!isMulti) {
+                items.push({ icon: 'flip_to_front', label: '移至最上層', action: 'bringFront' });
+                items.push({ icon: 'flip_to_back', label: '移至最下層', action: 'sendBack' });
+                items.push('---');
+            }
+            if (isMulti) {
+                items.push({ icon: 'group_work', label: '群組', shortcut: '⌘G', action: 'group' });
+            }
+            if (hasGroup) {
+                items.push({ icon: 'workspaces', label: '解散群組', shortcut: '⇧⌘G', action: 'ungroup' });
+            }
+            if (isMulti || hasGroup) items.push('---');
+            items.push({ icon: 'delete', label: '刪除', shortcut: '⌫', action: 'delete', danger: true });
+        } else {
+            // 空白區域右鍵
+            items.push({ icon: 'content_paste', label: '貼上', shortcut: '⌘V', action: 'paste', disabled: !hasCopied });
+            items.push({ icon: 'select_all', label: '全選', shortcut: '⌘A', action: 'selectAll' });
+        }
+
+        // 建立選單 DOM
+        const menu = document.createElement('div');
+        menu.className = 'editor-context-menu';
+        menu.style.cssText = `
+            position:fixed; left:${e.clientX}px; top:${e.clientY}px; z-index:10000;
+            background:rgba(255,255,255,0.92); backdrop-filter:blur(16px) saturate(180%);
+            -webkit-backdrop-filter:blur(16px) saturate(180%);
+            border:1px solid rgba(0,0,0,0.08); border-radius:10px;
+            padding:6px; min-width:200px; box-shadow:0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+            font-family:'Inter','Noto Sans TC',system-ui,sans-serif; font-size:13px;
+            animation:ctxFadeIn 0.12s ease;
+        `;
+
+        // 注入動畫 CSS（一次性）
+        if (!document.getElementById('ctxMenuStyles')) {
+            const style = document.createElement('style');
+            style.id = 'ctxMenuStyles';
+            style.textContent = `
+                @keyframes ctxFadeIn { from { opacity:0; transform:scale(0.96); } }
+                .ctx-item { display:flex; align-items:center; gap:8px; padding:7px 12px; border-radius:6px;
+                    cursor:pointer; transition:background 0.1s; color:#1f2937; border:none; background:none;
+                    width:100%; font-size:13px; font-family:inherit; text-align:left; }
+                .ctx-item:hover { background:rgba(99,102,241,0.08); }
+                .ctx-item.disabled { opacity:0.35; pointer-events:none; }
+                .ctx-item.danger { color:#ef4444; }
+                .ctx-item.danger:hover { background:rgba(239,68,68,0.08); }
+                .ctx-item .material-symbols-outlined { font-size:16px; opacity:0.6; }
+                .ctx-item .ctx-shortcut { margin-left:auto; font-size:11px; color:#9ca3af; font-weight:500; }
+                .ctx-divider { height:1px; background:rgba(0,0,0,0.06); margin:4px 8px; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        items.forEach(item => {
+            if (item === '---') {
+                const div = document.createElement('div');
+                div.className = 'ctx-divider';
+                menu.appendChild(div);
+                return;
+            }
+            const btn = document.createElement('button');
+            btn.className = `ctx-item${item.disabled ? ' disabled' : ''}${item.danger ? ' danger' : ''}`;
+            btn.innerHTML = `
+                <span class="material-symbols-outlined">${item.icon}</span>
+                <span>${item.label}</span>
+                ${item.shortcut ? `<span class="ctx-shortcut">${item.shortcut}</span>` : ''}
+            `;
+            btn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                this._removeContextMenu();
+                this._executeContextAction(item.action);
+            });
+            menu.appendChild(btn);
+        });
+
+        document.body.appendChild(menu);
+
+        // 確保選單不超出視窗
+        requestAnimationFrame(() => {
+            const r = menu.getBoundingClientRect();
+            if (r.right > window.innerWidth) menu.style.left = `${window.innerWidth - r.width - 8}px`;
+            if (r.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - r.height - 8}px`;
+        });
+    }
+
+    _executeContextAction(action) {
+        const slide = this.slideManager.getCurrentSlide();
+        if (!slide) return;
+        const selectedId = this.editor.selectedElement?.dataset?.id;
+
+        switch (action) {
+            case 'copy': {
+                this._copiedElements = [...this.editor.selectedElements].map(sel => {
+                    const data = slide.elements.find(d => d.id === sel.dataset.id);
+                    return data ? JSON.parse(JSON.stringify(data)) : null;
+                }).filter(Boolean);
+                break;
+            }
+            case 'paste': {
+                if (!this._copiedElements?.length) return;
+                const newIds = [];
+                this._copiedElements.forEach(dup => {
+                    const copy = JSON.parse(JSON.stringify(dup));
+                    copy.id = this.slideManager.generateId();
+                    copy.groupId = null;
+                    copy.x += 20;
+                    copy.y += 20;
+                    slide.elements.push(copy);
+                    newIds.push(copy.id);
+                });
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.renderThumbnails();
+                this.editor.deselectAll();
+                newIds.forEach(id => {
+                    const dom = this.canvasContentEl.querySelector(`[data-id="${id}"]`);
+                    if (dom) { this.editor.selectedElements.add(dom); dom.classList.add('selected'); }
+                });
+                if (this.editor.selectedElements.size > 0)
+                    this.editor.selectedElement = [...this.editor.selectedElements][0];
+                break;
+            }
+            case 'duplicate': {
+                // 模擬 Cmd+D
+                const ev = new KeyboardEvent('keydown', { key: 'd', metaKey: true, bubbles: true });
+                document.dispatchEvent(ev);
+                break;
+            }
+            case 'delete': {
+                const ids = [...this.editor.selectedElements].map(el => el.dataset.id).filter(Boolean);
+                this.editor.deselectAll();
+                if (ids.length > 1) {
+                    this.slideManager.deleteElementsBatch(ids);
+                } else if (ids.length === 1) {
+                    this.slideManager.deleteElement(ids[0]);
+                }
+                break;
+            }
+            case 'bringFront': {
+                if (selectedId) {
+                    const idx = slide.elements.findIndex(e => e.id === selectedId);
+                    if (idx >= 0 && idx < slide.elements.length - 1) {
+                        const [el] = slide.elements.splice(idx, 1);
+                        slide.elements.push(el);
+                        this.slideManager.renderCurrentSlide();
+                        this.slideManager.renderThumbnails();
+                        this.editor.selectElementById(selectedId);
+                    }
+                }
+                break;
+            }
+            case 'sendBack': {
+                if (selectedId) {
+                    const idx = slide.elements.findIndex(e => e.id === selectedId);
+                    if (idx > 0) {
+                        const [el] = slide.elements.splice(idx, 1);
+                        slide.elements.unshift(el);
+                        this.slideManager.renderCurrentSlide();
+                        this.slideManager.renderThumbnails();
+                        this.editor.selectElementById(selectedId);
+                    }
+                }
+                break;
+            }
+            case 'group': {
+                this.editor.groupSelected();
+                break;
+            }
+            case 'ungroup': {
+                this.editor.ungroupSelected();
+                break;
+            }
+            case 'selectAll': {
+                const ev = new KeyboardEvent('keydown', { key: 'a', metaKey: true, bubbles: true });
+                document.dispatchEvent(ev);
+                break;
+            }
+        }
     }
 
     forceReset() {
@@ -799,6 +1016,7 @@ export class DragDrop {
         // Ctrl+V 貼上元素
         if (isMeta && e.key === 'v' && !e.shiftKey && this._copiedElements?.length > 0 && !isEditing) {
             e.preventDefault();
+            e.stopImmediatePropagation();
             const slide = this.slideManager.getCurrentSlide();
             if (!slide) return;
             const newIds = [];
