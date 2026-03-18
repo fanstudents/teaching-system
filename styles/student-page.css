@@ -498,6 +498,7 @@ body {
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .slide-nav-arrow:hover {
@@ -538,6 +539,7 @@ body {
     font-weight: 600;
     z-index: 10;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -611,6 +613,7 @@ body {
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 100;
     align-items: center;
     justify-content: center;
@@ -900,6 +903,7 @@ body {
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-radius: 14px;
         padding: 8px 4px;
     }
@@ -929,6 +933,7 @@ body {
         justify-content: center !important;
         padding: 0 !important;
         backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
     }
 
     .student-presentation .slide-nav-arrow.prev {
@@ -985,6 +990,7 @@ body {
         background: rgba(15, 23, 42, 0.85) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
     }
 
     .msp-right .msp-btn {
@@ -1184,6 +1190,7 @@ body {
     opacity: 1;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .student-presentation:fullscreen .student-slide-wrapper,
@@ -1222,6 +1229,7 @@ body {
     opacity: 1;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .student-presentation.immersive-mode .student-slide-wrapper {
@@ -1273,6 +1281,7 @@ body {
         border: none !important;
         border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
         backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
         box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4) !important;
         padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     }
@@ -1320,6 +1329,7 @@ body {
         background: rgba(15, 23, 42, 0.95) !important;
         border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
         backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
     }
 }
 
@@ -1337,6 +1347,7 @@ body {
     font-weight: 500;
     z-index: 100000;
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     pointer-events: none;
     animation: hintFadeOut 3s ease-in-out forwards;
 }

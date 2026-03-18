@@ -125,9 +125,11 @@ export class QuizGame {
             if (allCorrect) {
                 resultEl.className = 'quiz-result success';
                 resultEl.textContent = '✓ 回答正確！';
+                try { navigator.vibrate?.([100, 50, 100]); } catch(_) {} // 震動回饋
             } else {
                 resultEl.className = 'quiz-result error';
                 resultEl.textContent = `✗ ${correct}/${totalCorrect} 正確`;
+                try { navigator.vibrate?.(200); } catch(_) {} // 短震動
             }
         }
 

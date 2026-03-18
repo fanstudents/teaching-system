@@ -694,6 +694,7 @@
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     transition: all 0.2s ease;
     opacity: 0.7;
 }
@@ -976,6 +977,7 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 .doc-viewer-panel {

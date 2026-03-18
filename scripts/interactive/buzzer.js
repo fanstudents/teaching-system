@@ -129,6 +129,7 @@ export class BuzzerGame {
 
             const timestamp = new Date().toISOString();
             showPressed(answer);
+            try { navigator.vibrate?.([100, 50, 100]); } catch(_) {} // 震動回饋
 
             const title = container.querySelector('.buzzer-question')?.textContent || '搶答';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 10;
