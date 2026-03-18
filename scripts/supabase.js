@@ -557,7 +557,9 @@ export const ai = {
 
 export const functions = {
     async invoke(slug, { body = {}, headers = {}, method = 'POST' } = {}) {
-        const token = (localStorage.getItem('_at') || sessionStorage.getItem('_at')) || SUPABASE_ANON_KEY;
+        // 確保 token 是最新的（自動 refresh）
+        const session = await auth.getSession();
+        const token = session?.accessToken || SUPABASE_ANON_KEY;
         const res = await fetch(`${SUPABASE_URL}/functions/v1/${slug}`, {
             method,
             headers: {
