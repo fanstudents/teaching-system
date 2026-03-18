@@ -1,15 +1,15 @@
 /* ========================================
-   manage.html — 課程管理頁面（v2 Modern）
+   manage.html — 課程管理頁面（v3 Bold）
    ======================================== */
 
 body {
-    background: var(--s79-bg, #F8F9FB);
-    color: var(--text-primary);
+    background: #F0F2F5;
+    color: var(--text-primary, #111827);
 }
 
 /* ── Container ── */
 .container {
-    padding: 20px 28px;
+    padding: 24px 32px;
 }
 
 /* ── Stats Bar (top metrics) ── */
@@ -21,14 +21,14 @@ body {
 }
 
 .stats-bar .stat-card {
-    padding: 20px 22px;
+    padding: 22px 24px;
     background: #fff;
-    border: 1px solid var(--s79-border, #E5E7EB);
-    border-radius: var(--s79-radius-md, 10px);
+    border: 1px solid #E2E5EA;
+    border-radius: 12px;
     position: relative;
     overflow: hidden;
     transition: all 0.2s ease;
-    box-shadow: var(--s79-shadow-xs, 0 1px 2px rgba(0,0,0,0.04));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .stats-bar .stat-card::before {
@@ -37,7 +37,8 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
+    border-radius: 12px 12px 0 0;
 }
 
 .stats-bar .stat-card:nth-child(1)::before {
@@ -57,25 +58,25 @@ body {
 }
 
 .stats-bar .stat-card:hover {
-    border-color: var(--s79-border-strong, #D1D5DB);
-    box-shadow: var(--s79-shadow-md, 0 4px 6px rgba(0,0,0,0.07));
-    transform: translateY(-1px);
+    border-color: #CDD1D9;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
 }
 
 .stat-label {
     font-size: 11px;
-    color: var(--s79-text-muted, #9CA3AF);
+    color: #9CA3AF;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .stat-value {
-    font-size: 1.85rem;
+    font-size: 2rem;
     font-weight: 700;
     letter-spacing: -0.03em;
-    color: var(--s79-text, #111827);
+    color: #111827;
 }
 
 .stats-bar .stat-card:nth-child(1) .stat-value {
@@ -221,16 +222,17 @@ body {
 
 .tree-project {
     background: #fff;
-    border: 1px solid var(--s79-border, #E5E7EB);
-    border-radius: var(--s79-radius-md, 10px);
+    border: 1px solid #E2E5EA;
+    border-radius: 12px;
     overflow: hidden;
     transition: all 0.2s ease;
-    box-shadow: var(--s79-shadow-xs, 0 1px 2px rgba(0,0,0,0.04));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .tree-project:hover {
     border-color: #C7D2FE;
-    box-shadow: var(--s79-shadow-md, 0 4px 6px rgba(0,0,0,0.07));
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.1);
+    transform: translateY(-1px);
 }
 
 /* ── Tree Row (project header) — spacious card header ── */
@@ -542,10 +544,10 @@ body {
 /* ── Data Table ── */
 .data-table-wrap {
     background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    border: 1px solid #E2E5EA;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .data-table {
@@ -923,12 +925,12 @@ body {
 
 .project-card {
     background: #fff;
-    border: 1px solid var(--s79-border, #E5E7EB);
-    border-radius: var(--s79-radius-md, 10px);
-    padding: 20px 22px;
+    border: 1px solid #E2E5EA;
+    border-radius: 12px;
+    padding: 22px 24px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: var(--s79-shadow-xs, 0 1px 2px rgba(0,0,0,0.04));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -936,8 +938,8 @@ body {
 
 .project-card:hover {
     border-color: #C7D2FE;
-    box-shadow: var(--s79-shadow-md, 0 4px 6px rgba(0,0,0,0.07));
-    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+    transform: translateY(-3px);
 }
 
 .pcard-top {

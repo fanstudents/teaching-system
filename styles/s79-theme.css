@@ -1,5 +1,5 @@
 /* =============================================
-   S79 Corporate Clean — Shared Theme (v2 Modern)
+   S79 Corporate Clean — Shared Theme (v3 Bold)
    
    所有後台頁面共用的設計 tokens 與基礎樣式。
    與 admin-layout.css 搭配使用。
@@ -19,12 +19,12 @@
     --s79-error: #EF4444;
     --s79-error-light: #FEE2E2;
 
-    /* Colors — 灰階（更精緻的灰） */
-    --s79-bg: #F8F9FB;
+    /* Colors — 灰階 */
+    --s79-bg: #F0F2F5;
     --s79-surface: #FFFFFF;
-    --s79-surface-hover: #F9FAFB;
-    --s79-border: #E5E7EB;
-    --s79-border-strong: #D1D5DB;
+    --s79-surface-hover: #FAFAFA;
+    --s79-border: #E2E5EA;
+    --s79-border-strong: #CDD1D9;
     --s79-text: #111827;
     --s79-text-secondary: #6B7280;
     --s79-text-muted: #9CA3AF;
@@ -33,43 +33,49 @@
     --s79-font: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
 
     /* Radius — 更大更柔和 */
-    --s79-radius-sm: 6px;
-    --s79-radius-md: 10px;
+    --s79-radius-sm: 8px;
+    --s79-radius-md: 12px;
     --s79-radius-lg: 16px;
     --s79-radius-xl: 20px;
     --s79-radius-full: 9999px;
 
-    /* Shadow — 更精緻 */
-    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-    --s79-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --s79-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    --s79-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-    --s79-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    /* Shadow — 更有層次 */
+    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --s79-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --s79-shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    --s79-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+    --s79-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.2);
 
     /* Duration */
     --s79-duration: 150ms;
     --s79-duration-md: 200ms;
 
     /* ── Override admin-layout.css variables ── */
-    --sidebar-w: 240px;
-    --sidebar-bg: #111113;
-    --sidebar-text: rgba(255, 255, 255, 0.55);
-    --sidebar-text-hover: rgba(255, 255, 255, 0.9);
-    --sidebar-active-bg: rgba(99, 102, 241, 0.12);
+    --sidebar-w: 252px;
+    --sidebar-bg: #0C0C0E;
+    --sidebar-text: rgba(255, 255, 255, 0.50);
+    --sidebar-text-hover: rgba(255, 255, 255, 0.92);
+    --sidebar-active-bg: rgba(99, 102, 241, 0.15);
     --sidebar-active-text: #A5B4FC;
     --sidebar-accent: #818CF8;
-    --sidebar-divider: rgba(255, 255, 255, 0.06);
-    --sidebar-group-text: rgba(255, 255, 255, 0.3);
-    --gradient-primary: linear-gradient(135deg, #6366F1, #4F46E5);
+    --sidebar-divider: rgba(255, 255, 255, 0.05);
+    --sidebar-group-text: rgba(255, 255, 255, 0.25);
+    --gradient-primary: linear-gradient(135deg, #6366F1, #7C3AED);
 
     /* ── Override dashboard-style variables ── */
-    --radius-sm: 6px;
-    --content-bg: #F8F9FB;
-    --border-color: #E5E7EB;
+    --radius-sm: 8px;
+    --content-bg: #F0F2F5;
+    --border-color: #E2E5EA;
     --text-primary: #111827;
     --text-secondary: #6B7280;
     --bg-hover: rgba(0, 0, 0, 0.03);
-    --header-h: 52px;
+    --header-h: 56px;
+
+    /* ── 新增：text & border shortcuts ── */
+    --text-1: #111827;
+    --text-2: #6B7280;
+    --text-3: #9CA3AF;
+    --border: #E2E5EA;
 }
 
 /* ── Base Reset ── */
@@ -98,23 +104,23 @@ body.sidebar-closed {
     padding-left: 0;
 }
 
-/* ── Inter font import  ── */
+/* ── Inter font import ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ── Admin Header Override ── */
 .admin-header {
-    background: var(--s79-surface);
-    border-bottom: 1px solid var(--s79-border);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     height: var(--header-h);
     font-family: var(--s79-font);
-    backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.85);
 }
 
 .admin-header-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     color: var(--s79-text);
 }
 
@@ -125,7 +131,7 @@ button.primary-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 16px;
+    padding: 8px 16px;
     border-radius: var(--s79-radius-sm);
     font-size: 13px;
     font-weight: 500;
@@ -133,7 +139,7 @@ button.primary-btn {
     cursor: pointer;
     transition: all var(--s79-duration) ease;
     border: 1px solid transparent;
-    min-height: 34px;
+    min-height: 36px;
     line-height: 1;
     letter-spacing: -0.01em;
 }
@@ -147,12 +153,12 @@ button.primary-btn {
     background: var(--s79-primary);
     color: #fff;
     border-color: var(--s79-primary);
-    box-shadow: 0 1px 2px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.4);
 }
 
 .s79-btn-primary:hover {
     background: var(--s79-primary-hover);
-    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.45);
     transform: translateY(-0.5px);
 }
 
@@ -170,7 +176,7 @@ button.primary-btn {
 .s79-btn-danger {
     background: var(--s79-error);
     color: #fff;
-    box-shadow: 0 1px 2px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 1px 3px rgba(239, 68, 68, 0.4);
 }
 
 .s79-btn-danger:hover {
@@ -190,7 +196,7 @@ button.primary-btn {
     border-radius: var(--s79-radius-md);
     overflow: hidden;
     box-shadow: var(--s79-shadow-xs);
-    transition: box-shadow var(--s79-duration-md) ease;
+    transition: all var(--s79-duration-md) ease;
 }
 
 .s79-card:hover {
@@ -198,7 +204,7 @@ button.primary-btn {
 }
 
 .s79-card-header {
-    padding: 14px 18px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--s79-border);
     font-size: 14px;
     font-weight: 600;
@@ -206,7 +212,7 @@ button.primary-btn {
 }
 
 .s79-card-body {
-    padding: 18px;
+    padding: 20px;
 }
 
 /* ── Table ── */
@@ -219,17 +225,17 @@ button.primary-btn {
 .s79-table th {
     background: var(--s79-bg);
     border-bottom: 1px solid var(--s79-border);
-    padding: 10px 14px;
+    padding: 10px 16px;
     text-align: left;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--s79-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
 }
 
 .s79-table td {
-    padding: 12px 14px;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--s79-border);
     color: var(--s79-text);
 }
@@ -248,7 +254,7 @@ button.primary-btn {
     align-items: center;
     font-size: 11px;
     font-weight: 600;
-    padding: 3px 8px;
+    padding: 3px 10px;
     border-radius: var(--s79-radius-full);
     letter-spacing: 0.02em;
 }
@@ -265,7 +271,7 @@ button.primary-btn {
 .s79-textarea {
     width: 100%;
     padding: 9px 14px;
-    border: 1px solid var(--s79-border);
+    border: 1.5px solid var(--s79-border);
     border-radius: var(--s79-radius-sm);
     font-size: 14px;
     font-family: var(--s79-font);
@@ -291,8 +297,8 @@ button.primary-btn {
 .s79-modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
     z-index: 300;
     display: none;
     align-items: center;
@@ -309,6 +315,11 @@ button.primary-btn {
     overflow-y: auto;
     padding: 28px;
     box-shadow: var(--s79-shadow-lg);
+    animation: modalSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(8px) scale(0.98); opacity: 0; }
 }
 
 .s79-modal-title {
@@ -335,22 +346,22 @@ button.primary-btn {
 .s79-toast,
 .toast {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--s79-text);
+    bottom: 24px;
+    right: 24px;
+    background: #1F2937;
     color: #fff;
-    padding: 12px 18px;
+    padding: 12px 20px;
     border-radius: var(--s79-radius-sm);
     font-size: 13px;
     z-index: 999;
-    animation: s79-toast-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: s79-toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     font-family: var(--s79-font);
-    box-shadow: var(--s79-shadow-lg);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     font-weight: 500;
 }
 
 @keyframes s79-toast-in {
-    from { transform: translateY(10px) scale(0.97); opacity: 0; }
+    from { transform: translateY(12px) scale(0.96); opacity: 0; }
 }
 
 /* ── Empty State ── */
@@ -373,7 +384,7 @@ button.primary-btn {
     background: var(--s79-surface);
     border: 1px solid var(--s79-border);
     border-radius: var(--s79-radius-md);
-    padding: 18px;
+    padding: 20px;
     box-shadow: var(--s79-shadow-xs);
     transition: all var(--s79-duration-md) ease;
 }
@@ -427,7 +438,7 @@ button.primary-btn {
     align-items: center;
     gap: 6px;
     padding: 8px 14px;
-    border: 1px solid var(--s79-border);
+    border: 1.5px solid var(--s79-border);
     border-radius: var(--s79-radius-sm);
     background: var(--s79-surface);
     transition: border-color var(--s79-duration) ease, box-shadow var(--s79-duration) ease;
@@ -505,10 +516,10 @@ button.primary-btn {
 
 /* Topbar overrides */
 .topbar {
-    background: rgba(255, 255, 255, 0.85) !important;
-    border-bottom: 1px solid var(--s79-border) !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+    backdrop-filter: saturate(180%) blur(12px) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
     font-family: var(--s79-font);
-    backdrop-filter: blur(8px);
 }
 
 /* Existing buttons in all pages */
@@ -524,11 +535,11 @@ table {
 }
 
 table th {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--s79-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
 }
 
 /* Ensure all inputs get consistent styling */
@@ -542,6 +553,12 @@ textarea,
 select {
     font-family: var(--s79-font);
     border-radius: var(--s79-radius-sm);
+}
+
+/* ── Global content animations ── */
+@keyframes contentFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
 }
 
 /* Scrollbar styling */
