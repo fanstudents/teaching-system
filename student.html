@@ -2176,6 +2176,28 @@
                     if (leftPanel) leftPanel.style.display = 'flex';
                     if (rightPanel) rightPanel.style.display = 'flex';
                 }
+
+                // ★ 橫放手機：把 nav arrows 移到 .student-presentation 直接子層
+                // （避免 transform 容器內 position:fixed 失效）
+                const pres = document.getElementById('studentPresentation');
+                const wrapper = document.getElementById('slideWrapper');
+                const prevBtn = document.getElementById('prevSlideBtn');
+                const nextBtn = document.getElementById('nextSlideBtn');
+                if (pres && wrapper && prevBtn && nextBtn) {
+                    if (isMobile && !isPortrait) {
+                        // 橫放：移到 presentation 層
+                        if (prevBtn.parentElement === wrapper) {
+                            pres.appendChild(prevBtn);
+                            pres.appendChild(nextBtn);
+                        }
+                    } else {
+                        // 直式/桌面：移回 wrapper
+                        if (prevBtn.parentElement !== wrapper) {
+                            wrapper.insertBefore(prevBtn, wrapper.firstChild);
+                            wrapper.insertBefore(nextBtn, wrapper.querySelector('.follow-banner'));
+                        }
+                    }
+                }
             }
 
             // 初始執行 + 監聽變化

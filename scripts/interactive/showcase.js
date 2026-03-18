@@ -109,35 +109,42 @@ export class Showcase {
                 ]);
             };
 
-            // ★ 主查詢：優先用 assignment_title + session_id（避免跨專案）
-            let { data, error } = { data: null, error: null };
+            // ★ 查詢提交（含 session_id 優先 + fallback）
+            let data = null;
+            let error = null;
 
+            // 第一輪：帶 session_id 嚴格查詢
             if (this.sessionCode) {
-                const strict = await fetchWithTimeout('submissions', {
-                    filter: {
-                        assignment_title: `eq.${assignmentTitle}`,
-                        session_id: `eq.${this.sessionCode}`
-                    },
-                    order: 'submitted_at.asc'
-                });
-                data = strict.data;
-                error = strict.error;
+                try {
+                    const r = await fetchWithTimeout('submissions', {
+                        filter: {
+                            assignment_title: `eq.${assignmentTitle}`,
+                            session_id: `eq.${this.sessionCode}`
+                        },
+                        order: 'submitted_at.asc'
+                    });
+                    data = r.data;
+                    error = r.error;
+                } catch (e) {
+                    console.warn('[Showcase] strict query failed:', e);
+                }
             }
 
-            // Fallback：無 sessionCode 或嚴格查詢無結果 → 只用 assignment_title
+            // 第二輪：如果無結果，退回只用 assignment_title
             if (!data || data.length === 0) {
-                const loose = await fetchWithTimeout('submissions', {
-                    filter: { assignment_title: `eq.${assignmentTitle}` },
-                    order: 'submitted_at.asc'
-                });
-                data = loose.data;
-                error = loose.error;
+                try {
+                    const r = await fetchWithTimeout('submissions', {
+                        filter: { assignment_title: `eq.${assignmentTitle}` },
+                        order: 'submitted_at.asc'
+                    });
+                    data = r.data;
+                    error = r.error;
+                } catch (e) {
+                    console.warn('[Showcase] loose query failed:', e);
+                }
             }
 
-            console.log('[Showcase] query result for', assignmentTitle, '(session:', this.sessionCode, '):', data?.length, 'rows');
-
-
-
+            console.log('[Showcase] result for', assignmentTitle, ':', data?.length, 'rows');
             if (error || !data) {
                 console.error('[Showcase] query error:', error);
                 this.renderError(container, '無法載入作品');

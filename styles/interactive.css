@@ -4603,3 +4603,41 @@
     20% { opacity: 1; }
     100% { opacity: 0; transform: translateX(-50%) translateY(-40px); letter-spacing: 20px; }
 }
+
+/* ── 手機端 showcase 作業牆修復 ── */
+@media (max-width: 1024px) {
+    /* 移除嵌套 transform，避免 iOS Safari 在 transform:scale 父元素內渲染異常 */
+    .showcase-container {
+        will-change: auto;
+        -webkit-transform: none;
+        transform: none;
+        overflow: auto;
+    }
+
+    /* 作業牆 grid 改為垂直滾動、wrap */
+    .showcase-grid {
+        flex-wrap: wrap;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-transform: none;
+        transform: none;
+    }
+
+    /* 卡片寬度自適應（手機上不強制 280px） */
+    .showcase-work-card {
+        flex: 0 0 auto;
+        width: calc(50% - 7px);
+        max-width: none;
+        min-width: 120px;
+    }
+
+    .showcase-header-bar {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .showcase-status-row {
+        padding: 4px 8px;
+        gap: 4px;
+    }
+}
