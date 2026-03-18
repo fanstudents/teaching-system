@@ -876,6 +876,11 @@ body {
     /* 桌面版隱藏 */
 }
 
+/* 橫放提示預設隱藏（桌面版 + 橫放) */
+.rotate-hint {
+    display: none;
+}
+
 /* 箭頭文字標籤預設隱藏 */
 .nav-arrow-label {
     display: none;
@@ -907,45 +912,42 @@ body {
         right: 6px;
     }
 
-    /* 手機版投影片箭頭 — 分散到最左/最右上方 */
+    /* 手機版投影片箭頭 — 投影片兩側垂直居中 */
     .student-presentation .slide-nav-arrow {
-        position: fixed !important;
-        top: 6px !important;
+        position: absolute !important;
+        top: 50% !important;
         bottom: auto !important;
-        transform: none !important;
-        height: 28px !important;
-        border-radius: 6px !important;
-        background: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transform: translateY(-50%) !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
+        background: rgba(0, 0, 0, 0.35) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         z-index: 310 !important;
         display: flex !important;
         align-items: center !important;
-        gap: 2px !important;
-        padding: 0 8px !important;
-        width: auto !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        backdrop-filter: blur(8px) !important;
     }
 
     .student-presentation .slide-nav-arrow.prev {
-        left: 6px !important;
+        left: 4px !important;
         right: auto !important;
     }
 
     .student-presentation .slide-nav-arrow.next {
-        right: 6px !important;
+        right: 4px !important;
         left: auto !important;
     }
 
     .student-presentation .slide-nav-arrow .material-symbols-outlined {
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.6);
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.85);
     }
 
     .student-presentation .slide-nav-arrow .nav-arrow-label {
-        display: inline;
-        font-size: 10px;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.5);
-        letter-spacing: 0.02em;
+        display: none;
     }
 }
 
@@ -1025,9 +1027,22 @@ body {
         height: calc(100dvh - 40px - 50px) !important; /* dynamic viewport height */
     }
 
-    /* 橫向瀏覽提示 — 隱藏，避免遮擋 */
-    .student-presentation::after {
-        content: none;
+    /* 橫向瀏覽提示 — 在投影片上方黑色區域顯示 */
+    .rotate-hint {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 8px 0;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        flex-shrink: 0;
+    }
+
+    .rotate-hint svg {
+        flex-shrink: 0;
     }
 
     /* 穩定沉浸模式 */

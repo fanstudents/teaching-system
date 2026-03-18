@@ -152,6 +152,21 @@
                 style="height:100%;background:linear-gradient(90deg,#6366f1,#818cf8);width:0%;transition:width 0.3s ease;border-radius:0 2px 2px 0;">
             </div>
         </div>
+        <!-- 橫放提示（手機直式時顯示） -->
+        <div class="rotate-hint" id="rotateHint" style="display:none;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="animation: rotatePhone 2.5s ease-in-out infinite;">
+                <rect x="4" y="2" width="16" height="20" rx="2"/>
+                <line x1="12" y1="18" x2="12" y2="18.01"/>
+            </svg>
+            <span>建議將手機橫放，享受最佳瀏覽大小</span>
+        </div>
+        <style>
+            @keyframes rotatePhone {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-90deg); }
+                50%, 75% { transform: rotate(-90deg); }
+            }
+        </style>
         <div class="student-slide-wrapper" id="slideWrapper">
             <button class="slide-nav-arrow prev" id="prevSlideBtn">
                 <span class="material-symbols-outlined">chevron_left</span>
@@ -2135,6 +2150,38 @@
             document.getElementById('studentLbClose')?.addEventListener('click', () => {
                 document.getElementById('studentLeaderboard')?.classList.remove('open');
             });
+        })();
+
+        // ── 方向偵測：橫放提示 + 橫放自動開啟面板 ──
+        (function initOrientationHandler() {
+            const rotateHint = document.getElementById('rotateHint');
+            const leftPanel = document.getElementById('mobileSidePanel');
+            const rightPanel = document.getElementById('mobileRightPanel');
+            if (!rotateHint) return;
+
+            function handleOrientation() {
+                const isMobile = window.innerWidth <= 1024;
+                const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+
+                if (isMobile && isPortrait) {
+                    // 直式：顯示橫放提示
+                    rotateHint.style.display = 'flex';
+                } else {
+                    // 橫放或桌面：隱藏提示
+                    rotateHint.style.display = 'none';
+                }
+
+                // 橫放手機：自動顯示左右面板
+                if (isMobile && !isPortrait) {
+                    if (leftPanel) leftPanel.style.display = 'flex';
+                    if (rightPanel) rightPanel.style.display = 'flex';
+                }
+            }
+
+            // 初始執行 + 監聽變化
+            handleOrientation();
+            window.addEventListener('resize', handleOrientation);
+            window.matchMedia('(orientation: portrait)').addEventListener('change', handleOrientation);
         })();
 
         // ── 全螢幕 / 沉浸模式 ──
