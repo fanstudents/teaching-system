@@ -707,6 +707,7 @@
 
             // 查詢角色，決定導向
             const profile = await getUserProfile();
+            if (profile?.role) localStorage.setItem('_user_role', profile.role);
             const defaultRedirect = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
             const redirect = new URLSearchParams(location.search).get('redirect') || defaultRedirect;
             location.replace(redirect);

@@ -66,12 +66,13 @@ const NAV_ITEMS = [
         group: '教學管理',
         items: [
             { label: '專案管理', icon: 'space_dashboard', href: 'manage.html' },
-            { label: '客戶管理', icon: 'business', href: 'clients.html' },
-            { label: '開課單位', icon: 'apartment', href: 'organizations.html' },
+            { label: '客戶管理', icon: 'business', href: 'clients.html', adminOnly: true },
+            { label: '開課單位', icon: 'apartment', href: 'organizations.html', adminOnly: true },
         ]
     },
     {
         group: '素材與新聞',
+        adminOnly: true,
         items: [
             { label: '新聞總覽', icon: 'newspaper', href: 'news-dashboard.html' },
             { label: '素材庫', icon: 'palette', href: 'assets.html' },
@@ -79,6 +80,7 @@ const NAV_ITEMS = [
     },
     {
         group: '合作管理',
+        adminOnly: true,
         items: [
             { label: '聯盟行銷', icon: 'campaign', href: 'partners.html#affiliates' },
             { label: '講師管理', icon: 'school', href: 'partners.html#instructors' },
@@ -86,6 +88,7 @@ const NAV_ITEMS = [
     },
     {
         group: '系統',
+        adminOnly: true,
         items: [
             { label: '會員管理', icon: 'group', href: 'members.html' },
             { label: '系統設置', icon: 'settings', href: 'settings.html' },
@@ -102,6 +105,19 @@ function getCurrentPage() {
 function createAdminSidebar() {
     const currentPage = getCurrentPage();
 
+    // 檢查使用者角色（從 user_profiles 快取）
+    const userRole = window.__userRole || localStorage.getItem('_user_role') || 'instructor';
+    const isAdmin = userRole === 'super_admin';
+
+    // 過濾 nav items
+    const filteredNav = NAV_ITEMS
+        .filter(group => isAdmin || !group.adminOnly)
+        .map(group => ({
+            ...group,
+            items: group.items.filter(item => isAdmin || !item.adminOnly)
+        }))
+        .filter(group => group.items.length > 0);
+
     // -- Overlay (mobile) --
     const overlay = document.createElement('div');
     overlay.className = 'admin-sidebar-overlay';
@@ -112,7 +128,7 @@ function createAdminSidebar() {
     sidebar.className = 'admin-sidebar';
     sidebar.id = 'adminSidebar';
 
-    const groupsHtml = NAV_ITEMS.map((group, idx) => `
+    const groupsHtml = filteredNav.map((group, idx) => `
         ${idx > 0 ? '<div class="admin-sidebar-divider"></div>' : ''}
         <div class="admin-sidebar-group">
             <div class="admin-sidebar-group-label">${group.group}</div>
@@ -179,6 +195,7 @@ function createAdminSidebar() {
         sessionStorage.removeItem('_rt');
         localStorage.removeItem('_at');
         localStorage.removeItem('_rt');
+        localStorage.removeItem('_user_role');
         location.replace('login.html');
     });
 

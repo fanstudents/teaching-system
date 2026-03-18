@@ -619,6 +619,8 @@
         if (!authResult) throw new Error('not authenticated');
         const currentUser = authResult.session.user;
         const currentProfile = authResult.profile;
+        // 儲存角色供 nav.js sidebar 過濾使用
+        if (currentProfile?.role) localStorage.setItem('_user_role', currentProfile.role);
 
         // 顯示使用者資訊
         const nameEl = document.getElementById('userDisplayName');
