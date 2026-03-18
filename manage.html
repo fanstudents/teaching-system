@@ -45,7 +45,7 @@
                     <div class="stat-label">學員</div>
                     <div class="stat-value" id="statStudents">-</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card admin-only">
                     <div class="stat-label">訂單</div>
                     <div class="stat-value" id="statPurchases">-</div>
                 </div>
@@ -57,13 +57,13 @@
                     <button class="l1-tab active" data-l1tab="projects">
                         <span class="material-symbols-outlined">folder</span> 專案
                     </button>
-                    <a class="l1-tab" href="assets.html" style="text-decoration:none;color:inherit;">
+                    <a class="l1-tab admin-only" href="assets.html" style="text-decoration:none;color:inherit;">
                         <span class="material-symbols-outlined">palette</span> 素材庫
                     </a>
-                    <button class="l1-tab" data-l1tab="instructors">
+                    <button class="l1-tab admin-only" data-l1tab="instructors">
                         <span class="material-symbols-outlined">school</span> 講師
                     </button>
-                    <button class="l1-tab" data-l1tab="purchases">
+                    <button class="l1-tab admin-only" data-l1tab="purchases">
                         <span class="material-symbols-outlined">receipt_long</span> 訂單
                     </button>
                 </div>
@@ -630,6 +630,11 @@
             clearProfileCache();
             location.href = 'login.html';
         });
+
+        // 非 super_admin 隱藏管理者專屬元素
+        if (currentProfile?.role !== 'super_admin') {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        }
 
         // Category filter (no more URL-based type separation)
         let selectedCategory = '';
