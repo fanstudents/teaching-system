@@ -244,11 +244,15 @@ export class HomeworkSubmission {
             // ── 檔案上傳 ──
             this.setupUploadArea(overlay, 'imageUploadArea', 'homeworkImageInput', 'imagePreview',
                 (data) => { uploadedData = data; });
+            // 監聽刪除事件
+            overlay.querySelector('#imageUploadArea')?.addEventListener('hw-file-cleared', () => { uploadedData = null; });
             if (!mode) {
                 this.setupUploadArea(overlay, 'videoUploadArea', 'homeworkVideoInput', 'videoPreview',
                     (data) => { uploadedData = data; });
                 this.setupUploadArea(overlay, 'audioUploadArea', 'homeworkAudioInput', 'audioPreview',
                     (data) => { uploadedData = data; });
+                overlay.querySelector('#videoUploadArea')?.addEventListener('hw-file-cleared', () => { uploadedData = null; });
+                overlay.querySelector('#audioUploadArea')?.addEventListener('hw-file-cleared', () => { uploadedData = null; });
             }
 
             // ── 關閉 ──
@@ -494,7 +498,34 @@ export class HomeworkSubmission {
                 </div>`;
         }
 
-        preview.innerHTML += `<button class="change-file-btn" onclick="this.closest('.homework-panel').querySelector('.homework-upload-area').style.display='flex';this.closest('.homework-preview').innerHTML='';">更換檔案</button>`;
+        // 操作按鈕列：更換 + 刪除
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'display:flex;gap:8px;margin-top:8px;justify-content:center;';
+
+        const changeBtn = document.createElement('button');
+        changeBtn.className = 'change-file-btn';
+        changeBtn.textContent = '更換檔案';
+        changeBtn.addEventListener('click', () => {
+            area.style.display = 'flex';
+            preview.innerHTML = '';
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'change-file-btn';
+        deleteBtn.style.cssText = 'background:#fef2f2;color:#dc2626;border-color:#fecaca;';
+        deleteBtn.textContent = '🗑 刪除';
+        deleteBtn.addEventListener('click', () => {
+            area.style.display = 'flex';
+            preview.innerHTML = '';
+            this._pendingFile = null;
+            // 通知外層清除 uploadedData
+            const evt = new CustomEvent('hw-file-cleared');
+            area.dispatchEvent(evt);
+        });
+
+        btnRow.appendChild(changeBtn);
+        btnRow.appendChild(deleteBtn);
+        preview.appendChild(btnRow);
     }
 
     /* ── 提交 ── */

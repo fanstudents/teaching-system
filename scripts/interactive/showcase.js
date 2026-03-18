@@ -109,28 +109,45 @@ export class Showcase {
                 ]);
             };
 
-            let { data, error } = await fetchWithTimeout('submissions', {
-                filter: { assignment_title: `eq.${assignmentTitle}` },
-                order: 'submitted_at.asc'
-            });
+            // ★ 主查詢：優先用 assignment_title + session_id（避免跨專案）
+            let { data, error } = { data: null, error: null };
 
-            console.log('[Showcase] query result for', assignmentTitle, ':', data?.length, 'rows, error:', error);
-
-            // 如果精確匹配無結果，且有 sessionCode，用 session_id 回撈（僅作業類型）
-            if ((!data || data.length === 0) && this.sessionCode) {
-                console.log('[Showcase] title match empty, trying session_id:', this.sessionCode);
-                const fallback = await fetchWithTimeout('submissions', {
+            if (this.sessionCode) {
+                const strict = await fetchWithTimeout('submissions', {
                     filter: {
-                        session_id: `eq.${this.sessionCode}`,
-                        type: 'in.(text,image,video,audio,link)'
+                        assignment_title: `eq.${assignmentTitle}`,
+                        session_id: `eq.${this.sessionCode}`
                     },
                     order: 'submitted_at.asc'
                 });
-                console.log('[Showcase] session_id fallback result:', fallback.data?.length, 'rows');
-                if (fallback.data && fallback.data.length > 0) {
-                    data = fallback.data;
-                    error = fallback.error;
+                data = strict.data;
+                error = strict.error;
+            }
+
+            // Fallback：無 sessionCode 或嚴格查詢無結果 → 只用 assignment_title
+            if (!data || data.length === 0) {
+                const loose = await fetchWithTimeout('submissions', {
+                    filter: { assignment_title: `eq.${assignmentTitle}` },
+                    order: 'submitted_at.asc'
+                });
+                data = loose.data;
+                error = loose.error;
+            }
+
+            console.log('[Showcase] query result for', assignmentTitle, '(session:', this.sessionCode, '):', data?.length, 'rows');
+
+            // ★ 去重：每位學員只保留最新一筆（避免編輯後出現重複）
+            if (data && data.length > 0) {
+                const latest = new Map();
+                for (const row of data) {
+                    const key = row.student_name || row.student_email || row.id;
+                    const existing = latest.get(key);
+                    if (!existing || new Date(row.submitted_at || row.created_at) > new Date(existing.submitted_at || existing.created_at)) {
+                        latest.set(key, row);
+                    }
                 }
+                data = Array.from(latest.values());
+                data.sort((a, b) => new Date(a.submitted_at || a.created_at) - new Date(b.submitted_at || b.created_at));
             }
 
             if (error || !data) {
