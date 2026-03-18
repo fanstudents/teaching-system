@@ -297,6 +297,38 @@ export class DragDrop {
         }
     }
 
+    _doPasteElements() {
+        const slide = this.slideManager.getCurrentSlide();
+        if (!slide || !this._copiedElements?.length) return;
+        const newIds = [];
+        this._copiedElements.forEach(data => {
+            const dup = JSON.parse(JSON.stringify(data));
+            dup.id = this.slideManager.generateId();
+            dup.groupId = null;
+            dup.x += 20;
+            dup.y += 20;
+            slide.elements.push(dup);
+            newIds.push(dup.id);
+        });
+        this.slideManager.renderCurrentSlide();
+        this.slideManager.renderThumbnails();
+        this.editor.deselectAll();
+        const canvas = this.canvasContentEl;
+        newIds.forEach(id => {
+            const dom = canvas.querySelector(`[data-id="${id}"]`);
+            if (dom) { this.editor.selectedElements.add(dom); dom.classList.add('selected'); }
+        });
+        if (this.editor.selectedElements.size > 0) {
+            this.editor.selectedElement = [...this.editor.selectedElements][0];
+            if (this.editor.selectedElements.size === 1) {
+                this.editor.addResizeHandles(this.editor.selectedElement);
+                this.editor.showPropertyPanel(this.editor.selectedElement);
+            } else {
+                this.editor.showMultiSelectPanel();
+            }
+        }
+    }
+
     forceReset() {
         if (this.isDragging && this.activeElement) {
             this.activeElement.style.cursor = 'move';
@@ -1013,44 +1045,7 @@ export class DragDrop {
             return;
         }
 
-        // Ctrl+V 貼上元素
-        if (isMeta && e.key === 'v' && !e.shiftKey && this._copiedElements?.length > 0 && !isEditing) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            const slide = this.slideManager.getCurrentSlide();
-            if (!slide) return;
-            const newIds = [];
-            this._copiedElements.forEach(data => {
-                const dup = JSON.parse(JSON.stringify(data));
-                dup.id = this.slideManager.generateId();
-                dup.groupId = null;
-                dup.x += 20;
-                dup.y += 20;
-                slide.elements.push(dup);
-                newIds.push(dup.id);
-            });
-            this.slideManager.renderCurrentSlide();
-            this.slideManager.renderThumbnails();
-            this.editor.deselectAll();
-            const canvas = this.canvasContentEl;
-            newIds.forEach(id => {
-                const dom = canvas.querySelector(`[data-id="${id}"]`);
-                if (dom) {
-                    this.editor.selectedElements.add(dom);
-                    dom.classList.add('selected');
-                }
-            });
-            if (this.editor.selectedElements.size > 0) {
-                this.editor.selectedElement = [...this.editor.selectedElements][0];
-                if (this.editor.selectedElements.size === 1) {
-                    this.editor.addResizeHandles(this.editor.selectedElement);
-                    this.editor.showPropertyPanel(this.editor.selectedElement);
-                } else {
-                    this.editor.showMultiSelectPanel();
-                }
-            }
-            return;
-        }
+        // Ctrl+V → 不在 keydown 處理，改由 editor.js 的 paste event 統一處理
 
         // Delete 或 Backspace 刪除選中元素
         if ((e.key === 'Delete' || e.key === 'Backspace') && this.editor.selectedElement) {

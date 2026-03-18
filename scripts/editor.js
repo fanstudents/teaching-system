@@ -37,18 +37,33 @@ export class Editor {
             e.target.value = '';
         });
 
-        // 貼上事件：擷取剪貼簿中的圖片
+        // 貼上事件：剪貼簿圖片 or 內部元素
         document.addEventListener('paste', (e) => {
-            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image/') === 0) {
-                    const file = items[i].getAsFile();
-                    if (file) {
-                        e.preventDefault();
-                        this.handleImageUpload(file);
+            // 如果正在編輯文字，不攔截
+            const active = document.activeElement;
+            if (active && (active.isContentEditable || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
+
+            const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+            let hasImage = false;
+
+            if (items) {
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image/') === 0) {
+                        const file = items[i].getAsFile();
+                        if (file) {
+                            e.preventDefault();
+                            this.handleImageUpload(file);
+                            hasImage = true;
+                        }
+                        break;
                     }
-                    break;
                 }
+            }
+
+            // 剪貼簿沒有圖片 → 嘗試貼上內部複製的元素
+            if (!hasImage && window._editorDragDrop?._copiedElements?.length > 0) {
+                e.preventDefault();
+                window._editorDragDrop._doPasteElements();
             }
         });
     }

@@ -80,6 +80,7 @@ class App {
         this.editor = new Editor(this.slideManager);
         window.__editorRef = this.editor;
         this.dragDrop = new DragDrop(this.slideManager, this.editor);
+        window._editorDragDrop = this.dragDrop;
         this.iconLibrary = new IconLibrary(this.slideManager);
         this.matchingGame = new MatchingGame();
         this.fillBlank = new FillBlank();
