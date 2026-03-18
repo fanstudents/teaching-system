@@ -845,8 +845,10 @@
                         delete newData.id;
                         delete newData.created_at;
                         delete newData.updated_at;
+                        delete newData.owner_id;
                         newData.name = origProject.name + '（複製）';
                         newData.join_code = generateCode(6);
+                        newData.owner_id = currentUser.id;
                         await db.insert('projects', newData);
                         await Promise.all([loadProjects(), loadSessions()]);
                         updateStats();
