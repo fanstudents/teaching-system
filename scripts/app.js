@@ -131,6 +131,7 @@ class App {
         this.bindProjectSwitcher();
         this.bindShareEntryLink();
         this.bindLogoBack();
+        this.setupCanvasTools();
 
         // 載入已儲存的資料 (等 DB 初始化完成)
         this.slideManager._initPromise.then(async () => {
@@ -5139,6 +5140,159 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this.duplicateCurrentSlide();
             }
         });
+    }
+
+    /* =========================================
+       畫布工具：Zoom、格線、鎖定、快捷鍵
+       ========================================= */
+    setupCanvasTools() {
+        // ── Zoom 控制 ──
+        this._zoom = 1;
+        const wrapper = document.querySelector('.canvas-wrapper');
+        const canvas = document.getElementById('slideCanvas');
+        const zoomLabel = document.getElementById('zoomLevel');
+        const zoomIn = document.getElementById('zoomInBtn');
+        const zoomOut = document.getElementById('zoomOutBtn');
+
+        const setZoom = (z) => {
+            this._zoom = Math.max(0.25, Math.min(2, z));
+            canvas.style.transform = `scale(${this._zoom})`;
+            canvas.style.transformOrigin = 'center center';
+            zoomLabel.textContent = Math.round(this._zoom * 100) + '%';
+            zoomIn?.classList.toggle('active', this._zoom > 1);
+            zoomOut?.classList.toggle('active', this._zoom < 1);
+        };
+
+        zoomIn?.addEventListener('click', () => setZoom(this._zoom + 0.1));
+        zoomOut?.addEventListener('click', () => setZoom(this._zoom - 0.1));
+        zoomLabel?.addEventListener('click', () => setZoom(1));
+
+        // Ctrl+滾輪 縮放
+        wrapper?.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                setZoom(this._zoom - e.deltaY * 0.002);
+            }
+        }, { passive: false });
+
+        // ── 格線 ──
+        const gridBtn = document.getElementById('gridToggleBtn');
+        let gridOverlay = document.querySelector('.canvas-grid-overlay');
+        if (!gridOverlay) {
+            gridOverlay = document.createElement('div');
+            gridOverlay.className = 'canvas-grid-overlay';
+            document.getElementById('canvasContent')?.appendChild(gridOverlay);
+        }
+        gridBtn?.addEventListener('click', () => {
+            gridOverlay.classList.toggle('visible');
+            gridBtn.classList.toggle('active', gridOverlay.classList.contains('visible'));
+        });
+
+        // ── 鎖定 ──
+        const lockBtn = document.getElementById('lockToggleBtn');
+        lockBtn?.addEventListener('click', () => {
+            const selected = this.editor?.selectedElement;
+            if (!selected) return;
+            const id = selected.dataset.id;
+            const slide = this.slideManager.getCurrentSlide();
+            if (!slide) return;
+            const elData = slide.elements.find(d => d.id === id);
+            if (!elData) return;
+            elData.locked = !elData.locked;
+            selected.classList.toggle('locked', elData.locked);
+            lockBtn.querySelector('.material-symbols-outlined').textContent =
+                elData.locked ? 'lock' : 'lock_open';
+            this.slideManager.save();
+        });
+
+        // 同步鎖定圖示 when element is selected
+        window.addEventListener('elementSelected', (e) => {
+            const detail = e.detail;
+            if (!detail || !lockBtn) { lockBtn?.querySelector('.material-symbols-outlined') && (lockBtn.querySelector('.material-symbols-outlined').textContent = 'lock_open'); return; }
+            const slide = this.slideManager.getCurrentSlide();
+            const elData = slide?.elements?.find(d => d.id === detail.id);
+            lockBtn.querySelector('.material-symbols-outlined').textContent =
+                elData?.locked ? 'lock' : 'lock_open';
+        });
+
+        // ── 快捷鍵面板 ──
+        const shortcutsBtn = document.getElementById('shortcutsBtn');
+        shortcutsBtn?.addEventListener('click', () => this._showShortcutsPanel());
+
+        // 追加鍵盤快捷鍵
+        document.addEventListener('keydown', (e) => {
+            const isMeta = e.ctrlKey || e.metaKey;
+            const isEditing = this._isEditingText?.() ?? false;
+            if (isEditing) return;
+
+            // Ctrl++ / Ctrl+-
+            if (isMeta && (e.key === '=' || e.key === '+')) { e.preventDefault(); setZoom(this._zoom + 0.1); }
+            if (isMeta && e.key === '-') { e.preventDefault(); setZoom(this._zoom - 0.1); }
+            if (isMeta && e.key === '0') { e.preventDefault(); setZoom(1); }
+
+            // Ctrl+G 格線
+            if (isMeta && e.key === 'g' && !e.shiftKey) {
+                e.preventDefault();
+                gridBtn?.click();
+            }
+
+            // Ctrl+L 鎖定
+            if (isMeta && e.key === 'l') {
+                e.preventDefault();
+                lockBtn?.click();
+            }
+
+            // ? 快捷鍵面板
+            if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+                this._showShortcutsPanel();
+            }
+        });
+    }
+
+    _showShortcutsPanel() {
+        if (document.querySelector('.shortcuts-modal')) return;
+        const modal = document.createElement('div');
+        modal.className = 'shortcuts-modal';
+        modal.innerHTML = `
+            <div class="shortcuts-card">
+                <h3>
+                    <span class="material-symbols-outlined" style="color:#6366f1;">keyboard</span>
+                    快捷鍵一覽
+                </h3>
+                <div class="shortcut-group">
+                    <div class="shortcut-group-title">一般</div>
+                    <div class="shortcut-row"><span>復原</span><kbd>⌘Z</kbd></div>
+                    <div class="shortcut-row"><span>重做</span><kbd>⇧⌘Z</kbd></div>
+                    <div class="shortcut-row"><span>儲存</span><kbd>⌘S</kbd></div>
+                    <div class="shortcut-row"><span>全選</span><kbd>⌘A</kbd></div>
+                    <div class="shortcut-row"><span>新增投影片</span><kbd>⌘N</kbd></div>
+                    <div class="shortcut-row"><span>複製投影片</span><kbd>⇧⌘D</kbd></div>
+                    <div class="shortcut-row"><span>播放簡報</span><kbd>F5</kbd></div>
+                </div>
+                <div class="shortcut-group">
+                    <div class="shortcut-group-title">元素操作</div>
+                    <div class="shortcut-row"><span>複製</span><kbd>⌘C</kbd></div>
+                    <div class="shortcut-row"><span>貼上</span><kbd>⌘V</kbd></div>
+                    <div class="shortcut-row"><span>快速複製</span><kbd>⌘D</kbd></div>
+                    <div class="shortcut-row"><span>刪除</span><kbd>⌫</kbd></div>
+                    <div class="shortcut-row"><span>移動元素</span><kbd>↑↓←→</kbd></div>
+                    <div class="shortcut-row"><span>移動 10px</span><kbd>⇧ + ↑↓←→</kbd></div>
+                    <div class="shortcut-row"><span>鎖定/解鎖</span><kbd>⌘L</kbd></div>
+                </div>
+                <div class="shortcut-group">
+                    <div class="shortcut-group-title">檢視</div>
+                    <div class="shortcut-row"><span>放大</span><kbd>⌘+</kbd></div>
+                    <div class="shortcut-row"><span>縮小</span><kbd>⌘-</kbd></div>
+                    <div class="shortcut-row"><span>重設縮放</span><kbd>⌘0</kbd></div>
+                    <div class="shortcut-row"><span>格線開關</span><kbd>⌘G</kbd></div>
+                    <div class="shortcut-row"><span>快捷鍵面板</span><kbd>?</kbd></div>
+                </div>
+            </div>
+        `;
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+        document.body.appendChild(modal);
     }
 
     /* =========================================

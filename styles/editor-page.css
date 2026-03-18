@@ -147,3 +147,132 @@
 .tpl-info .material-symbols-outlined {
     color: var(--accent-primary);
 }
+
+/* ── 底部導航工具列 ── */
+.slide-nav {
+    justify-content: space-between !important;
+}
+
+.nav-tool-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    padding: 0;
+}
+
+.nav-tool-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+}
+
+.nav-tool-btn.active {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: #6366f1;
+    color: #6366f1;
+}
+
+/* ── 格線疊層 ── */
+.canvas-grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+        linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.canvas-grid-overlay.visible {
+    opacity: 1;
+}
+
+/* ── 鎖定元素 ── */
+.editable-element.locked {
+    pointer-events: none !important;
+    outline: 1px dashed rgba(239, 68, 68, 0.4) !important;
+}
+
+.editable-element.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 10px;
+    z-index: 10;
+}
+
+/* ── 快捷鍵面板 ── */
+.shortcuts-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: ctxFadeIn 0.15s ease;
+}
+
+.shortcuts-card {
+    background: #fff;
+    border-radius: 14px;
+    width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    padding: 24px;
+}
+
+.shortcuts-card h3 {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shortcut-group {
+    margin-bottom: 16px;
+}
+
+.shortcut-group-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+
+.shortcut-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 0.85rem;
+}
+
+.shortcut-row kbd {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 0.78rem;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    color: #475569;
+    min-width: 22px;
+    text-align: center;
+}

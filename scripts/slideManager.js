@@ -735,6 +735,10 @@ export class SlideManager {
         if (element) {
             Object.assign(element, updates);
             this.save();
+
+            // debounce 縮圖更新（拖曳時不會過度重建）
+            if (this._thumbTimer) clearTimeout(this._thumbTimer);
+            this._thumbTimer = setTimeout(() => this.renderThumbnails(), 300);
         }
 
         return element;
@@ -901,7 +905,7 @@ export class SlideManager {
      */
     createElementNode(element) {
         const el = document.createElement('div');
-        el.className = `editable-element ${element.type}-element`;
+        el.className = `editable-element ${element.type}-element${element.locked ? ' locked' : ''}`;
         el.dataset.id = element.id;
         el.dataset.type = element.type;
 
