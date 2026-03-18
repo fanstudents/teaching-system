@@ -5104,7 +5104,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     const slide = this.slideManager.getCurrentSlide();
                     if (slide) {
                         this._copiedSlide = JSON.parse(JSON.stringify(slide));
-                        this.showToast('已複製投影片');
+
                     }
                 }
             }
@@ -5123,7 +5123,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     this.slideManager.renderThumbnails();
                     this.slideManager.updateCounter();
                     this.slideManager.save();
-                    this.showToast('已貼上投影片');
+
                 }
             }
 
