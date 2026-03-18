@@ -748,6 +748,7 @@
         async function loadProjects() {
             try {
                 const { data, error } = await db.select('projects', {
+                    filter: { owner_id: `eq.${currentUser.id}` },
                     order: 'created_at.desc'
                 });
                 if (error) throw error;
@@ -1057,7 +1058,13 @@
         // ── Sessions ──
         async function loadSessions() {
             try {
-                const { data, error } = await db.select('project_sessions', { order: 'date.desc' });
+                // 取得自己專案的 IDs，只載入這些專案的場次
+                const projectIds = projects.map(p => p.id);
+                if (projectIds.length === 0) { sessions = []; return; }
+                const { data, error } = await db.select('project_sessions', {
+                    filter: { project_id: `in.(${projectIds.join(',')})` },
+                    order: 'date.desc'
+                });
                 if (error) throw error;
                 sessions = data || [];
             } catch (e) {
