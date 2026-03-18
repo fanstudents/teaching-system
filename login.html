@@ -662,12 +662,14 @@
     </div>
 
     <script type="module">
-        import { auth } from './scripts/supabase.js';
+        import { auth, db, getUserProfile } from './scripts/supabase.js';
 
-        // If already logged in, redirect
+        // If already logged in, redirect based on role
         const session = await auth.getSession();
         if (session) {
-            const redirect = new URLSearchParams(location.search).get('redirect') || 'manage.html';
+            const profile = await getUserProfile();
+            const defaultRedirect = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
+            const redirect = new URLSearchParams(location.search).get('redirect') || defaultRedirect;
             location.replace(redirect);
         }
 
@@ -703,7 +705,10 @@
                 return;
             }
 
-            const redirect = new URLSearchParams(location.search).get('redirect') || 'manage.html';
+            // 查詢角色，決定導向
+            const profile = await getUserProfile();
+            const defaultRedirect = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
+            const redirect = new URLSearchParams(location.search).get('redirect') || defaultRedirect;
             location.replace(redirect);
         });
     </script>

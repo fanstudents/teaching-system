@@ -12,11 +12,15 @@
 const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
 
-const defaultHeaders = {
-    'apikey': SUPABASE_ANON_KEY,
-    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-    'Content-Type': 'application/json'
-};
+// 動態 headers：如果有 access token 就用 authenticated 身份
+function getHeaders() {
+    const token = (localStorage.getItem('_at') || sessionStorage.getItem('_at')) || SUPABASE_ANON_KEY;
+    return {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
 
 // ── Database (PostgREST — Supabase 底層相同) ──
 
@@ -38,7 +42,7 @@ export const db = {
         }
         const res = await fetch(url, {
             method: 'POST',
-            headers: { ...defaultHeaders, 'Prefer': prefer.join(',') },
+            headers: { ...getHeaders(), 'Prefer': prefer.join(',') },
             body: JSON.stringify(body)
         });
         const data = await res.json().catch(() => null);
@@ -64,7 +68,7 @@ export const db = {
         }
         const qs = params.toString();
         const url = `${SUPABASE_URL}/rest/v1/${table}${qs ? '?' + qs : ''}`;
-        const res = await fetch(url, { headers: defaultHeaders });
+        const res = await fetch(url, { headers: getHeaders() });
         const data = await res.json().catch(() => null);
         return { data: res.ok ? data : null, error: res.ok ? null : data };
     },
@@ -82,7 +86,7 @@ export const db = {
         const url = `${SUPABASE_URL}/rest/v1/${table}${qs ? '?' + qs : ''}`;
         const res = await fetch(url, {
             method: 'PATCH',
-            headers: { ...defaultHeaders, 'Prefer': 'return=representation' },
+            headers: { ...getHeaders(), 'Prefer': 'return=representation' },
             body: JSON.stringify(values)
         });
         const data = await res.json().catch(() => null);
@@ -101,7 +105,7 @@ export const db = {
         const url = `${SUPABASE_URL}/rest/v1/${table}${qs ? '?' + qs : ''}`;
         const res = await fetch(url, {
             method: 'DELETE',
-            headers: defaultHeaders
+            headers: getHeaders()
         });
         const data = await res.json().catch(() => null);
         return { data: res.ok ? data : null, error: res.ok ? null : data };
@@ -569,7 +573,46 @@ export const functions = {
     }
 };
 
+// ── User Profile Helper ──
+
+let _cachedProfile = null;
+
+export async function getUserProfile() {
+    if (_cachedProfile) return _cachedProfile;
+    const session = await auth.getSession();
+    if (!session) return null;
+    const { data } = await db.select('user_profiles', {
+        filter: { id: `eq.${session.user.id}` },
+        limit: 1
+    });
+    _cachedProfile = data?.[0] || null;
+    return _cachedProfile;
+}
+
+export function clearProfileCache() {
+    _cachedProfile = null;
+}
+
+// ── Auth Guard ──
+
+export async function requireAuth(allowedRoles = null) {
+    const session = await auth.getSession();
+    if (!session) {
+        location.href = `login.html?redirect=${encodeURIComponent(location.pathname + location.search)}`;
+        return null;
+    }
+    if (allowedRoles) {
+        const profile = await getUserProfile();
+        if (!profile || !allowedRoles.includes(profile.role)) {
+            location.href = 'login.html';
+            return null;
+        }
+        return { session, profile };
+    }
+    return { session, profile: await getUserProfile() };
+}
+
 // ── Export all ──
 
-export const supabase = { db, auth, storage, realtime, ai, functions, generateSessionCode };
+export const supabase = { db, auth, storage, realtime, ai, functions, generateSessionCode, getUserProfile, requireAuth, clearProfileCache };
 export default supabase;

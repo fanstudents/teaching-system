@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者儀表板 — 教學系統</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-1: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Noto Sans TC', -apple-system, system-ui, sans-serif;
+            margin: 0;
+            color: var(--text-1);
+        }
+
+        .admin-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .admin-header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-right .user-email {
+            font-size: 0.82rem;
+            color: var(--text-2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            background: var(--surface);
+            color: var(--text-1);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .btn:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            border-color: #4f46e5;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.78rem;
+        }
+
+        .btn-danger-text {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.78rem;
+            padding: 4px 8px;
+        }
+
+        /* ── 統計卡片 ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-3);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-1);
+        }
+
+        /* ── Tabs ── */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--text-3);
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-2);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ── 講師表格 ── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .data-table th {
+            background: #f1f5f9;
+            color: var(--text-2);
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .data-table td {
+            border-top: 1px solid var(--border);
+        }
+
+        .data-table tr:hover td {
+            background: #fafbfc;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .role-badge.super_admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-badge.instructor {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-dot.active {
+            background: var(--success);
+        }
+
+        .status-dot.inactive {
+            background: #cbd5e1;
+        }
+
+        /* ── 專案總覽 ── */
+        .instructor-group {
+            margin-bottom: 32px;
+        }
+
+        .instructor-group-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .instructor-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .instructor-group-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .instructor-group-meta {
+            font-size: 0.78rem;
+            color: var(--text-3);
+        }
+
+        .project-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .project-mini-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+
+        .project-mini-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-color: #cbd5e1;
+        }
+
+        .pmc-name {
+            font-weight: 600;
+            font-size: 0.92rem;
+            margin-bottom: 6px;
+        }
+
+        .pmc-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.78rem;
+            color: var(--text-3);
+        }
+
+        .pmc-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pmc-stats .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: modalIn 0.2s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-3);
+            padding: 4px;
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-2);
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            padding: 16px 24px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-3);
+            font-size: 0.9rem;
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .admin-main {
+                padding: 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .project-mini-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="admin-header">
+            <div class="admin-header-title">
+                <span class="material-symbols-outlined" style="vertical-align:middle;margin-right:6px;color:var(--primary);">admin_panel_settings</span>
+                管理者儀表板
+            </div>
+            <div class="header-right">
+                <span class="user-email" id="userEmail"></span>
+                <a href="manage.html" class="btn btn-sm">
+                    <span class="material-symbols-outlined" style="font-size:16px;">folder</span> 專案管理
+                </a>
+                <button class="btn btn-sm" id="logoutBtn">
+                    <span class="material-symbols-outlined" style="font-size:16px;">logout</span> 登出
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">總講師數</div>
+                <div class="stat-value" id="statInstructors">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">總專案數</div>
+                <div class="stat-value" id="statProjects">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">總場次數</div>
+                <div class="stat-value" id="statSessions">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">總學員數</div>
+                <div class="stat-value" id="statStudents">-</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="instructors">
+                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">people</span>
+                講師管理
+            </button>
+            <button class="tab-btn" data-tab="overview">
+                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">grid_view</span>
+                全域專案總覽
+            </button>
+        </div>
+
+        <!-- Tab: 講師管理 -->
+        <div class="tab-panel active" id="panel-instructors">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;">所有講師</h3>
+                <button class="btn btn-primary btn-sm" id="addInstructorBtn">
+                    <span class="material-symbols-outlined" style="font-size:16px;">person_add</span> 新增講師
+                </button>
+            </div>
+            <table class="data-table" id="instructorTable">
+                <thead>
+                    <tr>
+                        <th>名稱</th>
+                        <th>Email</th>
+                        <th>角色</th>
+                        <th>狀態</th>
+                        <th>專案數</th>
+                        <th>建立時間</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="instructorTableBody">
+                    <tr>
+                        <td colspan="7" class="empty-state">載入中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab: 全域專案總覽 -->
+        <div class="tab-panel" id="panel-overview">
+            <div id="overviewContent">
+                <div class="empty-state">載入中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Instructor Modal -->
+    <div class="modal-overlay" id="addInstructorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>新增講師</h3>
+                <button class="modal-close" onclick="document.getElementById('addInstructorModal').classList.remove('active')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Email <span style="color:var(--danger)">*</span></label>
+                    <input type="email" id="newInstructorEmail" placeholder="instructor@example.com">
+                </div>
+                <div class="form-group">
+                    <label>顯示名稱</label>
+                    <input type="text" id="newInstructorName" placeholder="講師名稱">
+                </div>
+                <div class="form-group">
+                    <label>初始密碼 <span style="font-weight:400;color:var(--text-3)">（留空則自動產生）</span></label>
+                    <input type="text" id="newInstructorPassword" placeholder="至少 6 個字元">
+                </div>
+                <div id="createResult" style="display:none;padding:12px;border-radius:8px;font-size:0.82rem;margin-top:8px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="document.getElementById('addInstructorModal').classList.remove('active')">取消</button>
+                <button class="btn btn-primary" id="saveInstructorBtn">建立帳號</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { db, auth, functions, requireAuth, clearProfileCache } from './scripts/supabase.js';
+
+        // ── Auth Guard (super_admin only) ──
+        const authResult = await requireAuth(['super_admin']);
+        if (!authResult) throw new Error('not authorized');
+        const currentUser = authResult.session.user;
+
+        document.getElementById('userEmail').textContent = currentUser.email;
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await auth.signOut();
+            clearProfileCache();
+            location.href = 'login.html';
+        });
+
+        // ── Data ──
+        let instructors = [];
+        let allProjects = [];
+        let allSessions = [];
+        let allStudents = [];
+
+        // ── Init ──
+        async function init() {
+            await Promise.allSettled([
+                loadInstructors(),
+                loadAllProjects(),
+                loadAllSessions(),
+                loadAllStudents()
+            ]);
+            updateStats();
+            renderInstructorTable();
+            renderOverview();
+        }
+
+        async function loadInstructors() {
+            const { data } = await db.select('user_profiles', { order: 'created_at.desc' });
+            instructors = data || [];
+        }
+
+        async function loadAllProjects() {
+            const { data } = await db.select('projects', { order: 'created_at.desc' });
+            allProjects = data || [];
+        }
+
+        async function loadAllSessions() {
+            const { data } = await db.select('project_sessions', { order: 'date.desc' });
+            allSessions = data || [];
+        }
+
+        async function loadAllStudents() {
+            const { data } = await db.select('students', { select: 'id,session_id' });
+            allStudents = data || [];
+        }
+
+        function updateStats() {
+            document.getElementById('statInstructors').textContent = instructors.filter(i => i.role === 'instructor').length;
+            document.getElementById('statProjects').textContent = allProjects.length;
+            document.getElementById('statSessions').textContent = allSessions.length;
+            document.getElementById('statStudents').textContent = allStudents.length;
+        }
+
+        // ── Tabs ──
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        // ── Render Instructor Table ──
+        function renderInstructorTable() {
+            const tbody = document.getElementById('instructorTableBody');
+            if (instructors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">尚無講師</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = instructors.map(inst => {
+                const projectCount = allProjects.filter(p => p.owner_id === inst.id).length;
+                const date = inst.created_at ? new Date(inst.created_at).toLocaleDateString('zh-TW') : '';
+                return `<tr>
+                    <td style="font-weight:600;">${inst.display_name || '—'}</td>
+                    <td>${inst.email}</td>
+                    <td><span class="role-badge ${inst.role}">${inst.role === 'super_admin' ? '管理者' : '講師'}</span></td>
+                    <td><span class="status-dot ${inst.is_active ? 'active' : 'inactive'}"></span>${inst.is_active ? '啟用' : '停用'}</td>
+                    <td>${projectCount}</td>
+                    <td>${date}</td>
+                    <td>
+                        ${inst.role !== 'super_admin' ? `<button class="btn-danger-text" data-toggle-id="${inst.id}" data-active="${inst.is_active}">${inst.is_active ? '停用' : '啟用'}</button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Toggle active/inactive
+            tbody.querySelectorAll('[data-toggle-id]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.toggleId;
+                    const isActive = btn.dataset.active === 'true';
+                    await db.update('user_profiles', { is_active: !isActive }, { id: `eq.${id}` });
+                    await loadInstructors();
+                    renderInstructorTable();
+                    showToast(isActive ? '已停用' : '已啟用');
+                });
+            });
+        }
+
+        // ── Render Overview (projects grouped by instructor) ──
+        function renderOverview() {
+            const container = document.getElementById('overviewContent');
+
+            // Group projects by owner_id
+            const groups = new Map();
+            for (const p of allProjects) {
+                const ownerId = p.owner_id || 'unknown';
+                if (!groups.has(ownerId)) groups.set(ownerId, []);
+                groups.get(ownerId).push(p);
+            }
+
+            if (groups.size === 0) {
+                container.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">folder_off</span>尚無專案</div>';
+                return;
+            }
+
+            let html = '';
+            for (const [ownerId, projects] of groups) {
+                const inst = instructors.find(i => i.id === ownerId);
+                const name = inst?.display_name || inst?.email || '未知';
+                const initial = name.charAt(0).toUpperCase();
+
+                const sessionIds = allSessions.filter(s => projects.some(p => p.id === s.project_id)).map(s => s.id);
+                const studentCount = allStudents.filter(st => sessionIds.includes(st.session_id)).length;
+                const sessionCount = sessionIds.length;
+
+                html += `
+                <div class="instructor-group">
+                    <div class="instructor-group-header">
+                        <div class="instructor-avatar">${initial}</div>
+                        <div>
+                            <div class="instructor-group-name">${name}</div>
+                            <div class="instructor-group-meta">${projects.length} 專案 · ${sessionCount} 場次 · ${studentCount} 學員</div>
+                        </div>
+                    </div>
+                    <div class="project-mini-grid">
+                        ${projects.map(p => {
+                            const pSessions = allSessions.filter(s => s.project_id === p.id);
+                            const pStudents = allStudents.filter(st => pSessions.some(s => s.id === st.session_id));
+                            return `
+                            <div class="project-mini-card" onclick="window.open('editor.html?id=${p.id}#id=${p.id}','_blank')">
+                                <div class="pmc-name">${p.name || '未命名'}</div>
+                                <div class="pmc-stats">
+                                    <span><span class="material-symbols-outlined">event</span>${pSessions.length} 場次</span>
+                                    <span><span class="material-symbols-outlined">group</span>${pStudents.length} 學員</span>
+                                    <span><span class="material-symbols-outlined">tag</span>${p.join_code}</span>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // ── Add Instructor ──
+        document.getElementById('addInstructorBtn').addEventListener('click', () => {
+            document.getElementById('newInstructorEmail').value = '';
+            document.getElementById('newInstructorName').value = '';
+            document.getElementById('newInstructorPassword').value = '';
+            document.getElementById('createResult').style.display = 'none';
+            document.getElementById('addInstructorModal').classList.add('active');
+        });
+
+        document.getElementById('saveInstructorBtn').addEventListener('click', async () => {
+            const email = document.getElementById('newInstructorEmail').value.trim();
+            const display_name = document.getElementById('newInstructorName').value.trim();
+            const password = document.getElementById('newInstructorPassword').value.trim();
+            const resultEl = document.getElementById('createResult');
+
+            if (!email) {
+                resultEl.style.display = 'block';
+                resultEl.style.background = '#fef2f2';
+                resultEl.style.color = '#dc2626';
+                resultEl.textContent = '請輸入 Email';
+                return;
+            }
+
+            const btn = document.getElementById('saveInstructorBtn');
+            btn.disabled = true;
+            btn.textContent = '建立中...';
+
+            try {
+                const { data, error } = await functions.invoke('create-instructor', {
+                    body: { email, display_name, password: password || undefined }
+                });
+
+                if (error) throw new Error(error.message);
+
+                resultEl.style.display = 'block';
+                resultEl.style.background = '#f0fdf4';
+                resultEl.style.color = '#059669';
+                resultEl.innerHTML = `✅ ${data.message}<br>` +
+                    (data.temp_password && data.temp_password !== '(已使用隨機密碼)'
+                        ? `臨時密碼: <strong>${data.temp_password}</strong>（請通知講師修改）`
+                        : '');
+
+                await loadInstructors();
+                renderInstructorTable();
+                updateStats();
+                showToast('講師帳號已建立');
+            } catch (e) {
+                resultEl.style.display = 'block';
+                resultEl.style.background = '#fef2f2';
+                resultEl.style.color = '#dc2626';
+                resultEl.textContent = '建立失敗: ' + e.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '建立帳號';
+            }
+        });
+
+        // ── Toast ──
+        function showToast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        // ── Start ──
+        init();
+    </script>
+</body>
+
+</html>

@@ -22,6 +22,12 @@
     <div class="admin-main">
         <div class="admin-header">
             <div class="admin-header-title">專案管理</div>
+            <div id="userHeaderInfo" style="display:flex;align-items:center;gap:12px;margin-left:auto;">
+                <span id="userDisplayName" style="font-size:0.82rem;color:var(--text-2);"></span>
+                <button id="logoutBtn" style="background:none;border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:0.78rem;cursor:pointer;color:var(--text-2);display:flex;align-items:center;gap:4px;font-family:inherit;" title="登出">
+                    <span class="material-symbols-outlined" style="font-size:16px;">logout</span> 登出
+                </button>
+            </div>
         </div>
 
         <div class="container">
@@ -606,7 +612,24 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { db, storage } from './scripts/supabase.js';
+        import { db, storage, auth, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
+
+        // ── Auth Guard ──
+        const authResult = await requireAuth();
+        if (!authResult) throw new Error('not authenticated');
+        const currentUser = authResult.session.user;
+        const currentProfile = authResult.profile;
+
+        // 顯示使用者資訊
+        const nameEl = document.getElementById('userDisplayName');
+        if (nameEl) nameEl.textContent = currentProfile?.display_name || currentUser.email;
+
+        // 登出
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            await auth.signOut();
+            clearProfileCache();
+            location.href = 'login.html';
+        });
 
         // Category filter (no more URL-based type separation)
         let selectedCategory = '';
@@ -1304,7 +1327,7 @@
             try {
                 const projectCategory = document.getElementById('createProjectCategory').value;
                 const organization_id = projectCategory === 'corporate' ? (document.getElementById('createClient').value || null) : null;
-                await db.insert('projects', { name, description, course_type, instructor, course_id: projectCategory === 'corporate' ? '' : course_id, slide_mode, course_link, join_code, current_phase: 'pre-class', type: projectCategory, organization_id });
+                await db.insert('projects', { name, description, course_type, instructor, course_id: projectCategory === 'corporate' ? '' : course_id, slide_mode, course_link, join_code, current_phase: 'pre-class', type: projectCategory, organization_id, owner_id: currentUser.id });
                 await Promise.all([loadProjects(), loadSessions()]);
                 updateStats();
                 closeModal('createProjectModal');
