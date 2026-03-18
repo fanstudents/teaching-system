@@ -45,8 +45,8 @@
                 <input type="email" id="studentEmail" placeholder="your@email.com">
             </div>
             <div class="join-field">
-                <label for="studentName">姓名</label>
-                <input type="text" id="studentName" placeholder="請輸入姓名">
+                <label for="studentName">顯示名稱</label>
+                <input type="text" id="studentName" placeholder="請輸入顯示名稱">
             </div>
             <div id="extraJoinFields"></div>
             <button class="join-btn" id="joinBtn">加入課堂</button>
@@ -471,7 +471,7 @@
                 return;
             }
             if (!studentName) {
-                errorEl.textContent = '請輸入你的姓名';
+                errorEl.textContent = '請輸入你的顯示名稱';
                 errorEl.style.display = 'block';
                 return;
             }

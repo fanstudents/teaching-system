@@ -3224,7 +3224,7 @@ export class SlideManager {
         this._isUndoRedo = false;
     }
 
-    async _saveToDB(data) {
+    async _saveToDB(data, _isRetry = false) {
         if (!this._db || !this.currentProjectId) {
             console.warn('[SaveDB] skip — no db or no project ID', { db: !!this._db, pid: this.currentProjectId });
             return;
@@ -3270,14 +3270,35 @@ export class SlideManager {
             }, { id: `eq.${this.currentProjectId}` });
 
             if (result.error) {
+                const errMsg = result.error?.message || JSON.stringify(result.error);
+                // ★ JWT expired → 自動 refresh token 並重試一次
+                if (!_isRetry && /jwt|token|expire|unauthorized/i.test(errMsg)) {
+                    console.warn('[SaveDB] JWT expired, refreshing token…');
+                    try {
+                        const { auth } = await import('./supabase.js');
+                        await auth.getSession(); // 會自動 refresh
+                    } catch (e) { /* ignore */ }
+                    this._isSaving = false;
+                    return this._saveToDB(data, true);
+                }
                 console.error('[SaveDB] ❌ DB returned error:', result.error);
-                this._showSaveError('資料庫儲存失敗：' + (result.error?.message || JSON.stringify(result.error)));
+                this._showSaveError('資料庫儲存失敗：' + errMsg);
             } else {
                 console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, version: data._version });
                 this._lastSaveOk = true;
             }
         } catch (e) {
             console.error('[SaveDB] ❌ exception:', e);
+            // ★ JWT expired 例外也重試
+            if (!_isRetry && /jwt|token|expire/i.test(e.message)) {
+                console.warn('[SaveDB] JWT expired (exception), refreshing…');
+                try {
+                    const { auth } = await import('./supabase.js');
+                    await auth.getSession();
+                } catch (_) { /* ignore */ }
+                this._isSaving = false;
+                return this._saveToDB(data, true);
+            }
             this._showSaveError('資料庫連線失敗：' + e.message);
         } finally {
             this._isSaving = false;

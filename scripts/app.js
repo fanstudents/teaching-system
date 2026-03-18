@@ -908,8 +908,8 @@ ${slideContents}
             elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 30, y: 400, width: 100, height: 100, background: 'rgba(99,102,241,0.1)' });
 
             // ── 右側大 QR Code：學員掃碼進入互動頁 ──
-            const projectId = this.slideManager.currentProjectId || this.slideManager.projectId || '';
-            const audienceUrl = `${location.origin}/student.html?id=${projectId}`;
+            const joinCode = this.slideManager.getCurrentJoinCode() || '';
+            const audienceUrl = `${location.origin}/student.html?code=${joinCode}`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(audienceUrl)}&bgcolor=ffffff&color=312e81`;
 
             // QR 區域背景卡片
@@ -5161,7 +5161,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const zoomOut = document.getElementById('zoomOutBtn');
 
         const setZoom = (z) => {
-            this._zoom = Math.max(0.25, Math.min(2, z));
+            this._zoom = Math.max(0.25, Math.min(1.5, z));
             canvas.style.transform = `scale(${this._zoom})`;
             canvas.style.transformOrigin = 'center center';
             zoomLabel.textContent = Math.round(this._zoom * 100) + '%';

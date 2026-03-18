@@ -57,8 +57,8 @@
                     <input type="email" id="loginEmail" placeholder="your@email.com">
                 </div>
                 <div class="login-field">
-                    <label for="loginName">姓名</label>
-                    <input type="text" id="loginName" placeholder="請輸入姓名">
+                    <label for="loginName">顯示名稱</label>
+                    <input type="text" id="loginName" placeholder="請輸入顯示名稱">
                 </div>
                 <div class="login-field">
                     <label for="loginSessionCode">場次代碼</label>
@@ -903,7 +903,7 @@
             errEl.style.display = 'none';
 
             if (!email || !email.includes('@')) { errEl.textContent = '請輸入有效的 Email'; errEl.style.display = 'block'; return; }
-            if (!name) { errEl.textContent = '請輸入姓名'; errEl.style.display = 'block'; return; }
+            if (!name) { errEl.textContent = '請輸入顯示名稱'; errEl.style.display = 'block'; return; }
             if (!sessionCode) { errEl.textContent = '請輸入場次代碼'; errEl.style.display = 'block'; return; }
 
             try {
