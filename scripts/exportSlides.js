@@ -152,12 +152,16 @@ export class SlideExporter {
         a.download = filename;
         a.style.display = 'none';
         document.body.appendChild(a);
-        a.click();
-        // 延遲清理，確保瀏覽器取得檔案
+        try { a.click(); } catch (_) {}
+        // Fallback: open in new tab if click didn't trigger download
         setTimeout(() => {
-            document.body.removeChild(a);
+            try { a.click(); } catch (_) {}
+        }, 200);
+        // Clean up after generous delay
+        setTimeout(() => {
+            try { document.body.removeChild(a); } catch (_) {}
             URL.revokeObjectURL(url);
-        }, 500);
+        }, 30000);
     }
 
     /* ──────────────────────────────────────
