@@ -659,7 +659,7 @@
         window.handleLogoUpload = async (input) => {
             const file = input.files[0];
             if (!file) return;
-            const key = `client-logos/${Date.now()}_${file.name}`;
+            const key = `client-logos/${Date.now()}_${encodeURIComponent(file.name)}`;
             try {
                 const { data, error } = await storage.upload('outline-files', key, file);
                 if (error) throw error;

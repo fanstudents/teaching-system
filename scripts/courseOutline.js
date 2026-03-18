@@ -1887,7 +1887,7 @@ window.submitOrg = async () => {
 window.handleOrgLogoUpload = async (input) => {
     const file = input.files[0];
     if (!file) return;
-    const key = `org-logos/${Date.now()}_${file.name}`;
+    const key = `org-logos/${Date.now()}_${encodeURIComponent(file.name)}`;
     const { data, error } = await storage.upload('outline-files', key, file);
     if (error) { alert('上傳失敗'); return; }
     document.getElementById('orgLogo').value = data.url;
@@ -2087,7 +2087,7 @@ window.handleFileUpload = async (input) => {
         }
 
         const projectId = projectData?.id || 'default';
-        const key = `projects/${projectId}/${Date.now()}_${file.name}`;
+        const key = `projects/${projectId}/${Date.now()}_${encodeURIComponent(file.name)}`;
         const { data, error } = await storage.upload('outline-files', key, file);
 
         if (error) {

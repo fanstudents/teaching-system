@@ -2142,7 +2142,7 @@
             let photoUrl = document.getElementById('instPhoto').value.trim();
             if (fileInput.files[0]) {
                 const file = fileInput.files[0];
-                const key = `instructors/${Date.now()}_${file.name}`;
+                const key = `instructors/${Date.now()}_${encodeURIComponent(file.name)}`;
                 try {
                     const { data, error } = await storage.upload('instructor-photos', key, file);
                     if (error) throw error;
