@@ -1010,41 +1010,60 @@ body {
         margin: 0 2px !important;
     }
 
-    /* 箭頭在投影片兩側 — 垂直居中 */
+    /* 導覽箭頭 — fixed 定位在螢幕左右兩側 */
     .student-presentation .slide-nav-arrow {
-        top: 50% !important;
-        transform: translateY(-50%) !important;
+        position: fixed !important;
+        top: auto !important;
+        bottom: 70px !important;
+        transform: none !important;
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 50% !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        z-index: 310 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
     }
 
     .student-presentation .slide-nav-arrow.prev {
-        left: 4px !important;
+        left: 12px !important;
         right: auto !important;
     }
 
     .student-presentation .slide-nav-arrow.next {
-        right: 4px !important;
+        right: 12px !important;
         left: auto !important;
     }
 
-    /* 投影片容器居中 — 精確計算高度 */
+    /* 投影片容器居中 — 給橫放提示讓出空間 */
     .student-slide-wrapper {
         padding: 0 !important;
-        height: calc(100vh - 40px - 50px) !important; /* viewport - top panel - bottom panel */
-        height: calc(100dvh - 40px - 50px) !important; /* dynamic viewport height */
+        height: calc(100vh - 36px - 50px) !important;
+        height: calc(100dvh - 36px - 50px) !important;
     }
 
-    /* 橫向瀏覽提示 — 在投影片上方黑色區域顯示 */
+    /* 橫放提示 — fixed 定位在頂部面板下方 */
     .rotate-hint {
         display: flex !important;
+        position: fixed !important;
+        top: 36px !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 290 !important;
         align-items: center;
         justify-content: center;
         gap: 10px;
-        padding: 8px 0;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 12px;
+        padding: 6px 16px;
+        background: rgba(15, 23, 42, 0.8) !important;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 11px;
         font-weight: 500;
         letter-spacing: 0.03em;
-        flex-shrink: 0;
     }
 
     .rotate-hint svg {
