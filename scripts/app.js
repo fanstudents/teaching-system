@@ -864,6 +864,12 @@ ${slideContents}
         const eventOverlay = document.getElementById('eventOpenerOverlay');
         document.getElementById('insertEventOpenerBtn')?.addEventListener('click', () => {
             if (eventOverlay) eventOverlay.style.display = 'flex';
+            // 自動帶入專案名稱
+            const titleInput = document.getElementById('eventOpenerTitle');
+            if (titleInput && !titleInput.value) {
+                const pName = document.getElementById('projectName')?.textContent?.trim() || '';
+                if (pName) titleInput.value = pName;
+            }
         });
         document.getElementById('eventOpenerClose')?.addEventListener('click', () => {
             if (eventOverlay) eventOverlay.style.display = 'none';
@@ -901,30 +907,35 @@ ${slideContents}
             // 左下裝飾
             elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 30, y: 400, width: 100, height: 100, background: 'rgba(99,102,241,0.1)' });
 
-            // ── 右上角：課前入口 QR Code ──
-            const projectId = this.slideManager.projectId || '';
-            const preClassUrl = `${location.origin}/student.html?id=${projectId}&phase=pre`;
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(preClassUrl)}&bgcolor=ffffff&color=312e81`;
-            // QR Code 背景卡片
-            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 740, y: 25, width: 190, height: 190, background: 'rgba(255,255,255,0.08)', borderRadius: 14 });
+            // ── 右側大 QR Code：學員掃碼進入互動頁 ──
+            const projectId = this.slideManager.currentProjectId || this.slideManager.projectId || '';
+            const audienceUrl = `${location.origin}/student.html?id=${projectId}`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(audienceUrl)}&bgcolor=ffffff&color=312e81`;
+
+            // QR 區域背景卡片
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 610, y: 80, width: 310, height: 380, background: 'rgba(255,255,255,0.06)', borderRadius: 16 });
+            // 大 QR Code
             elements.push({
-                id: gen(), type: 'image', x: 775, y: 35, width: 120, height: 120,
-                src: qrApiUrl, label: '課前入口 QR Code'
+                id: gen(), type: 'image', x: 650, y: 100, width: 230, height: 230,
+                src: qrApiUrl, label: '掃碼進入互動頁'
+            });
+            // QR 說明
+            elements.push({
+                id: gen(), type: 'text', x: 620, y: 340, width: 290, height: 30,
+                content: `<b style="font-size:16px;color:#ffffff;text-align:center;display:block;">📱 掃碼加入課堂互動</b>`,
+                fontSize: 16
             });
             elements.push({
-                id: gen(), type: 'text', x: 740, y: 160, width: 190, height: 20,
-                content: `<span style="font-size:11px;color:#a5b4fc;text-align:center;display:block;">📱 掃描進入課前頁</span>`,
+                id: gen(), type: 'text', x: 620, y: 370, width: 290, height: 50,
+                content: `<span style="font-size:11px;color:rgba(165,180,252,0.8);text-align:center;display:block;line-height:1.6;">掃描 QR Code 或輸入網址<br>即可即時參與互動</span>`,
                 fontSize: 11
             });
-            elements.push({
-                id: gen(), type: 'text', x: 740, y: 180, width: 190, height: 20,
-                content: `<span style="font-size:9px;color:rgba(255,255,255,0.3);text-align:center;display:block;">完成問卷 · 準備上課</span>`,
-                fontSize: 9
-            });
+            // 裝飾底線
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 680, y: 430, width: 170, height: 2, background: 'rgba(129,140,248,0.3)' });
 
-            // 主標題
+            // ── 左側：主標題 ──
             elements.push({
-                id: gen(), type: 'text', x: 60, y: 100, width: 650, height: 70,
+                id: gen(), type: 'text', x: 60, y: 100, width: 520, height: 70,
                 content: `<b style="font-size:42px;color:#ffffff;letter-spacing:2px;">${title}</b>`,
                 fontSize: 42, bold: true, textAlign: 'left'
             });
@@ -932,59 +943,55 @@ ${slideContents}
             // 副標題
             if (subtitle) {
                 elements.push({
-                    id: gen(), type: 'text', x: 60, y: 180, width: 650, height: 35,
+                    id: gen(), type: 'text', x: 60, y: 180, width: 520, height: 35,
                     content: `<span style="font-size:20px;color:#a5b4fc;">${subtitle}</span>`,
                     fontSize: 20, textAlign: 'left'
                 });
             }
 
-            // Wi-Fi 資訊卡片
-            if (wifi) {
-                const yWifi = subtitle ? 250 : 220;
-                // 卡片背景
-                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yWifi, width: 380, height: password ? 110 : 70, background: 'rgba(255,255,255,0.08)', borderRadius: 12 });
-                // Wi-Fi 圖標 + 標題
-                elements.push({
-                    id: gen(), type: 'text', x: 80, y: yWifi + 12, width: 340, height: 30,
-                    content: `<span style="font-size:14px;color:#818cf8;">📶 Wi-Fi 連線資訊</span>`,
-                    fontSize: 14
-                });
-                // SSID
-                elements.push({
-                    id: gen(), type: 'text', x: 80, y: yWifi + 40, width: 340, height: 26,
-                    content: `<span style="font-size:16px;color:#e0e7ff;">名稱：<b style="color:#fff;">${wifi}</b></span>`,
-                    fontSize: 16
-                });
-                // 密碼
-                if (password) {
-                    elements.push({
-                        id: gen(), type: 'text', x: 80, y: yWifi + 68, width: 340, height: 26,
-                        content: `<span style="font-size:16px;color:#e0e7ff;">密碼：<b style="color:#fff;">${password}</b></span>`,
-                        fontSize: 16
-                    });
-                }
-            }
+            // ── Wi-Fi 資訊卡片（不管有沒有填都預留位置）──
+            const yWifi = subtitle ? 240 : 210;
+            // 卡片背景
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yWifi, width: 500, height: 110, background: 'rgba(255,255,255,0.08)', borderRadius: 12 });
+            // Wi-Fi 圖標 + 標題
+            elements.push({
+                id: gen(), type: 'text', x: 80, y: yWifi + 12, width: 460, height: 30,
+                content: `<span style="font-size:14px;color:#818cf8;">📶 Wi-Fi 連線資訊</span>`,
+                fontSize: 14
+            });
+            // SSID
+            elements.push({
+                id: gen(), type: 'text', x: 80, y: yWifi + 42, width: 460, height: 26,
+                content: `<span style="font-size:16px;color:#e0e7ff;">名稱：<b style="color:#fff;">${wifi || '（請查看現場公告）'}</b></span>`,
+                fontSize: 16
+            });
+            // 密碼
+            elements.push({
+                id: gen(), type: 'text', x: 80, y: yWifi + 70, width: 460, height: 26,
+                content: `<span style="font-size:16px;color:#e0e7ff;">密碼：<b style="color:#fff;">${password || '（請查看現場公告）'}</b></span>`,
+                fontSize: 16
+            });
 
-            // ── 講師資訊（右下角）──
+            // ── 講師資訊（左下角）──
             if (instructorName || avatarSrc) {
-                const yInst = 440;
+                const yInst = yWifi + 130;
                 // 講師卡片背景
-                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 680, y: yInst, width: 250, height: 70, background: 'rgba(255,255,255,0.06)', borderRadius: 10 });
+                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yInst, width: 260, height: 60, background: 'rgba(255,255,255,0.06)', borderRadius: 10 });
                 if (avatarSrc) {
                     elements.push({
-                        id: gen(), type: 'image', x: 695, y: yInst + 10, width: 50, height: 50,
+                        id: gen(), type: 'image', x: 75, y: yInst + 5, width: 50, height: 50,
                         src: avatarSrc, label: '講師頭像', borderRadius: 25
                     });
                 }
                 if (instructorName) {
-                    const textX = avatarSrc ? 755 : 695;
+                    const textX = avatarSrc ? 135 : 75;
                     elements.push({
-                        id: gen(), type: 'text', x: textX, y: yInst + 12, width: 160, height: 22,
+                        id: gen(), type: 'text', x: textX, y: yInst + 8, width: 170, height: 22,
                         content: `<span style="font-size:10px;color:#818cf8;">講師</span>`,
                         fontSize: 10
                     });
                     elements.push({
-                        id: gen(), type: 'text', x: textX, y: yInst + 32, width: 160, height: 26,
+                        id: gen(), type: 'text', x: textX, y: yInst + 28, width: 170, height: 26,
                         content: `<b style="font-size:16px;color:#ffffff;">${instructorName}</b>`,
                         fontSize: 16
                     });
@@ -992,20 +999,19 @@ ${slideContents}
             }
 
             // 「課程即將開始」提示
-            const yBottom = instructorName || avatarSrc ? 420 : 440;
-            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: yBottom, width: 12, height: 12, background: '#34d399' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: 480, width: 12, height: 12, background: '#34d399' });
             elements.push({
-                id: gen(), type: 'text', x: 82, y: yBottom - 4, width: 400, height: 24,
+                id: gen(), type: 'text', x: 82, y: 476, width: 400, height: 24,
                 content: `<span style="font-size:15px;color:#6ee7b7;">課程即將開始，請稍候 ...</span>`,
                 fontSize: 15
             });
 
             // 底部分隔線
-            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: yBottom + 30, width: 840, height: 1, background: 'rgba(255,255,255,0.1)' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 505, width: 840, height: 1, background: 'rgba(255,255,255,0.1)' });
             // 底部日期
             const today = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
             elements.push({
-                id: gen(), type: 'text', x: 60, y: yBottom + 40, width: 400, height: 22,
+                id: gen(), type: 'text', x: 60, y: 512, width: 400, height: 22,
                 content: `<span style="font-size:13px;color:rgba(255,255,255,0.4);">${today}</span>`,
                 fontSize: 13
             });
