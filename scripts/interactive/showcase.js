@@ -136,19 +136,7 @@ export class Showcase {
 
             console.log('[Showcase] query result for', assignmentTitle, '(session:', this.sessionCode, '):', data?.length, 'rows');
 
-            // ★ 去重：每位學員只保留最新一筆（避免編輯後出現重複）
-            if (data && data.length > 0) {
-                const latest = new Map();
-                for (const row of data) {
-                    const key = row.student_name || row.student_email || row.id;
-                    const existing = latest.get(key);
-                    if (!existing || new Date(row.submitted_at || row.created_at) > new Date(existing.submitted_at || existing.created_at)) {
-                        latest.set(key, row);
-                    }
-                }
-                data = Array.from(latest.values());
-                data.sort((a, b) => new Date(a.submitted_at || a.created_at) - new Date(b.submitted_at || b.created_at));
-            }
+
 
             if (error || !data) {
                 console.error('[Showcase] query error:', error);

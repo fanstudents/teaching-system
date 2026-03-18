@@ -956,6 +956,33 @@ body {
     }
 }
 
+/* ── 橫放（Landscape）專用佈局 ── */
+@media (max-width: 1024px) and (orientation: landscape) {
+    /* 導覽箭頭 — 固定在畫面最上方左右兩側 */
+    .student-presentation .slide-nav-arrow {
+        position: fixed !important;
+        top: 6px !important;
+        bottom: auto !important;
+        transform: none !important;
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 50% !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        z-index: 310 !important;
+    }
+
+    .student-presentation .slide-nav-arrow.prev {
+        left: 8px !important;
+        right: auto !important;
+    }
+
+    .student-presentation .slide-nav-arrow.next {
+        right: 8px !important;
+        left: auto !important;
+    }
+}
+
 /* ── 直式（Portrait）專用佈局 ── */
 @media (max-width: 1024px) and (orientation: portrait) {
 

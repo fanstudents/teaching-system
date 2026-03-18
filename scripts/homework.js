@@ -325,7 +325,14 @@ export class HomeworkSubmission {
                     const submission = await this.submit(assignmentTitle, currentType, content, currentUser, assignmentId);
 
                     // ── 顯示提交後預覽 ──
-                    this._showPostSubmitPreview(overlay, submission, uploadedData, promptText, () => {
+                    this._showPostSubmitPreview(overlay, submission, uploadedData, promptText, async () => {
+                        // ★ 編輯：先刪除舊的 DB row，再重新開啟
+                        try {
+                            if (submission.elementId) {
+                                await db.delete('submissions', { element_id: `eq.${submission.elementId}` });
+                                console.log('[Homework] 舊提交已刪除:', submission.elementId);
+                            }
+                        } catch (e) { console.warn('[Homework] 刪除舊提交失敗:', e); }
                         overlay.remove();
                         this.showSubmitDialog(assignmentOrTitle, submissionMode).then(resolve).catch(reject);
                     }, () => {
@@ -599,6 +606,7 @@ export class HomeworkSubmission {
             }
         }
 
+        const elementId = assignmentId ? `${assignmentId}__v${Date.now()}` : `hw__v${Date.now()}`;
         const submission = {
             id: 'sub_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
             assignmentTitle,
@@ -608,7 +616,8 @@ export class HomeworkSubmission {
             submittedAt: new Date().toISOString(),
             fileUrl,
             fileKey,
-            assignmentId
+            assignmentId,
+            elementId
         };
 
         this.submissions.push(submission);
@@ -618,7 +627,6 @@ export class HomeworkSubmission {
         const joinCode = new URLSearchParams(location.search).get('code')
             || new URLSearchParams(location.search).get('session')
             || '';
-        const versionTs = Date.now();
         const row = {
             student_name: user.name,
             student_email: user.email || '',
@@ -629,8 +637,8 @@ export class HomeworkSubmission {
             file_key: fileKey || '',
             submitted_at: submission.submittedAt,
             session_id: joinCode || null,
-            element_id: assignmentId ? `${assignmentId}__v${versionTs}` : `hw__v${versionTs}`,
-            state: { version: versionTs, base_element_id: assignmentId || '' }
+            element_id: elementId,
+            state: { version: Date.now(), base_element_id: assignmentId || '' }
         };
 
         let saved = false;
