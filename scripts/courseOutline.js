@@ -24,6 +24,20 @@ const ADMIN_PASSWORD = 'admin2026';
 // ── DOM Ready ──
 document.addEventListener('DOMContentLoaded', init);
 
+// Immediately hide login overlay if session exists — prevents flash on refresh
+(function() {
+    const saved = sessionStorage.getItem('outline_user');
+    const params = new URLSearchParams(location.search);
+    const isPreview = params.get('preview') === 'admin';
+    const hasToken = localStorage.getItem('_at') || sessionStorage.getItem('_at');
+    if (saved || isPreview || (params.get('admin') === '1' && hasToken)) {
+        // Hide overlay before paint
+        const style = document.createElement('style');
+        style.textContent = '#loginOverlay{display:none!important}#pageContent{display:block!important}';
+        document.head.appendChild(style);
+    }
+})();
+
 async function init() {
     const params = new URLSearchParams(location.search);
     isAdmin = params.get('admin') === '1';
