@@ -481,7 +481,7 @@ function renderOutlineFromDB() {
                     return `<div class="timeline-day-col">
                         <div class="timeline-day-header">
                             <span class="timeline-day-badge">${badgeText}</span>
-                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
+                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}${dayInfo.instructor ? `<span style="margin-left:8px;font-size:0.78rem;color:var(--text-2);font-weight:400">👤 ${dayInfo.instructor}</span>` : ''}</span>
                         </div>
                         ${renderBlocks(dayBlocks)}
                     </div>`;
@@ -935,6 +935,7 @@ window.addScheduleDay = function(data = {}) {
             <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">小時</span>
         </div>
         <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日課程主題" style="flex:1;min-width:120px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
+        <input type="text" data-key="instructor" value="${_esc(data.instructor || '')}" placeholder="講師" style="width:80px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
         <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
     `;
     list.appendChild(div);
@@ -953,7 +954,8 @@ function getScheduleDays() {
         date: el.querySelector('[data-key="date"]')?.value || '',
         hours: el.querySelector('[data-key="hours"]').value.trim(),
         startTime: el.querySelector('[data-key="startTime"]')?.value || '09:00',
-        topic: el.querySelector('[data-key="topic"]').value.trim()
+        topic: el.querySelector('[data-key="topic"]').value.trim(),
+        instructor: el.querySelector('[data-key="instructor"]')?.value?.trim() || ''
     }));
 }
 
