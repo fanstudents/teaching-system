@@ -605,6 +605,21 @@ function renderOutlineFromDB() {
         }
     }
 
+    // Course Notes — render custom notes if available
+    const notesEl = document.getElementById('courseNotesContent');
+    if (notesEl) {
+        const notes = od.courseNotes?.length ? od.courseNotes : DEFAULT_COURSE_NOTES;
+        notesEl.innerHTML = notes.map(n => `
+            <div style="display:flex;gap:12px;align-items:flex-start">
+                <span class="material-symbols-outlined" style="color:#f59e0b;font-size:22px;flex-shrink:0;margin-top:1px">${n.icon || 'info'}</span>
+                <div>
+                    <div style="font-weight:600;color:var(--text);margin-bottom:2px">${n.title}</div>
+                    <div style="font-size:0.85rem;color:var(--text-2);line-height:1.6">${n.desc}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
     // TA Config — hide entirely
     const taSection = document.querySelector('.ta-card')?.closest('.outline-section');
     if (taSection) taSection.style.display = 'none';
@@ -866,6 +881,10 @@ function initOutlineEditor() {
         _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
     }
 
+    // Populate Course Notes
+    const notesData = od?.courseNotes?.length ? od.courseNotes : DEFAULT_COURSE_NOTES;
+    notesData.forEach(n => addCourseNote(n));
+
     // Populate Email Template
     const emailTemplEl = document.getElementById('oeEmailTemplate');
     if (emailTemplEl) {
@@ -1018,6 +1037,36 @@ function getScheduleDays() {
         topic: el.querySelector('[data-key="topic"]').value.trim(),
         instructor: el.querySelector('[data-key="instructor"]')?.value?.trim() || ''
     }));
+}
+
+// ── Course Notes Builder ──
+const DEFAULT_COURSE_NOTES = [
+    { icon: 'menu_book', title: '數位課程，不提供實體講義', desc: '本課程屬於數位課程，所有教學資源均以線上方式提供，不另外印製實體講義。' },
+    { icon: 'touch_app', title: '互動式簡報系統', desc: '本次課程簡報並非傳統投影片，而是採用特別開發的互動式簡報。上課當天，學員可透過「課前準備頁」進入簡報連結，即時參與課堂互動。' },
+    { icon: 'videocam', title: '課程錄影說明', desc: '本課程講師會進行螢幕錄影，錄影原檔交付不剪輯。若需實體拍攝，請由客戶自行安排拍攝及收音事宜。若螢幕錄影因設備意外導致不連續，將提供課程逐字稿摘要供學員後續參考。' }
+];
+
+window.addCourseNote = function(data = {}) {
+    const list = document.getElementById('oeCourseNotesList');
+    if (!list) return;
+    const div = document.createElement('div');
+    div.className = 'oe-course-note';
+    div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;padding:10px 14px;background:#f8fafc;border:1px solid var(--border);border-radius:10px';
+    div.innerHTML = `
+        <input type="text" data-key="icon" value="${_esc(data.icon || 'info')}" placeholder="icon 名稱" style="width:70px;font-size:0.82rem;border:1px solid var(--border);border-radius:6px;padding:4px 8px;background:#fff">
+        <input type="text" data-key="title" value="${_esc(data.title || '')}" placeholder="標題" style="width:160px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff;font-weight:600">
+        <textarea data-key="desc" placeholder="說明內容" rows="2" style="flex:1;min-width:150px;font-size:0.82rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff;resize:vertical;font-family:inherit">${_esc(data.desc || '')}</textarea>
+        <button class="oe-delete" onclick="this.closest('.oe-course-note').remove()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s;flex-shrink:0;margin-top:4px" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
+    `;
+    list.appendChild(div);
+};
+
+function getCourseNotes() {
+    return [...document.querySelectorAll('#oeCourseNotesList .oe-course-note')].map(el => ({
+        icon: el.querySelector('[data-key="icon"]').value.trim(),
+        title: el.querySelector('[data-key="title"]').value.trim(),
+        desc: el.querySelector('[data-key="desc"]').value.trim()
+    })).filter(n => n.title || n.desc);
 }
 
 function getScheduleOptions() {
@@ -1403,6 +1452,9 @@ function collectOutlineData() {
         count: document.getElementById('oeTaCount').value.trim(),
         duties: document.getElementById('oeTaDuties').value.split('\n').map(s => s.trim()).filter(Boolean)
     };
+
+    // Course Notes
+    od.courseNotes = getCourseNotes();
 
     // Email Template
     const emailEl = document.getElementById('oeEmailTemplate');
@@ -2159,8 +2211,22 @@ window.handleFileUpload = async (input) => {
 
     for (const file of files) {
         const ext = '.'+file.name.split('.').pop().toLowerCase();
-        if (!allowed.includes(ext)) { alert(`不支援的格式：${ext}`); continue; }
-        if (file.size > 50*1024*1024) { alert('檔案上限 50MB'); continue; }
+        if (!allowed.includes(ext)) {
+            if (progressEl) {
+                progressEl.style.display = 'block';
+                progressEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span class="material-symbols-outlined" style="font-size:18px;color:#ef4444">error</span><span style="font-size:0.82rem;font-weight:600;color:#ef4444">不支援的格式：${ext}</span></div>`;
+                setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+            }
+            continue;
+        }
+        if (file.size > 50*1024*1024) {
+            if (progressEl) {
+                progressEl.style.display = 'block';
+                progressEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span class="material-symbols-outlined" style="font-size:18px;color:#ef4444">error</span><span style="font-size:0.82rem;font-weight:600;color:#ef4444">檔案上限 50MB</span></div>`;
+                setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+            }
+            continue;
+        }
 
         // Show progress
         if (progressEl) {
@@ -2182,8 +2248,11 @@ window.handleFileUpload = async (input) => {
         const { data, error } = await storage.upload('outline-files', key, file);
 
         if (error) {
-            if (progressEl) progressEl.style.display = 'none';
-            alert('上傳失敗：' + (error.message || '未知錯誤'));
+            if (progressEl) {
+                progressEl.style.display = 'block';
+                progressEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span class="material-symbols-outlined" style="font-size:18px;color:#ef4444">error</span><span style="font-size:0.82rem;font-weight:600;color:#ef4444">上傳失敗：${error.message || '未知錯誤'}</span></div>`;
+                setTimeout(() => { progressEl.style.display = 'none'; }, 4000);
+            }
         } else {
             // Save to DB
             const fileRecord = {

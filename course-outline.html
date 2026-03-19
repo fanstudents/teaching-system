@@ -294,7 +294,7 @@
                     <div class="section-icon" style="background:#f59e0b"><span class="material-symbols-outlined">info</span></div>
                     <div><div class="section-title">課程須知</div><div class="section-desc">上課前請務必了解</div></div>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:12px;padding:20px 24px">
+                <div id="courseNotesContent" style="display:flex;flex-direction:column;gap:12px;padding:20px 24px">
                     <div style="display:flex;gap:12px;align-items:flex-start">
                         <span class="material-symbols-outlined" style="color:#f59e0b;font-size:22px;flex-shrink:0;margin-top:1px">menu_book</span>
                         <div>
@@ -488,6 +488,17 @@
                 <div class="oe-fields">
                     <div class="oe-field"><label>建議人數</label><input type="text" id="oeTaCount" placeholder="1–2 位"></div>
                     <div class="oe-field"><label>職責（每行一項）</label><textarea id="oeTaDuties" rows="3" placeholder="負責協助學員操作工具&#10;即時回答學員問題&#10;協助發放講義"></textarea></div>
+                </div>
+            </details>
+
+            <!-- 課程須知 -->
+            <details class="outline-edit-group" open>
+                <summary><span class="material-symbols-outlined" style="font-size:16px">info</span> 課程須知</summary>
+                <div style="padding:16px 20px">
+                    <div id="oeCourseNotesList" style="display:flex;flex-direction:column;gap:10px"></div>
+                    <button class="btn btn-outline" onclick="addCourseNote()" style="margin-top:12px;font-size:0.78rem;padding:6px 14px">
+                        <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增須知
+                    </button>
                 </div>
             </details>
 
