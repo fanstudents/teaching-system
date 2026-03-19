@@ -168,9 +168,9 @@ function createAdminSidebar() {
             ${groupsHtml}
         </div>
         <div class="admin-sidebar-footer">
-            <button id="btnLogout" style="background:none;border:1px solid #ddd;border-radius:6px;padding:6px 12px;font-size:0.75rem;font-family:inherit;color:#888;cursor:pointer;display:flex;align-items:center;gap:4px;width:100%;justify-content:center;transition:all 0.15s;"
-                onmouseover="this.style.background='#f5f5f5';this.style.color='#333'"
-                onmouseout="this.style.background='none';this.style.color='#888'">
+            <button id="btnLogout" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px 12px;font-size:0.75rem;font-family:inherit;color:rgba(255,255,255,0.45);cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;justify-content:center;transition:all 0.15s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.85)'"
+                onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.color='rgba(255,255,255,0.45)'">
                 <span class="material-symbols-outlined" style="font-size:0.9rem;">logout</span> 登出
             </button>
         </div>

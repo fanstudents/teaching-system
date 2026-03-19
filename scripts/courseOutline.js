@@ -484,6 +484,14 @@ function renderOutlineFromDB() {
 
             timelineEl.innerHTML = html + `<div class="timeline-note"><span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:1px">info</span><span>以上時間配置為建議規劃，實際授課時數與進度將依現場學員吸收狀況與講師節奏進行彈性調整。</span></div>`;
 
+            // Widen container for 3+ day layouts
+            if (isMultiDay && schedule.length >= 3) {
+                const container = timelineEl.closest('.outline-container');
+                if (container) {
+                    container.style.maxWidth = schedule.length >= 4 ? '1480px' : '1280px';
+                }
+            }
+
             // Dynamic section description
             const descEl = document.getElementById('timelineSectionDesc');
             if (descEl) {

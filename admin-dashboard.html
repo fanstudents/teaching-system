@@ -13,46 +13,9 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles/base.css">
     <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/s79-theme.css">
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-light: #eef2ff;
-            --success: #059669;
-            --warning: #d97706;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text-1: #0f172a;
-            --text-2: #475569;
-            --text-3: #94a3b8;
-        }
-
-        body {
-            background: var(--bg);
-            font-family: 'Noto Sans TC', -apple-system, system-ui, sans-serif;
-            margin: 0;
-            color: var(--text-1);
-        }
-
-        .admin-main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px 32px;
-        }
-
-        .admin-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-        }
-
-        .admin-header-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
+        /* ── Page-specific styles (admin-dashboard) ── */
         .header-right {
             display: flex;
             align-items: center;
@@ -64,50 +27,19 @@
             color: var(--text-2);
         }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            background: var(--surface);
-            color: var(--text-1);
-            font-family: inherit;
-            transition: all 0.15s;
-        }
-
-        .btn:hover {
-            border-color: #cbd5e1;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background: #4f46e5;
-            border-color: #4f46e5;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 0.78rem;
-        }
-
         .btn-danger-text {
             background: none;
             border: none;
-            color: var(--danger);
+            color: var(--s79-error);
             cursor: pointer;
             font-size: 0.78rem;
             padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+
+        .btn-danger-text:hover {
+            background: var(--s79-error-light);
         }
 
         /* ── 統計卡片 ── */
@@ -116,26 +48,6 @@
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .stat-label {
-            font-size: 0.78rem;
-            color: var(--text-3);
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-1);
         }
 
         /* ── Tabs ── */
@@ -159,56 +71,11 @@
             font-family: inherit;
         }
 
-        .tab-btn:hover {
-            color: var(--text-2);
-        }
+        .tab-btn:hover { color: var(--text-2); }
+        .tab-btn.active { color: var(--s79-primary); border-bottom-color: var(--s79-primary); }
 
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-panel {
-            display: none;
-        }
-
-        .tab-panel.active {
-            display: block;
-        }
-
-        /* ── 講師表格 ── */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 0.85rem;
-        }
-
-        .data-table th {
-            background: #f1f5f9;
-            color: var(--text-2);
-            font-weight: 600;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .data-table td {
-            border-top: 1px solid var(--border);
-        }
-
-        .data-table tr:hover td {
-            background: #fafbfc;
-        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
         .role-badge {
             display: inline-flex;
@@ -220,15 +87,8 @@
             font-weight: 600;
         }
 
-        .role-badge.super_admin {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .role-badge.instructor {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
+        .role-badge.super_admin { background: #fef3c7; color: #92400e; }
+        .role-badge.instructor { background: #e0e7ff; color: #3730a3; }
 
         .status-dot {
             display: inline-block;
@@ -238,18 +98,11 @@
             margin-right: 6px;
         }
 
-        .status-dot.active {
-            background: var(--success);
-        }
-
-        .status-dot.inactive {
-            background: #cbd5e1;
-        }
+        .status-dot.active { background: var(--s79-success); }
+        .status-dot.inactive { background: #cbd5e1; }
 
         /* ── 專案總覽 ── */
-        .instructor-group {
-            margin-bottom: 32px;
-        }
+        .instructor-group { margin-bottom: 32px; }
 
         .instructor-group-header {
             display: flex;
@@ -263,8 +116,8 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: var(--primary-light);
-            color: var(--primary);
+            background: var(--s79-primary-light);
+            color: var(--s79-primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -272,15 +125,8 @@
             font-weight: 700;
         }
 
-        .instructor-group-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .instructor-group-meta {
-            font-size: 0.78rem;
-            color: var(--text-3);
-        }
+        .instructor-group-name { font-weight: 600; font-size: 1rem; }
+        .instructor-group-meta { font-size: 0.78rem; color: var(--text-3); }
 
         .project-mini-grid {
             display: grid;
@@ -289,24 +135,22 @@
         }
 
         .project-mini-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: var(--s79-surface);
+            border: 1px solid var(--s79-border);
             border-radius: 10px;
             padding: 16px;
             transition: all 0.15s;
             cursor: pointer;
+            box-shadow: var(--s79-shadow-card);
         }
 
         .project-mini-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border-color: #cbd5e1;
+            box-shadow: var(--s79-shadow-card-hover);
+            border-color: var(--s79-border-strong);
+            transform: translateY(-2px);
         }
 
-        .pmc-name {
-            font-weight: 600;
-            font-size: 0.92rem;
-            margin-bottom: 6px;
-        }
+        .pmc-name { font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; }
 
         .pmc-stats {
             display: flex;
@@ -315,161 +159,13 @@
             color: var(--text-3);
         }
 
-        .pmc-stats span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .pmc-stats .material-symbols-outlined {
-            font-size: 14px;
-        }
-
-        /* ── Modal ── */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(3px);
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--surface);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 480px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            animation: modalIn 0.2s ease-out;
-        }
-
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: translateY(-12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px 0;
-        }
-
-        .modal-header h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-3);
-            padding: 4px;
-        }
-
-        .modal-body {
-            padding: 20px 24px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--text-2);
-            margin-bottom: 6px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: var(--primary);
-        }
-
-        .modal-footer {
-            padding: 16px 24px 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        /* ── Toast ── */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: #fff;
-            padding: 10px 24px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 9999;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-3);
-            font-size: 0.9rem;
-        }
-
-        .empty-state .material-symbols-outlined {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 12px;
-            opacity: 0.4;
-        }
+        .pmc-stats span { display: flex; align-items: center; gap: 4px; }
+        .pmc-stats .material-symbols-outlined { font-size: 14px; }
 
         /* ── Responsive ── */
         @media (max-width: 768px) {
-            .admin-main {
-                padding: 16px;
-            }
-
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .project-mini-grid {
-                grid-template-columns: 1fr;
-            }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .project-mini-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>

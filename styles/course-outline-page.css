@@ -333,6 +333,9 @@ body {
    CONTAINER & SECTIONS
    ══════════════════════════════════ */
 .outline-container { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+/* When 3+ day columns, widen container so columns aren't squeezed */
+.outline-container:has(.timeline-grid-3) { max-width: 1280px; }
+.outline-container:has(.timeline-grid-4) { max-width: 1480px; }
 
 .outline-section {
     margin-bottom: 56px;

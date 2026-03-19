@@ -1,5 +1,5 @@
 /* =============================================
-   S79 Corporate Clean — Shared Theme (v3 Bold)
+   S79 Corporate Clean — Shared Theme (v4 Modern Dashboard)
    
    所有後台頁面共用的設計 tokens 與基礎樣式。
    與 admin-layout.css 搭配使用。
@@ -12,6 +12,7 @@
     --s79-primary-hover: #4F46E5;
     --s79-primary-light: #EEF2FF;
     --s79-primary-subtle: rgba(99, 102, 241, 0.08);
+    --s79-primary-glow: rgba(99, 102, 241, 0.25);
     --s79-success: #10B981;
     --s79-success-light: #D1FAE5;
     --s79-warning: #F59E0B;
@@ -19,12 +20,13 @@
     --s79-error: #EF4444;
     --s79-error-light: #FEE2E2;
 
-    /* Colors — 灰階 */
-    --s79-bg: #F0F2F5;
+    /* Colors — 灰階 (slightly cooler) */
+    --s79-bg: #F1F3F8;
     --s79-surface: #FFFFFF;
-    --s79-surface-hover: #FAFAFA;
-    --s79-border: #E2E5EA;
-    --s79-border-strong: #CDD1D9;
+    --s79-surface-hover: #F8F9FC;
+    --s79-surface-alt: #F5F6FA;
+    --s79-border: #E2E5EB;
+    --s79-border-strong: #CBD0DA;
     --s79-text: #111827;
     --s79-text-secondary: #6B7280;
     --s79-text-muted: #9CA3AF;
@@ -39,43 +41,54 @@
     --s79-radius-xl: 20px;
     --s79-radius-full: 9999px;
 
-    /* Shadow — 更有層次 */
-    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --s79-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-    --s79-shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-    --s79-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+    /* Shadow — 更有層次 + glow 系列 */
+    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --s79-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --s79-shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    --s79-shadow-lg: 0 12px 32px -6px rgba(0, 0, 0, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.06);
+    --s79-shadow-xl: 0 24px 48px -12px rgba(0, 0, 0, 0.15);
     --s79-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    --s79-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    --s79-shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+    --s79-shadow-primary-glow: 0 4px 14px -2px rgba(99, 102, 241, 0.4);
 
     /* Duration */
     --s79-duration: 150ms;
     --s79-duration-md: 200ms;
+    --s79-duration-lg: 300ms;
 
     /* ── Override admin-layout.css variables ── */
-    --sidebar-w: 252px;
-    --sidebar-bg: #0C0C0E;
+    --sidebar-w: 260px;
+    --sidebar-bg: linear-gradient(180deg, #1a1d2e 0%, #12141e 100%);
     --sidebar-text: rgba(255, 255, 255, 0.50);
-    --sidebar-text-hover: rgba(255, 255, 255, 0.92);
-    --sidebar-active-bg: rgba(99, 102, 241, 0.15);
-    --sidebar-active-text: #A5B4FC;
+    --sidebar-text-hover: rgba(255, 255, 255, 0.95);
+    --sidebar-active-bg: rgba(99, 102, 241, 0.12);
+    --sidebar-active-text: #c7d2fe;
     --sidebar-accent: #818CF8;
-    --sidebar-divider: rgba(255, 255, 255, 0.05);
-    --sidebar-group-text: rgba(255, 255, 255, 0.25);
+    --sidebar-divider: rgba(255, 255, 255, 0.06);
+    --sidebar-group-text: rgba(255, 255, 255, 0.28);
     --gradient-primary: linear-gradient(135deg, #6366F1, #7C3AED);
 
     /* ── Override dashboard-style variables ── */
     --radius-sm: 8px;
-    --content-bg: #F0F2F5;
-    --border-color: #E2E5EA;
+    --content-bg: #F1F3F8;
+    --border-color: #E2E5EB;
     --text-primary: #111827;
     --text-secondary: #6B7280;
     --bg-hover: rgba(0, 0, 0, 0.03);
-    --header-h: 56px;
+    --header-h: 60px;
 
-    /* ── 新增：text & border shortcuts ── */
+    /* ── Stat card accent colors ── */
+    --stat-color-1: #6366F1;
+    --stat-color-2: #10B981;
+    --stat-color-3: #F59E0B;
+    --stat-color-4: #EC4899;
+
+    /* ── text & border shortcuts ── */
     --text-1: #111827;
     --text-2: #6B7280;
     --text-3: #9CA3AF;
-    --border: #E2E5EA;
+    --border: #E2E5EB;
 }
 
 /* ── Base Reset ── */
@@ -107,14 +120,15 @@ body.sidebar-closed {
 /* ── Inter font import ── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ── Admin Header Override ── */
+/* ── Admin Header Override — Premium Frosted Glass ── */
 .admin-header {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(200%) blur(16px);
+    -webkit-backdrop-filter: saturate(200%) blur(16px);
+    border-bottom: 1px solid rgba(226, 229, 235, 0.6);
     height: var(--header-h);
     font-family: var(--s79-font);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .admin-header-title {
@@ -124,7 +138,7 @@ body.sidebar-closed {
     color: var(--s79-text);
 }
 
-/* ── Shared Button Styles ── */
+/* ── Shared Button Styles — Premium ── */
 .s79-btn,
 .admin-header-actions .btn,
 button.primary-btn {
@@ -153,13 +167,18 @@ button.primary-btn {
     background: var(--s79-primary);
     color: #fff;
     border-color: var(--s79-primary);
-    box-shadow: 0 1px 3px rgba(99, 102, 241, 0.4);
+    box-shadow: var(--s79-shadow-primary-glow);
 }
 
 .s79-btn-primary:hover {
     background: var(--s79-primary-hover);
-    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.45);
-    transform: translateY(-0.5px);
+    box-shadow: 0 6px 20px -4px rgba(99, 102, 241, 0.5);
+    transform: translateY(-1px);
+}
+
+.s79-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .s79-btn-ghost {
@@ -171,17 +190,19 @@ button.primary-btn {
 .s79-btn-ghost:hover {
     background: var(--s79-surface-hover);
     border-color: var(--s79-border-strong);
+    transform: translateY(-0.5px);
 }
 
 .s79-btn-danger {
     background: var(--s79-error);
     color: #fff;
-    box-shadow: 0 1px 3px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
 .s79-btn-danger:hover {
     background: #DC2626;
-    transform: translateY(-0.5px);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
 }
 
 .s79-btn .material-symbols-outlined,
@@ -189,18 +210,19 @@ button.primary-btn {
     font-size: 16px;
 }
 
-/* ── Card ── */
+/* ── Card — Premium with subtle shadow ── */
 .s79-card {
     background: var(--s79-surface);
     border: 1px solid var(--s79-border);
     border-radius: var(--s79-radius-md);
     overflow: hidden;
-    box-shadow: var(--s79-shadow-xs);
+    box-shadow: var(--s79-shadow-card);
     transition: all var(--s79-duration-md) ease;
 }
 
 .s79-card:hover {
-    box-shadow: var(--s79-shadow-sm);
+    box-shadow: var(--s79-shadow-card-hover);
+    transform: translateY(-1px);
 }
 
 .s79-card-header {
@@ -215,7 +237,7 @@ button.primary-btn {
     padding: 20px;
 }
 
-/* ── Table ── */
+/* ── Table — Zebra striping + better hover ── */
 .s79-table {
     width: 100%;
     border-collapse: collapse;
@@ -223,7 +245,7 @@ button.primary-btn {
 }
 
 .s79-table th {
-    background: var(--s79-bg);
+    background: var(--s79-surface-alt);
     border-bottom: 1px solid var(--s79-border);
     padding: 10px 16px;
     text-align: left;
@@ -244,8 +266,12 @@ button.primary-btn {
     transition: background var(--s79-duration) ease;
 }
 
+.s79-table tbody tr:nth-child(even) {
+    background: rgba(241, 243, 248, 0.5);
+}
+
 .s79-table tbody tr:hover td {
-    background: var(--s79-surface-hover);
+    background: rgba(99, 102, 241, 0.04);
 }
 
 /* ── Badge ── */
@@ -293,12 +319,12 @@ button.primary-btn {
     min-height: 60px;
 }
 
-/* ── Modal ── */
+/* ── Modal — Premium ── */
 .s79-modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
     z-index: 300;
     display: none;
     align-items: center;
@@ -314,12 +340,13 @@ button.primary-btn {
     max-height: 80vh;
     overflow-y: auto;
     padding: 28px;
-    box-shadow: var(--s79-shadow-lg);
-    animation: modalSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--s79-shadow-xl);
+    animation: s79ModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes modalSlideUp {
-    from { transform: translateY(8px) scale(0.98); opacity: 0; }
+@keyframes s79ModalIn {
+    from { transform: translateY(12px) scale(0.97); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .s79-modal-title {
@@ -342,7 +369,7 @@ button.primary-btn {
     margin-bottom: 6px;
 }
 
-/* ── Toast ── */
+/* ── Toast — positioned bottom-right ── */
 .s79-toast,
 .toast {
     position: fixed;
@@ -354,10 +381,11 @@ button.primary-btn {
     border-radius: var(--s79-radius-sm);
     font-size: 13px;
     z-index: 999;
-    animation: s79-toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: s79-toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     font-family: var(--s79-font);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
     font-weight: 500;
+    border-left: 3px solid var(--s79-primary);
 }
 
 @keyframes s79-toast-in {
@@ -379,21 +407,62 @@ button.primary-btn {
     margin: 0 auto 12px;
 }
 
-/* ── Stat Card ── */
-.s79-stat {
+/* ── Stat Card — Premium with colored top border ── */
+.s79-stat,
+.stat-card {
     background: var(--s79-surface);
     border: 1px solid var(--s79-border);
     border-radius: var(--s79-radius-md);
     padding: 20px;
-    box-shadow: var(--s79-shadow-xs);
+    box-shadow: var(--s79-shadow-card);
     transition: all var(--s79-duration-md) ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.s79-stat:hover {
-    box-shadow: var(--s79-shadow-sm);
+.s79-stat::before,
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--s79-primary);
+    border-radius: 3px 3px 0 0;
+    opacity: 0.9;
 }
 
-.s79-stat-value {
+/* Color rotate for stat cards */
+.stats-row .stat-card:nth-child(1)::before,
+.stats-grid .stat-card:nth-child(1)::before,
+.stats-bar .stat-card:nth-child(1)::before {
+    background: var(--stat-color-1);
+}
+.stats-row .stat-card:nth-child(2)::before,
+.stats-grid .stat-card:nth-child(2)::before,
+.stats-bar .stat-card:nth-child(2)::before {
+    background: var(--stat-color-2);
+}
+.stats-row .stat-card:nth-child(3)::before,
+.stats-grid .stat-card:nth-child(3)::before,
+.stats-bar .stat-card:nth-child(3)::before {
+    background: var(--stat-color-3);
+}
+.stats-row .stat-card:nth-child(4)::before,
+.stats-grid .stat-card:nth-child(4)::before,
+.stats-bar .stat-card:nth-child(4)::before {
+    background: var(--stat-color-4);
+}
+
+.s79-stat:hover,
+.stat-card:hover {
+    box-shadow: var(--s79-shadow-md);
+    transform: translateY(-2px);
+}
+
+.s79-stat-value,
+.stat-card .stat-value {
     font-size: 28px;
     font-weight: 700;
     line-height: 1;
@@ -401,7 +470,8 @@ button.primary-btn {
     letter-spacing: -0.03em;
 }
 
-.s79-stat-label {
+.s79-stat-label,
+.stat-card .stat-label {
     font-size: 12px;
     color: var(--s79-text-muted);
     font-weight: 500;
@@ -512,13 +582,49 @@ button.primary-btn {
 
 @keyframes s79-spin { to { transform: rotate(360deg); } }
 
+/* ── Page Entrance Animation ── */
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-container,
+.container,
+.admin-main > .admin-header ~ *:not(.admin-header) {
+    animation: pageFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger animation for stat cards */
+.stat-card,
+.s79-stat {
+    animation: pageFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stats-row .stat-card:nth-child(1),
+.stats-grid .stat-card:nth-child(1),
+.stats-bar .stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stats-row .stat-card:nth-child(2),
+.stats-grid .stat-card:nth-child(2),
+.stats-bar .stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stats-row .stat-card:nth-child(3),
+.stats-grid .stat-card:nth-child(3),
+.stats-bar .stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stats-row .stat-card:nth-child(4),
+.stats-grid .stat-card:nth-child(4),
+.stats-bar .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
 /* ── Override existing page-specific styles for consistency ── */
 
 /* Topbar overrides */
 .topbar {
-    background: rgba(255, 255, 255, 0.72) !important;
-    backdrop-filter: saturate(180%) blur(12px) !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    background: rgba(255, 255, 255, 0.78) !important;
+    backdrop-filter: saturate(200%) blur(16px) !important;
+    border-bottom: 1px solid rgba(226, 229, 235, 0.6) !important;
     font-family: var(--s79-font);
 }
 
@@ -528,7 +634,28 @@ button, .btn, input[type="submit"] {
     border-radius: var(--s79-radius-sm);
 }
 
-/* Table overrides for existing pages */
+/* Global button hover lift */
+.btn:hover,
+button.btn:hover {
+    transform: translateY(-0.5px);
+}
+
+.btn:active,
+button.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary,
+.btn-dark {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:hover,
+.btn-dark:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* Table overrides for existing pages — zebra + better hover */
 table {
     border-collapse: collapse;
     font-family: var(--s79-font);
@@ -540,6 +667,24 @@ table th {
     color: var(--s79-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
+}
+
+table tbody tr:nth-child(even) {
+    background: rgba(241, 243, 248, 0.4);
+}
+
+table tbody tr:hover td {
+    background: rgba(99, 102, 241, 0.03);
+}
+
+/* Data table card wrapper */
+.data-table-wrap,
+.table-wrap {
+    background: var(--s79-surface);
+    border: 1px solid var(--s79-border);
+    border-radius: var(--s79-radius-md);
+    overflow: hidden;
+    box-shadow: var(--s79-shadow-card);
 }
 
 /* Ensure all inputs get consistent styling */
@@ -555,6 +700,21 @@ select {
     border-radius: var(--s79-radius-sm);
 }
 
+/* ── Project / HW cards — subtle shadow + hover lift ── */
+.project-card,
+.hw-card,
+.project-mini-card,
+.pcard-top {
+    box-shadow: var(--s79-shadow-card);
+}
+
+.project-card:hover,
+.hw-card:hover,
+.project-mini-card:hover {
+    box-shadow: var(--s79-shadow-card-hover);
+    transform: translateY(-2px);
+}
+
 /* ── Global content animations ── */
 @keyframes contentFadeIn {
     from { opacity: 0; transform: translateY(4px); }
@@ -564,7 +724,7 @@ select {
 /* Scrollbar styling */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #CFD4DE; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
 /* ── Print ── */
