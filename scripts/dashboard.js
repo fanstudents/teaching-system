@@ -746,7 +746,7 @@ function renderTrailView() {
             return esc(vars || c).slice(0, 120);
         }
         if (c.startsWith('data:image')) return '(圖片)';
-        if (c.startsWith('http')) return `<a href="${esc(c)}" target="_blank" style="color:#6366f1;">${esc(c.slice(0, 60))}</a>`;
+        if (c.startsWith('http')) return `<a href="${esc(c)}" target="_blank" style="color:#1a73e8;">${esc(c.slice(0, 60))}</a>`;
         return esc(c).slice(0, 120);
     };
 
@@ -756,7 +756,7 @@ function renderTrailView() {
         return `
             <div class="trail-student" style="margin-bottom:12px;">
                 <div class="trail-student-header" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-weight:600;font-size:14px;">
-                    <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">person</span>
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#1a73e8;">person</span>
                     <span style="flex:1;">${esc(name)}</span>
                     <span style="background:#f1f5f9;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:500;color:#475569;">${count} 筆</span>
                     <span class="material-symbols-outlined trail-arrow" style="font-size:16px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
@@ -769,7 +769,7 @@ function renderTrailView() {
                             <div style="position:relative;padding:8px 12px;margin-bottom:6px;background:#fafbfc;border-radius:8px;font-size:13px;border:1px solid #f0f0f0;">
                                 <div style="position:absolute;left:-22px;top:12px;width:10px;height:10px;border-radius:50%;background:#e2e8f0;border:2px solid #fff;"></div>
                                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                                    <span class="material-symbols-outlined" style="font-size:14px;color:#6366f1;">${icon}</span>
+                                    <span class="material-symbols-outlined" style="font-size:14px;color:#1a73e8;">${icon}</span>
                                     <span style="font-weight:600;color:#334155;">${esc(label)}</span>
                                     ${item.title && item.title !== label ? `<span style="color:#94a3b8;font-size:12px;">— ${esc(item.title)}</span>` : ''}
                                     <span style="margin-left:auto;color:#94a3b8;font-size:11px;">${formatTime(item.time)}</span>

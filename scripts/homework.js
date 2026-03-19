@@ -715,8 +715,8 @@ export class HomeworkSubmission {
                 previewHtml = `<div style="text-align:center;"><img src="${imgSrc}" style="max-width:100%;max-height:220px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.08);"></div>`;
             }
             if (promptText) {
-                previewHtml += `<div style="margin-top:10px;padding:10px 14px;background:#f0f4ff;border-radius:8px;border:1px solid #c7d2fe;">
-                    <div style="font-size:11px;color:#6366f1;font-weight:600;margin-bottom:4px;">💬 Prompt</div>
+                previewHtml += `<div style="margin-top:10px;padding:10px 14px;background:#f0f4ff;border-radius:8px;border:1px solid #a8c7fa;">
+                    <div style="font-size:11px;color:#1a73e8;font-weight:600;margin-bottom:4px;">💬 Prompt</div>
                     <div style="font-size:0.85rem;color:#1e293b;white-space:pre-wrap;">${promptText.replace(/</g, '&lt;')}</div>
                 </div>`;
             }

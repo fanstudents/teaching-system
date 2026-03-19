@@ -398,7 +398,7 @@ class InteractionState {
      */
     playSuccessFeedback(container) {
         // --- 1. 煙火動畫 ---
-        const colors = ['#4A7AE8', '#22c55e', '#f59e0b', '#ec4899', '#8b5cf6'];
+        const colors = ['#4A7AE8', '#22c55e', '#f59e0b', '#ec4899', '#4285f4'];
         // 如果容器有 relative，就在容器內；沒有的話，先設定
         if (getComputedStyle(container).position === 'static') {
             container.style.position = 'relative';
@@ -487,7 +487,7 @@ class InteractionState {
         mountTarget.appendChild(popup);
 
         // JS 煙火粒子
-        const colors = ['#fbbf24', '#f59e0b', '#d97706', '#6366f1', '#ec4899', '#22c55e'];
+        const colors = ['#fbbf24', '#f59e0b', '#d97706', '#1a73e8', '#ec4899', '#22c55e'];
         for (let i = 0; i < 16; i++) {
             const p = document.createElement('div');
             p.style.cssText = `

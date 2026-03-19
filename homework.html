@@ -12,7 +12,7 @@
     <meta property="og:description" content="學員作業繳交與管理">
     <meta property="og:image" content="https://tbr.digital/og-image.png">
     <meta property="og:url" content="https://tbr.digital">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -29,8 +29,8 @@
 
         body {
             font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
+            background: #f8f9fa;
+            color: #1f1f1f;
             min-height: 100vh;
         }
 
@@ -41,7 +41,7 @@
             justify-content: space-between;
             padding: 14px 20px;
             background: white;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #dadce0;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -59,7 +59,7 @@
             gap: 4px;
             background: none;
             border: none;
-            color: #6366f1;
+            color: #1a73e8;
             font-size: 14px;
             cursor: pointer;
             padding: 6px 10px;
@@ -68,7 +68,7 @@
         }
 
         .hw-back-btn:hover {
-            background: #f1f5f9;
+            background: #f1f3f4;
         }
 
         .hw-back-btn .material-symbols-outlined {
@@ -91,14 +91,14 @@
             align-items: center;
             gap: 6px;
             font-size: 13px;
-            color: #64748b;
+            color: #444746;
         }
 
         .hw-user-avatar {
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
             color: white;
             display: flex;
             align-items: center;
@@ -120,7 +120,7 @@
             background: white;
             border-radius: 16px;
             padding: 20px 24px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
         }
 
         .hw-stat {
@@ -131,24 +131,24 @@
         .hw-stat-value {
             font-size: 28px;
             font-weight: 700;
-            color: #1e293b;
+            color: #1f1f1f;
         }
 
         .hw-stat-value.done {
-            color: #10b981;
+            color: #1e8e3e;
         }
 
         .hw-stat-value.pending {
-            color: #f59e0b;
+            color: #f9ab00;
         }
 
         .hw-stat-value.overdue {
-            color: #ef4444;
+            color: #d93025;
         }
 
         .hw-stat-label {
             font-size: 12px;
-            color: #94a3b8;
+            color: #80868b;
             margin-top: 2px;
         }
 
@@ -165,7 +165,7 @@
         .hw-section-label {
             font-size: 12px;
             font-weight: 600;
-            color: #94a3b8;
+            color: #80868b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-top: 8px;
@@ -174,15 +174,15 @@
         .hw-card {
             background: white;
             border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             padding: 18px 20px;
             transition: all 0.2s;
             cursor: pointer;
         }
 
         .hw-card:hover {
-            border-color: #c7d2fe;
-            box-shadow: 0 2px 12px rgba(99, 102, 241, 0.08);
+            border-color: #a8c7fa;
+            box-shadow: 0 2px 12px rgba(26, 115, 232, 0.08);
         }
 
         .hw-card-header {
@@ -195,7 +195,7 @@
         .hw-card-title {
             font-size: 15px;
             font-weight: 600;
-            color: #1e293b;
+            color: #1f1f1f;
         }
 
         .hw-card-badge {
@@ -215,22 +215,22 @@
 
         .hw-card-badge.submitted {
             background: #ecfdf5;
-            color: #059669;
+            color: #188038;
         }
 
         .hw-card-badge.not-submitted {
-            background: #fef3c7;
-            color: #d97706;
+            background: #fef7e0;
+            color: #e37400;
         }
 
         .hw-card-badge.overdue {
-            background: #fef2f2;
-            color: #dc2626;
+            background: #fce8e6;
+            color: #c5221f;
         }
 
         .hw-card-desc {
             font-size: 13px;
-            color: #64748b;
+            color: #444746;
             margin-top: 6px;
             line-height: 1.5;
         }
@@ -241,7 +241,7 @@
             gap: 16px;
             margin-top: 10px;
             font-size: 12px;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .hw-card-meta-item {
@@ -258,21 +258,21 @@
         .hw-submission-preview {
             margin-top: 12px;
             padding: 12px 14px;
-            background: #f8fafc;
+            background: #f8f9fa;
             border-radius: 10px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
         }
 
         .hw-submission-label {
             font-size: 11px;
             font-weight: 600;
-            color: #94a3b8;
+            color: #80868b;
             margin-bottom: 6px;
         }
 
         .hw-submission-content {
             font-size: 13px;
-            color: #334155;
+            color: #1f1f1f;
             line-height: 1.5;
         }
 
@@ -285,7 +285,7 @@
 
         .hw-submission-time {
             font-size: 11px;
-            color: #94a3b8;
+            color: #80868b;
             margin-top: 6px;
         }
 
@@ -296,7 +296,7 @@
             gap: 6px;
             margin-top: 12px;
             padding: 8px 16px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
             color: white;
             border: none;
             border-radius: 10px;
@@ -317,15 +317,15 @@
 
         .hw-submit-btn.resubmit {
             background: transparent;
-            color: #6366f1;
-            border: 1px solid #c7d2fe;
+            color: #1a73e8;
+            border: 1px solid #a8c7fa;
         }
 
         /* ── Empty State ── */
         .hw-empty {
             text-align: center;
             padding: 60px 20px;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .hw-empty .material-symbols-outlined {
@@ -342,7 +342,7 @@
         .hw-loading {
             text-align: center;
             padding: 60px 20px;
-            color: #94a3b8;
+            color: #80868b;
             font-size: 14px;
         }
 
@@ -670,7 +670,7 @@
                 const imgSrc = parsed.image.data || parsed.image;
                 let html = `<img src="${imgSrc}" alt="作業圖片" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:8px;">`;
                 if (parsed.prompt) {
-                    html += `<div style="margin-top:6px;padding:6px 8px;background:#f0f4ff;border-radius:4px;border:1px solid #e0e7ff;font-size:12px;color:#334155;line-height:1.4;white-space:pre-wrap;"><span style="font-size:10px;color:#6366f1;font-weight:600;">Prompt</span><br>${parsed.prompt.replace(/</g, '&lt;')}</div>`;
+                    html += `<div style="margin-top:6px;padding:6px 8px;background:#f0f4ff;border-radius:4px;border:1px solid #d2e3fc;font-size:12px;color:#1f1f1f;line-height:1.4;white-space:pre-wrap;"><span style="font-size:10px;color:#1a73e8;font-weight:600;">Prompt</span><br>${parsed.prompt.replace(/</g, '&lt;')}</div>`;
                 }
                 return html;
             }
@@ -678,15 +678,15 @@
             if (sub.file_url) {
                 if (sub.type === 'image') {
                     let extra = '';
-                    if (parsed && parsed.prompt) extra = `<div style="margin-top:6px;font-size:12px;color:#64748b;">提示詞：${parsed.prompt}</div>`;
+                    if (parsed && parsed.prompt) extra = `<div style="margin-top:6px;font-size:12px;color:#444746;">提示詞：${parsed.prompt}</div>`;
                     return `<img src="${sub.file_url}" alt="作業圖片">${extra}`;
                 }
-                return `<a href="${sub.file_url}" target="_blank" style="color:#6366f1;">查看檔案</a>`;
+                return `<a href="${sub.file_url}" target="_blank" style="color:#1a73e8;">查看檔案</a>`;
             }
             if (sub.content) {
                 return `<div style="white-space:pre-wrap;max-height:200px;overflow-y:auto;">${sub.content.replace(/</g, '&lt;')}</div>`;
             }
-            return '<span style="color:#94a3b8;">（無內容）</span>';
+            return '<span style="color:#80868b;">（無內容）</span>';
         }
 
         function formatDate(dateStr) {

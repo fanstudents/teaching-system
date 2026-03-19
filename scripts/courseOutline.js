@@ -525,7 +525,7 @@ function renderOutlineFromDB() {
                             <span class="timeline-day-badge">${badgeText}</span>
                             <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
                         </div>
-                        ${dayInfo.instructor ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;margin-bottom:10px;background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:8px;border:1px solid rgba(99,102,241,0.12)"><span class="material-symbols-outlined" style="font-size:16px;color:var(--accent)">person</span><span style="font-size:0.82rem;font-weight:600;color:var(--text-1)">課堂講師：${dayInfo.instructor}</span></div>` : ''}
+                        ${dayInfo.instructor ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;margin-bottom:10px;background:linear-gradient(135deg,#e8f0fe,#d2e3fc);border-radius:8px;border:1px solid rgba(99,102,241,0.12)"><span class="material-symbols-outlined" style="font-size:16px;color:var(--accent)">person</span><span style="font-size:0.82rem;font-weight:600;color:var(--text-1)">課堂講師：${dayInfo.instructor}</span></div>` : ''}
                         ${renderBlocks(dayBlocks)}
                     </div>`;
                 }).join('');
@@ -999,7 +999,7 @@ window.addScheduleDay = function(data = {}) {
     const dayNum = data.day || (list.children.length + 1);
     const div = document.createElement('div');
     div.className = 'oe-schedule-day';
-    div.style.cssText = 'display:flex;gap:10px;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid #e0e7ff;border-radius:10px;transition:box-shadow 0.2s;flex-wrap:wrap';
+    div.style.cssText = 'display:flex;gap:10px;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#e8f0fe);border:1px solid #d2e3fc;border-radius:10px;transition:box-shadow 0.2s;flex-wrap:wrap';
     div.onmouseenter = () => div.style.boxShadow = '0 2px 8px rgba(99,102,241,0.08)';
     div.onmouseleave = () => div.style.boxShadow = 'none';
     div.innerHTML = `
@@ -1616,7 +1616,7 @@ async function importFromProject() {
 
         // Hover
         modal.querySelectorAll('.import-proj-item').forEach(b => {
-            b.addEventListener('mouseenter', () => { b.style.borderColor = '#6366f1'; b.style.background = '#f5f3ff'; });
+            b.addEventListener('mouseenter', () => { b.style.borderColor = '#1a73e8'; b.style.background = '#f5f3ff'; });
             b.addEventListener('mouseleave', () => { b.style.borderColor = '#e2e8f0'; b.style.background = '#fff'; });
         });
 

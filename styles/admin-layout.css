@@ -1,63 +1,48 @@
 /* =============================================
-   Admin Layout — Persistent Left Sidebar (v4 Modern Dashboard)
+   Admin Layout — M3 Navigation Drawer + Top App Bar
    ============================================= */
 
-/* ── Sidebar — Deep gradient with subtle glow ── */
+/* ── Sidebar — M3 Navigation Drawer (white) ── */
 .admin-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     width: var(--sidebar-w);
-    background: linear-gradient(180deg, #1a1d2e 0%, #12141e 100%);
+    background: #ffffff;
     z-index: 200;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+    border-right: 1px solid #dadce0;
 }
 
-/* Right edge glow line */
+/* No glow line in M3 */
 .admin-sidebar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(99, 102, 241, 0.15) 20%,
-        rgba(129, 140, 248, 0.2) 50%,
-        rgba(99, 102, 241, 0.15) 80%,
-        transparent 100%
-    );
-    pointer-events: none;
+    display: none;
 }
 
-/* ── Brand — with glow ── */
+/* ── Brand ── */
 .admin-sidebar-brand {
     padding: 22px 20px 20px;
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #e8eaed;
     flex-shrink: 0;
 }
 
 .admin-sidebar-brand-icon {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #6366F1, #7C3AED);
+    border-radius: 12px;
+    background: #1a73e8;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4), 0 0 20px rgba(99, 102, 241, 0.15);
 }
 
 .admin-sidebar-brand-icon .material-symbols-outlined {
@@ -66,9 +51,9 @@
 
 .admin-sidebar-brand-text {
     font-size: 15px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.95);
-    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: #1f1f1f;
+    letter-spacing: 0;
 }
 
 /* ── Nav ── */
@@ -83,99 +68,89 @@
 }
 
 .admin-sidebar-group-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.28);
+    font-size: 11px;
+    font-weight: 500;
+    color: #80868b;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 20px 14px 8px;
+    letter-spacing: 0.05em;
+    padding: 20px 16px 8px;
 }
 
 .admin-sidebar-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 24px;
+    font-size: 14px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.52);
+    color: #444746;
     text-decoration: none;
-    transition: all 0.18s ease;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
     position: relative;
     margin-bottom: 2px;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
 }
 
 .admin-sidebar-item .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 20px;
     flex-shrink: 0;
-    opacity: 0.55;
-    transition: all 0.18s ease;
+    color: #444746;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .admin-sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.9);
+    background: #f1f3f4;
+    color: #1f1f1f;
 }
 
 .admin-sidebar-item:hover .material-symbols-outlined {
-    opacity: 0.9;
-    color: #a5b4fc;
+    color: #1f1f1f;
 }
 
-/* Active state — glowing left bar + highlighted bg */
+/* Active state — M3 active indicator (pill shape) */
 .admin-sidebar-item.active {
-    background: rgba(99, 102, 241, 0.12);
-    color: #c7d2fe;
-    font-weight: 600;
+    background: #e8f0fe;
+    color: #1a73e8;
+    font-weight: 500;
 }
 
 .admin-sidebar-item.active .material-symbols-outlined {
-    opacity: 1;
-    color: #818CF8;
+    color: #1a73e8;
 }
 
 .admin-sidebar-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 6px;
-    bottom: 6px;
-    width: 3px;
-    background: linear-gradient(180deg, #818CF8, #6366F1);
-    border-radius: 0 3px 3px 0;
-    box-shadow: 0 0 8px rgba(129, 140, 248, 0.5);
+    display: none;
 }
 
 .admin-sidebar-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.05);
-    margin: 10px 14px;
+    background: #e8eaed;
+    margin: 8px 16px;
 }
 
 /* ── Footer ── */
 .admin-sidebar-footer {
-    padding: 14px 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 14px 16px;
+    border-top: 1px solid #e8eaed;
     flex-shrink: 0;
 }
 
 .admin-sidebar-footer .btn {
     width: 100%;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.45);
-    font-size: 12px;
-    border-radius: 8px;
+    background: transparent;
+    border: 1px solid #dadce0;
+    color: #444746;
+    font-size: 13px;
+    border-radius: 20px;
     padding: 8px 12px;
-    transition: all 0.15s;
+    transition: all 0.2s;
 }
 
 .admin-sidebar-footer .btn:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.85);
+    background: #f1f3f4;
+    color: #1f1f1f;
 }
 
 /* ── Main Content Area ── */
@@ -186,13 +161,11 @@
     transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Header — Premium Frosted Glass ── */
+/* ── Header — M3 Top App Bar ── */
 .admin-header {
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: saturate(200%) blur(16px);
-    -webkit-backdrop-filter: saturate(200%) blur(16px);
-    border-bottom: 1px solid rgba(226, 229, 235, 0.6);
-    padding: 0 28px;
+    background: #ffffff;
+    border-bottom: 1px solid #dadce0;
+    padding: 0 24px;
     height: var(--header-h);
     display: flex;
     align-items: center;
@@ -200,7 +173,6 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .admin-header-title {

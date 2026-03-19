@@ -34,7 +34,7 @@ export const LAYOUT_STYLES = [
         name: '左欄標題',
         icon: 'view_sidebar',
         desc: '標題在左側 30%，內容佔右側 70%，適合圖文並排',
-        colors: { bg: '#ffffff', bgDark: '#0f172a', accent: '#7c3aed', card: '#f5f3ff' },
+        colors: { bg: '#ffffff', bgDark: '#0f172a', accent: '#1a73e8', card: '#f5f3ff' },
         layout: {
             title: { x: 30, y: 30, w: 250, h: 480, align: 'left', vertical: true },
             accentLine: { x: 300, y: 30, w: 3, h: 480 },
@@ -161,11 +161,11 @@ export class AiSlideGenerator {
         const type = page.slideType || 'content';
         // 裝飾配色輪替 — 依 page index 做變化
         const accents = [
-            { bar: '#4f46e5', bg: '#eef2ff', light: '#e0e7ff', dot: '#818cf8' },
+            { bar: '#1765cc', bg: '#e8f0fe', light: '#d2e3fc', dot: '#4285f4' },
             { bar: '#0891b2', bg: '#ecfeff', light: '#cffafe', dot: '#22d3ee' },
             { bar: '#059669', bg: '#ecfdf5', light: '#d1fae5', dot: '#34d399' },
             { bar: '#b45309', bg: '#fffbeb', light: '#fef3c7', dot: '#fbbf24' },
-            { bar: '#7c3aed', bg: '#f5f3ff', light: '#ede9fe', dot: '#a78bfa' },
+            { bar: '#1a73e8', bg: '#f5f3ff', light: '#ede9fe', dot: '#8ab4f8' },
             { bar: '#dc2626', bg: '#fef2f2', light: '#fee2e2', dot: '#f87171' },
         ];
         const c = accents[(page._index || 0) % accents.length];
@@ -557,7 +557,7 @@ export class AiSlideGenerator {
 5. 可用中文標籤
 
 ══ 配色指南 ══
-• 主色系：#6366f1(靛藍), #8b5cf6(紫), #0d9488(青), #f59e0b(琥珀), #ef4444(珊瑚)
+• 主色系：#1a73e8(靛藍), #4285f4(紫), #0d9488(青), #f59e0b(琥珀), #ef4444(珊瑚)
 • 背景：透明（不要加背景矩形）
 
 ══ 設計規則 ══

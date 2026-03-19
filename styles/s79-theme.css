@@ -1,94 +1,94 @@
 /* =============================================
-   S79 Corporate Clean — Shared Theme (v4 Modern Dashboard)
+   Shared Theme — Material Design 3
    
-   所有後台頁面共用的設計 tokens 與基礎樣式。
+   所有後台頁面共用的 M3 design tokens 與基礎樣式。
    與 admin-layout.css 搭配使用。
    ============================================= */
 
 /* ── Design Tokens ── */
 :root {
-    /* Colors — 主色系 */
-    --s79-primary: #6366F1;
-    --s79-primary-hover: #4F46E5;
-    --s79-primary-light: #EEF2FF;
-    --s79-primary-subtle: rgba(99, 102, 241, 0.08);
-    --s79-primary-glow: rgba(99, 102, 241, 0.25);
-    --s79-success: #10B981;
-    --s79-success-light: #D1FAE5;
-    --s79-warning: #F59E0B;
-    --s79-warning-light: #FEF3C7;
-    --s79-error: #EF4444;
-    --s79-error-light: #FEE2E2;
+    /* Colors — Google M3 */
+    --s79-primary: #1a73e8;
+    --s79-primary-hover: #1765cc;
+    --s79-primary-light: #e8f0fe;
+    --s79-primary-subtle: rgba(26, 115, 232, 0.08);
+    --s79-primary-glow: rgba(26, 115, 232, 0.15);
+    --s79-success: #1e8e3e;
+    --s79-success-light: #e6f4ea;
+    --s79-warning: #f9ab00;
+    --s79-warning-light: #fef7e0;
+    --s79-error: #d93025;
+    --s79-error-light: #fce8e6;
 
-    /* Colors — 灰階 (slightly cooler) */
-    --s79-bg: #F1F3F8;
-    --s79-surface: #FFFFFF;
-    --s79-surface-hover: #F8F9FC;
-    --s79-surface-alt: #F5F6FA;
-    --s79-border: #E2E5EB;
-    --s79-border-strong: #CBD0DA;
-    --s79-text: #111827;
-    --s79-text-secondary: #6B7280;
-    --s79-text-muted: #9CA3AF;
+    /* Colors — M3 neutral */
+    --s79-bg: #f8f9fa;
+    --s79-surface: #ffffff;
+    --s79-surface-hover: #f1f3f4;
+    --s79-surface-alt: #f1f3f4;
+    --s79-border: #dadce0;
+    --s79-border-strong: #bdc1c6;
+    --s79-text: #1f1f1f;
+    --s79-text-secondary: #444746;
+    --s79-text-muted: #80868b;
 
     /* Typography */
-    --s79-font: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+    --s79-font: 'Google Sans', 'Roboto', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
 
-    /* Radius — 更大更柔和 */
+    /* Radius — M3 shape scale */
     --s79-radius-sm: 8px;
     --s79-radius-md: 12px;
     --s79-radius-lg: 16px;
-    --s79-radius-xl: 20px;
+    --s79-radius-xl: 28px;
     --s79-radius-full: 9999px;
 
-    /* Shadow — 更有層次 + glow 系列 */
-    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-    --s79-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --s79-shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-    --s79-shadow-lg: 0 12px 32px -6px rgba(0, 0, 0, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.06);
-    --s79-shadow-xl: 0 24px 48px -12px rgba(0, 0, 0, 0.15);
-    --s79-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    --s79-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-    --s79-shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
-    --s79-shadow-primary-glow: 0 4px 14px -2px rgba(99, 102, 241, 0.4);
+    /* Shadow — M3 elevation */
+    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --s79-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --s79-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+    --s79-shadow-lg: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1);
+    --s79-shadow-xl: 0 2px 6px rgba(0, 0, 0, 0.08), 0 16px 48px rgba(0, 0, 0, 0.14);
+    --s79-shadow-focus: 0 0 0 2px #e8f0fe;
+    --s79-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+    --s79-shadow-card-hover: 0 1px 3px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.08);
+    --s79-shadow-primary-glow: none;
 
     /* Duration */
-    --s79-duration: 150ms;
-    --s79-duration-md: 200ms;
-    --s79-duration-lg: 300ms;
+    --s79-duration: 200ms;
+    --s79-duration-md: 250ms;
+    --s79-duration-lg: 350ms;
 
     /* ── Override admin-layout.css variables ── */
-    --sidebar-w: 260px;
-    --sidebar-bg: linear-gradient(180deg, #1a1d2e 0%, #12141e 100%);
-    --sidebar-text: rgba(255, 255, 255, 0.50);
-    --sidebar-text-hover: rgba(255, 255, 255, 0.95);
-    --sidebar-active-bg: rgba(99, 102, 241, 0.12);
-    --sidebar-active-text: #c7d2fe;
-    --sidebar-accent: #818CF8;
-    --sidebar-divider: rgba(255, 255, 255, 0.06);
-    --sidebar-group-text: rgba(255, 255, 255, 0.28);
-    --gradient-primary: linear-gradient(135deg, #6366F1, #7C3AED);
+    --sidebar-w: 280px;
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #444746;
+    --sidebar-text-hover: #1f1f1f;
+    --sidebar-active-bg: #e8f0fe;
+    --sidebar-active-text: #1a73e8;
+    --sidebar-accent: #1a73e8;
+    --sidebar-divider: #e8eaed;
+    --sidebar-group-text: #80868b;
+    --gradient-primary: #1a73e8;
 
     /* ── Override dashboard-style variables ── */
     --radius-sm: 8px;
-    --content-bg: #F1F3F8;
-    --border-color: #E2E5EB;
-    --text-primary: #111827;
-    --text-secondary: #6B7280;
-    --bg-hover: rgba(0, 0, 0, 0.03);
-    --header-h: 60px;
+    --content-bg: #f8f9fa;
+    --border-color: #dadce0;
+    --text-primary: #1f1f1f;
+    --text-secondary: #444746;
+    --bg-hover: rgba(0, 0, 0, 0.04);
+    --header-h: 64px;
 
     /* ── Stat card accent colors ── */
-    --stat-color-1: #6366F1;
-    --stat-color-2: #10B981;
-    --stat-color-3: #F59E0B;
-    --stat-color-4: #EC4899;
+    --stat-color-1: #1a73e8;
+    --stat-color-2: #1e8e3e;
+    --stat-color-3: #f9ab00;
+    --stat-color-4: #e8710a;
 
     /* ── text & border shortcuts ── */
-    --text-1: #111827;
-    --text-2: #6B7280;
-    --text-3: #9CA3AF;
-    --border: #E2E5EB;
+    --text-1: #1f1f1f;
+    --text-2: #444746;
+    --text-3: #80868b;
+    --border: #dadce0;
 }
 
 /* ── Base Reset ── */
@@ -107,6 +107,7 @@ body {
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
+    letter-spacing: 0.01em;
 }
 
 @media (max-width: 768px) {
@@ -117,18 +118,16 @@ body.sidebar-closed {
     padding-left: 0;
 }
 
-/* ── Inter font import ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ── Google Sans + Roboto font import ── */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
 
-/* ── Admin Header Override — Premium Frosted Glass ── */
+/* ── Admin Header Override — M3 Top App Bar ── */
 .admin-header {
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: saturate(200%) blur(16px);
-    -webkit-backdrop-filter: saturate(200%) blur(16px);
-    border-bottom: 1px solid rgba(226, 229, 235, 0.6);
+    background: #ffffff;
+    border-bottom: 1px solid var(--s79-border);
     height: var(--header-h);
     font-family: var(--s79-font);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    box-shadow: none;
 }
 
 .admin-header-title {
@@ -138,24 +137,24 @@ body.sidebar-closed {
     color: var(--s79-text);
 }
 
-/* ── Shared Button Styles — Premium ── */
+/* ── Shared Button Styles — M3 ── */
 .s79-btn,
 .admin-header-actions .btn,
 button.primary-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: var(--s79-radius-sm);
-    font-size: 13px;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-size: 14px;
     font-weight: 500;
     font-family: var(--s79-font);
     cursor: pointer;
-    transition: all var(--s79-duration) ease;
+    transition: background var(--s79-duration) ease, box-shadow var(--s79-duration) ease;
     border: 1px solid transparent;
-    min-height: 36px;
+    min-height: 40px;
     line-height: 1;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.01em;
 }
 
 .s79-btn:focus-visible {
@@ -167,18 +166,16 @@ button.primary-btn {
     background: var(--s79-primary);
     color: #fff;
     border-color: var(--s79-primary);
-    box-shadow: var(--s79-shadow-primary-glow);
+    box-shadow: none;
 }
 
 .s79-btn-primary:hover {
     background: var(--s79-primary-hover);
-    box-shadow: 0 6px 20px -4px rgba(99, 102, 241, 0.5);
-    transform: translateY(-1px);
+    box-shadow: var(--s79-shadow-sm);
 }
 
 .s79-btn-primary:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    background: #1557b0;
 }
 
 .s79-btn-ghost {
@@ -190,39 +187,34 @@ button.primary-btn {
 .s79-btn-ghost:hover {
     background: var(--s79-surface-hover);
     border-color: var(--s79-border-strong);
-    transform: translateY(-0.5px);
 }
 
 .s79-btn-danger {
     background: var(--s79-error);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
 }
 
 .s79-btn-danger:hover {
-    background: #DC2626;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    background: #c5221f;
 }
 
 .s79-btn .material-symbols-outlined,
 .s79-btn .material-symbols-rounded {
-    font-size: 16px;
+    font-size: 18px;
 }
 
-/* ── Card — Premium with subtle shadow ── */
+/* ── Card — M3 Elevated ── */
 .s79-card {
     background: var(--s79-surface);
     border: 1px solid var(--s79-border);
-    border-radius: var(--s79-radius-md);
+    border-radius: var(--s79-radius-lg);
     overflow: hidden;
     box-shadow: var(--s79-shadow-card);
-    transition: all var(--s79-duration-md) ease;
+    transition: box-shadow var(--s79-duration-md) ease;
 }
 
 .s79-card:hover {
     box-shadow: var(--s79-shadow-card-hover);
-    transform: translateY(-1px);
 }
 
 .s79-card-header {
@@ -237,23 +229,22 @@ button.primary-btn {
     padding: 20px;
 }
 
-/* ── Table — Zebra striping + better hover ── */
+/* ── Table — M3 Data Table ── */
 .s79-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .s79-table th {
-    background: var(--s79-surface-alt);
+    background: transparent;
     border-bottom: 1px solid var(--s79-border);
-    padding: 10px 16px;
+    padding: 12px 16px;
     text-align: left;
     font-weight: 500;
-    font-size: 11px;
-    color: var(--s79-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 12px;
+    color: var(--s79-text-secondary);
+    letter-spacing: 0.01em;
 }
 
 .s79-table td {
@@ -267,11 +258,11 @@ button.primary-btn {
 }
 
 .s79-table tbody tr:nth-child(even) {
-    background: rgba(241, 243, 248, 0.5);
+    background: transparent;
 }
 
 .s79-table tbody tr:hover td {
-    background: rgba(99, 102, 241, 0.04);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 /* ── Badge ── */
@@ -286,8 +277,8 @@ button.primary-btn {
 }
 
 .s79-badge-primary { background: var(--s79-primary-light); color: var(--s79-primary); }
-.s79-badge-success { background: var(--s79-success-light); color: #059669; }
-.s79-badge-warning { background: var(--s79-warning-light); color: #D97706; }
+.s79-badge-success { background: var(--s79-success-light); color: #188038; }
+.s79-badge-warning { background: var(--s79-warning-light); color: #e37400; }
 .s79-badge-error { background: var(--s79-error-light); color: var(--s79-error); }
 .s79-badge-neutral { background: #F3F4F6; color: var(--s79-text-muted); }
 
@@ -407,74 +398,59 @@ button.primary-btn {
     margin: 0 auto 12px;
 }
 
-/* ── Stat Card — Premium with colored top border ── */
+/* ── Stat Card — M3 Filled Card ── */
 .s79-stat,
 .stat-card {
     background: var(--s79-surface);
     border: 1px solid var(--s79-border);
-    border-radius: var(--s79-radius-md);
+    border-radius: var(--s79-radius-lg);
     padding: 20px;
     box-shadow: var(--s79-shadow-card);
-    transition: all var(--s79-duration-md) ease;
+    transition: box-shadow var(--s79-duration-md) ease;
     position: relative;
     overflow: hidden;
 }
 
 .s79-stat::before,
 .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--s79-primary);
-    border-radius: 3px 3px 0 0;
-    opacity: 0.9;
+    display: none;
 }
 
-/* Color rotate for stat cards */
+/* Color rotate — hidden in M3 */
 .stats-row .stat-card:nth-child(1)::before,
 .stats-grid .stat-card:nth-child(1)::before,
-.stats-bar .stat-card:nth-child(1)::before {
-    background: var(--stat-color-1);
-}
+.stats-bar .stat-card:nth-child(1)::before,
 .stats-row .stat-card:nth-child(2)::before,
 .stats-grid .stat-card:nth-child(2)::before,
-.stats-bar .stat-card:nth-child(2)::before {
-    background: var(--stat-color-2);
-}
+.stats-bar .stat-card:nth-child(2)::before,
 .stats-row .stat-card:nth-child(3)::before,
 .stats-grid .stat-card:nth-child(3)::before,
-.stats-bar .stat-card:nth-child(3)::before {
-    background: var(--stat-color-3);
-}
+.stats-bar .stat-card:nth-child(3)::before,
 .stats-row .stat-card:nth-child(4)::before,
 .stats-grid .stat-card:nth-child(4)::before,
 .stats-bar .stat-card:nth-child(4)::before {
-    background: var(--stat-color-4);
+    display: none;
 }
 
 .s79-stat:hover,
 .stat-card:hover {
     box-shadow: var(--s79-shadow-md);
-    transform: translateY(-2px);
 }
 
 .s79-stat-value,
 .stat-card .stat-value {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1;
     margin-bottom: 4px;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.01em;
 }
 
 .s79-stat-label,
 .stat-card .stat-label {
     font-size: 12px;
     color: var(--s79-text-muted);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 /* ── Pagination ── */
@@ -535,7 +511,7 @@ button.primary-btn {
     color: var(--s79-text-muted);
 }
 
-/* ── Tabs ── */
+/* ── Tabs — M3 ── */
 .s79-tabs {
     display: flex;
     border-bottom: 1px solid var(--s79-border);
@@ -543,20 +519,20 @@ button.primary-btn {
 }
 
 .s79-tab {
-    padding: 10px 18px;
-    font-size: 13px;
+    padding: 12px 24px;
+    font-size: 14px;
     font-weight: 500;
-    color: var(--s79-text-muted);
+    color: var(--s79-text-secondary);
     background: none;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 3px solid transparent;
     cursor: pointer;
     font-family: var(--s79-font);
     transition: all var(--s79-duration) ease;
 }
 
-.s79-tab:hover { color: var(--s79-text); }
-.s79-tab.active { color: var(--s79-primary); border-bottom-color: var(--s79-primary); font-weight: 600; }
+.s79-tab:hover { color: var(--s79-text); background: rgba(0, 0, 0, 0.04); }
+.s79-tab.active { color: var(--s79-primary); border-bottom-color: var(--s79-primary); font-weight: 500; }
 
 /* ── Chip / Tag ── */
 .s79-chip {
@@ -618,63 +594,46 @@ button.primary-btn {
 .stats-grid .stat-card:nth-child(4),
 .stats-bar .stat-card:nth-child(4) { animation-delay: 0.2s; }
 
-/* ── Override existing page-specific styles for consistency ── */
+/* ── Override existing page-specific styles for M3 consistency ── */
 
 /* Topbar overrides */
 .topbar {
-    background: rgba(255, 255, 255, 0.78) !important;
-    backdrop-filter: saturate(200%) blur(16px) !important;
-    border-bottom: 1px solid rgba(226, 229, 235, 0.6) !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--s79-border) !important;
     font-family: var(--s79-font);
 }
 
 /* Existing buttons in all pages */
 button, .btn, input[type="submit"] {
     font-family: var(--s79-font);
-    border-radius: var(--s79-radius-sm);
+    border-radius: 20px;
 }
 
-/* Global button hover lift */
-.btn:hover,
-button.btn:hover {
-    transform: translateY(-0.5px);
-}
-
-.btn:active,
-button.btn:active {
-    transform: translateY(0);
-}
-
+/* No hover lift in M3 */
 .btn-primary,
 .btn-dark {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: none;
 }
 
-.btn-primary:hover,
-.btn-dark:hover {
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-}
-
-/* Table overrides for existing pages — zebra + better hover */
+/* Table overrides for existing pages — M3 clean */
 table {
     border-collapse: collapse;
     font-family: var(--s79-font);
 }
 
 table th {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
-    color: var(--s79-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    color: var(--s79-text-secondary);
+    letter-spacing: 0.01em;
 }
 
 table tbody tr:nth-child(even) {
-    background: rgba(241, 243, 248, 0.4);
+    background: transparent;
 }
 
 table tbody tr:hover td {
-    background: rgba(99, 102, 241, 0.03);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 /* Data table card wrapper */
@@ -700,7 +659,7 @@ select {
     border-radius: var(--s79-radius-sm);
 }
 
-/* ── Project / HW cards — subtle shadow + hover lift ── */
+/* ── Project / HW cards — M3 elevation ── */
 .project-card,
 .hw-card,
 .project-mini-card,
@@ -712,7 +671,6 @@ select {
 .hw-card:hover,
 .project-mini-card:hover {
     box-shadow: var(--s79-shadow-card-hover);
-    transform: translateY(-2px);
 }
 
 /* ── Global content animations ── */
@@ -721,11 +679,11 @@ select {
     to { opacity: 1; transform: none; }
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* Scrollbar styling — M3 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #CFD4DE; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
 
 /* ── Print ── */
 @media print {

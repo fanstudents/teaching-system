@@ -463,7 +463,7 @@ export class Showcase {
                 }
                 if (promptText) {
                     html += `<div class="showcase-preview-prompt">
-                        <span style="font-size:10px;color:#6366f1;font-weight:600;">Prompt</span>
+                        <span style="font-size:10px;color:#1a73e8;font-weight:600;">Prompt</span>
                         <div style="font-size:12px;color:#334155;line-height:1.5;margin-top:2px;white-space:pre-wrap;">${this.escapeHtml(promptText)}</div>
                     </div>`;
                 }
@@ -481,14 +481,14 @@ export class Showcase {
                 let src = s.file_url || '';
                 if (!src) { try { src = JSON.parse(content).data || ''; } catch { src = ''; } }
                 return `<div style="text-align:center;padding:12px;">
-                    <span class="material-symbols-outlined" style="font-size:28px;color:#6366f1;">headphones</span>
+                    <span class="material-symbols-outlined" style="font-size:28px;color:#1a73e8;">headphones</span>
                     ${src ? `<audio src="${src}" controls style="width:100%;margin-top:8px;height:32px;"></audio>` : '<div style="color:#94a3b8;font-size:12px;margin-top:4px;">音檔</div>'}
                 </div>`;
             }
 
             case 'link':
                 return `<div style="padding:8px;word-break:break-all;">
-                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;color:#6366f1;">link</span>
+                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;color:#1a73e8;">link</span>
                     <a href="${content}" target="_blank" style="color:#4A7AE8;font-size:12px;">${this.truncate(content, 60)}</a>
                 </div>`;
 
@@ -591,8 +591,8 @@ export class Showcase {
                 const { src, promptText } = this._extractImageSrc(s);
                 let html = src ? `<img src="${src}" class="showcase-full-img">` : '<p>圖片無法顯示</p>';
                 if (promptText) {
-                    html += `<div style="margin-top:14px;padding:14px 18px;background:#f0f4ff;border-radius:10px;border:1px solid #c7d2fe;">
-                        <div style="font-size:12px;color:#6366f1;font-weight:700;margin-bottom:6px;">💬 Prompt</div>
+                    html += `<div style="margin-top:14px;padding:14px 18px;background:#f0f4ff;border-radius:10px;border:1px solid #a8c7fa;">
+                        <div style="font-size:12px;color:#1a73e8;font-weight:700;margin-bottom:6px;">💬 Prompt</div>
                         <div style="font-size:15px;color:#1e293b;line-height:1.6;white-space:pre-wrap;">${this.escapeHtml(promptText)}</div>
                     </div>`;
                 }

@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+  <defs>
+    <style>
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      @keyframes drawIn { from { stroke-dashoffset: 800; } to { stroke-dashoffset: 0; } }
+      @keyframes funnelGrow { from { opacity: 0; transform: scaleY(0); } to { opacity: 1; transform: scaleY(1); } }
+
+      .title { animation: slideUp 0.6s ease both; }
+      .funnel-part { cursor: pointer; transition: filter 0.2s, opacity 0.2s; }
+      .funnel-part:hover { filter: brightness(1.08) drop-shadow(0 3px 8px rgba(0,0,0,0.15)); }
+      .funnel-top { animation: fadeIn 0.5s ease 0.3s both; }
+      .funnel-mid { animation: fadeIn 0.5s ease 0.5s both; }
+      .funnel-bot { animation: fadeIn 0.5s ease 0.7s both; }
+      .label-group { animation: fadeIn 0.4s ease 0.8s both; }
+      .quote-box { animation: slideUp 0.5s ease 1s both; cursor: pointer; transition: transform 0.2s; }
+      .quote-box:hover { transform: translateY(-3px); filter: drop-shadow(0 4px 12px rgba(99,102,241,0.2)); }
+      .arrow-line { animation: fadeIn 0.4s ease 0.6s both; }
+      .check-row { animation: scaleIn 0.4s ease 0.9s both; }
+      .msg-icon { animation: fadeIn 0.3s ease both; }
+      .source-link { animation: fadeIn 0.4s ease 1.5s both; }
+
+      /* Chat bubble icons */
+      .bubble { fill: #475569; opacity: 0.6; transition: opacity 0.2s; }
+      .funnel-top:hover .bubble { opacity: 1; }
+    </style>
+    <!-- Arrow marker -->
+    <marker id="arrowRight" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#94a3b8"/>
+    </marker>
+    <!-- Funnel gradient -->
+    <linearGradient id="funnelGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="funnelGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a5b4fc"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="funnelGrad3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <!-- Glow filter for mid section -->
+    <filter id="glowMid">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="540" fill="#ffffff" rx="0"/>
+
+  <!-- ═══ Title ═══ -->
+  <g class="title">
+    <text x="60" y="52" font-size="26" font-weight="700" fill="#1e293b">營運防護罩：SOP 機器人與自動化客服</text>
+  </g>
+
+  <!-- ═══ Funnel ═══ -->
+  <!-- Top of Funnel — wide trapezoid with chat bubbles -->
+  <g class="funnel-part funnel-top">
+    <!-- Trapezoid shape -->
+    <path d="M120,95 L400,95 L360,220 L160,220 Z" fill="url(#funnelGrad1)" stroke="#cbd5e1" stroke-width="1"/>
+    <!-- Chat bubble icons scattered inside -->
+    <g>
+      <!-- Row 1 -->
+      <rect class="bubble" x="175" y="108" width="22" height="15" rx="4" style="animation-delay:0.35s"/>
+      <rect class="bubble" x="205" y="105" width="18" height="13" rx="3.5" style="animation-delay:0.4s"/>
+      <rect class="bubble" x="235" y="110" width="24" height="14" rx="4" style="animation-delay:0.45s"/>
+      <rect class="bubble" x="268" y="106" width="20" height="13" rx="3.5" style="animation-delay:0.5s"/>
+      <rect class="bubble" x="296" y="109" width="22" height="14" rx="4" style="animation-delay:0.55s"/>
+      <rect class="bubble" x="326" y="105" width="18" height="13" rx="3.5" style="animation-delay:0.6s"/>
+      <!-- Row 2 -->
+      <rect class="bubble" x="182" y="130" width="20" height="14" rx="4" style="animation-delay:0.42s"/>
+      <rect class="bubble" x="212" y="132" width="24" height="13" rx="3.5" style="animation-delay:0.47s"/>
+      <rect class="bubble" x="246" y="128" width="18" height="15" rx="4" style="animation-delay:0.52s"/>
+      <rect class="bubble" x="274" y="131" width="22" height="13" rx="3.5" style="animation-delay:0.57s"/>
+      <rect class="bubble" x="306" y="129" width="20" height="14" rx="4" style="animation-delay:0.62s"/>
+      <!-- Row 3 -->
+      <rect class="bubble" x="192" y="153" width="22" height="13" rx="3.5" style="animation-delay:0.49s"/>
+      <rect class="bubble" x="224" y="155" width="18" height="14" rx="4" style="animation-delay:0.54s"/>
+      <rect class="bubble" x="252" y="151" width="24" height="13" rx="3.5" style="animation-delay:0.59s"/>
+      <rect class="bubble" x="286" y="154" width="20" height="14" rx="4" style="animation-delay:0.64s"/>
+      <!-- Row 4 -->
+      <rect class="bubble" x="200" y="175" width="20" height="13" rx="4" style="animation-delay:0.56s"/>
+      <rect class="bubble" x="230" y="177" width="24" height="14" rx="3.5" style="animation-delay:0.61s"/>
+      <rect class="bubble" x="264" y="174" width="18" height="13" rx="4" style="animation-delay:0.66s"/>
+      <!-- Row 5 -->
+      <rect class="bubble" x="212" y="196" width="22" height="13" rx="3.5" style="animation-delay:0.63s"/>
+      <rect class="bubble" x="244" y="198" width="20" height="14" rx="4" style="animation-delay:0.68s"/>
+    </g>
+    <!-- Down arrow -->
+    <line x1="260" y1="88" x2="260" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowRight)" class="arrow-line" style="transform:rotate(90deg);transform-origin:260px 94px;"/>
+    <title>Top of Funnel：100 條高頻重複詢問</title>
+  </g>
+
+  <!-- Arrow between top and mid -->
+  <g class="arrow-line">
+    <line x1="260" y1="222" x2="260" y2="238" stroke="#94a3b8" stroke-width="1.5"/>
+    <polygon points="253,236 260,244 267,236" fill="#94a3b8"/>
+  </g>
+
+  <!-- Middle of Funnel — AI System with mesh/grid pattern -->
+  <g class="funnel-part funnel-mid">
+    <path d="M160,248 L360,248 L320,370 L200,370 Z" fill="url(#funnelGrad2)" filter="url(#glowMid)"/>
+    <!-- Grid/mesh lines to represent AI filtering -->
+    <g stroke="#fff" stroke-width="0.6" opacity="0.35">
+      <line x1="175" y1="265" x2="345" y2="265"/>
+      <line x1="180" y1="282" x2="340" y2="282"/>
+      <line x1="188" y1="299" x2="332" y2="299"/>
+      <line x1="195" y1="316" x2="325" y2="316"/>
+      <line x1="202" y1="333" x2="318" y2="333"/>
+      <line x1="209" y1="350" x2="311" y2="350"/>
+      <!-- Vertical mesh -->
+      <line x1="220" y1="251" x2="235" y2="367"/>
+      <line x1="260" y1="248" x2="260" y2="370"/>
+      <line x1="300" y1="251" x2="285" y2="367"/>
+    </g>
+    <!-- Glow effect on mesh center -->
+    <ellipse cx="260" cy="310" rx="50" ry="30" fill="#fff" opacity="0.08"/>
+    <title>Middle of Funnel：AI 自動化知識庫篩選系統</title>
+  </g>
+
+  <!-- Arrow between mid and bottom -->
+  <g class="arrow-line" style="animation-delay:0.7s">
+    <line x1="260" y1="372" x2="260" y2="388" stroke="#94a3b8" stroke-width="1.5"/>
+    <polygon points="253,386 260,394 267,386" fill="#94a3b8"/>
+  </g>
+
+  <!-- Bottom of Funnel — narrow output -->
+  <g class="funnel-part funnel-bot">
+    <path d="M200,398 L320,398 L300,448 L220,448 Z" fill="url(#funnelGrad3)"/>
+    <title>Bottom of Funnel：成功擋掉 80% 的繁瑣訊息</title>
+  </g>
+
+  <!-- Checkmarks row below funnel -->
+  <g class="check-row">
+    <circle cx="232" cy="472" r="12" fill="#22c55e" opacity="0.85"/>
+    <text x="232" y="477" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">✓</text>
+    <circle cx="260" cy="472" r="12" fill="#22c55e" opacity="0.85"/>
+    <text x="260" y="477" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">✓</text>
+    <circle cx="288" cy="472" r="12" fill="#22c55e" opacity="0.85"/>
+    <text x="288" y="477" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">✓</text>
+
+    <circle cx="240" cy="498" r="12" fill="#22c55e" opacity="0.85"/>
+    <text x="240" y="503" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">✓</text>
+    <circle cx="268" cy="498" r="12" fill="#22c55e" opacity="0.85"/>
+    <text x="268" y="503" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">✓</text>
+  </g>
+
+  <!-- ═══ Right-side Labels ═══ -->
+  <!-- Top of Funnel label -->
+  <g class="label-group" style="animation-delay:0.8s">
+    <line x1="398" y1="140" x2="440" y2="140" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="450" y="135" font-size="16" font-weight="700" fill="#1e293b">Top of Funnel：</text>
+    <text x="450" y="158" font-size="15" font-weight="400" fill="#475569">100 條高頻重複詢問。</text>
+  </g>
+
+  <!-- Middle of Funnel label -->
+  <g class="label-group" style="animation-delay:1s">
+    <line x1="360" y1="300" x2="440" y2="290" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="450" y="278" font-size="16" font-weight="700" fill="#1e293b">Middle of Funnel / AI System：</text>
+    <text x="450" y="301" font-size="14" font-weight="400" fill="#475569">建立自動化知識庫 —— 將 QA 餵給 AI，由</text>
+    <text x="450" y="322" font-size="14" font-weight="400" fill="#475569">AI 撰寫「如何使用 AI 的 SOP」。</text>
+  </g>
+
+  <!-- Bottom of Funnel label -->
+  <g class="label-group" style="animation-delay:1.2s">
+    <line x1="320" y1="440" x2="440" y2="440" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="450" y="432" font-size="16" font-weight="700" fill="#1e293b">Bottom of Funnel：</text>
+    <text x="450" y="455" font-size="15" font-weight="400" fill="#475569">成功擋掉 80% 的繁瑣訊息。</text>
+  </g>
+
+  <!-- ═══ Quote Box (右下) ═══ -->
+  <g class="quote-box">
+    <rect x="660" y="370" width="268" height="140" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <!-- Quote mark -->
+    <text x="685" y="405" font-size="36" font-weight="800" fill="#6366f1" opacity="0.7">❝</text>
+    <!-- Core Philosophy -->
+    <text x="685" y="430" font-size="14" font-weight="700" fill="#1e293b">Core Philosophy：</text>
+    <text x="685" y="452" font-size="13" font-weight="400" fill="#475569" line-height="1.5">AI 不是讓你做更多事，而</text>
+    <text x="685" y="471" font-size="13" font-weight="400" fill="#475569">是保護你的注意力，專注</text>
+    <text x="685" y="490" font-size="13" font-weight="400" fill="#475569">於「決策價值」。</text>
+  </g>
+
+  <!-- ═══ Source ═══ -->
+  <g class="source-link">
+    <text x="480" y="530" text-anchor="middle" font-size="11" fill="#94a3b8">
+      素材來源：教學簡報 — 營運防護罩概念圖（2026）
+    </text>
+  </g>
+</svg>

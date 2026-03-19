@@ -4,23 +4,23 @@
    ======================================== */
 :root {
     --ix-bg: #ffffff;
-    --ix-bg-subtle: #f8fafc;
+    --ix-bg-subtle: #f8f9fa;
     --ix-border: #e5e7eb;
-    --ix-border-focus: #6366f1;
+    --ix-border-focus: #1a73e8;
     --ix-radius: 14px;
     --ix-radius-sm: 8px;
     --ix-radius-full: 9999px;
     --ix-text: #1f2937;
-    --ix-text-muted: #6b7280;
-    --ix-text-light: #9ca3af;
-    --ix-primary: #6366f1;
-    --ix-primary-light: #818cf8;
-    --ix-primary-bg: rgba(99, 102, 241, 0.08);
-    --ix-success: #10b981;
+    --ix-text-muted: #5f6368;
+    --ix-text-light: #80868b;
+    --ix-primary: #1a73e8;
+    --ix-primary-light: #4285f4;
+    --ix-primary-bg: rgba(26, 115, 232, 0.08);
+    --ix-success: #1e8e3e;
     --ix-success-bg: rgba(16, 185, 129, 0.08);
     --ix-danger: #f43f5e;
     --ix-danger-bg: rgba(244, 63, 94, 0.08);
-    --ix-warning: #f59e0b;
+    --ix-warning: #f9ab00;
     --ix-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
     --ix-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     --ix-font: inherit;
@@ -188,7 +188,7 @@
     appearance: none;
     height: 6px;
     border-radius: 3px;
-    background: linear-gradient(90deg, #e0e7ff, var(--ix-primary));
+    background: linear-gradient(90deg, #d2e3fc, var(--ix-primary));
 }
 
 .scale-range::-webkit-slider-thumb {
@@ -199,7 +199,7 @@
     border-radius: 50%;
     background: var(--ix-primary);
     border: 3px solid white;
-    box-shadow: 0 1px 6px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 1px 6px rgba(26, 115, 232, 0.3);
     cursor: pointer;
 }
 
@@ -649,7 +649,7 @@
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    color: #6b7280;
+    color: #5f6368;
     flex: 1;
     cursor: pointer;
 }
@@ -664,7 +664,7 @@
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: #9ca3af;
+    color: #80868b;
     cursor: pointer;
     font-size: 14px;
     display: flex;
@@ -673,7 +673,7 @@
 }
 
 .hs-node-delete:hover {
-    background: #fef2f2;
+    background: #fce8e6;
     color: var(--ix-danger);
 }
 
@@ -1052,7 +1052,7 @@
     border: none;
     border-radius: 8px;
     background: transparent;
-    color: #94a3b8;
+    color: #80868b;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1061,8 +1061,8 @@
 }
 
 .doc-viewer-close-btn:hover {
-    background: #f1f5f9;
-    color: #334155;
+    background: #f1f3f4;
+    color: #1f1f1f;
 }
 
 .doc-viewer-body {
@@ -1075,7 +1075,7 @@
 .doc-viewer-content {
     font-size: 0.92rem;
     line-height: 1.75;
-    color: #1e293b;
+    color: #1f1f1f;
     word-break: break-word;
 }
 
@@ -1084,7 +1084,7 @@
     font-weight: 700;
     margin: 0 0 16px;
     color: #0f172a;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid #dadce0;
     padding-bottom: 10px;
 }
 
@@ -1092,21 +1092,21 @@
     font-size: 1.3rem;
     font-weight: 600;
     margin: 28px 0 12px;
-    color: #1e293b;
+    color: #1f1f1f;
 }
 
 .doc-viewer-content h3 {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 20px 0 8px;
-    color: #334155;
+    color: #1f1f1f;
 }
 
 .doc-viewer-content h4 {
     font-size: 1rem;
     font-weight: 600;
     margin: 16px 0 6px;
-    color: #475569;
+    color: #444746;
 }
 
 .doc-viewer-content p {
@@ -1133,7 +1133,7 @@
 }
 
 .doc-viewer-content code {
-    background: #f1f5f9;
+    background: #f1f3f4;
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Fira Code', monospace;
@@ -1142,8 +1142,8 @@
 }
 
 .doc-viewer-content pre {
-    background: #1e293b;
-    color: #e2e8f0;
+    background: #1f1f1f;
+    color: #dadce0;
     padding: 16px 20px;
     border-radius: 10px;
     overflow-x: auto;
@@ -1170,7 +1170,7 @@
 
 .doc-viewer-content hr {
     border: none;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid #dadce0;
     margin: 20px 0;
 }
 
@@ -1183,18 +1183,18 @@
 .doc-viewer-content th,
 .doc-viewer-content td {
     padding: 8px 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #dadce0;
     text-align: left;
 }
 
 .doc-viewer-content th {
-    background: #f8fafc;
+    background: #f8f9fa;
     font-weight: 600;
 }
 
 /* ── Card hover effect ── */
 .document-card-container:hover {
-    transform: translateY(-2px);
+    
     box-shadow: 0 6px 20px rgba(2, 132, 199, 0.15);
 }
 

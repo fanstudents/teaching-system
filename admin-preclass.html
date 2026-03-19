@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課前設定 — 教學系統</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet">
@@ -30,7 +30,7 @@
         }
 
         .manage-item.drag-over {
-            border-top: 2.5px solid #6366f1;
+            border-top: 2.5px solid #1a73e8;
         }
 
         .drag-handle {
@@ -42,7 +42,7 @@
         }
 
         .drag-handle:hover {
-            color: #6366f1;
+            color: #1a73e8;
         }
 
         /* ── Login Field Chips ── */
@@ -51,28 +51,28 @@
             align-items: center;
             gap: 6px;
             padding: 6px 14px;
-            border: 1.5px solid #e2e8f0;
+            border: 1.5px solid #dadce0;
             border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 500;
-            color: #475569;
+            color: #444746;
             cursor: pointer;
             transition: all 0.15s;
             user-select: none;
         }
 
         .field-chip:hover {
-            border-color: #94a3b8;
+            border-color: #80868b;
         }
 
         .field-chip:has(input:checked) {
-            border-color: #6366f1;
-            background: #eef2ff;
+            border-color: #1a73e8;
+            background: #e8f0fe;
             color: #4338ca;
         }
 
         .field-chip input {
-            accent-color: #6366f1;
+            accent-color: #1a73e8;
         }
 
         .custom-field-row {
@@ -80,22 +80,22 @@
             align-items: center;
             gap: 8px;
             padding: 6px 10px;
-            background: #f8fafc;
+            background: #f8f9fa;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
         }
 
         .custom-field-row .field-name {
             flex: 1;
             font-size: 0.85rem;
             font-weight: 500;
-            color: #334155;
+            color: #1f1f1f;
         }
 
         .custom-field-row .remove-btn {
             background: none;
             border: none;
-            color: #94a3b8;
+            color: #80868b;
             cursor: pointer;
             font-size: 18px;
             padding: 0;
@@ -104,14 +104,14 @@
         }
 
         .custom-field-row .remove-btn:hover {
-            color: #ef4444;
+            color: #d93025;
         }
 
         /* ── Section Cards ── */
         .setup-section {
             background: #fff;
             border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             padding: 24px 28px;
             margin-bottom: 20px;
         }
@@ -135,7 +135,7 @@
 
         .setup-section-title .material-symbols-rounded {
             font-size: 20px;
-            color: #6366f1;
+            color: #1a73e8;
         }
 
         /* ── Inline field groups ── */
@@ -154,7 +154,7 @@
             display: block;
             font-size: 0.78rem;
             font-weight: 600;
-            color: #64748b;
+            color: #444746;
             margin-bottom: 4px;
         }
 
@@ -162,7 +162,7 @@
         .field-textarea {
             width: 100%;
             padding: 9px 12px;
-            border: 1.5px solid #e2e8f0;
+            border: 1.5px solid #dadce0;
             border-radius: 8px;
             font-size: 0.88rem;
             font-family: inherit;
@@ -173,7 +173,7 @@
 
         .field-input:focus,
         .field-textarea:focus {
-            border-color: #6366f1;
+            border-color: #1a73e8;
         }
 
         .field-textarea {
@@ -183,7 +183,7 @@
 
         .save-indicator {
             font-size: 0.78rem;
-            color: #22c55e;
+            color: #1e8e3e;
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -221,20 +221,20 @@
                     <span class="material-symbols-rounded" style="font-size:16px;">link</span> 學生入口連結
                 </div>
                 <div id="shareLinkWithSession" style="display:none;margin-bottom:8px;">
-                    <div style="font-size:0.75rem;color:#64748b;margin-bottom:3px;">🔗 含場次代碼（學生不需手動輸入）</div>
+                    <div style="font-size:0.75rem;color:#444746;margin-bottom:3px;">🔗 含場次代碼（學生不需手動輸入）</div>
                     <div style="display:flex;align-items:center;gap:6px;">
                         <input type="text" id="shareLinkInputSession" readonly
-                            style="flex:1;min-width:200px;padding:6px 10px;border:1px solid #d0e1ff;border-radius:6px;font-size:0.78rem;color:#1e293b;background:#fff;font-family:'SF Mono','Fira Code',monospace;">
+                            style="flex:1;min-width:200px;padding:6px 10px;border:1px solid #d0e1ff;border-radius:6px;font-size:0.78rem;color:#1f1f1f;background:#fff;font-family:'SF Mono','Fira Code',monospace;">
                         <button class="btn btn-sm btn-primary" onclick="copyLink('shareLinkInputSession', this)">
                             <span class="material-symbols-rounded" style="font-size:16px;">content_copy</span> 複製
                         </button>
                     </div>
                 </div>
                 <div>
-                    <div style="font-size:0.75rem;color:#64748b;margin-bottom:3px;">🌐 通用連結（學生需自行輸入場次代碼）</div>
+                    <div style="font-size:0.75rem;color:#444746;margin-bottom:3px;">🌐 通用連結（學生需自行輸入場次代碼）</div>
                     <div style="display:flex;align-items:center;gap:6px;">
                         <input type="text" id="shareLinkInputGeneral" readonly
-                            style="flex:1;min-width:200px;padding:6px 10px;border:1px solid #d0e1ff;border-radius:6px;font-size:0.78rem;color:#1e293b;background:#fff;font-family:'SF Mono','Fira Code',monospace;">
+                            style="flex:1;min-width:200px;padding:6px 10px;border:1px solid #d0e1ff;border-radius:6px;font-size:0.78rem;color:#1f1f1f;background:#fff;font-family:'SF Mono','Fira Code',monospace;">
                         <button class="btn btn-sm btn-outline" onclick="copyLink('shareLinkInputGeneral', this)">
                             <span class="material-symbols-rounded" style="font-size:16px;">content_copy</span> 複製
                         </button>
@@ -251,7 +251,7 @@
                     </div>
                     <span class="save-indicator" id="loginFieldsSaveStatus">✓ 已儲存</span>
                 </div>
-                <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+                <p style="font-size:0.82rem;color:#444746;margin-bottom:12px;">
                     Email、姓名、場次代碼為必填，以下為可選欄位（勾選後學員登入時需額外填寫）
                 </p>
                 <div id="loginFieldsConfig" style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -263,7 +263,7 @@
                     </label>
                 </div>
                 <div style="margin-top:14px;border-top:1px solid #f0f2f5;padding-top:14px;">
-                    <p style="font-size:0.82rem;color:#64748b;margin-bottom:8px;">自訂欄位</p>
+                    <p style="font-size:0.82rem;color:#444746;margin-bottom:8px;">自訂欄位</p>
                     <div id="customFieldsList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                     </div>
                     <div style="display:flex;gap:6px;">
@@ -284,11 +284,11 @@
                     </div>
                     <span class="save-indicator" id="heroImageSaveStatus">✓ 已儲存</span>
                 </div>
-                <p style="font-size:0.82rem;color:#64748b;margin-bottom:12px;">
+                <p style="font-size:0.82rem;color:#444746;margin-bottom:12px;">
                     建議尺寸 1200×620px，學生登入頁面會顯示此圖片（非必填）
                 </p>
                 <div id="heroImagePreview"
-                    style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+                    style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;border:1px solid #dadce0;">
                     <img id="heroImageImg" style="width:100%;height:auto;display:block;" alt="主視覺">
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;">
@@ -298,7 +298,7 @@
                         <span class="material-symbols-rounded" style="font-size:16px;">upload</span> 上傳
                         <input type="file" id="heroImageUpload" accept="image/*" style="display:none;">
                     </label>
-                    <button class="btn btn-sm btn-outline" id="heroImageClear" style="color:#ef4444;" title="清除">
+                    <button class="btn btn-sm btn-outline" id="heroImageClear" style="color:#d93025;" title="清除">
                         <span class="material-symbols-rounded" style="font-size:16px;">delete</span>
                     </button>
                 </div>
@@ -341,7 +341,7 @@
                         <label class="field-label">群組圖示 Icon（選填）</label>
                         <div style="display:flex;gap:8px;align-items:center;">
                             <div id="groupIconPreview"
-                                style="display:none;width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid #e2e8f0;flex-shrink:0;">
+                                style="display:none;width:32px;height:32px;border-radius:50%;overflow:hidden;border:1.5px solid #dadce0;flex-shrink:0;">
                                 <img id="groupIconImg" style="width:100%;height:100%;object-fit:cover;" alt="icon">
                             </div>
                             <input class="field-input" type="url" id="fieldGroupIconUrl" placeholder="貼上圖片 URL 或上傳"
@@ -389,11 +389,11 @@
             <!-- ═══════ 填答結果（連結到儀表板） ═══════ -->
             <div class="setup-section" style="text-align:center;padding:24px;">
                 <a id="dashboardLink" href="#" target="_blank"
-                    style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#6366f1;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.9rem;transition:background 0.15s;">
+                    style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#1a73e8;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.9rem;transition:background 0.15s;">
                     <span class="material-symbols-rounded" style="font-size:20px;">bar_chart</span>
                     查看課前統計儀表板
                 </a>
-                <p style="margin-top:10px;font-size:0.78rem;color:#94a3b8;">查看學員報到、課前事項勾選、問卷填答的統計與明細</p>
+                <p style="margin-top:10px;font-size:0.78rem;color:#80868b;">查看學員報到、課前事項勾選、問卷填答的統計與明細</p>
             </div>
         </div>
 
@@ -410,7 +410,7 @@
                     <label>圖示 Logo（選填，取代編號）</label>
                     <div style="display:flex;gap:8px;align-items:center;">
                         <div id="checklistIconPreview"
-                            style="display:none;width:36px;height:36px;border-radius:50%;overflow:hidden;border:1.5px solid #e2e8f0;flex-shrink:0;">
+                            style="display:none;width:36px;height:36px;border-radius:50%;overflow:hidden;border:1.5px solid #dadce0;flex-shrink:0;">
                             <img id="checklistIconImg" style="width:100%;height:100%;object-fit:cover;" alt="icon">
                         </div>
                         <input type="url" class="field-input" id="checklistIconUrl" placeholder="貼上圖片 URL 或上傳"
@@ -421,7 +421,7 @@
                                 onchange="uploadChecklistIcon(event)">
                         </label>
                         <button type="button" class="btn btn-sm btn-outline" onclick="clearChecklistIcon()"
-                            style="color:#ef4444;padding:5px 6px;" title="清除">
+                            style="color:#d93025;padding:5px 6px;" title="清除">
                             <span class="material-symbols-rounded" style="font-size:16px;">close</span>
                         </button>
                     </div>
@@ -464,11 +464,11 @@
                     <label>選項</label>
                     <div id="optionsEditor">
                         <div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle"
-                                style="font-size:16px;cursor:grab;color:#9ca3af;">drag_indicator</span><input
+                                style="font-size:16px;cursor:grab;color:#80868b;">drag_indicator</span><input
                                 type="text" class="opt-input" placeholder="選項 1"><button type="button" class="opt-del"
                                 onclick="removeOption(this)" title="刪除">✕</button></div>
                         <div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle"
-                                style="font-size:16px;cursor:grab;color:#9ca3af;">drag_indicator</span><input
+                                style="font-size:16px;cursor:grab;color:#80868b;">drag_indicator</span><input
                                 type="text" class="opt-input" placeholder="選項 2"><button type="button" class="opt-del"
                                 onclick="removeOption(this)" title="刪除">✕</button></div>
                     </div>
@@ -649,7 +649,7 @@
             });
             // Show warning if no session (fields visible but can't save)
             if (!sessionId) {
-                const warn = '<p style="font-size:0.78rem;color:#d97706;margin-bottom:8px;">⚠️ 未偵測到場次參數，填寫後無法自動儲存。請從專案管理的場次進入此頁面。</p>';
+                const warn = '<p style="font-size:0.78rem;color:#e37400;margin-bottom:8px;">⚠️ 未偵測到場次參數，填寫後無法自動儲存。請從專案管理的場次進入此頁面。</p>';
                 document.getElementById('sessionInfoSection').insertAdjacentHTML('afterbegin', warn);
                 document.getElementById('heroImageSection').insertAdjacentHTML('afterbegin', warn);
             }
@@ -751,7 +751,7 @@
                 if (!text) return '';
                 // Convert markdown-style [text](url) to <a> tags
                 return text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
-                    '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#6366f1;text-decoration:underline;">$1</a>');
+                    '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#1a73e8;text-decoration:underline;">$1</a>');
             }
 
             window.insertLink = function () {
@@ -864,7 +864,7 @@
                 <li class="manage-item" draggable="true" data-id="${item.id}">
                     <span class="material-symbols-rounded drag-handle">drag_indicator</span>
                     ${item.icon_url
-                        ? `<img src="${item.icon_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #e2e8f0;">`
+                        ? `<img src="${item.icon_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid #dadce0;">`
                         : `<span class="item-order">${i + 1}</span>`}
                     <div class="item-info">
                         <div class="item-title">${item.title}</div>
@@ -1106,7 +1106,7 @@
 
             function _optRowHtml(value, num) {
                 const escaped = (value || '').replace(/"/g, '&quot;');
-                return `<div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle" style="font-size:16px;cursor:grab;color:#9ca3af;">drag_indicator</span><input type="text" class="opt-input" placeholder="選項 ${num}" value="${escaped}"><button type="button" class="opt-del" onclick="removeOption(this)" title="刪除">✕</button></div>`;
+                return `<div class="option-row" draggable="true"><span class="material-symbols-rounded drag-handle" style="font-size:16px;cursor:grab;color:#80868b;">drag_indicator</span><input type="text" class="opt-input" placeholder="選項 ${num}" value="${escaped}"><button type="button" class="opt-del" onclick="removeOption(this)" title="刪除">✕</button></div>`;
             }
 
             window.addOption = function () {

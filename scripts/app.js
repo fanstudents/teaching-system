@@ -309,7 +309,7 @@ class App {
                     const allChip = Object.assign(document.createElement('span'), {
                         textContent: '全部',
                         style: 'padding:3px 10px;border-radius:12px;font-size:0.72rem;cursor:pointer;' +
-                            (_activeTag === '' ? 'background:#eef2ff;color:#6366f1;border:1px solid #c7d2fe;' : 'background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')
+                            (_activeTag === '' ? 'background:#e8f0fe;color:#1a73e8;border:1px solid #a8c7fa;' : 'background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')
                     });
                     allChip.onclick = () => { _activeTag = ''; renderAssetGrid(); };
                     tagsEl.appendChild(allChip);
@@ -317,7 +317,7 @@ class App {
                         const chip = Object.assign(document.createElement('span'), {
                             textContent: tag,
                             style: 'padding:3px 10px;border-radius:12px;font-size:0.72rem;cursor:pointer;' +
-                                (_activeTag === tag ? 'background:#eef2ff;color:#6366f1;border:1px solid #c7d2fe;' : 'background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')
+                                (_activeTag === tag ? 'background:#e8f0fe;color:#1a73e8;border:1px solid #a8c7fa;' : 'background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')
                         });
                         chip.onclick = () => { _activeTag = tag; renderAssetGrid(); };
                         tagsEl.appendChild(chip);
@@ -902,8 +902,8 @@ ${slideContents}
             // 背景漸層裝飾色塊（深色底 + 幾何裝飾）
             elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 540, background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%)' });
             // 頂部裝飾線
-            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 80, height: 4, background: '#818cf8' });
-            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 4, height: 30, background: '#818cf8' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 80, height: 4, background: '#4285f4' });
+            elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 50, width: 4, height: 30, background: '#4285f4' });
             // 左下裝飾
             elements.push({ id: gen(), type: 'shape', shapeType: 'circle', x: 30, y: 400, width: 100, height: 100, background: 'rgba(99,102,241,0.1)' });
 
@@ -944,7 +944,7 @@ ${slideContents}
             if (subtitle) {
                 elements.push({
                     id: gen(), type: 'text', x: 60, y: 180, width: 520, height: 35,
-                    content: `<span style="font-size:20px;color:#a5b4fc;">${subtitle}</span>`,
+                    content: `<span style="font-size:20px;color:#8ab4f8;">${subtitle}</span>`,
                     fontSize: 20, textAlign: 'left'
                 });
             }
@@ -956,19 +956,19 @@ ${slideContents}
             // Wi-Fi 圖標 + 標題
             elements.push({
                 id: gen(), type: 'text', x: 80, y: yWifi + 12, width: 460, height: 30,
-                content: `<span style="font-size:14px;color:#818cf8;">📶 Wi-Fi 連線資訊</span>`,
+                content: `<span style="font-size:14px;color:#4285f4;">📶 Wi-Fi 連線資訊</span>`,
                 fontSize: 14
             });
             // SSID
             elements.push({
                 id: gen(), type: 'text', x: 80, y: yWifi + 42, width: 460, height: 26,
-                content: `<span style="font-size:16px;color:#e0e7ff;">名稱：<b style="color:#fff;">${wifi || '（請查看現場公告）'}</b></span>`,
+                content: `<span style="font-size:16px;color:#d2e3fc;">名稱：<b style="color:#fff;">${wifi || '（請查看現場公告）'}</b></span>`,
                 fontSize: 16
             });
             // 密碼
             elements.push({
                 id: gen(), type: 'text', x: 80, y: yWifi + 70, width: 460, height: 26,
-                content: `<span style="font-size:16px;color:#e0e7ff;">密碼：<b style="color:#fff;">${password || '（請查看現場公告）'}</b></span>`,
+                content: `<span style="font-size:16px;color:#d2e3fc;">密碼：<b style="color:#fff;">${password || '（請查看現場公告）'}</b></span>`,
                 fontSize: 16
             });
 
@@ -987,7 +987,7 @@ ${slideContents}
                     const textX = avatarSrc ? 135 : 75;
                     elements.push({
                         id: gen(), type: 'text', x: textX, y: yInst + 8, width: 170, height: 22,
-                        content: `<span style="font-size:10px;color:#818cf8;">講師</span>`,
+                        content: `<span style="font-size:10px;color:#4285f4;">講師</span>`,
                         fontSize: 10
                     });
                     elements.push({
@@ -1926,7 +1926,7 @@ ${slideContents}
                                     font-size:0.85rem;font-family:monospace;background:#f8f9fa;color:#334155;
                                 ">
                                 <button id="copyDirectBtn" style="
-                                    padding:9px 16px;background:#6366f1;
+                                    padding:9px 16px;background:#1a73e8;
                                     color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;
                                     font-size:0.85rem;white-space:nowrap;
                                 ">複製</button>
@@ -2373,9 +2373,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             for (let i = 1; i <= 3; i++) {
                 const dot = document.getElementById(`aiPhase${i}`);
                 if (i < phase || (i === phase && step === 'done')) {
-                    dot.style.background = '#6366f1'; dot.style.color = '#fff';
+                    dot.style.background = '#1a73e8'; dot.style.color = '#fff';
                 } else if (i === phase) {
-                    dot.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6)'; dot.style.color = '#fff';
+                    dot.style.background = 'linear-gradient(135deg,#1a73e8,#4285f4)'; dot.style.color = '#fff';
                 } else {
                     dot.style.background = '#e2e8f0'; dot.style.color = '#94a3b8';
                 }
@@ -2651,11 +2651,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         grid.querySelectorAll('.ai-theme-card').forEach(card => {
             card.addEventListener('click', () => {
                 grid.querySelectorAll('.ai-theme-card').forEach(c => c.style.borderColor = '#e2e8f0');
-                card.style.borderColor = '#6366f1';
+                card.style.borderColor = '#1a73e8';
                 selectedTheme = card.dataset.theme;
             });
         });
-        grid.querySelector('.ai-theme-card').style.borderColor = '#6366f1';
+        grid.querySelector('.ai-theme-card').style.borderColor = '#1a73e8';
         this._selectedDesignTheme = () => selectedTheme;
 
         // Load prompt
@@ -2857,7 +2857,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 let detail = '';
                 if (s.distribution) {
                     detail = Object.entries(s.distribution).map(([k, v]) =>
-                        `<span style="background:#e0e7ff;padding:2px 8px;border-radius:4px;margin:2px;">${k}: ${v}</span>`
+                        `<span style="background:#d2e3fc;padding:2px 8px;border-radius:4px;margin:2px;">${k}: ${v}</span>`
                     ).join(' ');
                 } else {
                     detail = `<span style="color:#94a3b8;">${s.totalResponses} 則文字回覆</span>`;
@@ -3017,7 +3017,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 'qa-page': '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;"><div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.35);">Q&A</div><div style="width:40%;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;"></div></div>',
                 'end-page': '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;"><div style="width:40%;height:5px;background:rgba(255,255,255,0.3);border-radius:2px;"></div><div style="width:25px;height:1px;background:rgba(255,255,255,0.1);"></div><div style="width:30%;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;"></div></div>',
                 // 結構
-                'timeline': '<div style="padding:6px 12px;display:flex;height:100%;"><div style="width:2px;background:#e2e8f0;margin:4px 6px 4px 8px;"></div><div style="flex:1;display:flex;flex-direction:column;gap:4px;justify-content:center;"><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;"></div><div style="width:60%;height:2px;background:#1e293b;opacity:0.12;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;flex-shrink:0;"></div><div style="width:50%;height:2px;background:#1e293b;opacity:0.1;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#059669;flex-shrink:0;"></div><div style="width:55%;height:2px;background:#1e293b;opacity:0.08;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#d97706;flex-shrink:0;"></div><div style="width:45%;height:2px;background:#1e293b;opacity:0.06;border-radius:2px;"></div></div></div></div>',
+                'timeline': '<div style="padding:6px 12px;display:flex;height:100%;"><div style="width:2px;background:#e2e8f0;margin:4px 6px 4px 8px;"></div><div style="flex:1;display:flex;flex-direction:column;gap:4px;justify-content:center;"><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#1a73e8;flex-shrink:0;"></div><div style="width:60%;height:2px;background:#1e293b;opacity:0.12;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#4285f4;flex-shrink:0;"></div><div style="width:50%;height:2px;background:#1e293b;opacity:0.1;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#059669;flex-shrink:0;"></div><div style="width:55%;height:2px;background:#1e293b;opacity:0.08;border-radius:2px;"></div></div><div style="display:flex;align-items:center;gap:3px;"><div style="width:6px;height:6px;border-radius:50%;background:#d97706;flex-shrink:0;"></div><div style="width:45%;height:2px;background:#1e293b;opacity:0.06;border-radius:2px;"></div></div></div></div>',
                 'comparison': '<div style="padding:6px 10px;display:flex;gap:4px;height:100%;align-items:center;"><div style="flex:1;background:#fef2f2;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#dc2626;opacity:0.5;">close</span><div style="width:50%;height:2px;background:#991b1b;opacity:0.08;border-radius:2px;"></div></div><span style="font-size:7px;color:#bbb;">VS</span><div style="flex:1;background:#ecfdf5;border-radius:4px;height:80%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span class="material-symbols-outlined" style="font-size:10px;color:#059669;opacity:0.5;">check_circle</span><div style="width:50%;height:2px;background:#065f46;opacity:0.08;border-radius:2px;"></div></div></div>',
                 'stats': '<div style="padding:6px 10px;display:flex;flex-direction:column;gap:4px;height:100%;"><div style="width:40%;height:3px;background:#1e293b;opacity:0.25;border-radius:2px;"></div><div style="display:flex;gap:3px;flex:1;"><div style="flex:1;background:#eff6ff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#2563eb;opacity:0.5;">95%</div><div style="flex:1;background:#ecfdf5;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#059669;opacity:0.5;">3.2x</div><div style="flex:1;background:#fefce8;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#d97706;opacity:0.5;">4.8</div></div></div>',
                 'flow': '<div style="padding:10px 10px;display:flex;gap:2px;height:100%;align-items:center;"><div style="flex:1;background:#eff6ff;border-radius:3px;height:50%;"></div><span class="material-symbols-outlined" style="font-size:8px;color:#cbd5e1;">arrow_forward</span><div style="flex:1;background:#ecfdf5;border-radius:3px;height:50%;"></div><span class="material-symbols-outlined" style="font-size:8px;color:#cbd5e1;">arrow_forward</span><div style="flex:1;background:#fefce8;border-radius:3px;height:50%;"></div><span class="material-symbols-outlined" style="font-size:8px;color:#cbd5e1;">arrow_forward</span><div style="flex:1;background:#fce7f3;border-radius:3px;height:50%;"></div></div>',
@@ -4208,7 +4208,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             qrEl.id = 'presQRCode';
             qrEl.style.cssText = 'position:fixed;bottom:20px;left:20px;z-index:10001;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);opacity:0.85;transition:opacity 0.3s;cursor:pointer;';
             qrEl.innerHTML = `<img src="${qrSrc}" width="100" height="100" style="display:block;border-radius:6px;">
-                <div style="text-align:center;font-size:10px;color:#6366f1;margin-top:4px;font-weight:600;">掃碼互動</div>`;
+                <div style="text-align:center;font-size:10px;color:#1a73e8;margin-top:4px;font-weight:600;">掃碼互動</div>`;
             qrEl.addEventListener('mouseenter', () => qrEl.style.opacity = '1');
             qrEl.addEventListener('mouseleave', () => qrEl.style.opacity = '0.85');
             qrEl.addEventListener('click', () => {
@@ -4274,7 +4274,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!qaBtn) {
             qaBtn = document.createElement('button');
             qaBtn.id = 'presQABtn';
-            qaBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:10001;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;cursor:pointer;font-size:20px;box-shadow:0 4px 16px rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;';
+            qaBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:10001;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#1a73e8,#4285f4);color:white;border:none;cursor:pointer;font-size:20px;box-shadow:0 4px 16px rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;';
             qaBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:24px;">forum</span>';
             qaBtn.addEventListener('click', () => this.toggleQAPanel());
             document.getElementById('presentationMode').appendChild(qaBtn);
@@ -4288,7 +4288,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             panel.style.cssText = 'position:fixed;top:0;right:-380px;width:380px;height:100vh;background:white;z-index:10003;box-shadow:-4px 0 20px rgba(0,0,0,0.1);transition:right 0.3s ease;display:flex;flex-direction:column;';
             panel.innerHTML = `
                 <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">
-                    <div style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">question_answer</span><span style="font-size:16px;font-weight:600;">觀眾提問</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;"><span class="material-symbols-outlined" style="font-size:20px;color:#1a73e8;">question_answer</span><span style="font-size:16px;font-weight:600;">觀眾提問</span></div>
                     <button id="qaCloseBtn" style="background:none;border:none;cursor:pointer;font-size:20px;color:#94a3b8;">✕</button>
                 </div>
                 <div id="qaListContainer" style="flex:1;overflow-y:auto;padding:12px 16px;"></div>`;
@@ -4367,7 +4367,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         ${imageHtml}
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
-                        <span style="display:flex;align-items:center;gap:2px;font-size:12px;color:#6366f1;font-weight:500;cursor:default;"><span class="material-symbols-outlined" style="font-size:14px;">thumb_up</span> ${q.votes}</span>
+                        <span style="display:flex;align-items:center;gap:2px;font-size:12px;color:#1a73e8;font-weight:500;cursor:default;"><span class="material-symbols-outlined" style="font-size:14px;">thumb_up</span> ${q.votes}</span>
                         <button onclick="window.__markQAAnswered('${q.id}')" style="font-size:11px;padding:2px 8px;border-radius:4px;border:1px solid ${q.answered ? '#86efac' : '#cbd5e1'};background:${q.answered ? '#d1fae5' : 'transparent'};color:${q.answered ? '#059669' : '#64748b'};cursor:pointer;">
                             ${q.answered ? '✓ 已解決' : '標記已解決'}
                         </button>
@@ -4439,7 +4439,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             { id: 'q10', type: 'text', text: '給講師的一句話或建議 💬', placeholder: '任何想說的話都可以！' },
         ];
         const ctaCards = tyCfg.ctaCards || [
-            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#1a73e8' },
             { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
             { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL', url: 'https://www.threads.net/', icon: 'share', color: '#10b981' },
         ];
@@ -4459,7 +4459,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 <div style="display:flex;align-items:center;justify-content:between;margin-bottom:24px;">
                     <div style="flex:1;">
                         <h2 style="font-size:1.2rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px;">
-                            <span class="material-symbols-outlined" style="color:#8b5cf6;">rate_review</span>
+                            <span class="material-symbols-outlined" style="color:#4285f4;">rate_review</span>
                             課後問卷設定
                         </h2>
                         <p style="font-size:0.82rem;color:#94a3b8;margin-top:4px;">這些設定會儲存在專案層級，廣播時可透過連結讓學員填寫</p>
@@ -4479,7 +4479,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 <div style="margin-bottom:20px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                         <label style="font-size:13px;font-weight:600;color:#cbd5e1;">問卷題目</label>
-                        <button id="ssAddQ" style="padding:4px 12px;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;">+ 新增題目</button>
+                        <button id="ssAddQ" style="padding:4px 12px;background:#1a73e8;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;">+ 新增題目</button>
                     </div>
                     <div id="ssQuestionList" style="display:flex;flex-direction:column;gap:8px;">
                         ${questions.map((q, i) => this._renderSurveyQuestionRow(q, i)).join('')}
@@ -4509,7 +4509,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 <div style="margin-bottom:16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                         <label style="font-size:13px;font-weight:600;color:#cbd5e1;">CTA 卡片</label>
-                        <button id="ssAddCTA" style="padding:4px 12px;background:#6366f1;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;">+ 新增</button>
+                        <button id="ssAddCTA" style="padding:4px 12px;background:#1a73e8;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;">+ 新增</button>
                     </div>
                     <div id="ssCtaList" style="display:flex;flex-direction:column;gap:8px;">
                         ${ctaCards.map((c, i) => this._renderSurveyCTARow(c, i)).join('')}
@@ -4521,13 +4521,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 <!-- 問卷連結 -->
                 <div style="margin-bottom:20px;padding:12px 16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);border-radius:10px;">
                     <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">問卷連結預覽（廣播後可使用）</div>
-                    <code style="font-size:11px;color:#818cf8;word-break:break-all;">${surveyUrl}</code>
+                    <code style="font-size:11px;color:#4285f4;word-break:break-all;">${surveyUrl}</code>
                 </div>
 
                 <!-- 儲存 -->
                 <div style="display:flex;justify-content:flex-end;gap:10px;">
                     <button class="survey-settings-close" style="padding:8px 20px;background:transparent;border:1px solid #475569;border-radius:8px;color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">取消</button>
-                    <button id="ssSaveBtn" style="padding:8px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">儲存</button>
+                    <button id="ssSaveBtn" style="padding:8px 24px;background:linear-gradient(135deg,#1a73e8,#4285f4);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">儲存</button>
                 </div>
             </div>
         `;
@@ -4552,7 +4552,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // Add CTA
         overlay.querySelector('#ssAddCTA').addEventListener('click', () => {
             const list = overlay.querySelector('#ssCtaList');
-            const newC = { title: '新卡片', desc: '', url: '', icon: 'link', color: '#6366f1' };
+            const newC = { title: '新卡片', desc: '', url: '', icon: 'link', color: '#1a73e8' };
             const div = document.createElement('div');
             div.innerHTML = this._renderSurveyCTARow(newC, list.children.length);
             list.appendChild(div.firstElementChild);
@@ -4587,7 +4587,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     desc: row.querySelector('.ss-cta-desc')?.value || '',
                     url: row.querySelector('.ss-cta-url')?.value || '',
                     icon: row.querySelector('.ss-cta-icon')?.value || 'link',
-                    color: row.querySelector('.ss-cta-color')?.value || '#6366f1',
+                    color: row.querySelector('.ss-cta-color')?.value || '#1a73e8',
                 });
             });
 
@@ -4633,11 +4633,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     _renderSurveyCTARow(c, idx) {
         return `
             <div class="ss-cta-row" style="display:flex;gap:6px;align-items:center;padding:8px 10px;background:#0f172a;border-radius:8px;border:1px solid #334155;">
-                <input class="ss-cta-color" type="color" value="${c.color || '#6366f1'}" style="width:28px;height:28px;border:none;cursor:pointer;border-radius:4px;">
+                <input class="ss-cta-color" type="color" value="${c.color || '#1a73e8'}" style="width:28px;height:28px;border:none;cursor:pointer;border-radius:4px;">
                 <input class="ss-cta-icon" type="text" value="${c.icon || 'link'}" placeholder="icon" style="width:60px;padding:4px 6px;background:#1e293b;border:1px solid #475569;border-radius:4px;color:#e2e8f0;font-size:11px;">
                 <input class="ss-cta-title" type="text" value="${c.title}" placeholder="標題" style="flex:1;padding:6px 8px;background:transparent;border:1px solid #475569;border-radius:4px;color:#e2e8f0;font-size:13px;font-family:inherit;">
                 <input class="ss-cta-desc" type="text" value="${c.desc || ''}" placeholder="說明" style="flex:1;padding:6px 8px;background:transparent;border:1px solid #334155;border-radius:4px;color:#94a3b8;font-size:12px;font-family:inherit;">
-                <input class="ss-cta-url" type="text" value="${c.url || ''}" placeholder="https://..." style="width:140px;padding:6px 8px;background:transparent;border:1px solid #334155;border-radius:4px;color:#818cf8;font-size:11px;font-family:inherit;">
+                <input class="ss-cta-url" type="text" value="${c.url || ''}" placeholder="https://..." style="width:140px;padding:6px 8px;background:transparent;border:1px solid #334155;border-radius:4px;color:#4285f4;font-size:11px;font-family:inherit;">
                 <button class="ss-cta-remove" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:2px;">
                     <span class="material-symbols-outlined" style="font-size:18px;">close</span>
                 </button>
@@ -4812,7 +4812,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         bar.innerHTML = '';
         const total = this.slideManager.slides.length;
         const currentIdx = this.presentationIndex;
-        const colors = ['#6366f1', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0d9488', '#c026d3'];
+        const colors = ['#1a73e8', '#0891b2', '#059669', '#d97706', '#dc2626', '#1a73e8', '#0d9488', '#c026d3'];
 
         // 前綴（section 0 不從 0 開始時）
         if (sections[0].startIndex > 0) {
@@ -5262,7 +5262,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         modal.innerHTML = `
             <div class="shortcuts-card">
                 <h3>
-                    <span class="material-symbols-outlined" style="color:#6366f1;">keyboard</span>
+                    <span class="material-symbols-outlined" style="color:#1a73e8;">keyboard</span>
                     快捷鍵一覽
                 </h3>
                 <div class="shortcut-group">
@@ -5398,7 +5398,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     hasJoin ? '<span style="background:#22c55e30;color:#22c55e;padding:1px 4px;border-radius:3px;font-size:9px;">出席</span>' : '',
                     hasQuiz ? '<span style="background:#3b82f630;color:#3b82f6;padding:1px 4px;border-radius:3px;font-size:9px;">答題</span>' : '',
                     hasHomework ? '<span style="background:#f59e0b30;color:#f59e0b;padding:1px 4px;border-radius:3px;font-size:9px;">作業</span>' : '',
-                    hasSurvey ? '<span style="background:#8b5cf630;color:#8b5cf6;padding:1px 4px;border-radius:3px;font-size:9px;">問卷</span>' : '',
+                    hasSurvey ? '<span style="background:#4285f430;color:#4285f4;padding:1px 4px;border-radius:3px;font-size:9px;">問卷</span>' : '',
                 ].filter(Boolean).join(' ');
 
                 const card = document.createElement('div');
@@ -5506,7 +5506,7 @@ ${surveyAnswers || '（未填寫）'}
                 card.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                         <span style="font-weight:600;font-size:12px;">${stu.name} <span style="color:#64748b;font-size:10px;">${stu.email}</span></span>
-                        <button class="copy-email-btn" style="background:#6366f1;border:none;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">📋</button>
+                        <button class="copy-email-btn" style="background:#1a73e8;border:none;color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">📋</button>
                     </div>
                     <pre style="white-space:pre-wrap;font-size:10px;color:#cbd5e1;line-height:1.5;margin:0;font-family:inherit;max-height:150px;overflow-y:auto;">${emailText}</pre>
                 `;

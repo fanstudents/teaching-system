@@ -681,9 +681,9 @@ export class DragDrop {
                 const line = document.createElement('div');
                 line.className = 'snap-guide';
                 if (g.type === 'v') {
-                    line.style.cssText = `position:absolute;left:${g.pos}px;top:0;width:0;height:100%;border-left:1px dashed #6366f1;z-index:9999;pointer-events:none;opacity:0.8;`;
+                    line.style.cssText = `position:absolute;left:${g.pos}px;top:0;width:0;height:100%;border-left:1px dashed #1a73e8;z-index:9999;pointer-events:none;opacity:0.8;`;
                 } else {
-                    line.style.cssText = `position:absolute;top:${g.pos}px;left:0;width:100%;height:0;border-top:1px dashed #6366f1;z-index:9999;pointer-events:none;opacity:0.8;`;
+                    line.style.cssText = `position:absolute;top:${g.pos}px;left:0;width:100%;height:0;border-top:1px dashed #1a73e8;z-index:9999;pointer-events:none;opacity:0.8;`;
                 }
                 canvas.appendChild(line);
             });

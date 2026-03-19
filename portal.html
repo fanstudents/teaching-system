@@ -13,7 +13,7 @@
     <meta property="og:image" content="https://tbr.digital/og-image.png">
     <meta property="og:url" content="https://tbr.digital">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -114,7 +114,7 @@
             <!-- 課程資訊 -->
             <div class="section-card" id="courseInfoSection">
                 <div class="section-header">
-                    <div class="section-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#1a73e8,#4285f4);">
                         <span class="material-symbols-outlined">info</span>
                     </div>
                     <h2 class="section-title">課程資訊</h2>
@@ -167,7 +167,7 @@
             <!-- 課前準備清單 -->
             <div class="section-card collapsible" id="checklistSection">
                 <div class="section-header" onclick="window.__toggleCollapse('checklistSection')">
-                    <div class="section-icon" style="background:linear-gradient(135deg,#059669,#34d399);">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#188038,#34d399);">
                         <span class="material-symbols-outlined">checklist</span>
                     </div>
                     <h2 class="section-title">課前準備清單</h2>
@@ -194,7 +194,7 @@
             <!-- 課前問卷 -->
             <div class="section-card collapsible" id="surveySection">
                 <div class="section-header" onclick="window.__toggleCollapse('surveySection')">
-                    <div class="section-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#1a73e8,#8ab4f8);">
                         <span class="material-symbols-outlined">quiz</span>
                     </div>
                     <h2 class="section-title">課前問卷</h2>
@@ -212,7 +212,7 @@
             <!-- 溫馨提醒 -->
             <div class="section-card" id="remindersSection" style="display:none;">
                 <div class="section-header">
-                    <div class="section-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#e37400,#fbbf24);">
                         <span class="material-symbols-outlined">emoji_objects</span>
                     </div>
                     <h2 class="section-title">溫馨提醒</h2>
@@ -223,7 +223,7 @@
             <!-- 群組連結 -->
             <div class="section-card" id="groupSection" style="display:none;">
                 <div class="section-header">
-                    <div class="section-icon" style="background:linear-gradient(135deg,#059669,#34d399);">
+                    <div class="section-icon" style="background:linear-gradient(135deg,#188038,#34d399);">
                         <span class="material-symbols-outlined">groups</span>
                     </div>
                     <h2 class="section-title">課程群組</h2>
@@ -518,7 +518,7 @@
             if (config.transportInfo || config.venueAddress || config.venue) {
                 document.getElementById('transportArea').style.display = '';
                 if (config.transportInfo) {
-                    const linkified = config.transportInfo.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#6366f1;text-decoration:underline;">$1</a>');
+                    const linkified = config.transportInfo.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#1a73e8;text-decoration:underline;">$1</a>');
                     document.getElementById('transportContent').innerHTML = linkified;
                 }
                 // Google Maps embed
@@ -584,7 +584,7 @@
         function linkify(text) {
             if (!text) return '';
             return text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
-                '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#6366f1;text-decoration:underline;">$1</a>');
+                '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#1a73e8;text-decoration:underline;">$1</a>');
         }
 
         function renderChecklist() {

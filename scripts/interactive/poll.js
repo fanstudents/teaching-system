@@ -272,7 +272,7 @@ export class PollGame {
             if (!c.querySelector('.poll-reveal-btn')) {
                 const revealBtn = document.createElement('button');
                 revealBtn.className = 'poll-reveal-btn';
-                revealBtn.style.cssText = 'display:block;margin:10px auto 0;padding:8px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;';
+                revealBtn.style.cssText = 'display:block;margin:10px auto 0;padding:8px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#1a73e8,#4285f4);color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;';
                 revealBtn.textContent = '📊 公布結果';
                 revealBtn.addEventListener('click', () => this.revealResults(elementId, sessionCode));
                 c.appendChild(revealBtn);

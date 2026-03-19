@@ -155,16 +155,16 @@ export class SurveyGame {
         // 讀取設定（從元件或專案層級注入）
         const cfg = element.thankYouConfig || {};
         const ctaCards = cfg.ctaCards || [
-            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#1a73e8' },
             { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
             { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL 讓老師看到你的感受！', url: `https://www.threads.net/intent/post?text=${encodeURIComponent('剛上完數位簡報室的課程！收穫滿滿 🎓✨ @TBR.DIGITAL')}`, icon: 'share', color: '#10b981' }
         ];
         const farewell = cfg.farewell || '🙌 歡迎來找老師聊聊天、私下互動<br>或是開心地離開教室，回家注意安全！';
-        const emailNotice = cfg.emailNotice || '我們會在 <strong style="color:#c7d2fe;">課後兩天內</strong>，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬';
+        const emailNotice = cfg.emailNotice || '我們會在 <strong style="color:#a8c7fa;">課後兩天內</strong>，將這堂課的學習筆記整理寄到你的 Email，請務必留意課後信件 📬';
         const sectionTitle = cfg.sectionTitle || '✨ 修完這堂課，你還可以…';
 
         const ctaHtml = ctaCards.map(c => {
-            const bg = c.color || '#6366f1';
+            const bg = c.color || '#1a73e8';
             return `
                 <a href="${c.url || '#'}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:${bg}18;border:1px solid ${bg}40;border-radius:12px;margin-bottom:10px;text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='${bg}30'" onmouseout="this.style.background='${bg}18'">
                     <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,${bg},${bg}cc);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -198,12 +198,12 @@ export class SurveyGame {
 
                 <!-- Email 通知 -->
                 <div style="margin-top:12px;padding:12px 16px;background:rgba(99,102,241,0.06);border-radius:10px;border:1px solid rgba(99,102,241,0.12);display:flex;align-items:flex-start;gap:10px;">
-                    <span class="material-symbols-outlined" style="color:#818cf8;font-size:20px;flex-shrink:0;margin-top:1px;">mail</span>
+                    <span class="material-symbols-outlined" style="color:#4285f4;font-size:20px;flex-shrink:0;margin-top:1px;">mail</span>
                     <div style="font-size:12px;color:#94a3b8;line-height:1.6;">${emailNotice}</div>
                 </div>
                 <!-- 返回修改 -->
                 <div style="margin-top:12px;text-align:center;">
-                    <button class="survey-edit-back-btn" type="button" style="background:none;border:1px solid #475569;color:#94a3b8;border-radius:10px;padding:8px 20px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.borderColor='#818cf8';this.style.color='#c7d2fe'" onmouseout="this.style.borderColor='#475569';this.style.color='#94a3b8'">
+                    <button class="survey-edit-back-btn" type="button" style="background:none;border:1px solid #475569;color:#94a3b8;border-radius:10px;padding:8px 20px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.borderColor='#4285f4';this.style.color='#a8c7fa'" onmouseout="this.style.borderColor='#475569';this.style.color='#94a3b8'">
                         <span class="material-symbols-outlined" style="font-size:16px;">edit_note</span>
                         返回修改問卷
                     </button>

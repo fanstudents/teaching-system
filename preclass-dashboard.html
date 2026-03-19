@@ -7,7 +7,7 @@
     <title>課前統計儀表板 — 數位簡報室</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet">
@@ -38,7 +38,7 @@
 
         .pin-box {
             background: #fff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             border-radius: 16px;
             padding: 40px;
             text-align: center;
@@ -51,8 +51,8 @@
             width: 56px;
             height: 56px;
             border-radius: 16px;
-            background: #eef2ff;
-            color: #6366f1;
+            background: #e8f0fe;
+            color: #1a73e8;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -62,20 +62,20 @@
         .pin-box h2 {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #1e293b;
+            color: #1f1f1f;
             margin-bottom: 6px;
         }
 
         .pin-box p {
             font-size: 0.82rem;
-            color: #94a3b8;
+            color: #80868b;
             margin-bottom: 20px;
         }
 
         .pin-input {
             width: 100%;
             padding: 12px 16px;
-            border: 1.5px solid #e2e8f0;
+            border: 1.5px solid #dadce0;
             border-radius: 10px;
             font-size: 1.2rem;
             font-family: inherit;
@@ -86,11 +86,11 @@
         }
 
         .pin-input:focus {
-            border-color: #6366f1;
+            border-color: #1a73e8;
         }
 
         .pin-input.error {
-            border-color: #ef4444;
+            border-color: #d93025;
             animation: shake 0.3s;
         }
 
@@ -115,7 +115,7 @@
             padding: 11px;
             border: none;
             border-radius: 10px;
-            background: #6366f1;
+            background: #1a73e8;
             color: #fff;
             font-size: 0.9rem;
             font-weight: 600;
@@ -126,12 +126,12 @@
         }
 
         .pin-submit:hover {
-            background: #4f46e5;
+            background: #1765cc;
         }
 
         .pin-error-msg {
             font-size: 0.78rem;
-            color: #ef4444;
+            color: #d93025;
             margin-top: 8px;
             min-height: 1.2em;
         }
@@ -139,7 +139,7 @@
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background: #f6f8fb;
-            color: #1e293b;
+            color: #1f1f1f;
             min-height: 100vh;
         }
 
@@ -150,7 +150,7 @@
             justify-content: space-between;
             padding: 14px 28px;
             background: #fff;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #dadce0;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -166,7 +166,7 @@
         .dash-topbar-left .brand {
             font-weight: 600;
             font-size: 1rem;
-            color: #6366f1;
+            color: #1a73e8;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -174,8 +174,8 @@
 
         .dash-topbar-left .course-name {
             font-size: 0.88rem;
-            color: #64748b;
-            border-left: 1px solid #e2e8f0;
+            color: #444746;
+            border-left: 1px solid #dadce0;
             padding-left: 12px;
         }
 
@@ -191,9 +191,9 @@
             gap: 4px;
             padding: 7px 14px;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             background: #fff;
-            color: #475569;
+            color: #444746;
             font-size: 0.82rem;
             font-family: inherit;
             cursor: pointer;
@@ -201,7 +201,7 @@
         }
 
         .btn-refresh:hover {
-            background: #f1f5f9;
+            background: #f1f3f4;
             border-color: #cbd5e1;
         }
 
@@ -212,7 +212,7 @@
             padding: 7px 14px;
             border-radius: 8px;
             border: none;
-            background: #6366f1;
+            background: #1a73e8;
             color: #fff;
             font-size: 0.82rem;
             font-family: inherit;
@@ -221,7 +221,7 @@
         }
 
         .btn-export:hover {
-            background: #4f46e5;
+            background: #1765cc;
         }
 
         .btn-share {
@@ -230,9 +230,9 @@
             gap: 4px;
             padding: 7px 14px;
             border-radius: 8px;
-            border: 1px solid #c7d2fe;
-            background: #eef2ff;
-            color: #6366f1;
+            border: 1px solid #a8c7fa;
+            background: #e8f0fe;
+            color: #1a73e8;
             font-size: 0.82rem;
             font-weight: 500;
             font-family: inherit;
@@ -241,13 +241,13 @@
         }
 
         .btn-share:hover {
-            background: #e0e7ff;
+            background: #d2e3fc;
         }
 
         .btn-share.copied {
-            background: #dcfce7;
+            background: #e6f4ea;
             border-color: #86efac;
-            color: #16a34a;
+            color: #1e8e3e;
         }
 
         /* ── Container ── */
@@ -259,7 +259,7 @@
 
         /* ── Overview Summary (NEW) ── */
         .overview-summary {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
             border-radius: 16px;
             padding: 28px 32px;
             margin-bottom: 24px;
@@ -337,7 +337,7 @@
 
         .stat-card {
             background: #fff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             border-radius: 14px;
             padding: 18px 20px;
             position: relative;
@@ -352,7 +352,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: var(--accent, #6366f1);
+            background: var(--accent, #1a73e8);
         }
 
         .stat-icon {
@@ -368,7 +368,7 @@
 
         .stat-label {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: #80868b;
             font-weight: 500;
             margin-bottom: 4px;
             text-transform: uppercase;
@@ -385,20 +385,20 @@
         .stat-value small {
             font-size: 0.82rem;
             font-weight: 400;
-            color: #94a3b8;
+            color: #80868b;
             margin-left: 3px;
         }
 
         .stat-sub {
             font-size: 0.75rem;
-            color: #64748b;
+            color: #444746;
             margin-top: 4px;
         }
 
         /* ── Section ── */
         .dash-section {
             background: #fff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             border-radius: 14px;
             padding: 24px;
             margin-bottom: 20px;
@@ -418,12 +418,12 @@
             gap: 8px;
             font-size: 0.95rem;
             font-weight: 600;
-            color: #1e293b;
+            color: #1f1f1f;
         }
 
         .dash-section-title .material-symbols-rounded {
             font-size: 20px;
-            color: #6366f1;
+            color: #1a73e8;
         }
 
         /* ── Student Table ── */
@@ -438,21 +438,21 @@
             padding: 10px 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            color: #94a3b8;
+            color: #80868b;
             text-transform: uppercase;
             letter-spacing: 0.03em;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #dadce0;
             background: #fafbfc;
         }
 
         .student-table td {
             padding: 10px 12px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #475569;
+            border-bottom: 1px solid #f1f3f4;
+            color: #444746;
         }
 
         .student-table tr:hover td {
-            background: #f8fafc;
+            background: #f8f9fa;
         }
 
         .badge-done {
@@ -463,8 +463,8 @@
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            background: #dcfce7;
-            color: #16a34a;
+            background: #e6f4ea;
+            color: #1e8e3e;
         }
 
         .badge-partial {
@@ -475,8 +475,8 @@
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            background: #fef3c7;
-            color: #d97706;
+            background: #fef7e0;
+            color: #e37400;
         }
 
         .badge-none {
@@ -487,8 +487,8 @@
             border-radius: 12px;
             font-size: 0.72rem;
             font-weight: 600;
-            background: #f1f5f9;
-            color: #94a3b8;
+            background: #f1f3f4;
+            color: #80868b;
         }
 
         /* ── Survey Charts ── */
@@ -496,7 +496,7 @@
             padding: 18px;
             margin-bottom: 14px;
             background: #fafbfc;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             border-radius: 10px;
         }
 
@@ -512,20 +512,20 @@
             font-weight: 700;
             padding: 2px 8px;
             border-radius: 4px;
-            background: #eef2ff;
-            color: #6366f1;
+            background: #e8f0fe;
+            color: #1a73e8;
         }
 
         .survey-q-text {
             font-size: 0.9rem;
             font-weight: 600;
-            color: #1e293b;
+            color: #1f1f1f;
         }
 
         .survey-q-count {
             margin-left: auto;
             font-size: 0.78rem;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .bar-row {
@@ -536,24 +536,24 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.82rem;
-            color: #475569;
+            color: #444746;
             margin-bottom: 3px;
         }
 
         .bar-label .bar-stat {
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .bar-track {
             height: 10px;
-            background: #f1f5f9;
+            background: #f1f3f4;
             border-radius: 5px;
             overflow: hidden;
         }
 
         .bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #6366f1, #a78bfa);
+            background: linear-gradient(90deg, #1a73e8, #8ab4f8);
             border-radius: 5px;
             transition: width 0.5s ease;
         }
@@ -568,15 +568,15 @@
             padding: 8px 12px;
             margin-bottom: 4px;
             background: #fff;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #dadce0;
             border-radius: 8px;
             font-size: 0.82rem;
-            color: #475569;
+            color: #444746;
         }
 
         .text-resp-email {
             font-size: 0.72rem;
-            color: #94a3b8;
+            color: #80868b;
             margin-right: 8px;
         }
 
@@ -584,14 +584,14 @@
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #94a3b8;
+            color: #80868b;
             font-size: 0.9rem;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         /* ── Responsive ── */
@@ -703,30 +703,30 @@
 
         <!-- Stat Cards -->
         <div class="stat-grid" id="statGrid">
-            <div class="stat-card" style="--accent:#6366f1;">
-                <div class="stat-icon" style="background:#eef2ff;color:#6366f1;">
+            <div class="stat-card" style="--accent:#1a73e8;">
+                <div class="stat-icon" style="background:#e8f0fe;color:#1a73e8;">
                     <span class="material-symbols-rounded">group</span>
                 </div>
                 <div class="stat-label">已登錄學員</div>
                 <div class="stat-value" id="statStudents">-</div>
             </div>
-            <div class="stat-card" style="--accent:#22c55e;">
-                <div class="stat-icon" style="background:#dcfce7;color:#16a34a;">
+            <div class="stat-card" style="--accent:#1e8e3e;">
+                <div class="stat-icon" style="background:#e6f4ea;color:#1e8e3e;">
                     <span class="material-symbols-rounded">checklist</span>
                 </div>
                 <div class="stat-label">課前事項完成</div>
                 <div class="stat-value" id="statChecklist">-</div>
                 <div class="stat-sub" id="statChecklistSub"></div>
             </div>
-            <div class="stat-card" style="--accent:#f59e0b;">
-                <div class="stat-icon" style="background:#fef3c7;color:#d97706;">
+            <div class="stat-card" style="--accent:#f9ab00;">
+                <div class="stat-icon" style="background:#fef7e0;color:#e37400;">
                     <span class="material-symbols-rounded">quiz</span>
                 </div>
                 <div class="stat-label">問卷已填</div>
                 <div class="stat-value" id="statSurvey">-</div>
                 <div class="stat-sub" id="statSurveySub"></div>
             </div>
-            <div class="stat-card" style="--accent:#ec4899;">
+            <div class="stat-card" style="--accent:#ea4335;">
                 <div class="stat-icon" style="background:#fce7f3;color:#db2777;">
                     <span class="material-symbols-rounded">task</span>
                 </div>
@@ -976,11 +976,11 @@
 
                 html += `<tr>
                     <td>${i + 1}</td>
-                    <td style="font-weight:500;color:#1e293b;">${s.name || '—'}</td>
-                    <td style="font-size:0.8rem;color:#64748b;">${s.email || '—'}</td>
+                    <td style="font-weight:500;color:#1f1f1f;">${s.name || '—'}</td>
+                    <td style="font-size:0.8rem;color:#444746;">${s.email || '—'}</td>
                     <td>${checkBadge}</td>
                     <td>${surveyBadge}</td>
-                    <td style="font-size:0.78rem;color:#94a3b8;">${time}</td>
+                    <td style="font-size:0.78rem;color:#80868b;">${time}</td>
                 </tr>`;
             });
 
@@ -1013,7 +1013,7 @@
 
                 html += `<div class="bar-row" style="margin-bottom:12px;">`;
                 html += `<div class="bar-label"><span>${idx + 1}. ${item.title}</span><span class="bar-stat">${completed}/${students.length} (${pct}%)</span></div>`;
-                html += `<div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:linear-gradient(90deg,#22c55e,#86efac);"></div></div>`;
+                html += `<div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:linear-gradient(90deg,#1e8e3e,#86efac);"></div></div>`;
                 html += `</div>`;
             });
 
@@ -1027,13 +1027,13 @@
             html += `</tr></thead><tbody>`;
 
             students.forEach((s, i) => {
-                html += `<tr><td>${i + 1}</td><td style="font-weight:500;color:#1e293b;white-space:nowrap;">${s.name || '—'}</td>`;
+                html += `<tr><td>${i + 1}</td><td style="font-weight:500;color:#1f1f1f;white-space:nowrap;">${s.name || '—'}</td>`;
                 checklistItems.forEach(item => {
                     const done = checklistProgress.some(cp =>
                         cp.student_email === s.email && cp.checklist_item_id === item.id && cp.completed
                     );
                     html += `<td style="text-align:center;">${done
-                        ? '<span style="color:#16a34a;font-weight:700;">✓</span>'
+                        ? '<span style="color:#1e8e3e;font-weight:700;">✓</span>'
                         : '<span style="color:#cbd5e1;">✗</span>'
                         }</td>`;
                 });
@@ -1098,13 +1098,13 @@
                 } else {
                     // fillblank
                     if (responses.length === 0) {
-                        html += `<div style="color:#94a3b8;font-size:0.82rem;">尚無回覆</div>`;
+                        html += `<div style="color:#80868b;font-size:0.82rem;">尚無回覆</div>`;
                     } else {
                         html += `<div class="text-responses">`;
                         responses.forEach(r => {
                             html += `<div class="text-resp-item">`;
                             html += `<span class="text-resp-email">${r.student_email}</span>`;
-                            html += `${r.answer || '<em style="color:#94a3b8;">未填寫</em>'}`;
+                            html += `${r.answer || '<em style="color:#80868b;">未填寫</em>'}`;
                             html += `</div>`;
                         });
                         html += `</div>`;

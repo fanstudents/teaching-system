@@ -3,20 +3,20 @@
    ======================================== */
 
 :root {
-    --dash-bg: #fafbfc;
+    --dash-bg: #f8f9fa;
     --dash-surface: #ffffff;
-    --dash-surface-hover: #f4f5f7;
-    --dash-border: #e1e4e8;
-    --dash-text: #24292f;
-    --dash-text-secondary: #57606a;
-    --dash-text-muted: #8b949e;
-    --dash-accent: #0969da;
-    --dash-success: #1a7f37;
-    --dash-danger: #cf222e;
-    --dash-warning: #9a6700;
-    --dash-info: #0969da;
-    --dash-radius: 8px;
-    --dash-font: 'Noto Sans TC', -apple-system, sans-serif;
+    --dash-surface-hover: #f1f3f4;
+    --dash-border: #dadce0;
+    --dash-text: #1f1f1f;
+    --dash-text-secondary: #444746;
+    --dash-text-muted: #80868b;
+    --dash-accent: #1a73e8;
+    --dash-success: #1e8e3e;
+    --dash-danger: #d93025;
+    --dash-warning: #f9ab00;
+    --dash-info: #1a73e8;
+    --dash-radius: 12px;
+    --dash-font: 'Google Sans', 'Roboto', 'Noto Sans TC', -apple-system, sans-serif;
 }
 
 * {
@@ -330,7 +330,7 @@ body {
 }
 
 .type-ordering {
-    color: #7c3aed;
+    color: #1a73e8;
 }
 
 .type-fillblank {

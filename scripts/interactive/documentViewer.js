@@ -499,7 +499,7 @@ export class DocumentViewer {
 
             statsPanel.innerHTML = `
                 <div class="doc-stats-header">
-                    <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">bar_chart</span>
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#1a73e8;">bar_chart</span>
                     標記統計（共 ${totalStudents} 人作答）
                 </div>
                 ${statsHtml}
@@ -573,7 +573,7 @@ export class DocumentViewer {
 
             statsPanel.innerHTML = `
                 <div class="doc-stats-header">
-                    <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">bar_chart</span>
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#1a73e8;">bar_chart</span>
                     勾選統計（共 ${totalStudents} 人作答）
                 </div>
                 ${statsHtml}

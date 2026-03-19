@@ -175,9 +175,9 @@
 }
 
 .nav-tool-btn.active {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: #6366f1;
-    color: #6366f1;
+    background: rgba(26, 115, 232, 0.1);
+    border-color: #1a73e8;
+    color: #1a73e8;
 }
 
 /* ── 格線疊層 ── */
@@ -187,8 +187,8 @@
     pointer-events: none;
     z-index: 1;
     background-image:
-        linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+        linear-gradient(rgba(26, 115, 232, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 115, 232, 0.06) 1px, transparent 1px);
     background-size: 48px 48px;
     opacity: 0;
     transition: opacity 0.2s;
@@ -201,7 +201,7 @@
 /* ── 鎖定元素 ── */
 .editable-element.locked {
     pointer-events: none !important;
-    outline: 1px dashed rgba(239, 68, 68, 0.4) !important;
+    outline: 1px dashed rgba(217, 48, 37, 0.4) !important;
 }
 
 .editable-element.locked::after {
@@ -253,7 +253,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #94a3b8;
+    color: #80868b;
     margin-bottom: 6px;
 }
 
@@ -266,13 +266,13 @@
 }
 
 .shortcut-row kbd {
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background: #f1f3f4;
+    border: 1px solid #dadce0;
     border-radius: 5px;
     padding: 2px 8px;
     font-size: 0.78rem;
     font-family: 'SF Mono', 'Menlo', monospace;
-    color: #475569;
+    color: #444746;
     min-width: 22px;
     text-align: center;
 }

@@ -7,7 +7,7 @@
     <title>管理者儀表板 — 教學系統</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet">
@@ -87,8 +87,8 @@
             font-weight: 600;
         }
 
-        .role-badge.super_admin { background: #fef3c7; color: #92400e; }
-        .role-badge.instructor { background: #e0e7ff; color: #3730a3; }
+        .role-badge.super_admin { background: #fef7e0; color: #92400e; }
+        .role-badge.instructor { background: #d2e3fc; color: #3730a3; }
 
         .status-dot {
             display: inline-block;
@@ -473,8 +473,8 @@
 
             if (!email) {
                 resultEl.style.display = 'block';
-                resultEl.style.background = '#fef2f2';
-                resultEl.style.color = '#dc2626';
+                resultEl.style.background = '#fce8e6';
+                resultEl.style.color = '#c5221f';
                 resultEl.textContent = '請輸入 Email';
                 return;
             }
@@ -491,8 +491,8 @@
                 if (error) throw new Error(error.message);
 
                 resultEl.style.display = 'block';
-                resultEl.style.background = '#f0fdf4';
-                resultEl.style.color = '#059669';
+                resultEl.style.background = '#e6f4ea';
+                resultEl.style.color = '#188038';
                 resultEl.innerHTML = `✅ ${data.message}<br>` +
                     (data.temp_password && data.temp_password !== '(已使用隨機密碼)'
                         ? `臨時密碼: <strong>${data.temp_password}</strong>（請通知講師修改）`
@@ -504,8 +504,8 @@
                 showToast('講師帳號已建立');
             } catch (e) {
                 resultEl.style.display = 'block';
-                resultEl.style.background = '#fef2f2';
-                resultEl.style.color = '#dc2626';
+                resultEl.style.background = '#fce8e6';
+                resultEl.style.color = '#c5221f';
                 resultEl.textContent = '建立失敗: ' + e.message;
             } finally {
                 btn.disabled = false;

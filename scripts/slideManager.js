@@ -988,7 +988,7 @@ export class SlideManager {
                 const url = element.linkUrl || '#';
                 const label = element.linkLabel || '開啟連結';
                 const desc = element.linkDesc || '';
-                const lColor = element.linkColor || '#6366f1';
+                const lColor = element.linkColor || '#1a73e8';
                 const lIcon = element.linkIcon || 'open_in_new';
                 const lImage = element.linkImage || '';
 
@@ -1312,7 +1312,7 @@ export class SlideManager {
                     const currentUserObj = window.app?.homework?.getUser();
                     const userName = currentUserObj?.name || '';
                     const userBadgeHtml = userName
-                        ? `<div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#6366f1;background:#f0f0ff;padding:4px 10px;border-radius:20px;font-weight:500;">
+                        ? `<div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#1a73e8;background:#f0f0ff;padding:4px 10px;border-radius:20px;font-weight:500;">
                             <span class="material-symbols-outlined" style="font-size:14px;">person</span>${userName}
                           </div>`
                         : '';
@@ -1670,7 +1670,7 @@ export class SlideManager {
                                     promptVal = content.prompt || '';
                                 }
                                 if (imgSrc) previewHtml += `<img src="${imgSrc}" style="max-width:100%;max-height:120px;object-fit:contain;border-radius:6px;display:block;margin:0 auto;">`;
-                                if (promptVal) previewHtml += `<div style="margin-top:4px;padding:6px 8px;background:#f0f4ff;border-radius:4px;border:1px solid #e0e7ff;font-size:11px;color:#334155;line-height:1.4;white-space:pre-wrap;max-height:60px;overflow-y:auto;"><span style="font-size:9px;color:#6366f1;font-weight:600;">Prompt</span><br>${promptVal.replace(/</g, '&lt;')}</div>`;
+                                if (promptVal) previewHtml += `<div style="margin-top:4px;padding:6px 8px;background:#f0f4ff;border-radius:4px;border:1px solid #d2e3fc;font-size:11px;color:#334155;line-height:1.4;white-space:pre-wrap;max-height:60px;overflow-y:auto;"><span style="font-size:9px;color:#1a73e8;font-weight:600;">Prompt</span><br>${promptVal.replace(/</g, '&lt;')}</div>`;
                             } else if (type === 'link') {
                                 previewHtml = `<div style="padding:4px;word-break:break-all;"><a href="${contentStr}" target="_blank" style="color:#4A7AE8;font-size:12px;">${contentStr}</a></div>`;
                             } else {
@@ -1743,8 +1743,8 @@ export class SlideManager {
             }
         }
 
-        const color = element.lineColor || '#6366f1';
-        const glow = element.glowColor || '#818cf8';
+        const color = element.lineColor || '#1a73e8';
+        const glow = element.glowColor || '#4285f4';
         const lw = element.lineWidth || 3;
         const speed = element.flowSpeed || 2;
         const dir = element.flowDirection || 1;
@@ -1837,7 +1837,7 @@ export class SlideManager {
                 top:${pt.y - 7}px;
                 width:14px;height:14px;
                 border-radius:50%;
-                background:${isEndpoint ? '#6366f1' : '#a5b4fc'};
+                background:${isEndpoint ? '#1a73e8' : '#8ab4f8'};
                 border:2px solid #fff;
                 cursor:grab;
                 z-index:20;
@@ -3626,7 +3626,7 @@ export class SlideManager {
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 110, width: 400, height: 75, background: '#f0f9ff' },
                     { id: gen(), type: 'text', x: 80, y: 118, width: 360, height: 60, content: '<div><b style="color:#0284c7;font-size:15px;">01</b> <span style="font-size:16px;color:#1e293b;">認識行銷數據 — 數據來源與類型</span></div>', fontSize: 16 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 500, y: 110, width: 400, height: 75, background: '#faf5ff' },
-                    { id: gen(), type: 'text', x: 520, y: 118, width: 360, height: 60, content: '<div><b style="color:#7c3aed;font-size:15px;">02</b> <span style="font-size:16px;color:#1e293b;">核心指標 — KPI 與 ROI 解析</span></div>', fontSize: 16 },
+                    { id: gen(), type: 'text', x: 520, y: 118, width: 360, height: 60, content: '<div><b style="color:#1a73e8;font-size:15px;">02</b> <span style="font-size:16px;color:#1e293b;">核心指標 — KPI 與 ROI 解析</span></div>', fontSize: 16 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 205, width: 400, height: 75, background: '#f0fdf4' },
                     { id: gen(), type: 'text', x: 80, y: 213, width: 360, height: 60, content: '<div><b style="color:#16a34a;font-size:15px;">03</b> <span style="font-size:16px;color:#1e293b;">轉換漏斗 — 從曝光到成交</span></div>', fontSize: 16 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 500, y: 205, width: 400, height: 75, background: '#fffbeb' },
@@ -3663,7 +3663,7 @@ export class SlideManager {
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 110, width: 270, height: 110, background: '#f0f9ff' },
                     { id: gen(), type: 'text', x: 75, y: 118, width: 240, height: 95, content: '<div style="text-align:center;"><b style="font-size:18px;color:#0284c7;">CTR</b><br><span style="font-size:13px;color:#64748b;">點擊率<br>Click-Through Rate<br>衡量廣告吸引力</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 345, y: 110, width: 270, height: 110, background: '#faf5ff' },
-                    { id: gen(), type: 'text', x: 360, y: 118, width: 240, height: 95, content: '<div style="text-align:center;"><b style="font-size:18px;color:#7c3aed;">CPC</b><br><span style="font-size:13px;color:#64748b;">單次點擊成本<br>Cost Per Click<br>廣告成本效益</span></div>', fontSize: 13 },
+                    { id: gen(), type: 'text', x: 360, y: 118, width: 240, height: 95, content: '<div style="text-align:center;"><b style="font-size:18px;color:#1a73e8;">CPC</b><br><span style="font-size:13px;color:#64748b;">單次點擊成本<br>Cost Per Click<br>廣告成本效益</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 630, y: 110, width: 270, height: 110, background: '#f0fdf4' },
                     { id: gen(), type: 'text', x: 645, y: 118, width: 240, height: 95, content: '<div style="text-align:center;"><b style="font-size:18px;color:#16a34a;">ROAS</b><br><span style="font-size:13px;color:#64748b;">廣告投報率<br>Return on Ad Spend<br>每 $1 廣告產出</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 240, width: 270, height: 110, background: '#fffbeb' },
@@ -3688,7 +3688,7 @@ export class SlideManager {
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 380, y: 140, width: 530, height: 60, background: '#f0f9ff' },
                     { id: gen(), type: 'text', x: 400, y: 148, width: 490, height: 45, content: '<div><b style="color:#0284c7;font-size:15px;">曝光 Awareness</b><br><span style="font-size:13px;color:#64748b;">廣告觸及、SEO 排名、社群分享</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 380, y: 210, width: 530, height: 60, background: '#faf5ff' },
-                    { id: gen(), type: 'text', x: 400, y: 218, width: 490, height: 45, content: '<div><b style="color:#7c3aed;font-size:15px;">興趣 Interest</b><br><span style="font-size:13px;color:#64748b;">頁面停留時間、內容互動、訂閱電子報</span></div>', fontSize: 13 },
+                    { id: gen(), type: 'text', x: 400, y: 218, width: 490, height: 45, content: '<div><b style="color:#1a73e8;font-size:15px;">興趣 Interest</b><br><span style="font-size:13px;color:#64748b;">頁面停留時間、內容互動、訂閱電子報</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 380, y: 280, width: 530, height: 60, background: '#fffbeb' },
                     { id: gen(), type: 'text', x: 400, y: 288, width: 490, height: 45, content: '<div><b style="color:#d97706;font-size:15px;">考慮 Consideration</b><br><span style="font-size:13px;color:#64748b;">加入購物車、對比產品、詢問客服</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 380, y: 350, width: 530, height: 60, background: '#f0fdf4' },
@@ -3708,7 +3708,7 @@ export class SlideManager {
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 110, width: 470, height: 65, background: '#f0f9ff' },
                     { id: gen(), type: 'text', x: 80, y: 118, width: 430, height: 50, content: '<div><b style="font-size:15px;color:#0284c7;">觸及率 Reach Rate</b><br><span style="font-size:13px;color:#64748b;">內容被多少人看到，衡量品牌能見度</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 185, width: 470, height: 65, background: '#faf5ff' },
-                    { id: gen(), type: 'text', x: 80, y: 193, width: 430, height: 50, content: '<div><b style="font-size:15px;color:#7c3aed;">互動率 Engagement Rate</b><br><span style="font-size:13px;color:#64748b;">按讚 + 留言 + 分享 / 觸及人數</span></div>', fontSize: 13 },
+                    { id: gen(), type: 'text', x: 80, y: 193, width: 430, height: 50, content: '<div><b style="font-size:15px;color:#1a73e8;">互動率 Engagement Rate</b><br><span style="font-size:13px;color:#64748b;">按讚 + 留言 + 分享 / 觸及人數</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 260, width: 470, height: 65, background: '#f0fdf4' },
                     { id: gen(), type: 'text', x: 80, y: 268, width: 430, height: 50, content: '<div><b style="font-size:15px;color:#16a34a;">粉絲成長率 Follower Growth</b><br><span style="font-size:13px;color:#64748b;">每月淨增粉絲 / 總粉絲數</span></div>', fontSize: 13 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 335, width: 470, height: 65, background: '#fffbeb' },
@@ -3723,7 +3723,7 @@ export class SlideManager {
                 id: gen(),
                 elements: [
                     { id: gen(), type: 'text', x: 60, y: 30, width: 700, height: 50, content: '<b style="font-size:30px;color:#1e293b;">互動練習：行銷指標配對</b>', fontSize: 30, bold: true },
-                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 75, width: 50, height: 3, background: '#7c3aed' },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 75, width: 50, height: 3, background: '#1a73e8' },
                     { id: gen(), type: 'text', x: 60, y: 90, width: 840, height: 28, content: '<span style="font-size:15px;color:#64748b;">請將左邊的行銷指標與右邊的定義連起來</span>', fontSize: 15 },
                     {
                         id: gen(), type: 'matching', x: 60, y: 130, width: 840, height: 320,
@@ -3783,7 +3783,7 @@ export class SlideManager {
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 540, background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)' },
                     { id: gen(), type: 'text', x: 60, y: 40, width: 700, height: 50, content: '<b style="font-size:32px;color:#f1f5f9;">課程回顧與重點整理</b>', fontSize: 32, bold: true },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 90, width: 50, height: 3, background: '#38bdf8' },
-                    { id: gen(), type: 'text', x: 60, y: 115, width: 840, height: 220, content: '<div style="font-size:17px;line-height:2.2;color:#cbd5e1;"><b style="color:#38bdf8;">✓ 數據是行銷決策的基礎</b>，不靠直覺靠數字<br><b style="color:#7c3aed;">✓ 掌握核心指標</b>，CTR / ROAS / CAC / LTV<br><b style="color:#16a34a;">✓ 理解轉換漏斗</b>，從曝光到成交每步追蹤<br><b style="color:#d97706;">✓ 社群數據分析</b>，觸及、互動、成長率<br><b style="color:#dc2626;">✓ 持續優化</b>，用 A/B Test 驗證每個假設</div>', fontSize: 17 },
+                    { id: gen(), type: 'text', x: 60, y: 115, width: 840, height: 220, content: '<div style="font-size:17px;line-height:2.2;color:#cbd5e1;"><b style="color:#38bdf8;">✓ 數據是行銷決策的基礎</b>，不靠直覺靠數字<br><b style="color:#1a73e8;">✓ 掌握核心指標</b>，CTR / ROAS / CAC / LTV<br><b style="color:#16a34a;">✓ 理解轉換漏斗</b>，從曝光到成交每步追蹤<br><b style="color:#d97706;">✓ 社群數據分析</b>，觸及、互動、成長率<br><b style="color:#dc2626;">✓ 持續優化</b>，用 A/B Test 驗證每個假設</div>', fontSize: 17 },
                     { id: gen(), type: 'shape', shapeType: 'rectangle', x: 200, y: 360, width: 560, height: 80, background: 'rgba(255,255,255,0.08)' },
                     { id: gen(), type: 'text', x: 220, y: 370, width: 520, height: 60, content: '<div style="text-align:center;font-size:28px;color:#f1f5f9;"><b>Q & A 時間</b><br><span style="font-size:16px;color:#94a3b8;">歡迎提出任何問題！</span></div>', fontSize: 28 },
                     { id: gen(), type: 'text', x: 60, y: 470, width: 840, height: 30, content: '<div style="text-align:center;font-size:14px;color:#64748b;">感謝參與！課程資料將於課後寄送至各位信箱</div>', fontSize: 14 }
@@ -4037,7 +4037,7 @@ export class SlideManager {
                         } else if (parsed && parsed.title) {
                             // Fallback: 舊格式 title+bullets
                             const elements = [
-                                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 55, width: 4, height: 50, background: '#6366f1' },
+                                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 55, width: 4, height: 50, background: '#1a73e8' },
                                 { id: gen(), type: 'text', x: 80, y: 50, width: 800, height: 55, content: `<b style="font-size:32px;color:#18181b;">${parsed.title}</b>`, fontSize: 32, bold: true },
                             ];
                             let yPos = 120;
@@ -4107,7 +4107,7 @@ export class SlideManager {
                         // 建立互動投影片
                         const elements = [
                             { id: gen(), type: 'text', x: 60, y: 30, width: 700, height: 50, content: `<b style="font-size:28px;color:#18181b;">${slideTitle}</b>`, fontSize: 28, bold: true },
-                            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 75, width: 50, height: 3, background: '#6366f1' },
+                            { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 75, width: 50, height: 3, background: '#1a73e8' },
                         ];
 
                         // 根據類型設定互動元件的位置和大小
@@ -4154,7 +4154,7 @@ export class SlideManager {
         const titleIdx = lines.indexOf(maxFontLine);
 
         // 標題
-        elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 55, width: 4, height: 50, background: '#6366f1' });
+        elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 55, width: 4, height: 50, background: '#1a73e8' });
         elements.push({
             id: gen(), type: 'text',
             x: 80, y: 50, width: 800, height: 55,
@@ -4195,7 +4195,7 @@ export class SlideManager {
         const elements = [];
 
         // 裝飾條
-        elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 55, width: 4, height: 50, background: '#6366f1' });
+        elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 55, width: 4, height: 50, background: '#1a73e8' });
 
         // 標題
         elements.push({

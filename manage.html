@@ -8,7 +8,7 @@
     <meta name="description" content="專案管理介面，管理專案、場次與學員">
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet">
@@ -360,14 +360,14 @@
                     <input type="url" id="sessionStreamUrl" placeholder="https://...">
                 </div>
                 <div class="form-group">
-                    <label>交通資訊 <span style="color:#94a3b8;font-weight:400;font-size:0.78rem;">（顯示於課前須知頁）</span></label>
+                    <label>交通資訊 <span style="color:#80868b;font-weight:400;font-size:0.78rem;">（顯示於課前須知頁）</span></label>
                     <textarea id="sessionTransport" rows="3" placeholder="輸入交通方式，每行一項&#10;例如：捷運至中山站4號出口，步行5分鐘"
-                        style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea>
+                        style="width:100%;padding:8px 12px;border:1.5px solid #dadce0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>溫馨提醒 <span style="color:#94a3b8;font-weight:400;font-size:0.78rem;">（顯示於課前須知頁）</span></label>
+                    <label>溫馨提醒 <span style="color:#80868b;font-weight:400;font-size:0.78rem;">（顯示於課前須知頁）</span></label>
                     <textarea id="sessionReminders" rows="3" placeholder="每行一項提醒&#10;例如：請攜帶筆電與充電器"
-                        style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea>
+                        style="width:100%;padding:8px 12px;border:1.5px solid #dadce0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea>
                 </div>
                 <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div>
@@ -384,7 +384,7 @@
                     <input type="number" id="sessionCapacity" value="30" min="1">
                 </div>
                 <div class="form-group">
-                    <label>Teachify 方案 ID <span style="color:#94a3b8;font-weight:400;font-size:0.78rem;">（用於 Webhook 自動配對場次）</span></label>
+                    <label>Teachify 方案 ID <span style="color:#80868b;font-weight:400;font-size:0.78rem;">（用於 Webhook 自動配對場次）</span></label>
                     <input type="text" id="sessionTeachifyPlanId" placeholder="例：bccd76c0-9311-45bf-b0af-5721322f3904">
                 </div>
                 <div class="form-group">
@@ -400,7 +400,7 @@
                 <span id="sessionDeleteWrap" class="hidden" style="display:inline-flex;gap:6px;align-items:center;">
                     <button class="btn btn-danger" id="sessionDelete" style="font-size:0.82rem;">刪除場次</button>
                     <button class="btn btn-danger" id="sessionDeleteConfirm"
-                        style="display:none;font-size:0.82rem;background:#dc2626;">確定刪除</button>
+                        style="display:none;font-size:0.82rem;background:#c5221f;">確定刪除</button>
                     <button class="btn" id="sessionDeleteCancel" style="display:none;font-size:0.82rem;">取消</button>
                 </span>
                 <div class="modal-footer-right">
@@ -539,14 +539,14 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>專案分類 <span style="color:#dc2626">*</span></label>
+                    <label>專案分類 <span style="color:#c5221f">*</span></label>
                     <select id="createProjectCategory">
                         <option value="course">公開課程</option>
                         <option value="corporate">企業內訓</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>課程名稱 <span style="color:#dc2626">*</span></label>
+                    <label>課程名稱 <span style="color:#c5221f">*</span></label>
                     <input type="text" id="createName" placeholder="例：AI 職場應用工作坊">
                 </div>
                 <div class="form-group">
@@ -583,7 +583,7 @@
                 <div class="form-group">
                     <label>講師（可複選）</label>
                     <div id="createInstructorPicker" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:1px solid var(--border);border-radius:8px;min-height:38px;background:#fafbfc;cursor:pointer" onclick="document.getElementById('createInstructorDropdown').style.display=document.getElementById('createInstructorDropdown').style.display==='none'?'block':'none'">
-                        <span id="createInstructorPlaceholder" style="font-size:0.82rem;color:#94a3b8">點擊選擇講師...</span>
+                        <span id="createInstructorPlaceholder" style="font-size:0.82rem;color:#80868b">點擊選擇講師...</span>
                     </div>
                     <div id="createInstructorDropdown" style="display:none;border:1px solid var(--border);border-radius:8px;margin-top:4px;max-height:200px;overflow-y:auto;background:var(--surface);box-shadow:0 4px 12px rgba(0,0,0,0.08)"></div>
                 </div>
@@ -596,7 +596,7 @@
                     <select id="createClient">
                         <option value="">— 不綁定 —</option>
                     </select>
-                    <p style="font-size:0.75rem;color:#94a3b8;margin-top:4px;">企業內訓專案可綁定客戶，課程大綱將顯示客戶 Logo 與名稱</p>
+                    <p style="font-size:0.75rem;color:#80868b;margin-top:4px;">企業內訓專案可綁定客戶，課程大綱將顯示客戶 Logo 與名稱</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -922,7 +922,7 @@
                 <!-- Quick Actions -->
                 <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px">
                     ${isAdmin ? `<a class="pd-action-card" href="${slideLink.href}" ${slideLink.target?`target="${slideLink.target}"`:''}${slideLink.onclick?` onclick="${slideLink.onclick}"`:''}>` +
-                    `    <span class="material-symbols-outlined" style="color:#6366f1">slideshow</span>` +
+                    `    <span class="material-symbols-outlined" style="color:#1a73e8">slideshow</span>` +
                     `    <span>簡報</span>` +
                     `</a>` : ''}
                     <a class="pd-action-card" href="admin-preclass.html?code=${p.join_code}">
@@ -930,12 +930,12 @@
                         <span>課前</span>
                     </a>
                     <a class="pd-action-card" href="report.html" onclick="localStorage.setItem('current_project_id','${p.id}')">
-                        <span class="material-symbols-outlined" style="color:#059669">mail</span>
+                        <span class="material-symbols-outlined" style="color:#188038">mail</span>
                         <span>追蹤</span>
                     </a>
                     ${pType === 'corporate' ? `
                     <a class="pd-action-card" href="course-outline.html?admin=1&project=${p.id}">
-                        <span class="material-symbols-outlined" style="color:#d97706">description</span>
+                        <span class="material-symbols-outlined" style="color:#e37400">description</span>
                         <span>大綱</span>
                     </a>` : ''}
                 </div>
@@ -952,17 +952,17 @@
                     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:12px">
                         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                                <span class="material-symbols-outlined" style="color:#4f46e5;font-size:20px">business</span>
+                                <span class="material-symbols-outlined" style="color:#1765cc;font-size:20px">business</span>
                                 <h4 style="margin:0;font-size:0.9rem">客戶資訊</h4>
                             </div>
                             <p style="font-size:0.85rem;color:var(--text-2);margin:0 0 12px">${clientName}</p>
-                            <a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" style="background:#f0f4ff;color:#4f46e5">
+                            <a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" style="background:#f0f4ff;color:#1765cc">
                                 <span class="material-symbols-outlined" style="font-size:14px">open_in_new</span> 管理客戶與課綱
                             </a>
                         </div>
                         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                                <span class="material-symbols-outlined" style="color:#059669;font-size:20px">link</span>
+                                <span class="material-symbols-outlined" style="color:#188038;font-size:20px">link</span>
                                 <h4 style="margin:0;font-size:0.9rem">客戶預覽連結</h4>
                             </div>
                             <p style="font-size:0.8rem;color:var(--text-3);margin:0 0 8px;word-break:break-all">${location.origin}/course-outline.html?project=${p.id}</p>
@@ -972,11 +972,11 @@
                         </div>
                         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                                <span class="material-symbols-outlined" style="color:#d97706;font-size:20px">description</span>
+                                <span class="material-symbols-outlined" style="color:#e37400;font-size:20px">description</span>
                                 <h4 style="margin:0;font-size:0.9rem">課程大綱</h4>
                             </div>
                             <p style="font-size:0.85rem;color:var(--text-2);margin:0 0 12px">編輯教學架構、工具清單、設備需求</p>
-                            <a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" style="background:#fffbeb;color:#d97706">
+                            <a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" style="background:#fffbeb;color:#e37400">
                                 <span class="material-symbols-outlined" style="font-size:14px">edit</span> 編輯大綱
                             </a>
                         </div>
@@ -1184,7 +1184,7 @@
                     ? `<button class="status-toggle" onclick="advanceStatus('${s.id}', '${nextStatus[status]}')">
                         <span class="material-symbols-outlined">arrow_forward</span> ${nextAction[status]}
                        </button>`
-                    : `<span style="color:#10b981;font-size:0.7rem;">✓ 完成</span>`;
+                    : `<span style="color:#1e8e3e;font-size:0.7rem;">✓ 完成</span>`;
 
                 return `<tr>
                     <td>
@@ -1203,7 +1203,7 @@
                     <td><span class="status-badge ${status}">${statusLabel[status] || status}</span></td>
                     <td style="display:flex;gap:4px;align-items:center;">
                         ${actionBtn}
-                        <button class="btn btn-sm" style="color:#ef4444;" onclick="deleteStudent('${s.id}','${(s.email || '').replace(/'/g, "\\'")}','${(s.name || '').replace(/'/g, "\\'")}')" title="刪除學員及作業">
+                        <button class="btn btn-sm" style="color:#d93025;" onclick="deleteStudent('${s.id}','${(s.email || '').replace(/'/g, "\\'")}','${(s.name || '').replace(/'/g, "\\'")}')" title="刪除學員及作業">
                             <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
                         </button>
                     </td>
@@ -1610,7 +1610,7 @@
                         </tbody>
                     </table>`;
             } catch (e) {
-                document.getElementById('submissionsModalBody').innerHTML = `<div style="color:#dc2626;">${e.message}</div>`;
+                document.getElementById('submissionsModalBody').innerHTML = `<div style="color:#c5221f;">${e.message}</div>`;
             }
         };
 
@@ -1963,19 +1963,19 @@
             const dd = document.getElementById('createInstructorDropdown');
             if (!dd) return;
             if (!instructorsList.length) {
-                dd.innerHTML = '<div style="padding:12px;font-size:0.82rem;color:#94a3b8;text-align:center">尚無講師資料，請先至講師管理頁新增</div>';
+                dd.innerHTML = '<div style="padding:12px;font-size:0.82rem;color:#80868b;text-align:center">尚無講師資料，請先至講師管理頁新增</div>';
                 return;
             }
             dd.innerHTML = instructorsList.map(inst => {
                 const isSelected = window._createSelectedInstructors.find(s => s.id === inst.id);
-                const bg = isSelected ? '#eef2ff' : '';
+                const bg = isSelected ? '#e8f0fe' : '';
                 const icon = isSelected ? 'check_circle' : 'radio_button_unchecked';
                 const iconColor = isSelected ? 'var(--accent)' : '#cbd5e1';
-                return `<div onclick="toggleCreateInstructor('${inst.id}','${(inst.name||'').replace(/'/g,"\\\\'")}')" style="display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;padding:10px 14px;cursor:pointer;font-size:0.85rem;border-bottom:1px solid #f1f5f9;background:${bg};transition:background 0.15s" onmouseenter="this.style.background='${isSelected ? '#e0e7ff' : '#f8fafc'}'" onmouseleave="this.style.background='${bg}'">
+                return `<div onclick="toggleCreateInstructor('${inst.id}','${(inst.name||'').replace(/'/g,"\\\\'")}')" style="display:flex !important;flex-direction:row !important;align-items:center !important;gap:10px;padding:10px 14px;cursor:pointer;font-size:0.85rem;border-bottom:1px solid #f1f3f4;background:${bg};transition:background 0.15s" onmouseenter="this.style.background='${isSelected ? '#d2e3fc' : '#f8f9fa'}'" onmouseleave="this.style.background='${bg}'">
                     <span class="material-symbols-outlined" style="font-size:20px;color:${iconColor};flex-shrink:0">${icon}</span>
-                    ${inst.photo_url ? `<img src="${inst.photo_url}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">` : `<span class="material-symbols-outlined" style="font-size:24px;color:#94a3b8;flex-shrink:0">person</span>`}
+                    ${inst.photo_url ? `<img src="${inst.photo_url}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0">` : `<span class="material-symbols-outlined" style="font-size:24px;color:#80868b;flex-shrink:0">person</span>`}
                     <span style="font-weight:600;flex-shrink:0">${inst.name || ''}</span>
-                    ${inst.title ? `<span style="font-size:0.75rem;color:#94a3b8;margin-left:auto">${inst.title}</span>` : ''}
+                    ${inst.title ? `<span style="font-size:0.75rem;color:#80868b;margin-left:auto">${inst.title}</span>` : ''}
                 </div>`;
             }).join('');
         }

@@ -605,13 +605,13 @@ SLIDE_TEMPLATES.push(
                 },
                 { id: gen(), type: 'shape', shapeType: 'rectangle', x: 100, y: 90, width: 2, height: 400, background: '#e2e8f0' },
                 // Point 1
-                { id: gen(), type: 'shape', shapeType: 'circle', x: 88, y: 110, width: 24, height: 24, background: '#6366f1' },
+                { id: gen(), type: 'shape', shapeType: 'circle', x: 88, y: 110, width: 24, height: 24, background: '#1a73e8' },
                 {
                     id: gen(), type: 'text', x: 130, y: 105, width: 770, height: 60,
                     content: '<b style="font-size:15px;color:#1e293b;">階段一</b><br><span style="font-size:13px;color:#64748b;">說明文字</span>', fontSize: 15
                 },
                 // Point 2
-                { id: gen(), type: 'shape', shapeType: 'circle', x: 88, y: 210, width: 24, height: 24, background: '#8b5cf6' },
+                { id: gen(), type: 'shape', shapeType: 'circle', x: 88, y: 210, width: 24, height: 24, background: '#4285f4' },
                 {
                     id: gen(), type: 'text', x: 130, y: 205, width: 770, height: 60,
                     content: '<b style="font-size:15px;color:#1e293b;">階段二</b><br><span style="font-size:13px;color:#64748b;">說明文字</span>', fontSize: 15

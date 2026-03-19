@@ -103,7 +103,7 @@ export class Editor {
             linkUrl: 'https://example.com',
             linkLabel: '點擊開啟連結',
             linkDesc: '',
-            linkColor: '#6366f1',
+            linkColor: '#1a73e8',
             linkIcon: 'open_in_new',
         };
 
@@ -376,7 +376,7 @@ export class Editor {
             chartTitle: '圖表標題',
             chartData: [
                 { label: 'Q1', value: 120, color: '#3b82f6' },
-                { label: 'Q2', value: 180, color: '#8b5cf6' },
+                { label: 'Q2', value: 180, color: '#4285f4' },
                 { label: 'Q3', value: 240, color: '#10b981' },
                 { label: 'Q4', value: 320, color: '#f59e0b' },
             ]
@@ -561,9 +561,9 @@ export class Editor {
                 { x: 645, y: 100 },
                 { x: 860, y: 170 }
             ],
-            lineColor: '#6366f1',
+            lineColor: '#1a73e8',
             lineWidth: 3,
-            glowColor: '#818cf8',
+            glowColor: '#4285f4',
             flowSpeed: 2,
             flowDirection: 1,
             particleCount: 3,
@@ -816,10 +816,10 @@ export class Editor {
             const currentBg = elementData.background || '#e2e8f0';
             const FILL_PRESETS = [
                 '#ffffff', '#f8f9fa', '#e2e8f0', '#1e293b', '#0f172a', '#18181b',
-                '#2563eb', '#7c3aed', '#dc2626', '#16a34a', '#d97706', '#0284c7',
+                '#2563eb', '#1a73e8', '#dc2626', '#16a34a', '#d97706', '#0284c7',
                 'linear-gradient(135deg,#667eea,#764ba2)',
-                'linear-gradient(135deg,#0ea5e9,#6366f1)',
-                'linear-gradient(135deg,#f472b6,#7c3aed)',
+                'linear-gradient(135deg,#0ea5e9,#1a73e8)',
+                'linear-gradient(135deg,#f472b6,#1a73e8)',
                 'linear-gradient(135deg,#34d399,#059669)',
                 'linear-gradient(135deg,#fbbf24,#ea580c)',
                 'linear-gradient(135deg,#1a1a2e,#0f3460)',
@@ -854,7 +854,7 @@ export class Editor {
 
         // 連結元件
         if (type === 'link') {
-            const LINK_COLORS = ['#6366f1', '#3b82f6', '#0284c7', '#10b981', '#eab308', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#475569'];
+            const LINK_COLORS = ['#1a73e8', '#3b82f6', '#0284c7', '#10b981', '#eab308', '#f59e0b', '#ef4444', '#ec4899', '#4285f4', '#475569'];
             const LINK_ICONS = [
                 { icon: 'open_in_new', label: '開啟' },
                 { icon: 'edit_note', label: '問卷' },
@@ -867,7 +867,7 @@ export class Editor {
                 { icon: 'article', label: '文章' },
                 { icon: 'calendar_today', label: '行事曆' },
             ];
-            const curColor = elementData.linkColor || '#6366f1';
+            const curColor = elementData.linkColor || '#1a73e8';
             const curIcon = elementData.linkIcon || 'open_in_new';
             html += `
                 <div class="property-section">
@@ -893,7 +893,7 @@ export class Editor {
                     <div class="form-group">
                         <label class="form-label">圖示</label>
                         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                            ${LINK_ICONS.map(i => `<button class="link-icon-btn${i.icon === curIcon ? ' active' : ''}" data-icon="${i.icon}" title="${i.label}" style="width:34px;height:34px;border-radius:8px;border:2px solid ${i.icon === curIcon ? '#6366f1' : '#e2e8f0'};background:${i.icon === curIcon ? '#eef2ff' : '#f8fafc'};cursor:pointer;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:18px;">${i.icon}</span></button>`).join('')}
+                            ${LINK_ICONS.map(i => `<button class="link-icon-btn${i.icon === curIcon ? ' active' : ''}" data-icon="${i.icon}" title="${i.label}" style="width:34px;height:34px;border-radius:8px;border:2px solid ${i.icon === curIcon ? '#1a73e8' : '#e2e8f0'};background:${i.icon === curIcon ? '#e8f0fe' : '#f8fafc'};cursor:pointer;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:18px;">${i.icon}</span></button>`).join('')}
                         </div>
                     </div>
                     <div class="form-group">
@@ -912,7 +912,7 @@ export class Editor {
         if (type === 'survey') {
             const cfg = elementData.thankYouConfig || {};
             const ctaCards = cfg.ctaCards || [
-                { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+                { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#1a73e8' },
                 { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
                 { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL 讓老師看到你的感受！', url: 'https://www.threads.net/intent/post?text=' + encodeURIComponent('剛上完數位簡報室的課程！收穫滿滿 🎓✨ @TBR.DIGITAL'), icon: 'share', color: '#10b981' }
             ];
@@ -923,7 +923,7 @@ export class Editor {
             const ctaCardsHtml = ctaCards.map((c, i) => `
                 <div class="survey-cta-card-editor" data-idx="${i}" style="padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;">
                     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                        <span class="material-symbols-outlined" style="font-size:16px;color:${c.color || '#6366f1'};">${c.icon || 'link'}</span>
+                        <span class="material-symbols-outlined" style="font-size:16px;color:${c.color || '#1a73e8'};">${c.icon || 'link'}</span>
                         <strong style="font-size:12px;flex:1;">CTA #${i + 1}</strong>
                         <button class="survey-cta-remove" data-idx="${i}" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:14px;" title="移除">✕</button>
                     </div>
@@ -934,7 +934,7 @@ export class Editor {
                         <label style="font-size:11px;color:#64748b;">圖示</label>
                         <input class="form-input survey-cta-icon" data-idx="${i}" value="${c.icon || 'link'}" placeholder="icon" style="width:80px;font-size:11px;">
                         <label style="font-size:11px;color:#64748b;">色</label>
-                        <input type="color" class="survey-cta-color" data-idx="${i}" value="${c.color || '#6366f1'}" style="width:28px;height:24px;border:none;cursor:pointer;">
+                        <input type="color" class="survey-cta-color" data-idx="${i}" value="${c.color || '#1a73e8'}" style="width:28px;height:24px;border:none;cursor:pointer;">
                     </div>
                 </div>
             `).join('');
@@ -972,7 +972,7 @@ export class Editor {
 
         // 圖表元件
         if (type === 'chart') {
-            const CHART_COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
+            const CHART_COLORS = ['#3b82f6', '#4285f4', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
             html += `
                 <div class="property-section">
                     <div class="property-section-title">圖表設定</div>
@@ -1207,7 +1207,7 @@ export class Editor {
                         <label class="form-label">節點（點擊預覽圖新增）</label>
                         <div class="hs-preview-wrap" id="hsPreviewWrap" style="position:relative;width:100%;aspect-ratio:3/2;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;cursor:crosshair;">
                             ${elementData.image ? '<img src="' + elementData.image + '" style="width:100%;height:100%;object-fit:contain;">' : '<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#94a3b8;font-size:13px;">請先輸入圖片 URL</span>'}
-                            ${nodes.map(n => '<div class="hs-preview-node" style="position:absolute;left:' + n.x + '%;top:' + n.y + '%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;background:' + (n.isCorrect ? '#10b981' : '#6366f1') + ';color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">' + n.label + '</div>').join('')}
+                            ${nodes.map(n => '<div class="hs-preview-node" style="position:absolute;left:' + n.x + '%;top:' + n.y + '%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;background:' + (n.isCorrect ? '#10b981' : '#1a73e8') + ';color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">' + n.label + '</div>').join('')}
                         </div>
                     </div>
                     <div class="hs-nodes-list" id="hsNodesList">${nodesListHtml}</div>
@@ -1258,11 +1258,11 @@ export class Editor {
                     <div class="property-section-title">線條樣式</div>
                     <div class="property-row">
                         <label>線條色</label>
-                        <input type="color" id="flowLineColor" value="${elementData.lineColor || '#6366f1'}">
+                        <input type="color" id="flowLineColor" value="${elementData.lineColor || '#1a73e8'}">
                     </div>
                     <div class="property-row">
                         <label>光暈色</label>
-                        <input type="color" id="flowGlowColor" value="${elementData.glowColor || '#818cf8'}">
+                        <input type="color" id="flowGlowColor" value="${elementData.glowColor || '#4285f4'}">
                     </div>
                     <div class="property-row">
                         <label>線寬</label>
@@ -1272,7 +1272,7 @@ export class Editor {
                     <div class="property-row">
                         <label>箭頭</label>
                         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;">
-                            <input type="checkbox" id="flowShowArrow" ${elementData.showArrow ? 'checked' : ''} style="accent-color:#6366f1;">
+                            <input type="checkbox" id="flowShowArrow" ${elementData.showArrow ? 'checked' : ''} style="accent-color:#1a73e8;">
                             <span style="font-size:12px;">顯示箭頭</span>
                         </label>
                     </div>
@@ -1308,7 +1308,7 @@ export class Editor {
                     <div class="property-section-title">路徑控制</div>
                     <div style="font-size:11px;color:#64748b;line-height:1.6;">
                         <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">info</span>
-                        選取流動線後，拖曳<b style="color:#6366f1;">紫色圓點</b>即可調整路徑。端點靠近其他元素時會自動吸附。
+                        選取流動線後，拖曳<b style="color:#1a73e8;">紫色圓點</b>即可調整路徑。端點靠近其他元素時會自動吸附。
                     </div>
                     ${elementData.snapStartId || elementData.snapEndId ? `<div style="margin-top:6px;font-size:11px;color:#10b981;">✓ 已吸附元素，拖曳元素時線條會跟隨</div>` : ''}
                 </div>
@@ -1591,7 +1591,7 @@ export class Editor {
         const addChartBtn = document.getElementById('addChartData');
         if (addChartBtn) {
             addChartBtn.addEventListener('click', () => {
-                const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
+                const COLORS = ['#3b82f6', '#4285f4', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
                 const data = [...(elementData.chartData || [])];
                 data.push({ label: `項目 ${data.length + 1}`, value: 50, color: COLORS[data.length % 8] });
                 this.slideManager.updateElement(elementId, { chartData: data });
@@ -1789,7 +1789,7 @@ export class Editor {
                     elementData.thankYouConfig = {
                         sectionTitle: '✨ 修完這堂課，你還可以…',
                         ctaCards: [
-                            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#6366f1' },
+                            { title: '數位簡報室・更多課程', desc: '探索更多數位工具與 AI 應用課程', url: 'https://tbr.digital', icon: 'school', color: '#1a73e8' },
                             { title: '企業顧問服務', desc: '內部培訓 ・ 諮詢 ・ 數位工具導入', url: 'https://tbr.digital/consulting', icon: 'handshake', color: '#eab308' },
                             { title: '前往 Threads 分享心得', desc: '標記 @TBR.DIGITAL 讓老師看到你的感受！', url: 'https://www.threads.net/intent/post?text=' + encodeURIComponent('剛上完數位簡報室的課程！收穫滿滿 🎓✨ @TBR.DIGITAL'), icon: 'share', color: '#10b981' }
                         ],
@@ -1846,7 +1846,7 @@ export class Editor {
             // 新增 CTA
             document.getElementById('addCtaCardBtn')?.addEventListener('click', () => {
                 const cfg = ensureCfg();
-                cfg.ctaCards.push({ title: '新連結', desc: '', url: '#', icon: 'link', color: '#6366f1' });
+                cfg.ctaCards.push({ title: '新連結', desc: '', url: '#', icon: 'link', color: '#1a73e8' });
                 this.slideManager.saveCurrentSlide();
                 this.slideManager.renderCurrentSlide();
                 this.selectElementById(elementId);

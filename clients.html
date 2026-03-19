@@ -8,7 +8,7 @@
     <meta name="description" content="企業內訓客戶管理介面">
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet">
@@ -36,7 +36,7 @@
         }
 
         .client-card:hover {
-            border-color: #c7d2fe;
+            border-color: #a8c7fa;
             box-shadow: 0 4px 16px rgba(79, 70, 229, 0.08);
         }
 
@@ -51,7 +51,7 @@
             width: 52px;
             height: 52px;
             border-radius: 10px;
-            background: #f1f5f9;
+            background: #f1f3f4;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -68,18 +68,18 @@
 
         .client-logo .material-symbols-outlined {
             font-size: 24px;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .client-name {
             font-weight: 600;
             font-size: 1rem;
-            color: #1e293b;
+            color: #1f1f1f;
         }
 
         .client-meta {
             font-size: 0.82rem;
-            color: #64748b;
+            color: #444746;
             margin-top: 2px;
         }
 
@@ -88,7 +88,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px 20px;
             font-size: 0.82rem;
-            color: #64748b;
+            color: #444746;
             margin-top: 4px;
         }
 
@@ -100,11 +100,11 @@
 
         .client-info-item .material-symbols-outlined {
             font-size: 16px;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .client-info-label {
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .client-card-actions {
@@ -113,7 +113,7 @@
             gap: 6px;
             margin-top: 14px;
             padding-top: 12px;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid #f1f3f4;
         }
 
         .client-projects {
@@ -131,7 +131,7 @@
             border-radius: 6px;
             font-size: 0.75rem;
             background: #f0f4ff;
-            color: #4f46e5;
+            color: #1765cc;
         }
 
         /* Modal */
@@ -165,7 +165,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 20px 24px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f3f4;
         }
 
         .modal-header h3 {
@@ -180,7 +180,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #94a3b8;
+            color: #80868b;
             padding: 4px;
         }
 
@@ -190,7 +190,7 @@
 
         .modal-footer {
             padding: 16px 24px;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid #f1f3f4;
             display: flex;
             justify-content: flex-end;
             gap: 8px;
@@ -221,13 +221,13 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #4f46e5;
+            border-color: #1765cc;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
         .form-hint {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: #80868b;
             margin-top: 4px;
         }
 
@@ -239,10 +239,10 @@
 
         .form-error {
             display: none;
-            color: #ef4444;
+            color: #d93025;
             font-size: 0.82rem;
             padding: 8px 12px;
-            background: #fef2f2;
+            background: #fce8e6;
             border-radius: 8px;
             margin-top: 8px;
         }
@@ -272,7 +272,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
+            background: #1f1f1f;
             color: #fff;
             padding: 10px 24px;
             border-radius: 10px;
@@ -327,7 +327,7 @@
             align-items: center;
             gap: 8px;
             padding: 60px 20px;
-            color: #94a3b8;
+            color: #80868b;
         }
 
         .empty-state .material-symbols-outlined {
@@ -377,7 +377,7 @@
             <div class="modal">
                 <div class="modal-header">
                     <h3 id="clientModalTitle">
-                        <span class="material-symbols-outlined" style="font-size:20px;color:#4f46e5">business</span>
+                        <span class="material-symbols-outlined" style="font-size:20px;color:#1765cc">business</span>
                         新增客戶
                     </h3>
                     <button class="modal-close" id="clientModalClose">
@@ -548,7 +548,7 @@
         // ── Modal ──
         function openAddModal() {
             editingId = null;
-            document.getElementById('clientModalTitle').innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:#4f46e5">add_business</span> 新增客戶';
+            document.getElementById('clientModalTitle').innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:#1765cc">add_business</span> 新增客戶';
             document.getElementById('clientModalSubmit').textContent = '新增';
             clearForm();
             document.getElementById('clientModal').classList.add('active');
@@ -558,7 +558,7 @@
             const c = clients.find(x => x.id === id);
             if (!c) return;
             editingId = id;
-            document.getElementById('clientModalTitle').innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:#4f46e5">edit</span> 編輯客戶';
+            document.getElementById('clientModalTitle').innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:#1765cc">edit</span> 編輯客戶';
             document.getElementById('clientModalSubmit').textContent = '儲存';
             document.getElementById('clientName').value = c.name || '';
             document.getElementById('clientLogo').value = c.logo_url || '';

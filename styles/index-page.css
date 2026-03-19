@@ -156,8 +156,8 @@ body {
 }
 
 .pd-row-action.danger:hover {
-    background: #fef2f2;
-    color: #dc2626;
+    background: #fce8e6;
+    color: #c5221f;
 }
 
 .pd-row-action .material-symbols-outlined {
@@ -196,7 +196,7 @@ body {
 }
 
 .pd-session-item:hover {
-    border-color: #c7d2fe;
+    border-color: #a8c7fa;
 }
 
 .pd-session-item .session-date {
@@ -249,7 +249,7 @@ body {
 .pd-session-item .session-join {
     width: auto;
     font-size: 0.72rem;
-    background: #e0e7ff;
+    background: #d2e3fc;
     color: #4338ca;
     padding: 2px 8px;
     border-radius: 5px;
@@ -258,7 +258,7 @@ body {
 }
 
 .pd-session-item .session-join:hover {
-    background: #c7d2fe;
+    background: #a8c7fa;
 }
 
 .pd-add-session {
@@ -267,7 +267,7 @@ body {
     gap: 3px;
     margin-top: 4px;
     font-size: 0.76rem;
-    color: #9ca3af;
+    color: #80868b;
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 6px;
@@ -299,7 +299,7 @@ body {
     padding: 2px 6px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
-    background: #f8fafc;
+    background: #f8f9fa;
     color: var(--text-secondary);
     font-family: inherit;
     cursor: pointer;
@@ -309,7 +309,7 @@ body {
 }
 
 .session-phase-select:focus {
-    border-color: #818cf8;
+    border-color: #4285f4;
 }
 
 /* ── Project action buttons (inside expanded area) ── */
@@ -340,8 +340,8 @@ body {
 }
 
 .pd-proj-btn:hover {
-    background: #eef2ff;
-    border-color: #818cf8;
+    background: #e8f0fe;
+    border-color: #4285f4;
     color: #4338ca;
 }
 
@@ -351,7 +351,7 @@ body {
 
 /* ── Settings panel ── */
 .pd-settings-panel {
-    background: #f8fafc;
+    background: #f8f9fa;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 12px 14px;

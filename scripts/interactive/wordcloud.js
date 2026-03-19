@@ -176,7 +176,7 @@ export class WordCloudGame {
 
             const entries = Object.entries(freq).sort((a, b) => b[1] - a[1]).slice(0, 50);
             const maxFreq = Math.max(...entries.map(e => e[1]), 1);
-            const colors = ['#0969da', '#cf222e', '#1a7f37', '#9a6700', '#7c3aed', '#0e7490', '#bf5600', '#6e40c9', '#0550ae', '#953800'];
+            const colors = ['#0969da', '#cf222e', '#1a7f37', '#9a6700', '#1a73e8', '#0e7490', '#bf5600', '#6e40c9', '#0550ae', '#953800'];
 
             cloudEl.innerHTML = entries.map(([word, count], i) => {
                 const size = 0.85 + (count / maxFreq) * 2.2;

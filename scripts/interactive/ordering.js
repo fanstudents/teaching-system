@@ -407,7 +407,7 @@ export class OrderingGame {
        Confetti 效果 (成功時)
        ==================================================== */
     spawnConfetti(container) {
-        const colors = ['#4A7AE8', '#22c55e', '#f59e0b', '#ec4899', '#8b5cf6'];
+        const colors = ['#4A7AE8', '#22c55e', '#f59e0b', '#ec4899', '#4285f4'];
         const rect = container.getBoundingClientRect();
         for (let i = 0; i < 30; i++) {
             const dot = document.createElement('div');
