@@ -473,11 +473,15 @@ function renderOutlineFromDB() {
                 // Side-by-side grid columns
                 const cols = schedule.map(dayInfo => {
                     const dayBlocks = od.timeline.filter(b => (b.day || 1) === dayInfo.day);
-                    const dateStr = dayInfo.date ? (() => { const d = new Date(dayInfo.date + 'T00:00:00'); return `${d.getMonth()+1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）`; })() : '';
+                    let badgeText = `Day ${dayInfo.day}`;
+                    if (dayInfo.date) {
+                        const d = new Date(dayInfo.date + 'T00:00:00');
+                        badgeText = `${d.getMonth()+1}/${d.getDate()} ${'日一二三四五六'[d.getDay()]}`;
+                    }
                     return `<div class="timeline-day-col">
                         <div class="timeline-day-header">
-                            <span class="timeline-day-badge">Day ${dayInfo.day}</span>
-                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}${dateStr ? `<span style="margin-left:8px;font-size:0.78rem;color:var(--text-2);font-weight:400">${dateStr}</span>` : ''}</span>
+                            <span class="timeline-day-badge">${badgeText}</span>
+                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
                         </div>
                         ${renderBlocks(dayBlocks)}
                     </div>`;
