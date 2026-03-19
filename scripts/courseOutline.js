@@ -2244,7 +2244,8 @@ window.handleFileUpload = async (input) => {
         }
 
         const projectId = projectData?.id || 'default';
-        const key = `projects/${projectId}/${Date.now()}_${encodeURIComponent(file.name)}`;
+        const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+        const key = `projects/${projectId}/${Date.now()}${fileExt}`;
         const { data, error } = await storage.upload('outline-files', key, file);
 
         if (error) {
