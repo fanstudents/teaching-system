@@ -2283,9 +2283,10 @@ window.handleFileUpload = async (input) => {
 };
 
 async function loadUploadedFiles() {
+    uploadedFiles = []; // 清空避免殘留上一個專案的檔案
     const projectId = projectData?.id;
     if (!projectId) { renderFileList(); return; }
-    const { data } = await db.select('project_files', { project_id: projectId });
+    const { data } = await db.select('project_files', { project_id: `eq.${projectId}` });
     if (data?.length) {
         uploadedFiles = data.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
     }
