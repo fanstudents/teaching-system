@@ -425,8 +425,18 @@ function renderOutlineFromDB() {
             } else if (od.hero?.days && od.hero.days !== '1') {
                 scheduleText = `${od.hero.days} 天`;
             }
+            // Build date text from schedule dates
+            let dateText = '';
+            const datesWithValue = schedule.filter(s => s.date);
+            if (datesWithValue.length > 0) {
+                dateText = datesWithValue.map(s => {
+                    const d = new Date(s.date + 'T00:00:00');
+                    return `${d.getMonth()+1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）`;
+                }).join('、');
+            }
             const items = [
                 { icon: 'schedule', text: scheduleText },
+                { icon: 'event', text: dateText },
                 { icon: 'groups', text: od.hero.groupSize },
                 { icon: 'location_on', text: od.hero.location }
             ].filter(i => i.text);
@@ -463,10 +473,11 @@ function renderOutlineFromDB() {
                 // Side-by-side grid columns
                 const cols = schedule.map(dayInfo => {
                     const dayBlocks = od.timeline.filter(b => (b.day || 1) === dayInfo.day);
+                    const dateStr = dayInfo.date ? (() => { const d = new Date(dayInfo.date + 'T00:00:00'); return `${d.getMonth()+1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）`; })() : '';
                     return `<div class="timeline-day-col">
                         <div class="timeline-day-header">
                             <span class="timeline-day-badge">Day ${dayInfo.day}</span>
-                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
+                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}${dateStr ? `<span style="margin-left:8px;font-size:0.78rem;color:var(--text-2);font-weight:400">${dateStr}</span>` : ''}</span>
                         </div>
                         ${renderBlocks(dayBlocks)}
                     </div>`;
@@ -910,6 +921,7 @@ window.addScheduleDay = function(data = {}) {
     div.innerHTML = `
         <span class="oe-day-badge" style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:4px 10px;border-radius:6px;background:var(--accent);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;white-space:nowrap">Day ${dayNum}</span>
         <input type="hidden" data-key="day" value="${dayNum}">
+        <input type="date" data-key="date" value="${_esc(data.date || '')}" style="font-size:0.82rem;border:1px solid var(--border);border-radius:6px;padding:4px 8px;background:#fff;color:var(--text);font-family:inherit">
         <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 8px">
             <input type="time" data-key="startTime" value="${_esc(data.startTime || '09:00')}" style="width:80px;font-size:0.85rem;border:none;outline:none;background:transparent;font-weight:600" onchange="_updateTimelineTimeRanges()">
             <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">開始</span>
@@ -934,6 +946,7 @@ window.renumberScheduleDays = function() {
 function getScheduleDays() {
     return [...document.querySelectorAll('#oeScheduleList .oe-schedule-day')].map(el => ({
         day: parseInt(el.querySelector('[data-key="day"]').value),
+        date: el.querySelector('[data-key="date"]')?.value || '',
         hours: el.querySelector('[data-key="hours"]').value.trim(),
         startTime: el.querySelector('[data-key="startTime"]')?.value || '09:00',
         topic: el.querySelector('[data-key="topic"]').value.trim()
@@ -2028,8 +2041,8 @@ ${equipNote ? `\n⚠️ ${equipNote}` : ''}
 📅 上課時間與地點
 ━━━━━━━━━━━━━━━━━━━━
 
-日　　期：【請填入上課日期】
-時　　間：【請填入上課時間】
+日　　期：${schedule.some(s => s.date) ? schedule.filter(s => s.date).map(s => { const d = new Date(s.date + 'T00:00:00'); return `Day ${s.day} — ${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）`; }).join('\n　　　　　') : '【請填入上課日期】'}
+時　　間：${schedule[0]?.startTime ? schedule.map(s => `Day ${s.day} — ${s.startTime} 開始${s.hours ? `（${s.hours} 小時）` : ''}`).join('\n　　　　　') : '【請填入上課時間】'}
 地　　點：【請填入上課地點】
 
 
