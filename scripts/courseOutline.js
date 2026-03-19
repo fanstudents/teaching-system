@@ -638,6 +638,21 @@ async function enterPage() {
         if (previewBtn && projectData?.id) {
             previewBtn.href = `${location.origin}/course-outline.html?project=${projectData.id}&preview=admin`;
         }
+        // Copy client link button
+        const copyLinkBtn = document.getElementById('btnCopyClientLink');
+        if (copyLinkBtn && projectData?.id) {
+            copyLinkBtn.addEventListener('click', () => {
+                const url = `${location.origin}/course-outline.html?project=${projectData.id}`;
+                navigator.clipboard.writeText(url).then(() => {
+                    const orig = copyLinkBtn.innerHTML;
+                    copyLinkBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已複製';
+                    copyLinkBtn.style.background = '#059669';
+                    copyLinkBtn.style.color = '#fff';
+                    copyLinkBtn.style.borderColor = '#059669';
+                    setTimeout(() => { copyLinkBtn.innerHTML = orig; copyLinkBtn.style.background = ''; copyLinkBtn.style.color = ''; copyLinkBtn.style.borderColor = ''; }, 2000);
+                });
+            });
+        }
         // Set back to project button
         const backBtn = document.getElementById('btnBackToProject');
         if (backBtn && projectData?.id) {
