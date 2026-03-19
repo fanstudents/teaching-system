@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', init);
     const params = new URLSearchParams(location.search);
     const isPreview = params.get('preview') === 'admin';
     const hasToken = localStorage.getItem('_at') || sessionStorage.getItem('_at');
-    if (saved || isPreview || (params.get('admin') === '1' && hasToken)) {
+    if (saved || isPreview || params.get('code') || (params.get('admin') === '1' && hasToken)) {
         // Hide overlay before paint
         const style = document.createElement('style');
         style.textContent = '#loginOverlay{display:none!important}#pageContent{display:block!important}';
@@ -43,9 +43,25 @@ async function init() {
     isAdmin = params.get('admin') === '1';
     const sessionCode = params.get('session') || '';
     const projectId = params.get('project') || '';
+    const joinCode = params.get('code') || '';
 
     // Load session → project → org chain
-    if (sessionCode) {
+    if (joinCode) {
+        // ?code=JOINCODE — load project by join_code, auto-login
+        const { data: matchedProjects } = await db.select('projects', {
+            filter: { join_code: `eq.${joinCode.toUpperCase()}` },
+            limit: 1
+        });
+        if (matchedProjects?.length) {
+            projectData = matchedProjects[0];
+            if (projectData.organization_id) {
+                const { data: orgs } = await db.select('organizations', { filter: { id: `eq.${projectData.organization_id}` } });
+                if (orgs?.length) orgData = orgs[0];
+            }
+            const { data: sess } = await db.select('project_sessions', { filter: { project_id: `eq.${projectData.id}` }, order: 'date.asc', limit: 1 });
+            if (sess?.length) sessionData = sess[0];
+        }
+    } else if (sessionCode) {
         await loadSessionChain(sessionCode);
     } else if (projectId) {
         await loadProjectDirect(projectId);
@@ -57,6 +73,14 @@ async function init() {
     // Reveal login overlay now that dynamic content is populated
     const loginOverlay = document.getElementById('loginOverlay');
     if (loginOverlay) loginOverlay.style.opacity = '1';
+
+    // Auto-login when ?code= loaded a project successfully
+    if (joinCode && projectData?.id) {
+        currentUser = { name: '訪客', _isClient: true };
+        sessionStorage.setItem('outline_user', JSON.stringify(currentUser));
+        enterPage();
+        return;
+    }
 
     // Admin preview mode: skip login when coming from editor preview button
     const isPreview = params.get('preview') === 'admin';
@@ -642,7 +666,10 @@ async function enterPage() {
         const copyLinkBtn = document.getElementById('btnCopyClientLink');
         if (copyLinkBtn && projectData?.id) {
             copyLinkBtn.addEventListener('click', () => {
-                const url = `${location.origin}/course-outline.html?project=${projectData.id}`;
+                const code = projectData.join_code || '';
+                const url = code
+                    ? `${location.origin}/course-outline.html?code=${code}`
+                    : `${location.origin}/course-outline.html?project=${projectData.id}`;
                 navigator.clipboard.writeText(url).then(() => {
                     const orig = copyLinkBtn.innerHTML;
                     copyLinkBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已複製';
