@@ -525,7 +525,7 @@ function renderOutlineFromDB() {
                             <span class="timeline-day-badge">${badgeText}</span>
                             <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
                         </div>
-                        ${dayInfo.instructor ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;margin-bottom:10px;background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:8px;border:1px solid rgba(99,102,241,0.12)"><span class="material-symbols-outlined" style="font-size:16px;color:var(--accent)">person</span><span style="font-size:0.82rem;font-weight:600;color:var(--text-1)">${dayInfo.instructor}</span></div>` : ''}
+                        ${dayInfo.instructor ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;margin-bottom:10px;background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:8px;border:1px solid rgba(99,102,241,0.12)"><span class="material-symbols-outlined" style="font-size:16px;color:var(--accent)">person</span><span style="font-size:0.82rem;font-weight:600;color:var(--text-1)">課堂講師：${dayInfo.instructor}</span></div>` : ''}
                         ${renderBlocks(dayBlocks)}
                     </div>`;
                 }).join('');
