@@ -13,8 +13,22 @@ const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
 
 // 動態 headers：如果有 access token 就用 authenticated 身份
+function _isJwtExpired(token) {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp && payload.exp * 1000 < Date.now();
+    } catch { return true; }
+}
+
 function getHeaders() {
-    const token = (localStorage.getItem('_at') || sessionStorage.getItem('_at')) || SUPABASE_ANON_KEY;
+    let token = localStorage.getItem('_at') || sessionStorage.getItem('_at');
+    // 過期的 token 清掉，fallback 到 anon key
+    if (token && _isJwtExpired(token)) {
+        localStorage.removeItem('_at');
+        sessionStorage.removeItem('_at');
+        token = null;
+    }
+    token = token || SUPABASE_ANON_KEY;
     return {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${token}`,
