@@ -481,8 +481,9 @@ function renderOutlineFromDB() {
                     return `<div class="timeline-day-col">
                         <div class="timeline-day-header">
                             <span class="timeline-day-badge">${badgeText}</span>
-                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}${dayInfo.instructor ? `<span style="margin-left:8px;font-size:0.78rem;color:var(--text-2);font-weight:400">👤 ${dayInfo.instructor}</span>` : ''}</span>
+                            <span class="timeline-day-info">${dayInfo.topic || ''}${dayInfo.hours ? ` — ${dayInfo.hours} 小時` : ''}</span>
                         </div>
+                        ${dayInfo.instructor ? `<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;margin-bottom:10px;background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:8px;border:1px solid rgba(99,102,241,0.12)"><span class="material-symbols-outlined" style="font-size:16px;color:var(--accent)">person</span><span style="font-size:0.82rem;font-weight:600;color:var(--text-1)">${dayInfo.instructor}</span></div>` : ''}
                         ${renderBlocks(dayBlocks)}
                     </div>`;
                 }).join('');
