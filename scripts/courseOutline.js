@@ -54,6 +54,10 @@ async function init() {
     // Apply dynamic data to page
     renderDynamicContent();
 
+    // Reveal login overlay now that dynamic content is populated
+    const loginOverlay = document.getElementById('loginOverlay');
+    if (loginOverlay) loginOverlay.style.opacity = '1';
+
     // Admin preview mode: skip login when coming from editor preview button
     const isPreview = params.get('preview') === 'admin';
     if (isPreview && (localStorage.getItem('_at') || localStorage.getItem('_rt'))) {
