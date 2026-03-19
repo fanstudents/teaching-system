@@ -798,10 +798,13 @@ function initOutlineEditor() {
         } else {
             emailTemplEl.textContent = _generateEmailText();
         }
-        document.getElementById('btnRegenEmail')?.addEventListener('click', () => {
-            if (confirm('確定要依目前課綱資料重新生成通知信範本嗎？\n現有內容將被覆蓋。')) {
-                emailTemplEl.textContent = _generateEmailText();
-            }
+        document.getElementById('btnRegenEmail')?.addEventListener('click', (e) => {
+            emailTemplEl.textContent = _generateEmailText();
+            const btn = e.currentTarget;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">check</span> 已重新生成';
+            btn.style.background = '#059669';
+            setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
         });
         document.getElementById('btnCopyEmailAdmin')?.addEventListener('click', () => {
             const text = emailTemplEl.innerText;
