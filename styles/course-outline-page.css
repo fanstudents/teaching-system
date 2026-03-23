@@ -1218,7 +1218,8 @@ body {
     background: #fff; border: 1.5px solid #d2e3fc;
     border-radius: var(--radius-lg); padding: 0;
     display: flex; flex-direction: column;
-    min-height: 200px; transition: border-color 0.2s;
+    min-height: 200px; min-width: 0; overflow: hidden;
+    transition: border-color 0.2s;
 }
 .oe-day-column:hover { border-color: var(--accent); }
 
@@ -1256,13 +1257,15 @@ body {
 /* Items inside columns are more compact */
 .oe-day-column-body .oe-list-item {
     padding: 12px 12px 12px 40px;
+    overflow: hidden;
 }
 .oe-day-column-body .oe-list-item::after {
     left: 10px; top: 12px;
     width: 22px; height: 22px; font-size: 0.68rem;
 }
 .oe-day-column-body .oe-list-item .oe-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
 }
 /* Hide day selector inside columns (the column IS the day) */
 .oe-day-column-body .oe-list-item .oe-field-day-select {
