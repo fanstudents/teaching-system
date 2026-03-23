@@ -2061,35 +2061,48 @@
             const cbs = document.querySelectorAll('.import-slide-cb:checked');
             if (cbs.length === 0) { alert('請先勾選要匯入的投影片'); return; }
 
-            const sm = window.slideManager;
+            const sm = window.app?.slideManager;
             if (!sm) { alert('SlideManager 尚未初始化'); return; }
 
-            let count = 0;
-            cbs.forEach(cb => {
-                const idx = parseInt(cb.dataset.idx);
-                const source = importSlides[idx];
-                if (!source) return;
+            try {
+                let count = 0;
+                cbs.forEach(cb => {
+                    const idx = parseInt(cb.dataset.idx);
+                    const source = importSlides[idx];
+                    if (!source) return;
 
-                const newSlide = {
-                    id: sm.generateId(),
-                    elements: JSON.parse(JSON.stringify(source.elements || [])),
-                    background: source.background || undefined
-                };
-                // Generate new IDs for all elements
-                newSlide.elements.forEach(el => { el.id = sm.generateId(); });
-                sm.slides.push(newSlide);
-                count++;
-            });
+                    // Deep clone the entire slide
+                    const cloned = JSON.parse(JSON.stringify(source));
+                    const newSlide = {
+                        id: sm.generateId(),
+                        elements: cloned.elements || [],
+                        background: cloned.background || '#ffffff'
+                    };
+                    // Copy additional properties if they exist
+                    if (cloned.transition) newSlide.transition = cloned.transition;
+                    if (cloned.speakerNotes) newSlide.speakerNotes = cloned.speakerNotes;
+                    if (cloned.teachingNotes) newSlide.teachingNotes = cloned.teachingNotes;
+                    if (cloned.sectionStart) newSlide.sectionStart = cloned.sectionStart;
 
-            if (count > 0) {
-                sm.navigateTo(sm.slides.length - count);
-                sm.renderThumbnails();
-                sm.updateCounter();
-                sm.saveNow();
+                    // Generate new IDs for all elements
+                    newSlide.elements.forEach(el => { el.id = sm.generateId(); });
+                    sm.slides.push(newSlide);
+                    count++;
+                });
+
+                if (count > 0) {
+                    sm.renderThumbnails();
+                    sm.navigateTo(sm.slides.length - count);
+                    sm.updateCounter();
+                    sm.saveNow();
+                }
+
+                document.getElementById('importSlidesModal').style.display = 'none';
+                alert(`已匯入 ${count} 頁投影片`);
+            } catch (err) {
+                console.error('Import slides error:', err);
+                alert('匯入時發生錯誤：' + err.message);
             }
-
-            document.getElementById('importSlidesModal').style.display = 'none';
-            alert(`已匯入 ${count} 頁投影片`);
         };
     </script>
 
