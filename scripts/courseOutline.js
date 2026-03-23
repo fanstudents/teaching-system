@@ -837,6 +837,9 @@ function updateTopbar() {
 function initOutlineEditor() {
     const od = getOutlineData();
 
+    // Suppress column rebuild during initial population
+    _suppressRebuild = true;
+
     // Populate hero fields
     if (od?.hero) {
         _v('oeHeroSubtitle', od.hero.subtitle);
@@ -861,6 +864,13 @@ function initOutlineEditor() {
     // Populate timeline
     if (od?.timeline?.length > 0) {
         od.timeline.forEach(block => addTimelineBlock(block));
+    }
+
+    // Now enable rebuild and trigger it if multi-day
+    _suppressRebuild = false;
+    const scheduleDays = getScheduleDays();
+    if (scheduleDays.length > 1) {
+        rebuildTimelineColumns();
     }
 
     // Populate tools
@@ -992,6 +1002,16 @@ function _v(id, val) {
 
 // ── Schedule Day Builder ──
 let _schCounter = 0;
+let _rebuildColumnsTimer = null;
+let _suppressRebuild = false;
+function _scheduleRebuildColumns() {
+    if (_suppressRebuild) return;
+    clearTimeout(_rebuildColumnsTimer);
+    _rebuildColumnsTimer = setTimeout(() => {
+        if (typeof rebuildTimelineColumns === 'function') rebuildTimelineColumns();
+    }, 100);
+}
+
 window.addScheduleDay = function(data = {}) {
     const list = document.getElementById('oeScheduleList');
     if (!list) return;
@@ -1016,9 +1036,11 @@ window.addScheduleDay = function(data = {}) {
         </div>
         <input type="text" data-key="topic" value="${_esc(data.topic || '')}" placeholder="當日課程主題" style="flex:1;min-width:120px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
         <input type="text" data-key="instructor" value="${_esc(data.instructor || '')}" placeholder="講師" style="width:80px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
-        <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
+        <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays();_scheduleRebuildColumns()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
     `;
     list.appendChild(div);
+    // Trigger column rebuild after adding a day (debounced)
+    _scheduleRebuildColumns();
 };
 
 window.renumberScheduleDays = function() {
@@ -1076,11 +1098,12 @@ function getScheduleOptions() {
 
 // ── Timeline Block ──
 let _tlCounter = 0;
-window.addTimelineBlock = function(data = {}, afterEl = null) {
-    const list = document.getElementById('oeTimelineList');
+let _isColumnMode = false; // tracks whether multi-day column layout is active
+
+window.addTimelineBlock = function(data = {}, afterEl = null, targetDay = null) {
     const idx = _tlCounter++;
     const dayOptions = getScheduleOptions();
-    // Parse duration from existing data.time (may be "09:00 – 10:10（50 分鐘）" or "50 分鐘" or just a number)
+    // Parse duration from existing data.time
     let durationMin = data.duration || 0;
     if (!durationMin && data.time) {
         const m = data.time.match(/(\d+)\s*分鐘/);
@@ -1095,7 +1118,7 @@ window.addTimelineBlock = function(data = {}, afterEl = null) {
     div.innerHTML = `
         <button class="oe-delete" onclick="this.closest('.oe-list-item').remove();_updateTimelineTimeRanges()"><span class="material-symbols-outlined">close</span></button>
         <div class="oe-row" style="grid-template-columns:80px 120px 1fr 120px">
-            <div class="oe-field"><label>天數</label><select data-key="day" onchange="_updateTimelineTimeRanges()">${dayOptions}</select></div>
+            <div class="oe-field oe-field-day-select"><label>天數</label><select data-key="day" onchange="_updateTimelineTimeRanges()">${dayOptions}</select></div>
             <div class="oe-field"><label>時長</label>
                 <select data-key="duration" onchange="_updateTimelineTimeRanges()">
                     <option value="">選擇</option>
@@ -1111,10 +1134,10 @@ window.addTimelineBlock = function(data = {}, afterEl = null) {
         <div class="oe-field" style="margin-top:8px"><label>描述</label><textarea data-key="desc" rows="2" placeholder="模組說明...">${_esc(data.desc || '')}</textarea></div>
         <div class="oe-field" style="margin-top:8px"><label>標籤（逗號分隔）</label><input type="text" data-key="tags" value="${_esc((data.tags||[]).join(', '))}" placeholder="AI 辦公趨勢, 案例分享"></div>
     `;
-    if (data.day) {
-        const sel = div.querySelector('[data-key="day"]');
-        sel.value = data.day;
-    }
+    const actualDay = targetDay || data.day || 1;
+    const sel = div.querySelector('[data-key="day"]');
+    sel.value = actualDay;
+
     // Show/hide custom duration input
     const durSel = div.querySelector('[data-key="duration"]');
     const customInput = div.querySelector('[data-key="customDuration"]');
@@ -1122,15 +1145,160 @@ window.addTimelineBlock = function(data = {}, afterEl = null) {
         customInput.style.display = durSel.value === 'custom' ? 'block' : 'none';
         if (durSel.value !== 'custom') customInput.value = '';
     });
-    if (afterEl && afterEl.parentNode === list) {
-        list.insertBefore(div, afterEl.nextSibling);
+
+    // Determine where to insert
+    if (_isColumnMode) {
+        // Column mode: insert into the correct day column
+        const colBody = document.querySelector(`.oe-day-column[data-day="${actualDay}"] .oe-day-column-body`);
+        if (colBody) {
+            if (afterEl && afterEl.parentNode === colBody) {
+                colBody.insertBefore(div, afterEl.nextSibling);
+            } else {
+                colBody.appendChild(div);
+            }
+        } else {
+            // Fallback: append to flat list
+            const list = document.getElementById('oeTimelineList');
+            list.appendChild(div);
+        }
     } else {
-        list.appendChild(div);
+        // Flat list mode
+        const list = document.getElementById('oeTimelineList');
+        if (afterEl && afterEl.parentNode === list) {
+            list.insertBefore(div, afterEl.nextSibling);
+        } else {
+            list.appendChild(div);
+        }
     }
     _makeDraggable(div);
-    // Trigger time range recalc
     setTimeout(() => _updateTimelineTimeRanges(), 0);
 };
+
+// ══════════════════════════════════════
+// MULTI-DAY COLUMN LAYOUT
+// ══════════════════════════════════════
+
+window.rebuildTimelineColumns = function() {
+    const scheduleDays = getScheduleDays();
+    const isMultiDay = scheduleDays.length > 1;
+    const container = document.getElementById('oeTimelineList').parentNode;
+    const flatList = document.getElementById('oeTimelineList');
+    const addBtn = flatList.nextElementSibling?.classList?.contains('oe-add-btn')
+        ? flatList.nextElementSibling : null;
+
+    // Collect all existing blocks with their data BEFORE modifying DOM
+    const allBlocks = _collectBlocksFromDOM();
+
+    // Remove old column container if exists
+    const oldCols = container.querySelector('.oe-timeline-columns');
+    if (oldCols) oldCols.remove();
+    const oldSummary = container.querySelector('.oe-columns-summary');
+    if (oldSummary) oldSummary.remove();
+
+    // Clear flat list
+    flatList.innerHTML = '';
+    _tlCounter = 0;
+
+    if (isMultiDay) {
+        // ── Column mode ──
+        _isColumnMode = true;
+        flatList.style.display = 'none';
+        if (addBtn) addBtn.style.display = 'none';
+
+        const grid = document.createElement('div');
+        grid.className = `oe-timeline-columns oe-timeline-columns-${Math.min(scheduleDays.length, 4)}`;
+
+        scheduleDays.forEach(dayInfo => {
+            const col = document.createElement('div');
+            col.className = 'oe-day-column';
+            col.dataset.day = dayInfo.day;
+
+            const topicText = dayInfo.topic ? ` — ${dayInfo.topic}` : '';
+            const hoursText = dayInfo.hours ? ` (${dayInfo.hours}h)` : '';
+            col.innerHTML = `
+                <div class="oe-day-column-header">
+                    <span class="oe-day-badge">Day ${dayInfo.day}</span>
+                    <span class="oe-day-topic">${topicText}${hoursText}</span>
+                </div>
+                <div class="oe-day-column-body oe-list" id="oeTimelineDay${dayInfo.day}"></div>
+                <div class="oe-day-column-footer">
+                    <button class="oe-col-add-btn" onclick="addTimelineBlock({}, null, ${dayInfo.day})">
+                        <span class="material-symbols-outlined">add</span> 新增時段
+                    </button>
+                </div>
+            `;
+            grid.appendChild(col);
+        });
+
+        // Insert grid before flatList
+        flatList.parentNode.insertBefore(grid, flatList);
+
+        // Re-add blocks to their columns
+        allBlocks.forEach(blockData => {
+            // Ensure block day exists, fallback to Day 1
+            const dayExists = scheduleDays.find(s => s.day === blockData.day);
+            if (!dayExists) blockData.day = scheduleDays[0].day;
+            addTimelineBlock(blockData, null, blockData.day);
+        });
+
+        // Init drag-and-drop for each column body
+        scheduleDays.forEach(dayInfo => {
+            const colBody = document.getElementById(`oeTimelineDay${dayInfo.day}`);
+            if (colBody) _setupDropZone(colBody);
+        });
+    } else {
+        // ── Flat list mode ──
+        _isColumnMode = false;
+        flatList.style.display = '';
+        if (addBtn) addBtn.style.display = '';
+
+        // Re-add blocks to flat list
+        allBlocks.forEach(blockData => {
+            blockData.day = 1;
+            addTimelineBlock(blockData);
+        });
+
+        initDragAndDrop();
+    }
+
+    setTimeout(() => _updateTimelineTimeRanges(), 0);
+};
+
+/** Collect timeline block data from current DOM (regardless of flat/column mode) */
+function _collectBlocksFromDOM() {
+    const items = document.querySelectorAll('.oe-list-item[data-idx]');
+    const blocks = [];
+    items.forEach(el => {
+        // Skip items not in timeline (toolbar, equip, etc)
+        const parentList = el.closest('.oe-list');
+        if (!parentList) return;
+        const isTimeline = parentList.id === 'oeTimelineList'
+            || parentList.classList.contains('oe-day-column-body');
+        if (!isTimeline) return;
+
+        const durSel = el.querySelector('[data-key="duration"]');
+        const customDur = el.querySelector('[data-key="customDuration"]');
+        let mins = 0;
+        if (durSel) {
+            mins = durSel.value === 'custom' ? (parseInt(customDur?.value) || 0) : (parseInt(durSel.value) || 0);
+        }
+
+        // In column mode, day comes from the column; in flat mode, from the select
+        let day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+        const col = el.closest('.oe-day-column');
+        if (col) day = parseInt(col.dataset.day);
+
+        blocks.push({
+            day,
+            duration: mins,
+            title: el.querySelector('[data-key="title"]')?.value?.trim() || '',
+            desc: el.querySelector('[data-key="desc"]')?.value?.trim() || '',
+            dept: el.querySelector('[data-key="dept"]')?.value?.trim() || '全部門',
+            tags: (el.querySelector('[data-key="tags"]')?.value || '').split(',').map(s => s.trim()).filter(Boolean)
+        });
+    });
+    return blocks;
+}
 
 // ── Tool Block ──
 let _toolCounter = 0;
@@ -1236,6 +1404,10 @@ function initDragAndDrop() {
         if (!list) return;
         _setupDropZone(list);
     });
+    // Also set up drop zones for column bodies
+    document.querySelectorAll('.oe-day-column-body').forEach(colBody => {
+        _setupDropZone(colBody);
+    });
 }
 
 function _setupDropZone(list) {
@@ -1310,11 +1482,25 @@ window._updateTimelineTimeRanges = function() {
     schedule.forEach(s => { scheduleMap[s.day] = s; });
 
     const dayAccum = {};
-    const items = document.querySelectorAll('#oeTimelineList .oe-list-item');
+    // Find all timeline items regardless of flat list or column mode
+    const allItems = _isColumnMode
+        ? document.querySelectorAll('.oe-day-column-body .oe-list-item')
+        : document.querySelectorAll('#oeTimelineList .oe-list-item');
     let totalMinAll = 0;
 
-    items.forEach(el => {
-        const day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+    allItems.forEach(el => {
+        // In column mode, day comes from the column; otherwise from the select
+        let day;
+        const col = el.closest('.oe-day-column');
+        if (col) {
+            day = parseInt(col.dataset.day);
+            // Also sync the hidden day select
+            const daySel = el.querySelector('[data-key="day"]');
+            if (daySel) daySel.value = day;
+        } else {
+            day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+        }
+
         const durSel = el.querySelector('[data-key="duration"]');
         const customDur = el.querySelector('[data-key="customDuration"]');
         let mins = 0;
@@ -1345,15 +1531,38 @@ window._updateTimelineTimeRanges = function() {
         badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">schedule</span>${pad(startH)}:${pad(startM)} – ${pad(endH)}:${pad(endM)}`;
     });
 
+    // Update per-column summaries
+    if (_isColumnMode) {
+        document.querySelectorAll('.oe-day-column').forEach(col => {
+            const d = col.dataset.day;
+            const mins = dayAccum[d] || 0;
+            let sumEl = col.querySelector('.oe-day-column-summary');
+            if (!sumEl) {
+                sumEl = document.createElement('div');
+                sumEl.className = 'oe-day-column-summary';
+                const footer = col.querySelector('.oe-day-column-footer');
+                col.insertBefore(sumEl, footer);
+            }
+            if (mins > 0) {
+                sumEl.innerHTML = `<span class="material-symbols-outlined" style="font-size:14px">schedule</span> ${Math.floor(mins/60)}h${mins%60 ? mins%60 + 'm' : ''}`;
+                sumEl.style.display = 'flex';
+            } else {
+                sumEl.style.display = 'none';
+            }
+        });
+    }
+
     // Update total summary
     let summaryEl = document.getElementById('oeTimelineSummary');
     if (!summaryEl) {
-        const list = document.getElementById('oeTimelineList');
-        if (list) {
+        const anchor = _isColumnMode
+            ? document.querySelector('.oe-timeline-columns')
+            : document.getElementById('oeTimelineList');
+        if (anchor) {
             summaryEl = document.createElement('div');
             summaryEl.id = 'oeTimelineSummary';
             summaryEl.style.cssText = 'padding:8px 20px;font-size:0.78rem;color:var(--text-2);display:flex;gap:16px;align-items:center;flex-wrap:wrap';
-            list.parentNode.insertBefore(summaryEl, list.nextSibling);
+            anchor.parentNode.insertBefore(summaryEl, anchor.nextSibling);
         }
     }
     if (summaryEl && totalMinAll > 0) {
@@ -1394,8 +1603,19 @@ function collectOutlineData() {
     const scheduleMap = {};
     od.schedule.forEach(s => { scheduleMap[s.day] = s; });
     const dayAccum = {}; // accumulated minutes per day
-    od.timeline = [...document.querySelectorAll('#oeTimelineList .oe-list-item')].map(el => {
-        const day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+    // Collect timeline items from either column mode or flat mode
+    const timelineSelector = _isColumnMode
+        ? '.oe-day-column-body .oe-list-item'
+        : '#oeTimelineList .oe-list-item';
+    od.timeline = [...document.querySelectorAll(timelineSelector)].map(el => {
+        // In column mode, derive day from the column container
+        let day;
+        const col = el.closest('.oe-day-column');
+        if (col) {
+            day = parseInt(col.dataset.day);
+        } else {
+            day = parseInt(el.querySelector('[data-key="day"]')?.value || '1');
+        }
         const durSel = el.querySelector('[data-key="duration"]');
         const customDur = el.querySelector('[data-key="customDuration"]');
         let mins = 0;
@@ -1494,11 +1714,24 @@ async function saveOutlineData() {
 
 // ── Import Defaults (from hardcoded HTML) ──
 function importDefaults() {
-    if (document.querySelectorAll('#oeTimelineList .oe-list-item').length > 0) {
+    const hasItems = document.querySelectorAll('#oeTimelineList .oe-list-item, .oe-day-column-body .oe-list-item').length > 0;
+    if (hasItems) {
         if (!confirm('目前表單已有資料，匯入預設值會覆蓋。確定要匯入嗎？')) return;
     }
+    // Clean up column mode
+    const oldCols = document.querySelector('.oe-timeline-columns');
+    if (oldCols) oldCols.remove();
+    const oldSummary = document.getElementById('oeTimelineSummary');
+    if (oldSummary) oldSummary.remove();
+    _isColumnMode = false;
+    const flatList = document.getElementById('oeTimelineList');
+    flatList.style.display = '';
+    // Re-show flat add button
+    const addBtn = flatList.nextElementSibling;
+    if (addBtn?.classList?.contains('oe-add-btn')) addBtn.style.display = '';
+
     // Clear existing
-    document.getElementById('oeTimelineList').innerHTML = '';
+    flatList.innerHTML = '';
     document.getElementById('oeToolsList').innerHTML = '';
     document.getElementById('oeEquipList').innerHTML = '';
     _tlCounter = 0; _toolCounter = 0; _eqCounter = 0;
@@ -1644,7 +1877,17 @@ async function importFromProject() {
 
 function _applyOutlineData(od) {
     if (!od) return;
-    document.getElementById('oeTimelineList').innerHTML = '';
+    // Remove existing columns if any
+    const oldCols = document.querySelector('.oe-timeline-columns');
+    if (oldCols) oldCols.remove();
+    const oldSummary = document.getElementById('oeTimelineSummary');
+    if (oldSummary) oldSummary.remove();
+
+    const flatList = document.getElementById('oeTimelineList');
+    flatList.innerHTML = '';
+    flatList.style.display = '';
+    _isColumnMode = false;
+
     document.getElementById('oeToolsList').innerHTML = '';
     document.getElementById('oeEquipList').innerHTML = '';
     _tlCounter = 0; _toolCounter = 0; _eqCounter = 0;
@@ -1660,10 +1903,45 @@ function _applyOutlineData(od) {
     }
 
     document.getElementById('oeScheduleList').innerHTML = '';
-    (od.schedule || []).forEach(s => addScheduleDay(s));
-    if (!od.schedule?.length) addScheduleDay({ day: 1, hours: '', topic: '' });
+    _schCounter = 0;
+    // Add schedule days WITHOUT triggering rebuild (we do it manually after timeline is loaded)
+    const schedDays = od.schedule?.length ? od.schedule : [{ day: 1, hours: '', topic: '' }];
+    schedDays.forEach(s => {
+        const list = document.getElementById('oeScheduleList');
+        if (!list) return;
+        const dayNum = s.day || (list.children.length + 1);
+        const div = document.createElement('div');
+        div.className = 'oe-schedule-day';
+        div.style.cssText = 'display:flex;gap:10px;align-items:center;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#e8f0fe);border:1px solid #d2e3fc;border-radius:10px;transition:box-shadow 0.2s;flex-wrap:wrap';
+        div.onmouseenter = () => div.style.boxShadow = '0 2px 8px rgba(99,102,241,0.08)';
+        div.onmouseleave = () => div.style.boxShadow = 'none';
+        div.innerHTML = `
+            <span class="oe-day-badge" style="display:inline-flex;align-items:center;justify-content:center;min-width:52px;padding:4px 10px;border-radius:6px;background:var(--accent);color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:0.04em;white-space:nowrap">Day ${dayNum}</span>
+            <input type="hidden" data-key="day" value="${dayNum}">
+            <input type="date" data-key="date" value="${_esc(s.date || '')}" style="font-size:0.82rem;border:1px solid var(--border);border-radius:6px;padding:4px 8px;background:#fff;color:var(--text);font-family:inherit">
+            <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 8px">
+                <input type="time" data-key="startTime" value="${_esc(s.startTime || '09:00')}" style="width:80px;font-size:0.85rem;border:none;outline:none;background:transparent;font-weight:600" onchange="_updateTimelineTimeRanges()">
+                <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">開始</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 8px">
+                <input type="text" data-key="hours" value="${_esc(s.hours || '')}" placeholder="7" style="width:36px;font-size:0.85rem;border:none;outline:none;text-align:center;background:transparent;font-weight:600">
+                <span style="font-size:0.72rem;color:var(--text-3);white-space:nowrap">小時</span>
+            </div>
+            <input type="text" data-key="topic" value="${_esc(s.topic || '')}" placeholder="當日課程主題" style="flex:1;min-width:120px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
+            <input type="text" data-key="instructor" value="${_esc(s.instructor || '')}" placeholder="講師" style="width:80px;font-size:0.85rem;border:1px solid var(--border);border-radius:6px;padding:6px 10px;background:#fff">
+            <button class="oe-delete" onclick="this.closest('.oe-schedule-day').remove();renumberScheduleDays();_scheduleRebuildColumns()" style="position:static;width:26px;height:26px;border-radius:6px;opacity:0.4;transition:opacity 0.2s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
+        `;
+        list.appendChild(div);
+    });
 
+    // First add timeline blocks to the flat list
     (od.timeline || []).forEach(b => addTimelineBlock(b));
+
+    // Now rebuild columns if multi-day
+    if (schedDays.length > 1) {
+        rebuildTimelineColumns();
+    }
+
     (od.tools || []).forEach(t => addToolBlock(t));
     (od.equipment || []).forEach(e => addEquipBlock(e));
     _v('oeEquipNote', od.equipNote);
@@ -2286,7 +2564,7 @@ async function loadUploadedFiles() {
     uploadedFiles = []; // 清空避免殘留上一個專案的檔案
     const projectId = projectData?.id;
     if (!projectId) { renderFileList(); return; }
-    const { data } = await db.select('project_files', { project_id: `eq.${projectId}` });
+    const { data } = await db.select('project_files', { filter: { project_id: `eq.${projectId}` } });
     if (data?.length) {
         uploadedFiles = data.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
     }
@@ -2329,9 +2607,15 @@ window.removeFile = async (idx) => {
         if (file.id) {
             await db.delete('project_files', { id: `eq.${file.id}` });
         }
-        // Try to delete from storage if path exists
-        if (file.storage_path) {
-            try { await storage.remove('project-files', [file.storage_path]); } catch(e) { /* ignore */ }
+        // Try to delete from storage using correct key field and bucket
+        const storageKey = file.storage_key || file.storage_path;
+        if (storageKey) {
+            try {
+                await fetch(
+                    `https://wsaknnhjgiqmkendeyrj.supabase.co/storage/v1/object/outline-files/${storageKey}`,
+                    { method: 'DELETE', headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko', 'Authorization': `Bearer ${localStorage.getItem('_at') || sessionStorage.getItem('_at') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko'}` } }
+                );
+            } catch(e) { console.warn('Storage delete skipped:', e); }
         }
     } catch(e) {
         console.error('Delete file error:', e);

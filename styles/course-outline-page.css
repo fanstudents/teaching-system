@@ -646,6 +646,10 @@ body {
 /* ── Admin Panel ── */
 .admin-panel { display: none; padding: 32px; max-width: 960px; margin: 0 auto; }
 .admin-panel.show { display: block; }
+/* Widen admin panel when multi-day columns are active */
+.admin-panel:has(.oe-timeline-columns-2) { max-width: 1200px; }
+.admin-panel:has(.oe-timeline-columns-3) { max-width: 1400px; }
+.admin-panel:has(.oe-timeline-columns-4) { max-width: 1600px; }
 
 .admin-section {
     background: var(--surface); border: 1px solid var(--border);
@@ -1182,6 +1186,125 @@ body {
     background: var(--accent); border-color: var(--accent);
     color: white; transform: translateX(-50%) scale(1.15);
     box-shadow: 0 4px 12px rgba(26,115,232,0.25);
+}
+
+/* ── Multi-Day Side-by-Side Editor Columns ── */
+.oe-timeline-columns {
+    display: grid; gap: 16px; padding: 16px 20px; background: #fafbfe;
+}
+.oe-timeline-columns-2 { grid-template-columns: 1fr 1fr; }
+.oe-timeline-columns-3 { grid-template-columns: 1fr 1fr 1fr; }
+.oe-timeline-columns-4 { grid-template-columns: repeat(4, 1fr); }
+
+.oe-day-column {
+    background: #fff; border: 1.5px solid #d2e3fc;
+    border-radius: var(--radius-lg); padding: 0;
+    display: flex; flex-direction: column;
+    min-height: 200px; transition: border-color 0.2s;
+}
+.oe-day-column:hover { border-color: var(--accent); }
+
+.oe-day-column-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px; border-bottom: 2px solid var(--accent);
+    background: linear-gradient(135deg, #e8f0fe 0%, #d2e3fc 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: sticky; top: 0; z-index: 2;
+}
+.oe-day-column-header .oe-day-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 52px; padding: 4px 12px; border-radius: 6px;
+    background: var(--accent); color: #fff;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+.oe-day-column-header .oe-day-topic {
+    font-size: 0.82rem; font-weight: 600; color: var(--text-2);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.oe-day-column-body {
+    flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+    counter-reset: oe-item; min-height: 80px;
+}
+.oe-day-column-body:empty::after {
+    content: '拖放或新增時段';
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 12px; font-size: 0.8rem; color: var(--text-3);
+    border: 2px dashed var(--border); border-radius: var(--radius-md);
+    background: #fafbfe; flex: 1;
+}
+
+/* Items inside columns are more compact */
+.oe-day-column-body .oe-list-item {
+    padding: 12px 12px 12px 40px;
+}
+.oe-day-column-body .oe-list-item::after {
+    left: 10px; top: 12px;
+    width: 22px; height: 22px; font-size: 0.68rem;
+}
+.oe-day-column-body .oe-list-item .oe-row {
+    grid-template-columns: 1fr;
+}
+/* Hide day selector inside columns (the column IS the day) */
+.oe-day-column-body .oe-list-item .oe-field-day-select {
+    display: none !important;
+}
+
+.oe-day-column-footer {
+    padding: 8px 12px 12px;
+}
+.oe-day-column-footer .oe-col-add-btn {
+    width: 100%; font-size: 0.78rem; padding: 7px 12px;
+    border: 2px dashed var(--border); border-radius: 8px;
+    background: transparent; color: var(--text-3); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    font-family: inherit; font-weight: 600;
+    transition: all 0.2s;
+}
+.oe-day-column-footer .oe-col-add-btn:hover {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(26,115,232,0.04);
+}
+.oe-day-column-footer .oe-col-add-btn .material-symbols-outlined {
+    font-size: 14px;
+}
+
+/* Column summary (total hours per day) */
+.oe-day-column-summary {
+    padding: 6px 12px; font-size: 0.72rem; font-weight: 700;
+    color: var(--accent); background: #e8f0fe;
+    border-top: 1px solid #d2e3fc;
+    display: flex; align-items: center; gap: 6px;
+}
+
+/* Drag-over highlight for columns */
+.oe-day-column-body.drag-over-col {
+    background: rgba(26,115,232,0.04);
+    outline: 2px dashed var(--accent);
+    outline-offset: -4px;
+}
+
+/* Overall summary bar beneath columns */
+.oe-columns-summary {
+    padding: 10px 20px; font-size: 0.8rem; color: var(--text-2);
+    display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+    background: #fafbfe; border-top: 1px solid var(--border);
+}
+
+@media (max-width: 960px) {
+    .oe-timeline-columns-3,
+    .oe-timeline-columns-4 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .oe-timeline-columns,
+    .oe-timeline-columns-2,
+    .oe-timeline-columns-3,
+    .oe-timeline-columns-4 {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ══════════════════════════════════════
