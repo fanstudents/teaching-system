@@ -1188,6 +1188,24 @@ body {
     box-shadow: 0 4px 12px rgba(26,115,232,0.25);
 }
 
+/* ── Column Mode Toggle Button ── */
+.oe-column-toggle {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 8px;
+    border: 1.5px solid var(--accent); background: transparent;
+    color: var(--accent); font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s; white-space: nowrap;
+}
+.oe-column-toggle:hover {
+    background: var(--accent); color: #fff;
+}
+.oe-column-toggle.active {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 2px 8px rgba(26,115,232,0.25);
+}
+.oe-column-toggle .material-symbols-outlined { font-size: 15px; }
+
 /* ── Multi-Day Side-by-Side Editor Columns ── */
 .oe-timeline-columns {
     display: grid; gap: 16px; padding: 16px 20px; background: #fafbfe;

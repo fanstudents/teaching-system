@@ -1006,6 +1006,7 @@ let _rebuildColumnsTimer = null;
 let _suppressRebuild = false;
 function _scheduleRebuildColumns() {
     if (_suppressRebuild) return;
+    _forceFlat = false; // reset user toggle when schedule changes
     clearTimeout(_rebuildColumnsTimer);
     _rebuildColumnsTimer = setTimeout(() => {
         if (typeof rebuildTimelineColumns === 'function') rebuildTimelineColumns();
@@ -1199,7 +1200,7 @@ window.rebuildTimelineColumns = function() {
     flatList.innerHTML = '';
     _tlCounter = 0;
 
-    if (isMultiDay) {
+    if (isMultiDay && !_forceFlat) {
         // ── Column mode ──
         _isColumnMode = true;
         flatList.style.display = 'none';
@@ -1254,14 +1255,55 @@ window.rebuildTimelineColumns = function() {
 
         // Re-add blocks to flat list
         allBlocks.forEach(blockData => {
-            blockData.day = 1;
+            if (scheduleDays.length === 1) blockData.day = 1;
             addTimelineBlock(blockData);
         });
 
         initDragAndDrop();
     }
 
+    _updateToggleButton();
     setTimeout(() => _updateTimelineTimeRanges(), 0);
+};
+
+/** Show/hide and style the toggle button based on current state */
+function _updateToggleButton() {
+    const btn = document.getElementById('btnToggleColumnMode');
+    if (!btn) return;
+    const scheduleDays = getScheduleDays();
+    if (scheduleDays.length > 1) {
+        btn.style.display = 'inline-flex';
+        if (_isColumnMode) {
+            btn.classList.add('active');
+            btn.querySelector('.oe-column-toggle-label').textContent = '並排';
+            btn.querySelector('.material-symbols-outlined').textContent = 'view_column_2';
+            btn.title = '切換為單欄模式';
+        } else {
+            btn.classList.remove('active');
+            btn.querySelector('.oe-column-toggle-label').textContent = '單欄';
+            btn.querySelector('.material-symbols-outlined').textContent = 'view_list';
+            btn.title = '切換為並排模式';
+        }
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+/** Toggle between column and flat mode (user-triggered) */
+let _forceFlat = false;
+window.toggleColumnMode = function() {
+    const scheduleDays = getScheduleDays();
+    if (scheduleDays.length < 2) return;
+
+    if (_isColumnMode) {
+        // Switch to flat mode
+        _forceFlat = true;
+        rebuildTimelineColumns(); // will see _forceFlat and stay flat
+    } else {
+        // Switch to column mode
+        _forceFlat = false;
+        rebuildTimelineColumns();
+    }
 };
 
 /** Collect timeline block data from current DOM (regardless of flat/column mode) */
@@ -1371,8 +1413,13 @@ function _makeDraggable(el) {
         insertBtn.innerHTML = '<span class="material-symbols-outlined">add</span>';
         insertBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const listId = el.closest('.oe-list')?.id;
-            if (listId === 'oeTimelineList') addTimelineBlock({}, el);
+            const list = el.closest('.oe-list');
+            const listId = list?.id;
+            if (listId === 'oeTimelineList' || list?.classList?.contains('oe-day-column-body')) {
+                const col = el.closest('.oe-day-column');
+                const day = col ? parseInt(col.dataset.day) : null;
+                addTimelineBlock({}, el, day);
+            }
             else if (listId === 'oeToolsList') addToolBlock({}, el);
             else if (listId === 'oeEquipList') addEquipBlock({}, el);
         });

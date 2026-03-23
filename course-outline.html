@@ -455,7 +455,12 @@
 
             <!-- 時間表 -->
             <details class="outline-edit-group" open>
-                <summary><span class="material-symbols-outlined" style="font-size:16px">view_timeline</span> 教學架構大綱</summary>
+                <summary><span class="material-symbols-outlined" style="font-size:16px">view_timeline</span> 教學架構大綱
+                    <button id="btnToggleColumnMode" class="oe-column-toggle" onclick="event.preventDefault();event.stopPropagation();toggleColumnMode()" style="display:none" title="切換並排/單欄模式">
+                        <span class="material-symbols-outlined" style="font-size:16px">view_column_2</span>
+                        <span class="oe-column-toggle-label">並排</span>
+                    </button>
+                </summary>
                 <div id="oeTimelineList" class="oe-list"></div>
                 <button class="btn btn-outline oe-add-btn" onclick="addTimelineBlock()">
                     <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增時段
