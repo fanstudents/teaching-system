@@ -444,9 +444,43 @@ class RealtimeClient {
                 resolve({ ok: false, channel, error: 'Not connected' });
                 return;
             }
-            this._joinChannel(channel);
-            console.log('[Realtime] subscribed to:', channel);
-            resolve({ ok: true, channel });
+            const ref = this._nextRef();
+            this._subscribedChannels.set(channel, ref);
+
+            // 等待 phx_reply 確認加入成功
+            const topic = `realtime:${channel}`;
+            const timer = setTimeout(() => {
+                console.warn(`[Realtime] join timeout for ${channel}, assuming ok`);
+                resolve({ ok: true, channel });
+            }, 3000);
+
+            const origOnMessage = this.ws.onmessage;
+            const handler = (event) => {
+                const msg = JSON.parse(event.data);
+                if (msg.topic === topic && msg.event === 'phx_reply' && msg.ref === ref) {
+                    clearTimeout(timer);
+                    this.ws.onmessage = origOnMessage;
+                    // 先讓原 handler 處理這則訊息
+                    origOnMessage.call(this.ws, event);
+                    console.log(`[Realtime] subscribed to: ${channel} (confirmed)`);
+                    resolve({ ok: true, channel });
+                    return;
+                }
+                origOnMessage.call(this.ws, event);
+            };
+            this.ws.onmessage = handler;
+
+            this.ws.send(JSON.stringify({
+                topic,
+                event: 'phx_join',
+                payload: {
+                    config: {
+                        broadcast: { self: false, ack: false },
+                        presence: { key: '' }
+                    }
+                },
+                ref
+            }));
         });
     }
 

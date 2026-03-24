@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="styles/homework.css?v=20260306">
     <link rel="stylesheet" href="styles/assessment.css?v=20260324">
     <link rel="stylesheet" href="styles/icebreaker.css?v=20260324">
+    <link rel="stylesheet" href="styles/assessmentWall.css?v=20260324">
 </head>
 
 <body>
@@ -593,7 +594,7 @@
                             await realtime.connect();
                             await realtime.subscribe(`session:${sessionCode}`);
                         })(),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
                     ]);
                 } catch (rtErr) {
                     console.warn('[Student] realtime connect failed (non-fatal):', rtErr);
@@ -647,6 +648,17 @@
                 realtime.on('icebreaker_update', (payload) => {
                     if (payload?.students) {
                         window._icebreakerStudents = payload.students;
+                    }
+                });
+
+                // 接收分數牆統計（匿名級距分布）
+                realtime.on('assessment_wall_update', (payload) => {
+                    if (!window._assessmentWallData) window._assessmentWallData = {};
+                    if (payload?.wallType && payload?.buckets) {
+                        window._assessmentWallData[payload.wallType] = {
+                            buckets: payload.buckets,
+                            total: payload.total || 0,
+                        };
                     }
                 });
 
@@ -1137,7 +1149,7 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
             const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
@@ -2092,6 +2104,15 @@
                     el.style.overflow = 'hidden';
                     import('./scripts/interactive/icebreaker.js').then(({ IcebreakerGame }) => {
                         new IcebreakerGame().render(el, element);
+                    });
+                    break;
+                }
+
+                case 'assessmentWall': {
+                    el.classList.add('interactive-element', 'assessment-wall-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/assessmentWall.js').then(({ AssessmentWallGame }) => {
+                        new AssessmentWallGame().render(el, element);
                     });
                     break;
                 }

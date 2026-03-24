@@ -464,6 +464,14 @@ class App {
             this.editor.addIcebreaker();
         });
 
+        // 分數牆
+        document.getElementById('addAssessmentWallPreBtn')?.addEventListener('click', () => {
+            this.editor.addAssessmentWall('pre');
+        });
+        document.getElementById('addAssessmentWallPostBtn')?.addEventListener('click', () => {
+            this.editor.addAssessmentWall('post');
+        });
+
 
         // AI 出題
         document.getElementById('aiQuizBtn')?.addEventListener('click', () => {

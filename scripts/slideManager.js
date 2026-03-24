@@ -1134,6 +1134,23 @@ export class SlideManager {
                 break;
             }
 
+            case 'assessmentWall': {
+                el.classList.add('interactive-element', 'assessment-wall-element');
+                el.style.overflow = 'hidden';
+                this._applyInteractiveStyles(el, element);
+                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                if (isLive) {
+                    import('./interactive/assessmentWall.js').then(({ AssessmentWallGame }) => {
+                        new AssessmentWallGame().render(el, element);
+                    });
+                } else {
+                    import('./interactive/assessmentWall.js').then(({ AssessmentWallGame }) => {
+                        new AssessmentWallGame().renderPreview(el, element);
+                    });
+                }
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);

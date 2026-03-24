@@ -250,6 +250,10 @@ export class AssessmentGame {
                 },
             });
 
+            // 供分數牆定位自身位置
+            if (!window._assessmentWallMyScores) window._assessmentWallMyScores = {};
+            window._assessmentWallMyScores[element.assessmentType || 'pre'] = score;
+
             // 顯示結果
             const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
             const emoji = score >= 80 ? '🎉' : score >= 60 ? '👍' : '💪';

@@ -545,6 +545,24 @@ export class Editor {
     }
 
     /**
+     * 新增測驗分數牆
+     */
+    addAssessmentWall(wallType = 'pre') {
+        const element = {
+            type: 'assessmentWall',
+            x: 50,
+            y: 30,
+            width: 860,
+            height: 460,
+            wallType,
+            wallTitle: wallType === 'post' ? '📊 課後測驗分數分布' : '📊 課前測驗分數分布',
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增破冰元件（在線學員牆）
      */
     addIcebreaker() {
@@ -1004,6 +1022,26 @@ export class Editor {
                     <div class="form-group">
                         <label class="form-label">Email 通知文字</label>
                         <textarea class="form-input" id="thankYouEmail" rows="3" style="font-size:12px;">${emailNotice.replace(/"/g, '&quot;')}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 測驗分數牆
+        if (type === 'assessmentWall') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">分數牆設定</div>
+                    <div class="form-group">
+                        <label class="form-label">標題</label>
+                        <input type="text" class="form-input" id="wallTitle" value="${(elementData.wallTitle || '📊 測驗分數分布').replace(/"/g, '&quot;')}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">對應測驗</label>
+                        <select class="form-input" id="wallType">
+                            <option value="pre" ${(elementData.wallType || 'pre') === 'pre' ? 'selected' : ''}>課前測驗</option>
+                            <option value="post" ${elementData.wallType === 'post' ? 'selected' : ''}>課後測驗</option>
+                        </select>
                     </div>
                 </div>
             `;
@@ -1995,6 +2033,9 @@ export class Editor {
                 this.slideManager.renderCurrentSlide();
                 this.selectElementById(elementId);
             });
+        } else if (elementData.type === 'assessmentWall') {
+            bindSimple('wallTitle', 'wallTitle');
+            bindSimple('wallType', 'wallType');
         } else if (elementData.type === 'icebreaker') {
             bindSimple('icebreakerTitle', 'icebreakerTitle');
             bindSimple('icebreakerSubtitle', 'icebreakerSubtitle');
