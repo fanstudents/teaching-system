@@ -664,8 +664,9 @@
             const maxRetries = 2;
 
             async function loadAll() {
+                // ★ loadSessions 依賴 projects，必須先載入 projects
+                await loadProjects();
                 await Promise.allSettled([
-                    loadProjects(),
                     loadSessions(),
                     loadStudents(),
                     loadPurchases(),
