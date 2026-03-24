@@ -2106,7 +2106,7 @@ export class Editor {
                 status.style.color = '#64748b';
 
                 try {
-                    const { ai } = await import('../supabase.js');
+                    const { ai } = await import('./supabase.js');
                     // 蒐集簡報內容摘要
                     const slides = this.slideManager.slides || [];
                     const slideTexts = slides.map((s, i) => {
@@ -2243,7 +2243,7 @@ ${truncated}
                 status.style.color = '#64748b';
 
                 try {
-                    const { db } = await import('../supabase.js');
+                    const { db } = await import('./supabase.js');
                     const projects = this.slideManager._projectsCache || [];
                     if (projects.length === 0) {
                         status.textContent = '⚠️ 沒有找到其他專案';
