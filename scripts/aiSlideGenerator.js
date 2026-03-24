@@ -102,7 +102,7 @@ export class AiSlideGenerator {
             : trimmedOutline;
         const prompts = await this._loadPrompts();
 
-        const BATCH_SIZE = 5;
+        const BATCH_SIZE = 3;
         const totalBatches = Math.ceil(pageCount / BATCH_SIZE);
         const allPlan = [];
 
@@ -116,33 +116,33 @@ export class AiSlideGenerator {
             const batchProgress = (batch / totalBatches) * 30;
             this._emit(batchProgress, `規劃第 ${batchStart}-${batchEnd} 頁（第 ${batch + 1}/${totalBatches} 批）...`);
 
-            // 後續批次只帶最近 5 頁的標題摘要
+            // 後續批次只帶最近 3 頁的標題摘要
             let contextHint = '';
             if (allPlan.length > 0) {
-                const recentTitles = allPlan.slice(-5).map((p, i) => {
-                    const realIdx = allPlan.length - 5 + i;
+                const recentTitles = allPlan.slice(-3).map((p, i) => {
+                    const realIdx = allPlan.length - 3 + i;
                     return `第${(realIdx < 0 ? allPlan.length + realIdx : realIdx) + 1}頁: ${p.title}`;
                 }).join('\n');
-                contextHint = `\n\n【最近完成的頁面標題（共已完成 ${allPlan.length} 頁）】\n${recentTitles}\n\n請從第 ${batchStart} 頁繼續，不要重複已有的內容。`;
+                contextHint = `\n\n【已完成 ${allPlan.length} 頁】\n${recentTitles}\n\n請從第 ${batchStart} 頁繼續。`;
             }
 
             const prompt = this._replaceVars(prompts.slide_content, {
                 topic, level, pageCount: batchCount, outline: fullOutline
             }) + contextHint;
 
-            // ★ 每批最多重試 2 次（應對 504 timeout）
+            // ★ 每批最多重試 2 次（504 / CORS timeout / Failed to fetch）
             let result;
             for (let retry = 0; retry < 2; retry++) {
                 try {
                     result = await ai.chat([
                         { role: 'system', content: '你是專業簡報規劃師。只回傳 JSON 陣列，不加任何其他文字或 markdown 標記。' },
                         { role: 'user', content: prompt }
-                    ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 10000 });
+                    ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 8000 });
                     break;
                 } catch (e) {
-                    if (retry === 0 && (e.message.includes('504') || e.message.includes('超時'))) {
-                        this._emit(batchProgress, `第 ${batch + 1} 批超時，重試中...`);
-                        await new Promise(r => setTimeout(r, 2000));
+                    if (retry === 0 && (e.message.includes('504') || e.message.includes('超時') || e.message.includes('Failed to fetch'))) {
+                        this._emit(batchProgress, `第 ${batch + 1} 批超時，等候重試中...`);
+                        await new Promise(r => setTimeout(r, 3000));
                         continue;
                     }
                     throw e;
