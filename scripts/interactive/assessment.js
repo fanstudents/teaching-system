@@ -139,19 +139,24 @@ export class AssessmentGame {
                             <span class="material-symbols-outlined" style="font-size:28px;">cancel</span>
                             <span>錯誤</span>
                         </button>
+                        <button class="assessment-tf-btn assessment-idk-btn ${selected === -1 ? 'selected' : ''}" data-val="idk">
+                            <span class="material-symbols-outlined" style="font-size:28px;">help</span>
+                            <span>我不知道</span>
+                        </button>
                     </div>
                 `;
                 body.querySelectorAll('.assessment-tf-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        const val = btn.dataset.val === 'true';
-                        answers[idx] = val;
-                        renderQuestion(idx); // re-render to update selection
+                        const v = btn.dataset.val;
+                        answers[idx] = v === 'idk' ? -1 : v === 'true';
+                        renderQuestion(idx);
                     });
                 });
             } else {
                 // choice
                 const markers = 'ABCDEFGHIJ';
                 const selected = answers[idx];
+                const opts = q.options || [];
                 body.innerHTML = `
                     <div class="assessment-question">
                         <span class="assessment-q-badge">${idx + 1}</span>
@@ -159,12 +164,16 @@ export class AssessmentGame {
                         <div class="assessment-q-text">${this._esc(q.question)}</div>
                     </div>
                     <div class="assessment-choice-options">
-                        ${(q.options || []).map((opt, i) => `
+                        ${opts.map((opt, i) => `
                             <button class="assessment-choice-btn ${selected === i ? 'selected' : ''}" data-idx="${i}">
                                 <span class="assessment-choice-marker">${markers[i]}</span>
                                 <span class="assessment-choice-text">${this._esc(typeof opt === 'string' ? opt : opt.text)}</span>
                             </button>
                         `).join('')}
+                        <button class="assessment-choice-btn assessment-idk-btn ${selected === -1 ? 'selected' : ''}" data-idx="-1">
+                            <span class="assessment-choice-marker">?</span>
+                            <span class="assessment-choice-text">我不知道</span>
+                        </button>
                     </div>
                 `;
                 body.querySelectorAll('.assessment-choice-btn').forEach(btn => {

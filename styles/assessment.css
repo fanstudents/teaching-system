@@ -457,6 +457,27 @@
     color: #a8c7fa;
 }
 
+/* ── 我不知道 按鈕 ── */
+.assessment-idk-btn {
+    border-style: dashed !important;
+    opacity: 0.65;
+}
+.assessment-idk-btn:hover {
+    opacity: 1;
+}
+.assessment-idk-btn.selected {
+    border-color: #94a3b8 !important;
+    background: rgba(148, 163, 184, 0.1) !important;
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+.assessment-tf-options .assessment-idk-btn {
+    background: rgba(30, 41, 59, 0.5);
+    border-color: #475569;
+    color: #64748b;
+    padding: 24px 28px;
+}
+
 /* ── 載入動畫 ── */
 .assessment-spin {
     animation: spin 1s linear infinite;
