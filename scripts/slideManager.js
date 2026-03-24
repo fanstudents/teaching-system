@@ -9,6 +9,7 @@ export class SlideManager {
         this.slides = [];
         this.sections = []; // [{ name, startIndex }]
         this.currentIndex = 0;
+        this.currentSessionId = null; // 場次級簡報：非 null 時 save/load 指向 session
         this.slideListEl = document.getElementById('slideList');
 
         // Undo / Redo（最多 15 步）
@@ -344,6 +345,17 @@ export class SlideManager {
 
         try {
             const { db } = await import('./supabase.js');
+
+            // 建立場次時自動複製 project 簡報
+            let projectSlides = null;
+            try {
+                const { data: pRows } = await db.select('projects', {
+                    filter: { id: `eq.${projectId}` },
+                    select: 'slides_data'
+                });
+                if (pRows?.[0]?.slides_data) projectSlides = pRows[0].slides_data;
+            } catch (_) { /* ignore */ }
+
             const result = await db.insert('project_sessions', {
                 project_id: projectId,
                 session_code: sessionCode,
@@ -351,7 +363,8 @@ export class SlideManager {
                 time,
                 venue,
                 status: 'active',
-                current_phase: 'pre-class'
+                current_phase: 'pre-class',
+                slides_data: projectSlides
             });
             if (result?.[0]) {
                 const session = {
@@ -3301,7 +3314,6 @@ export class SlideManager {
                         ...s,
                         elements: (s.elements || []).map(el => {
                             if (el.type === 'image' && el.src?.startsWith('data:') && el.src.length > 50000) {
-                                // 用一個小的灰色 placeholder 替代
                                 return { ...el, src: 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' };
                             }
                             return el;
@@ -3314,12 +3326,20 @@ export class SlideManager {
                 console.log(`[SaveDB] 壓縮後 ${(payloadSize / 1024).toFixed(1)}KB`);
             }
 
-            console.log('[SaveDB] saving to project', this.currentProjectId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
-
-            const result = await this._db.update('projects', {
-                slides_data: data,
-                updated_at: new Date().toISOString()
-            }, { id: `eq.${this.currentProjectId}` });
+            // ★ 場次級簡報：寫入 session 或 project
+            let result;
+            if (this.currentSessionId) {
+                console.log('[SaveDB] saving to SESSION', this.currentSessionId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
+                result = await this._db.update('project_sessions', {
+                    slides_data: data,
+                }, { id: `eq.${this.currentSessionId}` });
+            } else {
+                console.log('[SaveDB] saving to PROJECT', this.currentProjectId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
+                result = await this._db.update('projects', {
+                    slides_data: data,
+                    updated_at: new Date().toISOString()
+                }, { id: `eq.${this.currentProjectId}` });
+            }
 
             if (result.error) {
                 const errMsg = result.error?.message || JSON.stringify(result.error);
@@ -3428,15 +3448,30 @@ export class SlideManager {
         let dbData = null;
         let localData = null;
 
-        // 1. 嘗試從 DB 載入
+        // 1. 嘗試從 DB 載入（場次優先 → fallback 專案）
         if (this._db && this.currentProjectId) {
             try {
-                const { data: rows } = await this._db.select('projects', {
-                    filter: { id: `eq.${this.currentProjectId}` },
-                    select: 'slides_data'
-                });
-                if (rows?.[0]?.slides_data && rows[0].slides_data.slides) {
-                    dbData = rows[0].slides_data;
+                // ★ 場次級：先讀 session.slides_data
+                if (this.currentSessionId) {
+                    const { data: sRows } = await this._db.select('project_sessions', {
+                        filter: { id: `eq.${this.currentSessionId}` },
+                        select: 'slides_data'
+                    });
+                    if (sRows?.[0]?.slides_data && sRows[0].slides_data.slides) {
+                        dbData = sRows[0].slides_data;
+                        console.log('[Load] ✅ Using SESSION slides', this.currentSessionId);
+                    }
+                }
+                // ★ fallback 到 project
+                if (!dbData) {
+                    const { data: rows } = await this._db.select('projects', {
+                        filter: { id: `eq.${this.currentProjectId}` },
+                        select: 'slides_data'
+                    });
+                    if (rows?.[0]?.slides_data && rows[0].slides_data.slides) {
+                        dbData = rows[0].slides_data;
+                        console.log('[Load] Using PROJECT slides (fallback)');
+                    }
                 }
             } catch (e) {
                 console.warn('DB load failed:', e);

@@ -3412,6 +3412,27 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 });
             });
 
+            // ★ 綁定場次級簡報：找今天的 project_session
+            const proj = this.slideManager._projectsCache?.find(p => p.id === this.slideManager.currentProjectId);
+            const today = new Date().toISOString().slice(0, 10);
+            const sessions = proj?.sessions || [];
+            const todaySession = sessions.find(s => s.date === today);
+            if (todaySession) {
+                this.slideManager.currentSessionId = todaySession.id;
+                console.log('[Broadcast] bound to session:', todaySession.id, todaySession.date);
+                // 重新載入場次簡報
+                await this.slideManager.load();
+            } else if (sessions.length > 0) {
+                // 找最近的場次
+                const sorted = [...sessions].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+                const nearest = sorted.find(s => s.date >= today) || sorted[sorted.length - 1];
+                if (nearest) {
+                    this.slideManager.currentSessionId = nearest.id;
+                    console.log('[Broadcast] bound to nearest session:', nearest.id, nearest.date);
+                    await this.slideManager.load();
+                }
+            }
+
             // 發送初始投影片資料
             this.slideManager.saveCurrentSlide();
             this.broadcastSlideData(0);
@@ -3515,6 +3536,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         this.showToast('📡 廣播已停止');
         this.sessionCode = null;
+
+        // ★ 解除場次級簡報綁定，回到專案模式
+        this.slideManager.currentSessionId = null;
+        await this.slideManager.load();
     }
 
     // ─── 排行榜輪詢 ───
