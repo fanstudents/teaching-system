@@ -611,7 +611,15 @@ export const ai = {
                 await new Promise(r => setTimeout(r, wait));
                 continue;
             }
-            const json = await res.json().catch(() => ({}));
+            // ★ Debug: 先讀 text，再 parse JSON
+            const rawText = await res.text();
+            console.log(`[AI] Response status: ${res.status}, body preview: ${rawText.substring(0, 200)}`);
+            let json;
+            try {
+                json = JSON.parse(rawText);
+            } catch (parseErr) {
+                throw new Error(`AI API 回傳非 JSON（HTTP ${res.status}）: ${rawText.substring(0, 100)}`);
+            }
             if (!res.ok) throw new Error(json.error || `AI API error: ${res.status}`);
             if (json.error) throw new Error(json.error);
             return json.text || json.content || json.choices?.[0]?.message?.content || '';
