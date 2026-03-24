@@ -1,8 +1,5 @@
 // AI Proxy Edge Function for Supabase
 // 透過 Zeabur AI Hub 使用 Claude API（Anthropic Messages 格式）
-//
-// Zeabur AI Hub endpoint: https://hnd1.aihub.zeabur.ai/
-// 認證方式: x-api-key
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
@@ -34,28 +31,59 @@ serve(async (req) => {
             }
         }
 
-        const res = await fetch(`${ZEABUR_BASE_URL}/v1/messages`, {
-            method: 'POST',
-            headers: {
-                'x-api-key': ZEABUR_API_KEY,
-                'anthropic-version': '2023-06-01',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: model || 'claude-sonnet-4-5',
-                messages: claudeMessages,
-                ...(system ? { system } : {}),
-                temperature: temperature ?? 0.7,
-                max_tokens: max_tokens ?? 16000,
-            }),
-        });
+        // ★ 加上 AbortController timeout (150 秒)
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 150000);
 
-        const data = await res.json();
+        let res;
+        try {
+            res = await fetch(`${ZEABUR_BASE_URL}/v1/messages`, {
+                method: 'POST',
+                headers: {
+                    'x-api-key': ZEABUR_API_KEY,
+                    'anthropic-version': '2023-06-01',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: model || 'claude-sonnet-4-5',
+                    messages: claudeMessages,
+                    ...(system ? { system } : {}),
+                    temperature: temperature ?? 0.7,
+                    max_tokens: max_tokens ?? 16000,
+                }),
+                signal: controller.signal,
+            });
+        } finally {
+            clearTimeout(timeout);
+        }
+
+        // ★ 先讀 text，避免 res.json() 直接爆掉
+        const rawText = await res.text();
 
         if (!res.ok) {
+            // 嘗試 parse JSON 錯誤訊息
+            let errorMsg = `Zeabur API error: ${res.status}`;
+            try {
+                const errData = JSON.parse(rawText);
+                errorMsg = errData.error?.message || errData.message || errorMsg;
+            } catch {
+                // rawText 是 HTML 或其他非 JSON
+                errorMsg = `Zeabur API returned non-JSON (HTTP ${res.status}): ${rawText.substring(0, 200)}`;
+            }
             return new Response(
-                JSON.stringify({ error: data.error?.message || `Zeabur Claude API error: ${res.status}`, detail: data }),
+                JSON.stringify({ error: errorMsg }),
                 { status: res.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+        }
+
+        // ★ 安全 parse JSON
+        let data;
+        try {
+            data = JSON.parse(rawText);
+        } catch {
+            return new Response(
+                JSON.stringify({ error: `Zeabur returned invalid JSON: ${rawText.substring(0, 200)}` }),
+                { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
         }
 
@@ -66,8 +94,11 @@ serve(async (req) => {
         );
 
     } catch (error) {
+        const errMsg = error.name === 'AbortError'
+            ? 'AI API 請求超時（150 秒），請減少頁數後重試'
+            : error.message;
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ error: errMsg }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
     }
