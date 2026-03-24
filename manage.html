@@ -167,6 +167,9 @@
                         <button class="btn btn-dark" id="btnAddSessionDetail">
                             <span class="material-symbols-outlined">add</span> 新增場次
                         </button>
+                        <button class="btn" id="btnAutoGenSessions" style="display:none;">
+                            <span class="material-symbols-outlined">auto_awesome</span> 從大綱建立場次
+                        </button>
                     </div>
                     <div id="sessionDetailList">
                         <div class="empty-state">尚無場次</div>
@@ -743,6 +746,103 @@
             document.getElementById('btnAddSessionDetail').addEventListener('click', () => {
                 if (currentProjectId) window.openAddSession(currentProjectId);
             });
+
+            // Auto-generate sessions from outline
+            document.getElementById('btnAutoGenSessions').addEventListener('click', async () => {
+                if (!currentProjectId) return;
+                const proj = projects.find(p => p.id === currentProjectId);
+                if (!proj) return;
+
+                // Fetch outline_data if not already loaded
+                let od = proj.outline_data;
+                if (!od) {
+                    try {
+                        const { data } = await db.select('projects', {
+                            filter: { id: `eq.${currentProjectId}` },
+                            select: 'outline_data'
+                        });
+                        od = data?.[0]?.outline_data;
+                    } catch (e) { /* ignore */ }
+                }
+                if (!od?.schedule?.length) {
+                    showToast('此專案尚無課程大綱或排程資料');
+                    return;
+                }
+
+                const schedule = od.schedule;
+                const existingSessions = sessions.filter(s => s.project_id === currentProjectId);
+
+                // Check overlap
+                const existingDates = new Set(existingSessions.map(s => s.date));
+                const newDays = schedule.filter(s => s.date && !existingDates.has(s.date));
+
+                if (newDays.length === 0 && schedule.every(s => s.date)) {
+                    showToast('所有大綱日期都已有對應場次');
+                    return;
+                }
+
+                const daysToCreate = schedule.filter(s => !s.date || !existingDates.has(s.date));
+                const msg = `將根據大綱建立 ${daysToCreate.length} 個場次：\n` +
+                    daysToCreate.map(s => `Day ${s.day}${s.date ? ` (${s.date})` : ''} — ${s.topic || '未命名'}`).join('\n') +
+                    '\n\n確定建立嗎？';
+                if (!confirm(msg)) return;
+
+                try {
+                    const btnEl = document.getElementById('btnAutoGenSessions');
+                    btnEl.disabled = true;
+                    btnEl.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> 建立中…';
+
+                    // Also fetch project slides for copying
+                    let projectSlides = null;
+                    try {
+                        const { data: pRows } = await db.select('projects', {
+                            filter: { id: `eq.${currentProjectId}` },
+                            select: 'slides_data'
+                        });
+                        if (pRows?.[0]?.slides_data) projectSlides = pRows[0].slides_data;
+                    } catch (_) { }
+
+                    for (const day of daysToCreate) {
+                        const startTime = day.startTime || '09:00';
+                        const hours = day.hours || '';
+                        const endMinutes = parseInt(startTime.split(':')[0]) * 60 +
+                            parseInt(startTime.split(':')[1] || 0) +
+                            (parseFloat(hours) || 7) * 60;
+                        const endH = Math.floor(endMinutes / 60);
+                        const endM = endMinutes % 60;
+                        const pad = n => String(n).padStart(2, '0');
+                        const timeStr = `${startTime} — ${pad(endH)}:${pad(endM)}`;
+
+                        const sessionData = {
+                            project_id: currentProjectId,
+                            session_code: generateCode(6),
+                            join_code: proj.join_code || generateCode(6),
+                            date: day.date || '',
+                            time: timeStr,
+                            venue: od.hero?.location || '',
+                            current_phase: 'pre-class',
+                            max_capacity: parseInt(od.hero?.groupSize) || 30,
+                            slides_data: projectSlides
+                        };
+
+                        await db.insert('project_sessions', sessionData);
+                    }
+
+                    await loadSessions();
+                    renderProjects();
+                    openProjectDetail(currentProjectId);
+                    updateStats();
+                    showToast(`✅ 已建立 ${daysToCreate.length} 個場次`);
+
+                    btnEl.disabled = false;
+                    btnEl.innerHTML = '<span class="material-symbols-outlined">auto_awesome</span> 從大綱建立場次';
+                } catch (e) {
+                    showToast('建立失敗：' + e.message);
+                    const btnEl = document.getElementById('btnAutoGenSessions');
+                    btnEl.disabled = false;
+                    btnEl.innerHTML = '<span class="material-symbols-outlined">auto_awesome</span> 從大綱建立場次';
+                }
+            });
         }
 
         // ── Projects ──
@@ -883,6 +983,13 @@
             document.querySelectorAll('.sub-panel').forEach(pp => pp.classList.remove('active'));
             document.querySelector('.sub-tab[data-subtab="sessions"]').classList.add('active');
             document.getElementById('sub-sessions').classList.add('active');
+
+            // ★ 顯示/隱藏「從大綱建立場次」按鈕
+            const autoGenBtn = document.getElementById('btnAutoGenSessions');
+            if (autoGenBtn) {
+                const hasOutline = p.outline_data?.schedule?.length > 0;
+                autoGenBtn.style.display = hasOutline ? '' : 'none';
+            }
 
             const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
             const catLabel = { 'course': '公開課程', 'corporate': '企業內訓' };
