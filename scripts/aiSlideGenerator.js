@@ -1374,7 +1374,7 @@ export class AiSlideGenerator {
         }, 0);
         const effectiveMinutes = totalMinutes - breakMinutes;
         const totalHours = Math.max(effectiveMinutes / 60, 1);
-        const pageCount = Math.max(Math.round(totalHours * 6), 8); // 至少 8 頁
+        const pageCount = Math.min(Math.max(Math.round(totalHours * 3), 8), 20); // 至少 8 頁，上限 20 頁
 
         // ── 組建大綱文字 ──
         const outlineText = timeline
