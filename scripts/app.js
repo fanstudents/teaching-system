@@ -148,9 +148,21 @@ class App {
                 return;
             }
 
+            // ★ 場次級簡報：讀取 ?sid= 參數
+            const sessionId = urlParams.get('sid');
+            if (sessionId) {
+                this.slideManager.currentSessionId = sessionId;
+                console.log('[Editor] bound to session:', sessionId);
+            }
+
             await this.slideManager.load();
             this.updateProjectName();
             this.renderProjectList();
+
+            // ★ 顯示場次指示器
+            if (sessionId) {
+                this._showSessionIndicator(sessionId);
+            }
         });
 
         // 備註同步
@@ -1753,6 +1765,25 @@ ${slideContents}
     updateProjectName() {
         const el = document.getElementById('projectName');
         if (el) el.textContent = this.slideManager.getCurrentProjectName();
+    }
+
+    async _showSessionIndicator(sessionId) {
+        try {
+            const { db } = await import('./supabase.js');
+            const { data } = await db.select('project_sessions', {
+                filter: { id: `eq.${sessionId}` },
+                select: 'date,time,venue'
+            });
+            const s = data?.[0];
+            const label = s ? `📅 ${s.date || '未設定'} ${s.time || ''}` : `場次 ${sessionId.slice(0, 8)}`;
+
+            const badge = document.createElement('span');
+            badge.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;background:#dbeafe;color:#1e40af;font-size:0.72rem;font-weight:600;margin-left:8px;white-space:nowrap;';
+            badge.textContent = label;
+
+            const nameEl = document.getElementById('projectName');
+            if (nameEl) nameEl.parentNode.insertBefore(badge, nameEl.nextSibling);
+        } catch (_) { /* non-critical */ }
     }
 
     /* =========================================

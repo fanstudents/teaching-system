@@ -805,15 +805,6 @@
                     btnEl.disabled = true;
                     btnEl.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> 建立中…';
 
-                    // Also fetch project slides for copying
-                    let projectSlides = null;
-                    try {
-                        const { data: pRows } = await db.select('projects', {
-                            filter: { id: `eq.${currentProjectId}` },
-                            select: 'slides_data'
-                        });
-                        if (pRows?.[0]?.slides_data) projectSlides = pRows[0].slides_data;
-                    } catch (_) { }
 
                     for (const day of daysToCreate) {
                         const startTime = day.startTime || '09:00';
@@ -830,15 +821,18 @@
                             project_id: currentProjectId,
                             session_code: generateCode(6),
                             join_code: proj.join_code || generateCode(6),
-                            date: day.date || '',
+                            date: day.date || null,
                             time: timeStr,
                             venue: od.hero?.location || '',
                             current_phase: 'pre-class',
                             max_capacity: parseInt(od.hero?.groupSize) || 30
                         };
-                        if (projectSlides) sessionData.slides_data = projectSlides;
 
-                        await db.insert('project_sessions', sessionData);
+                        const result = await db.insert('project_sessions', sessionData);
+                        if (result?.error) {
+                            console.error('[AutoGen] insert failed:', result.error);
+                            throw new Error(`Day ${day.day} 建立失敗: ${JSON.stringify(result.error)}`);
+                        }
                     }
 
                     await loadSessions();
@@ -1158,6 +1152,9 @@
                         <span class="sc-meta"><span class="material-symbols-outlined" style="font-size:14px;">tag</span> ${s.session_code || ''}</span>
                     </div>
                     <div class="sc-actions">
+                        <a class="btn btn-sm btn-dark" href="editor.html?id=${p?.id}&sid=${s.id}#id=${p?.id}" onclick="localStorage.setItem('current_project_id','${p?.id}')" title="編輯此場次簡報">
+                            <span class="material-symbols-outlined">slideshow</span> 簡報
+                        </a>
                         <a class="btn btn-sm" href="preclass-dashboard.html?code=${p?.join_code}&session=${s.session_code}" title="課前統計">
                             <span class="material-symbols-outlined">bar_chart</span> 統計
                         </a>
