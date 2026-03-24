@@ -213,7 +213,10 @@ export class AssessmentGame {
         });
 
         // 自動提交函數
+        let _submitted = false;
         const doSubmit = async () => {
+            if (_submitted) return;
+            _submitted = true;
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="material-symbols-outlined assessment-spin">progress_activity</span> 提交中…';

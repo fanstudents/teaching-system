@@ -1406,6 +1406,10 @@ export class AiSlideGenerator {
         this._emit(55, '插入課程結構元件（破冰、測驗、排行榜）...');
         slides = this._insertStructuralElements(slides);
 
+        // ── Phase 3.6: AI 自動生成課前/課後測驗題目 ──
+        this._emit(57, '生成課前/課後測驗題目...');
+        await this._generateAssessmentQuestions(slides, courseName, fullOutline);
+
         // ── Phase 4: 動畫效果 ──
         this._emit(60, 'Phase 4/6：設定動畫效果...');
         slides = await this.addAnimations(slides);
@@ -1422,6 +1426,87 @@ export class AiSlideGenerator {
 
         this._emit(100, `🎉 已完成！共 ${slides.length} 頁簡報`);
         return slides;
+    }
+
+    /**
+     * Phase 3.6: AI 生成課前/課後測驗題目
+     */
+    async _generateAssessmentQuestions(slides, courseName, outlineText) {
+        const { ai } = await import('./supabase.js');
+
+        // 蒐集簡報內容摘要
+        const slideTexts = slides.map((s, i) => {
+            const texts = (s.elements || [])
+                .filter(e => e.type === 'text')
+                .map(e => e.content || '')
+                .filter(t => t.length > 2);
+            return texts.length ? `[投影片${i + 1}] ${texts.join(' | ')}` : '';
+        }).filter(Boolean).join('\n').slice(0, 4000);
+
+        for (const slide of slides) {
+            const assessEl = (slide.elements || []).find(e => e.type === 'assessment');
+            if (!assessEl || (assessEl.questions && assessEl.questions.length > 0)) continue;
+
+            const assessType = assessEl.assessmentType || 'pre';
+            this._emit(assessType === 'pre' ? 57 : 58, `AI 生成${assessType === 'pre' ? '課前' : '課後'}測驗題目...`);
+
+            const prompt = assessType === 'pre'
+                ? `你是教學評量設計專家。根據以下課程資訊設計 10 題「課前測驗」。
+
+══ 課程主題 ══
+${courseName}
+
+══ 課程大綱 ══
+${outlineText.slice(0, 3000)}
+
+══ 課前測驗設計原則 ══
+- 測量學員上課前的先備知識，不可從「還沒教的簡報細節」出題
+- 根據該領域的通識、常見認知、基本概念出題
+- 4題易(difficulty:1) + 3題中(difficulty:2) + 3題難(difficulty:3)
+- 約7題選擇題(4選1) + 3題是非題
+
+══ 回傳格式（純 JSON 陣列）══
+[{"id":"q1","type":"choice","question":"題目","options":["A","B","C","D"],"answer":0,"difficulty":1,"concept":"知識點"},
+ {"id":"q2","type":"truefalse","question":"陳述句","answer":true,"difficulty":2,"concept":"知識點"}]
+
+注意：answer 在選擇題中是正確選項 index(0-3)，是非題是 true/false。繁體中文。只回傳 JSON。`
+                : `你是教學評量設計專家。根據以下課程簡報內容設計 10 題「課後測驗」。
+
+══ 課程主題 ══
+${courseName}
+
+══ 簡報內容 ══
+${slideTexts}
+
+══ 課後測驗設計原則 ══
+- 50% 從簡報專業內容出題，50% 延伸應用題
+- 不可與課前測驗重複，測試「上完課才知道」的內容
+- 4題易(difficulty:1) + 3題中(difficulty:2) + 3題難(difficulty:3)
+- 約7題選擇題(4選1) + 3題是非題
+
+══ 回傳格式（純 JSON 陣列）══
+[{"id":"q1","type":"choice","question":"題目","options":["A","B","C","D"],"answer":0,"difficulty":1,"concept":"知識點"},
+ {"id":"q2","type":"truefalse","question":"陳述句","answer":true,"difficulty":2,"concept":"知識點"}]
+
+注意：answer 在選擇題中是正確選項 index(0-3)，是非題是 true/false。繁體中文。只回傳 JSON。`;
+
+            try {
+                const result = await ai.chat([
+                    { role: 'system', content: '你是教育評量生成器，只回傳 JSON 陣列，不加任何額外說明。' },
+                    { role: 'user', content: prompt }
+                ], { model: 'claude-haiku-4-5', temperature: 0.7, maxTokens: 4000 });
+
+                let text = (result?.message || result?.content || '').trim();
+                text = text.replace(/^```json?\s*/i, '').replace(/\s*```\s*$/, '');
+                const questions = JSON.parse(text);
+                if (Array.isArray(questions) && questions.length > 0) {
+                    assessEl.questions = questions;
+                    this._emit(assessType === 'pre' ? 58 : 59, `已生成 ${questions.length} 題${assessType === 'pre' ? '課前' : '課後'}測驗`);
+                }
+            } catch (e) {
+                console.warn(`[generateFromSyllabus] ${assessType} 題目生成失敗:`, e);
+            }
+        }
     }
 
     /**

@@ -95,46 +95,48 @@ export class AssessmentWallGame {
                 }
                 totalCount = filtered.length;
 
-                // 廣播給學員端
-                if (window.app?.broadcasting) {
-                    // 計算平均分
-                    let avgScore = 0;
-                    if (filtered.length > 0) {
-                        const sumScore = filtered.reduce((sum, s) => {
+                // 計算平均分（廣播 + 本地渲染都需要）
+                let avgScore = 0;
+                if (filtered.length > 0) {
+                    const sumScore = filtered.reduce((sum, s) => {
+                        let st = s.state;
+                        if (typeof st === 'string') try { st = JSON.parse(st); } catch { return sum; }
+                        return sum + (parseInt(st?.score) || 0);
+                    }, 0);
+                    avgScore = Math.round(sumScore / filtered.length);
+                }
+
+                // 如果是課後牆，也讀取課前平均
+                let preAvg = null;
+                if (wallType === 'post') {
+                    const preSubs = subs.filter(s => {
+                        let st = s.state;
+                        if (typeof st === 'string') try { st = JSON.parse(st); } catch { return false; }
+                        return st?.assessmentType === 'pre';
+                    });
+                    if (preSubs.length > 0) {
+                        const preSum = preSubs.reduce((sum, s) => {
                             let st = s.state;
                             if (typeof st === 'string') try { st = JSON.parse(st); } catch { return sum; }
                             return sum + (parseInt(st?.score) || 0);
                         }, 0);
-                        avgScore = Math.round(sumScore / filtered.length);
+                        preAvg = Math.round(preSum / preSubs.length);
                     }
+                }
 
-                    // 如果是課後牆，也讀取課前平均
-                    let preAvg = null;
-                    if (wallType === 'post') {
-                        const preSubs = subs.filter(s => {
-                            let st = s.state;
-                            if (typeof st === 'string') try { st = JSON.parse(st); } catch { return false; }
-                            return st?.assessmentType === 'pre';
-                        });
-                        if (preSubs.length > 0) {
-                            const preSum = preSubs.reduce((sum, s) => {
-                                let st = s.state;
-                                if (typeof st === 'string') try { st = JSON.parse(st); } catch { return sum; }
-                                return sum + (parseInt(st?.score) || 0);
-                            }, 0);
-                            preAvg = Math.round(preSum / preSubs.length);
-                        }
-                    }
-
+                // 廣播給學員端
+                if (window.app?.broadcasting) {
                     const { realtime } = await import('../supabase.js');
                     realtime.publish(`session:${sessionCode}`, 'assessment_wall_update', {
-                        wallType,
-                        buckets,
-                        total: totalCount,
-                        avgScore,
-                        preAvg,
+                        wallType, buckets, total: totalCount, avgScore, preAvg,
                     });
                 }
+
+                // 本地也存一份，供 delta 渲染使用
+                if (!window._assessmentWallData) window._assessmentWallData = {};
+                window._assessmentWallData[wallType] = {
+                    buckets, total: totalCount, avgScore, preAvg,
+                };
             } catch (e) {
                 console.error('[AssessmentWall] fetch error:', e);
                 return;
