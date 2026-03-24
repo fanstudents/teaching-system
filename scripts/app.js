@@ -2377,7 +2377,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     /* =========================================
    AI 生成簡報
    ========================================= */
-    openAiGenerateModal() {
+    async openAiGenerateModal() {
         const overlay = document.getElementById('aiGenerateOverlay');
         if (!overlay) return;
         overlay.style.display = 'flex';
@@ -2399,19 +2399,32 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 從課程大綱生成按鈕
         const syllabusBtn = document.getElementById('aiGenerateFromSyllabus');
         if (syllabusBtn) {
-            const od = this.project?.outline_data;
-            if (od && od.timeline && od.timeline.length > 0) {
+            // 從 DB 查 outline_data（cache 裡沒有）
+            let od = this._cachedOutlineData;
+            if (!od) {
+                try {
+                    const { db } = await import('./supabase.js');
+                    const { data } = await db.select('projects', {
+                        filter: { id: `eq.${this.slideManager.currentProjectId}` },
+                        select: 'outline_data'
+                    });
+                    od = data?.[0]?.outline_data;
+                    if (od) this._cachedOutlineData = od;
+                } catch (_) { }
+            }
+            const hasOutline = od && od.timeline && od.timeline.length > 0;
+            if (hasOutline) {
                 syllabusBtn.style.display = '';
             }
             const newSyllabusBtn = syllabusBtn.cloneNode(true);
-            if (od && od.timeline && od.timeline.length > 0) newSyllabusBtn.style.display = '';
+            if (hasOutline) newSyllabusBtn.style.display = '';
             syllabusBtn.parentNode.replaceChild(newSyllabusBtn, syllabusBtn);
             newSyllabusBtn.addEventListener('click', () => this.startAiGenerationFromSyllabus());
         }
     }
 
     async startAiGenerationFromSyllabus() {
-        const od = this.project?.outline_data;
+        const od = this._cachedOutlineData;
         if (!od || !od.timeline?.length) {
             alert('此專案尚未建立課程大綱，請先到課程大綱頁面建立。');
             return;
