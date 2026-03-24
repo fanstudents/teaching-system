@@ -123,7 +123,6 @@ export class IcebreakerGame {
     renderPreview(container, element) {
         const title = element.icebreakerTitle || '🎉 歡迎來到課堂！';
         const subtitle = element.icebreakerSubtitle || '看看誰已經上線了？';
-        const demoNames = ['Alice', '小明', 'Bob', '小華', 'Carol', '大偉', '小美', '阿強'];
 
         container.innerHTML = `
             <div class="icebreaker-widget icebreaker-preview">
@@ -132,22 +131,11 @@ export class IcebreakerGame {
                     <div class="icebreaker-subtitle">${this._esc(subtitle)}</div>
                     <div class="icebreaker-count">
                         <span class="icebreaker-dot"></span>
-                        <span class="icebreaker-count-text">${demoNames.length} 人在線</span>
+                        <span class="icebreaker-count-text">廣播後顯示在線學員</span>
                     </div>
                 </div>
-                <div class="icebreaker-grid">
-                    ${demoNames.map(name => {
-                        const hue = this._nameToHue(name);
-                        const initials = this._getInitials(name);
-                        return `
-                            <div class="icebreaker-avatar">
-                                <div class="icebreaker-avatar-circle" style="--hue:${hue}">
-                                    <span class="icebreaker-initials">${this._esc(initials)}</span>
-                                </div>
-                                <div class="icebreaker-name">${this._esc(name)}</div>
-                            </div>
-                        `;
-                    }).join('')}
+                <div class="icebreaker-grid" style="justify-content:center;align-items:center;color:#94a3b8;font-size:13px;">
+                    <span class="material-symbols-outlined" style="font-size:32px;color:#cbd5e1;">group</span>
                 </div>
             </div>
         `;
