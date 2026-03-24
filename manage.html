@@ -821,9 +821,9 @@
                             time: timeStr,
                             venue: od.hero?.location || '',
                             current_phase: 'pre-class',
-                            max_capacity: parseInt(od.hero?.groupSize) || 30,
-                            slides_data: projectSlides
+                            max_capacity: parseInt(od.hero?.groupSize) || 30
                         };
+                        if (projectSlides) sessionData.slides_data = projectSlides;
 
                         await db.insert('project_sessions', sessionData);
                     }

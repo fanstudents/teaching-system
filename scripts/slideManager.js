@@ -356,16 +356,18 @@ export class SlideManager {
                 if (pRows?.[0]?.slides_data) projectSlides = pRows[0].slides_data;
             } catch (_) { /* ignore */ }
 
-            const result = await db.insert('project_sessions', {
+            const insertData = {
                 project_id: projectId,
                 session_code: sessionCode,
                 date,
                 time,
                 venue,
                 status: 'active',
-                current_phase: 'pre-class',
-                slides_data: projectSlides
-            });
+                current_phase: 'pre-class'
+            };
+            if (projectSlides) insertData.slides_data = projectSlides;
+
+            const result = await db.insert('project_sessions', insertData);
             if (result?.[0]) {
                 const session = {
                     id: result[0].id,
@@ -3329,11 +3331,22 @@ export class SlideManager {
             // ★ 場次級簡報：寫入 session 或 project
             let result;
             if (this.currentSessionId) {
-                console.log('[SaveDB] saving to SESSION', this.currentSessionId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
-                result = await this._db.update('project_sessions', {
-                    slides_data: data,
-                }, { id: `eq.${this.currentSessionId}` });
-            } else {
+                try {
+                    console.log('[SaveDB] saving to SESSION', this.currentSessionId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
+                    result = await this._db.update('project_sessions', {
+                        slides_data: data,
+                    }, { id: `eq.${this.currentSessionId}` });
+                    // 如果 slides_data 欄位不存在，result.error 會有值
+                    if (result.error) {
+                        console.warn('[SaveDB] session save failed, falling back to project:', result.error);
+                        this.currentSessionId = null; // 暫時清除，避免重複失敗
+                    }
+                } catch (sessErr) {
+                    console.warn('[SaveDB] session save exception, falling back to project:', sessErr.message);
+                    this.currentSessionId = null;
+                }
+            }
+            if (!this.currentSessionId) {
                 console.log('[SaveDB] saving to PROJECT', this.currentProjectId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
                 result = await this._db.update('projects', {
                     slides_data: data,
@@ -3451,15 +3464,19 @@ export class SlideManager {
         // 1. 嘗試從 DB 載入（場次優先 → fallback 專案）
         if (this._db && this.currentProjectId) {
             try {
-                // ★ 場次級：先讀 session.slides_data
+                // ★ 場次級：先讀 session.slides_data（欄位可能尚不存在）
                 if (this.currentSessionId) {
-                    const { data: sRows } = await this._db.select('project_sessions', {
-                        filter: { id: `eq.${this.currentSessionId}` },
-                        select: 'slides_data'
-                    });
-                    if (sRows?.[0]?.slides_data && sRows[0].slides_data.slides) {
-                        dbData = sRows[0].slides_data;
-                        console.log('[Load] ✅ Using SESSION slides', this.currentSessionId);
+                    try {
+                        const { data: sRows } = await this._db.select('project_sessions', {
+                            filter: { id: `eq.${this.currentSessionId}` },
+                            select: 'slides_data'
+                        });
+                        if (sRows?.[0]?.slides_data && sRows[0].slides_data.slides) {
+                            dbData = sRows[0].slides_data;
+                            console.log('[Load] ✅ Using SESSION slides', this.currentSessionId);
+                        }
+                    } catch (sessionErr) {
+                        console.warn('[Load] session slides_data read failed (column may not exist):', sessionErr.message);
                     }
                 }
                 // ★ fallback 到 project
