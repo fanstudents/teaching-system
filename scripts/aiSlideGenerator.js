@@ -1322,6 +1322,207 @@ export class AiSlideGenerator {
     }
 
     // ═══════════════════════════════════════
+    // 一鍵從課程大綱生成完整簡報
+    // ═══════════════════════════════════════
+    async generateFromSyllabus(outlineData, options = {}) {
+        if (!outlineData) throw new Error('缺少課程大綱資料');
+
+        const timeline = outlineData.timeline || [];
+        const schedule = outlineData.schedule || [];
+        const hero = outlineData.hero || {};
+        const tools = outlineData.tools || [];
+        const courseName = hero.subtitle || options.projectName || '課程';
+
+        // ── 計算時數 & 頁數 ──
+        let totalMinutes = 0;
+        for (const block of timeline) {
+            const timeStr = block.time || '';
+            // 嘗試解析 "09:00 – 10:00（60 分鐘）" 格式
+            const minMatch = timeStr.match(/(\d+)\s*分鐘/);
+            if (minMatch) {
+                totalMinutes += parseInt(minMatch[1]);
+            } else {
+                // 嘗試 "HH:MM – HH:MM" 格式
+                const rangeMatch = timeStr.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})/);
+                if (rangeMatch) {
+                    const start = parseInt(rangeMatch[1]) * 60 + parseInt(rangeMatch[2]);
+                    const end = parseInt(rangeMatch[3]) * 60 + parseInt(rangeMatch[4]);
+                    totalMinutes += Math.max(end - start, 0);
+                } else {
+                    totalMinutes += 30; // 預設 30 分鐘
+                }
+            }
+        }
+        // 去掉休息時段
+        const breakMinutes = timeline.filter(b => (b.title || '').includes('休息')).reduce((sum, b) => {
+            const m = (b.time || '').match(/(\d+)\s*分鐘/);
+            return sum + (m ? parseInt(m[1]) : 10);
+        }, 0);
+        const effectiveMinutes = totalMinutes - breakMinutes;
+        const totalHours = Math.max(effectiveMinutes / 60, 1);
+        const pageCount = Math.max(Math.round(totalHours * 6), 8); // 至少 8 頁
+
+        // ── 組建大綱文字 ──
+        const outlineText = timeline
+            .filter(b => !(b.title || '').includes('休息'))
+            .map((b, i) => {
+                const tags = (b.topics || b.tags || []).join('、');
+                return `${i + 1}. [${b.time || ''}] ${b.title || ''}\n   ${b.desc || b.description || ''}${tags ? '\n   關鍵字：' + tags : ''}`;
+            }).join('\n\n');
+
+        const toolNames = tools.map(t => t.name || t.tool_name || '').filter(Boolean).join('、');
+        const daysInfo = schedule.length > 0 ? `授課天數：${schedule.length} 天` : '';
+
+        const fullOutline = [
+            `課程名稱：${courseName}`,
+            daysInfo,
+            toolNames ? `使用工具：${toolNames}` : '',
+            `總時數：${totalHours.toFixed(1)} 小時`,
+            `\n【課程大綱】`,
+            outlineText,
+        ].filter(Boolean).join('\n');
+
+        this._emit(0, `解析大綱完成：${totalHours.toFixed(1)} 小時 → 預計生成 ${pageCount} 頁`);
+
+        // ── Phase 1: 生成文字內容 ──
+        this._emit(2, 'Phase 1/6：生成文字內容...');
+        let slides = await this.generateContent({
+            topic: courseName,
+            level: options.level || '一般',
+            pageCount,
+            outline: fullOutline,
+            pdfText: options.pdfText || '',
+        });
+
+        // ── Phase 2: 生成視覺圖表 ──
+        this._emit(25, 'Phase 2/6：生成視覺圖表...');
+        slides = await this.generateVisuals(slides);
+
+        // ── Phase 3: 插入互動元件 ──
+        this._emit(45, 'Phase 3/6：插入互動元件...');
+        slides = await this.insertInteractive(slides);
+
+        // ── Phase 3.5: 插入結構性元件（破冰、測驗、分數牆、排行榜）──
+        this._emit(55, '插入課程結構元件（破冰、測驗、排行榜）...');
+        slides = this._insertStructuralElements(slides);
+
+        // ── Phase 4: 動畫效果 ──
+        this._emit(60, 'Phase 4/6：設定動畫效果...');
+        slides = await this.addAnimations(slides);
+
+        // ── Phase 5: 套用設計 ──
+        this._emit(75, 'Phase 5/6：套用設計風格...');
+        const themeId = options.themeId || 'biz';
+        const layoutId = options.layoutId || 'classic-center';
+        slides = await this.applyDesign(slides, themeId, layoutId);
+
+        // ── Phase 6: 講師備忘錄 ──
+        this._emit(88, 'Phase 6/6：生成講師備忘錄...');
+        await this.generateTeachingNotes(slides);
+
+        this._emit(100, `🎉 已完成！共 ${slides.length} 頁簡報`);
+        return slides;
+    }
+
+    /**
+     * Phase 3.5: 在適當位置插入結構性元件
+     * - 破冰牆（第 1 頁後）
+     * - 課前測驗 + 課前分數牆（第 2 頁後）
+     * - 課後測驗 + 課後分數牆 + 排行榜（倒數 2 頁前）
+     */
+    _insertStructuralElements(slides) {
+        const gen = () => this.slideManager.generateId();
+        const insertions = []; // { index, slide }
+
+        // 1. 破冰牆 — 插在封面後
+        insertions.push({
+            targetIndex: 1,
+            slide: {
+                id: gen(), background: '#ffffff',
+                elements: [{
+                    id: gen(), type: 'icebreaker',
+                    x: 50, y: 30, width: 860, height: 460,
+                    icebreakerTitle: '🎉 歡迎來到課堂！',
+                    icebreakerSubtitle: '看看誰已經上線了？',
+                }]
+            }
+        });
+
+        // 2. 課前測驗 — 插在破冰後
+        insertions.push({
+            targetIndex: 2,
+            slide: {
+                id: gen(), background: '#ffffff',
+                elements: [{
+                    id: gen(), type: 'assessment',
+                    x: 50, y: 30, width: 860, height: 460,
+                    assessmentType: 'pre',
+                    title: '📝 課前測驗',
+                    questions: [], // AI 生成會另外處理
+                    points: 15,
+                }]
+            }
+        });
+
+        // 3. 課前分數牆 — 緊跟課前測驗
+        insertions.push({
+            targetIndex: 3,
+            slide: {
+                id: gen(), background: '#ffffff',
+                elements: [{
+                    id: gen(), type: 'assessmentWall',
+                    x: 50, y: 30, width: 860, height: 460,
+                    wallType: 'pre',
+                    wallTitle: '📊 課前測驗分數分布',
+                }]
+            }
+        });
+
+        // 插入尾端元件 — 在 thank-you 頁前
+        const lastContentIdx = slides.length; // 會在前面加 3 頁後偏移
+
+        // 4. 課後測驗
+        insertions.push({
+            targetIndex: lastContentIdx + 3 - 1, // thank-you 前 1 頁
+            slide: {
+                id: gen(), background: '#ffffff',
+                elements: [{
+                    id: gen(), type: 'assessment',
+                    x: 50, y: 30, width: 860, height: 460,
+                    assessmentType: 'post',
+                    title: '📝 課後測驗',
+                    questions: [],
+                    points: 15,
+                }]
+            }
+        });
+
+        // 5. 課後分數牆
+        insertions.push({
+            targetIndex: lastContentIdx + 3, // thank-you 前
+            slide: {
+                id: gen(), background: '#ffffff',
+                elements: [{
+                    id: gen(), type: 'assessmentWall',
+                    x: 50, y: 30, width: 860, height: 460,
+                    wallType: 'post',
+                    wallTitle: '📊 課後測驗分數分布',
+                }]
+            }
+        });
+
+        // 從前往後依序插入
+        let offset = 0;
+        for (const ins of insertions) {
+            const idx = Math.min(ins.targetIndex + offset, slides.length);
+            slides.splice(idx, 0, ins.slide);
+            offset++;
+        }
+
+        return slides;
+    }
+
+    // ═══════════════════════════════════════
     // Legacy: 一鍵全流程（保留相容性）
     // ═══════════════════════════════════════
     async generate({ clientName, level, pageCount, outline, pdfText }) {

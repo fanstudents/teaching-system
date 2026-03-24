@@ -97,11 +97,42 @@ export class AssessmentWallGame {
 
                 // 廣播給學員端
                 if (window.app?.broadcasting) {
+                    // 計算平均分
+                    let avgScore = 0;
+                    if (filtered.length > 0) {
+                        const sumScore = filtered.reduce((sum, s) => {
+                            let st = s.state;
+                            if (typeof st === 'string') try { st = JSON.parse(st); } catch { return sum; }
+                            return sum + (parseInt(st?.score) || 0);
+                        }, 0);
+                        avgScore = Math.round(sumScore / filtered.length);
+                    }
+
+                    // 如果是課後牆，也讀取課前平均
+                    let preAvg = null;
+                    if (wallType === 'post') {
+                        const preSubs = subs.filter(s => {
+                            let st = s.state;
+                            if (typeof st === 'string') try { st = JSON.parse(st); } catch { return false; }
+                            return st?.assessmentType === 'pre';
+                        });
+                        if (preSubs.length > 0) {
+                            const preSum = preSubs.reduce((sum, s) => {
+                                let st = s.state;
+                                if (typeof st === 'string') try { st = JSON.parse(st); } catch { return sum; }
+                                return sum + (parseInt(st?.score) || 0);
+                            }, 0);
+                            preAvg = Math.round(preSum / preSubs.length);
+                        }
+                    }
+
                     const { realtime } = await import('../supabase.js');
                     realtime.publish(`session:${sessionCode}`, 'assessment_wall_update', {
                         wallType,
                         buckets,
                         total: totalCount,
+                        avgScore,
+                        preAvg,
                     });
                 }
             } catch (e) {
@@ -146,6 +177,41 @@ export class AssessmentWallGame {
                 <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">person</span>
                 你的分數：<strong>${myScore}</strong> 分（位於 <strong style="color:${colors[myBucketIdx]}">${labels[myBucketIdx]}</strong> 級距）
             `;
+        }
+
+        // 課後牆：顯示平均分數差
+        const broadcastData = window._assessmentWallData?.[wallType];
+        const avgScore = broadcastData?.avgScore ?? null;
+        const preAvg = broadcastData?.preAvg ?? null;
+        let deltaHtml = container.querySelector('.aw-delta');
+        if (!deltaHtml) {
+            deltaHtml = document.createElement('div');
+            deltaHtml.className = 'aw-delta';
+            container.querySelector('.aw-widget')?.appendChild(deltaHtml);
+        }
+
+        if (wallType === 'post' && avgScore !== null && totalCount > 0) {
+            let deltaStr = '';
+            if (preAvg !== null) {
+                const delta = avgScore - preAvg;
+                const deltaColor = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#94a3b8';
+                const arrow = delta > 0 ? 'trending_up' : delta < 0 ? 'trending_down' : 'trending_flat';
+                deltaStr = `
+                    <div class="aw-delta-row">
+                        <span class="material-symbols-outlined" style="font-size:22px;color:${deltaColor}">${arrow}</span>
+                        <span>課前平均 <strong>${preAvg}</strong> 分 → 課後平均 <strong>${avgScore}</strong> 分</span>
+                        <span class="aw-delta-badge" style="background:${deltaColor}">
+                            ${delta > 0 ? '+' : ''}${delta} 分
+                        </span>
+                    </div>
+                `;
+            } else {
+                deltaStr = `<div class="aw-delta-row"><span>課後平均：<strong>${avgScore}</strong> 分</span></div>`;
+            }
+            deltaHtml.innerHTML = deltaStr;
+            deltaHtml.style.display = '';
+        } else {
+            deltaHtml.style.display = 'none';
         }
     }
 

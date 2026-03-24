@@ -2364,6 +2364,64 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const newBtn = startBtn.cloneNode(true);
         startBtn.parentNode.replaceChild(newBtn, startBtn);
         newBtn.addEventListener('click', () => this.startAiGeneration());
+
+        // 從課程大綱生成按鈕
+        const syllabusBtn = document.getElementById('aiGenerateFromSyllabus');
+        if (syllabusBtn) {
+            const od = this.project?.outline_data;
+            if (od && od.timeline && od.timeline.length > 0) {
+                syllabusBtn.style.display = '';
+            }
+            const newSyllabusBtn = syllabusBtn.cloneNode(true);
+            if (od && od.timeline && od.timeline.length > 0) newSyllabusBtn.style.display = '';
+            syllabusBtn.parentNode.replaceChild(newSyllabusBtn, syllabusBtn);
+            newSyllabusBtn.addEventListener('click', () => this.startAiGenerationFromSyllabus());
+        }
+    }
+
+    async startAiGenerationFromSyllabus() {
+        const od = this.project?.outline_data;
+        if (!od || !od.timeline?.length) {
+            alert('此專案尚未建立課程大綱，請先到課程大綱頁面建立。');
+            return;
+        }
+
+        document.getElementById('aiGenerateForm').style.display = 'none';
+        document.getElementById('aiGenerateProgress').style.display = 'block';
+
+        const { AiSlideGenerator } = await import('./aiSlideGenerator.js');
+        const generator = new AiSlideGenerator(this.slideManager);
+
+        generator.onProgress = (percent, message) => {
+            document.getElementById('aiGenEmoji').textContent = percent >= 100 ? '🎉' : percent >= 75 ? '🎨' : percent >= 45 ? '✨' : '🧠';
+            document.getElementById('aiGenPhaseTitle').textContent = message;
+            document.getElementById('aiGenStepLabel').textContent = message;
+            document.getElementById('aiGenPercent').textContent = Math.round(percent) + '%';
+            document.getElementById('aiGenBar').style.width = percent + '%';
+        };
+
+        try {
+            const slides = await generator.generateFromSyllabus(od, {
+                projectName: this.project?.name || '',
+            });
+            this.slideManager.slides = slides;
+            this.slideManager.currentIndex = 0;
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.save();
+
+            document.getElementById('aiGenEmoji').textContent = '🎉';
+            document.getElementById('aiGenPhaseTitle').textContent = `已生成 ${slides.length} 頁簡報！`;
+            document.getElementById('aiGenStepLabel').textContent = '即將關閉...';
+            setTimeout(() => { document.getElementById('aiGenerateOverlay').style.display = 'none'; }, 1500);
+        } catch (err) {
+            console.error('AI syllabus generation error:', err);
+            document.getElementById('aiGenEmoji').textContent = '❌';
+            document.getElementById('aiGenPhaseTitle').textContent = '生成失敗';
+            document.getElementById('aiGenStepLabel').textContent = err.message;
+            document.getElementById('aiGenBar').style.background = '#ef4444';
+        }
     }
 
     async startAiGeneration() {
@@ -3547,9 +3605,19 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                             <div class="lb-rank ${rankClass}">${i + 1}</div>
                             <div class="lb-name">${this._escHtml(s.name)}</div>
                             <div class="lb-pts">${s.totalPoints}</div>
+                            <button class="lb-del-btn" title="刪除此學員" style="background:none;border:none;color:#94a3b8;cursor:pointer;padding:2px 4px;border-radius:4px;font-size:14px;line-height:1;margin-left:4px;transition:all 0.15s;"
+                                onmouseenter="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)'"
+                                onmouseleave="this.style.color='#94a3b8';this.style.background='none'">
+                                <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+                            </button>
                         </div>
                         <div class="lb-bar-wrap"><div class="lb-bar" style="width:0%"></div></div>
                     `;
+                    // 繫結刪除按鈕
+                    row.querySelector('.lb-del-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this._deleteLeaderboardStudent(s.email, s.name);
+                    });
                     list.appendChild(row);
                     requestAnimationFrame(() => {
                         row.querySelector('.lb-bar').style.width = barPct + '%';
@@ -3578,6 +3646,49 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         popup.textContent = `${diff > 0 ? '+' : ''}${diff}`;
         row.appendChild(popup);
         popup.addEventListener('animationend', () => popup.remove());
+    }
+
+    /**
+     * 從排行榜刪除學員 — 雙重確認防呆
+     */
+    async _deleteLeaderboardStudent(email, name) {
+        // 第一層確認
+        if (!confirm(`確定要刪除「${name}」的所有互動紀錄嗎？\n\n⚠️ 此操作無法復原，該學員的所有得分、作業、測驗紀錄都會被清除。`)) {
+            return;
+        }
+        // 第二層確認：輸入學員名字
+        const input = prompt(`請輸入學員名字「${name}」以確認刪除：`);
+        if (!input || input.trim() !== name) {
+            this.showToast('名字不符，已取消刪除');
+            return;
+        }
+
+        try {
+            const { db } = await import('./supabase.js');
+            const { error } = await db.delete('submissions', {
+                session_code: `eq.${this.sessionCode}`,
+                student_email: `eq.${email}`,
+            });
+            if (error) throw new Error(error.message);
+
+            // 移除排行榜快取
+            this._lbScoreCache?.delete(email);
+
+            // 從 DOM 移除
+            const row = document.querySelector(`.lb-row[data-email="${email}"]`);
+            if (row) {
+                row.style.transition = 'opacity 0.3s, transform 0.3s';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                setTimeout(() => row.remove(), 300);
+            }
+
+            this.showToast(`已刪除「${name}」的所有紀錄`);
+            setTimeout(() => this.updateLeaderboard(), 500);
+        } catch (e) {
+            console.error('[Leaderboard] delete failed:', e);
+            alert('刪除失敗：' + e.message);
+        }
     }
 
     _escHtml(str) {
@@ -4253,7 +4364,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!qrEl) {
             qrEl = document.createElement('div');
             qrEl.id = 'presQRCode';
-            qrEl.style.cssText = 'position:fixed;bottom:20px;left:20px;z-index:10001;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);opacity:0.85;transition:opacity 0.3s;cursor:pointer;';
+            qrEl.style.cssText = 'position:fixed;bottom:60px;left:20px;z-index:10001;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);opacity:0.85;transition:opacity 0.3s;cursor:pointer;';
             qrEl.innerHTML = `<img src="${qrSrc}" width="100" height="100" style="display:block;border-radius:6px;">
                 <div style="text-align:center;font-size:10px;color:#1a73e8;margin-top:4px;font-weight:600;">掃碼互動</div>`;
             qrEl.addEventListener('mouseenter', () => qrEl.style.opacity = '1');

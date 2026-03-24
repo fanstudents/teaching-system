@@ -658,6 +658,8 @@
                         window._assessmentWallData[payload.wallType] = {
                             buckets: payload.buckets,
                             total: payload.total || 0,
+                            avgScore: payload.avgScore ?? null,
+                            preAvg: payload.preAvg ?? null,
                         };
                     }
                 });

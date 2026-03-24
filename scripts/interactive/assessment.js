@@ -67,6 +67,10 @@ export class AssessmentGame {
         // 建立 overlay
         const overlay = document.createElement('div');
         overlay.className = 'assessment-overlay';
+        // 倒數計時器
+        let timeLeft = 180;
+        let timerInterval = null;
+
         overlay.innerHTML = `
             <div class="assessment-fullscreen">
                 <div class="assessment-header">
@@ -74,6 +78,10 @@ export class AssessmentGame {
                     <div class="assessment-progress">
                         <span class="assessment-progress-text">1 / ${shuffled.length}</span>
                         <div class="assessment-progress-bar"><div class="assessment-progress-fill" style="width:${100 / shuffled.length}%"></div></div>
+                    </div>
+                    <div class="assessment-timer" id="assessmentTimer">
+                        <span class="material-symbols-outlined" style="font-size:16px;">timer</span>
+                        <span class="assessment-timer-text">3:00</span>
                     </div>
                     <button class="assessment-close-btn" title="關閉">
                         <span class="material-symbols-outlined">close</span>
@@ -199,13 +207,21 @@ export class AssessmentGame {
             if (answers.some(a => a !== null)) {
                 if (!confirm('還沒作答完畢，確定要離開嗎？')) return;
             }
+            if (timerInterval) clearInterval(timerInterval);
             overlay.remove();
             this._overlay = null;
         });
 
-        submitBtn.addEventListener('click', async () => {
+        // 自動提交函數
+        const doSubmit = async () => {
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="material-symbols-outlined assessment-spin">progress_activity</span> 提交中…';
+
+            // 未作答的填 -1（我不知道）
+            for (let i = 0; i < answers.length; i++) {
+                if (answers[i] === null) answers[i] = -1;
+            }
 
             // 計算分數
             let correct = 0;
@@ -295,7 +311,28 @@ export class AssessmentGame {
             });
 
             stateManager.playSuccessFeedback(body);
-        });
+        };
+
+        submitBtn.addEventListener('click', () => doSubmit());
+
+        // ── 倒數計時器邏輯 ──
+        const timerEl = overlay.querySelector('.assessment-timer-text');
+        const timerWrap = overlay.querySelector('.assessment-timer');
+        const updateTimer = () => {
+            const min = Math.floor(timeLeft / 60);
+            const sec = timeLeft % 60;
+            timerEl.textContent = `${min}:${String(sec).padStart(2, '0')}`;
+            if (timeLeft <= 30) {
+                timerWrap.classList.add('timer-danger');
+            }
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                doSubmit();
+            }
+            timeLeft--;
+        };
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
 
         renderQuestion(0);
 
