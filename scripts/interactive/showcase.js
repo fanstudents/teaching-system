@@ -72,7 +72,7 @@ export class Showcase {
         }
 
         if (this.pollingTimers[cid]) clearInterval(this.pollingTimers[cid]);
-        const timerId = setInterval(() => this.fetchAndRender(container, title), 5000);
+        const timerId = setInterval(() => this.fetchAndRender(container, title), 8000);
         this.pollingTimers[cid] = timerId;
 
         // 學員端：監聽講師捲動同步
@@ -201,16 +201,20 @@ export class Showcase {
         const count = submissions.length;
         const isPresenter = container._showcaseIsPresenter && container._showcaseBroadcasting;
 
-        const statusHtml = submissions.map(s => `
-            <div class="showcase-status-chip" title="${s.student_name}">
-                <span class="showcase-chip-avatar">${(s.student_name || '?')[0]}</span>
-                <span class="showcase-chip-name">${s.student_name || '匿名'}</span>
+        const statusHtml = submissions.map(s => {
+            const safeName = this.escapeHtml(s.student_name || '?');
+            return `
+            <div class="showcase-status-chip" title="${safeName}">
+                <span class="showcase-chip-avatar">${safeName[0]}</span>
+                <span class="showcase-chip-name">${safeName}</span>
             </div>
-        `).join('');
+        `;
+        }).join('');
 
         const cardsHtml = submissions.map((s, i) => {
             const preview = this.getPreview(s);
             const existingScore = s.instructor_score;
+            const safeName = this.escapeHtml(s.student_name || '匿名');
             // 5 星評分（每星 = 1 分，滿分 5 分）
             const scoreHtml = isPresenter ? `
                 <div class="showcase-score-bar" data-sub-id="${s.id}">
@@ -232,9 +236,9 @@ export class Showcase {
             return `
                 <div class="showcase-work-card" data-index="${i}">
                     <div class="showcase-work-header">
-                        <span class="showcase-work-avatar">${(s.student_name || '?')[0]}</span>
+                        <span class="showcase-work-avatar">${safeName[0]}</span>
                         <div style="flex:1;min-width:0;">
-                            <div class="showcase-work-name">${s.student_name || '匿名'}</div>
+                            <div class="showcase-work-name">${safeName}</div>
                             <div style="font-size:10px;color:#94a3b8;">${this.formatTime(s.submitted_at || s.created_at)}</div>
                         </div>
                         <div style="font-size:10px;color:#94a3b8;">#${i + 1}</div>

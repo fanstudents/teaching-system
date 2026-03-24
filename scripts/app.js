@@ -451,6 +451,19 @@ class App {
             this.editor.addHotspot();
         });
 
+        // 課前/課後評量
+        document.getElementById('addAssessmentPreBtn')?.addEventListener('click', () => {
+            this.editor.addAssessment('pre');
+        });
+        document.getElementById('addAssessmentPostBtn')?.addEventListener('click', () => {
+            this.editor.addAssessment('post');
+        });
+
+        // 破冰元件
+        document.getElementById('addIcebreakerBtn')?.addEventListener('click', () => {
+            this.editor.addIcebreaker();
+        });
+
 
         // AI 出題
         document.getElementById('aiQuizBtn')?.addEventListener('click', () => {
@@ -3197,6 +3210,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const joinCode = this.slideManager.getCurrentJoinCode();
             this.sessionCode = joinCode || generateSessionCode();
             this.onlineStudents = new Map(); // name → timestamp
+            window._onlineStudents = this.onlineStudents; // 給破冰元件讀取
             this.showcase.setSessionCode(this.sessionCode);
 
             // 寫入 DB（先清除同 code 的舊記錄，再新增）
@@ -3274,21 +3288,45 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 }
             });
 
-            // 定期清除超時學員（30 分鐘沒心跳視為離線）
+            // 監聽學員改名
+            realtime.on('student_rename', (msg) => {
+                const p = msg.payload || msg;
+                if (p.studentId && this.onlineStudents.has(p.studentId)) {
+                    this.onlineStudents.set(p.studentId, {
+                        name: p.newName,
+                        joinedAt: Date.now()
+                    });
+                    this.updateViewerCount();
+                    console.log('[Broadcast] student renamed:', p.oldName, '→', p.newName);
+                }
+            });
+
+            // 定期清除超時學員（90 秒沒心跳視為離線，心跳間隔 15 秒 × 6 倍）
             this._heartbeatCleanup = setInterval(() => {
                 const now = Date.now();
                 let changed = false;
                 for (const [id, info] of this.onlineStudents) {
-                    if (now - info.joinedAt > 1800000) {
+                    if (now - info.joinedAt > 90000) {
                         this.onlineStudents.delete(id);
                         changed = true;
                     }
                 }
                 if (changed) this.updateViewerCount();
-            }, 60000);
+            }, 15000);
 
-            // 每 10 秒主動廣播人數（保底，避免漏掉事件）
-            this._countBroadcast = setInterval(() => this.updateViewerCount(), 10000);
+            // 每 10 秒主動廣播人數 + 在線名單（給破冰元件）
+            this._countBroadcast = setInterval(() => {
+                this.updateViewerCount();
+                // 廣播在線學員名單給學員端破冰元件
+                if (this.onlineStudents && this.onlineStudents.size > 0) {
+                    const list = [...this.onlineStudents.values()].map(s => ({
+                        id: s.email || s.name,
+                        name: s.name || s.email || '匿名',
+                        email: s.email || '',
+                    }));
+                    realtime.publish(`session:${this.sessionCode}`, 'icebreaker_update', { students: list });
+                }
+            }, 10000);
 
             // 監聽投票事件
             realtime.on('poll_vote', (msg) => {
@@ -3544,6 +3582,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     broadcastSlideData(index) {
         if (!this.broadcasting) return;
         const slide = this.slideManager.slides[index];
+        if (!slide) { console.warn('[Broadcast] no slide at index', index); return; }
         realtime.publish(`session:${this.sessionCode}`, 'slide_change', {
             slideIndex: index,
             slide: slide,
@@ -4192,7 +4231,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const slide = this.slideManager.slides[this.presentationIndex];
         const hasInteractive = slide?.elements?.some(el =>
             ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud',
-                'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document'].includes(el.type));
+                'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker'].includes(el.type));
 
         if (!this.broadcasting || !this.sessionCode || !hasInteractive) {
             if (qrEl) qrEl.style.display = 'none';
@@ -5456,6 +5495,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     quizResults.push({ correct: sub.is_correct });
                 } else if (['text', 'image', 'video', 'audio'].includes(sub.type)) {
                     homeworkCount++;
+                } else if (sub.type === 'assessment') {
+                    try {
+                        const a = typeof sub.state === 'string' ? JSON.parse(sub.state) : sub.state;
+                        const label = a?.assessmentType === 'post' ? '課後' : '課前';
+                        quizResults.push({ type: 'assessment', label, score: a?.score, correct: a?.correct, total: a?.total });
+                    } catch { }
                 }
             }
 

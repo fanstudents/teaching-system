@@ -72,7 +72,7 @@ export const db = {
         const params = new URLSearchParams();
         if (opts.select) params.set('select', opts.select);
         if (opts.order) params.set('order', opts.order);
-        if (opts.limit) params.set('limit', opts.limit);
+        params.set('limit', opts.limit || 1000); // 預設上限 1000，避免無限制拉取
         if (opts.offset) params.set('offset', opts.offset);
         // PostgREST filters: { session_id: 'eq.ABC123' }
         if (opts.filter) {
@@ -120,6 +120,22 @@ export const db = {
         const res = await fetch(url, {
             method: 'DELETE',
             headers: getHeaders()
+        });
+        const data = await res.json().catch(() => null);
+        return { data: res.ok ? data : null, error: res.ok ? null : data };
+    },
+
+    /**
+     * RPC — 呼叫 Postgres function
+     * @param {string} fnName - function 名稱
+     * @param {object} params - 參數
+     */
+    async rpc(fnName, params = {}) {
+        const url = `${SUPABASE_URL}/rest/v1/rpc/${fnName}`;
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { ...getHeaders(), 'Prefer': 'return=representation' },
+            body: JSON.stringify(params)
         });
         const data = await res.json().catch(() => null);
         return { data: res.ok ? data : null, error: res.ok ? null : data };
@@ -330,8 +346,9 @@ class RealtimeClient {
                     this._joinChannel(ch);
                 }
 
-                // ★ Flush 重連佇列
-                const queued = this._publishQueue.splice(0);
+                // ★ Flush 重連佇列（丟棄超過 10 秒的舊訊息，避免發送過時資料）
+                const now = Date.now();
+                const queued = this._publishQueue.splice(0).filter(m => now - m._ts < 10000);
                 if (queued.length > 0) {
                     console.log(`[Realtime] flushing ${queued.length} queued messages`);
                     for (const msg of queued) {
@@ -412,6 +429,7 @@ class RealtimeClient {
             event: 'phx_join',
             payload: {
                 config: {
+                    // self: false — 不會收到自己 publish 的訊息，講師端用本地呼叫處理自己的狀態
                     broadcast: { self: false, ack: false },
                     presence: { key: '' }
                 }
@@ -457,7 +475,7 @@ class RealtimeClient {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
             // ★ 佇列訊息，重連後自動補發（最多保留 50 條）
             if (this._publishQueue.length < 50) {
-                this._publishQueue.push({ channel, event, payload });
+                this._publishQueue.push({ channel, event, payload, _ts: Date.now() });
                 console.warn(`[Realtime] not connected, queued (${this._publishQueue.length} pending)`);
             }
             return;

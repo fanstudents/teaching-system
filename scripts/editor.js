@@ -545,6 +545,45 @@ export class Editor {
     }
 
     /**
+     * 新增破冰元件（在線學員牆）
+     */
+    addIcebreaker() {
+        const element = {
+            type: 'icebreaker',
+            x: 50,
+            y: 30,
+            width: 860,
+            height: 460,
+            icebreakerTitle: '🎉 歡迎來到課堂！',
+            icebreakerSubtitle: '看看誰已經上線了？',
+            icebreakerLayout: 'grid',
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
+     * 新增課前/課後評量元件
+     */
+    addAssessment(assessmentType = 'pre') {
+        const element = {
+            type: 'assessment',
+            x: 50,
+            y: 30,
+            width: 860,
+            height: 460,
+            assessmentType,
+            title: assessmentType === 'post' ? '📝 課後測驗' : '📝 課前測驗',
+            questions: [],
+            points: 15,
+        };
+
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增流動線條元素
      */
     addFlowLine() {
@@ -966,6 +1005,111 @@ export class Editor {
                         <label class="form-label">Email 通知文字</label>
                         <textarea class="form-input" id="thankYouEmail" rows="3" style="font-size:12px;">${emailNotice.replace(/"/g, '&quot;')}</textarea>
                     </div>
+                </div>
+            `;
+        }
+
+        // 破冰元件（在線學員牆）
+        if (type === 'icebreaker') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">破冰設定</div>
+                    <div class="form-group">
+                        <label class="form-label">標題</label>
+                        <input type="text" class="form-input" id="icebreakerTitle" value="${(elementData.icebreakerTitle || '🎉 歡迎來到課堂！').replace(/"/g, '&quot;')}" placeholder="🎉 歡迎來到課堂！">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">副標題</label>
+                        <input type="text" class="form-input" id="icebreakerSubtitle" value="${(elementData.icebreakerSubtitle || '看看誰已經上線了？').replace(/"/g, '&quot;')}" placeholder="看看誰已經上線了？">
+                    </div>
+                </div>
+            `;
+        }
+
+        // 課前/課後評量元件
+        if (type === 'assessment') {
+            const aType = elementData.assessmentType || 'pre';
+            const questions = elementData.questions || [];
+            const qListHtml = questions.map((q, i) => {
+                const isChoice = q.type !== 'truefalse';
+                const diffLabels = ['', '易', '中', '難'];
+                return `
+                    <div class="assess-q-item" data-idx="${i}" style="padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:6px;">
+                        <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;">
+                            <span style="font-size:11px;font-weight:700;color:#64748b;width:24px;">${i + 1}</span>
+                            <span style="font-size:10px;padding:1px 5px;border-radius:3px;background:${isChoice ? '#dbeafe' : '#fef3c7'};color:${isChoice ? '#1e40af' : '#92400e'}">${isChoice ? '選擇' : '是非'}</span>
+                            <span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#f1f5f9;color:#64748b;">${diffLabels[q.difficulty] || '中'}</span>
+                            ${q.concept ? `<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:#ecfdf5;color:#059669;">${q.concept}</span>` : ''}
+                            <button class="assess-q-del" data-idx="${i}" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#ef4444;font-size:12px;" title="刪除">✕</button>
+                        </div>
+                        <input class="form-input assess-q-text" data-idx="${i}" value="${(q.question || '').replace(/"/g, '&quot;')}" placeholder="題目" style="font-size:12px;margin-bottom:4px;">
+                        ${isChoice ? (q.options || []).map((opt, j) => {
+                            const optText = typeof opt === 'string' ? opt : opt.text || '';
+                            return `<div style="display:flex;gap:4px;align-items:center;margin-bottom:2px;">
+                                <span style="font-size:11px;color:${j === q.answer ? '#10b981' : '#94a3b8'};font-weight:700;width:16px;">${'ABCD'[j]}</span>
+                                <input class="form-input assess-opt" data-idx="${i}" data-opt="${j}" value="${optText.replace(/"/g, '&quot;')}" style="flex:1;font-size:11px;padding:3px 6px;">
+                                <input type="radio" name="assess-ans-${i}" data-idx="${i}" data-opt="${j}" class="assess-ans-radio" ${j === q.answer ? 'checked' : ''} style="cursor:pointer;" title="正確答案">
+                            </div>`;
+                        }).join('') : `
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:3px;">
+                                    <input type="radio" name="assess-tf-${i}" data-idx="${i}" class="assess-tf-radio" value="true" ${q.answer === true ? 'checked' : ''}> 正確
+                                </label>
+                                <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:3px;">
+                                    <input type="radio" name="assess-tf-${i}" data-idx="${i}" class="assess-tf-radio" value="false" ${q.answer === false ? 'checked' : ''}> 錯誤
+                                </label>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">評量設定</div>
+                    <div class="form-group">
+                        <label class="form-label">標題</label>
+                        <input type="text" class="form-input" id="assessmentTitle" value="${(elementData.title || '').replace(/"/g, '&quot;')}" placeholder="📝 課前測驗">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">類型</label>
+                        <select id="assessmentType" style="width:100%;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="pre" ${aType === 'pre' ? 'selected' : ''}>課前測驗</option>
+                            <option value="post" ${aType === 'post' ? 'selected' : ''}>課後測驗</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">計分（滿分）</label>
+                        <input type="number" class="form-input" id="assessmentPoints" value="${elementData.points ?? 15}" min="1" max="100" style="width:80px;">
+                    </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title">題目 (${questions.length})</div>
+                    <div id="assessQList" style="max-height:360px;overflow-y:auto;">${qListHtml}</div>
+                    <div style="display:flex;gap:6px;margin-top:6px;">
+                        <button id="assessAddChoice" style="flex:1;padding:5px;border:1.5px dashed #cbd5e1;border-radius:6px;background:none;color:#64748b;cursor:pointer;font-size:11px;">+ 選擇題</button>
+                        <button id="assessAddTF" style="flex:1;padding:5px;border:1.5px dashed #cbd5e1;border-radius:6px;background:none;color:#64748b;cursor:pointer;font-size:11px;">+ 是非題</button>
+                    </div>
+                    <button id="assessAIGenerate" style="width:100%;margin-top:8px;padding:8px;border:none;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:white;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;">
+                        <span class="material-symbols-outlined" style="font-size:16px;">auto_awesome</span>
+                        AI 生成 15 題
+                    </button>
+                    <div id="assessAIStatus" style="font-size:11px;color:#64748b;margin-top:4px;text-align:center;"></div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title">題組管理</div>
+                    <div style="display:flex;gap:6px;">
+                        <button id="assessExportBtn" style="flex:1;padding:6px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#475569;cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span> 匯出題組
+                        </button>
+                        <button id="assessImportBtn" style="flex:1;padding:6px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#475569;cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">content_paste</span> 貼上題組
+                        </button>
+                    </div>
+                    <button id="assessImportProjectBtn" style="width:100%;margin-top:6px;padding:6px;border:1px solid #dbeafe;border-radius:6px;background:#eff6ff;color:#1d4ed8;cursor:pointer;font-size:11px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px;">
+                        <span class="material-symbols-outlined" style="font-size:14px;">folder_open</span> 從其他專案匯入
+                    </button>
+                    <div id="assessImportStatus" style="font-size:11px;color:#64748b;margin-top:4px;text-align:center;"></div>
                 </div>
             `;
         }
@@ -1850,6 +1994,326 @@ export class Editor {
                 this.slideManager.saveCurrentSlide();
                 this.slideManager.renderCurrentSlide();
                 this.selectElementById(elementId);
+            });
+        } else if (elementData.type === 'icebreaker') {
+            bindSimple('icebreakerTitle', 'icebreakerTitle');
+            bindSimple('icebreakerSubtitle', 'icebreakerSubtitle');
+        } else if (elementData.type === 'assessment') {
+            // 基本欄位
+            bindSimple('assessmentTitle', 'title');
+            document.getElementById('assessmentType')?.addEventListener('change', () => {
+                elementData.assessmentType = document.getElementById('assessmentType').value;
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.saveCurrentSlide();
+                this.selectElementById(elementId);
+            });
+            document.getElementById('assessmentPoints')?.addEventListener('change', () => {
+                elementData.points = parseInt(document.getElementById('assessmentPoints').value) || 15;
+                this.slideManager.saveCurrentSlide();
+            });
+
+            // 題目內容編輯
+            document.querySelectorAll('.assess-q-text').forEach(inp => {
+                inp.addEventListener('change', () => {
+                    const idx = parseInt(inp.dataset.idx);
+                    if (elementData.questions?.[idx]) {
+                        elementData.questions[idx].question = inp.value;
+                        this.slideManager.saveCurrentSlide();
+                    }
+                });
+            });
+            // 選項編輯
+            document.querySelectorAll('.assess-opt').forEach(inp => {
+                inp.addEventListener('change', () => {
+                    const qi = parseInt(inp.dataset.idx);
+                    const oi = parseInt(inp.dataset.opt);
+                    if (elementData.questions?.[qi]) {
+                        const q = elementData.questions[qi];
+                        if (!q.options) q.options = [];
+                        if (typeof q.options[oi] === 'string') {
+                            q.options[oi] = inp.value;
+                        } else if (q.options[oi]) {
+                            q.options[oi].text = inp.value;
+                        }
+                        this.slideManager.saveCurrentSlide();
+                    }
+                });
+            });
+            // 正確答案
+            document.querySelectorAll('.assess-ans-radio').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const qi = parseInt(radio.dataset.idx);
+                    const oi = parseInt(radio.dataset.opt);
+                    if (elementData.questions?.[qi]) {
+                        elementData.questions[qi].answer = oi;
+                        this.slideManager.saveCurrentSlide();
+                        this.selectElementById(elementId);
+                    }
+                });
+            });
+            // 是非題答案
+            document.querySelectorAll('.assess-tf-radio').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const qi = parseInt(radio.dataset.idx);
+                    if (elementData.questions?.[qi]) {
+                        elementData.questions[qi].answer = radio.value === 'true';
+                        this.slideManager.saveCurrentSlide();
+                    }
+                });
+            });
+            // 刪除題目
+            document.querySelectorAll('.assess-q-del').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.idx);
+                    if (elementData.questions) {
+                        elementData.questions.splice(idx, 1);
+                        this.slideManager.renderCurrentSlide();
+                        this.slideManager.saveCurrentSlide();
+                        this.selectElementById(elementId);
+                    }
+                });
+            });
+            // 新增選擇題
+            document.getElementById('assessAddChoice')?.addEventListener('click', () => {
+                if (!elementData.questions) elementData.questions = [];
+                const id = 'q' + Date.now().toString(36);
+                elementData.questions.push({
+                    id, type: 'choice', question: '新選擇題', difficulty: 2, concept: '',
+                    options: ['選項 A', '選項 B', '選項 C', '選項 D'], answer: 0
+                });
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.saveCurrentSlide();
+                this.selectElementById(elementId);
+            });
+            // 新增是非題
+            document.getElementById('assessAddTF')?.addEventListener('click', () => {
+                if (!elementData.questions) elementData.questions = [];
+                const id = 'q' + Date.now().toString(36);
+                elementData.questions.push({
+                    id, type: 'truefalse', question: '新是非題', difficulty: 2, concept: '', answer: true
+                });
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.saveCurrentSlide();
+                this.selectElementById(elementId);
+            });
+            // AI 生成
+            document.getElementById('assessAIGenerate')?.addEventListener('click', async () => {
+                const btn = document.getElementById('assessAIGenerate');
+                const status = document.getElementById('assessAIStatus');
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                status.textContent = '⏳ AI 正在根據簡報內容生成題目…';
+                status.style.color = '#64748b';
+
+                try {
+                    const { ai } = await import('../supabase.js');
+                    // 蒐集簡報內容摘要
+                    const slides = this.slideManager.slides || [];
+                    const slideTexts = slides.map((s, i) => {
+                        const texts = (s.elements || [])
+                            .filter(e => e.type === 'text' || e.type === 'copycard')
+                            .map(e => e.content || e.question || e.title || '')
+                            .filter(t => t.length > 2);
+                        return texts.length ? `[投影片${i + 1}] ${texts.join(' | ')}` : '';
+                    }).filter(Boolean).join('\n');
+
+                    const truncated = slideTexts.slice(0, 4000);
+                    const assessType = elementData.assessmentType || 'pre';
+
+                    const prompt = `你是一位教學評量設計專家。請根據以下課程投影片內容，設計 15 題具有「鑑別度」的測驗題目。
+
+══ 課程內容摘要 ══
+${truncated}
+
+══ 出題要求 ══
+- 類型：${assessType === 'post' ? '課後測驗（測試學完後是否掌握）' : '課前測驗（測試學員的先備知識）'}
+- 鑑別度設計：
+  • 5 題「易」(difficulty:1)：基礎常識/直覺判斷，大部分人答對
+  • 5 題「中」(difficulty:2)：需要理解核心概念
+  • 5 題「難」(difficulty:3)：需要深度理解或應用思考
+- 題型混合：約 10 題選擇題 + 5 題是非題
+- 每題標註對應的簡報知識點 (concept 欄位，2-6 字)
+- 選擇題要有合理的干擾項
+- 是非題的陳述要有深度，避免太明顯
+
+══ 回傳格式（純 JSON 陣列）══
+[
+  {"id":"q1","type":"choice","question":"題目","options":["A","B","C","D"],"answer":0,"difficulty":1,"concept":"知識點"},
+  {"id":"q2","type":"truefalse","question":"陳述句","answer":true,"difficulty":2,"concept":"知識點"}
+]
+
+注意：
+- answer 在選擇題中是正確選項的 index (0-3)
+- answer 在是非題中是 true 或 false
+- 全部使用繁體中文
+- 只回傳 JSON，不加任何額外說明`;
+
+                    const result = await ai.chat([
+                        { role: 'system', content: '你是教育評量生成器，只回傳 JSON，不加任何額外說明。' },
+                        { role: 'user', content: prompt }
+                    ], { model: 'claude-haiku-4-5', temperature: 0.7, maxTokens: 6000 });
+
+                    const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
+                    const questions = JSON.parse(jsonStr);
+
+                    if (!Array.isArray(questions) || questions.length === 0) {
+                        throw new Error('AI 回傳格式不正確');
+                    }
+
+                    // 標準化
+                    elementData.questions = questions.map((q, i) => ({
+                        id: q.id || `q${i + 1}`,
+                        type: q.type === 'truefalse' ? 'truefalse' : 'choice',
+                        question: q.question || '',
+                        options: q.options || [],
+                        answer: q.answer ?? 0,
+                        difficulty: q.difficulty || 2,
+                        concept: q.concept || '',
+                    }));
+
+                    this.slideManager.renderCurrentSlide();
+                    this.slideManager.saveCurrentSlide();
+                    this.selectElementById(elementId);
+
+                    status.textContent = `✅ 已生成 ${questions.length} 題！`;
+                    status.style.color = '#16a34a';
+                } catch (err) {
+                    console.error('Assessment AI generation error:', err);
+                    status.textContent = `❌ 生成失敗：${err.message}`;
+                    status.style.color = '#dc2626';
+                } finally {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            });
+
+            // 匯出題組到剪貼簿
+            document.getElementById('assessExportBtn')?.addEventListener('click', async () => {
+                const status = document.getElementById('assessImportStatus');
+                const qs = elementData.questions || [];
+                if (qs.length === 0) {
+                    status.textContent = '⚠️ 目前沒有題目可匯出';
+                    status.style.color = '#f59e0b';
+                    return;
+                }
+                try {
+                    const json = JSON.stringify({
+                        _type: 'assessment_questions',
+                        title: elementData.title || '',
+                        assessmentType: elementData.assessmentType || 'pre',
+                        questions: qs,
+                    }, null, 2);
+                    await navigator.clipboard.writeText(json);
+                    status.textContent = `✅ 已複製 ${qs.length} 題到剪貼簿`;
+                    status.style.color = '#16a34a';
+                } catch (e) {
+                    status.textContent = '❌ 複製失敗';
+                    status.style.color = '#dc2626';
+                }
+            });
+
+            // 從剪貼簿貼上題組
+            document.getElementById('assessImportBtn')?.addEventListener('click', async () => {
+                const status = document.getElementById('assessImportStatus');
+                try {
+                    const text = await navigator.clipboard.readText();
+                    const data = JSON.parse(text);
+                    if (data._type !== 'assessment_questions' || !Array.isArray(data.questions)) {
+                        throw new Error('格式不正確');
+                    }
+                    elementData.questions = data.questions;
+                    if (data.title) elementData.title = data.title;
+                    this.slideManager.renderCurrentSlide();
+                    this.slideManager.saveCurrentSlide();
+                    this.selectElementById(elementId);
+                    status.textContent = `✅ 已匯入 ${data.questions.length} 題`;
+                    status.style.color = '#16a34a';
+                } catch (e) {
+                    status.textContent = '❌ 剪貼簿中沒有有效的題組資料';
+                    status.style.color = '#dc2626';
+                }
+            });
+
+            // 從其他專案匯入
+            document.getElementById('assessImportProjectBtn')?.addEventListener('click', async () => {
+                const status = document.getElementById('assessImportStatus');
+                const btn = document.getElementById('assessImportProjectBtn');
+                btn.disabled = true;
+                status.textContent = '⏳ 載入專案列表…';
+                status.style.color = '#64748b';
+
+                try {
+                    const { db } = await import('../supabase.js');
+                    const projects = this.slideManager._projectsCache || [];
+                    if (projects.length === 0) {
+                        status.textContent = '⚠️ 沒有找到其他專案';
+                        status.style.color = '#f59e0b';
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // 掃描所有專案找 assessment 元件
+                    const found = [];
+                    for (const proj of projects) {
+                        if (proj.id === this.slideManager.currentProjectId) continue;
+                        const slides = proj.slides || [];
+                        for (const slide of slides) {
+                            for (const el of (slide.elements || [])) {
+                                if (el.type === 'assessment' && el.questions?.length > 0) {
+                                    found.push({
+                                        projectName: proj.name,
+                                        projectId: proj.id,
+                                        title: el.title || (el.assessmentType === 'post' ? '課後測驗' : '課前測驗'),
+                                        type: el.assessmentType || 'pre',
+                                        count: el.questions.length,
+                                        questions: el.questions,
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    if (found.length === 0) {
+                        status.textContent = '⚠️ 其他專案中沒有找到評量題組';
+                        status.style.color = '#f59e0b';
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // 建立選擇下拉
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'margin-top:6px;padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;';
+                    wrap.innerHTML = `
+                        <div style="font-size:11px;color:#64748b;margin-bottom:4px;">選擇題組：</div>
+                        <select id="assessProjectSelect" style="width:100%;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;margin-bottom:6px;">
+                            ${found.map((f, i) => `<option value="${i}">${f.projectName} — ${f.title} (${f.count}題)</option>`).join('')}
+                        </select>
+                        <button id="assessProjectConfirm" style="width:100%;padding:5px;border:none;border-radius:6px;background:#3b82f6;color:white;font-size:12px;cursor:pointer;font-family:inherit;">匯入此題組</button>
+                    `;
+                    btn.parentNode.insertBefore(wrap, btn.nextSibling);
+                    status.textContent = '';
+
+                    wrap.querySelector('#assessProjectConfirm').addEventListener('click', () => {
+                        const idx = parseInt(wrap.querySelector('#assessProjectSelect').value);
+                        const selected = found[idx];
+                        if (selected) {
+                            elementData.questions = JSON.parse(JSON.stringify(selected.questions));
+                            elementData.title = selected.title;
+                            this.slideManager.renderCurrentSlide();
+                            this.slideManager.saveCurrentSlide();
+                            this.selectElementById(elementId);
+                            status.textContent = `✅ 已匯入「${selected.projectName}」的 ${selected.count} 題`;
+                            status.style.color = '#16a34a';
+                        }
+                        wrap.remove();
+                    });
+                } catch (e) {
+                    console.error('Assessment import error:', e);
+                    status.textContent = '❌ 載入失敗';
+                    status.style.color = '#dc2626';
+                } finally {
+                    btn.disabled = false;
+                }
             });
         } else if (elementData.type === 'document') {
             bindSimple('docTitle', 'docTitle');

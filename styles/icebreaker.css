@@ -1,0 +1,228 @@
+/* ═══════════════════════════════════════════════════
+   破冰元件 — 在線學員牆 CSS
+   ═══════════════════════════════════════════════════ */
+
+.icebreaker-widget {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+}
+
+.icebreaker-header {
+    text-align: center;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.icebreaker-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.icebreaker-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.icebreaker-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 4px 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.icebreaker-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px #22c55e;
+    animation: icebreakerPulse 2s ease-in-out infinite;
+}
+@keyframes icebreakerPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ── 頭像網格 ── */
+.icebreaker-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-content: flex-start;
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.icebreaker-avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 72px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* 入場動畫 */
+.icebreaker-enter {
+    opacity: 0;
+    transform: scale(0.3) translateY(20px);
+}
+.icebreaker-avatar:not(.icebreaker-enter) {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* 離場動畫 */
+.icebreaker-exit {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s ease;
+}
+
+.icebreaker-avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        hsl(var(--hue, 210), 65%, 55%),
+        hsl(calc(var(--hue, 210) + 30), 55%, 45%)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 2px 8px hsla(var(--hue, 210), 60%, 40%, 0.3),
+        0 0 0 3px #fff;
+    transition: transform 0.2s;
+}
+.icebreaker-avatar:hover .icebreaker-avatar-circle {
+    transform: scale(1.1);
+}
+
+.icebreaker-initials {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.icebreaker-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    text-align: center;
+    max-width: 72px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.icebreaker-new-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    letter-spacing: 0.5px;
+    animation: icebreakerBadge 0.5s ease;
+}
+@keyframes icebreakerBadge {
+    from { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    to { transform: scale(1); }
+}
+
+/* ── 暗色投影片背景適配 ── */
+.presentation-slide .icebreaker-title,
+.aud-interaction-wrap .icebreaker-title {
+    color: #f1f5f9;
+}
+.presentation-slide .icebreaker-subtitle,
+.aud-interaction-wrap .icebreaker-subtitle {
+    color: #94a3b8;
+}
+.presentation-slide .icebreaker-count,
+.aud-interaction-wrap .icebreaker-count {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+.presentation-slide .icebreaker-name,
+.aud-interaction-wrap .icebreaker-name {
+    color: #cbd5e1;
+}
+.presentation-slide .icebreaker-avatar-circle,
+.aud-interaction-wrap .icebreaker-avatar-circle {
+    box-shadow:
+        0 2px 8px hsla(var(--hue, 210), 60%, 40%, 0.4),
+        0 0 0 3px rgba(255,255,255,0.1);
+}
+
+/* ── 預覽模式（編輯器） ── */
+.icebreaker-preview .icebreaker-title {
+    font-size: 16px;
+}
+.icebreaker-preview .icebreaker-subtitle {
+    font-size: 12px;
+}
+.icebreaker-preview .icebreaker-avatar-circle {
+    width: 40px;
+    height: 40px;
+}
+.icebreaker-preview .icebreaker-initials {
+    font-size: 13px;
+}
+.icebreaker-preview .icebreaker-name {
+    font-size: 10px;
+}
+.icebreaker-preview .icebreaker-avatar {
+    width: 56px;
+}
+
+/* ── 精簡模式（20+ 人） ── */
+.icebreaker-compact .icebreaker-grid {
+    gap: 8px;
+}
+.icebreaker-compact .icebreaker-avatar {
+    width: 44px;
+}
+.icebreaker-compact .icebreaker-avatar-circle {
+    width: 36px;
+    height: 36px;
+    box-shadow: 0 1px 4px hsla(var(--hue, 210), 60%, 40%, 0.25), 0 0 0 2px #fff;
+}
+.icebreaker-compact .icebreaker-initials {
+    font-size: 12px;
+}
+.icebreaker-compact .icebreaker-name {
+    font-size: 9px;
+    max-width: 44px;
+}
+.icebreaker-compact .icebreaker-new-badge {
+    font-size: 7px;
+    padding: 0 3px;
+    top: -2px;
+    right: -2px;
+}

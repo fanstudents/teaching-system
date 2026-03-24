@@ -1099,6 +1099,41 @@ export class SlideManager {
                 break;
             }
 
+            case 'assessment': {
+                el.classList.add('interactive-element', 'assessment-element');
+                el.style.overflow = 'hidden';
+                this._applyInteractiveStyles(el, element);
+                this._addScoreBadge(el, element);
+                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                if (isLive) {
+                    import('./interactive/assessment.js').then(({ AssessmentGame }) => {
+                        new AssessmentGame().render(el, element);
+                    });
+                } else {
+                    import('./interactive/assessment.js').then(({ AssessmentGame }) => {
+                        new AssessmentGame().renderPreview(el, element);
+                    });
+                }
+                break;
+            }
+
+            case 'icebreaker': {
+                el.classList.add('interactive-element', 'icebreaker-element');
+                el.style.overflow = 'hidden';
+                this._applyInteractiveStyles(el, element);
+                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                if (isLive) {
+                    import('./interactive/icebreaker.js').then(({ IcebreakerGame }) => {
+                        new IcebreakerGame().render(el, element);
+                    });
+                } else {
+                    import('./interactive/icebreaker.js').then(({ IcebreakerGame }) => {
+                        new IcebreakerGame().renderPreview(el, element);
+                    });
+                }
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
@@ -2083,7 +2118,7 @@ export class SlideManager {
         el.style.setProperty('--ia-padding', pad + 'px');
 
         // 計分分數 (供互動模組讀取)
-        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5 };
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, assessment: 15 };
         const pts = element.points ?? defaultPts[element.type] ?? 0;
         el.dataset.points = pts;
     }

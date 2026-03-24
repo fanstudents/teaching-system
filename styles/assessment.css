@@ -1,0 +1,474 @@
+/* ═══════════════════════════════════════════════════
+   課前/課後評量模組 CSS
+   ═══════════════════════════════════════════════════ */
+
+/* ── 入口卡片 ── */
+.assessment-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    padding: 24px;
+    position: relative;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.assessment-card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+.assessment-card-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.04));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.assessment-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+}
+
+.assessment-card-info {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.assessment-start-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent, #3b82f6);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.assessment-start-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--accent, #3b82f6) 40%, transparent);
+}
+
+/* ── 已完成狀態 ── */
+.assessment-done-score {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1;
+}
+.assessment-done-detail {
+    font-size: 14px;
+    color: #64748b;
+}
+.assessment-weak-concepts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+.assessment-weak-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 500;
+}
+
+/* ── 全螢幕 Overlay ── */
+.assessment-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    animation: assessFadeIn 0.3s ease;
+}
+@keyframes assessFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.assessment-fullscreen {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 16px;
+}
+
+.assessment-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid #1e293b;
+    flex-shrink: 0;
+}
+.assessment-header-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.assessment-progress {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+.assessment-progress-text {
+    font-size: 12px;
+    color: #94a3b8;
+    text-align: right;
+}
+.assessment-progress-bar {
+    height: 4px;
+    background: #1e293b;
+    border-radius: 2px;
+    overflow: hidden;
+}
+.assessment-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+.assessment-close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+.assessment-close-btn:hover {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+/* ── 題目區 ── */
+.assessment-body {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 0;
+}
+
+.assessment-question {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.assessment-q-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.assessment-q-type {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #1e293b;
+    color: #94a3b8;
+    vertical-align: middle;
+}
+.assessment-q-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+    line-height: 1.6;
+    margin-top: 16px;
+    max-width: 600px;
+}
+
+/* ── 選擇題選項 ── */
+.assessment-choice-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 520px;
+}
+.assessment-choice-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border: 1.5px solid #334155;
+    border-radius: 12px;
+    background: #1e293b;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    font-family: inherit;
+}
+.assessment-choice-btn:hover {
+    border-color: #475569;
+    background: #263244;
+}
+.assessment-choice-btn.selected {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.12);
+}
+.assessment-choice-marker {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #334155;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+.assessment-choice-btn.selected .assessment-choice-marker {
+    background: #3b82f6;
+    color: #fff;
+}
+.assessment-choice-text {
+    font-size: 15px;
+    color: #cbd5e1;
+    line-height: 1.4;
+}
+
+/* ── 是非題 ── */
+.assessment-tf-options {
+    display: flex;
+    gap: 16px;
+}
+.assessment-tf-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 40px;
+    border: 1.5px solid #334155;
+    border-radius: 16px;
+    background: #1e293b;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+}
+.assessment-tf-btn:hover {
+    border-color: #475569;
+    transform: translateY(-2px);
+}
+.assessment-tf-btn.selected {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+}
+
+/* ── 導覽列 ── */
+.assessment-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-top: 1px solid #1e293b;
+    flex-shrink: 0;
+}
+.assessment-prev-btn,
+.assessment-next-btn,
+.assessment-submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+.assessment-prev-btn,
+.assessment-next-btn {
+    background: #1e293b;
+    color: #94a3b8;
+}
+.assessment-prev-btn:hover:not(:disabled),
+.assessment-next-btn:hover {
+    background: #334155;
+    color: #e2e8f0;
+}
+.assessment-prev-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.assessment-submit-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+}
+.assessment-submit-btn:hover:not(:disabled) {
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+.assessment-submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── 結果頁 ── */
+.assessment-result-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 520px;
+}
+.assessment-result-emoji {
+    font-size: 56px;
+    animation: assessBounce 0.5s ease;
+}
+@keyframes assessBounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+.assessment-result-score {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+}
+.assessment-result-detail {
+    font-size: 16px;
+    color: #94a3b8;
+}
+.assessment-result-bar-wrap {
+    width: 100%;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+.assessment-result-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+.assessment-result-breakdown {
+    width: 100%;
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
+.assessment-result-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #1e293b;
+    font-size: 13px;
+}
+.assessment-result-row.correct { border-left: 3px solid #10b981; }
+.assessment-result-row.wrong { border-left: 3px solid #ef4444; }
+.assessment-result-q-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: #334155;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.assessment-result-q-text {
+    flex: 1;
+    color: #cbd5e1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.assessment-done-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 10px 24px;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+.assessment-done-btn:hover {
+    border-color: #3b82f6;
+    color: #a8c7fa;
+}
+
+/* ── 載入動畫 ── */
+.assessment-spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── 暗色主題下的預覽（編輯器） ── */
+.assessment-preview .assessment-card-title {
+    font-size: 15px;
+}
+.assessment-preview .assessment-card-info {
+    font-size: 12px;
+}

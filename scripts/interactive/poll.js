@@ -97,7 +97,7 @@ export class PollGame {
             });
         }
 
-        // 持久化到 DB
+        // 持久化到 DB（poll_votes 獨立表，用於即時統計）
         try {
             await db.insert('poll_votes', {
                 session_code: sessionCode || 'free',
@@ -351,7 +351,7 @@ export class PollGame {
                 voterEl.style.cssText = 'font-size:11px;color:#64748b;margin-top:4px;line-height:1.5;display:flex;flex-wrap:wrap;gap:4px;';
                 opt.appendChild(voterEl);
             }
-            voterEl.innerHTML = voters.map(n => `<span style="background:#f1f5f9;padding:1px 6px;border-radius:4px;white-space:nowrap;">${n}</span>`).join('');
+            voterEl.innerHTML = voters.map(n => `<span style="background:#f1f5f9;padding:1px 6px;border-radius:4px;white-space:nowrap;">${String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`).join('');
         });
     }
 

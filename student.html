@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="styles/interactive.css?v=20260306">
     <link rel="stylesheet" href="styles/interactive-theme.css?v=20260306">
     <link rel="stylesheet" href="styles/homework.css?v=20260306">
+    <link rel="stylesheet" href="styles/assessment.css?v=20260324">
+    <link rel="stylesheet" href="styles/icebreaker.css?v=20260324">
 </head>
 
 <body>
@@ -212,6 +214,18 @@
             backdrop-filter:blur(8px);color:white;cursor:pointer;display:none;
             align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(234,88,12,0.3);
         "><span class="material-symbols-outlined" style="font-size:20px;">forum</span></button>
+
+        <!-- Emoji Reaction 按鈕列 -->
+        <div id="studentReactionBar" style="
+            position:fixed;bottom:76px;right:12px;z-index:200;display:none;
+            gap:4px;align-items:center;
+        ">
+            <button class="reaction-emoji" data-emoji="👍" style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.15s;">👍</button>
+            <button class="reaction-emoji" data-emoji="❤️" style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.15s;">❤️</button>
+            <button class="reaction-emoji" data-emoji="😂" style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.15s;">😂</button>
+            <button class="reaction-emoji" data-emoji="🎉" style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.15s;">🎉</button>
+            <button class="reaction-emoji" data-emoji="🤔" style="width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);cursor:pointer;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform 0.15s;">🤔</button>
+        </div>
 
         <div id="studentQAPopup" style="
             position:fixed;bottom:170px;right:12px;z-index:300;width:320px;
@@ -614,11 +628,6 @@
                     while (slidesCache.length < total) slidesCache.push(null);
                     slidesCache[idx] = slide;
 
-                    // 廣播開始時，強制切到跟隨模式
-                    if (mode === 'free') {
-                        setMode('follow');
-                    }
-
                     if (mode === 'follow') {
                         currentIndex = idx;
                         renderSlide(slide, idx, total);
@@ -634,9 +643,20 @@
                     }
                 });
 
-                // 監聽 session_end 事件 → 切回自行瀏覽模式（不強制重新登入）
+                // 接收破冰元件資料（在線學員名單）
+                realtime.on('icebreaker_update', (payload) => {
+                    if (payload?.students) {
+                        window._icebreakerStudents = payload.students;
+                    }
+                });
+
+                // 監聯 session_end 事件 → 切回自行瀏覽模式（不強制重新登入）
                 realtime.on('session_end', () => {
                     if (heartbeatTimer) clearInterval(heartbeatTimer);
+                    if (lbTimer) clearInterval(lbTimer);
+                    // 隱藏 reaction bar
+                    const rb = document.getElementById('studentReactionBar');
+                    if (rb) rb.style.display = 'none';
                     // 切換到「自行瀏覽」tab
                     const browseTab = document.querySelector('[data-tab="browse"]');
                     if (browseTab) browseTab.click();
@@ -849,6 +869,24 @@
                     } catch (e) { console.warn('[Rename] DB update failed:', e); }
                 });
 
+                // ── Emoji Reaction ──
+                const reactionBar = document.getElementById('studentReactionBar');
+                if (reactionBar) {
+                    reactionBar.style.display = 'flex';
+                    let lastReactionTime = 0;
+                    reactionBar.querySelectorAll('.reaction-emoji').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const now = Date.now();
+                            if (now - lastReactionTime < 1000) return; // 1秒節流
+                            lastReactionTime = now;
+                            const emoji = btn.dataset.emoji;
+                            btn.style.transform = 'scale(1.4)';
+                            setTimeout(() => { btn.style.transform = ''; }, 150);
+                            realtime.publish(`session:${sessionCode}`, 'reaction', { emoji });
+                        });
+                    });
+                }
+
                 // ── Q&A 提問功能 ──
                 const qaBtn = document.getElementById('studentQABtn');
                 const qaPopup = document.getElementById('studentQAPopup');
@@ -946,7 +984,7 @@
                 async function updateStudentLeaderboard() {
                     if (!sessionCode) return;
                     try {
-                        const board = await stateManager.getLeaderboard(sessionCode);
+                        const board = await stateManager.getLeaderboard(sessionCode, project?.id || '');
                         const list = document.getElementById('studentLbList');
                         if (!list) return;
                         if (!board.length) {
@@ -959,7 +997,8 @@
                         list.innerHTML = board.map((s, i) => {
                             const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
                             const barPct = Math.round((s.totalPoints / maxPts) * 100);
-                            return `<div class="lb-row"><div class="lb-row-top"><div class="lb-rank ${rc}">${i + 1}</div><div class="lb-name">${s.name}</div><div class="lb-pts">${s.totalPoints}</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%"></div></div></div>`;
+                            const safeName = String(s.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                            return `<div class="lb-row"><div class="lb-row-top"><div class="lb-rank ${rc}">${i + 1}</div><div class="lb-name">${safeName}</div><div class="lb-pts">${s.totalPoints}</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%"></div></div></div>`;
                         }).join('');
                     } catch (e) { console.warn('[LB]', e); }
                 }

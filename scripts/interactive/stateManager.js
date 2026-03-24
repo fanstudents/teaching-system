@@ -65,30 +65,11 @@ class InteractionState {
 
         // ── 檢查是否已有首次作答（首次計分制）──
         let isRetry = false;
-        let firstAwardedPoints = awardedPoints; // 預設用本次分數
+        let firstAwardedPoints = awardedPoints;
         const cached = this._cache.get(k);
         if (cached) {
-            // 記憶體中已有紀錄 → 這是重複作答
             isRetry = true;
             firstAwardedPoints = cached.state?._awarded ?? cached.awarded_points ?? awardedPoints;
-        } else if (user) {
-            // 記憶體沒有但 DB 可能有
-            try {
-                const raw = await db.select('submissions', {
-                    filter: {
-                        session_id: `eq.${sessionId || ''}`,
-                        element_id: `eq.${elementId}`,
-                        student_email: `eq.${email}`,
-                    },
-                });
-                const existing = this._unwrap(raw);
-                if (existing.length > 0) {
-                    isRetry = true;
-                    let st = existing[0].state;
-                    if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                    firstAwardedPoints = st?._awarded ?? 0;
-                }
-            } catch { }
         }
 
         const record = {
@@ -102,7 +83,6 @@ class InteractionState {
             content: data.content || '',
             is_correct: data.isCorrect ?? null,
             score: data.score != null ? String(data.score) : null,
-            // 首次計分制：保留首次的分數
             state: {
                 ...(data.state || {}),
                 _awarded: isRetry ? firstAwardedPoints : awardedPoints,
@@ -118,38 +98,19 @@ class InteractionState {
         record._isRetry = isRetry;
         this._cache.set(k, record);
 
-        // 如果是訪客，不寫入 DB
         if (!user) return { isRetry };
 
-        // DB upsert（重複作答時只更新 content/state 但不改 _awarded）
-        // ★ 加入重試機制，失敗時通知 UI
+        // ★ DB upsert — 用 onConflict 取代 select→insert/update
         const MAX_RETRIES = 2;
         let saved = false;
         for (let attempt = 0; attempt <= MAX_RETRIES && !saved; attempt++) {
             try {
                 if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
 
-                const raw = await db.select('submissions', {
-                    filter: {
-                        session_id: `eq.${sessionId || ''}`,
-                        element_id: `eq.${elementId}`,
-                        student_email: `eq.${email}`,
-                    },
+                const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
+                await db.insert('submissions', dbRecord, {
+                    onConflict: 'session_id,element_id,student_email'
                 });
-                const existing = this._unwrap(raw);
-
-                if (existing.length > 0) {
-                    await db.update('submissions', {
-                        content: record.content,
-                        is_correct: record.is_correct,
-                        score: record.score,
-                        state: record.state,
-                        submitted_at: record.submitted_at,
-                    }, { id: `eq.${existing[0].id}` });
-                } else {
-                    const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
-                    await db.insert('submissions', dbRecord);
-                }
                 saved = true;
 
                 // 通知儀表板即時更新
@@ -165,7 +126,6 @@ class InteractionState {
             } catch (e) {
                 console.warn(`[stateManager] save attempt ${attempt + 1}/${MAX_RETRIES + 1} failed:`, e);
                 if (attempt === MAX_RETRIES) {
-                    // ★ 所有重試都失敗 → 通知 UI 顯示 toast
                     window.dispatchEvent(new CustomEvent('submission-error', {
                         detail: { elementId, type: data.type, error: e.message || '儲存失敗' }
                     }));
@@ -291,29 +251,39 @@ class InteractionState {
     async getLeaderboard(sessionId, projectId) {
         if (!sessionId) return [];
         try {
-            // 自動查找 projectId（如果未提供）
-            if (!projectId) {
-                try {
-                    const sessRaw = await db.select('project_sessions', {
-                        filter: { session_code: `eq.${sessionId}` },
-                        select: 'project_id',
-                        limit: 1,
-                    });
-                    const sess = this._unwrap(sessRaw);
-                    if (sess[0]?.project_id) projectId = sess[0].project_id;
-                } catch { }
+            // ★ 使用 DB 端 RPC function 聚合，避免前端拉全表
+            const { data, error } = await db.rpc('get_leaderboard', {
+                p_session_id: sessionId,
+                p_project_id: projectId || null
+            });
+
+            if (error || !data) {
+                console.warn('[stateManager] RPC getLeaderboard failed, fallback to client-side:', error);
+                return this._getLeaderboardFallback(sessionId, projectId);
             }
 
-            // 1. 取得 submissions 的分數
+            return data.map(r => ({
+                name: r.name || r.email,
+                email: r.email,
+                totalPoints: parseInt(r.total_points) || 0
+            }));
+        } catch (e) {
+            console.warn('[stateManager] getLeaderboard failed:', e);
+            return [];
+        }
+    }
+
+    /** Fallback：如果 RPC 不存在，退回 client-side 聚合 */
+    async _getLeaderboardFallback(sessionId, projectId) {
+        try {
             const raw = await db.select('submissions', {
                 filter: {
                     session_id: `eq.${sessionId}`,
                     student_email: 'neq.guest',
                 },
+                limit: 500,
             });
             const rows = this._unwrap(raw);
-
-            // 按學員分組加總 state._awarded
             const map = new Map();
             for (const r of rows) {
                 const key = r.student_email || r.student_name;
@@ -325,29 +295,9 @@ class InteractionState {
                 if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
                 map.get(key).totalPoints += (parseInt(st?._awarded) || 0);
             }
-
-            // 2. 取得已註冊學員（從 students 表），補齊沒有互動紀錄的學員
-            if (projectId) {
-                try {
-                    const studentsRaw = await db.select('students', {
-                        filter: { project_id: `eq.${projectId}` },
-                        select: 'email,name',
-                    });
-                    const students = this._unwrap(studentsRaw);
-                    for (const s of students) {
-                        if (s.email && !map.has(s.email)) {
-                            map.set(s.email, { name: s.name || s.email, email: s.email, totalPoints: 0 });
-                        }
-                    }
-                } catch (e) {
-                    console.warn('[stateManager] fetch registered students failed:', e);
-                }
-            }
-
-            // 排序（高分在前，同分按名字排序）
             return [...map.values()].sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
         } catch (e) {
-            console.warn('[stateManager] getLeaderboard failed:', e);
+            console.warn('[stateManager] fallback getLeaderboard failed:', e);
             return [];
         }
     }

@@ -7,6 +7,8 @@ import { db } from '../supabase.js';
 
 export class BuzzerGame {
     constructor() {
+        /** @type {Map<string, number>} elementId → intervalId */
+        this._intervals = new Map();
         this.setupEventListeners();
     }
 
@@ -15,9 +17,16 @@ export class BuzzerGame {
     }
 
     init() {
+        this.destroy(); // 清除舊的 interval
         document.querySelectorAll('.buzzer-container').forEach(c => {
             if (!c.dataset._bzReady) { c.dataset._bzReady = '1'; this.setupContainer(c); }
         });
+    }
+
+    /** 清除所有輪詢 interval */
+    destroy() {
+        for (const [, id] of this._intervals) clearInterval(id);
+        this._intervals.clear();
     }
 
     async setupContainer(container) {
@@ -153,16 +162,16 @@ export class BuzzerGame {
             if (elementId) await stateManager.clear(elementId);
         });
 
-        // 定期刷新排行 + 搶答狀態
         if (elementId) {
-            setInterval(async () => {
+            const tid = setInterval(async () => {
                 if (pressed) { this.loadRanking(elementId, rankEl); return; }
                 const firstPerson = await this.checkClaimed(elementId);
                 if (firstPerson) {
                     showClaimed(firstPerson);
                     this.loadRanking(elementId, rankEl);
                 }
-            }, 3000);
+            }, 5000); // 5 秒（降低頻率10→5s，並存起來以便清除）
+            this._intervals.set(elementId, tid);
         }
     }
 
