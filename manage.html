@@ -772,18 +772,31 @@
                 const schedule = od.schedule;
                 const existingSessions = sessions.filter(s => s.project_id === currentProjectId);
 
-                // Check overlap
-                const existingDates = new Set(existingSessions.map(s => s.date));
-                const newDays = schedule.filter(s => s.date && !existingDates.has(s.date));
-
-                if (newDays.length === 0 && schedule.every(s => s.date)) {
-                    showToast('所有大綱日期都已有對應場次');
+                // ★ 防重複：已有場次數 ≥ 大綱天數則擋住
+                if (existingSessions.length >= schedule.length) {
+                    showToast(`此專案已有 ${existingSessions.length} 個場次（大綱共 ${schedule.length} 天），無需重複建立`);
                     return;
                 }
 
-                const daysToCreate = schedule.filter(s => !s.date || !existingDates.has(s.date));
+                // 只建立有日期的天 & 日期不重複的
+                const existingDates = new Set(existingSessions.map(s => s.date).filter(Boolean));
+                const daysToCreate = schedule.filter(s => {
+                    if (!s.date) return false; // 沒填日期的不自動建立
+                    return !existingDates.has(s.date);
+                });
+
+                if (daysToCreate.length === 0) {
+                    const undatedCount = schedule.filter(s => !s.date).length;
+                    if (undatedCount > 0) {
+                        showToast(`有 ${undatedCount} 天尚未設定日期，請先在大綱中填寫日期`);
+                    } else {
+                        showToast('所有大綱日期都已有對應場次');
+                    }
+                    return;
+                }
+
                 const msg = `將根據大綱建立 ${daysToCreate.length} 個場次：\n` +
-                    daysToCreate.map(s => `Day ${s.day}${s.date ? ` (${s.date})` : ''} — ${s.topic || '未命名'}`).join('\n') +
+                    daysToCreate.map(s => `Day ${s.day} (${s.date}) — ${s.topic || '未命名'}`).join('\n') +
                     '\n\n確定建立嗎？';
                 if (!confirm(msg)) return;
 
