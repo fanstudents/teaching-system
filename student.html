@@ -819,19 +819,31 @@
                 const sessionInfoEl = document.getElementById('displaySessionInfo');
                 if (project) {
                     try {
-                        // 從 URL 取得 session code（portal 帶過來的）
-                        const urlSession = new URLSearchParams(location.search).get('session') || '';
-                        if (urlSession) {
-                            const { data: sessRows } = await db.select('project_sessions', {
-                                filter: { session_code: `eq.${urlSession}`, project_id: `eq.${project.id}` },
+                        const params = new URLSearchParams(location.search);
+
+                        // ★ 優先：?sid= 精確 ID 查詢（QR code / 廣播連結帶入）
+                        const sidParam = params.get('sid') || '';
+                        if (sidParam) {
+                            const { data: sidRows } = await db.select('project_sessions', {
+                                filter: { id: `eq.${sidParam}` },
                                 limit: 1
                             });
-                            if (sessRows?.[0]) {
-                                _projectSession = sessRows[0];
+                            if (sidRows?.[0]) _projectSession = sidRows[0];
+                        }
+
+                        // ★ 其次：?session= session_code 查詢（portal 帶入）
+                        if (!_projectSession) {
+                            const urlSession = params.get('session') || '';
+                            if (urlSession) {
+                                const { data: sessRows } = await db.select('project_sessions', {
+                                    filter: { session_code: `eq.${urlSession}`, project_id: `eq.${project.id}` },
+                                    limit: 1
+                                });
+                                if (sessRows?.[0]) _projectSession = sessRows[0];
                             }
                         }
 
-                        // ★ 沒帶 session 參數時，自動找今天/最近的場次
+                        // ★ 最後：自動找今天/最近的場次
                         if (!_projectSession) {
                             const today = new Date().toISOString().slice(0, 10);
                             const { data: allSess } = await db.select('project_sessions', {

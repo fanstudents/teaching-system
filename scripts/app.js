@@ -3189,7 +3189,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         document.getElementById('broadcastBarCopy')?.addEventListener('click', () => {
             if (this.sessionCode) {
                 const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-                const audUrl = `${base}student.html?code=${this.sessionCode}`;
+                const sidParam = this.slideManager.currentSessionId ? `&sid=${this.slideManager.currentSessionId}` : '';
+                const audUrl = `${base}student.html?code=${this.sessionCode}${sidParam}`;
                 navigator.clipboard.writeText(audUrl).then(() => {
                     this.showToast('已複製互動連結');
                 }).catch(() => {
@@ -3207,7 +3208,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         document.getElementById('broadcastBarAudience')?.addEventListener('click', () => {
             if (this.sessionCode) {
                 const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-                const audUrl = `${base}student.html?code=${this.sessionCode}`;
+                const sidParam = this.slideManager.currentSessionId ? `&sid=${this.slideManager.currentSessionId}` : '';
+                const audUrl = `${base}student.html?code=${this.sessionCode}${sidParam}`;
                 navigator.clipboard.writeText(audUrl).then(() => {
                     this.showToast('✓ 已複製觀眾互動連結');
                 }).catch(() => {
@@ -4383,7 +4385,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         }
 
         const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-        const audUrl = `${base}student.html?code=${this.sessionCode}`;
+        const sidParam = this.slideManager.currentSessionId ? `&sid=${this.slideManager.currentSessionId}` : '';
+        const audUrl = `${base}student.html?code=${this.sessionCode}${sidParam}`;
         const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(audUrl)}&bgcolor=ffffff&color=4f46e5`;
 
         if (!qrEl) {
