@@ -1156,6 +1156,9 @@
                         <a class="btn btn-sm btn-dark" href="editor.html?id=${p?.id}&sid=${s.id}#id=${p?.id}" onclick="localStorage.setItem('current_project_id','${p?.id}')" title="編輯此場次簡報">
                             <span class="material-symbols-outlined">slideshow</span> 簡報
                         </a>
+                        <a class="btn btn-sm" href="md-editor.html?id=${p?.id}&sid=${s.id}" title="用 Markdown 編輯簡報">
+                            <span class="material-symbols-outlined">edit_note</span> MD
+                        </a>
                         <a class="btn btn-sm" href="preclass-dashboard.html?code=${p?.join_code}&session=${s.session_code}" title="課前統計">
                             <span class="material-symbols-outlined">bar_chart</span> 統計
                         </a>

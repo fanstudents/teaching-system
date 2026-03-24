@@ -1077,6 +1077,14 @@ ${slideContents}
         const exportConfirmBtn = document.getElementById('exportConfirmBtn');
         const exportCancelBtn = document.getElementById('exportCancelBtn');
 
+        // MD 模式按鈕
+        document.getElementById('mdEditorBtn')?.addEventListener('click', () => {
+            const pid = this.slideManager?.currentProjectId || new URLSearchParams(location.search).get('id') || '';
+            const sid = this.slideManager?.currentSessionId || new URLSearchParams(location.search).get('sid') || '';
+            const url = sid ? `md-editor.html?id=${pid}&sid=${sid}` : `md-editor.html?id=${pid}`;
+            window.open(url, '_blank');
+        });
+
         // 打開 Modal
         exportModalBtn?.addEventListener('click', () => {
             exportConfigArea.style.display = 'block';

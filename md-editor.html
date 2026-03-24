@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown 簡報編輯器 — 教學系統</title>
+    <meta name="description" content="用 Markdown 語法快速起稿互動式教學簡報">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #252833;
+            --border: #2e3140;
+            --text: #e2e4e9;
+            --text2: #8b8fa3;
+            --accent: #4f8ff7;
+            --accent2: #7c5cfc;
+            --accent-bg: rgba(79,143,247,0.08);
+            --success: #34d399;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --radius: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Google Sans', 'Noto Sans TC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ═══ Top Bar ═══ */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .topbar-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .topbar-title .material-symbols-outlined { font-size: 20px; color: var(--accent); }
+        .topbar-badge {
+            background: var(--accent-bg);
+            color: var(--accent);
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500;
+        }
+        .topbar-spacer { flex: 1; }
+        .topbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            font-size: 13px;
+            font-family: inherit;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .topbar-btn:hover { background: var(--surface2); border-color: var(--accent); }
+        .topbar-btn .material-symbols-outlined { font-size: 18px; }
+        .topbar-btn.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            color: #fff;
+            font-weight: 600;
+        }
+        .topbar-btn.primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .topbar-btn.primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ═══ Main Split ═══ */
+        .main-split {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ═══ Editor Panel ═══ */
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            min-width: 0;
+        }
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .editor-toolbar-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border: none;
+            background: transparent;
+            color: var(--text2);
+            font-size: 12px;
+            font-family: inherit;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .editor-toolbar-btn:hover { background: var(--surface2); color: var(--text); }
+        .editor-toolbar-btn .material-symbols-outlined { font-size: 16px; }
+        .editor-toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+        .editor-textarea {
+            flex: 1;
+            border: none;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 20px 24px;
+            resize: none;
+            outline: none;
+            tab-size: 2;
+        }
+        .editor-textarea::placeholder { color: var(--text2); }
+        .editor-status {
+            padding: 4px 16px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        /* ═══ Preview Panel ═══ */
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: #111318;
+        }
+        .preview-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+        .preview-header .material-symbols-outlined { font-size: 18px; color: var(--accent); }
+        .preview-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .preview-scroll::-webkit-scrollbar { width: 6px; }
+        .preview-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* ═══ Slide Card ═══ */
+        .slide-card {
+            background: #fff;
+            border-radius: 10px;
+            aspect-ratio: 960 / 540;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+            transition: box-shadow 0.2s;
+        }
+        .slide-card:hover { box-shadow: 0 6px 32px rgba(0,0,0,0.5); }
+        .slide-card-num {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 11px;
+            color: #999;
+            z-index: 2;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .slide-card-element { position: absolute; overflow: hidden; }
+        .slide-card-shape { border-radius: inherit; }
+        .slide-card-text { line-height: 1.4; word-break: break-word; }
+        .slide-card-interactive {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f0f4ff;
+            border: 2px dashed #a0b4d0;
+            border-radius: 12px;
+            gap: 8px;
+        }
+        .slide-card-interactive .icon { font-size: 28px; color: #4f8ff7; }
+        .slide-card-interactive .label { font-size: 13px; color: #64748b; font-weight: 500; }
+        .slide-card-interactive .question { font-size: 11px; color: #94a3b8; text-align: center; padding: 0 10px; }
+
+        /* ═══ Insert Menu ═══ */
+        .insert-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 6px;
+            min-width: 220px;
+            z-index: 100;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        }
+        .insert-menu.show { display: block; }
+        .insert-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .insert-menu-item:hover { background: var(--accent-bg); }
+        .insert-menu-item .material-symbols-outlined { font-size: 18px; color: var(--accent); }
+        .insert-menu-divider { height: 1px; background: var(--border); margin: 4px 6px; }
+
+        /* ═══ Toast ═══ */
+        .md-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.2,0.9,0.3,1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .md-toast.show { transform: translateX(-50%) translateY(0); }
+        .md-toast.success { background: #065f46; color: #d1fae5; }
+        .md-toast.error { background: #7f1d1d; color: #fee2e2; }
+        .md-toast .material-symbols-outlined { font-size: 20px; }
+
+        /* ═══ Empty State ═══ */
+        .preview-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text2);
+            gap: 8px;
+        }
+        .preview-empty .material-symbols-outlined { font-size: 48px; opacity: 0.3; }
+        .preview-empty p { font-size: 14px; }
+
+        /* ═══ Resize handle ═══ */
+        .resize-handle {
+            width: 5px;
+            cursor: col-resize;
+            background: var(--border);
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .resize-handle:hover, .resize-handle.active { background: var(--accent); }
+    </style>
+</head>
+<body>
+
+<!-- ═══ Top Bar ═══ -->
+<div class="topbar">
+    <div class="topbar-title">
+        <span class="material-symbols-outlined">edit_note</span>
+        Markdown 簡報編輯器
+    </div>
+    <span class="topbar-badge" id="projectBadge">載入中...</span>
+    <span class="topbar-badge" id="sessionBadge" style="display:none"></span>
+    <div class="topbar-spacer"></div>
+    <button class="topbar-btn" id="btnTemplate" title="載入範例模板">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        範例模板
+    </button>
+    <button class="topbar-btn" id="btnBack" title="返回簡報編輯器">
+        <span class="material-symbols-outlined">arrow_back</span>
+        返回編輯器
+    </button>
+    <button class="topbar-btn primary" id="btnApply" title="將 Markdown 轉成簡報並儲存">
+        <span class="material-symbols-outlined">rocket_launch</span>
+        套用到簡報
+    </button>
+</div>
+
+<!-- ═══ Main Split ═══ -->
+<div class="main-split">
+    <!-- Editor -->
+    <div class="editor-panel" id="editorPanel">
+        <div class="editor-toolbar">
+            <button class="editor-toolbar-btn" id="btnInsert">
+                <span class="material-symbols-outlined">add_circle</span>
+                插入元件
+                <div class="insert-menu" id="insertMenu"></div>
+            </button>
+            <div class="editor-toolbar-sep"></div>
+            <button class="editor-toolbar-btn" title="插入分頁線" data-insert="\n\n---\nslide: content\n\n">
+                <span class="material-symbols-outlined">horizontal_rule</span>
+                分頁
+            </button>
+            <button class="editor-toolbar-btn" title="兩欄排版" data-insert="\n|||\n左欄內容\n|||\n右欄內容\n|||\n">
+                <span class="material-symbols-outlined">view_column_2</span>
+                兩欄
+            </button>
+            <button class="editor-toolbar-btn" title="引言" data-insert="\n> 名言內容 — 作者\n">
+                <span class="material-symbols-outlined">format_quote</span>
+                引言
+            </button>
+        </div>
+        <textarea class="editor-textarea" id="mdInput" placeholder="在此輸入 Markdown...&#10;&#10;用 --- 分隔投影片&#10;用 :::quiz ... ::: 插入互動元件&#10;&#10;按右上角「範例模板」載入範例" spellcheck="false"></textarea>
+        <div class="editor-status">
+            <span id="statusSlides">0 頁</span>
+            <span id="statusChars">0 字</span>
+            <span id="statusComponents">0 個互動元件</span>
+        </div>
+    </div>
+
+    <!-- Resize Handle -->
+    <div class="resize-handle" id="resizeHandle"></div>
+
+    <!-- Preview -->
+    <div class="preview-panel" id="previewPanel">
+        <div class="preview-header">
+            <span class="material-symbols-outlined">slideshow</span>
+            即時預覽
+            <span id="previewCount" style="margin-left:auto;font-size:12px"></span>
+        </div>
+        <div class="preview-scroll" id="previewScroll">
+            <div class="preview-empty">
+                <span class="material-symbols-outlined">slideshow</span>
+                <p>開始輸入 Markdown 即可預覽</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ Toast ═══ -->
+<div class="md-toast" id="mdToast">
+    <span class="material-symbols-outlined" id="toastIcon"></span>
+    <span id="toastMsg"></span>
+</div>
+
+<script type="module">
+import { parseMd, EXAMPLE_TEMPLATE } from './scripts/mdParser.js';
+import { md2slides } from './scripts/md2slides.js';
+
+// ═════════════════════════════════════════
+// Supabase config
+// ═════════════════════════════════════════
+const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+
+function getHeaders() {
+    let token = localStorage.getItem('_at') || sessionStorage.getItem('_at');
+    return {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+    };
+}
+
+// ═════════════════════════════════════════
+// URL params
+// ═════════════════════════════════════════
+const params = new URLSearchParams(location.search);
+const projectId = params.get('id');
+const sessionId = params.get('sid');
+
+if (!projectId) {
+    document.body.innerHTML = '<div style="padding:40px;color:#f87171;font-size:18px">缺少 ?id=PROJECT_ID 參數</div>';
+    throw new Error('Missing project ID');
+}
+
+// ═════════════════════════════════════════
+// DOM refs
+// ═════════════════════════════════════════
+const mdInput = document.getElementById('mdInput');
+const previewScroll = document.getElementById('previewScroll');
+const btnApply = document.getElementById('btnApply');
+const btnTemplate = document.getElementById('btnTemplate');
+const btnBack = document.getElementById('btnBack');
+const btnInsert = document.getElementById('btnInsert');
+const insertMenu = document.getElementById('insertMenu');
+const projectBadge = document.getElementById('projectBadge');
+const sessionBadge = document.getElementById('sessionBadge');
+
+// ═════════════════════════════════════════
+// Load project info
+// ═════════════════════════════════════════
+async function loadProjectInfo() {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}&select=title`, { headers: getHeaders() });
+        const [proj] = await res.json();
+        projectBadge.textContent = proj?.title || projectId;
+    } catch { projectBadge.textContent = projectId; }
+
+    if (sessionId) {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/project_sessions?id=eq.${sessionId}&select=session_date,title`, { headers: getHeaders() });
+            const [sess] = await res.json();
+            sessionBadge.textContent = `場次：${sess?.title || sess?.session_date || sessionId}`;
+            sessionBadge.style.display = '';
+        } catch {}
+    }
+}
+loadProjectInfo();
+
+// Back button
+btnBack.onclick = () => {
+    const url = sessionId
+        ? `editor.html?id=${projectId}&sid=${sessionId}`
+        : `editor.html?id=${projectId}`;
+    location.href = url;
+};
+
+// ═════════════════════════════════════════
+// Insert component menu
+// ═════════════════════════════════════════
+const INSERT_ITEMS = [
+    { icon: 'quiz', label: '選擇題', type: 'quiz', template: `:::quiz\nquestion: 題目內容？\noptions:\n  - 選項 A ✓\n  - 選項 B\n  - 選項 C\n  - 選項 D\n:::` },
+    { icon: 'how_to_vote', label: '投票', type: 'poll', template: `:::poll\nquestion: 投票題目？\noptions:\n  - 選項 A\n  - 選項 B\n  - 選項 C\n:::` },
+    { icon: 'check_circle', label: '是非題', type: 'truefalse', template: `:::truefalse\nquestion: 陳述句？\nanswer: true\n:::` },
+    { icon: 'edit_note', label: '填空題', type: 'fillblank', template: `:::fillblank\nquestion: ____是人工智慧的簡稱\nanswer: AI\n:::` },
+    { divider: true },
+    { icon: 'cloud', label: '文字雲', type: 'wordcloud', template: `:::wordcloud\nquestion: 說到 AI，你第一個想到什麼？\n:::` },
+    { icon: 'chat', label: '開放問答', type: 'opentext', template: `:::opentext\nquestion: 你對這個主題有什麼想法？\n:::` },
+    { icon: 'linear_scale', label: '量表', type: 'scale', template: `:::scale\nquestion: 你對 AI 的了解程度？\nmin: 1\nmax: 5\n:::` },
+    { icon: 'notifications_active', label: '搶答', type: 'buzzer', template: `:::buzzer\nquestion: 搶答題目？\n:::` },
+    { divider: true },
+    { icon: 'content_copy', label: '複寫卡', type: 'copycard', template: `:::copycard\ntitle: 重點筆記\ncontent: |\n  1. 重點一\n  2. 重點二\n  3. 重點三\n:::` },
+    { icon: 'drag_indicator', label: '排序題', type: 'ordering', template: `:::ordering\nquestion: 請排列正確順序\nitems:\n  - 第一步\n  - 第二步\n  - 第三步\n:::` },
+    { icon: 'join', label: '配對題', type: 'matching', template: `:::matching\nquestion: 請配對\npairs:\n  - AI → 人工智慧\n  - ML → 機器學習\n  - DL → 深度學習\n:::` },
+    { divider: true },
+    { icon: 'diversity_3', label: '破冰活動', type: 'icebreaker', template: `:::icebreaker\ntitle: 自我介紹\nmode: gallery\n:::` },
+    { icon: 'leaderboard', label: '排行榜', type: 'leaderboard', template: `:::leaderboard\n:::` },
+];
+
+// Build menu
+insertMenu.innerHTML = INSERT_ITEMS.map(item => {
+    if (item.divider) return '<div class="insert-menu-divider"></div>';
+    return `<div class="insert-menu-item" data-template="${encodeURIComponent(item.template)}">
+        <span class="material-symbols-outlined">${item.icon}</span>
+        ${item.label}
+    </div>`;
+}).join('');
+
+btnInsert.onclick = (e) => {
+    e.stopPropagation();
+    insertMenu.classList.toggle('show');
+};
+document.addEventListener('click', () => insertMenu.classList.remove('show'));
+
+insertMenu.addEventListener('click', (e) => {
+    const item = e.target.closest('.insert-menu-item');
+    if (!item) return;
+    const template = decodeURIComponent(item.dataset.template);
+    insertAtCursor('\n\n' + template + '\n');
+    insertMenu.classList.remove('show');
+});
+
+// Quick insert buttons
+document.querySelectorAll('[data-insert]').forEach(btn => {
+    btn.onclick = () => insertAtCursor(btn.dataset.insert);
+});
+
+function insertAtCursor(text) {
+    const pos = mdInput.selectionStart;
+    const before = mdInput.value.substring(0, pos);
+    const after = mdInput.value.substring(mdInput.selectionEnd);
+    mdInput.value = before + text + after;
+    mdInput.selectionStart = mdInput.selectionEnd = pos + text.length;
+    mdInput.focus();
+    updatePreview();
+}
+
+// ═════════════════════════════════════════
+// Load template
+// ═════════════════════════════════════════
+btnTemplate.onclick = () => {
+    if (mdInput.value.trim() && !confirm('載入範例模板會覆蓋目前內容，確定嗎？')) return;
+    mdInput.value = EXAMPLE_TEMPLATE;
+    updatePreview();
+};
+
+// ═════════════════════════════════════════
+// Live preview
+// ═════════════════════════════════════════
+const INTERACTIVE_ICONS = {
+    quiz: 'quiz', poll: 'how_to_vote', truefalse: 'check_circle', fillblank: 'edit_note',
+    ordering: 'format_list_numbered', matching: 'drag_indicator', wordcloud: 'cloud',
+    opentext: 'chat', scale: 'linear_scale', buzzer: 'notifications_active',
+    hotspot: 'my_location', icebreaker: 'diversity_3', leaderboard: 'leaderboard',
+    assessment: 'assignment', copycard: 'content_copy', document: 'description',
+    homework: 'task', showcase: 'collections'
+};
+const INTERACTIVE_LABELS = {
+    quiz: '選擇題', poll: '投票', truefalse: '是非題', fillblank: '填空題',
+    ordering: '排序題', matching: '配對題', wordcloud: '文字雲',
+    opentext: '開放問答', scale: '量表', buzzer: '搶答',
+    hotspot: '圖片熱點', icebreaker: '破冰活動', leaderboard: '排行榜',
+    assessment: '測驗', copycard: '複寫卡', document: '文件', homework: '作業', showcase: '作品展示'
+};
+
+let _previewTimer = null;
+mdInput.addEventListener('input', () => {
+    clearTimeout(_previewTimer);
+    _previewTimer = setTimeout(updatePreview, 200);
+});
+
+function updatePreview() {
+    const md = mdInput.value;
+    const slides = md2slides(md);
+
+    // Status bar
+    const parsed = parseMd(md);
+    const componentCount = parsed.reduce((sum, p) => sum + p.components.length, 0);
+    document.getElementById('statusSlides').textContent = `${slides.length} 頁`;
+    document.getElementById('statusChars').textContent = `${md.length} 字`;
+    document.getElementById('statusComponents').textContent = `${componentCount} 個互動元件`;
+    document.getElementById('previewCount').textContent = `${slides.length} 頁`;
+
+    if (slides.length === 0) {
+        previewScroll.innerHTML = `<div class="preview-empty">
+            <span class="material-symbols-outlined">slideshow</span>
+            <p>開始輸入 Markdown 即可預覽</p>
+        </div>`;
+        return;
+    }
+
+    previewScroll.innerHTML = slides.map((slide, idx) => renderSlideCard(slide, idx)).join('');
+}
+
+function renderSlideCard(slide, idx) {
+    const bg = slide.background || '#ffffff';
+    let elementsHtml = '';
+
+    const cardW = previewScroll.offsetWidth - 40; // actual pixel width
+    const scale = cardW / 960;
+
+    for (const el of (slide.elements || [])) {
+        const sx = el.x * scale;
+        const sy = el.y * scale;
+        const sw = el.width * scale;
+        const sh = el.height * scale;
+        const fs = (el.fontSize || 16) * scale;
+
+        // Determine if interactive
+        const interactiveTypes = ['quiz','poll','truefalse','fillblank','ordering','matching','wordcloud','opentext','scale','buzzer','hotspot','icebreaker','leaderboard','assessment','copycard','document','homework','showcase'];
+        if (interactiveTypes.includes(el.type)) {
+            const icon = INTERACTIVE_ICONS[el.type] || 'extension';
+            const label = INTERACTIVE_LABELS[el.type] || el.type;
+            const question = el.question || el.title || '';
+            elementsHtml += `<div class="slide-card-element slide-card-interactive" style="left:${sx}px;top:${sy}px;width:${sw}px;height:${sh}px">
+                <span class="material-symbols-outlined icon">${icon}</span>
+                <span class="label">${label}</span>
+                ${question ? `<span class="question">${question}</span>` : ''}
+            </div>`;
+            continue;
+        }
+
+        if (el.type === 'shape') {
+            const opacity = el.opacity !== undefined ? el.opacity : 1;
+            const borderRadius = el.borderRadius ? `border-radius:${el.borderRadius * scale}px;` : '';
+            elementsHtml += `<div class="slide-card-element slide-card-shape" style="left:${sx}px;top:${sy}px;width:${sw}px;height:${sh}px;background:${el.background || 'transparent'};opacity:${opacity};${borderRadius}${el.shapeType === 'circle' ? 'border-radius:50%;' : ''}"></div>`;
+            continue;
+        }
+
+        if (el.type === 'text') {
+            // Scale font sizes in content HTML
+            let content = el.content || '';
+            content = content.replace(/font-size:\s*(\d+)px/g, (_, size) => `font-size:${Math.round(size * scale)}px`);
+            elementsHtml += `<div class="slide-card-element slide-card-text" style="left:${sx}px;top:${sy}px;width:${sw}px;height:${sh}px;font-size:${fs}px">${content}</div>`;
+            continue;
+        }
+    }
+
+    return `<div class="slide-card" style="background:${bg}">
+        <span class="slide-card-num">${idx + 1}</span>
+        ${elementsHtml}
+    </div>`;
+}
+
+// ═════════════════════════════════════════
+// Apply to slides (save to DB)
+// ═════════════════════════════════════════
+btnApply.onclick = async () => {
+    const md = mdInput.value.trim();
+    if (!md) return showToast('請先輸入 Markdown 內容', 'error');
+
+    const slides = md2slides(md);
+    if (slides.length === 0) return showToast('沒有可用的投影片', 'error');
+
+    btnApply.disabled = true;
+    btnApply.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span>儲存中...';
+
+    try {
+        const data = {
+            slides,
+            sections: [],
+            version: Date.now(),
+            savedAt: new Date().toISOString(),
+            source: 'markdown-editor'
+        };
+
+        if (sessionId) {
+            // 儲存到場次
+            await fetch(`${SUPABASE_URL}/rest/v1/project_sessions?id=eq.${sessionId}`, {
+                method: 'PATCH',
+                headers: getHeaders(),
+                body: JSON.stringify({ slides_data: data })
+            });
+        } else {
+            // 儲存到專案
+            await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${projectId}`, {
+                method: 'PATCH',
+                headers: getHeaders(),
+                body: JSON.stringify({ slides_data: data })
+            });
+        }
+
+        showToast(`✅ 已套用 ${slides.length} 頁簡報`, 'success');
+
+        // 跳轉到編輯器
+        setTimeout(() => {
+            const url = sessionId
+                ? `editor.html?id=${projectId}&sid=${sessionId}`
+                : `editor.html?id=${projectId}`;
+            location.href = url;
+        }, 1200);
+
+    } catch (err) {
+        console.error('[MdEditor] Save error:', err);
+        showToast(`儲存失敗: ${err.message}`, 'error');
+    } finally {
+        btnApply.disabled = false;
+        btnApply.innerHTML = '<span class="material-symbols-outlined">rocket_launch</span>套用到簡報';
+    }
+};
+
+// ═════════════════════════════════════════
+// Toast
+// ═════════════════════════════════════════
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('mdToast');
+    const toastIcon = document.getElementById('toastIcon');
+    const toastMsg = document.getElementById('toastMsg');
+    toast.className = `md-toast ${type}`;
+    toastIcon.textContent = type === 'success' ? 'check_circle' : 'error';
+    toastMsg.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ═════════════════════════════════════════
+// Resize handle
+// ═════════════════════════════════════════
+const resizeHandle = document.getElementById('resizeHandle');
+const editorPanel = document.getElementById('editorPanel');
+const previewPanel = document.getElementById('previewPanel');
+let resizing = false;
+
+resizeHandle.addEventListener('mousedown', (e) => {
+    resizing = true;
+    resizeHandle.classList.add('active');
+    e.preventDefault();
+});
+document.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const pct = (e.clientX / window.innerWidth) * 100;
+    editorPanel.style.flex = 'none';
+    editorPanel.style.width = `${Math.max(25, Math.min(75, pct))}%`;
+    previewPanel.style.flex = '1';
+});
+document.addEventListener('mouseup', () => {
+    if (resizing) {
+        resizing = false;
+        resizeHandle.classList.remove('active');
+        updatePreview(); // recalc scale
+    }
+});
+
+// ═════════════════════════════════════════
+// Load saved markdown (localStorage)
+// ═════════════════════════════════════════
+const storageKey = `md_editor_${projectId}_${sessionId || 'proj'}`;
+const saved = localStorage.getItem(storageKey);
+if (saved) {
+    mdInput.value = saved;
+    updatePreview();
+}
+
+// Auto-save to localStorage
+mdInput.addEventListener('input', () => {
+    localStorage.setItem(storageKey, mdInput.value);
+});
+
+// ═════════════════════════════════════════
+// Keyboard shortcuts
+// ═════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        btnApply.click();
+    }
+});
+
+// Initial render
+updatePreview();
+</script>
+</body>
+</html>
