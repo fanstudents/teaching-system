@@ -137,7 +137,7 @@ export class AiSlideGenerator {
                     result = await ai.chat([
                         { role: 'system', content: '你是專業簡報規劃師。只回傳 JSON 陣列，不加任何其他文字或 markdown 標記。' },
                         { role: 'user', content: prompt }
-                    ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 6000 });
+                    ], { model: 'claude-sonnet-4-5', temperature: 0.7, maxTokens: 10000 });
                     break;
                 } catch (e) {
                     if (retry === 0 && (e.message.includes('504') || e.message.includes('超時'))) {
@@ -150,7 +150,25 @@ export class AiSlideGenerator {
             }
 
             const jsonStr = result.replace(/```json\n?|\n?```/g, '').trim();
-            const batchPlan = JSON.parse(jsonStr);
+            let batchPlan;
+            try {
+                batchPlan = JSON.parse(jsonStr);
+            } catch (parseErr) {
+                // ★ JSON 截斷修復：找最後一個完整物件
+                console.warn(`[AI] JSON truncated, attempting repair...`);
+                const lastComplete = jsonStr.lastIndexOf('},');
+                if (lastComplete > 0) {
+                    batchPlan = JSON.parse(jsonStr.substring(0, lastComplete + 1) + ']');
+                } else {
+                    const lastBrace = jsonStr.lastIndexOf('}');
+                    if (lastBrace > 0) {
+                        batchPlan = JSON.parse(jsonStr.substring(0, lastBrace + 1) + ']');
+                    } else {
+                        throw parseErr;
+                    }
+                }
+                console.log(`[AI] Repaired: recovered ${batchPlan.length} slides`);
+            }
             if (!Array.isArray(batchPlan)) throw new Error(`第 ${batch + 1} 批 AI 回傳格式不正確`);
 
             allPlan.push(...batchPlan);
