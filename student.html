@@ -817,7 +817,7 @@
                 // 顯示場次資訊（日期 · 時段）取代六位數代碼
                 let _projectSession = null; // 場次級簡報用
                 const sessionInfoEl = document.getElementById('displaySessionInfo');
-                if (sessionInfoEl && project) {
+                if (project) {
                     try {
                         // 從 URL 取得 session code（portal 帶過來的）
                         const urlSession = new URLSearchParams(location.search).get('session') || '';
@@ -827,13 +827,29 @@
                                 limit: 1
                             });
                             if (sessRows?.[0]) {
-                                const ps = sessRows[0];
-                                _projectSession = ps;
-                                const parts = [];
-                                if (ps.date) parts.push(ps.date);
-                                if (ps.time) parts.push(ps.time);
-                                sessionInfoEl.textContent = parts.join(' · ');
+                                _projectSession = sessRows[0];
                             }
+                        }
+
+                        // ★ 沒帶 session 參數時，自動找今天/最近的場次
+                        if (!_projectSession) {
+                            const today = new Date().toISOString().slice(0, 10);
+                            const { data: allSess } = await db.select('project_sessions', {
+                                filter: { project_id: `eq.${project.id}` },
+                                order: 'date.asc'
+                            });
+                            if (allSess?.length > 0) {
+                                _projectSession = allSess.find(s => s.date === today)
+                                    || allSess.find(s => s.date >= today)
+                                    || allSess[allSess.length - 1];
+                            }
+                        }
+
+                        if (_projectSession && sessionInfoEl) {
+                            const parts = [];
+                            if (_projectSession.date) parts.push(_projectSession.date);
+                            if (_projectSession.time) parts.push(_projectSession.time);
+                            sessionInfoEl.textContent = parts.join(' · ');
                         }
                     } catch { /* non-critical */ }
                 }
