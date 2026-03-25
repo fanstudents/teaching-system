@@ -44,17 +44,21 @@ export class SlideExporter {
         });
         wrapper.appendChild(content);
 
-        // 渲染元素
+        // 渲染元素（單一元素失敗不影響整頁）
         if (slide.elements && slide.elements.length > 0) {
             for (const element of slide.elements) {
-                const el = this.sm.createElementNode(element);
-                if (el) {
-                    // 移除編輯態的互動樣式
-                    el.style.cursor = 'default';
-                    el.style.outline = 'none';
-                    el.contentEditable = 'false';
-                    el.querySelectorAll('.resize-handle').forEach(h => h.remove());
-                    content.appendChild(el);
+                try {
+                    const el = this.sm.createElementNode(element);
+                    if (el) {
+                        // 移除編輯態的互動樣式
+                        el.style.cursor = 'default';
+                        el.style.outline = 'none';
+                        el.contentEditable = 'false';
+                        el.querySelectorAll('.resize-handle').forEach(h => h.remove());
+                        content.appendChild(el);
+                    }
+                } catch (e) {
+                    console.warn('[Export] Skip element:', element?.type, e.message);
                 }
             }
         }
@@ -75,15 +79,32 @@ export class SlideExporter {
         // 短暫等待渲染
         await new Promise(r => setTimeout(r, 100));
 
-        const canvas = await html2canvas(wrapper, {
-            width: this.SLIDE_W,
-            height: this.SLIDE_H,
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: null,
-            logging: false,
-        });
+        let canvas;
+        try {
+            canvas = await html2canvas(wrapper, {
+                width: this.SLIDE_W,
+                height: this.SLIDE_H,
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null,
+                logging: false,
+                foreignObjectRendering: false,
+                removeContainer: false,
+            });
+        } catch (e) {
+            console.warn('[Export] html2canvas failed, creating fallback canvas:', e.message);
+            // Fallback: 建立純色 canvas
+            canvas = document.createElement('canvas');
+            canvas.width = this.SLIDE_W * 2;
+            canvas.height = this.SLIDE_H * 2;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = slide.background || '#1e293b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '32px sans-serif';
+            ctx.fillText('(此頁包含互動元件，無法匯出為圖片)', 60, canvas.height / 2);
+        }
 
         document.body.removeChild(wrapper);
         return canvas;
