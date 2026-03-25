@@ -592,6 +592,7 @@ export function generateSessionCode(length = 6) {
 const _aiConfig = {
     provider: localStorage.getItem('_ai_provider') || '', // 'openai' | 'anthropic' | '' (supabase)
     apiKey: localStorage.getItem('_ai_api_key') || '',
+    baseUrl: localStorage.getItem('_ai_base_url') || '', // 自訂 endpoint（如 Zeabur AI Hub）
 };
 
 // Model 映射：把通用名稱轉成各 provider 的真實 model name
@@ -615,7 +616,8 @@ function _resolveModel(model, provider) {
 
 async function _chatOpenAI(messages, opts) {
     const model = _resolveModel(opts.model || 'gpt-4o-mini', 'openai');
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    const baseUrl = _aiConfig.baseUrl || 'https://api.openai.com';
+    const res = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${_aiConfig.apiKey}`,
@@ -712,13 +714,19 @@ export const ai = {
         }
     },
 
-    /** 設定 AI provider，會存到 localStorage */
-    setProvider(provider, apiKey) {
+    /** 設定 AI provider，會存到 localStorage
+     *  provider: 'openai' | 'anthropic' | '' (supabase)
+     *  apiKey: API key
+     *  baseUrl: 自訂 endpoint（如 Zeabur AI Hub: https://hub.zeabur.com）
+     */
+    setProvider(provider, apiKey, baseUrl) {
         _aiConfig.provider = provider;
         _aiConfig.apiKey = apiKey || '';
+        _aiConfig.baseUrl = baseUrl || '';
         localStorage.setItem('_ai_provider', provider);
         localStorage.setItem('_ai_api_key', apiKey || '');
-        console.log(`[AI] Provider set to: ${provider || 'supabase'}`);
+        localStorage.setItem('_ai_base_url', baseUrl || '');
+        console.log(`[AI] Provider set to: ${provider || 'supabase'}${baseUrl ? ` (${baseUrl})` : ''}`);
     },
 
     /** 取得目前設定 */
