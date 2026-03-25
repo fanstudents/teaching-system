@@ -584,46 +584,146 @@ export function generateSessionCode(length = 6) {
     return result;
 }
 
-// ── AI (透過 Supabase Edge Function proxy) ──
+// ── AI (支援 Direct API / Supabase proxy) ──
+// 設定方式：ai.setProvider('openai', 'sk-...') 或 ai.setProvider('anthropic', 'sk-ant-...')
+// 或在 localStorage 設定 _ai_provider / _ai_api_key
+// 未設定時 fallback 到 Supabase Edge Function proxy
 
-export const ai = {
-    async chat(messages, opts = {}) {
-        const maxRetries = 3;
-        const body = JSON.stringify({
-            model: opts.model || 'claude-sonnet-4-5',
+const _aiConfig = {
+    provider: localStorage.getItem('_ai_provider') || '', // 'openai' | 'anthropic' | '' (supabase)
+    apiKey: localStorage.getItem('_ai_api_key') || '',
+};
+
+// Model 映射：把通用名稱轉成各 provider 的真實 model name
+function _resolveModel(model, provider) {
+    const map = {
+        openai: {
+            'claude-haiku-4-5': 'gpt-4o-mini',
+            'claude-sonnet-4-5': 'gpt-4o',
+            'gpt-4o-mini': 'gpt-4o-mini',
+            'gpt-4o': 'gpt-4o',
+        },
+        anthropic: {
+            'claude-haiku-4-5': 'claude-haiku-4-5-20250315',
+            'claude-sonnet-4-5': 'claude-sonnet-4-5-20250514',
+            'gpt-4o-mini': 'claude-haiku-4-5-20250315',
+            'gpt-4o': 'claude-sonnet-4-5-20250514',
+        }
+    };
+    return map[provider]?.[model] || model;
+}
+
+async function _chatOpenAI(messages, opts) {
+    const model = _resolveModel(opts.model || 'gpt-4o-mini', 'openai');
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${_aiConfig.apiKey}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            model,
             messages,
             temperature: opts.temperature ?? 0.7,
             max_tokens: opts.maxTokens ?? 4096,
+        }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `OpenAI error: ${res.status}`);
+    return data.choices?.[0]?.message?.content || '';
+}
+
+async function _chatAnthropic(messages, opts) {
+    const model = _resolveModel(opts.model || 'claude-haiku-4-5', 'anthropic');
+    // Anthropic 格式：system 從 messages 抽出來
+    const systemMsg = messages.find(m => m.role === 'system');
+    const userMsgs = messages.filter(m => m.role !== 'system');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+            'x-api-key': _aiConfig.apiKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            model,
+            system: systemMsg?.content || '',
+            messages: userMsgs.map(m => ({ role: m.role, content: m.content })),
+            temperature: opts.temperature ?? 0.7,
+            max_tokens: opts.maxTokens ?? 4096,
+        }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `Anthropic error: ${res.status}`);
+    return data.content?.[0]?.text || '';
+}
+
+async function _chatSupabase(messages, opts) {
+    const maxRetries = 3;
+    const body = JSON.stringify({
+        model: opts.model || 'claude-sonnet-4-5',
+        messages,
+        temperature: opts.temperature ?? 0.7,
+        max_tokens: opts.maxTokens ?? 4096,
+    });
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-proxy`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body
         });
-        for (let attempt = 0; attempt < maxRetries; attempt++) {
-            const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-proxy`, {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body
-            });
-            if (res.status === 429 && attempt < maxRetries - 1) {
-                const wait = Math.pow(2, attempt + 1) * 1000; // 2s, 4s
-                console.warn(`[AI] 429 rate limit, retrying in ${wait / 1000}s... (${attempt + 1}/${maxRetries})`);
-                await new Promise(r => setTimeout(r, wait));
-                continue;
-            }
-            // ★ Debug: 先讀 text，再 parse JSON
-            const rawText = await res.text();
-            console.log(`[AI] Response status: ${res.status}, body preview: ${rawText.substring(0, 200)}`);
-            let json;
-            try {
-                json = JSON.parse(rawText);
-            } catch (parseErr) {
-                throw new Error(`AI API 回傳非 JSON（HTTP ${res.status}）: ${rawText.substring(0, 100)}`);
-            }
-            if (!res.ok) throw new Error(json.error || `AI API error: ${res.status}`);
-            if (json.error) throw new Error(json.error);
-            return json.text || json.content || json.choices?.[0]?.message?.content || '';
+        if (res.status === 429 && attempt < maxRetries - 1) {
+            const wait = Math.pow(2, attempt + 1) * 1000;
+            console.warn(`[AI] 429 rate limit, retrying in ${wait / 1000}s... (${attempt + 1}/${maxRetries})`);
+            await new Promise(r => setTimeout(r, wait));
+            continue;
         }
+        const rawText = await res.text();
+        console.log(`[AI] Response status: ${res.status}, body preview: ${rawText.substring(0, 200)}`);
+        let json;
+        try {
+            json = JSON.parse(rawText);
+        } catch (parseErr) {
+            throw new Error(`AI API 回傳非 JSON（HTTP ${res.status}）: ${rawText.substring(0, 100)}`);
+        }
+        if (!res.ok) throw new Error(json.error || `AI API error: ${res.status}`);
+        if (json.error) throw new Error(json.error);
+        return json.text || json.content || json.choices?.[0]?.message?.content || '';
+    }
+}
+
+export const ai = {
+    async chat(messages, opts = {}) {
+        const provider = _aiConfig.provider;
+        if (provider === 'openai' && _aiConfig.apiKey) {
+            console.log('[AI] Using OpenAI direct API');
+            return _chatOpenAI(messages, opts);
+        } else if (provider === 'anthropic' && _aiConfig.apiKey) {
+            console.log('[AI] Using Anthropic direct API');
+            return _chatAnthropic(messages, opts);
+        } else {
+            console.log('[AI] Using Supabase proxy');
+            return _chatSupabase(messages, opts);
+        }
+    },
+
+    /** 設定 AI provider，會存到 localStorage */
+    setProvider(provider, apiKey) {
+        _aiConfig.provider = provider;
+        _aiConfig.apiKey = apiKey || '';
+        localStorage.setItem('_ai_provider', provider);
+        localStorage.setItem('_ai_api_key', apiKey || '');
+        console.log(`[AI] Provider set to: ${provider || 'supabase'}`);
+    },
+
+    /** 取得目前設定 */
+    getProvider() {
+        return { provider: _aiConfig.provider || 'supabase', hasKey: !!_aiConfig.apiKey };
     }
 };
 
