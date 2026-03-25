@@ -1,11 +1,7 @@
-/**
- * Markdown → Slide JSON 轉換引擎
- * 
- * 將 mdParser 的中間結構轉成現有 slide JSON 格式，
- * 完全相容既有的簡報渲染引擎。
- */
-
-import { parseMd } from './mdParser.js';
+// md2slides.js — Markdown → slide JSON 轉換引擎（非 ES module 版）
+(function() {
+'use strict';
+const parseMd = window.MdParser.parseMd;
 
 // ═════════════════════════════════════════
 // 配色方案（輪替）
@@ -27,7 +23,7 @@ function _genId() {
 // ═════════════════════════════════════════
 // 主轉換函式
 // ═════════════════════════════════════════
-export function md2slides(markdown, genId) {
+function md2slides(markdown, genId) {
     const parsed = parseMd(markdown);
     const gen = genId || _genId;
     _idCounter = 0;
@@ -468,4 +464,6 @@ function _buildComponent(gen, comp, c) {
     }
 }
 
-export default md2slides;
+// Export to window
+window.md2slides = md2slides;
+})();

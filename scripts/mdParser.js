@@ -1,14 +1,6 @@
-/**
- * Markdown + :::component 語法解析器
- * 
- * 將 Markdown 文字解析為中間抽象結構，供 md2slides.js 轉換成 slide JSON。
- * 
- * 語法規則：
- * - `---` 分隔投影片
- * - `slide: type` 在分隔線後指定投影片類型
- * - 標準 Markdown：#, ##, -, *, **, >, ```, |||
- * - `:::component ... :::` 自訂互動元件區塊
- */
+// mdParser.js — Markdown + :::component 解析器（非 ES module 版）
+(function() {
+'use strict';
 
 // ═════════════════════════════════════════
 // 支援的互動元件清單
@@ -100,7 +92,7 @@ function parseComponentBlock(type, body) {
 // ═════════════════════════════════════════
 // 主解析函式
 // ═════════════════════════════════════════
-export function parseMd(markdown) {
+function parseMd(markdown) {
     if (!markdown || !markdown.trim()) return [];
 
     // 用 --- 分割投影片
@@ -275,7 +267,7 @@ export function parseMd(markdown) {
 // ═════════════════════════════════════════
 // 範例 Markdown 模板
 // ═════════════════════════════════════════
-export const EXAMPLE_TEMPLATE = `slide: cover
+const EXAMPLE_TEMPLATE = `slide: cover
 
 # AI 辦公室應用實戰
 *講師：范老師 ｜ 企業內訓*
@@ -375,4 +367,6 @@ slide: thank-you
 ## 開始你的 AI 之旅 🚀
 `;
 
-export { INTERACTIVE_TYPES, SLIDE_TYPES, mdToHtml, parseComponentBlock };
+// Export to window
+window.MdParser = { parseMd, EXAMPLE_TEMPLATE, INTERACTIVE_TYPES, SLIDE_TYPES, mdToHtml, parseComponentBlock };
+})();

@@ -385,9 +385,14 @@
     <span id="toastMsg"></span>
 </div>
 
-<script type="module">
-import { parseMd, EXAMPLE_TEMPLATE } from './scripts/mdParser.js';
-import { md2slides } from './scripts/md2slides.js';
+<script src="scripts/mdParser.js"></script>
+<script src="scripts/md2slides.js"></script>
+<script>
+(function() {
+'use strict';
+const parseMd = window.MdParser.parseMd;
+const EXAMPLE_TEMPLATE = window.MdParser.EXAMPLE_TEMPLATE;
+const md2slides = window.md2slides;
 
 // ═════════════════════════════════════════
 // Supabase config
@@ -752,6 +757,7 @@ document.addEventListener('keydown', (e) => {
 
 // Initial render
 updatePreview();
+})();
 </script>
 </body>
 </html>
