@@ -2355,7 +2355,7 @@ export class SlideManager {
     }
 
     renderCopyCardElement(el, element) {
-        const rawContent = element.content || '';
+        const rawContent = typeof element.content === 'string' ? element.content : (element.content != null ? String(element.content) : '');
         // 提取 {{變數}} 名稱
         const varRegex = /\{\{([^}]+)\}\}/g;
         const vars = [];
