@@ -5316,6 +5316,23 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this.slideManager.next();
             }
 
+            // Alt+Arrow Up/Down — 移動投影片位置
+            if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown') && !this._isEditingText()) {
+                e.preventDefault();
+                const sm = this.slideManager;
+                const indices = sm.selectedSlideIndices?.size > 0
+                    ? [...sm.selectedSlideIndices]
+                    : [sm.currentIndex];
+                if (e.key === 'ArrowUp') {
+                    const minIdx = Math.min(...indices);
+                    if (minIdx > 0) sm.moveSlides(indices, minIdx - 1);
+                } else {
+                    const maxIdx = Math.max(...indices);
+                    if (maxIdx < sm.slides.length - 1) sm.moveSlides(indices, maxIdx + 2);
+                }
+                return;
+            }
+
             // Arrow Up / Arrow Down（切換投影片 — 文字編輯中不觸發）
             if (e.key === 'ArrowUp' && !this._isEditingText()) {
                 e.preventDefault();

@@ -3006,6 +3006,46 @@ export class SlideManager {
     /**
      * 顯示縮略圖右鍵選單
      */
+    /**
+     * 批次移動投影片到指定位置
+     * @param {number[]} fromIndices - 要移動的投影片索引（可以是多個）
+     * @param {number} toIndex - 目標位置（插入點）
+     */
+    moveSlides(fromIndices, toIndex) {
+        if (!fromIndices.length) return;
+        const sorted = [...fromIndices].sort((a, b) => a - b);
+        // 取出要移動的投影片（從後往前取，避免索引偏移）
+        const moving = [];
+        for (let i = sorted.length - 1; i >= 0; i--) {
+            moving.unshift(this.slides.splice(sorted[i], 1)[0]);
+        }
+        // 計算插入位置（扣掉已取出的在前面的數量）
+        let insertAt = toIndex;
+        for (const idx of sorted) {
+            if (idx < toIndex) insertAt--;
+        }
+        insertAt = Math.max(0, Math.min(insertAt, this.slides.length));
+        this.slides.splice(insertAt, 0, ...moving);
+        // 更新 currentIndex
+        this.currentIndex = insertAt;
+        this.selectedSlideIndices.clear();
+        for (let i = 0; i < moving.length; i++) {
+            this.selectedSlideIndices.add(insertAt + i);
+        }
+        this.renderThumbnails();
+        this.renderCurrentSlide();
+        this.updateCounter();
+        this.save();
+        // 滾動到新位置
+        requestAnimationFrame(() => {
+            const thumb = this.slideListEl.querySelector(`.slide-thumbnail[data-index="${insertAt}"]`);
+            thumb?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    }
+
+    /**
+     * 顯示縮略圖右鍵選單
+     */
     showThumbnailContextMenu(e, index) {
         // 移除已存在的選單
         document.querySelectorAll('.context-menu').forEach(m => m.remove());
@@ -3024,7 +3064,12 @@ export class SlideManager {
 
         if (isMulti) {
             const count = this.selectedSlideIndices.size;
+            const indices = [...this.selectedSlideIndices].sort((a, b) => a - b);
             menu.innerHTML = `
+                <div class="context-menu-item" data-action="move-top-multi">⬆️ 移至最前面（${count} 張）</div>
+                <div class="context-menu-item" data-action="move-bottom-multi">⬇️ 移至最後面（${count} 張）</div>
+                <div class="context-menu-item" data-action="move-to-multi">📍 移至指定位置…</div>
+                <div class="context-menu-divider"></div>
                 <div class="context-menu-item danger" data-action="delete-multi">🗑 刪除 ${count} 張投影片</div>
             `;
         } else {
@@ -3032,6 +3077,10 @@ export class SlideManager {
             menu.innerHTML = `
                 <div class="context-menu-item" data-action="duplicate">📋 複製投影片</div>
                 <div class="context-menu-item" data-action="insert">➕ 插入新投影片</div>
+                <div class="context-menu-divider"></div>
+                <div class="context-menu-item" data-action="move-top" ${index === 0 ? 'style="opacity:0.4;pointer-events:none"' : ''}>⬆️ 移至最前面</div>
+                <div class="context-menu-item" data-action="move-bottom" ${index === this.slides.length - 1 ? 'style="opacity:0.4;pointer-events:none"' : ''}>⬇️ 移至最後面</div>
+                <div class="context-menu-item" data-action="move-to">📍 移至指定位置…</div>
                 <div class="context-menu-divider"></div>
                 ${hasSection
                     ? '<div class="context-menu-item" data-action="remove-section">🏷️ 移除分組標頭</div>'
@@ -3044,8 +3093,9 @@ export class SlideManager {
 
         document.body.appendChild(menu);
 
-        menu.addEventListener('click', (e) => {
-            const action = e.target.dataset.action;
+        menu.addEventListener('click', (ev) => {
+            const action = ev.target.dataset.action;
+            if (!action) return;
             if (action === 'duplicate') {
                 this.duplicateSlide(index);
             } else if (action === 'insert') {
@@ -3059,6 +3109,30 @@ export class SlideManager {
                 this.addSection(index);
             } else if (action === 'remove-section') {
                 this.removeSection(index);
+            } else if (action === 'move-top') {
+                this.moveSlides([index], 0);
+            } else if (action === 'move-bottom') {
+                this.moveSlides([index], this.slides.length);
+            } else if (action === 'move-to') {
+                const target = prompt(`移至第幾頁？（1 ~ ${this.slides.length}）`, '1');
+                if (target !== null) {
+                    const pos = parseInt(target);
+                    if (pos >= 1 && pos <= this.slides.length) {
+                        this.moveSlides([index], pos - 1);
+                    }
+                }
+            } else if (action === 'move-top-multi') {
+                this.moveSlides([...this.selectedSlideIndices], 0);
+            } else if (action === 'move-bottom-multi') {
+                this.moveSlides([...this.selectedSlideIndices], this.slides.length);
+            } else if (action === 'move-to-multi') {
+                const target = prompt(`移至第幾頁？（1 ~ ${this.slides.length}）`, '1');
+                if (target !== null) {
+                    const pos = parseInt(target);
+                    if (pos >= 1 && pos <= this.slides.length) {
+                        this.moveSlides([...this.selectedSlideIndices], pos - 1);
+                    }
+                }
             }
             menu.remove();
         });
@@ -3067,6 +3141,13 @@ export class SlideManager {
         setTimeout(() => {
             document.addEventListener('click', () => menu.remove(), { once: true });
         }, 10);
+
+        // 確保選單不超出視窗
+        requestAnimationFrame(() => {
+            const r = menu.getBoundingClientRect();
+            if (r.right > window.innerWidth) menu.style.left = `${window.innerWidth - r.width - 8}px`;
+            if (r.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - r.height - 8}px`;
+        });
     }
 
     // ── Section 管理 ──
