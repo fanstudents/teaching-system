@@ -61,7 +61,9 @@ export class Editor {
             }
 
             // 剪貼簿沒有圖片 → 嘗試貼上內部複製的元素
-            if (!hasImage && window._editorDragDrop?._copiedElements?.length > 0) {
+            // ★ 只在畫布有選取元素時才攔截，否則讓系統剪貼簿正常貼上
+            if (!hasImage && window._editorDragDrop?._copiedElements?.length > 0
+                && this.selectedElements?.size > 0) {
                 e.preventDefault();
                 window._editorDragDrop._doPasteElements();
             }
