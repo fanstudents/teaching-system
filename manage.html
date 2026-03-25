@@ -1165,6 +1165,9 @@
                         <a class="btn btn-sm" href="admin-preclass.html?code=${p?.join_code}&session=${s.session_code}" title="管理">
                             <span class="material-symbols-outlined">settings</span> 管理
                         </a>
+                        <button class="btn btn-sm" title="複製此場次學員登入連結" onclick="navigator.clipboard.writeText(location.origin+'/portal.html?code=${p?.join_code}&session=${s.session_code}').then(()=>showToast('登入連結已複製'))">
+                            <span class="material-symbols-outlined">link</span> 登入連結
+                        </button>
                         <button class="btn btn-sm" title="複製問卷連結" onclick="navigator.clipboard.writeText(location.origin+'/survey.html?session=${s.session_code}').then(()=>showToast('問卷連結已複製'))">
                             <span class="material-symbols-outlined">assignment_turned_in</span> 問卷
                         </button>
