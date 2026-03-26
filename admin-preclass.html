@@ -963,13 +963,19 @@
                     : checklistItems.length + 1;
                 try {
                     if (id) {
-                        await db.update('checklist_items', { title, description, icon_url, sort_order }, { id: `eq.${id}` });
+                        const { error } = await db.update('checklist_items', { title, description, icon_url, sort_order }, { id: `eq.${id}` });
+                        if (error) throw new Error(error.message || JSON.stringify(error));
                     } else {
-                        await db.insert('checklist_items', { title, description, icon_url, sort_order, session_code: dataCode });
+                        const { error } = await db.insert('checklist_items', { title, description, icon_url, sort_order, session_code: dataCode });
+                        if (error) throw new Error(error.message || JSON.stringify(error));
                     }
                     closeModal('checklistModal');
                     await loadChecklist();
-                } catch (err) { showToast('儲存失敗：' + err.message, { type: 'error' }); }
+                    showToast('已儲存');
+                } catch (err) {
+                    console.error('saveChecklist error:', err);
+                    showToast('儲存失敗：' + err.message, { type: 'error' });
+                }
             };
 
             window.deleteChecklist = async function (id) {
