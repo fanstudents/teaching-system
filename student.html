@@ -2179,7 +2179,7 @@
                 // 手動計算偏移量精確居中
                 const ww = wrapper.clientWidth;
                 const wh = wrapper.clientHeight;
-                const scale = Math.min(ww / 960, wh / 540, 1);
+                const scale = Math.min(ww / 960, wh / 540);
                 const scaledW = 960 * scale;
                 const scaledH = 540 * scale;
                 const offsetX = (ww - scaledW) / 2;
@@ -2190,7 +2190,7 @@
             } else if (isImmersive) {
                 const vw = window.innerWidth;
                 const vh = window.innerHeight;
-                const scale = Math.min(vw / 960, vh / 540, 1);
+                const scale = Math.min(vw / 960, vh / 540);
                 slideEl.style.transform = `scale(${scale})`;
                 slideEl.style.transformOrigin = 'center center';
                 slideEl.style.marginBottom = '0';
@@ -2198,7 +2198,7 @@
                 const pad = 40;
                 const ww = wrapper.clientWidth - pad;
                 const wh = wrapper.clientHeight - pad;
-                const scale = Math.min(ww / 960, wh / 540, 1);
+                const scale = Math.min(ww / 960, wh / 540);
                 slideEl.style.transform = `scale(${scale})`;
                 slideEl.style.transformOrigin = 'center center';
                 slideEl.style.marginBottom = '0';
