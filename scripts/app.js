@@ -1934,9 +1934,11 @@ ${slideContents}
             }
 
             const baseUrl = location.origin + location.pathname.replace(/\/[^/]*$/, '/');
+            const sessionId = this.slideManager.currentSessionId;
+            const sessionParam = sessionId ? `&session=${sessionId}` : '';
             const portalUrl = `${baseUrl}portal.html?code=${proj.joinCode}`;
-            const directUrl = `${baseUrl}student.html?code=${proj.joinCode}`;
-            const allUrl = `${baseUrl}student.html?code=${proj.joinCode}&preview=all`;
+            const directUrl = `${baseUrl}student.html?code=${proj.joinCode}${sessionParam}`;
+            const allUrl = `${baseUrl}student.html?code=${proj.joinCode}${sessionParam}&preview=all`;
             const phaseLabels = { 'pre-class': '課前準備', 'in-class': '課程進行中', 'post-class': '課後回顧' };
             const currentPhase = proj.currentPhase || 'pre-class';
 
