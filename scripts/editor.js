@@ -1554,6 +1554,9 @@ export class Editor {
      * 渲染連連看屬性
      */
     renderMatchingProperties(elementData) {
+        const iw = elementData.matchingItemWidth || 180;
+        const fs = elementData.matchingFontSize || 15;
+        const gap = elementData.matchingGap || 20;
         return `
             <div class="property-section">
                 <div class="property-section-title">配對項目</div>
@@ -1568,6 +1571,21 @@ export class Editor {
                     `).join('')}
                 </div>
                 <button class="add-pair-btn" id="addPair">+ 新增配對</button>
+            </div>
+            <div class="property-section">
+                <div class="property-section-title">區塊樣式</div>
+                <div class="form-group">
+                    <label class="form-label">區塊寬度 <span id="matchingWidthVal">${iw}px</span></label>
+                    <input type="range" class="form-range" id="matchingItemWidth" min="100" max="320" step="10" value="${iw}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">文字大小 <span id="matchingFsVal">${fs}px</span></label>
+                    <input type="range" class="form-range" id="matchingFontSize" min="10" max="24" step="1" value="${fs}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">項目間距 <span id="matchingGapVal">${gap}px</span></label>
+                    <input type="range" class="form-range" id="matchingGap" min="4" max="40" step="2" value="${gap}">
+                </div>
             </div>
         `;
     }
@@ -2831,6 +2849,33 @@ ${truncated}
                 this.slideManager.updateElement(elementId, { pairs: elementData.pairs });
                 this.slideManager.renderCurrentSlide();
                 this.selectElementById(elementId);
+            });
+        }
+
+        // ── 區塊樣式 slider ──
+        const widthSlider = document.getElementById('matchingItemWidth');
+        const fsSlider = document.getElementById('matchingFontSize');
+        const gapSlider = document.getElementById('matchingGap');
+
+        if (widthSlider) {
+            widthSlider.addEventListener('input', () => {
+                document.getElementById('matchingWidthVal').textContent = widthSlider.value + 'px';
+                this.slideManager.updateElement(elementId, { matchingItemWidth: parseInt(widthSlider.value) });
+                this.slideManager.renderCurrentSlide();
+            });
+        }
+        if (fsSlider) {
+            fsSlider.addEventListener('input', () => {
+                document.getElementById('matchingFsVal').textContent = fsSlider.value + 'px';
+                this.slideManager.updateElement(elementId, { matchingFontSize: parseInt(fsSlider.value) });
+                this.slideManager.renderCurrentSlide();
+            });
+        }
+        if (gapSlider) {
+            gapSlider.addEventListener('input', () => {
+                document.getElementById('matchingGapVal').textContent = gapSlider.value + 'px';
+                this.slideManager.updateElement(elementId, { matchingGap: parseInt(gapSlider.value) });
+                this.slideManager.renderCurrentSlide();
             });
         }
     }

@@ -2240,21 +2240,24 @@ export class SlideManager {
      * 渲染連連看元素
      */
     renderMatchingElement(el, element) {
+        const iw = element.matchingItemWidth || 180;
+        const fs = element.matchingFontSize || 15;
+        const gap = element.matchingGap || 20;
         el.innerHTML = `
             <div class="interactive-label">連連看</div>
             <div class="matching-container">
                 <svg class="matching-lines"></svg>
-                <div class="matching-column left-column">
+                <div class="matching-column left-column" style="width:${iw}px;gap:${gap}px;">
                     ${(element.pairs || []).map((pair, i) => `
-                        <div class="matching-item" data-index="${i}" data-side="left">
+                        <div class="matching-item" data-index="${i}" data-side="left" style="font-size:${fs}px;">
                             ${pair.left}
                             <div class="matching-dot left"></div>
                         </div>
                     `).join('')}
                 </div>
-                <div class="matching-column right-column">
+                <div class="matching-column right-column" style="width:${iw}px;gap:${gap}px;">
                     ${this.shuffleArray([...(element.pairs || [])]).map((pair, i) => `
-                        <div class="matching-item" data-answer="${pair.left}" data-side="right">
+                        <div class="matching-item" data-answer="${pair.left}" data-side="right" style="font-size:${fs}px;">
                             ${pair.right}
                             <div class="matching-dot right"></div>
                         </div>

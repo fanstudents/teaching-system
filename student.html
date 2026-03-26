@@ -1404,22 +1404,25 @@
                     el.classList.add('interactive-element');
                     const pairs = element.pairs || [];
                     const shuffledPairs = shuffleArray(pairs);
+                    const mIw = element.matchingItemWidth || 180;
+                    const mFs = element.matchingFontSize || 15;
+                    const mGap = element.matchingGap || 20;
                     el.innerHTML = `
                         <div class="matching-container">
                             <svg class="matching-lines"></svg>
-                            <div class="matching-column left-column">
+                            <div class="matching-column left-column" style="width:${mIw}px;gap:${mGap}px;">
                                 ${pairs.map((pair, i) => `
-                                    <div class="matching-item" data-index="${i}" data-side="left">
+                                    <div class="matching-item" data-index="${i}" data-side="left" style="font-size:${mFs}px;">
                                         ${pair.left}
                                         <div class="matching-dot left"></div>
                                     </div>
                                 `).join('')}
                             </div>
-                            <div class="matching-column right-column">
+                            <div class="matching-column right-column" style="width:${mIw}px;gap:${mGap}px;">
                                 ${shuffledPairs.map((pair) => {
                         const origIdx = pairs.indexOf(pair);
                         return `
-                                        <div class="matching-item" data-answer="${pair.left}" data-side="right">
+                                        <div class="matching-item" data-answer="${pair.left}" data-side="right" style="font-size:${mFs}px;">
                                             ${pair.right}
                                             <div class="matching-dot right"></div>
                                         </div>
