@@ -4074,6 +4074,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.initBGM();
         this.initReactions();
         this.initQA();
+        this._presFirstRender = true; // 跳過第一頁過場動畫
         this.renderPresentationSlide();
         presentationMode.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -5002,9 +5003,15 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         }
 
         presentationSlide.innerHTML = '';
-        presentationSlide.style.animation = 'none';
-        void presentationSlide.offsetHeight; // force reflow
-        presentationSlide.style.animation = animMap[transition] || animMap.fade;
+        // 第一頁不套用過場動畫（避免進入簡報時從小窗閃爍）
+        if (this._presFirstRender) {
+            this._presFirstRender = false;
+            presentationSlide.style.animation = 'none';
+        } else {
+            presentationSlide.style.animation = 'none';
+            void presentationSlide.offsetHeight; // force reflow
+            presentationSlide.style.animation = animMap[transition] || animMap.fade;
+        }
 
         // 套用背景
         if (slide.background && slide.background !== '#ffffff') {
