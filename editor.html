@@ -567,18 +567,38 @@
 
                     <!-- 過場動畫 -->
                     <div class="ribbon-group">
-                        <div class="ribbon-group-content">
-                            <button class="ribbon-btn transition-btn active" data-transition="fade" title="淡入">
+                        <div class="ribbon-group-content" style="flex-wrap:wrap;gap:2px;">
+                            <button class="ribbon-btn transition-btn" data-transition="none" title="無過場">
+                                <span class="material-symbols-outlined">block</span>
+                                <span class="ribbon-btn-label">無</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn active" data-transition="fade" title="淡入淡出">
                                 <span class="material-symbols-outlined">blur_on</span>
                                 <span class="ribbon-btn-label">淡入</span>
                             </button>
-                            <button class="ribbon-btn transition-btn" data-transition="slide-left" title="左滑">
+                            <button class="ribbon-btn transition-btn" data-transition="slide-left" title="向左推入">
                                 <span class="material-symbols-outlined">swipe_left</span>
-                                <span class="ribbon-btn-label">左滑</span>
+                                <span class="ribbon-btn-label">左推</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn" data-transition="slide-right" title="向右推入">
+                                <span class="material-symbols-outlined">swipe_right</span>
+                                <span class="ribbon-btn-label">右推</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn" data-transition="slide-up" title="向上推入">
+                                <span class="material-symbols-outlined">swipe_up</span>
+                                <span class="ribbon-btn-label">上推</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn" data-transition="slide-down" title="向下拉入">
+                                <span class="material-symbols-outlined">swipe_down</span>
+                                <span class="ribbon-btn-label">下拉</span>
                             </button>
                             <button class="ribbon-btn transition-btn" data-transition="zoom" title="縮放">
                                 <span class="material-symbols-outlined">zoom_in</span>
                                 <span class="ribbon-btn-label">縮放</span>
+                            </button>
+                            <button class="ribbon-btn transition-btn" data-transition="flip" title="翻轉">
+                                <span class="material-symbols-outlined">flip</span>
+                                <span class="ribbon-btn-label">翻轉</span>
                             </button>
                         </div>
                         <div class="ribbon-group-title">過場動畫</div>

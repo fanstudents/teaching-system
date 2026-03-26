@@ -1240,11 +1240,41 @@
         }
 
         // ── Render slide ──
+        // 注入過場動畫 CSS（一次性）
+        (function injectTransStyles() {
+            if (document.getElementById('stuTransStyles')) return;
+            const s = document.createElement('style');
+            s.id = 'stuTransStyles';
+            s.textContent = `
+                @keyframes stuTransFade { from { opacity:0; } to { opacity:1; } }
+                @keyframes stuTransSlideLeft { from { opacity:0; clip-path:inset(0 0 0 100%); } to { opacity:1; clip-path:inset(0); } }
+                @keyframes stuTransSlideRight { from { opacity:0; clip-path:inset(0 100% 0 0); } to { opacity:1; clip-path:inset(0); } }
+                @keyframes stuTransSlideUp { from { opacity:0; clip-path:inset(100% 0 0 0); } to { opacity:1; clip-path:inset(0); } }
+                @keyframes stuTransSlideDown { from { opacity:0; clip-path:inset(0 0 100% 0); } to { opacity:1; clip-path:inset(0); } }
+                @keyframes stuTransZoom { from { opacity:0; clip-path:circle(0% at 50% 50%); } to { opacity:1; clip-path:circle(100% at 50% 50%); } }
+                @keyframes stuTransFlip { from { opacity:0; } 50% { opacity:0; } to { opacity:1; } }
+            `;
+            document.head.appendChild(s);
+        })();
+
+        const _transAnimMap = {
+            none: '',
+            fade: 'stuTransFade 0.3s ease',
+            'slide-left': 'stuTransSlideLeft 0.4s ease',
+            'slide-right': 'stuTransSlideRight 0.4s ease',
+            'slide-up': 'stuTransSlideUp 0.4s ease',
+            'slide-down': 'stuTransSlideDown 0.4s ease',
+            zoom: 'stuTransZoom 0.5s ease',
+            flip: 'stuTransFlip 0.45s ease',
+        };
+
         function renderSlide(slide, index, total) {
             if (!slide) return;
 
-            // ── 過場動畫：淡出 → 替換 → 淡入（不碰 transform，避免覆蓋 scaleSlide）──
-            slideEl.style.transition = 'opacity 0.2s ease';
+            const transition = slide.transition || 'fade';
+
+            // 清空 → 重建 → 動畫進場
+            slideEl.style.animation = 'none';
             slideEl.style.opacity = '0';
 
             setTimeout(() => {
@@ -1279,9 +1309,10 @@
                     }
                 });
 
-                // 淡入 + 重新縮放
+                // 過場動畫進場 + 重新縮放
                 requestAnimationFrame(() => {
                     slideEl.style.opacity = '1';
+                    slideEl.style.animation = _transAnimMap[transition] || _transAnimMap.fade;
                     scaleSlide(); // 確保手機版正確縮放
                     // Re-attach laser pointer dot if it exists
                     if (laserDot) slideEl.appendChild(laserDot);

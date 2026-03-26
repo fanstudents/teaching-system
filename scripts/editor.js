@@ -1534,6 +1534,26 @@ export class Editor {
             `;
         }
 
+        // 動畫出場順序（所有元素通用）
+        const _ao = elementData.animOrder || 0;
+        html += `
+            <div class="property-section">
+                <div class="property-section-title">動畫出場</div>
+                <div class="property-row">
+                    <label>出場步驟</label>
+                    <select id="propAnimOrder" style="flex:1;padding:4px 6px;border:1px solid var(--border-light);border-radius:6px;font-size:12px;background:var(--bg-primary);color:var(--text-primary);">
+                        <option value="0" ${_ao === 0 ? 'selected' : ''}>一開始就顯示</option>
+                        ${[1,2,3,4,5,6,7,8,9,10].map(n =>
+                            `<option value="${n}" ${_ao === n ? 'selected' : ''}>第 ${n} 步淡入</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;line-height:1.4;">
+                    簡報播放時按 → 或空白鍵依序顯示
+                </div>
+            </div>
+        `;
+
         // 圖層與刪除
         html += `
             <div class="property-section">
@@ -1746,6 +1766,18 @@ export class Editor {
             deleteBtn.addEventListener('click', () => {
                 this.slideManager.deleteElement(elementId);
                 this.deselectAll();
+            });
+        }
+
+        // 動畫出場順序
+        const animOrderSelect = document.getElementById('propAnimOrder');
+        if (animOrderSelect) {
+            animOrderSelect.addEventListener('change', () => {
+                const val = parseInt(animOrderSelect.value);
+                this.slideManager.updateElement(elementId, { animOrder: val });
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.renderThumbnails();
+                this.selectElementById(elementId);
             });
         }
 

@@ -4972,7 +4972,39 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const presentationSlide = document.getElementById('presentationSlide');
         if (!slide) return;
 
+        // ── 過場動畫 ──
+        const transition = slide.transition || 'fade';
+        const animMap = {
+            none: '',
+            fade: 'presTransFade 0.35s ease',
+            'slide-left': 'presTransSlideLeft 0.4s ease',
+            'slide-right': 'presTransSlideRight 0.4s ease',
+            'slide-up': 'presTransSlideUp 0.4s ease',
+            'slide-down': 'presTransSlideDown 0.4s ease',
+            zoom: 'presTransZoom 0.4s ease',
+            flip: 'presTransFlip 0.5s ease',
+        };
+
+        // 注入動畫 CSS（一次性）
+        if (!document.getElementById('presTransStyles')) {
+            const s = document.createElement('style');
+            s.id = 'presTransStyles';
+            s.textContent = `
+                @keyframes presTransFade { from { opacity:0; } to { opacity:1; } }
+                @keyframes presTransSlideLeft { from { transform:translateX(60px);opacity:0; } to { transform:translateX(0);opacity:1; } }
+                @keyframes presTransSlideRight { from { transform:translateX(-60px);opacity:0; } to { transform:translateX(0);opacity:1; } }
+                @keyframes presTransSlideUp { from { transform:translateY(60px);opacity:0; } to { transform:translateY(0);opacity:1; } }
+                @keyframes presTransSlideDown { from { transform:translateY(-60px);opacity:0; } to { transform:translateY(0);opacity:1; } }
+                @keyframes presTransZoom { from { transform:scale(0.85);opacity:0; } to { transform:scale(1);opacity:1; } }
+                @keyframes presTransFlip { from { transform:perspective(800px) rotateY(90deg);opacity:0; } to { transform:perspective(800px) rotateY(0);opacity:1; } }
+            `;
+            document.head.appendChild(s);
+        }
+
         presentationSlide.innerHTML = '';
+        presentationSlide.style.animation = 'none';
+        void presentationSlide.offsetHeight; // force reflow
+        presentationSlide.style.animation = animMap[transition] || animMap.fade;
 
         // 套用背景
         if (slide.background && slide.background !== '#ffffff') {
