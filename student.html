@@ -336,6 +336,7 @@
         let instructorIndex = 0; // 講師目前頁碼
         let heartbeatTimer = null;
         let sessionAssignments = []; // 該場次的作業列表
+        let isPreviewMode = false; // 預覽模式旗標
 
         // ── URL params auto-fill ──
         const urlParams = new URLSearchParams(location.search);
@@ -382,6 +383,90 @@
                 document.getElementById('studentName').value = saved.studentName;
                 setTimeout(() => joinSession(), 200);
             }
+        }
+
+        // ── Preview Mode (客戶預覽全部投影片) ──
+        if (urlParams.get('preview') === 'all') {
+            (async function initPreviewMode() {
+                isPreviewMode = true;
+                const code = urlParams.get('code') || '';
+                const sessionParam = urlParams.get('session') || '';
+                if (!code) return;
+
+                // 查詢 project
+                let project = null;
+                try {
+                    const { data } = await db.select('projects', {
+                        filter: { join_code: `eq.${code}` }, limit: 1
+                    });
+                    if (data?.length) project = data[0];
+                } catch (e) { console.warn('[Preview] project query:', e); }
+
+                // 查詢 session data (for slides_data)
+                let sessionData = null;
+                if (sessionParam) {
+                    try {
+                        const { data } = await db.select('project_sessions', {
+                            filter: { session_code: `eq.${sessionParam}` }, limit: 1
+                        });
+                        if (data?.length) sessionData = data[0];
+                    } catch (e) { /* ignore */ }
+                }
+
+                const slidesSource = sessionData?.slides_data || project?.slides_data || null;
+                if (!slidesSource) {
+                    document.getElementById('joinScreen').innerHTML = '<div style="text-align:center;padding:60px 20px;color:#80868b;"><span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:12px;">error_outline</span>找不到投影片資料</div>';
+                    return;
+                }
+
+                const parsed = typeof slidesSource === 'string' ? JSON.parse(slidesSource) : slidesSource;
+                const slides = parsed.slides || [];
+                if (!slides.length) return;
+
+                slidesCache = slides;
+                totalSlides = slides.length;
+                instructorIndex = slides.length - 1; // 解鎖全部頁面
+                currentIndex = 0;
+
+                // 隱藏 join 畫面，顯示簡報
+                document.getElementById('joinScreen').style.display = 'none';
+                const pres = document.getElementById('studentPresentation');
+                pres.classList.add('active');
+
+                // Header 資訊
+                const title = sessionData?.title || project?.name || '教學簡報';
+                document.getElementById('displayTitle').textContent = title;
+                document.getElementById('displayName').textContent = '預覽者';
+                document.getElementById('displayAvatar').textContent = '👁';
+
+                // 替換 LIVE badge → 預覽模式
+                const liveBadge = document.querySelector('.student-session-badge');
+                if (liveBadge) {
+                    liveBadge.innerHTML = '<span style="font-size:11px;font-weight:600;color:#f59e0b;">👁 預覽模式</span>';
+                    liveBadge.style.background = 'rgba(245,158,11,0.1)';
+                    liveBadge.style.border = '1px solid rgba(245,158,11,0.3)';
+                }
+
+                // 隱藏跟隨/自行瀏覽切換（預覽模式永遠可自由翻頁）
+                const modeToggle = document.getElementById('modeToggle');
+                if (modeToggle) modeToggle.style.display = 'none';
+
+                // 隱藏 reaction bar
+                const rb = document.getElementById('studentReactionBar');
+                if (rb) rb.style.display = 'none !important';
+
+                mode = 'free';
+                renderSlide(slides[0], 0, totalSlides);
+                updateNavButtons();
+                scaleSlide();
+                window.addEventListener('resize', scaleSlide);
+
+                // 鍵盤導航
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') navigateSlide(-1);
+                    if (e.key === 'ArrowRight') navigateSlide(1);
+                });
+            })();
         }
 
         // ── Mode Toggle ──
@@ -450,15 +535,15 @@
             const maxIdx = Math.max(instructorIndex, currentIndex);
             const newIdx = currentIndex + dir;
             if (newIdx < 0 || newIdx >= totalSlides) return;
-            // 自由瀏覽模式不能超過講師目前教到的頁
-            if (dir > 0 && newIdx > instructorIndex) return;
+            // 預覽模式不受限；一般模式不能超過講師目前教到的頁
+            if (!isPreviewMode && dir > 0 && newIdx > instructorIndex) return;
             goToSlide(newIdx);
         }
 
         function goToSlide(index) {
             if (index < 0 || index >= slidesCache.length) return;
-            // 限制不能超過講師教到的頁（跟隨模式由講師控制，不受限）
-            if (mode === 'free' && index > instructorIndex) {
+            // 預覽模式不受限；一般模式限制不能超過講師教到的頁
+            if (!isPreviewMode && mode === 'free' && index > instructorIndex) {
                 index = instructorIndex;
             }
             currentIndex = index;
@@ -475,8 +560,8 @@
             const prevBtn = document.getElementById('prevSlideBtn');
             const nextBtn = document.getElementById('nextSlideBtn');
             prevBtn.disabled = currentIndex <= 0;
-            // 不能超過講師教到的頁
-            nextBtn.disabled = currentIndex >= totalSlides - 1 || currentIndex >= instructorIndex;
+            // 預覽模式不受限；一般模式不能超過講師教到的頁
+            nextBtn.disabled = currentIndex >= totalSlides - 1 || (!isPreviewMode && currentIndex >= instructorIndex);
         }
 
         async function joinSession() {
