@@ -204,12 +204,35 @@ export class AssessmentGame {
             if (currentIdx < shuffled.length - 1) renderQuestion(currentIdx + 1);
         });
         overlay.querySelector('.assessment-close-btn').addEventListener('click', () => {
+            const doClose = () => {
+                if (timerInterval) clearInterval(timerInterval);
+                overlay.remove();
+                this._overlay = null;
+            };
             if (answers.some(a => a !== null)) {
-                if (!confirm('還沒作答完畢，確定要離開嗎？')) return;
+                // 自訂確認面板（取代 confirm() 避免被 overlay 擋住）
+                const existing = overlay.querySelector('.assessment-confirm-exit');
+                if (existing) { existing.remove(); return; }
+                const panel = document.createElement('div');
+                panel.className = 'assessment-confirm-exit';
+                panel.style.cssText = 'position:absolute;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);';
+                panel.innerHTML = `
+                    <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px 32px;text-align:center;max-width:320px;box-shadow:0 16px 48px rgba(0,0,0,0.4);">
+                        <div style="font-size:32px;margin-bottom:8px;">⚠️</div>
+                        <div style="color:#f1f5f9;font-size:15px;font-weight:600;margin-bottom:6px;">還沒作答完畢</div>
+                        <div style="color:#94a3b8;font-size:13px;margin-bottom:20px;">離開後不會儲存作答進度，確定要離開嗎？</div>
+                        <div style="display:flex;gap:10px;justify-content:center;">
+                            <button class="confirm-cancel" style="padding:8px 20px;border-radius:8px;border:1px solid #475569;background:transparent;color:#cbd5e1;font-size:13px;cursor:pointer;">繼續作答</button>
+                            <button class="confirm-leave" style="padding:8px 20px;border-radius:8px;border:none;background:#ef4444;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">確定離開</button>
+                        </div>
+                    </div>
+                `;
+                overlay.querySelector('.assessment-fullscreen').appendChild(panel);
+                panel.querySelector('.confirm-cancel').addEventListener('click', () => panel.remove());
+                panel.querySelector('.confirm-leave').addEventListener('click', () => doClose());
+            } else {
+                doClose();
             }
-            if (timerInterval) clearInterval(timerInterval);
-            overlay.remove();
-            this._overlay = null;
         });
 
         // 自動提交函數
