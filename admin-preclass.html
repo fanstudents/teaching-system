@@ -998,14 +998,16 @@
 
             async function seedDefaultSurvey() {
                 const defaults = [
-                    { question_type: 'fillblank', question_text: '您目前的公司名稱與職級為何？（例如：OO公司 行銷主管）', sort_order: 1 },
-                    { question_type: 'choice', question_text: '您目前使用 AI 工具的頻率？', options: JSON.stringify(['每天都用', '每週幾次', '偶爾使用', '很少使用', '從未使用過']), sort_order: 2 },
-                    { question_type: 'multi_select', question_text: '您目前使用過哪些 AI 工具？', options: JSON.stringify(['ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Midjourney / DALL-E', 'Notion AI', 'Perplexity', 'Make / Zapier 自動化', '都沒用過', '其他']), sort_order: 3 },
-                    { question_type: 'fillblank', question_text: '您目前工作中，覺得 AI 最有可能應用在哪些場景？（可列舉 2-3 個）', sort_order: 4 },
-                    { question_type: 'multi_select', question_text: '您最想在這堂課中學習哪些內容？', options: JSON.stringify(['Prompt 工程技巧', 'AI 文案撰寫', 'AI 圖像生成', 'AI 數據分析', 'AI 簡報製作', 'AI 自動化流程', 'AI 程式開發輔助', '其他']), sort_order: 5 },
-                    { question_type: 'fillblank', question_text: '您希望在課程中解決什麼具體的工作問題？（越具體越好）', sort_order: 6 },
-                    { question_type: 'multi_select', question_text: '您偏好的學習方式？', options: JSON.stringify(['講師示範後自己操作', '直接動手做再討論', '看案例分析', '小組討論', '一對一指導']), sort_order: 7 },
-                    { question_type: 'fillblank', question_text: '對本次課程有什麼期待或想對講師說的話？（選填）', sort_order: 8 },
+                    { question_type: 'fillblank', question_text: '您的職稱', sort_order: 1 },
+                    { question_type: 'fillblank', question_text: '工作內容簡要說明', sort_order: 2 },
+                    { question_type: 'choice', question_text: '您對本次課程主題的了解程度？', options: JSON.stringify(['非常了解', '了解', '普通', '不太了解', '完全不了解']), sort_order: 3 },
+                    { question_type: 'fillblank', question_text: '您是否曾參加過類似主題的課程或訓練?若有，請簡述您印象較深的內容或學到的技巧', sort_order: 4 },
+                    { question_type: 'choice', question_text: '您在工作中是否常需要應用到本課程主題的相關技能？', options: JSON.stringify(['經常需要', '偶爾需要', '很少需要', '目前不需要但未來可能會', '完全不需要']), sort_order: 5 },
+                    { question_type: 'fillblank', question_text: '您目前在工作中遇到哪些與本課程主題相關的問題或困難？', sort_order: 6 },
+                    { question_type: 'fillblank', question_text: '您預期課後能將所學應用在哪些工作情境或任務？', sort_order: 7 },
+                    { question_type: 'multi_select', question_text: '您希望老師在課程中多著重哪一類內容?（可複選）', options: JSON.stringify(['基礎概念與原理', '實務操作與工具示範', '案例分析與產業應用', '互動練習與即時實作', '進階技巧與最新趨勢', '團隊協作與溝通應用']), sort_order: 8 },
+                    { question_type: 'fillblank', question_text: '課程中，您是否有希望老師特別說明或討論的問題?若有，請提供相關情境或實際案例。', sort_order: 9 },
+                    { question_type: 'fillblank', question_text: '其他建議或希望講師能事先了解的事項', sort_order: 10 },
                 ];
                 try {
                     for (const q of defaults) { await db.insert('survey_questions', { ...q, session_code: dataCode }); }
