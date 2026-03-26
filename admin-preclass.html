@@ -774,11 +774,11 @@
             //   Drag & Drop helper
             // ══════════════════════════════════════
             function enableDragSort(listEl, items, onReorder) {
-                let dragItem = null;
+                let dragId = null;
                 listEl.addEventListener('dragstart', e => {
                     const li = e.target.closest('.manage-item');
                     if (!li) return;
-                    dragItem = li;
+                    dragId = li.dataset.id;
                     li.classList.add('dragging');
                     e.dataTransfer.effectAllowed = 'move';
                 });
@@ -786,12 +786,12 @@
                     const li = e.target.closest('.manage-item');
                     if (li) li.classList.remove('dragging');
                     listEl.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                    dragItem = null;
+                    dragId = null;
                 });
                 listEl.addEventListener('dragover', e => {
                     e.preventDefault();
                     const li = e.target.closest('.manage-item');
-                    if (!li || li === dragItem) return;
+                    if (!li || li.dataset.id === dragId) return;
                     listEl.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
                     li.classList.add('drag-over');
                 });
@@ -802,12 +802,12 @@
                 listEl.addEventListener('drop', async e => {
                     e.preventDefault();
                     const targetLi = e.target.closest('.manage-item');
-                    if (!targetLi || !dragItem || targetLi === dragItem) return;
+                    if (!targetLi || !dragId || targetLi.dataset.id === dragId) return;
                     targetLi.classList.remove('drag-over');
-                    const allItems = [...listEl.querySelectorAll('.manage-item')];
-                    const fromIdx = allItems.indexOf(dragItem);
-                    const toIdx = allItems.indexOf(targetLi);
-                    if (fromIdx < 0 || toIdx < 0) return;
+                    // 用 data-id 匹配 items 索引（比 DOM indexOf 更穩）
+                    const fromIdx = items.findIndex(x => String(x.id) === dragId);
+                    const toIdx = items.findIndex(x => String(x.id) === targetLi.dataset.id);
+                    if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
                     // Reorder array
                     const moved = items.splice(fromIdx, 1)[0];
                     items.splice(toIdx, 0, moved);
@@ -887,11 +887,16 @@
                 try {
                     for (let i = 0; i < items.length; i++) {
                         items[i].sort_order = i + 1;
-                        await db.update('checklist_items', { sort_order: i + 1 }, { id: `eq.${items[i].id}` });
+                        const { error } = await db.update('checklist_items', { sort_order: i + 1 }, { id: `eq.${items[i].id}` });
+                        if (error) throw new Error(error.message || JSON.stringify(error));
                     }
                     renderChecklist();
                     showToast('排序已更新');
-                } catch (e) { showToast('排序失敗', { type: 'error' }); }
+                } catch (e) {
+                    console.error('Checklist reorder error:', e);
+                    showToast(`排序失敗：${e.message}`, { type: 'error' });
+                    await loadChecklist();
+                }
             }
 
             window.previewChecklistIcon = function () {
@@ -1055,11 +1060,16 @@
                 try {
                     for (let i = 0; i < items.length; i++) {
                         items[i].sort_order = i + 1;
-                        await db.update('survey_questions', { sort_order: i + 1 }, { id: `eq.${items[i].id}` });
+                        const { error } = await db.update('survey_questions', { sort_order: i + 1 }, { id: `eq.${items[i].id}` });
+                        if (error) throw new Error(error.message || JSON.stringify(error));
                     }
                     renderSurvey();
                     showToast('排序已更新');
-                } catch (e) { showToast('排序失敗', { type: 'error' }); }
+                } catch (e) {
+                    console.error('Survey reorder error:', e);
+                    showToast(`排序失敗：${e.message}`, { type: 'error' });
+                    await loadSurvey();
+                }
             }
 
             window.showAddQuestion = function () {
