@@ -3457,9 +3457,25 @@ export class SlideManager {
                 }
                 console.error('[SaveDB] ❌ DB returned error:', result.error);
                 this._showSaveError('資料庫儲存失敗：' + errMsg);
+                // ★ 更新狀態指示器
+                const statusEl = document.getElementById('autoSaveStatus');
+                if (statusEl) statusEl.textContent = '⚠ 儲存失敗';
             } else {
                 console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, version: data._version });
                 this._lastSaveOk = true;
+                // ★ 更新自動存檔狀態指示器
+                const statusEl = document.getElementById('autoSaveStatus');
+                if (statusEl) {
+                    const t = new Date();
+                    const hh = String(t.getHours()).padStart(2, '0');
+                    const mm = String(t.getMinutes()).padStart(2, '0');
+                    statusEl.textContent = `✓ ${hh}:${mm}`;
+                    statusEl.style.color = '#1e8e3e';
+                    clearTimeout(this._saveStatusTimer);
+                    this._saveStatusTimer = setTimeout(() => {
+                        statusEl.style.color = 'var(--text-muted)';
+                    }, 3000);
+                }
             }
         } catch (e) {
             console.error('[SaveDB] ❌ exception:', e);
