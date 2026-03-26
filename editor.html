@@ -77,26 +77,27 @@
                 <span class="material-symbols-outlined icon-md" style="color:var(--accent-primary);">slideshow</span>
                 <span id="projectName" style="font-weight:600;"></span>
             </div>
-            <div class="admin-header-actions">
+            <div class="admin-header-actions" style="display:flex;align-items:center;gap:4px;">
                 <div class="file-name" contenteditable="true" spellcheck="false"></div>
-                <button class="btn btn-ghost btn-sm" id="saveBtn" title="儲存專案">
+                <span id="autoSaveStatus" style="font-size:10px;color:var(--text-muted);white-space:nowrap;min-width:44px;"></span>
+                <button class="btn btn-ghost btn-sm" id="saveBtn" title="儲存專案" style="padding:4px 8px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">save</span> 儲存
                 </button>
-                <span id="autoSaveStatus" style="font-size:11px;color:var(--text-muted);margin-left:2px;white-space:nowrap;"></span>
-                <button class="btn btn-ghost btn-sm" id="shareEntryLinkBtn" title="生成入口連結">
+                <button class="btn btn-ghost btn-sm" id="shareEntryLinkBtn" title="生成入口連結" style="padding:4px 8px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">link</span> 分享
                 </button>
-                <button class="btn btn-ghost btn-sm" id="exportModalBtn" title="匯出簡報內容">
+                <button class="btn btn-ghost btn-sm" id="exportModalBtn" title="匯出簡報內容" style="padding:4px 8px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">download</span> 匯出
                 </button>
-                <button class="btn btn-ghost btn-sm" id="mdEditorBtn" title="用 Markdown 快速編輯簡報">
-                    <span class="material-symbols-outlined icon-sm">edit_note</span> MD 模式
+                <button class="btn btn-ghost btn-sm" id="mdEditorBtn" title="用 Markdown 快速編輯簡報" style="padding:4px 8px;gap:3px;">
+                    <span class="material-symbols-outlined icon-sm">edit_note</span> MD
                 </button>
-                <button class="btn btn-ghost btn-sm" id="broadcastBtn" title="開始廣播 — 學員同步觀看">
+                <span style="width:1px;height:18px;background:var(--border-color);margin:0 2px;"></span>
+                <button class="btn btn-ghost btn-sm" id="broadcastBtn" title="開始廣播 — 學員同步觀看" style="padding:4px 8px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm" id="broadcastBtnIcon">cell_tower</span>
                     <span id="broadcastBtnLabel">廣播</span>
                 </button>
-                <button class="btn btn-primary btn-sm" id="playBtn" title="播放簡報（F5）">
+                <button class="btn btn-primary btn-sm" id="playBtn" title="播放簡報（F5）" style="padding:4px 10px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">play_arrow</span> 播放
                 </button>
             </div>

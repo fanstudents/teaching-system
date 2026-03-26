@@ -1936,6 +1936,7 @@ ${slideContents}
             const baseUrl = location.origin + location.pathname.replace(/\/[^/]*$/, '/');
             const portalUrl = `${baseUrl}portal.html?code=${proj.joinCode}`;
             const directUrl = `${baseUrl}student.html?code=${proj.joinCode}`;
+            const allUrl = `${baseUrl}student.html?code=${proj.joinCode}&preview=all`;
             const phaseLabels = { 'pre-class': '課前準備', 'in-class': '課程進行中', 'post-class': '課後回顧' };
             const currentPhase = proj.currentPhase || 'pre-class';
 
@@ -1964,7 +1965,7 @@ ${slideContents}
                             <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">Join Code</label>
                             <div style="font-size:2rem;font-weight:800;letter-spacing:6px;color:#1a1a2e;text-align:center;padding:8px 0;">${proj.joinCode}</div>
                         </div>
-                        <div style="margin-bottom:16px;">
+                        <div style="margin-bottom:12px;">
                             <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">入口網址（課堂入口）</label>
                             <div style="display:flex;gap:8px;">
                                 <input id="shareUrlInput" readonly value="${portalUrl}" style="
@@ -1978,7 +1979,7 @@ ${slideContents}
                                 ">複製</button>
                             </div>
                         </div>
-                        <div style="margin-bottom:20px;">
+                        <div style="margin-bottom:12px;">
                             <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">📺 直達簡報連結<span style="font-weight:400;color:#94a3b8;margin-left:6px;">不需廣播即可觀看</span></label>
                             <div style="display:flex;gap:8px;">
                                 <input id="shareDirectInput" readonly value="${directUrl}" style="
@@ -1987,6 +1988,20 @@ ${slideContents}
                                 ">
                                 <button id="copyDirectBtn" style="
                                     padding:9px 16px;background:#1a73e8;
+                                    color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;
+                                    font-size:0.85rem;white-space:nowrap;
+                                ">複製</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">📋 全頁預覽連結<span style="font-weight:400;color:#94a3b8;margin-left:6px;">一次瀏覽所有投影片 + 互動元件</span></label>
+                            <div style="display:flex;gap:8px;">
+                                <input id="shareAllInput" readonly value="${allUrl}" style="
+                                    flex:1;padding:9px 12px;border:2px solid #e2e8f0;border-radius:8px;
+                                    font-size:0.85rem;font-family:monospace;background:#f8f9fa;color:#334155;
+                                ">
+                                <button id="copyAllBtn" style="
+                                    padding:9px 16px;background:#0d9488;
                                     color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;
                                     font-size:0.85rem;white-space:nowrap;
                                 ">複製</button>
@@ -2033,6 +2048,17 @@ ${slideContents}
                     modal.querySelector('#shareDirectInput').select();
                     document.execCommand('copy');
                     this.showToast('已複製直達簡報連結');
+                });
+            });
+
+            // Copy all-preview URL
+            modal.querySelector('#copyAllBtn').addEventListener('click', () => {
+                navigator.clipboard.writeText(allUrl).then(() => {
+                    this.showToast('已複製全頁預覽連結');
+                }).catch(() => {
+                    modal.querySelector('#shareAllInput').select();
+                    document.execCommand('copy');
+                    this.showToast('已複製全頁預覽連結');
                 });
             });
 
