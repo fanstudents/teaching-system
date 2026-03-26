@@ -648,9 +648,19 @@
                 if (addBtn) addBtn.style.opacity = show ? '1' : '0.4';
                 if (addBtn) addBtn.style.pointerEvents = show ? '' : 'none';
             }
-            document.getElementById('showSurveyToggle')?.addEventListener('change', function() {
-                _applySurveyVisibility(this.checked);
-                autoSaveSessionField();
+            document.getElementById('showSurveyToggle')?.addEventListener('change', async function() {
+                const show = this.checked;
+                _applySurveyVisibility(show);
+                if (!sessionId) return;
+                try {
+                    await db.update('project_sessions', { show_survey: show }, { id: `eq.${sessionId}` });
+                    console.log('[Survey Toggle] saved show_survey =', show);
+                    const indicator = document.getElementById('infoSaveStatus');
+                    if (indicator) { indicator.classList.add('show'); setTimeout(() => indicator.classList.remove('show'), 2000); }
+                } catch (e) {
+                    console.error('[Survey Toggle] save failed:', e);
+                    alert('儲存失敗：' + (e.message || e));
+                }
             });
 
             // ── Auto-save session fields (debounced) ──
@@ -667,7 +677,6 @@
                             group_link_label: document.getElementById('fieldGroupLabel').value.trim(),
                             group_link_icon_url: document.getElementById('fieldGroupIconUrl').value.trim() || null,
                             hero_image_url: document.getElementById('fieldHeroImageUrl').value.trim() || null,
-                            show_survey: document.getElementById('showSurveyToggle')?.checked !== false,
                         }, { id: `eq.${sessionId}` });
                         const indicator = document.getElementById('infoSaveStatus');
                         indicator.classList.add('show');
