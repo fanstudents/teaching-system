@@ -1054,6 +1054,53 @@ export class SlideManager {
                 }
                 break;
             }
+
+            case 'fileDownload': {
+                el.classList.add('file-download-element');
+                const fname = element.fileName || '文件';
+                const furl = element.fileUrl || '#';
+                const fsize = element.fileSize || '';
+                const fext = element.fileExt || 'FILE';
+
+                // 副檔名色彩對應
+                const extColors = { PDF: '#e74c3c', DOC: '#2b579a', DOCX: '#2b579a', XLS: '#217346', XLSX: '#217346', PPT: '#d24726', PPTX: '#d24726', ZIP: '#f39c12', RAR: '#f39c12', TXT: '#636e72', CSV: '#27ae60' };
+                const extColor = extColors[fext] || '#636e72';
+
+                el.innerHTML = `
+                    <div class="file-download-card" data-url="${furl.replace(/"/g, '&quot;')}" style="
+                        display:flex;align-items:center;gap:12px;padding:14px 18px;
+                        background:#fff;border:2px solid #e2e8f0;border-radius:8px;
+                        height:100%;box-sizing:border-box;cursor:pointer;transition:all 0.2s;
+                    ">
+                        <div style="
+                            min-width:48px;height:48px;border-radius:6px;background:${extColor};
+                            display:flex;align-items:center;justify-content:center;
+                            color:#fff;font-weight:800;font-size:0.7rem;letter-spacing:0.5px;
+                        ">${fext}</div>
+                        <div style="flex:1;overflow:hidden;">
+                            <div style="font-size:0.88rem;font-weight:600;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fname}</div>
+                            <div style="font-size:0.75rem;color:#94a3b8;margin-top:2px;">${fsize}</div>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size:22px;color:${extColor};">download</span>
+                    </div>
+                `;
+                // 點擊下載（簡報 / 學員模式才觸發）
+                const card = el.querySelector('.file-download-card');
+                if (card) {
+                    card.addEventListener('click', (e) => {
+                        if (el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap') || el.closest('#allSlidesContainer')) {
+                            e.stopPropagation();
+                            const a = document.createElement('a');
+                            a.href = furl;
+                            a.download = fname;
+                            a.target = '_blank';
+                            a.click();
+                        }
+                    });
+                }
+                break;
+            }
+
             case 'leaderboard': {
                 el.classList.add('leaderboard-element');
                 el.style.overflow = 'hidden';

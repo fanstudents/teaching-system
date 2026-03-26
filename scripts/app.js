@@ -279,6 +279,48 @@ class App {
             this.editor.addLink();
         });
 
+        // 新增文件下載元素
+        document.getElementById('addFileBtn')?.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt,.csv,.mp3,.mp4,.mov,.png,.jpg,.jpeg,.gif,.svg';
+            input.addEventListener('change', async () => {
+                const file = input.files?.[0];
+                if (!file) return;
+                if (file.size > 50 * 1024 * 1024) {
+                    this.showToast('檔案過大（上限 50MB）');
+                    return;
+                }
+                this.showToast('上傳中…');
+                try {
+                    const { storage } = await import('./supabase.js');
+                    const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+                    const key = `files/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 6)}.${ext}`;
+                    const result = await storage.upload('homework', key, file);
+                    if (!result.data?.url) throw new Error('上傳失敗');
+
+                    const sizeStr = file.size > 1024 * 1024
+                        ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
+                        : `${(file.size / 1024).toFixed(0)} KB`;
+
+                    this.slideManager.addElement({
+                        type: 'fileDownload',
+                        x: 100, y: 200,
+                        width: 320, height: 80,
+                        fileName: file.name,
+                        fileUrl: result.data.url,
+                        fileSize: sizeStr,
+                        fileExt: ext.toUpperCase(),
+                    });
+                    this.showToast('文件已插入');
+                } catch (e) {
+                    console.error('[File Upload]', e);
+                    this.showToast('上傳失敗：' + e.message);
+                }
+            });
+            input.click();
+        });
+
         // 新增排行榜
         document.getElementById('addLeaderboardBtn')?.addEventListener('click', () => {
             this.editor.addLeaderboard();
