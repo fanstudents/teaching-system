@@ -407,7 +407,7 @@
                 if (sessionParam) {
                     try {
                         const { data } = await db.select('project_sessions', {
-                            filter: { session_code: `eq.${sessionParam}` }, limit: 1
+                            filter: { id: `eq.${sessionParam}` }, limit: 1
                         });
                         if (data?.length) sessionData = data[0];
                     } catch (e) { /* ignore */ }
