@@ -372,14 +372,21 @@
             </div>
 
             <!-- ═══════ 問卷題目 ═══════ -->
-            <div class="setup-section">
+            <div class="setup-section" id="surveySectionWrap">
                 <div class="setup-section-header">
                     <div class="setup-section-title">
                         <span class="material-symbols-rounded">quiz</span> 課前問卷題目
                     </div>
-                    <button class="btn btn-sm btn-primary" onclick="showAddQuestion()">
-                        <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增題目
-                    </button>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#5f6368;cursor:pointer;user-select:none;">
+                            <input type="checkbox" id="showSurveyToggle" checked
+                                style="width:16px;height:16px;accent-color:#1a73e8;cursor:pointer;">
+                            顯示問卷
+                        </label>
+                        <button class="btn btn-sm btn-primary" onclick="showAddQuestion()">
+                            <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增題目
+                        </button>
+                    </div>
                 </div>
                 <ul class="manage-list" id="surveyList">
                     <li class="empty-msg">載入中…</li>
@@ -619,9 +626,32 @@
                             document.getElementById('heroImageImg').src = s.hero_image_url;
                             document.getElementById('heroImagePreview').style.display = '';
                         }
+                        // show_survey toggle
+                        const showSurvey = s.show_survey !== false; // default true
+                        const toggle = document.getElementById('showSurveyToggle');
+                        if (toggle) {
+                            toggle.checked = showSurvey;
+                            _applySurveyVisibility(showSurvey);
+                        }
                     }
                 } catch (e) { console.warn('Session info fetch failed:', e); }
             }
+
+            // ── show_survey toggle ──
+            function _applySurveyVisibility(show) {
+                const wrap = document.getElementById('surveySectionWrap');
+                if (!wrap) return;
+                const list = wrap.querySelector('#surveyList');
+                const addBtn = wrap.querySelector('.btn-primary');
+                if (list) list.style.opacity = show ? '1' : '0.4';
+                if (list) list.style.pointerEvents = show ? '' : 'none';
+                if (addBtn) addBtn.style.opacity = show ? '1' : '0.4';
+                if (addBtn) addBtn.style.pointerEvents = show ? '' : 'none';
+            }
+            document.getElementById('showSurveyToggle')?.addEventListener('change', function() {
+                _applySurveyVisibility(this.checked);
+                autoSaveSessionField();
+            });
 
             // ── Auto-save session fields (debounced) ──
             let _saveTimer = null;
@@ -637,6 +667,7 @@
                             group_link_label: document.getElementById('fieldGroupLabel').value.trim(),
                             group_link_icon_url: document.getElementById('fieldGroupIconUrl').value.trim() || null,
                             hero_image_url: document.getElementById('fieldHeroImageUrl').value.trim() || null,
+                            show_survey: document.getElementById('showSurveyToggle')?.checked !== false,
                         }, { id: `eq.${sessionId}` });
                         const indicator = document.getElementById('infoSaveStatus');
                         indicator.classList.add('show');

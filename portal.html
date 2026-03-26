@@ -701,6 +701,14 @@
         let surveySubmitted = false;
 
         async function loadSurvey() {
+            // 如果後台關閉了問卷，直接隱藏該區塊
+            if (sessionData && sessionData.show_survey === false) {
+                document.getElementById('surveySection').style.display = 'none';
+                surveyQuestions = [];
+                surveySubmitted = true; // 視為已完成，讓資源區塊可以上移
+                return;
+            }
+
             const container = document.getElementById('surveyContainer');
             try {
                 // Use same session resolution as checklist
