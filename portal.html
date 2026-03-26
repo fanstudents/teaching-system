@@ -41,6 +41,8 @@
                 <img id="loginHeroImg" alt="">
             </div>
             <div class="login-left-brand">
+                <img id="loginOrgLogo" alt="" style="display:none;max-width:120px;max-height:80px;object-fit:contain;margin-bottom:16px;border-radius:8px;">
+                <div id="loginOrgName" style="display:none;font-size:0.9rem;color:rgba(255,255,255,0.7);margin-bottom:8px;letter-spacing:0.5px;"></div>
                 <h1 id="loginCourseName">AI 職場應用工作坊</h1>
                 <p><a href="https://tbr.digital" target="_blank" style="color:inherit;text-decoration:none;">數位簡報室</a> —
                     互動式教學簡報系統</p>
@@ -331,6 +333,20 @@
                 } catch (e) { console.warn('[portal] Session fetch failed:', e); }
             }
 
+            // Load organization data (logo + name)
+            if (project.organization_id) {
+                try {
+                    const { data: orgData } = await db.select('organizations', {
+                        filter: { id: `eq.${project.organization_id}` }, limit: 1,
+                        select: 'name,logo_url'
+                    });
+                    if (orgData?.[0]) {
+                        project._orgName = orgData[0].name;
+                        project._orgLogo = orgData[0].logo_url;
+                    }
+                } catch (e) { console.warn('[portal] Org fetch failed:', e); }
+            }
+
             // Restore user session
             const saved = localStorage.getItem('student_session');
             const portalSaved = sessionStorage.getItem(`portal_user_${code}`);
@@ -351,6 +367,19 @@
         function showLogin() {
             document.getElementById('loginCourseBadge').textContent = project.name;
             document.getElementById('loginCourseName').textContent = project.name;
+
+            // Organization logo & name
+            if (project._orgLogo) {
+                const logoEl = document.getElementById('loginOrgLogo');
+                logoEl.src = project._orgLogo;
+                logoEl.style.display = '';
+            }
+            if (project._orgName) {
+                const nameEl = document.getElementById('loginOrgName');
+                nameEl.textContent = project._orgName;
+                nameEl.style.display = '';
+            }
+
             if (project._heroImageUrl) {
                 const heroImg = document.getElementById('loginHeroImg');
                 heroImg.src = project._heroImageUrl;
