@@ -1557,7 +1557,7 @@ export class SlideManager {
                             img.crossOrigin = 'anonymous';
                             img.onload = () => {
                                 const canvas = document.createElement('canvas');
-                                const MAX = 1200;
+                                const MAX = 1920;
                                 let w = img.naturalWidth, h = img.naturalHeight;
                                 if (w > MAX || h > MAX) {
                                     if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
@@ -1565,7 +1565,7 @@ export class SlideManager {
                                 }
                                 canvas.width = w; canvas.height = h;
                                 canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                                const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
                                 uploadedData = dataUrl;
                                 preview.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:120px;border-radius:8px;">`;
                                 uploadZone.style.display = 'none';
@@ -1591,9 +1591,9 @@ export class SlideManager {
                             reader.onload = (ev) => {
                                 const img = new Image();
                                 img.onload = () => {
-                                    const MAX = 1200;
+                                    const MAX = 1920;
                                     let w = img.naturalWidth, h = img.naturalHeight;
-                                    const needsResize = w > MAX || h > MAX || file.size > 2 * 1024 * 1024;
+                                    const needsResize = w > MAX || h > MAX || file.size > 5 * 1024 * 1024;
                                     if (!needsResize) {
                                         // 小檔直接用原圖
                                         uploadedData = ev.target.result;
@@ -1608,7 +1608,7 @@ export class SlideManager {
                                     const canvas = document.createElement('canvas');
                                     canvas.width = w; canvas.height = h;
                                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                                    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
                                     uploadedData = dataUrl;
                                     preview.innerHTML = `<img src="${dataUrl}" style="max-width:100%;max-height:120px;border-radius:8px;">`;
                                     uploadZone.style.display = 'none';
@@ -3501,11 +3501,12 @@ export class SlideManager {
      */
     async _compressBase64Images() {
         let count = 0;
-        const MAX_DIM = 1200;
+        const MAX_DIM = 1920;
         for (const slide of this.slides) {
             for (const el of (slide.elements || [])) {
                 if (el.type !== 'image' || !el.src?.startsWith('data:')) continue;
-                if (el.src.length < 50000) continue; // < 50KB 不處理
+                if (el._compressed) continue; // 已壓縮過就不再壓
+                if (el.src.length < 200000) continue; // < 200KB 不處理
 
                 try {
                     const img = await new Promise((resolve, reject) => {
@@ -3523,10 +3524,11 @@ export class SlideManager {
                     canvas.width = cw;
                     canvas.height = ch;
                     canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
-                    const compressed = canvas.toDataURL('image/jpeg', 0.6);
+                    const compressed = canvas.toDataURL('image/jpeg', 0.85);
                     if (compressed.length < el.src.length) {
                         console.log(`[Compress] ${(el.src.length / 1024).toFixed(0)}KB → ${(compressed.length / 1024).toFixed(0)}KB`);
                         el.src = compressed;
+                        el._compressed = true;
                         count++;
                     }
                 } catch (e) {

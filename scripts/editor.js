@@ -209,8 +209,8 @@ export class Editor {
         if (width > maxWidth) { height = (height / width) * maxWidth; width = maxWidth; }
         if (height > maxHeight) { width = (width / height) * maxHeight; height = maxHeight; }
 
-        // ── 壓縮圖片（max 1200px, JPEG 0.7）避免 base64 過大 ──
-        const MAX_DIM = 1200;
+        // ── 壓縮圖片（max 1920px, JPEG 0.92）避免 base64 過大 ──
+        const MAX_DIM = 1920;
         let cw = img.width, ch = img.height;
         if (cw > MAX_DIM || ch > MAX_DIM) {
             if (cw > ch) { ch = Math.round(ch * MAX_DIM / cw); cw = MAX_DIM; }
@@ -220,8 +220,8 @@ export class Editor {
         canvas.width = cw;
         canvas.height = ch;
         canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
-        const compressedBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.7));
-        const compressedUrl = canvas.toDataURL('image/jpeg', 0.7);
+        const compressedBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+        const compressedUrl = canvas.toDataURL('image/jpeg', 0.92);
         console.log(`[Image] original ${(file.size / 1024).toFixed(0)}KB → compressed ${(compressedBlob.size / 1024).toFixed(0)}KB (${cw}x${ch})`);
 
         // ── 嘗試上傳到 Supabase Storage ──
