@@ -2249,19 +2249,21 @@ export class SlideManager {
                 <svg class="matching-lines"></svg>
                 <div class="matching-column left-column" style="width:${iw}px;gap:${gap}px;">
                     ${(element.pairs || []).map((pair, i) => `
-                        <div class="matching-item" data-index="${i}" data-side="left" style="font-size:${fs}px;">
+                        <div class="matching-item" data-index="${i}" data-side="left" data-match-id="m${i}" style="font-size:${fs}px;">
                             ${pair.left}
                             <div class="matching-dot left"></div>
                         </div>
                     `).join('')}
                 </div>
                 <div class="matching-column right-column" style="width:${iw}px;gap:${gap}px;">
-                    ${this.shuffleArray([...(element.pairs || [])]).map((pair, i) => `
-                        <div class="matching-item" data-answer="${pair.left}" data-side="right" style="font-size:${fs}px;">
+                    ${this.shuffleArray([...(element.pairs || [])]).map((pair, i) => {
+                        const origIdx = (element.pairs || []).indexOf(pair);
+                        return `
+                        <div class="matching-item" data-answer="${pair.left}" data-side="right" data-match-id="m${origIdx}" style="font-size:${fs}px;">
                             ${pair.right}
                             <div class="matching-dot right"></div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             </div>
         `;

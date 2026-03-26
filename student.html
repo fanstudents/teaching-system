@@ -453,9 +453,19 @@
 
                 // 隱藏 reaction bar
                 const rb = document.getElementById('studentReactionBar');
-                if (rb) rb.style.display = 'none !important';
+                if (rb) rb.style.setProperty('display', 'none', 'important');
 
                 mode = 'free';
+
+                // 設定 guest homework_user，讓互動元件的 stateManager 可正常運作
+                if (!sessionStorage.getItem('homework_user')) {
+                    sessionStorage.setItem('homework_user', JSON.stringify({
+                        name: '預覽者',
+                        email: 'preview@guest',
+                        joinedAt: new Date().toISOString()
+                    }));
+                }
+
                 renderSlide(slides[0], 0, totalSlides);
                 updateNavButtons();
                 scaleSlide();
@@ -1497,7 +1507,7 @@
                             <svg class="matching-lines"></svg>
                             <div class="matching-column left-column" style="width:${mIw}px;gap:${mGap}px;">
                                 ${pairs.map((pair, i) => `
-                                    <div class="matching-item" data-index="${i}" data-side="left" style="font-size:${mFs}px;">
+                                    <div class="matching-item" data-index="${i}" data-side="left" data-match-id="m${i}" style="font-size:${mFs}px;">
                                         ${pair.left}
                                         <div class="matching-dot left"></div>
                                     </div>
@@ -1507,7 +1517,7 @@
                                 ${shuffledPairs.map((pair) => {
                         const origIdx = pairs.indexOf(pair);
                         return `
-                                        <div class="matching-item" data-answer="${pair.left}" data-side="right" style="font-size:${mFs}px;">
+                                        <div class="matching-item" data-answer="${pair.left}" data-side="right" data-match-id="m${origIdx}" style="font-size:${mFs}px;">
                                             ${pair.right}
                                             <div class="matching-dot right"></div>
                                         </div>
