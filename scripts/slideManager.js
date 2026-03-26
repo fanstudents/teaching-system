@@ -3241,8 +3241,11 @@ export class SlideManager {
      * 儲存到 DB（debounce）+ localStorage 快取
      */
     save() {
-        // ★ 先從 DOM 讀取最新狀態到 memory
-        this.saveCurrentSlide();
+        // ★ 先從 DOM 讀取最新狀態到 memory（簡報模式下跳過，避免讀到隱藏的編輯器 DOM）
+        const inPresentation = document.getElementById('presentationMode')?.classList.contains('active');
+        if (!inPresentation) {
+            this.saveCurrentSlide();
+        }
 
         // ★ 記錄 undo snapshot（undo/redo 還原時不記錄）
         if (!this._isUndoRedo) {
@@ -3632,8 +3635,11 @@ export class SlideManager {
         if (this._autoSaveInterval) clearInterval(this._autoSaveInterval);
         this._autoSaveInterval = setInterval(() => {
             if (this._dbReady && this.currentProjectId && this.slides.length > 0) {
-                // ★ 先讀取 DOM 狀態
-                this.saveCurrentSlide();
+                // ★ 簡報模式下不讀 DOM（編輯器畫布是隱藏的，讀了會覆蓋正確資料）
+                const inPresentation = document.getElementById('presentationMode')?.classList.contains('active');
+                if (!inPresentation) {
+                    this.saveCurrentSlide();
+                }
                 const data = {
                     slides: this.slides,
                     sections: this.sections,
@@ -3652,7 +3658,11 @@ export class SlideManager {
         // ★ 頁面關閉前立即存檔 + 備份
         window.addEventListener('beforeunload', () => {
             if (this.currentProjectId && this.slides.length > 0) {
-                this.saveCurrentSlide();
+                // ★ 簡報模式下不讀 DOM
+                const inPresentation = document.getElementById('presentationMode')?.classList.contains('active');
+                if (!inPresentation) {
+                    this.saveCurrentSlide();
+                }
                 const data = {
                     slides: this.slides,
                     sections: this.sections,
