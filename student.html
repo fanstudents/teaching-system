@@ -471,10 +471,19 @@
                 scaleSlide();
                 window.addEventListener('resize', scaleSlide);
 
-                // 鍵盤導航
+                // 鍵盤導航（含動畫步驟）
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'ArrowLeft') navigateSlide(-1);
-                    if (e.key === 'ArrowRight') navigateSlide(1);
+                    if (e.key === 'ArrowRight' || e.key === ' ') {
+                        e.preventDefault();
+                        // 先顯示動畫步驟，全部顯示完再切下一頁
+                        if (_maxBuildStep > 0 && _currentBuildStep < _maxBuildStep) {
+                            _currentBuildStep++;
+                            revealBuildStep(_currentBuildStep);
+                        } else {
+                            navigateSlide(1);
+                        }
+                    }
                 });
             })();
         }
@@ -736,6 +745,15 @@
                         }
                         document.getElementById('slideCounter').textContent =
                             `${currentIndex + 1} / ${total}`;
+                    }
+                });
+
+                // 監聽 build_step（講師端點擊淡入）
+                realtime.on('build_step', (msg) => {
+                    const payload = msg.payload || msg;
+                    if (payload.slideIndex === currentIndex) {
+                        revealBuildStep(payload.step);
+                        _currentBuildStep = payload.step;
                     }
                 });
 
@@ -1210,6 +1228,17 @@
             }
         }
 
+        // ── animOrder (點擊淡入) 狀態 ──
+        let _currentBuildStep = 0;
+        let _maxBuildStep = 0;
+
+        function revealBuildStep(step) {
+            slideEl.querySelectorAll(`[data-anim-order="${step}"]`).forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = el.style.transform.replace(/translateY\([^)]*\)/, '') || '';
+            });
+        }
+
         // ── Render slide ──
         function renderSlide(slide, index, total) {
             if (!slide) return;
@@ -1230,11 +1259,22 @@
                     slideEl.style.background = 'white';
                 }
 
+                // 計算動畫步驟總數
+                _maxBuildStep = Math.max(0, ...(slide.elements || []).map(e => e.animOrder || 0));
+                _currentBuildStep = 0;
+
                 // 元素
                 (slide.elements || []).forEach(element => {
                     const el = createElementNode(element);
                     if (el) {
                         el.classList.add('presentation-element');
+                        // 有 animOrder 的元素先隱藏（點擊淡入）
+                        if (element.animOrder && element.animOrder > 0) {
+                            el.style.opacity = '0';
+                            el.style.transform = (el.style.transform || '') + ' translateY(18px)';
+                            el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                            el.dataset.animOrder = element.animOrder;
+                        }
                         slideEl.appendChild(el);
                     }
                 });

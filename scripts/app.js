@@ -5125,6 +5125,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
         });
+        // 廣播給學員端
+        if (this.broadcasting && this.sessionCode) {
+            realtime.publish(`session:${this.sessionCode}`, 'build_step', {
+                step,
+                slideIndex: this.presentationIndex
+            });
+        }
         return this._currentBuildStep < this._maxBuildStep;
     }
 
@@ -5300,11 +5307,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this.redo();
             }
 
-            // Ctrl/Cmd + D 複製元素
-            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-                e.preventDefault();
-                this.duplicateElement();
-            }
+            // Ctrl/Cmd + D 複製元素 → 由 dragDrop.js 統一處理（支援多選）
 
             // Page Up / Page Down
             if (e.key === 'PageUp') {
