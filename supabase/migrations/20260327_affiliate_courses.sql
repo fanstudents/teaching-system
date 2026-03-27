@@ -18,8 +18,9 @@ CREATE POLICY "Allow public read affiliate_courses" ON public.affiliate_courses
 CREATE POLICY "Allow all affiliate_courses" ON public.affiliate_courses
     FOR ALL USING (true) WITH CHECK (true);
 
--- 2. affiliates 表新增 platforms 欄位
+-- 2. affiliates 表新增欄位
 ALTER TABLE public.affiliates ADD COLUMN IF NOT EXISTS platforms text[];
+ALTER TABLE public.affiliates ADD COLUMN IF NOT EXISTS selected_courses text[];
 
 -- 3. 插入初始課程資料
 INSERT INTO public.affiliate_courses (name, url, platform, icon, sort_order) VALUES
