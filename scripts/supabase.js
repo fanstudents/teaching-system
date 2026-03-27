@@ -235,6 +235,38 @@ export const auth = (() => {
             _user = null;
         },
 
+        /** Sign in with Google OAuth — redirects to Google consent */
+        signInWithGoogle(redirectTo) {
+            const redirect = redirectTo || location.href;
+            const url = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirect)}`;
+            location.href = url;
+        },
+
+        /** Handle OAuth callback — extracts tokens from URL hash after redirect */
+        async handleOAuthCallback() {
+            const hash = location.hash.substring(1);
+            if (!hash) return null;
+            const params = new URLSearchParams(hash);
+            const accessToken = params.get('access_token');
+            const refreshToken = params.get('refresh_token');
+            if (!accessToken) return null;
+            _save(accessToken, refreshToken);
+            // Fetch user info
+            const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            if (res.ok) {
+                _user = await res.json();
+                // Clean up URL hash
+                history.replaceState(null, '', location.pathname + location.search);
+                return { user: _user, accessToken };
+            }
+            return null;
+        },
+
         get user() { return _user; },
         get accessToken() { return _accessToken; }
     };

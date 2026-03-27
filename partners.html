@@ -34,6 +34,9 @@
                 <button class="main-tab" data-tab="instructors">
                     <span class="material-symbols-outlined">school</span> 講師
                 </button>
+                <button class="main-tab" data-tab="courses">
+                    <span class="material-symbols-outlined">menu_book</span> 推廣課程
+                </button>
             </div>
 
             <!-- Tab: 聯盟行銷 -->
@@ -124,6 +127,44 @@
                         <tbody id="instrBody">
                             <tr>
                                 <td colspan="6" style="text-align:center;color:#999;padding:40px;">
+                                    <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: 推廣課程 -->
+            <div class="tab-panel" id="tab-courses">
+                <div class="filter-bar">
+                    <input type="text" id="courseSearch" placeholder="搜尋課程名稱…">
+                    <select id="coursePlatformFilter">
+                        <option value="">全部平台</option>
+                        <option value="tbr">數位簡報室</option>
+                        <option value="hahow">Hahow</option>
+                    </select>
+                    <button class="btn btn-dark" id="btnAddCourse">
+                        <span class="material-symbols-outlined">add</span> 新增課程
+                    </button>
+                    <button class="btn btn-dark" id="btnRefreshCourses">
+                        <span class="material-symbols-outlined">refresh</span> 重新整理
+                    </button>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="courseTable">
+                        <thead>
+                            <tr>
+                                <th>排序</th>
+                                <th>課程名稱</th>
+                                <th>平台</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courseBody">
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:#999;padding:40px;">
                                     <span class="material-symbols-outlined">hourglass_empty</span> 載入中
                                 </td>
                             </tr>
@@ -248,6 +289,60 @@
         </div>
     </div>
 
+    <!-- Course Modal -->
+    <div class="modal-overlay" id="courseOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="courseModalTitle">新增推廣課程</h3>
+                <button class="modal-close" onclick="closeModal('courseOverlay')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="courseEditId">
+                <div class="form-group">
+                    <label>課程名稱 <span style="color:#c5221f">*</span></label>
+                    <input type="text" id="courseName" placeholder="例：AI 職場全方位應用">
+                </div>
+                <div class="form-group">
+                    <label>課程連結 <span style="color:#c5221f">*</span></label>
+                    <input type="url" id="courseUrl" placeholder="https://tbr.digital/courses/...">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>平台</label>
+                        <select id="coursePlatform">
+                            <option value="tbr">數位簡報室</option>
+                            <option value="hahow">Hahow</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>排序（數字越小越前）</label>
+                        <input type="number" id="courseSortOrder" value="0">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>圖示（Material Icon 名稱）</label>
+                        <input type="text" id="courseIcon" placeholder="例：smart_toy" value="school">
+                    </div>
+                    <div class="form-group">
+                        <label>狀態</label>
+                        <select id="courseIsActive">
+                            <option value="true">啟用</option>
+                            <option value="false">停用</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger hidden" id="courseDelete">刪除</button>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('courseOverlay')">取消</button>
+                    <button class="btn btn-dark" id="courseSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Import Modal -->
     <div class="modal-overlay" id="importOverlay">
         <div class="modal">
@@ -285,6 +380,7 @@
 
         let affiliates = [];
         let instructors = [];
+        let affCourses = [];
         let instrCourseIds = []; // temp state for course id tags
 
         // ── Toast ──
@@ -691,7 +787,7 @@
         // Hash-based tab switching
         function switchToHash() {
             const hash = location.hash.replace('#', '');
-            if (hash === 'affiliates' || hash === 'instructors') {
+            if (hash === 'affiliates' || hash === 'instructors' || hash === 'courses') {
                 document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 document.querySelector(`.main-tab[data-tab="${hash}"]`)?.classList.add('active');
@@ -709,8 +805,127 @@
             navigator.clipboard.writeText(fullUrl).then(() => showToast('連結已複製'));
         });
 
+        // ── Affiliate Courses CRUD ──
+        async function loadCourses() {
+            const { data } = await db.select('affiliate_courses', { order: 'sort_order.asc' });
+            affCourses = data || [];
+            renderCourses();
+        }
+
+        function renderCourses() {
+            const search = document.getElementById('courseSearch').value.toLowerCase();
+            const platformFilter = document.getElementById('coursePlatformFilter').value;
+
+            let filtered = affCourses;
+            if (search) {
+                filtered = filtered.filter(c => (c.name || '').toLowerCase().includes(search));
+            }
+            if (platformFilter) {
+                filtered = filtered.filter(c => c.platform === platformFilter);
+            }
+
+            const platformLabel = { tbr: '數位簡報室', hahow: 'Hahow' };
+            const tbody = document.getElementById('courseBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px;">尚無課程</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => `
+                <tr>
+                    <td style="font-size:0.78rem;color:#999;">${c.sort_order}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span class="material-symbols-outlined" style="font-size:16px;color:#999;">${c.icon || 'school'}</span>
+                            <strong>${c.name}</strong>
+                        </div>
+                        <div style="font-size:0.72rem;color:#999;margin-top:2px;">${c.url}</div>
+                    </td>
+                    <td><span class="card-code" style="font-size:0.72rem;">${platformLabel[c.platform] || c.platform}</span></td>
+                    <td><span class="status-badge ${c.is_active ? 'paid' : ''}">${c.is_active ? '啟用' : '停用'}</span></td>
+                    <td>
+                        <button class="btn btn-sm" onclick="openCourseEdit('${c.id}')" title="編輯">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.openCourseEdit = function(id) {
+            const c = affCourses.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('courseModalTitle').textContent = '編輯課程';
+            document.getElementById('courseEditId').value = id;
+            document.getElementById('courseName').value = c.name || '';
+            document.getElementById('courseUrl').value = c.url || '';
+            document.getElementById('coursePlatform').value = c.platform || 'tbr';
+            document.getElementById('courseSortOrder').value = c.sort_order || 0;
+            document.getElementById('courseIcon').value = c.icon || 'school';
+            document.getElementById('courseIsActive').value = String(c.is_active !== false);
+            document.getElementById('courseDelete').classList.remove('hidden');
+            document.getElementById('courseOverlay').classList.add('active');
+        };
+
+        document.getElementById('btnAddCourse').addEventListener('click', () => {
+            document.getElementById('courseModalTitle').textContent = '新增推廣課程';
+            document.getElementById('courseEditId').value = '';
+            document.getElementById('courseName').value = '';
+            document.getElementById('courseUrl').value = '';
+            document.getElementById('coursePlatform').value = 'tbr';
+            document.getElementById('courseSortOrder').value = affCourses.length + 1;
+            document.getElementById('courseIcon').value = 'school';
+            document.getElementById('courseIsActive').value = 'true';
+            document.getElementById('courseDelete').classList.add('hidden');
+            document.getElementById('courseOverlay').classList.add('active');
+        });
+
+        document.getElementById('courseSave').addEventListener('click', async () => {
+            const editId = document.getElementById('courseEditId').value;
+            const name = document.getElementById('courseName').value.trim();
+            const url = document.getElementById('courseUrl').value.trim();
+            if (!name || !url) { showToast('請填寫課程名稱和連結'); return; }
+
+            const data = {
+                name, url,
+                platform: document.getElementById('coursePlatform').value,
+                sort_order: parseInt(document.getElementById('courseSortOrder').value) || 0,
+                icon: document.getElementById('courseIcon').value.trim() || 'school',
+                is_active: document.getElementById('courseIsActive').value === 'true'
+            };
+
+            try {
+                if (editId) {
+                    await db.update('affiliate_courses', data, { id: `eq.${editId}` });
+                    showToast('已更新');
+                } else {
+                    await db.insert('affiliate_courses', data);
+                    showToast('課程已新增');
+                }
+                await loadCourses();
+                closeModal('courseOverlay');
+            } catch (e) { showToast('儲存失敗：' + e.message); }
+        });
+
+        document.getElementById('courseDelete').addEventListener('click', async () => {
+            const id = document.getElementById('courseEditId').value;
+            if (!confirm('確定刪除此課程？')) return;
+            try {
+                await db.delete('affiliate_courses', { id: `eq.${id}` });
+                affCourses = affCourses.filter(x => x.id !== id);
+                renderCourses();
+                closeModal('courseOverlay');
+                showToast('已刪除');
+            } catch (e) { showToast('刪除失敗'); }
+        });
+
+        document.getElementById('courseSearch').addEventListener('input', () => renderCourses());
+        document.getElementById('coursePlatformFilter').addEventListener('change', () => renderCourses());
+        document.getElementById('btnRefreshCourses').addEventListener('click', () => loadCourses());
+
         loadAffiliates();
         loadInstructors();
+        loadCourses();
     </script>
 </body>
 

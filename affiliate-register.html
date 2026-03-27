@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聯盟行銷夥伴申請 — 數位簡報室</title>
-    <meta name="description" content="申請成為數位簡報室聯盟行銷夥伴，推廣課程獲得專屬佣金">
+    <meta name="description" content="申請成為數位簡報室聯盟行銷夥伴，推廣全站課程獲得 20% 分潤佣金">
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -22,106 +22,153 @@
 
         body {
             font-family: 'Noto Sans TC', -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1f1f1f 50%, #0f172a 100%);
+            background: #f8f9fa;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 24px;
-            color: #dadce0;
+            padding: 40px 24px 60px;
+            color: #1a1a2e;
         }
 
         .form-container {
             width: 100%;
-            max-width: 540px;
+            max-width: 600px;
         }
 
         /* ── Header ── */
         .form-header {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
 
         .form-header-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
             background: linear-gradient(135deg, #1a73e8, #4285f4);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(26, 115, 232, 0.25);
         }
 
         .form-header-icon .material-symbols-outlined {
-            font-size: 28px;
+            font-size: 30px;
             color: #fff;
         }
 
         .form-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            color: #1a1a2e;
         }
 
         .form-header p {
-            font-size: 0.85rem;
-            color: #80868b;
-            line-height: 1.6;
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.7;
         }
 
         .brand-name {
-            color: #8ab4f8;
+            color: #1a73e8;
             font-weight: 600;
+        }
+
+        /* ── Highlight Rules ── */
+        .rules-banner {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .rule-item {
+            background: #fff;
+            border: 1px solid #e8ecf1;
+            border-radius: 14px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .rule-item:hover {
+            border-color: #1a73e8;
+            box-shadow: 0 2px 12px rgba(26, 115, 232, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .rule-item .material-symbols-outlined {
+            font-size: 28px;
+            color: #1a73e8;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .rule-item .rule-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .rule-item .rule-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            line-height: 1.5;
         }
 
         /* ── Card ── */
         .form-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #fff;
+            border: 1px solid #e8ecf1;
             border-radius: 16px;
-            padding: 28px;
+            padding: 32px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
 
         .form-section-title {
             font-size: 0.72rem;
             font-weight: 600;
-            color: #80868b;
+            color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             margin-bottom: 14px;
             padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid #f1f5f9;
         }
 
         /* ── Form Fields ── */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            font-size: 0.82rem;
+            font-size: 0.84rem;
             font-weight: 500;
             margin-bottom: 6px;
-            color: #cbd5e1;
+            color: #334155;
         }
 
         .form-group label .required {
-            color: #f87171;
+            color: #ef4444;
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 8px;
+            padding: 11px 14px;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
             font-size: 0.88rem;
             font-family: inherit;
-            color: #dadce0;
+            color: #1a1a2e;
             outline: none;
             transition: border-color 0.15s, box-shadow 0.15s;
         }
@@ -133,18 +180,19 @@
 
         .form-group input::placeholder,
         .form-group textarea::placeholder {
-            color: #444746;
+            color: #94a3b8;
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             border-color: #1a73e8;
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+            background: #fff;
         }
 
         .field-hint {
             font-size: 0.75rem;
-            color: #444746;
+            color: #94a3b8;
             margin-top: 6px;
             line-height: 1.5;
         }
@@ -159,64 +207,68 @@
             margin: 24px 0;
         }
 
-        /* ── Social media checkboxes ── */
-        .channel-grid {
+        /* ── Chip checkboxes (shared) ── */
+        .chip-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
         }
 
-        .channel-chip {
+        .chip {
             display: flex;
             align-items: center;
             gap: 5px;
-            padding: 7px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: #80868b;
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 0.82rem;
+            color: #64748b;
             cursor: pointer;
             transition: all 0.15s;
             user-select: none;
+            background: #fff;
         }
 
-        .channel-chip input[type="checkbox"] {
+        .chip input[type="checkbox"] {
             display: none;
         }
 
-        .channel-chip:has(input:checked) {
-            background: rgba(26, 115, 232, 0.2);
+        .chip:has(input:checked) {
+            background: rgba(26, 115, 232, 0.08);
             border-color: #1a73e8;
-            color: #8ab4f8;
+            color: #1a73e8;
+            font-weight: 500;
         }
 
-        .channel-chip:hover {
-            border-color: rgba(255, 255, 255, 0.25);
-            color: #cbd5e1;
+        .chip:hover {
+            border-color: #94a3b8;
+            color: #334155;
         }
 
         /* ── Submit Button ── */
         .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             background: linear-gradient(135deg, #1a73e8, #4285f4);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 0.92rem;
+            font-size: 0.94rem;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
+            transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            margin-top: 24px;
+            margin-top: 28px;
+            box-shadow: 0 4px 14px rgba(26, 115, 232, 0.25);
         }
 
         .btn-submit:hover {
-            opacity: 0.9;
+            opacity: 0.92;
+            box-shadow: 0 6px 20px rgba(26, 115, 232, 0.3);
         }
 
         .btn-submit:active {
@@ -234,13 +286,13 @@
 
         /* ── Success state ── */
         .success-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #fff;
+            border: 1px solid #e8ecf1;
             border-radius: 16px;
             padding: 48px 28px;
             text-align: center;
             display: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
 
         .success-card.show {
@@ -251,11 +303,12 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1e8e3e, #1e8e3e);
+            background: linear-gradient(135deg, #10b981, #34d399);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
         }
 
         .success-icon .material-symbols-outlined {
@@ -266,27 +319,29 @@
         .success-card h2 {
             font-size: 1.3rem;
             margin-bottom: 8px;
+            color: #1a1a2e;
         }
 
         .success-card p {
-            color: #80868b;
+            color: #64748b;
             font-size: 0.85rem;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
         /* ── Cooperation Notes ── */
         .notes-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #fff;
+            border: 1px solid #e8ecf1;
             border-radius: 16px;
             padding: 28px;
             margin-top: 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
 
         .notes-title {
-            font-size: 0.82rem;
+            font-size: 0.84rem;
             font-weight: 600;
-            color: #80868b;
+            color: #334155;
             margin-bottom: 18px;
             display: flex;
             align-items: center;
@@ -294,7 +349,7 @@
         }
 
         .notes-title .material-symbols-outlined {
-            font-size: 18px;
+            font-size: 20px;
             color: #1a73e8;
         }
 
@@ -306,11 +361,11 @@
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 0.82rem;
-            color: #cbd5e1;
-            line-height: 1.6;
+            padding: 11px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.84rem;
+            color: #475569;
+            line-height: 1.7;
         }
 
         .notes-list li:last-child {
@@ -318,14 +373,14 @@
         }
 
         .notes-list .note-icon {
-            font-size: 16px;
+            font-size: 18px;
             color: #1a73e8;
             flex-shrink: 0;
             margin-top: 2px;
         }
 
         .notes-list a {
-            color: #8ab4f8;
+            color: #1a73e8;
             text-decoration: none;
         }
 
@@ -333,57 +388,119 @@
             text-decoration: underline;
         }
 
-        /* ── Promote section ── */
-        .promote-section {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        /* ── Courses Section ── */
+        .courses-card {
+            background: #fff;
+            border: 1px solid #e8ecf1;
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
 
-        .promote-title {
-            font-size: 0.75rem;
+        .courses-section-title {
+            font-size: 0.88rem;
             font-weight: 600;
-            color: #444746;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-
-        .promote-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .promote-link {
+            color: #334155;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
-            text-decoration: none;
-            color: #cbd5e1;
-            font-size: 0.82rem;
-            transition: all 0.15s;
         }
 
-        .promote-link:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
-
-        .promote-link .material-symbols-outlined {
-            font-size: 18px;
+        .courses-section-title .material-symbols-outlined {
+            font-size: 20px;
             color: #1a73e8;
         }
 
-        .promote-link-url {
-            font-family: 'Menlo', 'Consolas', monospace;
+        .courses-section-subtitle {
             font-size: 0.75rem;
-            color: #444746;
+            color: #94a3b8;
+            margin-bottom: 14px;
+        }
+
+        .courses-category {
+            margin-bottom: 20px;
+        }
+
+        .courses-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .courses-category-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .courses-category-label .cat-badge {
+            font-size: 0.65rem;
+            background: rgba(26, 115, 232, 0.08);
+            color: #1a73e8;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .course-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #334155;
+            font-size: 0.84rem;
+            transition: all 0.15s;
+        }
+
+        .course-item:hover {
+            background: rgba(26, 115, 232, 0.04);
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .course-item .material-symbols-outlined {
+            font-size: 16px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .course-item:hover .material-symbols-outlined {
+            color: #1a73e8;
+        }
+
+        .course-item .course-arrow {
             margin-left: auto;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .course-item:hover .course-arrow {
+            color: #1a73e8;
+        }
+
+        .courses-loading {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
+            font-size: 0.82rem;
         }
 
         /* ── Toast ── */
@@ -392,14 +509,14 @@
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(80px);
-            background: #1f1f1f;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #dadce0;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 0.82rem;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 0.84rem;
             transition: transform 0.3s ease;
             z-index: 999;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
         .toast.show {
@@ -407,13 +524,40 @@
         }
 
         @media (max-width: 520px) {
+            body {
+                padding: 24px 16px 40px;
+            }
+
+            .rules-banner {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .rule-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 14px 18px;
+                text-align: left;
+            }
+
+            .rule-item .material-symbols-outlined {
+                margin-bottom: 0;
+                font-size: 24px;
+            }
+
+            .rule-item .rule-value {
+                font-size: 1rem;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
 
             .form-card,
-            .notes-card {
-                padding: 20px;
+            .notes-card,
+            .courses-card {
+                padding: 22px;
             }
         }
     </style>
@@ -427,6 +571,25 @@
             </div>
             <h1>聯盟行銷夥伴申請</h1>
             <p>申請成為<span class="brand-name">數位簡報室</span>聯盟行銷夥伴，<br>推廣課程獲得專屬折扣碼與佣金方案。</p>
+        </div>
+
+        <!-- Rules Highlight -->
+        <div class="rules-banner">
+            <div class="rule-item">
+                <span class="material-symbols-outlined">percent</span>
+                <span class="rule-value">20%</span>
+                <span class="rule-label">銷售分潤比例</span>
+            </div>
+            <div class="rule-item">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span class="rule-value">每月 10 日</span>
+                <span class="rule-label">核對上月銷售金額</span>
+            </div>
+            <div class="rule-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="rule-value">全站課程</span>
+                <span class="rule-label">皆可推廣</span>
+            </div>
         </div>
 
         <form class="form-card" id="affiliateForm">
@@ -443,31 +606,45 @@
                 <div class="field-hint">審核通過後將以此 Email 寄送確認信與後台登入連結。</div>
             </div>
 
+            <div class="form-divider form-section-title">申請平台</div>
+
+            <div class="form-group">
+                <label>想推廣的平台（可複選） <span class="required">*</span></label>
+                <div class="chip-grid" id="platformGrid">
+                    <label class="chip">
+                        <input type="checkbox" name="platform" value="數位簡報室"> 數位簡報室
+                    </label>
+                    <label class="chip">
+                        <input type="checkbox" name="platform" value="Hahow"> Hahow
+                    </label>
+                </div>
+            </div>
+
             <div class="form-divider form-section-title">推廣管道</div>
 
             <div class="form-group">
                 <label>您的自媒體管道（可複選） <span class="required">*</span></label>
-                <div class="channel-grid">
-                    <label class="channel-chip">
-                        <input type="checkbox" value="Instagram"> Instagram
+                <div class="chip-grid">
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="Instagram"> Instagram
                     </label>
-                    <label class="channel-chip">
-                        <input type="checkbox" value="Facebook"> Facebook
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="Facebook"> Facebook
                     </label>
-                    <label class="channel-chip">
-                        <input type="checkbox" value="Blog"> Blog
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="Blog"> Blog
                     </label>
-                    <label class="channel-chip">
-                        <input type="checkbox" value="Threads"> Threads
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="Threads"> Threads
                     </label>
-                    <label class="channel-chip">
-                        <input type="checkbox" value="YouTube"> YouTube
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="YouTube"> YouTube
                     </label>
-                    <label class="channel-chip">
-                        <input type="checkbox" value="電子報"> 電子報
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="電子報"> 電子報
                     </label>
-                    <label class="channel-chip">
-                        <input type="checkbox" value="其他"> 其他
+                    <label class="chip">
+                        <input type="checkbox" name="channel" value="其他"> 其他
                     </label>
                 </div>
             </div>
@@ -506,6 +683,18 @@
             </div>
             <ul class="notes-list">
                 <li>
+                    <span class="material-symbols-outlined note-icon">percent</span>
+                    <span>推廣佣金為銷售金額的 <strong>20%</strong>，適用全站所有課程。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">calendar_month</span>
+                    <span>每月 <strong>10 日</strong>核對上個月銷售金額，每月 <strong>25 日</strong>撥款至您提供的帳戶。</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined note-icon">storefront</span>
+                    <span>可推廣<strong>全站課程</strong>，包含數位簡報室官網與 Hahow 合作課程。</span>
+                </li>
+                <li>
                     <span class="material-symbols-outlined note-icon">schedule</span>
                     <span>申請通過時間約 <strong>1–3 個工作天</strong>，審核結果將以 Email 通知。</span>
                 </li>
@@ -514,12 +703,8 @@
                     <span>透過您的專屬折扣碼購買時，您會<strong>立即收到訂單通知</strong> Email。</span>
                 </li>
                 <li>
-                    <span class="material-symbols-outlined note-icon">calendar_month</span>
-                    <span>每月 <strong>10 日</strong>統計上個月訂單，每月 <strong>25 日</strong>撥款至您提供的帳戶。</span>
-                </li>
-                <li>
                     <span class="material-symbols-outlined note-icon">dashboard</span>
-                    <span>審核通過後，您將從確認信中取得<strong>專用後台</strong>登入連結，可即時查看推廣成效、佣金明細與折扣碼資訊。</span>
+                    <span>審核通過後，您將取得<strong>專用後台</strong>登入連結，可即時查看推廣成效、佣金明細與折扣碼資訊。</span>
                 </li>
                 <li>
                     <span class="material-symbols-outlined note-icon">account_balance</span>
@@ -527,24 +712,21 @@
                 </li>
                 <li>
                     <span class="material-symbols-outlined note-icon">support_agent</span>
-                    <span>如有任何疑問，請聯繫官方 LINE 客服或來信 <strong>service@tbr.digital</strong></span>
+                    <span>如有任何疑問，請聯繫 <a href="https://lin.ee/77HaRyW" target="_blank"><strong>LINE 官方客服</strong></a> 或來信 <strong>service@tbr.digital</strong></span>
                 </li>
             </ul>
+        </div>
 
-            <!-- Promote targets -->
-            <div class="promote-section">
-                <div class="promote-title">可推廣的課程平台</div>
-                <div class="promote-links">
-                    <a class="promote-link" href="https://tbr.digital" target="_blank">
-                        <span class="material-symbols-outlined">language</span>
-                        數位簡報室
-                        <span class="promote-link-url">tbr.digital</span>
-                    </a>
-                    <a class="promote-link" href="https://hahow.in/" target="_blank">
-                        <span class="material-symbols-outlined">school</span>
-                        Hahow 好學校（合作課程）
-                        <span class="promote-link-url">hahow.in</span>
-                    </a>
+        <!-- Courses Catalog (loaded from DB) -->
+        <div class="courses-card">
+            <div class="courses-section-title">
+                <span class="material-symbols-outlined">school</span>
+                可推廣的課程總覽
+            </div>
+            <div class="courses-section-subtitle">以下為目前可推廣的全站課程，點擊可前往課程頁面</div>
+            <div id="coursesContainer">
+                <div class="courses-loading">
+                    <span class="material-symbols-outlined">hourglass_empty</span> 載入課程中…
                 </div>
             </div>
         </div>
@@ -562,6 +744,74 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         }
 
+        // ── Load courses from DB ──
+        async function loadCourses() {
+            const container = document.getElementById('coursesContainer');
+            try {
+                const { data: courses, error } = await db.select('affiliate_courses', {
+                    filter: { is_active: 'eq.true' },
+                    order: 'sort_order.asc'
+                });
+
+                if (error || !courses || courses.length === 0) {
+                    container.innerHTML = '<div class="courses-loading">暫無課程資料</div>';
+                    return;
+                }
+
+                // Group by platform
+                const tbrCourses = courses.filter(c => c.platform === 'tbr');
+                const hahowCourses = courses.filter(c => c.platform === 'hahow');
+
+                let html = '';
+
+                if (tbrCourses.length > 0) {
+                    html += `
+                        <div class="courses-category">
+                            <div class="courses-category-label">
+                                數位簡報室課程
+                                <span class="cat-badge">tbr.digital</span>
+                            </div>
+                            <div class="course-list">
+                                ${tbrCourses.map(c => `
+                                    <a class="course-item" href="${c.url}" target="_blank">
+                                        <span class="material-symbols-outlined">${c.icon || 'school'}</span>
+                                        ${c.name}
+                                        <span class="material-symbols-outlined course-arrow">arrow_forward</span>
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                }
+
+                if (hahowCourses.length > 0) {
+                    html += `
+                        <div class="courses-category">
+                            <div class="courses-category-label">
+                                Hahow 好學校 — 合作課程
+                                <span class="cat-badge">hahow.in</span>
+                            </div>
+                            <div class="course-list">
+                                ${hahowCourses.map(c => `
+                                    <a class="course-item" href="${c.url}" target="_blank">
+                                        <span class="material-symbols-outlined">${c.icon || 'school'}</span>
+                                        ${c.name}
+                                        <span class="material-symbols-outlined course-arrow">arrow_forward</span>
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>`;
+                }
+
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = '<div class="courses-loading">載入課程失敗</div>';
+                console.error('Load courses error:', e);
+            }
+        }
+
+        loadCourses();
+
+        // ── Form submit ──
         document.getElementById('affiliateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -573,12 +823,23 @@
             const coupon_code = document.getElementById('affCoupon').value.trim().toUpperCase();
             const channel_detail = document.getElementById('affChannelDetail').value.trim();
 
+            // Collect selected platforms
+            const platforms = [...document.querySelectorAll('input[name="platform"]:checked')]
+                .map(cb => cb.value);
+
             // Collect selected channels
-            const channels = [...document.querySelectorAll('.channel-chip input:checked')]
+            const channels = [...document.querySelectorAll('input[name="channel"]:checked')]
                 .map(cb => cb.value);
 
             if (!name || !email || !coupon_code) {
                 showToast('請填寫所有必填欄位');
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請';
+                return;
+            }
+
+            if (platforms.length === 0) {
+                showToast('請至少選擇一個推廣平台');
                 btn.disabled = false;
                 btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請';
                 return;
@@ -594,6 +855,7 @@
             try {
                 const { error } = await db.insert('affiliates', {
                     name, email, coupon_code,
+                    platforms,
                     channels: channels.join(', '),
                     channel_detail,
                     status: 'pending'
