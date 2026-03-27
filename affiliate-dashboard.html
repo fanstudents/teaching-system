@@ -454,6 +454,10 @@
             text-decoration: none;
         }
 
+        /* When form is centered (register / pending) */
+        .login-screen.centered .login-brand-panel { display: none; }
+        .login-screen.centered .login-form-panel { width: 100%; min-width: unset; }
+
         @media (max-width: 1024px) {
             .login-brand-panel { display: none; }
             .login-form-panel { width: 100%; min-width: unset; }
@@ -872,6 +876,7 @@
 
         function showRegisterForm(user) {
             showLogin();
+            document.getElementById('loginScreen').classList.add('centered');
             document.getElementById('phaseLogin').style.display = 'none';
             document.getElementById('phaseRegister').classList.add('show');
             document.getElementById('regName').value = user.user_metadata?.full_name || user.user_metadata?.name || '';
@@ -880,6 +885,7 @@
 
         function showPending() {
             showLogin();
+            document.getElementById('loginScreen').classList.add('centered');
             document.getElementById('phaseLogin').style.display = 'none';
             document.getElementById('phasePending').style.display = 'block';
         }
