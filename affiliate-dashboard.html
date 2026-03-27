@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>夥伴後台 — 數位簡報室</title>
+    <title>聯盟行銷夥伴 — 數位簡報室</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap"
@@ -17,53 +17,234 @@
         .login-screen {
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            background: #0c111b;
+        }
+
+        .login-brand-panel {
+            flex: 1;
+            background: linear-gradient(160deg, #0a0a1a 0%, #0f1029 40%, #161638 100%);
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            background: #f8f9fa;
-            padding: 24px;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 48px 40px;
-            max-width: 420px;
+        .login-brand-panel::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(26, 115, 232, 0.12) 0%, transparent 70%);
+            top: -100px;
+            left: -150px;
+            pointer-events: none;
+        }
+
+        .login-brand-panel::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
+            bottom: -100px;
+            right: -80px;
+            pointer-events: none;
+        }
+
+        .login-brand-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .login-brand-content {
+            position: relative;
+            z-index: 2;
+            max-width: 480px;
+        }
+
+        .login-brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(66, 133, 244, 0.1);
+            border: 1px solid rgba(66, 133, 244, 0.2);
+            border-radius: 24px;
+            font-size: 0.75rem;
+            color: #8ab4f8;
+            margin-bottom: 24px;
+        }
+
+        .login-brand-badge .material-symbols-outlined { font-size: 14px; }
+
+        .login-brand-content h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #d2e3fc 0%, #a8c7fa 30%, #8ab4f8 60%, #4285f4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+
+        .login-brand-content > p {
+            font-size: 0.95rem;
+            color: rgba(165, 180, 252, 0.45);
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .login-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 48px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-stat-item {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+        }
+
+        .login-stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+        }
+
+        .login-stat-item:nth-child(1) .login-stat-value { color: #4285f4; }
+        .login-stat-item:nth-child(2) .login-stat-value { color: #34d399; }
+        .login-stat-item:nth-child(3) .login-stat-value { color: #fbbf24; }
+
+        .login-stat-label {
+            font-size: 0.75rem;
+            color: rgba(165, 180, 252, 0.35);
+        }
+
+        .login-features {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 36px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: rgba(165, 180, 252, 0.4);
+        }
+
+        .login-feature .material-symbols-outlined {
+            font-size: 20px;
+            color: rgba(66, 133, 244, 0.5);
+        }
+
+        /* Right Form Panel */
+        .login-form-panel {
+            width: 480px;
+            min-width: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .login-form-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1a73e8, #34d399);
+        }
+
+        .login-form-wrapper {
             width: 100%;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e8ecf1;
+            max-width: 340px;
+            animation: fadeSlideUp 0.5s ease-out;
         }
 
-        .login-card-icon {
-            width: 72px;
-            height: 72px;
-            border-radius: 18px;
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-form-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .login-form-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
             background: linear-gradient(135deg, #1a73e8, #4285f4);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 16px rgba(26, 115, 232, 0.25);
         }
 
-        .login-card-icon .material-symbols-outlined {
-            font-size: 34px;
+        .login-form-icon .material-symbols-outlined {
+            font-size: 28px;
             color: #fff;
         }
 
-        .login-card h1 {
-            font-size: 1.5rem;
+        .login-form-header h2 {
+            font-size: 1.4rem;
             font-weight: 700;
-            color: #1a1a2e;
+            color: #0f172a;
             margin-bottom: 8px;
         }
 
-        .login-card p {
-            font-size: 0.88rem;
-            color: #64748b;
-            line-height: 1.7;
-            margin-bottom: 32px;
+        .login-form-header p {
+            font-size: 0.85rem;
+            color: #80868b;
+            line-height: 1.6;
         }
+
+        .login-error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 24px;
+            font-size: 0.84rem;
+            color: #dc2626;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .login-error-msg.show { display: flex; }
+        .login-error-msg .material-symbols-outlined { font-size: 20px; flex-shrink: 0; }
 
         .btn-google {
             width: 100%;
@@ -86,11 +267,7 @@
         .btn-google:hover {
             background: #f8f9fa;
             border-color: #1a73e8;
-            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.1);
-        }
-
-        .btn-google:active {
-            transform: scale(0.99);
+            box-shadow: 0 2px 12px rgba(26, 115, 232, 0.1);
         }
 
         .btn-google svg {
@@ -98,78 +275,192 @@
             height: 20px;
         }
 
-        .login-card .login-note {
-            margin-top: 24px;
-            font-size: 0.78rem;
-            color: #94a3b8;
-            line-height: 1.6;
+        .login-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
-        .login-card .login-note a {
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .login-footer-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #b0b8c4;
+            line-height: 1.7;
+        }
+
+        .login-footer-note a {
             color: #1a73e8;
             text-decoration: none;
         }
 
-        .login-card .login-note a:hover {
-            text-decoration: underline;
+        /* ── Register Form (inside login panel) ── */
+        .register-form { display: none; }
+        .register-form.show { display: block; }
+
+        .register-form .form-group {
+            margin-bottom: 16px;
         }
 
-        /* Error state */
-        .login-error-msg {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
+        .register-form .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .register-form .form-group label .req { color: #ef4444; }
+
+        .register-form .form-group input,
+        .register-form .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 24px;
-            font-size: 0.84rem;
-            color: #dc2626;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            text-align: left;
-            line-height: 1.6;
+            background: #f8f9fa;
+            font-size: 0.86rem;
+            font-family: inherit;
+            color: #1a1a2e;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
-        .login-error-msg.show {
+        .register-form .form-group input:focus,
+        .register-form .form-group textarea:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.08);
+            background: #fff;
+        }
+
+        .register-form textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .chip-grid {
             display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
-        .login-error-msg .material-symbols-outlined {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        /* ── Logout button ── */
-        .btn-logout {
-            background: none;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, 0.7);
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             padding: 6px 14px;
-            font-size: 0.78rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            background: #fff;
+        }
+
+        .chip input[type="checkbox"] { display: none; }
+
+        .chip:has(input:checked) {
+            background: rgba(26, 115, 232, 0.08);
+            border-color: #1a73e8;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+
+        .btn-submit-register {
+            width: 100%;
+            padding: 12px;
+            background: #1a73e8;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 600;
             font-family: inherit;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
-            transition: all 0.15s;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 20px;
+            transition: opacity 0.2s;
         }
 
-        .btn-logout:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #fff;
+        .btn-submit-register:hover { opacity: 0.9; }
+        .btn-submit-register:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-submit-register .material-symbols-outlined { font-size: 18px; }
+
+        .field-hint {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 4px;
         }
 
-        .btn-logout .material-symbols-outlined {
-            font-size: 16px;
-        }
-
-        /* Token fallback note */
-        .token-link-note {
+        /* ── Pending Screen ── */
+        .pending-card {
+            background: #fff;
+            border: 1px solid #e8ecf1;
+            border-radius: 16px;
+            padding: 48px 36px;
             text-align: center;
-            margin-top: 16px;
-            font-size: 0.75rem;
-            color: #b0b8c4;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .pending-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .pending-icon .material-symbols-outlined {
+            font-size: 30px;
+            color: #f59e0b;
+        }
+
+        .pending-card h2 {
+            font-size: 1.2rem;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .pending-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .pending-card a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        @media (max-width: 1024px) {
+            .login-brand-panel { display: none; }
+            .login-form-panel { width: 100%; min-width: unset; }
+        }
+
+        @media (max-width: 480px) {
+            .login-form-panel { padding: 40px 24px; }
         }
     </style>
 </head>
@@ -181,438 +472,589 @@
         驗證中…
     </div>
 
-    <!-- Login Screen -->
+    <!-- ═══ Login Screen ═══ -->
     <div class="login-screen" id="loginScreen" style="display:none;">
-        <div class="login-card">
-            <div class="login-card-icon">
-                <span class="material-symbols-outlined">cell_tower</span>
+        <div class="login-brand-panel">
+            <div class="login-brand-grid"></div>
+            <div class="login-brand-content">
+                <div class="login-brand-badge">
+                    <span class="material-symbols-outlined">verified</span>
+                    數位簡報室官方計畫
+                </div>
+                <h1>聯盟行銷<br>夥伴計畫</h1>
+                <p>推廣全站課程，賺取高額佣金回饋。<br>即時追蹤你的推廣成效與收益。</p>
+                <div class="login-stats">
+                    <div class="login-stat-item">
+                        <div class="login-stat-value">20%</div>
+                        <div class="login-stat-label">銷售分潤比例</div>
+                    </div>
+                    <div class="login-stat-item">
+                        <div class="login-stat-value">18+</div>
+                        <div class="login-stat-label">可推廣課程</div>
+                    </div>
+                    <div class="login-stat-item">
+                        <div class="login-stat-value">即時</div>
+                        <div class="login-stat-label">銷售通知推播</div>
+                    </div>
+                </div>
+                <div class="login-features">
+                    <div class="login-feature">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>專屬折扣碼 — 每筆成交自動追蹤</span>
+                    </div>
+                    <div class="login-feature">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>每月 10 日結算，25 日準時撥款</span>
+                    </div>
+                    <div class="login-feature">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>即時儀表板 — 隨時查看收益與推廣數據</span>
+                    </div>
+                </div>
             </div>
-            <h1>夥伴後台登入</h1>
-            <p>使用您申請時的 Google 帳號登入，<br>即可查看推廣成效與佣金明細。</p>
+        </div>
 
-            <div class="login-error-msg" id="loginErrorMsg">
-                <span class="material-symbols-outlined">error</span>
-                <span id="loginErrorText"></span>
-            </div>
+        <div class="login-form-panel">
+            <div class="login-form-wrapper">
+                <!-- Phase A: Google Login -->
+                <div id="phaseLogin">
+                    <div class="login-form-header">
+                        <div class="login-form-icon">
+                            <span class="material-symbols-outlined">cell_tower</span>
+                        </div>
+                        <h2>夥伴專區</h2>
+                        <p>使用 Google 帳號登入或申請加入</p>
+                    </div>
 
-            <button class="btn-google" id="btnGoogleLogin">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                使用 Google 帳號登入
-            </button>
+                    <div class="login-error-msg" id="loginErrorMsg">
+                        <span class="material-symbols-outlined">error</span>
+                        <span id="loginErrorText"></span>
+                    </div>
 
-            <div class="login-note">
-                尚未成為夥伴？<a href="affiliate-register.html">立即申請</a><br>
-                如有疑問，請聯繫 <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a>
+                    <button class="btn-google" id="btnGoogleLogin">
+                        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        使用 Google 帳號繼續
+                    </button>
+
+                    <div class="login-footer-note" style="margin-top:28px;">
+                        登入即代表同意我們的服務條款<br>
+                        如有疑問，請聯繫 <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a>
+                    </div>
+                </div>
+
+                <!-- Phase B: Register Form -->
+                <div id="phaseRegister" class="register-form">
+                    <div class="login-form-header" style="margin-bottom:24px;">
+                        <div class="login-form-icon" style="background:linear-gradient(135deg,#10b981,#34d399);">
+                            <span class="material-symbols-outlined">person_add</span>
+                        </div>
+                        <h2>申請成為推廣夥伴</h2>
+                        <p>填寫以下資料完成申請</p>
+                    </div>
+
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label>姓名 <span class="req">*</span></label>
+                            <input type="text" id="regName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" readonly style="color:#94a3b8;">
+                        </div>
+                        <div class="form-group">
+                            <label>推廣平台（可複選）<span class="req">*</span></label>
+                            <div class="chip-grid">
+                                <label class="chip"><input type="checkbox" name="platform" value="數位簡報室"> 數位簡報室</label>
+                                <label class="chip"><input type="checkbox" name="platform" value="Hahow"> Hahow</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>推廣管道（可複選）<span class="req">*</span></label>
+                            <div class="chip-grid">
+                                <label class="chip"><input type="checkbox" name="channel" value="Instagram"> Instagram</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="Facebook"> Facebook</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="Blog"> Blog</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="Threads"> Threads</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="YouTube"> YouTube</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="電子報"> 電子報</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="其他"> 其他</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>推廣管道連結或說明</label>
+                            <textarea id="regChannelDetail" placeholder="自媒體連結或簡述推廣方式" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>希望的折扣碼 <span class="req">*</span></label>
+                            <input type="text" id="regCoupon" placeholder="例如：JOHN20" required style="text-transform:uppercase;">
+                            <div class="field-hint">實際折扣碼以確認信件為主。</div>
+                        </div>
+                        <button type="submit" class="btn-submit-register" id="regSubmitBtn">
+                            <span class="material-symbols-outlined">send</span> 送出申請
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Phase C: Pending -->
+                <div id="phasePending" style="display:none;">
+                    <div class="pending-card" style="box-shadow:none;border:none;padding:24px 0;">
+                        <div class="pending-icon">
+                            <span class="material-symbols-outlined">hourglass_top</span>
+                        </div>
+                        <h2>申請審核中</h2>
+                        <p>您的申請已送出，我們會在 <strong>1–3 個工作天</strong>內完成審核。<br>結果將以 Email 通知您。</p>
+                        <p style="margin-top:16px;">
+                            <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Auth Error (for invalid tokens / not approved) -->
-    <div class="auth-screen" id="authError" style="display:none;">
-        <div class="auth-card">
-            <span class="material-symbols-outlined">lock</span>
-            <h2 id="authErrorTitle">無法驗證身份</h2>
-            <p id="authErrorMsg">此帳號尚未通過聯盟夥伴審核，或尚未申請。<br>
-                <a href="affiliate-register.html">前往申請</a> ·
-                <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a>
-            </p>
-            <button class="btn-google" id="btnRetryLogin" style="margin-top:20px;max-width:280px;">
-                <span class="material-symbols-outlined" style="font-size:18px;">refresh</span>
-                使用其他帳號登入
-            </button>
-        </div>
-    </div>
-
-    <!-- Dashboard -->
-    <div class="dash-wrapper" id="dashboard" style="display:none;">
-        <!-- Header -->
-        <div class="dash-header">
-            <div class="dash-brand">
-                <div class="dash-brand-icon">
+    <!-- ═══ Dashboard ═══ -->
+    <div class="saas-layout" id="dashboard" style="display:none;">
+        <!-- Sidebar -->
+        <aside class="saas-sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon">
                     <span class="material-symbols-outlined">cell_tower</span>
                 </div>
-                <div>
-                    <h1>數位簡報室 — 夥伴後台</h1>
-                    <p>聯盟行銷管理儀表板</p>
+                <div class="sidebar-brand-text">
+                    數位簡報室
+                    <span>聯盟夥伴後台</span>
                 </div>
             </div>
-            <div class="dash-user">
-                <strong id="userName"></strong>
-                <span id="userEmail"></span>
-                <button class="btn-logout" id="btnLogout">
-                    <span class="material-symbols-outlined">logout</span> 登出
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="overview">
+                    <span class="material-symbols-outlined">dashboard</span> 銷售儀表板
+                </button>
+                <button class="nav-item" data-view="courses">
+                    <span class="material-symbols-outlined">menu_book</span> 可推廣課程
+                </button>
+                <button class="nav-item" data-view="orders">
+                    <span class="material-symbols-outlined">receipt_long</span> 訂單紀錄
+                </button>
+                <button class="nav-item" data-view="coupon">
+                    <span class="material-symbols-outlined">confirmation_number</span> 折扣碼管理
+                </button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" data-view="account">
+                    <span class="material-symbols-outlined">manage_accounts</span> 帳戶管理
+                </button>
+            </nav>
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="userAvatar">
+                    <span class="material-symbols-outlined">person</span>
+                </div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebarName"></div>
+                    <div class="sidebar-user-email" id="sidebarEmail"></div>
+                </div>
+                <button class="btn-logout-sm" id="btnLogout" title="登出">
+                    <span class="material-symbols-outlined">logout</span>
                 </button>
             </div>
-        </div>
+        </aside>
 
-        <!-- Stats -->
-        <div class="stat-grid">
-            <div class="dash-stat stat-sales">
-                <div class="dash-stat-icon">
-                    <span class="material-symbols-outlined">trending_up</span>
-                </div>
-                <div class="dash-stat-label">總銷售額</div>
-                <div class="dash-stat-value" id="statSales">$0</div>
-            </div>
-            <div class="dash-stat stat-commission">
-                <div class="dash-stat-icon">
-                    <span class="material-symbols-outlined">payments</span>
-                </div>
-                <div class="dash-stat-label">佣金總額</div>
-                <div class="dash-stat-value" id="statCommission">$0</div>
-            </div>
-            <div class="dash-stat stat-orders">
-                <div class="dash-stat-icon">
-                    <span class="material-symbols-outlined">receipt_long</span>
-                </div>
-                <div class="dash-stat-label">轉介訂單</div>
-                <div class="dash-stat-value" id="statOrders">0</div>
-            </div>
-            <div class="dash-stat stat-code">
-                <div class="dash-stat-icon">
-                    <span class="material-symbols-outlined">local_offer</span>
-                </div>
-                <div class="dash-stat-label">佣金比例</div>
-                <div class="dash-stat-value" id="statRate">20%</div>
-            </div>
-        </div>
+        <!-- Main -->
+        <main class="saas-main">
+            <!-- View: Overview -->
+            <div class="view-page active" id="view-overview">
+                <h2 class="page-title">銷售儀表板</h2>
+                <p class="page-subtitle">你的推廣數據總覽</p>
 
-        <!-- Coupon Code -->
-        <div class="dash-section">
-            <div class="dash-section-header">
-                <span class="material-symbols-outlined">confirmation_number</span>
-                折扣碼資訊
-            </div>
-            <div class="coupon-card">
-                <div class="coupon-code-display" id="couponDisplay" title="點擊複製"></div>
-                <div class="coupon-meta">
-                    <p>這是你的專屬折扣碼，透過此碼購買的訂單將自動計入你的銷售。</p>
-                    <p>佣金比例：<strong id="commissionRateText">20%</strong></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Promotable Courses -->
-        <div class="dash-section">
-            <div class="dash-section-header">
-                <span class="material-symbols-outlined">menu_book</span>
-                可推廣課程
-            </div>
-            <div id="promoteCourses" style="font-size:0.82rem;color:#999;">載入中…</div>
-        </div>
-
-        <!-- Sales Detail -->
-        <div class="dash-section">
-            <div class="dash-section-header">
-                <span class="material-symbols-outlined">bar_chart</span>
-                銷售明細
-            </div>
-            <div id="salesContent">
-                <div class="sales-empty">
-                    <span class="material-symbols-outlined">inbox</span>
-                    尚無銷售記錄
-                </div>
-            </div>
-        </div>
-
-        <!-- Bank Info -->
-        <div class="dash-section">
-            <div class="dash-section-header">
-                <span class="material-symbols-outlined">account_balance</span>
-                銀行匯款資訊
-            </div>
-            <form class="bank-form" id="bankForm">
-                <div class="form-group">
-                    <label>銀行名稱</label>
-                    <input type="text" id="bankName" placeholder="例：中國信託">
-                </div>
-                <div class="form-group">
-                    <label>戶名</label>
-                    <input type="text" id="accountHolder" placeholder="帳戶持有人姓名">
-                </div>
-                <div class="form-group full-width">
-                    <label>銀行帳號</label>
-                    <input type="text" id="bankAccount" placeholder="請輸入完整帳號">
-                </div>
-                <div class="bank-actions">
-                    <div class="bank-saved-msg" id="bankSavedMsg">
-                        <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
-                        已儲存
+                <div class="stat-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><span class="material-symbols-outlined">trending_up</span></div>
+                        <div class="stat-label">總銷售額</div>
+                        <div class="stat-value" id="statSales">$0</div>
                     </div>
-                    <button type="submit" class="btn-save" id="btnSaveBank">
-                        <span class="material-symbols-outlined" style="font-size:18px;">save</span>
-                        儲存資訊
-                    </button>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><span class="material-symbols-outlined">payments</span></div>
+                        <div class="stat-label">佣金總額</div>
+                        <div class="stat-value" id="statCommission">$0</div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon"><span class="material-symbols-outlined">receipt_long</span></div>
+                        <div class="stat-label">轉介訂單</div>
+                        <div class="stat-value" id="statOrders">0</div>
+                    </div>
+                    <div class="stat-card pink">
+                        <div class="stat-icon"><span class="material-symbols-outlined">local_offer</span></div>
+                        <div class="stat-label">佣金比例</div>
+                        <div class="stat-value" id="statRate">20%</div>
+                    </div>
                 </div>
-            </form>
-        </div>
 
-        <!-- Footer -->
-        <div class="dash-footer">
-            如有任何疑問，請聯繫 <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a> 或來信 <a href="mailto:service@tbr.digital">service@tbr.digital</a>
+                <div class="section-card">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">bar_chart</span> 近期訂單
+                    </div>
+                    <div id="recentOrders">
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">inbox</span>
+                            尚無銷售記錄
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Courses -->
+            <div class="view-page" id="view-courses">
+                <h2 class="page-title">可推廣課程</h2>
+                <p class="page-subtitle">以下課程皆可使用你的折扣碼推廣</p>
+                <div class="section-card">
+                    <div id="coursesList" style="padding:20px;">
+                        <div class="empty-state"><span class="material-symbols-outlined">hourglass_empty</span>載入中…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Orders -->
+            <div class="view-page" id="view-orders">
+                <h2 class="page-title">訂單紀錄</h2>
+                <p class="page-subtitle">所有透過你的折扣碼完成的訂單</p>
+                <div class="section-card">
+                    <div id="allOrders">
+                        <div class="empty-state">
+                            <span class="material-symbols-outlined">inbox</span>
+                            尚無銷售記錄
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Coupon -->
+            <div class="view-page" id="view-coupon">
+                <h2 class="page-title">折扣碼管理</h2>
+                <p class="page-subtitle">你的專屬推廣折扣碼</p>
+                <div class="section-card">
+                    <div class="coupon-display">
+                        <div class="coupon-code-box" id="couponDisplay" title="點擊複製"></div>
+                        <div class="coupon-meta">
+                            <p>透過此折扣碼購買的訂單將自動計入你的銷售。</p>
+                            <p>佣金比例：<strong id="commissionRateText">20%</strong></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-card" style="margin-top:16px;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">info</span> 推廣須知
+                    </div>
+                    <div class="section-body" style="font-size:0.84rem;color:var(--text-secondary);line-height:1.8;">
+                        <p>• 佣金比例為銷售金額的 <strong>20%</strong></p>
+                        <p>• 每月 <strong>10 日</strong>核對上月銷售金額</p>
+                        <p>• 每月 <strong>25 日</strong>撥款至您提供的銀行帳戶</p>
+                        <p>• 訂單成交時您將立即收到 Email 通知</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Account -->
+            <div class="view-page" id="view-account">
+                <h2 class="page-title">帳戶管理</h2>
+                <p class="page-subtitle">管理你的銀行匯款資訊</p>
+                <div class="section-card">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">account_balance</span> 銀行匯款資訊
+                    </div>
+                    <div class="section-body">
+                        <form class="bank-form" id="bankForm">
+                            <div class="form-group">
+                                <label>銀行名稱</label>
+                                <input type="text" id="bankName" placeholder="例：中國信託">
+                            </div>
+                            <div class="form-group">
+                                <label>戶名</label>
+                                <input type="text" id="accountHolder" placeholder="帳戶持有人姓名">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>銀行帳號</label>
+                                <input type="text" id="bankAccount" placeholder="請輸入完整帳號（含分行代碼）">
+                            </div>
+                            <div class="bank-actions">
+                                <div class="bank-saved-msg" id="bankSavedMsg">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> 已儲存
+                                </div>
+                                <button type="submit" class="btn-save" id="btnSaveBank">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">save</span> 儲存資訊
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="saas-footer">
+                如有疑問，請聯繫 <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a> 或來信 <a href="mailto:service@tbr.digital">service@tbr.digital</a>
+            </div>
+        </main>
+
+        <!-- Mobile Nav -->
+        <div class="mobile-nav">
+            <button data-view="overview" class="active"><span class="material-symbols-outlined">dashboard</span>儀表板</button>
+            <button data-view="courses"><span class="material-symbols-outlined">menu_book</span>課程</button>
+            <button data-view="orders"><span class="material-symbols-outlined">receipt_long</span>訂單</button>
+            <button data-view="coupon"><span class="material-symbols-outlined">confirmation_number</span>折扣碼</button>
+            <button data-view="account"><span class="material-symbols-outlined">manage_accounts</span>帳戶</button>
         </div>
     </div>
 
     <script type="module">
         import { auth, db } from './scripts/supabase.js';
 
-        // ── Auth Flow ──
-        // 1. Check URL for token (legacy link) or OAuth callback
-        // 2. If has OAuth hash → handle callback
-        // 3. If has ?token= → legacy token auth
-        // 4. If has session → try email match
-        // 5. Otherwise → show login screen
+        let currentAffiliate = null;
+        let currentUser = null;
 
-        const urlParams = new URLSearchParams(location.search);
-        const legacyToken = urlParams.get('token');
-
+        // ── Init ──
         async function init() {
-            // Step 1: Check for OAuth callback (hash contains access_token)
+            // OAuth callback
             if (location.hash.includes('access_token')) {
                 const session = await auth.handleOAuthCallback();
-                if (session) {
-                    return await tryEmailLogin(session.user.email, session.user);
-                }
-                showLoginError('Google 登入失敗，請重試。');
+                if (session) return await handleUser(session.user);
+                showLoginWithError('Google 登入失敗，請重試。');
                 return;
             }
 
-            // Step 2: Legacy token auth (backward compatible)
-            if (legacyToken) {
-                return await tryTokenLogin(legacyToken);
+            // Legacy token
+            const token = new URLSearchParams(location.search).get('token');
+            if (token) {
+                const { data } = await db.select('affiliates', {
+                    filter: { login_token: `eq.${token}`, status: 'eq.approved' }, limit: 1
+                });
+                if (data?.[0]) return showDashboard(data[0]);
+                showLoginWithError('此連結無效或已過期。');
+                return;
             }
 
-            // Step 3: Check existing session
+            // Existing session
             const session = await auth.getSession();
-            if (session && session.user?.email) {
-                return await tryEmailLogin(session.user.email, session.user);
-            }
+            if (session?.user?.email) return await handleUser(session.user);
 
-            // Step 4: Show login screen
-            showLoginScreen();
+            showLogin();
         }
 
-        async function tryEmailLogin(email, user) {
-            const { data: affiliates, error } = await db.select('affiliates', {
-                filter: { email: `eq.${email}`, status: 'eq.approved' },
-                limit: 1
+        async function handleUser(user) {
+            currentUser = user;
+            const email = user.email;
+
+            // Check affiliates table
+            const { data } = await db.select('affiliates', {
+                filter: { email: `eq.${email}` }, limit: 1
             });
 
-            if (error || !affiliates || affiliates.length === 0) {
-                showAuthError(
-                    '尚未通過審核',
-                    `帳號 ${email} 尚未通過聯盟夥伴審核，或尚未使用此 Email 申請。`
-                );
-                return;
+            const affiliate = data?.[0];
+
+            if (affiliate && affiliate.status === 'approved') {
+                return showDashboard(affiliate, user);
             }
 
-            showDashboard(affiliates[0], user);
-        }
-
-        async function tryTokenLogin(token) {
-            const { data: affiliates, error } = await db.select('affiliates', {
-                filter: { login_token: `eq.${token}`, status: 'eq.approved' },
-                limit: 1
-            });
-
-            if (error || !affiliates || affiliates.length === 0) {
-                showAuthError(
-                    '無法驗證身份',
-                    '此連結無效或已過期。請使用 Google 帳號登入。'
-                );
-                return;
+            if (affiliate && affiliate.status === 'pending') {
+                return showPending();
             }
 
-            showDashboard(affiliates[0]);
+            // Not registered — show register form
+            return showRegisterForm(user);
         }
 
-        function showLoginScreen() {
+        // ── Screens ──
+        function showLogin() {
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
         }
 
-        function showLoginError(msg) {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
+        function showLoginWithError(msg) {
+            showLogin();
             document.getElementById('loginErrorText').textContent = msg;
             document.getElementById('loginErrorMsg').classList.add('show');
         }
 
-        function showAuthError(title, msg) {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('authError').style.display = 'flex';
-            if (title) document.getElementById('authErrorTitle').textContent = title;
-            if (msg) document.getElementById('authErrorMsg').innerHTML = msg +
-                '<br><a href="affiliate-register.html">前往申請</a> · <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a>';
+        function showRegisterForm(user) {
+            showLogin();
+            document.getElementById('phaseLogin').style.display = 'none';
+            document.getElementById('phaseRegister').classList.add('show');
+            document.getElementById('regName').value = user.user_metadata?.full_name || user.user_metadata?.name || '';
+            document.getElementById('regEmail').value = user.email;
         }
 
-        async function showDashboard(affiliate, user) {
+        function showPending() {
+            showLogin();
+            document.getElementById('phaseLogin').style.display = 'none';
+            document.getElementById('phasePending').style.display = 'block';
+        }
+
+        function showDashboard(affiliate, user) {
+            currentAffiliate = affiliate;
             document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'flex';
 
-            // Populate header
-            const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || affiliate.name || '夥伴';
-            document.getElementById('userName').textContent = displayName;
-            document.getElementById('userEmail').textContent = affiliate.email;
+            const name = user?.user_metadata?.full_name || user?.user_metadata?.name || affiliate.name || '夥伴';
+            const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
 
-            // Populate coupon
+            document.getElementById('sidebarName').textContent = name;
+            document.getElementById('sidebarEmail').textContent = affiliate.email;
+            if (avatarUrl) {
+                document.getElementById('userAvatar').innerHTML = `<img src="${avatarUrl}" alt="">`;
+            }
+
+            // Coupon
             document.getElementById('couponDisplay').textContent = affiliate.coupon_code;
             const rate = Math.round((affiliate.commission_rate || 0.20) * 100);
             document.getElementById('statRate').textContent = rate + '%';
             document.getElementById('commissionRateText').textContent = rate + '%';
 
-            // Populate bank info
+            // Bank
             document.getElementById('bankName').value = affiliate.bank_name || '';
             document.getElementById('accountHolder').value = affiliate.account_holder || '';
             document.getElementById('bankAccount').value = affiliate.bank_account || '';
 
-            // Load sales data
-            await loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.20);
-
-            // Load promotable courses
-            await loadPromoteCourses();
-
-            // Setup events
-            setupCouponCopy(affiliate.coupon_code);
-            setupBankForm(affiliate.id);
-            setupLogout();
+            loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.20);
+            loadCourses();
+            setupEvents(affiliate);
         }
 
-        async function loadSales(couponCode, commissionRate) {
-            const { data: purchases, error } = await db.select('purchases', {
+        // ── Data ──
+        async function loadSales(couponCode, rate) {
+            const { data: purchases } = await db.select('purchases', {
                 filter: { coupon_name: `eq.${couponCode}`, payment_state: 'eq.paid' },
                 order: 'created_at.desc'
             });
 
-            if (error || !purchases || purchases.length === 0) {
-                document.getElementById('statSales').textContent = '$0';
-                document.getElementById('statCommission').textContent = '$0';
-                document.getElementById('statOrders').textContent = '0';
+            if (!purchases || purchases.length === 0) return;
+
+            const total = purchases.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+            const commission = Math.round(total * rate);
+
+            document.getElementById('statSales').textContent = '$' + total.toLocaleString();
+            document.getElementById('statCommission').textContent = '$' + commission.toLocaleString();
+            document.getElementById('statOrders').textContent = purchases.length;
+
+            const buildTable = (items) => {
+                let html = `<table class="s-table"><thead><tr><th>訂單編號</th><th>購買者</th><th>金額</th><th>佣金</th><th>日期</th></tr></thead><tbody>`;
+                for (const p of items) {
+                    const amt = Number(p.amount) || 0;
+                    const com = Math.round(amt * rate);
+                    const d = p.paid_at ? new Date(p.paid_at).toLocaleDateString('zh-TW') : '-';
+                    html += `<tr><td>${p.order_id || '-'}</td><td>${p.name || p.email}</td><td class="amount">$${amt.toLocaleString()}</td><td class="commission">$${com.toLocaleString()}</td><td>${d}</td></tr>`;
+                }
+                return html + '</tbody></table>';
+            };
+
+            document.getElementById('recentOrders').innerHTML = buildTable(purchases.slice(0, 5));
+            document.getElementById('allOrders').innerHTML = buildTable(purchases);
+        }
+
+        async function loadCourses() {
+            const container = document.getElementById('coursesList');
+            const { data: courses } = await db.select('affiliate_courses', {
+                filter: { is_active: 'eq.true' }, order: 'sort_order.asc'
+            });
+
+            if (!courses || courses.length === 0) {
+                container.innerHTML = '<div class="empty-state">暫無課程資料</div>';
                 return;
             }
 
-            const totalSales = purchases.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-            const totalCommission = Math.round(totalSales * commissionRate);
-
-            document.getElementById('statSales').textContent = '$' + totalSales.toLocaleString();
-            document.getElementById('statCommission').textContent = '$' + totalCommission.toLocaleString();
-            document.getElementById('statOrders').textContent = purchases.length;
-
-            // Build table
-            let html = `<table class="sales-table">
-                <thead><tr>
-                    <th>訂單編號</th>
-                    <th>購買者</th>
-                    <th>金額</th>
-                    <th>佣金</th>
-                    <th>日期</th>
-                </tr></thead><tbody>`;
-
-            for (const p of purchases) {
-                const amount = Number(p.amount) || 0;
-                const commission = Math.round(amount * commissionRate);
-                const date = p.paid_at ? new Date(p.paid_at).toLocaleDateString('zh-TW') : '-';
-                html += `<tr>
-                    <td>${p.order_id || '-'}</td>
-                    <td>${p.name || p.email}</td>
-                    <td class="amount">$${amount.toLocaleString()}</td>
-                    <td class="commission">$${commission.toLocaleString()}</td>
-                    <td>${date}</td>
-                </tr>`;
-            }
-
-            html += '</tbody></table>';
-            document.getElementById('salesContent').innerHTML = html;
+            const pl = { tbr: '數位簡報室', hahow: 'Hahow' };
+            container.innerHTML = '<div class="course-links">' +
+                courses.map(c => `
+                    <a class="course-link-item" href="${c.url}" target="_blank">
+                        <span class="material-symbols-outlined">${c.icon || 'school'}</span>
+                        ${c.name}
+                        <span class="platform-tag">${pl[c.platform] || ''}</span>
+                    </a>`).join('') +
+                '</div>';
         }
 
-        async function loadPromoteCourses() {
-            const container = document.getElementById('promoteCourses');
-            try {
-                const { data: courses } = await db.select('affiliate_courses', {
-                    filter: { is_active: 'eq.true' },
-                    order: 'sort_order.asc'
+        // ── Events ──
+        function setupEvents(affiliate) {
+            // Nav switching
+            document.querySelectorAll('[data-view]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const view = btn.dataset.view;
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    document.querySelectorAll('.mobile-nav button').forEach(n => n.classList.remove('active'));
+                    document.querySelectorAll('.view-page').forEach(p => p.classList.remove('active'));
+                    document.querySelector(`.nav-item[data-view="${view}"]`)?.classList.add('active');
+                    document.querySelector(`.mobile-nav button[data-view="${view}"]`)?.classList.add('active');
+                    document.getElementById(`view-${view}`)?.classList.add('active');
                 });
-                if (!courses || courses.length === 0) {
-                    container.innerHTML = '<div style="color:#999;padding:12px;">暫無課程資料</div>';
-                    return;
-                }
-                const platformLabel = { tbr: '數位簡報室', hahow: 'Hahow' };
-                container.innerHTML = '<div class="promote-links">' +
-                    courses.map(c => `
-                        <a class="promote-link-item" href="${c.url}" target="_blank">
-                            <span class="material-symbols-outlined">${c.icon || 'school'}</span>
-                            ${c.name}
-                            <span style="margin-left:auto;font-size:0.72rem;color:#666;">${platformLabel[c.platform] || ''}</span>
-                        </a>
-                    `).join('') +
-                    '</div>';
-            } catch (e) {
-                container.innerHTML = '<div style="color:#999;padding:12px;">載入失敗</div>';
-            }
-        }
-
-        function setupCouponCopy(code) {
-            const el = document.getElementById('couponDisplay');
-            el.addEventListener('click', async () => {
-                await navigator.clipboard.writeText(code);
-                el.textContent = '已複製！';
-                setTimeout(() => { el.textContent = code; }, 1500);
             });
-        }
 
-        function setupBankForm(affiliateId) {
+            // Coupon copy
+            document.getElementById('couponDisplay').addEventListener('click', async () => {
+                await navigator.clipboard.writeText(affiliate.coupon_code);
+                const el = document.getElementById('couponDisplay');
+                el.textContent = '已複製！';
+                setTimeout(() => { el.textContent = affiliate.coupon_code; }, 1500);
+            });
+
+            // Bank form
             document.getElementById('bankForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('btnSaveBank');
-                const msg = document.getElementById('bankSavedMsg');
-
                 btn.disabled = true;
-                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_empty</span> 儲存中…';
-
                 const { error } = await db.update('affiliates', {
                     bank_name: document.getElementById('bankName').value.trim(),
                     bank_account: document.getElementById('bankAccount').value.trim(),
                     account_holder: document.getElementById('accountHolder').value.trim()
-                }, { id: `eq.${affiliateId}` });
-
+                }, { id: `eq.${affiliate.id}` });
                 if (!error) {
+                    const msg = document.getElementById('bankSavedMsg');
                     msg.classList.add('show');
                     setTimeout(() => msg.classList.remove('show'), 3000);
-                } else {
-                    alert('儲存失敗：' + (error.message || '未知錯誤'));
                 }
-
                 btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> 儲存資訊';
             });
-        }
 
-        function setupLogout() {
+            // Logout
             document.getElementById('btnLogout').addEventListener('click', async () => {
                 await auth.signOut();
                 location.href = 'affiliate-dashboard.html';
             });
         }
 
-        // ── Google Login Button ──
+        // ── Google Login ──
         document.getElementById('btnGoogleLogin').addEventListener('click', () => {
-            const redirectUrl = new URL('affiliate-dashboard.html', location.origin).href;
-            auth.signInWithGoogle(redirectUrl);
+            auth.signInWithGoogle(new URL('affiliate-dashboard.html', location.origin).href);
         });
 
-        // Retry login button (on auth error screen)
-        document.getElementById('btnRetryLogin').addEventListener('click', async () => {
-            await auth.signOut();
-            const redirectUrl = new URL('affiliate-dashboard.html', location.origin).href;
-            auth.signInWithGoogle(redirectUrl);
+        // ── Register Form ──
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('regSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> 送出中…';
+
+            const platforms = [...document.querySelectorAll('#phaseRegister input[name="platform"]:checked')].map(c => c.value);
+            const channels = [...document.querySelectorAll('#phaseRegister input[name="channel"]:checked')].map(c => c.value);
+            const coupon = document.getElementById('regCoupon').value.trim().toUpperCase();
+
+            if (platforms.length === 0) { alert('請選擇推廣平台'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; return; }
+            if (channels.length === 0) { alert('請選擇推廣管道'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; return; }
+
+            const { error } = await db.insert('affiliates', {
+                name: document.getElementById('regName').value.trim(),
+                email: document.getElementById('regEmail').value.trim(),
+                coupon_code: coupon,
+                platforms,
+                channels: channels.join(', '),
+                channel_detail: document.getElementById('regChannelDetail').value.trim(),
+                status: 'pending'
+            });
+
+            if (error) {
+                alert('送出失敗：' + (error.message || ''));
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請';
+                return;
+            }
+
+            document.getElementById('phaseRegister').classList.remove('show');
+            document.getElementById('phasePending').style.display = 'block';
         });
 
-        // Start
         init();
     </script>
 </body>
