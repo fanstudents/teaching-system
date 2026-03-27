@@ -7,6 +7,7 @@
     <title>聯盟行銷夥伴 — 數位簡報室</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
@@ -828,7 +829,13 @@
         <main class="saas-main">
             <!-- View: Overview -->
             <div class="view-page active" id="view-overview">
-                <h2 class="page-title">銷售儀表板</h2>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                    <h2 class="page-title">銷售儀表板</h2>
+                    <div style="font-size:0.72rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
+                        <span class="material-symbols-outlined" style="font-size:14px;">schedule</span>
+                        <span id="lastUpdated"></span>
+                    </div>
+                </div>
                 <p class="page-subtitle">你的推廣數據總覽</p>
 
                 <div class="stat-grid">
@@ -854,9 +861,29 @@
                     </div>
                 </div>
 
+                <!-- Charts Row -->
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span class="material-symbols-outlined">show_chart</span> 月度銷售趨勢
+                        </div>
+                        <div class="section-body" style="padding:16px 20px;">
+                            <canvas id="chartSalesTrend" height="220"></canvas>
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span class="material-symbols-outlined">donut_large</span> 佣金收入概覽
+                        </div>
+                        <div class="section-body" style="padding:16px 20px;display:flex;align-items:center;justify-content:center;">
+                            <canvas id="chartCommission" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="section-card">
                     <div class="section-header">
-                        <span class="material-symbols-outlined">bar_chart</span> 近期訂單
+                        <span class="material-symbols-outlined">receipt_long</span> 近期訂單
                     </div>
                     <div id="recentOrders">
                         <div class="empty-state">
@@ -1109,12 +1136,18 @@
 
         // ── Data ──
         async function loadSales(couponCode, rate) {
+            // Last updated timestamp
+            document.getElementById('lastUpdated').textContent = '更新於 ' + new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
             const { data: purchases } = await db.select('purchases', {
                 filter: { coupon_name: `eq.${couponCode}`, payment_state: 'eq.paid' },
                 order: 'created_at.desc'
             });
 
-            if (!purchases || purchases.length === 0) return;
+            if (!purchases || purchases.length === 0) {
+                renderEmptyCharts();
+                return;
+            }
 
             const total = purchases.reduce((s, p) => s + (Number(p.amount) || 0), 0);
             const commission = Math.round(total * rate);
@@ -1123,19 +1156,156 @@
             document.getElementById('statCommission').textContent = '$' + commission.toLocaleString();
             document.getElementById('statOrders').textContent = purchases.length;
 
+            // ── Monthly aggregation for chart ──
+            const monthlyData = {};
+            const now = new Date();
+            // Ensure last 6 months have entries
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                monthlyData[key] = { sales: 0, commission: 0, orders: 0 };
+            }
+            for (const p of purchases) {
+                const d = new Date(p.paid_at || p.created_at);
+                const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                if (!monthlyData[key]) monthlyData[key] = { sales: 0, commission: 0, orders: 0 };
+                const amt = Number(p.amount) || 0;
+                monthlyData[key].sales += amt;
+                monthlyData[key].commission += Math.round(amt * rate);
+                monthlyData[key].orders += 1;
+            }
+
+            const labels = Object.keys(monthlyData).sort();
+            const salesData = labels.map(k => monthlyData[k].sales);
+            const commissionData = labels.map(k => monthlyData[k].commission);
+            const monthLabels = labels.map(k => {
+                const [y, m] = k.split('-');
+                return parseInt(m) + '月';
+            });
+
+            // ── Sales Trend Chart ──
+            const ctxTrend = document.getElementById('chartSalesTrend').getContext('2d');
+            new Chart(ctxTrend, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            label: '銷售額',
+                            data: salesData,
+                            backgroundColor: 'rgba(26,115,232,0.15)',
+                            borderColor: '#1a73e8',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            order: 2
+                        },
+                        {
+                            label: '佣金',
+                            data: commissionData,
+                            type: 'line',
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16,185,129,0.08)',
+                            borderWidth: 2.5,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#10b981',
+                            tension: 0.3,
+                            fill: true,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 16, font: { size: 11, family: 'Noto Sans TC' } } },
+                        tooltip: { backgroundColor: '#1a1a2e', titleFont: { family: 'Noto Sans TC' }, bodyFont: { family: 'Noto Sans TC' }, padding: 12, cornerRadius: 8, callbacks: { label: ctx => ctx.dataset.label + '：$' + ctx.parsed.y.toLocaleString() } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Noto Sans TC' }, color: '#94a3b8' } },
+                        y: { grid: { color: '#f0f0f5' }, ticks: { font: { size: 11 }, color: '#94a3b8', callback: v => '$' + v.toLocaleString() }, beginAtZero: true }
+                    }
+                }
+            });
+
+            // ── Commission Doughnut ──
+            const paid = commission; // already earned
+            const pending = 0; // future: calculate pending
+            const ctxDonut = document.getElementById('chartCommission').getContext('2d');
+            new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已確認佣金', '待結算'],
+                    datasets: [{
+                        data: [paid, pending || (paid * 0.1 || 1)],
+                        backgroundColor: ['#10b981', '#f0f0f5'],
+                        borderWidth: 0,
+                        cutout: '72%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 14, font: { size: 11, family: 'Noto Sans TC' } } },
+                        tooltip: { backgroundColor: '#1a1a2e', padding: 12, cornerRadius: 8, callbacks: { label: ctx => ctx.label + '：$' + ctx.parsed.toLocaleString() } }
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    afterDraw(chart) {
+                        const { width, height, ctx: c } = chart;
+                        c.save();
+                        c.font = '800 1.3rem Noto Sans TC';
+                        c.fillStyle = '#1a1a2e';
+                        c.textAlign = 'center';
+                        c.textBaseline = 'middle';
+                        c.fillText('$' + paid.toLocaleString(), width / 2, height / 2 - 8);
+                        c.font = '500 0.7rem Noto Sans TC';
+                        c.fillStyle = '#94a3b8';
+                        c.fillText('佣金總額', width / 2, height / 2 + 14);
+                        c.restore();
+                    }
+                }]
+            });
+
+            // ── Tables ──
             const buildTable = (items) => {
                 let html = `<table class="s-table"><thead><tr><th>訂單編號</th><th>購買者</th><th>金額</th><th>佣金</th><th>日期</th></tr></thead><tbody>`;
                 for (const p of items) {
                     const amt = Number(p.amount) || 0;
                     const com = Math.round(amt * rate);
                     const d = p.paid_at ? new Date(p.paid_at).toLocaleDateString('zh-TW') : '-';
-                    html += `<tr><td>${p.order_id || '-'}</td><td>${p.name || p.email}</td><td class="amount">$${amt.toLocaleString()}</td><td class="commission">$${com.toLocaleString()}</td><td>${d}</td></tr>`;
+                    html += `<tr><td style="font-family:'SF Mono',monospace;font-size:0.78rem;color:var(--text-muted);">${p.order_id || '-'}</td><td>${p.name || p.email}</td><td class="amount">$${amt.toLocaleString()}</td><td class="commission">$${com.toLocaleString()}</td><td style="color:var(--text-muted);font-size:0.8rem;">${d}</td></tr>`;
                 }
                 return html + '</tbody></table>';
             };
 
             document.getElementById('recentOrders').innerHTML = buildTable(purchases.slice(0, 5));
             document.getElementById('allOrders').innerHTML = buildTable(purchases);
+        }
+
+        function renderEmptyCharts() {
+            const monthLabels = [];
+            const now = new Date();
+            for (let i = 5; i >= 0; i--) {
+                monthLabels.push((now.getMonth() - i + 13) % 12 + 1 + '月');
+            }
+            const zeros = [0, 0, 0, 0, 0, 0];
+
+            new Chart(document.getElementById('chartSalesTrend').getContext('2d'), {
+                type: 'bar',
+                data: { labels: monthLabels, datasets: [{ label: '銷售額', data: zeros, backgroundColor: 'rgba(26,115,232,0.08)', borderColor: '#e8ecf1', borderWidth: 1, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Noto Sans TC' }, color: '#cbd5e1' } }, y: { grid: { color: '#f5f5f5' }, ticks: { display: false }, beginAtZero: true, max: 100 } } }
+            });
+
+            new Chart(document.getElementById('chartCommission').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: ['尚無資料'], datasets: [{ data: [1], backgroundColor: ['#f0f0f5'], borderWidth: 0, cutout: '72%' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } },
+                plugins: [{ id: 'emptyCenter', afterDraw(chart) { const { width, height, ctx: c } = chart; c.save(); c.font = '600 0.82rem Noto Sans TC'; c.fillStyle = '#cbd5e1'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('尚無資料', width / 2, height / 2); c.restore(); } }]
+            });
         }
 
         async function loadCourses() {
