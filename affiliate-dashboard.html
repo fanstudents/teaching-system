@@ -306,20 +306,49 @@
             text-decoration: none;
         }
 
-        /* ── Register Form (inside login panel) ── */
+        /* ── Register Form (Professional Redesign) ── */
         .register-form { display: none; }
         .register-form.show { display: block; }
+
+        .register-form .form-section {
+            margin-bottom: 28px;
+        }
+
+        .register-form .form-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f5;
+        }
+
+        .register-form .form-section-title .material-symbols-outlined {
+            font-size: 18px;
+            color: #1a73e8;
+        }
+
+        .register-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
 
         .register-form .form-group {
             margin-bottom: 16px;
         }
 
+        .register-form .form-group.full { grid-column: 1 / -1; }
+
         .register-form .form-group label {
             display: block;
-            font-size: 0.82rem;
-            font-weight: 500;
+            font-size: 0.78rem;
+            font-weight: 600;
             margin-bottom: 6px;
-            color: #334155;
+            color: #475569;
         }
 
         .register-form .form-group label .req { color: #ef4444; }
@@ -328,9 +357,9 @@
         .register-form .form-group textarea {
             width: 100%;
             padding: 10px 14px;
-            border: 1px solid #e2e8f0;
+            border: 1.5px solid #e2e8f0;
             border-radius: 10px;
-            background: #f8f9fa;
+            background: #fafbfc;
             font-size: 0.86rem;
             font-family: inherit;
             color: #1a1a2e;
@@ -345,11 +374,104 @@
             background: #fff;
         }
 
-        .register-form textarea {
-            resize: vertical;
-            min-height: 50px;
+        .register-form .form-group input[readonly] {
+            color: #94a3b8;
+            background: #f1f5f9;
+            cursor: not-allowed;
         }
 
+        .register-form textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .field-hint {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        /* Course checkbox cards */
+        .course-check-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .course-check-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .course-check-grid::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        .course-check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1.5px solid #e8ecf1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #fafbfc;
+            user-select: none;
+        }
+
+        .course-check-item:hover {
+            border-color: #cbd5e1;
+            background: #f8f9fa;
+        }
+
+        .course-check-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a73e8;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .course-check-item .course-name {
+            flex: 1;
+            font-size: 0.82rem;
+            color: #1a1a2e;
+            font-weight: 500;
+        }
+
+        .course-check-item .course-platform {
+            font-size: 0.68rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .course-check-item:has(input:checked) {
+            border-color: #1a73e8;
+            background: rgba(26, 115, 232, 0.04);
+        }
+
+        .course-check-item:has(input:checked) .course-platform {
+            background: rgba(26, 115, 232, 0.08);
+            color: #1a73e8;
+            border-color: rgba(26, 115, 232, 0.2);
+        }
+
+        .course-loading {
+            padding: 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.82rem;
+        }
+
+        /* Chip grid (for channels) */
         .chip-grid {
             display: flex;
             flex-wrap: wrap;
@@ -361,14 +483,14 @@
             align-items: center;
             gap: 4px;
             padding: 6px 14px;
-            border: 1px solid #e2e8f0;
+            border: 1.5px solid #e2e8f0;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: #64748b;
             cursor: pointer;
             transition: all 0.15s;
             user-select: none;
-            background: #fff;
+            background: #fafbfc;
         }
 
         .chip input[type="checkbox"] { display: none; }
@@ -377,15 +499,16 @@
             background: rgba(26, 115, 232, 0.08);
             border-color: #1a73e8;
             color: #1a73e8;
-            font-weight: 500;
+            font-weight: 600;
         }
 
+        /* Submit button */
         .btn-submit-register {
             width: 100%;
-            padding: 12px;
-            background: #1a73e8;
+            padding: 13px;
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: #fff;
             font-size: 0.88rem;
             font-weight: 600;
@@ -395,20 +518,28 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            margin-top: 20px;
-            transition: opacity 0.2s;
+            margin-top: 24px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
         }
 
-        .btn-submit-register:hover { opacity: 0.9; }
-        .btn-submit-register:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-submit-register:hover {
+            box-shadow: 0 4px 16px rgba(26, 115, 232, 0.3);
+            transform: translateY(-1px);
+        }
 
+        .btn-submit-register:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-submit-register .material-symbols-outlined { font-size: 18px; }
 
-        .field-hint {
+        .register-note {
+            text-align: center;
+            margin-top: 16px;
             font-size: 0.72rem;
             color: #94a3b8;
-            margin-top: 4px;
+            line-height: 1.6;
         }
+
+        .register-note a { color: #1a73e8; text-decoration: none; }
 
         /* ── Pending Screen ── */
         .pending-card {
@@ -548,6 +679,11 @@
 
                 <!-- Phase B: Register Form -->
                 <div id="phaseRegister" class="register-form">
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+                        <button id="btnRegLogout" type="button" style="background:none;border:none;color:#94a3b8;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;padding:4px 8px;border-radius:6px;transition:all 0.15s;">
+                            <span class="material-symbols-outlined" style="font-size:16px;">logout</span> 登出
+                        </button>
+                    </div>
                     <div class="login-form-header" style="margin-bottom:24px;">
                         <div class="login-form-icon" style="background:linear-gradient(135deg,#10b981,#34d399);">
                             <span class="material-symbols-outlined">person_add</span>
@@ -557,45 +693,72 @@
                     </div>
 
                     <form id="registerForm">
-                        <div class="form-group">
-                            <label>姓名 <span class="req">*</span></label>
-                            <input type="text" id="regName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="regEmail" readonly style="color:#94a3b8;">
-                        </div>
-                        <div class="form-group">
-                            <label>推廣平台（可複選）<span class="req">*</span></label>
-                            <div class="chip-grid">
-                                <label class="chip"><input type="checkbox" name="platform" value="數位簡報室"> 數位簡報室</label>
-                                <label class="chip"><input type="checkbox" name="platform" value="Hahow"> Hahow</label>
+                        <!-- Section 1: 基本資料 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <span class="material-symbols-outlined">person</span> 基本資料
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>姓名 <span class="req">*</span></label>
+                                    <input type="text" id="regName" required placeholder="您的姓名">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" id="regEmail" readonly>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>推廣管道（可複選）<span class="req">*</span></label>
+
+                        <!-- Section 2: 推廣課程 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <span class="material-symbols-outlined">menu_book</span> 想推廣的課程（可複選）<span class="req">*</span>
+                            </div>
+                            <div class="course-check-grid" id="regCourseGrid">
+                                <div class="course-loading">載入課程中…</div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: 推廣管道 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <span class="material-symbols-outlined">share</span> 推廣管道（可複選）<span class="req">*</span>
+                            </div>
                             <div class="chip-grid">
                                 <label class="chip"><input type="checkbox" name="channel" value="Instagram"> Instagram</label>
                                 <label class="chip"><input type="checkbox" name="channel" value="Facebook"> Facebook</label>
                                 <label class="chip"><input type="checkbox" name="channel" value="Blog"> Blog</label>
                                 <label class="chip"><input type="checkbox" name="channel" value="Threads"> Threads</label>
                                 <label class="chip"><input type="checkbox" name="channel" value="YouTube"> YouTube</label>
+                                <label class="chip"><input type="checkbox" name="channel" value="Podcast"> Podcast</label>
                                 <label class="chip"><input type="checkbox" name="channel" value="電子報"> 電子報</label>
                                 <label class="chip"><input type="checkbox" name="channel" value="其他"> 其他</label>
                             </div>
+                            <div class="form-group" style="margin-top:12px;">
+                                <label>推廣管道連結或說明</label>
+                                <textarea id="regChannelDetail" placeholder="例：IG @yourname（粉絲 10K）、Blog https://..." rows="2"></textarea>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>推廣管道連結或說明</label>
-                            <textarea id="regChannelDetail" placeholder="自媒體連結或簡述推廣方式" rows="2"></textarea>
+
+                        <!-- Section 4: 折扣碼 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <span class="material-symbols-outlined">confirmation_number</span> 專屬折扣碼
+                            </div>
+                            <div class="form-group">
+                                <label>希望的折扣碼 <span class="req">*</span></label>
+                                <input type="text" id="regCoupon" placeholder="例如：JOHN20" required style="text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">
+                                <div class="field-hint">僅限英文與數字，實際折扣碼以確認信件為主。</div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>希望的折扣碼 <span class="req">*</span></label>
-                            <input type="text" id="regCoupon" placeholder="例如：JOHN20" required style="text-transform:uppercase;">
-                            <div class="field-hint">實際折扣碼以確認信件為主。</div>
-                        </div>
+
                         <button type="submit" class="btn-submit-register" id="regSubmitBtn">
                             <span class="material-symbols-outlined">send</span> 送出申請
                         </button>
+                        <div class="register-note">
+                            送出即代表同意<a href="terms.html" target="_blank">服務條款</a>與<a href="privacy.html" target="_blank">隱私權政策</a>
+                        </div>
                     </form>
                 </div>
 
@@ -875,13 +1038,36 @@
             document.getElementById('loginErrorMsg').classList.add('show');
         }
 
-        function showRegisterForm(user) {
+        async function showRegisterForm(user) {
             showLogin();
             document.getElementById('loginScreen').classList.add('centered');
             document.getElementById('phaseLogin').style.display = 'none';
             document.getElementById('phaseRegister').classList.add('show');
             document.getElementById('regName').value = user.user_metadata?.full_name || user.user_metadata?.name || '';
             document.getElementById('regEmail').value = user.email;
+
+            // Load courses for checkbox list
+            const grid = document.getElementById('regCourseGrid');
+            const { data: courses } = await db.select('affiliate_courses', {
+                filter: { is_active: 'eq.true' }, order: 'sort_order.asc'
+            });
+            const pl = { tbr: '數位簡報室', hahow: 'Hahow' };
+            if (courses && courses.length > 0) {
+                grid.innerHTML = courses.map(c => `
+                    <label class="course-check-item">
+                        <input type="checkbox" name="reg_course" value="${c.name}">
+                        <span class="course-name">${c.name}</span>
+                        <span class="course-platform">${pl[c.platform] || c.platform || ''}</span>
+                    </label>`).join('');
+            } else {
+                grid.innerHTML = '<div class="course-loading">暫無課程資料</div>';
+            }
+
+            // Register logout
+            document.getElementById('btnRegLogout').addEventListener('click', async () => {
+                await auth.signOut();
+                location.href = 'affiliate-dashboard.html';
+            });
         }
 
         function showPending() {
@@ -1034,12 +1220,19 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> 送出中…';
 
-            const platforms = [...document.querySelectorAll('#phaseRegister input[name="platform"]:checked')].map(c => c.value);
+            const selectedCourses = [...document.querySelectorAll('#phaseRegister input[name="reg_course"]:checked')].map(c => c.value);
             const channels = [...document.querySelectorAll('#phaseRegister input[name="channel"]:checked')].map(c => c.value);
             const coupon = document.getElementById('regCoupon').value.trim().toUpperCase();
+            const resetBtn = () => { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; };
 
-            if (platforms.length === 0) { alert('請選擇推廣平台'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; return; }
-            if (channels.length === 0) { alert('請選擇推廣管道'); btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; return; }
+            if (selectedCourses.length === 0) { alert('請選擇至少一門想推廣的課程'); resetBtn(); return; }
+            if (channels.length === 0) { alert('請選擇推廣管道'); resetBtn(); return; }
+
+            // Derive platforms from selected course names
+            const platforms = [...new Set(selectedCourses.map(name => {
+                const el = document.querySelector(`input[name="reg_course"][value="${CSS.escape(name)}"]`);
+                return el?.closest('.course-check-item')?.querySelector('.course-platform')?.textContent?.trim() || '';
+            }).filter(Boolean))];
 
             const { error } = await db.insert('affiliates', {
                 name: document.getElementById('regName').value.trim(),
@@ -1048,6 +1241,7 @@
                 platforms,
                 channels: channels.join(', '),
                 channel_detail: document.getElementById('regChannelDetail').value.trim(),
+                selected_courses: selectedCourses,
                 status: 'pending'
             });
 
