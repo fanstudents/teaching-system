@@ -4515,14 +4515,78 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!qrEl) {
             qrEl = document.createElement('div');
             qrEl.id = 'presQRCode';
-            qrEl.style.cssText = 'position:fixed;bottom:60px;left:20px;z-index:10001;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);opacity:0.85;transition:opacity 0.3s;cursor:pointer;';
-            qrEl.innerHTML = `<img src="${qrSrc}" width="100" height="100" style="display:block;border-radius:6px;">
-                <div style="text-align:center;font-size:10px;color:#1a73e8;margin-top:4px;font-weight:600;">掃碼互動</div>`;
-            qrEl.addEventListener('mouseenter', () => qrEl.style.opacity = '1');
-            qrEl.addEventListener('mouseleave', () => qrEl.style.opacity = '0.85');
+            qrEl.style.cssText = 'position:fixed;bottom:60px;left:20px;z-index:10001;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.15);opacity:0.85;transition:opacity 0.3s, transform 0.2s, width 0.3s, padding 0.3s;cursor:grab;user-select:none;';
+            qrEl.innerHTML = `<img src="${qrSrc}" width="100" height="100" style="display:block;border-radius:6px;pointer-events:none;transition:width 0.3s,height 0.3s;">
+                <div style="text-align:center;font-size:10px;color:#1a73e8;margin-top:4px;font-weight:600;pointer-events:none;">掃碼互動</div>`;
+            qrEl.addEventListener('mouseenter', () => { if (!qrEl._dragging) qrEl.style.opacity = '1'; });
+            qrEl.addEventListener('mouseleave', () => { if (!qrEl._dragging) qrEl.style.opacity = '0.85'; });
+
+            // ── 拖移 ──
+            let dragStartX, dragStartY, elStartX, elStartY;
+            qrEl._dragging = false;
+            qrEl._enlarged = false;
+            qrEl._didDrag = false;
+
+            qrEl.addEventListener('pointerdown', (e) => {
+                qrEl._didDrag = false;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                const rect = qrEl.getBoundingClientRect();
+                elStartX = rect.left;
+                elStartY = rect.top;
+                qrEl.style.cursor = 'grabbing';
+                qrEl.setPointerCapture(e.pointerId);
+            });
+
+            qrEl.addEventListener('pointermove', (e) => {
+                if (dragStartX == null) return;
+                const dx = e.clientX - dragStartX;
+                const dy = e.clientY - dragStartY;
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    qrEl._dragging = true;
+                    qrEl._didDrag = true;
+                    qrEl.style.left = (elStartX + dx) + 'px';
+                    qrEl.style.top = (elStartY + dy) + 'px';
+                    qrEl.style.bottom = 'auto';
+                    qrEl.style.right = 'auto';
+                    qrEl.style.opacity = '1';
+                }
+            });
+
+            qrEl.addEventListener('pointerup', (e) => {
+                dragStartX = null;
+                qrEl._dragging = false;
+                qrEl.style.cursor = 'grab';
+                qrEl.releasePointerCapture(e.pointerId);
+            });
+
+            // ── 點擊放大/縮小 ──
             qrEl.addEventListener('click', () => {
+                if (qrEl._didDrag) return; // 拖移結束不觸發
+                const img = qrEl.querySelector('img');
+                qrEl._enlarged = !qrEl._enlarged;
+                if (qrEl._enlarged) {
+                    const bigSrc = qrSrc.replace('size=120x120', 'size=260x260');
+                    img.src = bigSrc;
+                    img.width = 240; img.height = 240;
+                    qrEl.style.padding = '12px';
+                    qrEl.style.opacity = '1';
+                    qrEl.style.boxShadow = '0 8px 40px rgba(0,0,0,0.25)';
+                } else {
+                    img.src = qrSrc;
+                    img.width = 100; img.height = 100;
+                    qrEl.style.padding = '8px';
+                    qrEl.style.opacity = '0.85';
+                    qrEl.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+                }
+            });
+
+            // ── 雙擊複製連結 ──
+            qrEl.addEventListener('dblclick', (e) => {
+                e.preventDefault();
                 navigator.clipboard.writeText(audUrl).then(() => this.showToast('✓ 已複製互動連結'));
             });
+
             document.getElementById('presentationMode').appendChild(qrEl);
         }
         qrEl.querySelector('img').src = qrSrc;

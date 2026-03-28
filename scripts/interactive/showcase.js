@@ -351,7 +351,6 @@ export class Showcase {
                                 is_correct: sub.is_correct ?? null,
                                 score: String(score),
                                 state: mergedState,
-                                instructor_score: score,
                                 submitted_at: sub.submitted_at || new Date().toISOString(),
                             };
 
