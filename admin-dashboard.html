@@ -15,118 +15,208 @@
     <link rel="stylesheet" href="styles/admin-layout.css">
     <link rel="stylesheet" href="styles/s79-theme.css">
     <style>
-        /* ── Page-specific styles (admin-dashboard) ── */
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        /* ── Dark Sidebar Layout ── */
+        :root {
+            --ad-sidebar-w: 230px;
+            --ad-sidebar-bg: #1e2a3a;
+            --ad-sidebar-active: rgba(255,255,255,0.12);
+            --ad-sidebar-hover: rgba(255,255,255,0.06);
+            --ad-sidebar-text: rgba(255,255,255,0.7);
+            --ad-sidebar-text-active: #fff;
         }
 
-        .header-right .user-email {
-            font-size: 0.82rem;
-            color: var(--text-2);
+        body { margin: 0; background: #f4f6f9; }
+
+        .ad-sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: var(--ad-sidebar-w);
+            background: var(--ad-sidebar-bg);
+            z-index: 200; display: flex; flex-direction: column;
+            transition: transform 0.3s ease;
         }
 
-        .btn-danger-text {
-            background: none;
-            border: none;
-            color: var(--s79-error);
-            cursor: pointer;
-            font-size: 0.78rem;
-            padding: 4px 8px;
-            border-radius: 6px;
+        .ad-sidebar-brand {
+            padding: 20px 16px; display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .ad-sidebar-logo {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; flex-shrink: 0;
+        }
+
+        .ad-sidebar-logo .material-symbols-outlined { font-size: 18px; }
+        .ad-sidebar-title { font-size: 14px; font-weight: 700; color: #fff; }
+        .ad-sidebar-subtitle { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; }
+
+        .ad-sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 10px; }
+
+        .ad-nav-group-label {
+            font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35);
+            text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 16px 12px 6px;
+        }
+
+        .ad-nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: 8px;
+            font-size: 13px; font-weight: 500;
+            color: var(--ad-sidebar-text);
+            border: none; background: none;
+            cursor: pointer; width: 100%;
+            text-align: left; font-family: inherit;
+            text-decoration: none;
+            transition: all 0.15s;
+            margin-bottom: 1px;
+            position: relative;
+        }
+
+        .ad-nav-item .material-symbols-outlined { font-size: 19px; }
+        .ad-nav-item:hover { background: var(--ad-sidebar-hover); color: var(--ad-sidebar-text-active); }
+
+        .ad-nav-item.active {
+            background: var(--ad-sidebar-active);
+            color: var(--ad-sidebar-text-active);
+            font-weight: 600;
+        }
+
+        .ad-badge {
+            background: #f59e0b; color: #fff;
+            font-size: 10px; font-weight: 700;
+            padding: 1px 6px; border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .ad-sidebar-user {
+            padding: 12px 14px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+
+        .ad-sidebar-user-info {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; color: rgba(255,255,255,0.45);
+            margin-bottom: 6px;
+        }
+
+        .ad-logout-btn {
+            display: flex; align-items: center; gap: 6px;
+            width: 100%; padding: 7px 10px; margin-top: 6px;
+            border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
+            background: none; color: rgba(255,255,255,0.55);
+            font-size: 12px; font-family: inherit; cursor: pointer;
             transition: all 0.15s;
         }
 
-        .btn-danger-text:hover {
-            background: var(--s79-error-light);
+        .ad-logout-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .ad-logout-btn .material-symbols-outlined { font-size: 16px; }
+
+        /* Main Content */
+        .ad-main {
+            margin-left: var(--ad-sidebar-w);
+            min-height: 100vh;
+            padding: 0 28px 40px;
         }
 
-        /* ── 統計卡片 ── */
+        .ad-topbar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 20px 0 8px;
+        }
+
+        .ad-page-title {
+            font-size: 1.25rem; font-weight: 700; color: #1e293b;
+            margin: 0;
+        }
+
+        .ad-hamburger {
+            display: none; border: none; background: none;
+            cursor: pointer; color: #64748b; padding: 4px;
+            border-radius: 6px;
+        }
+
+        .ad-hamburger:hover { background: #f1f5f9; }
+        .ad-hamburger .material-symbols-outlined { font-size: 22px; }
+
+        .ad-overlay {
+            position: fixed; inset: 0; z-index: 199;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+
+        .ad-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .ad-view { display: none; padding-top: 12px; }
+        .ad-view.active { display: block; }
+
+        /* Stats Cards */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
 
-        /* ── Tabs ── */
-        .tab-bar {
-            display: flex;
-            gap: 4px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
+        .stat-card {
+            background: #fff; border: 1px solid #e8ecf1;
+            border-radius: 12px; padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
-        .tab-btn {
-            padding: 10px 20px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            border: none;
-            background: none;
-            cursor: pointer;
-            color: var(--text-3);
-            border-bottom: 2px solid transparent;
-            transition: all 0.15s;
-            font-family: inherit;
+        .stat-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 10px;
         }
 
-        .tab-btn:hover { color: var(--text-2); }
-        .tab-btn.active { color: var(--s79-primary); border-bottom-color: var(--s79-primary); }
+        .stat-icon .material-symbols-outlined { font-size: 18px; }
+        .stat-label { font-size: 0.75rem; color: #94a3b8; font-weight: 500; margin-bottom: 4px; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: #1e293b; }
 
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
-
+        /* Role/Status badges */
         .role-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600;
         }
 
         .role-badge.super_admin { background: #fef7e0; color: #92400e; }
         .role-badge.instructor { background: #d2e3fc; color: #3730a3; }
 
         .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 6px;
+            display: inline-block; width: 8px; height: 8px;
+            border-radius: 50%; margin-right: 6px;
         }
 
-        .status-dot.active { background: var(--s79-success); }
+        .status-dot.active { background: #10b981; }
         .status-dot.inactive { background: #cbd5e1; }
 
-        /* ── 專案總覽 ── */
+        .btn-danger-text {
+            background: none; border: none; color: #c5221f;
+            cursor: pointer; font-size: 0.78rem; padding: 4px 8px;
+            border-radius: 6px; transition: all 0.15s;
+        }
+
+        .btn-danger-text:hover { background: #fce8e6; }
+
+        /* Project cards */
         .instructor-group { margin-bottom: 32px; }
 
         .instructor-group-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            padding: 8px 0;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 12px; padding: 8px 0;
         }
 
         .instructor-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--s79-primary-light);
-            color: var(--s79-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-            font-weight: 700;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #e8f0fe; color: #1a73e8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 700;
         }
 
         .instructor-group-name { font-weight: 600; font-size: 1rem; }
-        .instructor-group-meta { font-size: 0.78rem; color: var(--text-3); }
+        .instructor-group-meta { font-size: 0.78rem; color: #94a3b8; }
 
         .project-mini-grid {
             display: grid;
@@ -135,84 +225,50 @@
         }
 
         .project-mini-card {
-            background: var(--s79-surface);
-            border: 1px solid var(--s79-border);
-            border-radius: 10px;
-            padding: 16px;
-            transition: all 0.15s;
-            cursor: pointer;
-            box-shadow: var(--s79-shadow-card);
+            background: #fff; border: 1px solid #e8ecf1;
+            border-radius: 10px; padding: 16px;
+            transition: all 0.15s; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .project-mini-card:hover {
-            box-shadow: var(--s79-shadow-card-hover);
-            border-color: var(--s79-border-strong);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #d0d5dd;
             transform: translateY(-2px);
         }
 
         .pmc-name { font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; }
 
-        .pmc-stats {
-            display: flex;
-            gap: 16px;
-            font-size: 0.78rem;
-            color: var(--text-3);
-        }
-
+        .pmc-stats { display: flex; gap: 16px; font-size: 0.78rem; color: #94a3b8; }
         .pmc-stats span { display: flex; align-items: center; gap: 4px; }
         .pmc-stats .material-symbols-outlined { font-size: 14px; }
 
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .project-mini-grid { grid-template-columns: 1fr; }
-        }
-
-        /* ── Affiliate Management ── */
-        .aff-filter-bar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
+        /* Affiliate styles */
+        .aff-filter-bar { display: flex; gap: 6px; margin-bottom: 16px; }
 
         .aff-filter-btn {
-            padding: 6px 16px;
-            border: 1.5px solid var(--s79-border);
-            border-radius: 20px;
-            background: none;
-            font-size: 0.78rem;
-            font-family: inherit;
-            color: var(--text-3);
-            cursor: pointer;
-            transition: all 0.15s;
+            padding: 6px 16px; border: 1.5px solid #e8ecf1;
+            border-radius: 20px; background: none;
+            font-size: 0.78rem; font-family: inherit;
+            color: #94a3b8; cursor: pointer; transition: all 0.15s;
         }
 
-        .aff-filter-btn:hover { border-color: var(--s79-border-strong); color: var(--text-2); }
-        .aff-filter-btn.active { border-color: var(--s79-primary); background: var(--s79-primary-light); color: var(--s79-primary); font-weight: 600; }
+        .aff-filter-btn:hover { border-color: #d0d5dd; color: #64748b; }
+        .aff-filter-btn.active { border-color: #3b82f6; background: #eff6ff; color: #3b82f6; font-weight: 600; }
 
         .aff-status {
-            display: inline-flex;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
+            display: inline-flex; padding: 2px 10px;
+            border-radius: 20px; font-size: 0.72rem; font-weight: 600;
         }
 
         .aff-status.pending { background: #fef7e0; color: #92400e; }
         .aff-status.approved { background: #e6f4ea; color: #188038; }
         .aff-status.rejected { background: #fce8e6; color: #c5221f; }
 
-        .aff-actions { display: flex; gap: 4px; }
-
         .aff-btn {
-            padding: 4px 12px;
-            border-radius: 6px;
-            border: none;
-            font-size: 0.75rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.15s;
+            padding: 4px 12px; border-radius: 6px; border: none;
+            font-size: 0.75rem; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.15s;
         }
 
         .aff-btn.approve { background: #e6f4ea; color: #188038; }
@@ -220,31 +276,18 @@
         .aff-btn.reject { background: #fce8e6; color: #c5221f; }
         .aff-btn.reject:hover { background: #f5c6c2; }
 
-        .aff-detail-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
+        .aff-detail-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 
         .aff-detail-chip {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.68rem;
-            background: #f1f5f9;
-            color: #64748b;
-            border: 1px solid #e2e8f0;
+            padding: 2px 8px; border-radius: 10px;
+            font-size: 0.68rem; background: #f1f5f9;
+            color: #64748b; border: 1px solid #e2e8f0;
         }
 
         .aff-expand {
-            cursor: pointer;
-            color: var(--s79-primary);
-            font-size: 0.78rem;
-            background: none;
-            border: none;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 2px;
+            cursor: pointer; color: #3b82f6; font-size: 0.78rem;
+            background: none; border: none; font-family: inherit;
+            display: flex; align-items: center; gap: 2px;
         }
 
         .aff-expand .material-symbols-outlined { font-size: 16px; }
@@ -254,69 +297,111 @@
 
         .aff-detail-cell {
             padding: 12px 16px !important;
-            background: #f8fafc;
-            font-size: 0.8rem;
-            line-height: 1.7;
+            background: #f8fafc; font-size: 0.8rem; line-height: 1.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ad-sidebar { transform: translateX(-100%); box-shadow: 4px 0 24px rgba(0,0,0,0.3); }
+            .ad-sidebar.open { transform: translateX(0); }
+            .ad-main { margin-left: 0; padding: 0 16px 40px; }
+            .ad-hamburger { display: flex; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .project-mini-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
 <body>
-    <div class="admin-main">
-        <div class="admin-header">
-            <div class="admin-header-title">
-                <span class="material-symbols-outlined" style="vertical-align:middle;margin-right:6px;color:var(--primary);">admin_panel_settings</span>
-                管理者儀表板
+    <!-- Dark Sidebar -->
+    <aside class="ad-sidebar" id="adSidebar">
+        <div class="ad-sidebar-brand">
+        <div class="ad-sidebar-logo">
+                <img src="logo.png" alt="數位簡報室" style="width:34px;height:34px;border-radius:10px;">
             </div>
-            <div class="header-right">
-                <span class="user-email" id="userEmail"></span>
-                <a href="manage.html" class="btn btn-sm">
-                    <span class="material-symbols-outlined" style="font-size:16px;">folder</span> 專案管理
-                </a>
-                <button class="btn btn-sm" id="logoutBtn">
-                    <span class="material-symbols-outlined" style="font-size:16px;">logout</span> 登出
-                </button>
+            <div>
+                <div class="ad-sidebar-title">數位簡報室</div>
+                <div class="ad-sidebar-subtitle">Admin Dashboard</div>
+            </div>
+        </div>
+        <nav class="ad-sidebar-nav">
+            <div class="ad-nav-group-label">儀表板</div>
+            <button class="ad-nav-item active" data-view="overview">
+                <span class="material-symbols-outlined">dashboard</span> 總覽
+            </button>
+
+            <div class="ad-nav-group-label">管理</div>
+            <button class="ad-nav-item" data-view="instructors">
+                <span class="material-symbols-outlined">people</span> 講師管理
+            </button>
+            <button class="ad-nav-item" data-view="projects">
+                <span class="material-symbols-outlined">grid_view</span> 專案總覽
+            </button>
+            <a class="ad-nav-item" href="manage.html">
+                <span class="material-symbols-outlined">folder</span> 專案管理
+            </a>
+
+            <div class="ad-nav-group-label">聯盟</div>
+            <button class="ad-nav-item" data-view="affiliates">
+                <span class="material-symbols-outlined">handshake</span> 夥伴審核
+                <span class="ad-badge" id="affPendingBadge" style="display:none;"></span>
+            </button>
+        </nav>
+        <div class="ad-sidebar-user">
+            <div class="ad-sidebar-user-info">
+                <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
+                <span id="sidebarTime"></span>
+            </div>
+            <div class="ad-sidebar-user-info">
+                <span class="material-symbols-outlined" style="font-size:16px;">person</span>
+                <span id="userEmail"></span>
+            </div>
+            <button class="ad-logout-btn" id="logoutBtn">
+                <span class="material-symbols-outlined">logout</span> 登出
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile hamburger overlay -->
+    <div class="ad-overlay" id="adOverlay"></div>
+
+    <!-- Main Content -->
+    <main class="ad-main">
+        <div class="ad-topbar">
+            <button class="ad-hamburger" id="adHamburger">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <h1 class="ad-page-title" id="pageTitle">總覽</h1>
+        </div>
+
+        <!-- View: Overview -->
+        <div class="ad-view active" id="view-overview">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#e8f0fe;color:#1a73e8;"><span class="material-symbols-outlined">people</span></div>
+                    <div class="stat-label">總講師數</div>
+                    <div class="stat-value" id="statInstructors">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fef7e0;color:#e37400;"><span class="material-symbols-outlined">folder</span></div>
+                    <div class="stat-label">總專案數</div>
+                    <div class="stat-value" id="statProjects">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#e6f4ea;color:#188038;"><span class="material-symbols-outlined">event</span></div>
+                    <div class="stat-label">總場次數</div>
+                    <div class="stat-value" id="statSessions">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fce8e6;color:#c5221f;"><span class="material-symbols-outlined">group</span></div>
+                    <div class="stat-label">總學員數</div>
+                    <div class="stat-value" id="statStudents">-</div>
+                </div>
             </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-label">總講師數</div>
-                <div class="stat-value" id="statInstructors">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">總專案數</div>
-                <div class="stat-value" id="statProjects">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">總場次數</div>
-                <div class="stat-value" id="statSessions">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">總學員數</div>
-                <div class="stat-value" id="statStudents">-</div>
-            </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="tab-bar">
-            <button class="tab-btn active" data-tab="instructors">
-                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">people</span>
-                講師管理
-            </button>
-            <button class="tab-btn" data-tab="affiliates">
-                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">handshake</span>
-                聯盟夥伴 <span id="affPendingBadge" style="display:none;background:#f59e0b;color:#fff;font-size:0.65rem;padding:1px 6px;border-radius:10px;margin-left:4px;"></span>
-            </button>
-            <button class="tab-btn" data-tab="overview">
-                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">grid_view</span>
-                全域專案總覽
-            </button>
-        </div>
-
-        <!-- Tab: 講師管理 -->
-        <div class="tab-panel active" id="panel-instructors">
+        <!-- View: Instructors -->
+        <div class="ad-view" id="view-instructors">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <h3 style="margin:0;font-size:1rem;font-weight:600;">所有講師</h3>
                 <button class="btn btn-primary btn-sm" id="addInstructorBtn">
@@ -336,22 +421,20 @@
                     </tr>
                 </thead>
                 <tbody id="instructorTableBody">
-                    <tr>
-                        <td colspan="7" class="empty-state">載入中...</td>
-                    </tr>
+                    <tr><td colspan="7" class="empty-state">載入中...</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Tab: 全域專案總覽 -->
-        <div class="tab-panel" id="panel-overview">
+        <!-- View: Projects -->
+        <div class="ad-view" id="view-projects">
             <div id="overviewContent">
                 <div class="empty-state">載入中...</div>
             </div>
         </div>
 
-        <!-- Tab: 聯盟夥伴 -->
-        <div class="tab-panel" id="panel-affiliates">
+        <!-- View: Affiliates -->
+        <div class="ad-view" id="view-affiliates">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <h3 style="margin:0;font-size:1rem;font-weight:600;">聯盟夥伴管理</h3>
             </div>
@@ -378,7 +461,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </main>
 
     <!-- Add Instructor Modal -->
     <div class="modal-overlay" id="addInstructorModal">
@@ -478,14 +561,37 @@
             document.getElementById('statStudents').textContent = allStudents.length;
         }
 
-        // ── Tabs ──
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        // ── Sidebar Time ──
+        const updateTime = () => {
+            document.getElementById('sidebarTime').textContent = new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        };
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // ── Sidebar Nav ──
+        const viewTitles = { overview: '總覽', instructors: '講師管理', projects: '專案總覽', affiliates: '夥伴審核' };
+        document.querySelectorAll('.ad-nav-item[data-view]').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                const view = btn.dataset.view;
+                document.querySelectorAll('.ad-nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.ad-view').forEach(p => p.classList.remove('active'));
                 btn.classList.add('active');
-                document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+                document.getElementById(`view-${view}`)?.classList.add('active');
+                document.getElementById('pageTitle').textContent = viewTitles[view] || view;
+                // close mobile sidebar
+                document.getElementById('adSidebar').classList.remove('open');
+                document.getElementById('adOverlay').classList.remove('open');
             });
+        });
+
+        // ── Mobile Hamburger ──
+        document.getElementById('adHamburger').addEventListener('click', () => {
+            document.getElementById('adSidebar').classList.toggle('open');
+            document.getElementById('adOverlay').classList.toggle('open');
+        });
+        document.getElementById('adOverlay').addEventListener('click', () => {
+            document.getElementById('adSidebar').classList.remove('open');
+            document.getElementById('adOverlay').classList.remove('open');
         });
 
         // ── Render Instructor Table ──
