@@ -3,349 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude AI 企業教學指南 — 數位簡報室</title>
-    <meta name="description" content="Claude AI 企業導入教學指南：從基礎到進階，幫助企業快速掌握 Anthropic Claude 各項功能，提升組織 AI 應用能力。">
+    <title>Claude AI 企業教學指南 2026 — ChatGPT vs Gemini 比較 | 數位簡報室</title>
+    <meta name="description" content="2026 最完整 Claude AI 企業導入教學指南。涵蓋 Claude vs ChatGPT vs Gemini 比較、8 大部門應用場景、20 題 FAQ、Prompt 工程課程、AI Lobster 企業導入方案。">
+    <meta name="keywords" content="Claude AI,企業內訓,AI 導入,ChatGPT 比較,Gemini 比較,Prompt 工程,Anthropic,AI 課程,企業培訓,AI Lobster">
+    <meta name="author" content="數位簡報室 The Briefing Room">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://teaching.tbr.digital/claude.html">
+    <meta property="og:title" content="Claude AI 企業教學指南 2026 — 數位簡報室">
+    <meta property="og:description" content="2026 最完整 Claude AI 企業導入教學指南。涵蓋模型比較、部門場景、20 FAQ、AI Lobster 企業導入。">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://teaching.tbr.digital/claude.html">
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
-    <style>
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--bg:#f8f9fb;--surface:#fff;--text:#0f172a;--text-2:#475569;--text-3:#94a3b8;--border:#e2e8f0;--claude:#da7756;--claude-dark:#c4623e;--claude-bg:#fef5f0;--blue:#2563eb;--green:#059669;--purple:#7c3aed;--radius:14px}
-        body{font-family:'Noto Sans TC','Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-        a{color:var(--claude);text-decoration:none}a:hover{text-decoration:underline}
-
-        /* ── Hero ── */
-        .hero{background:linear-gradient(160deg,#1a0a00 0%,#2d1810 30%,#1e293b 100%);min-height:520px;display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 20px;position:relative;overflow:hidden}
-        .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(218,119,86,0.15) 0%,transparent 60%)}
-        .hero-content{position:relative;z-index:1;max-width:800px}
-        .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(218,119,86,0.15);border:1px solid rgba(218,119,86,0.3);border-radius:20px;padding:6px 16px;font-size:0.72rem;color:#f0a882;margin-bottom:20px;font-weight:600}
-        .hero h1{font-size:2.8rem;font-weight:900;color:#fff;line-height:1.3;margin-bottom:16px;letter-spacing:-1px}
-        .hero h1 span{color:var(--claude)}
-        .hero p{font-size:1rem;color:rgba(255,255,255,0.6);line-height:1.8;max-width:600px;margin:0 auto 28px}
-        .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-        .btn-hero{padding:12px 28px;border-radius:10px;font-size:0.88rem;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;font-family:inherit}
-        .btn-hero.primary{background:var(--claude);color:#fff}
-        .btn-hero.primary:hover{background:var(--claude-dark);transform:translateY(-1px)}
-        .btn-hero.ghost{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.15)}
-        .btn-hero.ghost:hover{background:rgba(255,255,255,0.15)}
-
-        /* ── Container ── */
-        .container{max-width:1100px;margin:0 auto;padding:60px 24px}
-
-        /* ── Section ── */
-        .section-label{display:inline-flex;align-items:center;gap:6px;background:var(--claude-bg);color:var(--claude);font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:12px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.05em}
-        .section-title{font-size:1.6rem;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px}
-        .section-desc{font-size:0.88rem;color:var(--text-2);line-height:1.7;max-width:700px;margin-bottom:32px}
-
-        /* ── Feature Grid ── */
-        .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px}
-        .feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;transition:all 0.2s;position:relative;overflow:hidden}
-        .feature-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06)}
-        .feature-card .fc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px}
-        .feature-card h3{font-size:0.95rem;font-weight:700;margin-bottom:8px}
-        .feature-card p{font-size:0.8rem;color:var(--text-2);line-height:1.6}
-        .feature-card .fc-tag{position:absolute;top:12px;right:12px;font-size:0.62rem;padding:2px 8px;border-radius:8px;background:#dcfce7;color:#16a34a;font-weight:600}
-
-        /* ── Model Compare ── */
-        .model-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:48px}
-        .model-table th{background:#f8fafc;padding:14px 18px;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)}
-        .model-table td{padding:14px 18px;font-size:0.82rem;border-bottom:1px solid #f1f5f9}
-        .model-table tr:last-child td{border:none}
-        .model-table .model-name{font-weight:700;color:var(--text)}
-        .model-table .highlight{background:var(--claude-bg)}
-
-        /* ── Curriculum ── */
-        .curriculum{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:48px}
-        .cur-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-        .cur-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-        .cur-number{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:800;color:#fff;flex-shrink:0}
-        .cur-header h3{font-size:0.92rem;font-weight:700}
-        .cur-header .dur{font-size:0.7rem;color:var(--text-3);margin-top:2px}
-        .cur-body{padding:16px 24px}
-        .cur-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:0.8rem;color:var(--text-2)}
-        .cur-item::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
-
-        /* ── Enterprise Steps ── */
-        .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px}
-        .step-card{text-align:center;padding:28px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);position:relative}
-        .step-card::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);font-size:1.2rem;color:var(--text-3)}
-        .step-card:last-child::after{display:none}
-        .step-num{font-size:1.8rem;font-weight:900;color:var(--claude);margin-bottom:8px}
-        .step-card h4{font-size:0.85rem;font-weight:700;margin-bottom:6px}
-        .step-card p{font-size:0.72rem;color:var(--text-2);line-height:1.5}
-
-        /* ── Use Cases SVG ── */
-        .use-cases{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:48px}
-        .uc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;display:flex;gap:16px;align-items:flex-start}
-        .uc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px}
-        .uc-card h4{font-size:0.88rem;font-weight:700;margin-bottom:4px}
-        .uc-card p{font-size:0.78rem;color:var(--text-2);line-height:1.6}
-        .uc-card .uc-tags{margin-top:8px;display:flex;gap:4px;flex-wrap:wrap}
-        .uc-tag{font-size:0.65rem;padding:2px 8px;border-radius:6px;background:#f1f5f9;color:var(--text-3);font-weight:500}
-
-        /* ── Pricing ── */
-        .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
-        .price-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center}
-        .price-card.featured{border-color:var(--claude);box-shadow:0 4px 20px rgba(218,119,86,0.15);position:relative}
-        .price-card.featured::before{content:'推薦';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--claude);color:#fff;font-size:0.68rem;font-weight:700;padding:2px 12px;border-radius:8px}
-        .price-name{font-size:0.82rem;font-weight:700;margin-bottom:4px}
-        .price-amount{font-size:1.6rem;font-weight:900;margin:8px 0}
-        .price-amount span{font-size:0.72rem;font-weight:500;color:var(--text-3)}
-        .price-feat{list-style:none;text-align:left;font-size:0.78rem;color:var(--text-2)}
-        .price-feat li{padding:6px 0;border-bottom:1px solid #f8fafc}
-        .price-feat li::before{content:'✓ ';color:var(--green);font-weight:700}
-
-        /* ── CTA ── */
-        .cta-section{background:linear-gradient(135deg,#2d1810,#1e293b);border-radius:20px;padding:48px;text-align:center;color:#fff;margin-bottom:48px}
-        .cta-section h2{font-size:1.6rem;font-weight:800;margin-bottom:12px}
-        .cta-section p{color:rgba(255,255,255,0.6);margin-bottom:24px;font-size:0.88rem}
-
-        /* ── Footer ── */
-        .page-footer{text-align:center;padding:32px;font-size:0.72rem;color:var(--text-3);border-top:1px solid var(--border)}
-
-        /* ── Responsive ── */
-        @media(max-width:768px){
-            .hero h1{font-size:1.6rem}
-            .feature-grid,.pricing-grid,.steps{grid-template-columns:1fr}
-            .curriculum,.use-cases{grid-template-columns:1fr}
-            .step-card::after{display:none}
-            .container{padding:40px 16px}
-        }
-    </style>
+    <link rel="stylesheet" href="styles/claude.css">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"Article","headline":"Claude AI 企業教學指南 2026","description":"完整的 Claude AI 企業導入教學，涵蓋 ChatGPT/Gemini 比較、部門應用場景、FAQ","author":{"@type":"Organization","name":"數位簡報室 The Briefing Room","url":"https://tbr.digital"},"publisher":{"@type":"Organization","name":"數位簡報室"},"datePublished":"2026-03-28","dateModified":"2026-03-28"}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Claude 是什麼？","acceptedAnswer":{"@type":"Answer","text":"Claude 是 Anthropic 開發的 AI 助手，以安全性與精準度著稱，支援百萬級 context window。"}},
+    {"@type":"Question","name":"Claude 和 ChatGPT 有什麼不同？","acceptedAnswer":{"@type":"Answer","text":"Claude 擅長長文分析與精準推理，ChatGPT 生態系最廣泛，Gemini 與 Google Workspace 整合最佳。"}},
+    {"@type":"Question","name":"企業導入 AI 需要多久？","acceptedAnswer":{"@type":"Answer","text":"一般評估+培訓約 2-4 週，系統整合視規模而定約 1-3 個月。"}}
+    ]}
+    </script>
 </head>
 <body>
+
+<!-- Nav -->
+<nav class="top-nav">
+    <a class="nav-brand" href="overview.html">← 數位簡報室</a>
+    <div class="nav-links">
+        <a href="#capabilities">核心能力</a>
+        <a href="#comparison">模型比較</a>
+        <a href="#curriculum">課程架構</a>
+        <a href="#usecases">部門場景</a>
+        <a href="#lobster">龍蝦導入</a>
+        <a href="#faq">FAQ</a>
+    </div>
+</nav>
 
 <!-- HERO -->
 <section class="hero">
     <div class="hero-content">
-        <div class="hero-badge">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#da7756" stroke-width="1.5"/><path d="M5 8.5L7 10.5L11 6" stroke="#da7756" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            同步 Anthropic 官方最新資訊 · 2026 Q1
-        </div>
+        <div class="hero-badge">✦ 同步 Anthropic 官方最新資訊 · 2026 Q1</div>
         <h1>用 <span>Claude</span> 打造<br>企業 AI 競爭力</h1>
-        <p>從 Prompt 基礎到 Agentic 工作流，完整的 Claude AI 企業導入教學指南。<br>幫助 HR、主管與團隊快速掌握最新 AI 工具，提升 80% 工作效率。</p>
+        <p>從 Prompt 基礎到 Agentic 工作流，完整的 Claude AI 企業導入教學指南。<br>同步比較 ChatGPT、Gemini，幫助企業選擇最適合的 AI 策略。</p>
         <div class="hero-actions">
-            <a class="btn-hero primary" href="#curriculum">查看課程大綱</a>
-            <a class="btn-hero ghost" href="#enterprise">企業導入方案</a>
+            <a class="btn-h pri" href="#curriculum">查看課程大綱</a>
+            <a class="btn-h gho" href="#lobster">AI Lobster 導入</a>
         </div>
     </div>
 </section>
 
-<!-- Claude 核心能力 -->
 <div class="container">
-    <div class="section-label">Core Capabilities</div>
-    <h2 class="section-title">Claude 核心能力總覽</h2>
-    <p class="section-desc">Anthropic 最新旗艦模型 Claude Opus 4.6 — 百萬級 Context Window，支援電腦操作、程式開發、深度整合企業工具。</p>
 
-    <div class="feature-grid">
-        <div class="feature-card">
-            <div class="fc-icon" style="background:#fef5f0;color:var(--claude);">🧠</div>
-            <div class="fc-tag">旗艦</div>
-            <h3>Claude Opus 4.6</h3>
-            <p>1M token context window，128K output。卓越的推理、分析、程式能力，企業級首選模型。</p>
-        </div>
-        <div class="feature-card">
-            <div class="fc-icon" style="background:#eff6ff;color:var(--blue);">🖥️</div>
-            <div class="fc-tag">New</div>
-            <h3>Computer Use</h3>
-            <p>像人一樣操作電腦 — 點擊、滾動、導航應用程式，完成多步驟跨軟體任務。</p>
-        </div>
-        <div class="feature-card">
-            <div class="fc-icon" style="background:#f5f3ff;color:var(--purple);">💻</div>
-            <h3>Claude Code</h3>
-            <p>終端機開發工具，自動化程式碼撰寫、repo 管理、Bug 除錯。開發效率提升 3 倍。</p>
-        </div>
-        <div class="feature-card">
-            <div class="fc-icon" style="background:#ecfdf5;color:var(--green);">🤝</div>
-            <div class="fc-tag">New</div>
-            <h3>Claude Cowork</h3>
-            <p>跨應用程式生產力工具。委派文件處理、郵件管理、數據分析等日常任務。</p>
-        </div>
-        <div class="feature-card">
-            <div class="fc-icon" style="background:#fef7e0;color:#e37400;">🔌</div>
-            <h3>MCP 深度整合</h3>
-            <p>透過 Model Context Protocol 連接 Google Drive、Gmail、Slack、DocuSign 等企業工具。</p>
-        </div>
-        <div class="feature-card">
-            <div class="fc-icon" style="background:#fce8e6;color:#c5221f;">🧩</div>
-            <h3>Persistent Memory</h3>
-            <p>跨對話記憶：記住使用者偏好、溝通風格、專案脈絡，提供一致的個人化體驗。</p>
-        </div>
+<!-- ═══ Claude 核心能力 ═══ -->
+<div id="capabilities"></div>
+<div class="sl">Core Capabilities</div>
+<h2 class="st">Claude 核心能力總覽</h2>
+<p class="sd">Anthropic 最新旗艦模型 <a href="https://www.anthropic.com/claude" target="_blank" rel="noopener">Claude Opus 4.6</a> — 百萬級 Context Window，支援電腦操作、程式開發、深度整合企業工具。</p>
+
+<div class="fg">
+    <div class="fc"><div class="fi" style="background:#fef5f0;color:var(--claude)">🧠</div><div class="ft">旗艦</div><h3>Claude Opus 4.6</h3><p>1M token context window，最強推理、分析與程式能力。<a href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank" rel="noopener">模型文件 →</a></p></div>
+    <div class="fc"><div class="fi" style="background:#eff6ff;color:var(--blue)">🖥️</div><div class="ft">New</div><h3>Computer Use</h3><p>像人一樣操作電腦 — 點擊、滾動、導航應用程式。<a href="https://docs.anthropic.com/en/docs/agents-and-tools/computer-use" target="_blank" rel="noopener">官方文件 →</a></p></div>
+    <div class="fc"><div class="fi" style="background:#f5f3ff;color:var(--purple)">💻</div><h3>Claude Code</h3><p>終端機開發工具，自動化程式碼撰寫、Bug 除錯。<a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" rel="noopener">開發文件 →</a></p></div>
+    <div class="fc"><div class="fi" style="background:#ecfdf5;color:var(--green)">🤝</div><div class="ft">New</div><h3>Claude Cowork</h3><p>跨應用程式生產力代理，委派文件處理與郵件管理。<a href="https://www.anthropic.com/products" target="_blank" rel="noopener">產品頁 →</a></p></div>
+    <div class="fc"><div class="fi" style="background:#fef7e0;color:#e37400">🔌</div><h3>MCP 深度整合</h3><p>透過 <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol</a> 連接 Google Drive、Slack 等工具。</p></div>
+    <div class="fc"><div class="fi" style="background:#fce8e6;color:#c5221f">🧩</div><h3>Persistent Memory</h3><p>跨對話記憶使用者偏好與專案脈絡，提供個人化體驗。</p></div>
+</div>
+
+<!-- ═══ 企業導入示意圖 SVG ═══ -->
+<div class="sl">Enterprise Adoption</div>
+<h2 class="st">多部門同步導入 Claude</h2>
+<p class="sd">企業各部門同時連接 Claude，透過統一平台實現 AI 能力的快速擴散。</p>
+
+<div style="text-align:center;margin-bottom:48px">
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;width:100%">
+  <defs>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#da7756"/><stop offset="100%" stop-color="#c4623e"/></linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="900" height="420" rx="20" fill="#0f172a"/>
+  <!-- Center: Claude -->
+  <circle cx="450" cy="210" r="58" fill="url(#cg)" filter="url(#glow)" opacity="0.9"/>
+  <text x="450" y="198" text-anchor="middle" fill="#fff" font-size="18" font-weight="800" font-family="Inter,sans-serif">Claude</text>
+  <text x="450" y="218" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10" font-weight="600" font-family="Inter,sans-serif">Opus 4.6</text>
+  <text x="450" y="236" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8" font-family="Inter,sans-serif">企業 AI 中樞</text>
+  <!-- Connection lines with animation -->
+  <g stroke="#da7756" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4">
+    <line x1="392" y1="210" x2="190" y2="80"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+    <line x1="392" y1="210" x2="190" y2="210"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+    <line x1="392" y1="210" x2="190" y2="340"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+    <line x1="508" y1="210" x2="710" y2="80"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+    <line x1="508" y1="210" x2="710" y2="210"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+    <line x1="508" y1="210" x2="710" y2="340"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+  </g>
+  <!-- Left departments -->
+  <g>
+    <rect x="100" y="50" width="130" height="60" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="130" y="73" fill="#fff" font-size="18">💻</text>
+    <text x="152" y="73" fill="#fff" font-size="11" font-weight="700" font-family="Noto Sans TC,sans-serif">行銷部</text>
+    <rect x="152" y="80" width="42" height="14" rx="4" fill="rgba(218,119,86,0.3)"/><text x="158" y="90" fill="#f0a882" font-size="8" font-weight="600" font-family="Noto Sans TC,sans-serif">導入中</text>
+  </g>
+  <g>
+    <rect x="100" y="180" width="130" height="60" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="130" y="203" fill="#fff" font-size="18">💻</text>
+    <text x="152" y="203" fill="#fff" font-size="11" font-weight="700" font-family="Noto Sans TC,sans-serif">人資部</text>
+    <rect x="152" y="210" width="42" height="14" rx="4" fill="rgba(218,119,86,0.3)"/><text x="158" y="220" fill="#f0a882" font-size="8" font-weight="600" font-family="Noto Sans TC,sans-serif">導入中</text>
+  </g>
+  <g>
+    <rect x="100" y="310" width="130" height="60" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="130" y="333" fill="#fff" font-size="18">💻</text>
+    <text x="152" y="333" fill="#fff" font-size="11" font-weight="700" font-family="Noto Sans TC,sans-serif">財務部</text>
+    <rect x="152" y="340" width="42" height="14" rx="4" fill="rgba(218,119,86,0.3)"/><text x="158" y="350" fill="#f0a882" font-size="8" font-weight="600" font-family="Noto Sans TC,sans-serif">導入中</text>
+  </g>
+  <!-- Right departments -->
+  <g>
+    <rect x="670" y="50" width="130" height="60" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="700" y="73" fill="#fff" font-size="18">💻</text>
+    <text x="722" y="73" fill="#fff" font-size="11" font-weight="700" font-family="Noto Sans TC,sans-serif">工程部</text>
+    <rect x="722" y="80" width="42" height="14" rx="4" fill="rgba(59,130,246,0.3)"/><text x="728" y="90" fill="#93c5fd" font-size="8" font-weight="600" font-family="Noto Sans TC,sans-serif">已導入</text>
+  </g>
+  <g>
+    <rect x="670" y="180" width="130" height="60" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="700" y="203" fill="#fff" font-size="18">💻</text>
+    <text x="722" y="203" fill="#fff" font-size="11" font-weight="700" font-family="Noto Sans TC,sans-serif">客服部</text>
+    <rect x="722" y="210" width="42" height="14" rx="4" fill="rgba(218,119,86,0.3)"/><text x="728" y="220" fill="#f0a882" font-size="8" font-weight="600" font-family="Noto Sans TC,sans-serif">導入中</text>
+  </g>
+  <g>
+    <rect x="670" y="310" width="130" height="60" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <text x="700" y="333" fill="#fff" font-size="18">💻</text>
+    <text x="722" y="333" fill="#fff" font-size="11" font-weight="700" font-family="Noto Sans TC,sans-serif">法務部</text>
+    <rect x="722" y="340" width="42" height="14" rx="4" fill="rgba(218,119,86,0.3)"/><text x="728" y="350" fill="#f0a882" font-size="8" font-weight="600" font-family="Noto Sans TC,sans-serif">導入中</text>
+  </g>
+  <!-- Bottom labels -->
+  <text x="450" y="400" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="9" font-family="Inter,sans-serif">透過 MCP 協定統一連接企業內部系統 · SSO / SCIM / 審計日誌</text>
+</svg>
+</div>
+
+<!-- ═══ Claude vs ChatGPT vs Gemini ═══ -->
+<div id="comparison"></div>
+<div class="sl">AI Platform Comparison</div>
+<h2 class="st">Claude vs ChatGPT vs Gemini — 2026 企業比較</h2>
+<p class="sd">三大 AI 平台各有優勢，企業應根據需求選擇最適方案。資料來源：<a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">Anthropic</a>、<a href="https://openai.com/chatgpt/pricing" target="_blank" rel="noopener">OpenAI</a>、<a href="https://ai.google.dev/pricing" target="_blank" rel="noopener">Google AI</a></p>
+
+<table class="mt">
+    <thead><tr><th>比較項目</th><th style="color:var(--claude)">Claude (Anthropic)</th><th style="color:#10a37f">ChatGPT (OpenAI)</th><th style="color:#4285f4">Gemini (Google)</th></tr></thead>
+    <tbody>
+        <tr class="hl"><td class="mn">核心優勢</td><td>精準推理、長文分析、安全性</td><td>生態系最廣、插件最多</td><td>Google Workspace 深度整合</td></tr>
+        <tr><td class="mn">最強模型</td><td>Opus 4.6</td><td>GPT-5 Turbo</td><td>Gemini Ultra 2.5</td></tr>
+        <tr><td class="mn">Context Window</td><td><strong>1M tokens</strong></td><td>256K tokens</td><td>1M+ tokens</td></tr>
+        <tr><td class="mn">程式能力</td><td>Claude Code（精準推理型）</td><td>Code Interpreter（速度型）</td><td>Code Assist</td></tr>
+        <tr><td class="mn">電腦操作</td><td>✅ Computer Use</td><td>⚠️ 有限支援</td><td>⚠️ 有限支援</td></tr>
+        <tr><td class="mn">Agent 能力</td><td>Cowork + MCP 整合</td><td>GPTs + Actions</td><td>Gems + Extensions</td></tr>
+        <tr><td class="mn">企業安全</td><td>SOC 2, SSO, SCIM, 審計日誌</td><td>SOC 2, SSO, 資料隔離</td><td>SOC 2, Google Cloud 合規</td></tr>
+        <tr><td class="mn">個人方案</td><td>$20/月 (Pro)</td><td>$20/月 (Plus)</td><td>$19.99/月 (Advanced)</td></tr>
+        <tr><td class="mn">團隊方案</td><td>$25/人/月 (Team)</td><td>$25/人/月 (Team)</td><td>含 Workspace 方案</td></tr>
+        <tr><td class="mn">最佳場景</td><td>長文分析、法務合規、精密程式</td><td>通用對話、客服、行銷</td><td>Google 生態系企業</td></tr>
+    </tbody>
+</table>
+
+<!-- ═══ Claude 模型內部比較 ═══ -->
+<div class="sl">Model Lineup</div>
+<h2 class="st">Claude 模型選擇指南</h2>
+<p class="sd">三個模型層級，API 定價依據 <a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">Anthropic 官方定價</a>（2026 Q1）。</p>
+
+<table class="mt">
+    <thead><tr><th>模型</th><th>特色</th><th>Context</th><th>最佳場景</th><th>API 成本 (Input/Output)</th></tr></thead>
+    <tbody>
+        <tr class="hl"><td class="mn">Opus 4.6</td><td>旗艦 · 最強推理</td><td>1M tokens</td><td>複雜分析、策略規劃、程式架構</td><td>$5 / $25 per 1M</td></tr>
+        <tr><td class="mn">Sonnet 4.6</td><td>平衡 · 高性價比</td><td>1M tokens</td><td>日常辦公、文案、程式、Computer Use</td><td>$3 / $15 per 1M</td></tr>
+        <tr><td class="mn">Haiku 4.5</td><td>輕量 · 超快速</td><td>200K tokens</td><td>即時回應、分類、摘要</td><td>$1 / $5 per 1M</td></tr>
+    </tbody>
+</table>
+
+<!-- ═══ 課程架構 ═══ -->
+<div id="curriculum"></div>
+<div class="sl">Curriculum</div>
+<h2 class="st">企業培訓課程架構</h2>
+<p class="sd">4 階段漸進式學習路徑，從 AI 零基礎到能獨立設計 Agentic 工作流。</p>
+
+<div class="cur">
+    <div class="cc"><div class="ch"><div class="cn" style="background:var(--claude)">01</div><div><h3>AI 基礎與 Prompt 工程</h3><div class="du">3 小時 · 全員適用</div></div></div><div class="cb"><div class="ci">生成式 AI 原理與 Claude / ChatGPT / Gemini 定位</div><div class="ci">Prompt 結構化撰寫技巧（角色/脈絡/格式）</div><div class="ci">Claude 介面操作與 Projects 功能</div><div class="ci">常見 Prompt 失敗案例與修正方法</div><div class="ci">實作：用 Claude 完成 5 個日常工作任務</div></div></div>
+    <div class="cc"><div class="ch"><div class="cn" style="background:var(--blue)">02</div><div><h3>進階應用與文件分析</h3><div class="du">3 小時 · 知識工作者</div></div></div><div class="cb"><div class="ci">百萬 Token 長文件分析策略</div><div class="ci">Multi-turn 對話與複雜推理技巧</div><div class="ci">Vision：圖表解讀、截圖分析</div><div class="ci">Claude Projects：知識庫建置與管理</div><div class="ci">實作：建立部門專屬 AI 助手</div></div></div>
+    <div class="cc"><div class="ch"><div class="cn" style="background:var(--green)">03</div><div><h3>Agentic 工作流設計</h3><div class="du">3 小時 · 進階用戶</div></div></div><div class="cb"><div class="ci">Computer Use：多步驟自動化任務</div><div class="ci">Claude Cowork：跨應用程式代理</div><div class="ci">MCP 整合企業工具（Slack/Drive/CRM）</div><div class="ci">Artifacts：即時產生圖表、文件、程式</div><div class="ci">實作：設計一個端到端的自動化流程</div></div></div>
+    <div class="cc"><div class="ch"><div class="cn" style="background:var(--purple)">04</div><div><h3>企業部署與治理</h3><div class="du">2 小時 · 管理者/IT</div></div></div><div class="cb"><div class="ci">API 串接與 Claude Code 開發</div><div class="ci">企業方案 SSO/SCIM/審計日誌設定</div><div class="ci">AI 使用政策與安全規範制定</div><div class="ci">ROI 衡量與 AI 導入成效追蹤框架</div><div class="ci">Constitutional AI 安全機制解析</div></div></div>
+</div>
+
+<!-- ═══ 8 部門應用場景 ═══ -->
+<div id="usecases"></div>
+<div class="sl">Department Use Cases</div>
+<h2 class="st">8 大部門 AI 導入場景</h2>
+<p class="sd">各部門如何運用 Claude 提升效率的具體應用案例與工具推薦。</p>
+
+<div class="uc">
+    <div class="ucc"><div class="uci" style="background:#eff6ff">📊</div><div><h4>行銷部門</h4><p>內容企劃生成、社群貼文草稿、競品分析報告、SEO 關鍵字策略、Email 行銷文案 AB 測試、廣告素材發想。</p><div class="ut"><span class="utg">文案產生</span><span class="utg">數據分析</span><span class="utg">SEO</span><span class="utg">社群經營</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#f5f3ff">👥</div><div><h4>人資部門</h4><p>JD 撰寫、履歷篩選輔助、面試問題設計、教育訓練教材製作、員工手冊更新、勞動法規查詢。</p><div class="ut"><span class="utg">招募</span><span class="utg">訓練</span><span class="utg">合規</span><span class="utg">文件</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#ecfdf5">⚙️</div><div><h4>工程部門</h4><p>Claude Code 開發加速、Code Review、Bug 分析、技術文件撰寫、架構設計、測試案例生成。</p><div class="ut"><span class="utg">Claude Code</span><span class="utg">除錯</span><span class="utg">文件</span><span class="utg">架構</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#fef7e0">📋</div><div><h4>營運 / PM</h4><p>會議紀錄摘要、PRD 撰寫、數據報表分析、跨部門溝通草稿、OKR 追蹤歸納、流程優化建議。</p><div class="ut"><span class="utg">摘要</span><span class="utg">文件</span><span class="utg">分析</span><span class="utg">規劃</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#fce8e6">⚖️</div><div><h4>法務部門</h4><p>合約條款審查、法規比對分析、法律意見草稿、合規文件整理、風險評估報告（1M context 適合長合約）。</p><div class="ut"><span class="utg">合約審查</span><span class="utg">合規</span><span class="utg">風險評估</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#f0fdf4">💰</div><div><h4>財務部門</h4><p>財報數據摘要、預算分析、費用分類自動化、稅務法規查詢、管理報告撰寫。</p><div class="ut"><span class="utg">報表分析</span><span class="utg">預算</span><span class="utg">自動化</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#fef5f0">🎧</div><div><h4>客服部門</h4><p>客戶問答知識庫建置、回覆範本生成、客訴分析歸類、SOP 文件更新、多語言翻譯支援。</p><div class="ut"><span class="utg">知識庫</span><span class="utg">範本</span><span class="utg">分析</span><span class="utg">翻譯</span></div></div></div>
+    <div class="ucc"><div class="uci" style="background:#eff6ff">🏢</div><div><h4>高階管理層</h4><p>策略報告撰寫、市場趨勢分析、競爭情報整理、董事會簡報草稿、ESG 報告準備。</p><div class="ut"><span class="utg">策略</span><span class="utg">趨勢</span><span class="utg">簡報</span><span class="utg">ESG</span></div></div></div>
+</div>
+
+<!-- ═══ 導入步驟 ═══ -->
+<div class="sl">Implementation</div>
+<h2 class="st">企業 AI 導入四步驟</h2>
+<p class="sd">從評估到落地，我們提供完整的導入顧問服務。</p>
+<div class="steps">
+    <div class="sc"><div class="sn">01</div><h4>需求評估</h4><p>AI 成熟度診斷<br>痛點與機會盤點<br>制定導入藍圖</p></div>
+    <div class="sc"><div class="sn">02</div><h4>方案設計</h4><p>選擇適合的 Plan<br>帳號權限架構<br>安全合規確認</p></div>
+    <div class="sc"><div class="sn">03</div><h4>培訓實施</h4><p>分層培訓計畫<br>種子用戶培養<br>部門客製工作坊</p></div>
+    <div class="sc"><div class="sn">04</div><h4>持續優化</h4><p>使用數據追蹤<br>最佳實踐分享<br>季度回顧與迭代</p></div>
+</div>
+
+<!-- ═══ AI Lobster 龍蝦導入 ═══ -->
+<div id="lobster"></div>
+<div class="lobster-sec">
+    <div class="sl" style="background:rgba(218,119,86,0.2)">🦞 AI Lobster</div>
+    <h2>AI Lobster — 企業 AI 生態系導入</h2>
+    <p class="sd">不只是 Claude，而是打造企業專屬的完整 AI 應用生態系。整合 Claude、ChatGPT、Gemini 等多模型策略，確保企業在 AI 時代的全面競爭力。</p>
+    <div class="lobster-grid">
+        <div class="lobster-card"><h4>🔍 AI 診斷與選型</h4><p>評估企業 AI 成熟度，根據業務需求推薦最適合的 AI 工具組合（Claude / ChatGPT / Gemini），制定多模型策略。</p></div>
+        <div class="lobster-card"><h4>⚡ 流程自動化</h4><p>運用 MCP、Computer Use、Cowork 等技術，將重複性工作自動化。平均為企業節省 40% 人力時間。</p></div>
+        <div class="lobster-card"><h4>🎯 一對一顧問</h4><p>指派專屬 AI 顧問，每月定期檢視導入成效，持續調整策略並培養企業內部 AI 種子講師。</p></div>
     </div>
-
-    <!-- Model Comparison -->
-    <div class="section-label">Model Comparison</div>
-    <h2 class="section-title">模型比較與選擇</h2>
-    <p class="section-desc">三個模型層級，滿足不同企業需求場景。</p>
-
-    <table class="model-table">
-        <thead>
-            <tr><th>模型</th><th>特色</th><th>Context</th><th>最佳場景</th><th>API 成本</th></tr>
-        </thead>
-        <tbody>
-            <tr class="highlight">
-                <td class="model-name">Opus 4.6</td>
-                <td>旗艦 · 最強推理</td>
-                <td>1M tokens</td>
-                <td>複雜分析、策略規劃、程式架構</td>
-                <td>$15 / $75 per 1M</td>
-            </tr>
-            <tr>
-                <td class="model-name">Sonnet 4.6</td>
-                <td>平衡 · 高性價比</td>
-                <td>200K tokens</td>
-                <td>日常辦公、文案撰寫、客服</td>
-                <td>$3 / $15 per 1M</td>
-            </tr>
-            <tr>
-                <td class="model-name">Haiku 4.6</td>
-                <td>輕量 · 超快速</td>
-                <td>200K tokens</td>
-                <td>即時回應、分類、摘要</td>
-                <td>$0.25 / $1.25 per 1M</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Curriculum -->
-    <div id="curriculum"></div>
-    <div class="section-label">Curriculum</div>
-    <h2 class="section-title">企業培訓課程架構</h2>
-    <p class="section-desc">4 階段漸進式學習路徑，從 AI 零基礎到能獨立設計 Agentic 工作流。</p>
-
-    <div class="curriculum">
-        <div class="cur-card">
-            <div class="cur-header"><div class="cur-number" style="background:var(--claude);">01</div><div><h3>AI 基礎與 Prompt 工程</h3><div class="dur">3 小時 · 全員適用</div></div></div>
-            <div class="cur-body">
-                <div class="cur-item">生成式 AI 原理與 Claude 定位</div>
-                <div class="cur-item">Prompt 結構化撰寫技巧（角色/脈絡/格式）</div>
-                <div class="cur-item">Claude 介面操作與 Projects 功能</div>
-                <div class="cur-item">常見 Prompt 失敗案例與修正方法</div>
-                <div class="cur-item">實作：用 Claude 完成 5 個日常工作任務</div>
-            </div>
-        </div>
-        <div class="cur-card">
-            <div class="cur-header"><div class="cur-number" style="background:var(--blue);">02</div><div><h3>進階應用與文件分析</h3><div class="dur">3 小時 · 知識工作者</div></div></div>
-            <div class="cur-body">
-                <div class="cur-item">百萬 Token 長文件分析策略</div>
-                <div class="cur-item">Multi-turn 對話與複雜推理技巧</div>
-                <div class="cur-item">Vision：圖表解讀、截圖分析</div>
-                <div class="cur-item">Claude Projects：知識庫建置與管理</div>
-                <div class="cur-item">實作：建立部門專屬 AI 助手</div>
-            </div>
-        </div>
-        <div class="cur-card">
-            <div class="cur-header"><div class="cur-number" style="background:var(--green);">03</div><div><h3>Agentic 工作流設計</h3><div class="dur">3 小時 · 進階用戶</div></div></div>
-            <div class="cur-body">
-                <div class="cur-item">Computer Use：多步驟自動化任務</div>
-                <div class="cur-item">Claude Cowork：跨應用程式代理</div>
-                <div class="cur-item">MCP 整合企業工具（Slack/Drive/CRM）</div>
-                <div class="cur-item">Artifacts：即時產生圖表、文件、程式</div>
-                <div class="cur-item">實作：設計一個端到端的自動化流程</div>
-            </div>
-        </div>
-        <div class="cur-card">
-            <div class="cur-header"><div class="cur-number" style="background:var(--purple);">04</div><div><h3>企業部署與治理</h3><div class="dur">2 小時 · 管理者/IT</div></div></div>
-            <div class="cur-body">
-                <div class="cur-item">API 串接與 Claude Code 開發</div>
-                <div class="cur-item">企業方案 SSO/SCIM/審計日誌設定</div>
-                <div class="cur-item">AI 使用政策與安全規範制定</div>
-                <div class="cur-item">ROI 衡量與 AI 導入成效追蹤框架</div>
-                <div class="cur-item">Constitutional AI 安全機制解析</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Enterprise Adoption -->
-    <div id="enterprise"></div>
-    <div class="section-label">Enterprise Adoption</div>
-    <h2 class="section-title">企業 AI 導入四步驟</h2>
-    <p class="section-desc">從評估到落地，我們提供完整的導入顧問服務。</p>
-
-    <div class="steps">
-        <div class="step-card"><div class="step-num">01</div><h4>需求評估</h4><p>AI 成熟度診斷<br>痛點與機會盤點<br>制定導入藍圖</p></div>
-        <div class="step-card"><div class="step-num">02</div><h4>方案設計</h4><p>選擇適合的 Plan<br>帳號權限架構<br>安全合規確認</p></div>
-        <div class="step-card"><div class="step-num">03</div><h4>培訓實施</h4><p>分層培訓計畫<br>種子用戶培養<br>部門客製工作坊</p></div>
-        <div class="step-card"><div class="step-num">04</div><h4>持續優化</h4><p>使用數據追蹤<br>最佳實踐分享<br>季度回顧與迭代</p></div>
-    </div>
-
-    <!-- Use Cases -->
-    <div class="section-label">Use Cases</div>
-    <h2 class="section-title">企業部門應用場景</h2>
-    <p class="section-desc">各部門如何運用 Claude 提升效率的實際案例。</p>
-
-    <div class="use-cases">
-        <div class="uc-card">
-            <div class="uc-icon" style="background:#eff6ff;">📊</div>
-            <div><h4>行銷部門</h4><p>內容企劃生成、社群貼文草稿、競品分析報告、SEO 關鍵字策略、Email 行銷文案 AB 測試。</p><div class="uc-tags"><span class="uc-tag">文案產生</span><span class="uc-tag">數據分析</span><span class="uc-tag">SEO</span></div></div>
-        </div>
-        <div class="uc-card">
-            <div class="uc-icon" style="background:#f5f3ff;">👥</div>
-            <div><h4>人資部門</h4><p>JD 撰寫、履歷篩選輔助、面試問題設計、教育訓練教材製作、員工手冊更新。</p><div class="uc-tags"><span class="uc-tag">招募</span><span class="uc-tag">訓練</span><span class="uc-tag">文件</span></div></div>
-        </div>
-        <div class="uc-card">
-            <div class="uc-icon" style="background:#ecfdf5;">⚙️</div>
-            <div><h4>工程部門</h4><p>Claude Code 開發加速、Code Review、Bug 分析、技術文件撰寫、架構設計討論。</p><div class="uc-tags"><span class="uc-tag">Claude Code</span><span class="uc-tag">除錯</span><span class="uc-tag">文件</span></div></div>
-        </div>
-        <div class="uc-card">
-            <div class="uc-icon" style="background:#fef7e0;">📋</div>
-            <div><h4>營運/PM</h4><p>會議紀錄摘要、Spec 撰寫、數據報表分析、跨部門溝通草稿、OKR 追蹤歸納。</p><div class="uc-tags"><span class="uc-tag">摘要</span><span class="uc-tag">文件</span><span class="uc-tag">分析</span></div></div>
-        </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="section-label">Pricing Reference</div>
-    <h2 class="section-title">Claude 訂閱方案參考</h2>
-    <p class="section-desc">依據 Anthropic 官方公開資訊整理（2026 Q1）。</p>
-
-    <div class="pricing-grid">
-        <div class="price-card">
-            <div class="price-name">Pro</div>
-            <div class="price-amount">$20 <span>/月</span></div>
-            <ul class="price-feat">
-                <li>5 倍 Free 用量</li>
-                <li>Claude Code / Cowork</li>
-                <li>優先使用新功能</li>
-                <li>適合個人或小型團隊</li>
-            </ul>
-        </div>
-        <div class="price-card featured">
-            <div class="price-name">Team</div>
-            <div class="price-amount">$30 <span>/人/月</span></div>
-            <ul class="price-feat">
-                <li>最低 5 人起訂</li>
-                <li>集中帳務管理</li>
-                <li>Admin 權限控管</li>
-                <li>適合 5-50 人團隊</li>
-            </ul>
-        </div>
-        <div class="price-card">
-            <div class="price-name">Enterprise</div>
-            <div class="price-amount">客製 <span>聯繫報價</span></div>
-            <ul class="price-feat">
-                <li>SSO / SCIM / 審計日誌</li>
-                <li>高安全性合規（SOC 2）</li>
-                <li>專屬客戶經理</li>
-                <li>適合 50+ 人組織</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- CTA -->
-    <div class="cta-section">
-        <h2>準備好讓團隊擁抱 AI 了嗎？</h2>
-        <p>聯繫我們安排企業培訓需求評估，第一步完全免費。</p>
-        <div class="hero-actions">
-            <a class="btn-hero primary" href="mailto:service@tbr.digital">預約免費諮詢</a>
-            <a class="btn-hero ghost" href="affiliate.html">成為推廣夥伴</a>
-        </div>
+    <div style="margin-top:24px;text-align:center">
+        <a class="btn-h pri" href="mailto:service@tbr.digital" style="display:inline-flex">預約免費 AI 診斷</a>
     </div>
 </div>
 
+<!-- ═══ 訂閱方案 ═══ -->
+<div class="sl">Pricing Reference</div>
+<h2 class="st">Claude 訂閱方案參考</h2>
+<p class="sd">依據 <a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">Anthropic 官方公開資訊</a>（2026 Q1）。</p>
+<div class="pg">
+    <div class="pc"><div class="pn">Pro</div><div class="pa">$20 <span>/月</span></div><ul class="pf"><li>5 倍 Free 用量</li><li>Claude Code / Cowork</li><li>Opus 4.6 使用權</li><li>適合個人或小型團隊</li></ul></div>
+    <div class="pc pop"><div class="pn">Team</div><div class="pa">$25 <span>/人/月</span></div><ul class="pf"><li>最低 5 人起訂</li><li>集中帳務管理</li><li>Admin 權限控管</li><li>Workspace 連接器</li></ul></div>
+    <div class="pc"><div class="pn">Enterprise</div><div class="pa">客製 <span>聯繫報價</span></div><ul class="pf"><li>SSO / SCIM / 審計日誌</li><li>SOC 2 / HIPAA 合規</li><li>500K+ context window</li><li>專屬客戶經理</li></ul></div>
+</div>
+
+<!-- ═══ 20 題 FAQ ═══ -->
+<div id="faq"></div>
+<div class="sl">FAQ</div>
+<h2 class="st">常見問題 (20 題)</h2>
+<p class="sd">關於 Claude AI 企業導入最常被問到的問題。</p>
+
+<div class="faq-list">
+<div class="faq-item"><div class="faq-q">Claude 是什麼？跟 ChatGPT 有什麼不同？</div><div class="faq-a"><div class="faq-a-inner">Claude 是 <a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic</a> 開發的 AI 助手。與 ChatGPT 相比，Claude 擅長長文分析（1M context）、精準推理與程式設計。ChatGPT 生態系最廣泛，適合通用場景。建議企業根據需求選擇或採用多模型策略。</div></div></div>
+<div class="faq-item"><div class="faq-q">Claude 和 Gemini 哪個適合企業用？</div><div class="faq-a"><div class="faq-a-inner">如果企業已重度使用 Google Workspace（Gmail、Drive、Docs），Gemini 整合最佳。若需要精準推理、長篇合約分析或程式開發，Claude 是更好的選擇。兩者皆支援 1M+ token context。</div></div></div>
+<div class="faq-item"><div class="faq-q">企業導入 Claude 需要多久？</div><div class="faq-a"><div class="faq-a-inner">一般評估+培訓約 2-4 週。若需 API 串接或系統整合，視規模約 1-3 個月。AI Lobster 方案提供全程顧問支援。</div></div></div>
+<div class="faq-item"><div class="faq-q">Claude 的企業資料安全嗎？</div><div class="faq-a"><div class="faq-a-inner">Enterprise 方案不使用客戶資料訓練模型，支援 SOC 2、HIPAA 合規，具備 SSO/SCIM 整合與完整審計日誌。詳見 <a href="https://www.anthropic.com/trust" target="_blank" rel="noopener">Anthropic Trust Center</a>。</div></div></div>
+<div class="faq-item"><div class="faq-q">什麼是 Computer Use？</div><div class="faq-a"><div class="faq-a-inner">Computer Use 讓 Claude 像人一樣操作電腦螢幕 — 點擊按鈕、填寫表單、切換應用程式，完成跨軟體的自動化任務。適合 RPA 場景。</div></div></div>
+<div class="faq-item"><div class="faq-q">什麼是 MCP (Model Context Protocol)？</div><div class="faq-a"><div class="faq-a-inner">MCP 是 Anthropic 推出的開放協定（<a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">官方站</a>），讓 Claude 可以直接連接企業工具如 Google Drive、Slack、GitHub 等，實現資料即時存取。</div></div></div>
+<div class="faq-item"><div class="faq-q">Claude Cowork 是什麼？</div><div class="faq-a"><div class="faq-a-inner">Cowork 是 2026 年推出的 GUI 代理產品，可建立角色化、持久性的 AI 代理，自動執行跨應用程式的複雜工作流。例如自動整理會議筆記並發送 follow-up email。</div></div></div>
+<div class="faq-item"><div class="faq-q">什麼是 Prompt 工程？為什麼重要？</div><div class="faq-a"><div class="faq-a-inner">Prompt 工程是設計有效指令讓 AI 產出精準結果的技巧。好的 Prompt 可以讓 AI 輸出品質提升 5-10 倍，是企業 AI 導入最重要的基礎能力。</div></div></div>
+<div class="faq-item"><div class="faq-q">非技術人員也能學會用 Claude 嗎？</div><div class="faq-a"><div class="faq-a-inner">完全可以。我們的培訓從零基礎起步，第一階段不需要任何程式能力。行銷、HR、PM 等非技術部門是最大受益者。</div></div></div>
+<div class="faq-item"><div class="faq-q">Claude 支援中文嗎？</div><div class="faq-a"><div class="faq-a-inner">支援。Claude 具備優秀的多語言能力，包含繁體中文、簡體中文、日文、韓文等，對中文的理解與生成品質持續提升。</div></div></div>
+<div class="faq-item"><div class="faq-q">一次培訓可以容納多少人？</div><div class="faq-a"><div class="faq-a-inner">建議每場實作工作坊 20-40 人最佳。演講型課程可支援 200+ 人。透過我們的互動教學簡報系統，所有人都能用手機即時參與互動。</div></div></div>
+<div class="faq-item"><div class="faq-q">培訓之後會有後續支援嗎？</div><div class="faq-a"><div class="faq-a-inner">是的。我們提供培訓後 30 天免費線上諮詢，AI Lobster 方案則包含持續的顧問服務、季度回顧與策略調整。</div></div></div>
+<div class="faq-item"><div class="faq-q">Claude API 怎麼計費？</div><div class="faq-a"><div class="faq-a-inner">API 按 token 計費。Opus 4.6 為 $5/$25 per 1M tokens（Input/Output），Sonnet 為 $3/$15，Haiku 為 $1/$5。可透過 Prompt Caching 和 Batch API 進一步降低成本。</div></div></div>
+<div class="faq-item"><div class="faq-q">Claude 可以分析 PDF 和圖片嗎？</div><div class="faq-a"><div class="faq-a-inner">可以。Claude 支援 PDF 直接上傳分析、圖片辨識（Vision）、截圖解讀等。1M context window 可以一次處理超過 1,000 頁的文件。</div></div></div>
+<div class="faq-item"><div class="faq-q">什麼是 Constitutional AI？</div><div class="faq-a"><div class="faq-a-inner">這是 Anthropic 的核心安全技術，透過一組「AI 憲法」原則來約束模型行為，確保輸出安全、誠實且無害。詳見 <a href="https://www.anthropic.com/research" target="_blank" rel="noopener">Anthropic Research</a>。</div></div></div>
+<div class="faq-item"><div class="faq-q">企業應該用哪個模型？</div><div class="faq-a"><div class="faq-a-inner">建議多模型搭配：Opus 處理複雜分析/策略規劃，Sonnet 處理日常辦公/程式開發，Haiku 用於即時客服/分類任務。根據場景選擇，最佳化成本效益。</div></div></div>
+<div class="faq-item"><div class="faq-q">什麼是 AI Lobster？</div><div class="faq-a"><div class="faq-a-inner">AI Lobster 是我們的企業 AI 生態系導入服務，整合 Claude、ChatGPT、Gemini 等多平台策略，提供從需求評估、工具選型到持續優化的一站式服務。</div></div></div>
+<div class="faq-item"><div class="faq-q">培訓費用怎麼算？</div><div class="faq-a"><div class="faq-a-inner">依企業規模和需求客製報價。單場工作坊約 NT$30,000-80,000，企業全面導入方案另行評估。歡迎填寫表單取得免費報價。</div></div></div>
+<div class="faq-item"><div class="faq-q">可以只訓練特定部門嗎？</div><div class="faq-a"><div class="faq-a-inner">可以。我們提供分部門客製化培訓，可針對行銷、HR、工程、法務等特定部門設計專屬課程內容與實作案例。</div></div></div>
+<div class="faq-item"><div class="faq-q">有線上課程可以自學嗎？</div><div class="faq-a"><div class="faq-a-inner">有的。我們在 <a href="https://tbr.digital" target="_blank" rel="noopener">tbr.digital</a> 提供 AI 公開課程，涵蓋 ChatGPT、Claude、Gemini 等工具的線上教學，適合個人自學或小團隊學習。</div></div></div>
+</div>
+
+<!-- External Links -->
+<div class="sl">Official Resources</div>
+<h2 class="st">官方資源與延伸閱讀</h2>
+<div class="ext-links" style="margin-bottom:48px">
+    <a class="ext-link" href="https://www.anthropic.com" target="_blank" rel="noopener">🔗 Anthropic 官網</a>
+    <a class="ext-link" href="https://docs.anthropic.com" target="_blank" rel="noopener">📄 Claude 開發文件</a>
+    <a class="ext-link" href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">💰 定價方案</a>
+    <a class="ext-link" href="https://modelcontextprotocol.io" target="_blank" rel="noopener">🔌 MCP 協定</a>
+    <a class="ext-link" href="https://openai.com" target="_blank" rel="noopener">🤖 OpenAI 官網</a>
+    <a class="ext-link" href="https://ai.google.dev" target="_blank" rel="noopener">🌐 Google AI</a>
+    <a class="ext-link" href="https://www.anthropic.com/research" target="_blank" rel="noopener">🔬 Anthropic 研究</a>
+    <a class="ext-link" href="https://tbr.digital" target="_blank" rel="noopener">🎓 公開課程</a>
+</div>
+
+<!-- CTA -->
+<div class="cta-sec">
+    <h2>準備好讓團隊擁抱 AI 了嗎？</h2>
+    <p>聯繫我們安排企業培訓需求評估，第一步完全免費。</p>
+    <div class="hero-actions">
+        <a class="btn-h pri" href="mailto:service@tbr.digital">預約免費諮詢</a>
+        <a class="btn-h gho" href="overview.html">回到首頁</a>
+    </div>
+</div>
+
+</div><!-- container -->
+
 <footer class="page-footer">
-    <p>© 2026 數位簡報室 The Briefing Room · <a href="index.html">首頁</a> · <a href="tools.html">免費工具</a></p>
-    <p style="margin-top:4px;">資訊參考 Anthropic 官方公開文件，如有異動以官方為準。</p>
+    <p>© 2026 數位簡報室 The Briefing Room · <a href="overview.html">首頁</a> · <a href="tools.html">免費工具</a> · <a href="claude.html">Claude 指南</a></p>
+    <p style="margin-top:4px">資訊參考 <a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic</a>、<a href="https://openai.com" target="_blank" rel="noopener">OpenAI</a>、<a href="https://ai.google.dev" target="_blank" rel="noopener">Google AI</a> 官方公開文件，如有異動以官方為準。</p>
 </footer>
 
+<script>
+document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => q.closest('.faq-item').classList.toggle('open'));
+});
+</script>
 </body>
 </html>
