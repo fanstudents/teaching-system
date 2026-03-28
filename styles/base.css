@@ -130,9 +130,20 @@ body {
     background: var(--bg-primary);
 }
 
-/* Material Symbols 全域設定 */
+/* Material Symbols 全域設定 — 防止載入前顯示英文文字 (FOUT) */
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    overflow: hidden;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
 }
 
 /* ── Toast ── */
