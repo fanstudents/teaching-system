@@ -65,6 +65,7 @@ const NAV_ITEMS = [
     {
         group: '教學管理',
         items: [
+            { label: '管理總覽', icon: 'dashboard', href: 'admin-dashboard.html', adminOnly: true },
             { label: '專案管理', icon: 'space_dashboard', href: 'manage.html' },
             { label: '客戶管理', icon: 'business', href: 'clients.html', adminOnly: true },
             { label: '開課單位', icon: 'apartment', href: 'organizations.html', adminOnly: true },
@@ -91,7 +92,6 @@ const NAV_ITEMS = [
         group: '系統',
         adminOnly: true,
         items: [
-            { label: '管理總覽', icon: 'dashboard', href: 'admin-dashboard.html' },
             { label: '會員管理', icon: 'group', href: 'members.html' },
             { label: '系統設置', icon: 'settings', href: 'settings.html' },
         ]
