@@ -831,7 +831,7 @@
                     <span class="material-symbols-outlined">manage_accounts</span> 帳戶管理
                 </button>
             </nav>
-            <div class="sidebar-user">
+            <div class="sidebar-bottom">
                 <div class="sidebar-user-avatar" id="userAvatar">
                     <span class="material-symbols-outlined">person</span>
                 </div>
@@ -891,7 +891,7 @@
                             <canvas id="chartSalesTrend" height="220"></canvas>
                         </div>
                     </div>
-                    <div class="section-card">
+<div class="section-card">
                         <div class="section-header">
                             <span class="material-symbols-outlined">donut_large</span> 佣金收入概覽
                         </div>
@@ -926,31 +926,78 @@
             <!-- View: Referral -->
             <div class="view-page" id="view-referral">
                 <h2 class="page-title">企業引薦</h2>
-                <p class="page-subtitle">企業內訓 & 系統導入引薦，分潤比例 <strong>15%</strong></p>
+                <p class="page-subtitle">成功引薦企業客戶，可獲得合約金額 <strong style="color:#10b981;">15% 分潤</strong></p>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
-                    <div class="section-card">
-                        <div class="section-header">
-                            <span class="material-symbols-outlined">school</span> 企業內訓
-                        </div>
-                        <div class="section-body" style="font-size:0.84rem;line-height:1.8;">
-                            <p>推薦企業客戶採購「數位簡報室」內訓課程，包含：</p>
-                            <p>• AI 職場應用內訓<br>• 數位行銷內訓<br>• Vibe Coding 企業工作坊<br>• 客製化課程設計</p>
-                            <div style="margin-top:10px;padding:10px 14px;background:#eff6ff;border-radius:8px;font-size:0.78rem;color:#1d4ed8;">
-                                💰 成功引薦內訓合約，可獲得合約金額 <strong>15%</strong> 分潤
+                <!-- Two Service Cards -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+                    <!-- AI 培訓 -->
+                    <div style="background:linear-gradient(135deg,#1e40af 0%,#3b82f6 100%);border-radius:14px;padding:24px;color:#fff;position:relative;overflow:hidden;">
+                        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+                        <div style="position:absolute;bottom:-30px;right:40px;width:60px;height:60px;background:rgba(255,255,255,0.05);border-radius:50%;"></div>
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="rgba(255,255,255,0.2)"/><path d="M14 6L7 10v8l7 4 7-4v-8l-7-4z" stroke="#fff" stroke-width="1.5" fill="none"/><circle cx="14" cy="14" r="3" fill="#fff" opacity="0.8"/></svg>
+                            <div>
+                                <div style="font-size:1rem;font-weight:700;">AI 培訓</div>
+                                <div style="font-size:0.68rem;opacity:0.7;">Enterprise AI Training</div>
                             </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><rect x="2" y="4" width="16" height="12" rx="2" stroke="#fff" stroke-width="1.3"/><path d="M6 10h3M11 10h3M8 8v4M12 8v4" stroke="#fff" stroke-width="1" opacity="0.7"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">Vibe Coding</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">企業實戰工作坊</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><rect x="3" y="3" width="14" height="14" rx="3" stroke="#fff" stroke-width="1.3"/><path d="M7 7h6M7 10h4M7 13h5" stroke="#fff" stroke-width="1" opacity="0.7"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">辦公室應用</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">AI 效率提升</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);grid-column:span 2;">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><circle cx="10" cy="10" r="7" stroke="#fff" stroke-width="1.3"/><path d="M10 6v4l3 2" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">Claude 全方位教學</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">從入門到進階企業級 AI 應用</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:14px;padding:8px 12px;background:rgba(255,255,255,0.15);border-radius:8px;font-size:0.72rem;text-align:center;font-weight:600;">
+                            💰 成功引薦 → 合約金額 15% 分潤
                         </div>
                     </div>
-                    <div class="section-card">
-                        <div class="section-header">
-                            <span class="material-symbols-outlined">integration_instructions</span> 系統導入
-                        </div>
-                        <div class="section-body" style="font-size:0.84rem;line-height:1.8;">
-                            <p>推薦企業採用「數位簡報室」教學系統導入，包含：</p>
-                            <p>• 互動教學簡報系統<br>• 學員管理 & 成果追蹤<br>• 課前/課後問卷自動化<br>• AI 教學助理整合</p>
-                            <div style="margin-top:10px;padding:10px 14px;background:#fefce8;border-radius:8px;font-size:0.78rem;color:#92400e;">
-                                💰 成功引薦系統導入，可獲得合約金額 <strong>15%</strong> 分潤
+
+                    <!-- 企業導入 -->
+                    <div style="background:linear-gradient(135deg,#7c3aed 0%,#a78bfa 100%);border-radius:14px;padding:24px;color:#fff;position:relative;overflow:hidden;">
+                        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+                        <div style="position:absolute;bottom:-30px;right:40px;width:60px;height:60px;background:rgba(255,255,255,0.05);border-radius:50%;"></div>
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="rgba(255,255,255,0.2)"/><path d="M8 8h12v12H8z" stroke="#fff" stroke-width="1.5" fill="none"/><path d="M12 8v12M8 14h12" stroke="#fff" stroke-width="1" opacity="0.5"/><circle cx="18" cy="10" r="1.5" fill="#fff" opacity="0.8"/></svg>
+                            <div>
+                                <div style="font-size:1rem;font-weight:700;">企業導入</div>
+                                <div style="font-size:0.68rem;opacity:0.7;">System Integration</div>
                             </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><path d="M3 14l4-4 3 3 7-7" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="3" width="16" height="14" rx="2" stroke="#fff" stroke-width="1.2" fill="none"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">儀表板數據整合</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">BI Dashboard</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><path d="M4 16V6a2 2 0 012-2h8a2 2 0 012 2v10" stroke="#fff" stroke-width="1.3"/><path d="M2 16h16" stroke="#fff" stroke-width="1.3"/><path d="M8 8h4M8 11h3" stroke="#fff" stroke-width="1" opacity="0.6"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">老系統改造</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Legacy Migration</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><circle cx="10" cy="10" r="7" stroke="#fff" stroke-width="1.3"/><path d="M7 10l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">企業官網建置</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Corporate Website</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:4px;"><rect x="3" y="5" width="14" height="10" rx="2" stroke="#fff" stroke-width="1.3"/><path d="M3 8h14" stroke="#fff" stroke-width="1" opacity="0.5"/><circle cx="6" cy="6.5" r="0.8" fill="#fff" opacity="0.6"/><circle cx="8.5" cy="6.5" r="0.8" fill="#fff" opacity="0.6"/></svg>
+                                <div style="font-size:0.78rem;font-weight:600;">內部系統打造</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Internal Tools</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:14px;padding:8px 12px;background:rgba(255,255,255,0.15);border-radius:8px;font-size:0.72rem;text-align:center;font-weight:600;">
+                            💰 成功引薦 → 合約金額 15% 分潤
                         </div>
                     </div>
                 </div>
@@ -963,10 +1010,10 @@
                     <div class="section-body" style="padding:16px 20px;">
                         <div id="referralCopy" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:0.82rem;line-height:1.8;cursor:pointer;transition:all 0.15s;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);">我想推薦「數位簡報室」的企業服務給你。
 
-他們提供 AI 職場應用、數位行銷、Vibe Coding 等專業內訓課程，以及互動教學簡報系統的企業導入服務。
+🎯 AI 培訓：Vibe Coding 工作坊、辦公室 AI 應用、Claude 全方位教學
+💻 企業導入：儀表板數據整合、老系統改造、企業官網建置、內部系統打造
 
-✨ 企業內訓：可客製化課程內容，包含 AI 應用、行銷數據、工作坊等
-💻 系統導入：互動教學簡報 + 學員管理 + AI 助理整合
+所有課程與系統都可以依企業需求客製化。
 
 有興趣的話，可以直接跟他們聯繫：
 📧 service@tbr.digital
@@ -975,37 +1022,62 @@
                     </div>
                 </div>
 
-                <!-- 推薦表單 -->
+                <!-- 推薦表單（重新設計） -->
                 <div class="section-card" style="margin-bottom:20px;">
                     <div class="section-header">
-                        <span class="material-symbols-outlined">assignment</span> 推薦客戶表單
+                        <span class="material-symbols-outlined">assignment</span> 推薦客戶
                     </div>
-                    <div class="section-body">
-                        <form id="referralForm" style="display:flex;flex-direction:column;gap:12px;padding:16px 20px;">
-                            <div class="form-group">
-                                <label>引薦類型 <span class="req">*</span></label>
-                                <select id="refType" required style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:0.88rem;">
-                                    <option value="">請選擇</option>
-                                    <option value="企業內訓">企業內訓</option>
-                                    <option value="系統導入">系統導入</option>
-                                </select>
+                    <div class="section-body" style="padding:20px;">
+                        <form id="referralForm">
+                            <!-- 引薦類型 Card Selector -->
+                            <div style="margin-bottom:16px;">
+                                <div style="font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:8px;">選擇引薦類型 <span style="color:#ef4444;">*</span></div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="refTypeCards">
+                                    <label style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s;background:#fff;">
+                                        <input type="radio" name="refTypeRadio" value="AI 培訓" required style="display:none;">
+                                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <span class="material-symbols-outlined" style="color:#fff;font-size:18px;">school</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">AI 培訓</div>
+                                            <div style="font-size:0.68rem;color:#94a3b8;">Vibe Coding · 辦公應用 · Claude</div>
+                                        </div>
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s;background:#fff;">
+                                        <input type="radio" name="refTypeRadio" value="企業導入" style="display:none;">
+                                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <span class="material-symbols-outlined" style="color:#fff;font-size:18px;">integration_instructions</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">企業導入</div>
+                                            <div style="font-size:0.68rem;color:#94a3b8;">儀表板 · 官網 · 系統改造</div>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>客戶名稱 <span class="req">*</span></label>
-                                <input type="text" id="refClientName" placeholder="公司或單位名稱" required>
+                            <input type="hidden" id="refType" value="">
+
+                            <!-- 兩欄表單 -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                <div style="margin-bottom:0;">
+                                    <div style="font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:4px;">客戶名稱 <span style="color:#ef4444;">*</span></div>
+                                    <input type="text" id="refClientName" placeholder="公司或單位名稱" required style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.88rem;width:100%;box-sizing:border-box;transition:border-color 0.15s;font-family:inherit;">
+                                </div>
+                                <div style="margin-bottom:0;">
+                                    <div style="font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:4px;">聯繫方式 <span style="color:#ef4444;">*</span></div>
+                                    <input type="text" id="refContact" placeholder="電話、Email 或 LINE ID" required style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.88rem;width:100%;box-sizing:border-box;transition:border-color 0.15s;font-family:inherit;">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>聯繫方式 <span class="req">*</span></label>
-                                <input type="text" id="refContact" placeholder="電話、Email 或 LINE ID" required>
+                            <div style="margin-bottom:16px;">
+                                <div style="font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:4px;">需求說明</div>
+                                <textarea id="refNotes" rows="3" placeholder="例：公司約 50 人，需要 AI 辦公室應用培訓，預計 Q2 執行..." style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.88rem;width:100%;box-sizing:border-box;resize:vertical;font-family:inherit;transition:border-color 0.15s;"></textarea>
                             </div>
-                            <div class="form-group">
-                                <label>需求說明</label>
-                                <textarea id="refNotes" rows="3" placeholder="例：公司約 50 人，希望安排 AI 應用內訓..."></textarea>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <button type="submit" id="refSubmitBtn" style="display:flex;align-items:center;gap:6px;padding:10px 28px;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;border:none;border-radius:10px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;box-shadow:0 2px 8px rgba(59,130,246,0.3);">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">send</span> 提交推薦
+                                </button>
+                                <div id="refSuccessMsg" style="display:none;padding:8px 14px;background:#e6f4ea;border-radius:8px;font-size:0.82rem;color:#188038;">✅ 推薦已送出，我們會盡快聯繫該客戶！</div>
                             </div>
-                            <button type="submit" class="btn-submit-register" id="refSubmitBtn" style="align-self:flex-start;">
-                                <span class="material-symbols-outlined">send</span> 提交推薦
-                            </button>
-                            <div id="refSuccessMsg" style="display:none;padding:10px 14px;background:#e6f4ea;border-radius:8px;font-size:0.82rem;color:#188038;">✅ 推薦已送出，我們會盡快聯繫該客戶！</div>
                         </form>
                     </div>
                 </div>
@@ -1015,11 +1087,11 @@
                     <div class="section-header">
                         <span class="material-symbols-outlined">support_agent</span> 官方聯繫方式
                     </div>
-                    <div class="section-body" style="padding:16px 20px;display:flex;gap:16px;flex-wrap:wrap;">
-                        <a href="https://lin.ee/77HaRyW" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#06c755;color:#fff;border-radius:8px;text-decoration:none;font-size:0.84rem;font-weight:600;">
+                    <div class="section-body" style="padding:16px 20px;display:flex;gap:12px;flex-wrap:wrap;">
+                        <a href="https://lin.ee/77HaRyW" target="_blank" style="display:flex;align-items:center;gap:8px;padding:12px 24px;background:#06c755;color:#fff;border-radius:10px;text-decoration:none;font-size:0.84rem;font-weight:600;box-shadow:0 2px 8px rgba(6,199,85,0.25);transition:transform 0.15s;">
                             <span class="material-symbols-outlined">chat</span> LINE 官方客服
                         </a>
-                        <a href="mailto:service@tbr.digital" style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#1a73e8;color:#fff;border-radius:8px;text-decoration:none;font-size:0.84rem;font-weight:600;">
+                        <a href="mailto:service@tbr.digital" style="display:flex;align-items:center;gap:8px;padding:12px 24px;background:#1a73e8;color:#fff;border-radius:10px;text-decoration:none;font-size:0.84rem;font-weight:600;box-shadow:0 2px 8px rgba(26,115,232,0.25);transition:transform 0.15s;">
                             <span class="material-symbols-outlined">mail</span> service@tbr.digital
                         </a>
                     </div>
@@ -1531,6 +1603,20 @@
                 setTimeout(() => { el.textContent = affiliate.coupon_code; }, 1500);
             });
 
+            // Radio card selector for referral type
+            document.querySelectorAll('#refTypeCards label').forEach(label => {
+                label.addEventListener('click', () => {
+                    document.querySelectorAll('#refTypeCards label').forEach(l => {
+                        l.style.borderColor = '#e2e8f0';
+                        l.style.background = '#fff';
+                    });
+                    label.style.borderColor = '#3b82f6';
+                    label.style.background = '#eff6ff';
+                    const radio = label.querySelector('input[type="radio"]');
+                    document.getElementById('refType').value = radio.value;
+                });
+            });
+
             // Bank form
             document.getElementById('bankForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1552,15 +1638,17 @@
             // Referral form
             document.getElementById('referralForm')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const refTypeVal = document.getElementById('refType').value;
+                if (!refTypeVal) { alert('請選擇引薦類型'); return; }
                 const btn = document.getElementById('refSubmitBtn');
                 btn.disabled = true;
-                btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> 提交中...';
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_empty</span> 提交中...';
 
                 const { error } = await db.insert('affiliate_referrals', {
                     affiliate_id: affiliate.id,
                     affiliate_name: affiliate.name,
                     affiliate_email: affiliate.email,
-                    referral_type: document.getElementById('refType').value,
+                    referral_type: refTypeVal,
                     client_name: document.getElementById('refClientName').value.trim(),
                     contact: document.getElementById('refContact').value.trim(),
                     notes: document.getElementById('refNotes').value.trim(),
