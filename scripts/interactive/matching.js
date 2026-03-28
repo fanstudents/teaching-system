@@ -29,45 +29,49 @@ export class MatchingGame {
 
         // ── 載入歷史狀態 ──
         if (elementId) {
-            const prev = await stateManager.load(elementId);
-            if (prev && prev.state && prev.state.completed) {
-                // 恢復線並標記為已完成
-                leftItems.forEach(li => {
-                    const leftText = li.textContent.trim().replace(/\s+/g, ' ');
-                    const matchId = li.dataset.matchId;
-                    let targetRi = null;
+            try {
+                const prev = await stateManager.load(elementId);
+                if (prev && prev.state && prev.state.completed) {
+                    // 恢復線並標記為已完成
+                    leftItems.forEach(li => {
+                        const leftText = li.textContent.trim().replace(/\s+/g, ' ');
+                        const matchId = li.dataset.matchId;
+                        let targetRi = null;
 
-                    rightItems.forEach(ri => {
-                        const targetId = ri.dataset.matchId;
-                        if (matchId && targetId) {
-                            if (matchId === targetId) targetRi = ri;
-                        } else {
-                            const answer = ri.dataset.answer;
-                            if (leftText.includes(answer) || (answer && answer.includes(leftText.split('\n')[0].trim()))) {
-                                targetRi = ri;
+                        rightItems.forEach(ri => {
+                            const targetId = ri.dataset.matchId;
+                            if (matchId && targetId) {
+                                if (matchId === targetId) targetRi = ri;
+                            } else {
+                                const answer = ri.dataset.answer;
+                                if (leftText.includes(answer) || (answer && answer.includes(leftText.split('\n')[0].trim()))) {
+                                    targetRi = ri;
+                                }
                             }
+                        });
+
+                        if (targetRi) {
+                            li.classList.add('correct');
+                            targetRi.classList.add('correct');
+                            // 確保 DOM paint 之後才畫線，以取得正確座標
+                            setTimeout(() => {
+                                try { this.drawLine(svg, li, targetRi, true); } catch (e) { }
+                            }, 50);
                         }
                     });
 
-                    if (targetRi) {
-                        li.classList.add('correct');
-                        targetRi.classList.add('correct');
-                        // 確保 DOM paint 之後才畫線，以取得正確座標
-                        setTimeout(() => {
-                            try { this.drawLine(svg, li, targetRi, true); } catch (e) { }
-                        }, 50);
+                    // 顯示已完成結果
+                    let resultEl = container.querySelector('.matching-result');
+                    if (!resultEl) {
+                        resultEl = document.createElement('div');
+                        resultEl.className = 'matching-result';
+                        container.appendChild(resultEl);
                     }
-                });
-
-                // 顯示已完成結果
-                let resultEl = container.querySelector('.matching-result');
-                if (!resultEl) {
-                    resultEl = document.createElement('div');
-                    resultEl.className = 'matching-result';
-                    container.appendChild(resultEl);
+                    resultEl.innerHTML = `<span style="color:#22c55e;font-weight:600;">✓ 已完成 — ${prev.content || ''}</span>`;
+                    return; // 已完成，不再綁定拖曳事件
                 }
-                resultEl.innerHTML = `<span style="color:#22c55e;font-weight:600;">✓ 已完成 — ${prev.content || ''}</span>`;
-                return; // 已完成，不再綁定拖曳事件
+            } catch (e) {
+                console.warn('[matching] load history failed:', e);
             }
         }
 

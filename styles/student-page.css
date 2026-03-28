@@ -650,6 +650,27 @@ body {
 
 .student-slide .interactive-element {
     pointer-events: auto;
+    user-select: none;
+    cursor: pointer;
+    -webkit-user-drag: none;
+}
+
+/* 確保互動元素內的按鈕/拖曳元件可點擊 */
+.student-slide .interactive-element button,
+.student-slide .interactive-element .tf-btn,
+.student-slide .interactive-element .matching-item,
+.student-slide .interactive-element .ordering-chip {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* 確保互動元素內的表單欄位可輸入 */
+.student-slide .interactive-element input,
+.student-slide .interactive-element textarea,
+.student-slide .interactive-element select {
+    pointer-events: auto;
+    user-select: text;
+    cursor: text;
 }
 
 .student-slide .text-element {

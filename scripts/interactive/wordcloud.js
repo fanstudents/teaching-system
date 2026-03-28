@@ -117,8 +117,12 @@ export class WordCloudGame {
 
         // 載入歷史
         if (elementId) {
-            const prev = await stateManager.load(elementId);
-            if (prev?.state?.words) { showSubmitted(prev.state.words); }
+            try {
+                const prev = await stateManager.load(elementId);
+                if (prev?.state?.words) { showSubmitted(prev.state.words); }
+            } catch (e) {
+                console.warn('[wordcloud] load history failed:', e);
+            }
         }
 
         // 載入文字雲

@@ -43,40 +43,44 @@ export class OrderingGame {
 
         // ── 載入歷史狀態 ──
         if (elementId) {
-            const prev = await stateManager.load(elementId);
-            if (prev && prev.state && prev.state.completed) {
-                // 恢復 chips 到 slots
-                const order = prev.state.order || [];
-                slots.forEach((slot, idx) => {
-                    const val = order[idx];
-                    if (val) {
-                        const chip = sourcePool.querySelector(`.ordering-chip[data-value="${val}"]`) ||
-                            Array.from(chips).find(c => c.dataset.value === val);
-                        if (chip) {
-                            slot.appendChild(chip);
+            try {
+                const prev = await stateManager.load(elementId);
+                if (prev && prev.state && prev.state.completed) {
+                    // 恢復 chips 到 slots
+                    const order = prev.state.order || [];
+                    slots.forEach((slot, idx) => {
+                        const val = order[idx];
+                        if (val) {
+                            const chip = sourcePool.querySelector(`.ordering-chip[data-value="${val}"]`) ||
+                                Array.from(chips).find(c => c.dataset.value === val);
+                            if (chip) {
+                                slot.appendChild(chip);
+                            }
                         }
-                    }
-                });
+                    });
 
-                // 鎖定所有 slot 為已完成
-                slots.forEach(slot => {
-                    slot.classList.add('correct', 'locked');
-                    const chip = slot.querySelector('.ordering-chip');
-                    if (chip) {
-                        chip.classList.add('locked');
-                        chip.setAttribute('draggable', 'false');
+                    // 鎖定所有 slot 為已完成
+                    slots.forEach(slot => {
+                        slot.classList.add('correct', 'locked');
+                        const chip = slot.querySelector('.ordering-chip');
+                        if (chip) {
+                            chip.classList.add('locked');
+                            chip.setAttribute('draggable', 'false');
+                        }
+                    });
+                    // 顯示已完成結果
+                    let resultEl = container.querySelector('.ordering-result');
+                    if (!resultEl) {
+                        resultEl = document.createElement('div');
+                        resultEl.className = 'ordering-result success';
+                        container.appendChild(resultEl);
                     }
-                });
-                // 顯示已完成結果
-                let resultEl = container.querySelector('.ordering-result');
-                if (!resultEl) {
-                    resultEl = document.createElement('div');
-                    resultEl.className = 'ordering-result success';
-                    container.appendChild(resultEl);
+                    resultEl.innerHTML = '<span class="material-symbols-outlined">check_circle</span> 已完成 — 排列正確！';
+                    container.classList.add('all-correct');
+                    return; // 已完成，不再綁定拖曳事件
                 }
-                resultEl.innerHTML = '<span class="material-symbols-outlined">check_circle</span> 已完成 — 排列正確！';
-                container.classList.add('all-correct');
-                return; // 已完成，不再綁定拖曳事件
+            } catch (e) {
+                console.warn('[ordering] load history failed:', e);
             }
         }
 

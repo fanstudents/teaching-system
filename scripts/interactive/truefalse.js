@@ -151,17 +151,7 @@ export class TrueFalseGame {
             } catch (e) { /* no realtime */ }
         }
 
-        // 載入歷史
-        if (elementId) {
-            const prev = await stateManager.load(elementId);
-            if (prev?.state?.chosen !== undefined) {
-                markChosen(prev.state.chosen);
-                // 如有歷史且已公布，直接揭曉
-                if (prev.state.revealed) revealAnswer();
-            }
-        }
-
-        // 按鈕事件
+        // ★ 先綁定按鈕事件（確保 UI 可互動，不被 async 阻塞）
         container.querySelectorAll('.tf-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 if (answered) return;
@@ -184,6 +174,20 @@ export class TrueFalseGame {
                 // 不自動揭曉
             });
         });
+
+        // 載入歷史（非阻塞）
+        if (elementId) {
+            try {
+                const prev = await stateManager.load(elementId);
+                if (prev?.state?.chosen !== undefined) {
+                    markChosen(prev.state.chosen);
+                    // 如有歷史且已公布，直接揭曉
+                    if (prev.state.revealed) revealAnswer();
+                }
+            } catch (e) {
+                console.warn('[truefalse] load history failed:', e);
+            }
+        }
 
         // 重新作答
         resetBtn.addEventListener('click', async () => {
