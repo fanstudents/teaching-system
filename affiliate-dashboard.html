@@ -1144,268 +1144,248 @@
             <!-- View: Tutorial -->
             <div class="view-page" id="view-tutorial">
                 <h2 class="page-title">推廣教學</h2>
-                <p class="page-subtitle">學習如何在各平台有效推廣，提升轉換率</p>
+                <p class="page-subtitle">選擇課程，取得各渠道的專業推廣範本</p>
 
-                <!-- 推廣三大原則 -->
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
-                    <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;padding:18px;color:#fff;text-align:center;">
-                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="margin-bottom:8px;"><circle cx="16" cy="16" r="13" stroke="#fff" stroke-width="1.5" fill="none"/><path d="M16 10v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="22" r="1.5" fill="#fff"/></svg>
-                        <div style="font-size:0.88rem;font-weight:700;">保持禮貌</div>
-                        <div style="font-size:0.68rem;opacity:0.7;margin-top:4px;">真誠推薦，不強迫銷售</div>
+                <!-- Step 1: 選擇課程 -->
+                <div class="section-card" style="margin-bottom:20px;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">tune</span> 步驟一：選擇你要推廣的課程
                     </div>
-                    <div style="background:linear-gradient(135deg,#dc2626,#f87171);border-radius:12px;padding:18px;color:#fff;text-align:center;">
-                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="margin-bottom:8px;"><rect x="6" y="6" width="20" height="20" rx="4" stroke="#fff" stroke-width="1.5" fill="none"/><path d="M12 12l8 8M20 12l-8 8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-                        <div style="font-size:0.88rem;font-weight:700;">避免濫發</div>
-                        <div style="font-size:0.68rem;opacity:0.7;margin-top:4px;">質量優先，不洗版刷屏</div>
-                    </div>
-                    <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);border-radius:12px;padding:18px;color:#fff;text-align:center;">
-                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="margin-bottom:8px;"><path d="M16 6l-8 5v10l8 5 8-5V11l-8-5z" stroke="#fff" stroke-width="1.5" fill="none"/><circle cx="16" cy="16" r="4" fill="#fff" opacity="0.3"/><path d="M16 12v4l3 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
-                        <div style="font-size:0.88rem;font-weight:700;">理解課程</div>
-                        <div style="font-size:0.68rem;opacity:0.7;margin-top:4px;">先學習再推薦，建立信任</div>
+                    <div class="section-body" style="padding:16px 20px;">
+                        <select id="tutCourseSelect" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:0.92rem;font-family:inherit;background:#fff;cursor:pointer;transition:border-color 0.15s;">
+                            <option value="">— 請先選擇課程 —</option>
+                        </select>
+                        <div id="tutCourseInfo" style="display:none;margin-top:12px;padding:14px 16px;background:#f8fafc;border-radius:10px;display:none;">
+                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                                <div style="flex:1;min-width:180px;">
+                                    <div style="font-size:0.72rem;color:#94a3b8;">推廣連結</div>
+                                    <a id="tutCourseLink" href="#" target="_blank" style="font-size:0.8rem;color:#1a73e8;word-break:break-all;"></a>
+                                </div>
+                                <div>
+                                    <div style="font-size:0.72rem;color:#94a3b8;">折扣碼</div>
+                                    <span id="tutCourseCoupon" style="font-family:'SF Mono',monospace;font-weight:700;font-size:0.88rem;color:#1e293b;background:#e2e8f0;padding:2px 10px;border-radius:6px;"></span>
+                                </div>
+                                <div>
+                                    <div style="font-size:0.72rem;color:#94a3b8;">分潤</div>
+                                    <span style="font-weight:700;color:#10b981;font-size:0.88rem;">20%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 渠道選擇 Tabs -->
-                <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" id="tutorialTabs">
-                    <button class="tut-tab active" data-channel="facebook" style="display:flex;align-items:center;gap:6px;padding:10px 18px;border:2px solid transparent;border-radius:10px;background:#1877f2;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="#fff"><path d="M16 8a8 8 0 10-9.25 7.9v-5.59H4.72V8h2.03V6.24c0-2 1.2-3.11 3.02-3.11.88 0 1.8.16 1.8.16v1.97h-1.01c-1 0-1.31.62-1.31 1.26V8h2.22l-.36 2.31H9.25v5.59A8 8 0 0016 8z"/></svg>
-                        Facebook
-                    </button>
-                    <button class="tut-tab" data-channel="instagram" style="display:flex;align-items:center;gap:6px;padding:10px 18px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;color:#64748b;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" rx="4" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="12.5" cy="3.5" r="1" fill="currentColor"/></svg>
-                        Instagram
-                    </button>
-                    <button class="tut-tab" data-channel="youtube" style="display:flex;align-items:center;gap:6px;padding:10px 18px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;color:#64748b;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="10" rx="3" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6.5 6v4l3.5-2-3.5-2z" fill="currentColor"/></svg>
-                        YouTube
-                    </button>
-                    <button class="tut-tab" data-channel="blog" style="display:flex;align-items:center;gap:6px;padding:10px 18px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;color:#64748b;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 5h6M5 8h4M5 11h5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-                        Blog
-                    </button>
-                    <button class="tut-tab" data-channel="line" style="display:flex;align-items:center;gap:6px;padding:10px 18px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;color:#64748b;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C4.13 1 1 3.58 1 6.76c0 2.84 2.52 5.22 5.93 5.67.23.05.54.15.62.35.07.18.05.46.02.64l-.1.59c-.03.18-.14.7.62.38s4.09-2.41 5.58-4.12C14.82 8.88 15 7.86 15 6.76 15 3.58 11.87 1 8 1z"/></svg>
-                        LINE
-                    </button>
+                <!-- Step 2: 渠道範本 (hidden until course selected) -->
+                <div id="tutTemplatesArea" style="display:none;">
+                    <div class="section-card" style="margin-bottom:20px;">
+                        <div class="section-header">
+                            <span class="material-symbols-outlined">edit_note</span> 步驟二：選擇推廣渠道，複製範本
+                        </div>
+                        <div class="section-body" style="padding:0;">
+
+                            <!-- Channel Tabs -->
+                            <div style="display:flex;border-bottom:1px solid #e8ecf1;overflow-x:auto;" id="tutorialTabs">
+                                <button class="tut-tab active" data-channel="facebook" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#1877f2;cursor:pointer;font-family:inherit;border-bottom:2px solid #1877f2;transition:all 0.15s;white-space:nowrap;">
+                                    Facebook
+                                </button>
+                                <button class="tut-tab" data-channel="instagram" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;">
+                                    Instagram
+                                </button>
+                                <button class="tut-tab" data-channel="youtube" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;">
+                                    YouTube
+                                </button>
+                                <button class="tut-tab" data-channel="blog" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;">
+                                    Blog
+                                </button>
+                                <button class="tut-tab" data-channel="line" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;">
+                                    LINE
+                                </button>
+                            </div>
+
+                            <div style="padding:20px;" id="tutorialContent">
+
+                                <!-- Facebook -->
+                                <div class="tut-channel active" id="tut-facebook">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#1877f2;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 貼文範本</div>
+                                            <div id="tplFb" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:160px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            <div style="margin-top:6px;font-size:0.68rem;color:#94a3b8;">💡 點擊範本即可複製</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📐 撰寫要點</div>
+                                            <div style="font-size:0.78rem;color:#475569;line-height:1.9;">
+                                                <div style="padding:10px 12px;background:#eff6ff;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>發文結構</strong><br>
+                                                    ① 痛點開頭 → 引發共鳴<br>
+                                                    ② 個人故事 → 建立信任<br>
+                                                    ③ 課程介紹 → 自然帶入<br>
+                                                    ④ 折扣碼 + 連結 → 行動呼籲
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fefce8;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>最佳時段</strong><br>
+                                                    早 8-9 點 / 午 12-1 點 / 晚 8-10 點
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fef2f2;border-radius:8px;">
+                                                    <strong>社團守則</strong><br>
+                                                    先看版規 → 每週最多 1-2 篇 → 回覆留言互動
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Instagram -->
+                                <div class="tut-channel" id="tut-instagram" style="display:none;">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#e1306c;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 貼文範本</div>
+                                            <div id="tplIg" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:160px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            <div style="margin-top:6px;font-size:0.68rem;color:#94a3b8;">💡 點擊範本即可複製</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📐 撰寫要點</div>
+                                            <div style="font-size:0.78rem;color:#475569;line-height:1.9;">
+                                                <div style="padding:10px 12px;background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:8px;margin-bottom:8px;">
+                                                    <strong>Stories 策略</strong><br>
+                                                    每天 2-3 則 → 穿插日常與學習<br>
+                                                    用投票貼紙增加互動 → Bio 放連結
+                                                </div>
+                                                <div style="padding:10px 12px;background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-radius:8px;margin-bottom:8px;">
+                                                    <strong>Reels（前 3 秒是關鍵）</strong><br>
+                                                    「30 秒學會一個技巧」<br>
+                                                    「用 AI 前 vs 後」對比
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fefce8;border-radius:8px;">
+                                                    <strong>Hashtag 15-20 個</strong><br>
+                                                    #AI學習 #VibeCoding #職場技能 #數位轉型
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- YouTube -->
+                                <div class="tut-channel" id="tut-youtube" style="display:none;">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#ff0000;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 影片描述範本</div>
+                                            <div id="tplYt" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:160px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            <div style="margin-top:6px;font-size:0.68rem;color:#94a3b8;">💡 點擊範本即可複製</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📐 影片主題建議</div>
+                                            <div style="font-size:0.78rem;color:#475569;line-height:1.9;">
+                                                <div style="padding:10px 12px;background:#fef2f2;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>長影片 10-20 分鐘</strong><br>
+                                                    「我用這門課做了什麼」成果展示<br>
+                                                    「一週挑戰紀錄」觀眾跟你一起學
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fff7ed;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>Shorts 60 秒</strong><br>
+                                                    「一個你不知道的 AI 技巧」<br>
+                                                    快節奏 + 成果展示 + 結尾導流
+                                                </div>
+                                                <div style="padding:10px 12px;background:#eff6ff;border-radius:8px;">
+                                                    <strong>關鍵提醒</strong><br>
+                                                    描述欄放推廣連結 + 折扣碼<br>
+                                                    口頭提及「連結在描述欄」
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Blog -->
+                                <div class="tut-channel" id="tut-blog" style="display:none;">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#059669;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 文章架構範本</div>
+                                            <div id="tplBlog" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:160px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            <div style="margin-top:6px;font-size:0.68rem;color:#94a3b8;">💡 點擊範本即可複製</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📐 SEO 策略</div>
+                                            <div style="font-size:0.78rem;color:#475569;line-height:1.9;">
+                                                <div style="padding:10px 12px;background:#f0fdf4;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>推薦關鍵字</strong><br>
+                                                    「AI 課程推薦 2026」<br>
+                                                    「Vibe Coding 是什麼」<br>
+                                                    「Claude AI 教學」
+                                                </div>
+                                                <div style="padding:10px 12px;background:#eff6ff;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>五段式架構</strong><br>
+                                                    ① 含關鍵字標題 → ② 問題描述<br>
+                                                    ③ 學習體驗 → ④ 課程推薦<br>
+                                                    ⑤ CTA + 折扣碼
+                                                </div>
+                                                <div style="padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+                                                    <strong>文章長度</strong> 2000-4000 字最佳<br>
+                                                    嵌入截圖 + 個人心得提升信任度
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LINE -->
+                                <div class="tut-channel" id="tut-line" style="display:none;">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#06c755;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 私訊範本</div>
+                                            <div id="tplLine" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:160px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            <div style="margin-top:6px;font-size:0.68rem;color:#94a3b8;">💡 點擊範本即可複製</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📐 LINE 推廣原則</div>
+                                            <div style="font-size:0.78rem;color:#475569;line-height:1.9;">
+                                                <div style="padding:10px 12px;background:#f0fdf4;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>✅ 建議做法</strong><br>
+                                                    先提供免費技巧建立專業感<br>
+                                                    回答問題後自然分享課程<br>
+                                                    1 對 1 私訊（對方有興趣時）
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fef2f2;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>❌ 絕對避免</strong><br>
+                                                    未經同意貼廣告連結<br>
+                                                    大量群發相同訊息<br>
+                                                    加入群組後第一句就推銷
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fefce8;border-radius:8px;">
+                                                    <strong>核心原則</strong><br>
+                                                    LINE 是高信任度管道<br>
+                                                    關係 > 推銷，品質 > 數量
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Channel Content -->
-                <div id="tutorialContent">
-
-                    <!-- Facebook -->
-                    <div class="tut-channel active" id="tut-facebook">
-                        <div class="section-card" style="margin-bottom:16px;">
-                            <div class="section-header" style="color:#1877f2;">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="#1877f2"><path d="M20 10a10 10 0 10-11.56 9.88v-6.99H5.9V10h2.54V7.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V10h2.78l-.44 2.89h-2.34v6.99A10 10 0 0020 10z"/></svg>
-                                Facebook 推廣策略
-                            </div>
-                            <div class="section-body" style="padding:20px;">
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                                    <div style="background:#eff6ff;border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#1e40af;margin-bottom:8px;">📝 貼文推廣</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p><strong>最佳發文時段：</strong>早上 8-9 點、中午 12-1 點、晚上 8-10 點</p>
-                                            <p style="margin-top:6px;"><strong>貼文結構：</strong></p>
-                                            <p>① 用痛點開頭，吸引注意</p>
-                                            <p>② 分享自己的學習心得或改變</p>
-                                            <p>③ 自然帶入課程推薦</p>
-                                            <p>④ 附上折扣碼與課程連結</p>
-                                        </div>
-                                    </div>
-                                    <div style="background:#fefce8;border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#92400e;margin-bottom:8px;">💬 社團推廣</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p><strong>適合的社團類型：</strong>AI 學習、職場技能、數位轉型、自我成長</p>
-                                            <p style="margin-top:6px;"><strong>社團發文守則：</strong></p>
-                                            <p>① 先閱讀社團規範，確認可分享</p>
-                                            <p>② 提供有價值的內容（教學/心得）</p>
-                                            <p>③ 回覆留言，建立互動</p>
-                                            <p>④ 每週最多 1-2 篇，避免洗版</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 16px;margin-top:14px;font-size:0.78rem;color:#166534;line-height:1.7;">
-                                    <strong>✅ 範例開頭：</strong>「最近開始學 AI 課程，原本以為很難，沒想到三天就能用 AI 做出自己的小工具了！分享一下我的學習路線...」
-                                </div>
-                                <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px 16px;margin-top:8px;font-size:0.78rem;color:#991b1b;line-height:1.7;">
-                                    <strong>❌ 避免這樣：</strong>「超強 AI 課程限時特價！快用我的折扣碼買！」—— 這樣的內容會被視為垃圾廣告。
-                                </div>
-                            </div>
+                <!-- 推廣守則 -->
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;">
+                    <div style="font-size:0.82rem;font-weight:700;color:#1e293b;margin-bottom:10px;">推廣基本守則</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:0.76rem;color:#475569;line-height:1.7;">
+                        <div style="padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #e8ecf1;">
+                            <span style="font-weight:600;color:#059669;">保持禮貌</span><br>真誠分享，不強迫銷售。推薦基於你的真實體驗。
+                        </div>
+                        <div style="padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #e8ecf1;">
+                            <span style="font-weight:600;color:#dc2626;">避免濫發</span><br>每個平台有適當頻率。質量永遠優先於數量。
+                        </div>
+                        <div style="padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #e8ecf1;">
+                            <span style="font-weight:600;color:#1e40af;">理解課程</span><br>先學習再推薦。了解課程內容才能真正說服人。
                         </div>
                     </div>
-
-                    <!-- Instagram -->
-                    <div class="tut-channel" id="tut-instagram" style="display:none;">
-                        <div class="section-card" style="margin-bottom:16px;">
-                            <div class="section-header" style="color:#e1306c;">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="5" stroke="#e1306c" stroke-width="1.5"/><circle cx="10" cy="10" r="4" stroke="#e1306c" stroke-width="1.5"/><circle cx="15" cy="5" r="1.2" fill="#e1306c"/></svg>
-                                Instagram 推廣策略
-                            </div>
-                            <div class="section-body" style="padding:20px;">
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                                    <div style="background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#be185d;margin-bottom:8px;">📸 限時動態 Stories</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p><strong>策略：</strong>每天 2-3 則限動，穿插日常與學習</p>
-                                            <p style="margin-top:6px;">① 螢幕錄影課程精華片段</p>
-                                            <p>② 用投票/問答貼紙增加互動</p>
-                                            <p>③ 倒數計時貼紙製造緊迫感</p>
-                                            <p>④ 向上滑連結（或 Bio 放連結）</p>
-                                        </div>
-                                    </div>
-                                    <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#6d28d9;margin-bottom:8px;">🎞 Reels 短影片</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p><strong>影片類型推薦：</strong></p>
-                                            <p>① 「30 秒學會一個 AI 技巧」</p>
-                                            <p>② 「用 AI 前 vs 後」對比效果</p>
-                                            <p>③ 轉場特效 + 成果展示</p>
-                                            <p style="margin-top:6px;"><strong>小訣竅：</strong>前 3 秒是關鍵！用視覺衝擊抓住注意力</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;margin-top:14px;font-size:0.78rem;color:#92400e;line-height:1.7;">
-                                    <strong>💡 Hashtag 策略：</strong>混合使用大中小標籤，例如 #AI學習 #VibeCoding #職場技能提升 #數位轉型 #自我成長。每篇 15-20 個，不要超過 30 個。
-                                </div>
-                            </div>
-                        </div>
+                    <div style="margin-top:12px;display:flex;align-items:center;gap:10px;font-size:0.76rem;color:#64748b;">
+                        有推廣問題？
+                        <a href="https://lin.ee/77HaRyW" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;background:#06c755;color:#fff;border-radius:6px;text-decoration:none;font-size:0.72rem;font-weight:600;">LINE 客服</a>
+                        <a href="mailto:service@tbr.digital" style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;background:#1a73e8;color:#fff;border-radius:6px;text-decoration:none;font-size:0.72rem;font-weight:600;">Email</a>
                     </div>
-
-                    <!-- YouTube -->
-                    <div class="tut-channel" id="tut-youtube" style="display:none;">
-                        <div class="section-card" style="margin-bottom:16px;">
-                            <div class="section-header" style="color:#ff0000;">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="3" stroke="#ff0000" stroke-width="1.5"/><path d="M8 7.5v5l4.5-2.5L8 7.5z" fill="#ff0000"/></svg>
-                                YouTube 推廣策略
-                            </div>
-                            <div class="section-body" style="padding:20px;">
-                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
-                                    <div style="background:#fef2f2;border-radius:10px;padding:14px;text-align:center;">
-                                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="margin-bottom:6px;"><rect x="4" y="6" width="20" height="16" rx="3" stroke="#dc2626" stroke-width="1.5"/><path d="M12 11v6l5-3-5-3z" fill="#dc2626"/></svg>
-                                        <div style="font-size:0.78rem;font-weight:700;color:#dc2626;">長影片</div>
-                                        <div style="font-size:0.65rem;color:#94a3b8;margin-top:2px;">10-20 分鐘深度教學</div>
-                                    </div>
-                                    <div style="background:#fff7ed;border-radius:10px;padding:14px;text-align:center;">
-                                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="margin-bottom:6px;"><rect x="8" y="4" width="12" height="20" rx="2" stroke="#ea580c" stroke-width="1.5"/><path d="M12 12v4l3.5-2-3.5-2z" fill="#ea580c"/></svg>
-                                        <div style="font-size:0.78rem;font-weight:700;color:#ea580c;">Shorts</div>
-                                        <div style="font-size:0.65rem;color:#94a3b8;margin-top:2px;">60 秒精華技巧</div>
-                                    </div>
-                                    <div style="background:#eff6ff;border-radius:10px;padding:14px;text-align:center;">
-                                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="margin-bottom:6px;"><rect x="4" y="8" width="20" height="12" rx="2" stroke="#2563eb" stroke-width="1.5"/><path d="M8 14h12M14 11v6" stroke="#2563eb" stroke-width="1.3" stroke-linecap="round"/></svg>
-                                        <div style="font-size:0.78rem;font-weight:700;color:#2563eb;">社群貼文</div>
-                                        <div style="font-size:0.65rem;color:#94a3b8;margin-top:2px;">圖文投票互動</div>
-                                    </div>
-                                </div>
-                                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;font-size:0.78rem;color:#475569;line-height:1.8;">
-                                    <div style="font-weight:700;color:#1e293b;margin-bottom:8px;">🎬 推薦影片主題</div>
-                                    <p>① <strong>「我用 AI 做了什麼」</strong> — 展示學習成果，引發好奇心</p>
-                                    <p>② <strong>「新手必看！AI 工具完整教學」</strong> — 提供免費價值，順帶推薦進階課程</p>
-                                    <p>③ <strong>「一週 Vibe Coding 挑戰」</strong> — 紀錄式內容，觀眾跟著你一起學</p>
-                                    <p>④ <strong>「這堂課改變了我的工作方式」</strong> — 真實心得分享，最有說服力</p>
-                                    <p style="margin-top:8px;">📌 <strong>重要提醒：</strong>在影片描述欄放上你的推廣連結與折扣碼，並口頭提及「連結在描述欄」</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Blog -->
-                    <div class="tut-channel" id="tut-blog" style="display:none;">
-                        <div class="section-card" style="margin-bottom:16px;">
-                            <div class="section-header" style="color:#059669;">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="#059669" stroke-width="1.5"/><path d="M6 6h8M6 9h6M6 12h7" stroke="#059669" stroke-width="1.2" stroke-linecap="round"/></svg>
-                                網站 Blog 推廣策略
-                            </div>
-                            <div class="section-body" style="padding:20px;">
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-                                    <div style="background:#f0fdf4;border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#166534;margin-bottom:8px;">📊 SEO 文章</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p><strong>目標關鍵字範例：</strong></p>
-                                            <p>• 「AI 課程推薦 2026」</p>
-                                            <p>• 「Vibe Coding 是什麼」</p>
-                                            <p>• 「Claude AI 教學」</p>
-                                            <p>• 「職場 AI 工具推薦」</p>
-                                            <p style="margin-top:6px;"><strong>文章長度：</strong>2000-4000 字最佳</p>
-                                        </div>
-                                    </div>
-                                    <div style="background:#eff6ff;border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#1e40af;margin-bottom:8px;">✍️ 文章架構</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p><strong>推薦結構：</strong></p>
-                                            <p>① 標題含關鍵字，吸引點擊</p>
-                                            <p>② 開頭描述問題或需求</p>
-                                            <p>③ 中段分享學習體驗與收穫</p>
-                                            <p>④ 結尾自然帶入課程推薦</p>
-                                            <p>⑤ CTA：折扣碼 + 課程連結</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;border-radius:10px;padding:16px;font-size:0.78rem;color:#475569;line-height:1.7;">
-                                    <strong>💡 進階技巧：</strong>在文章中嵌入課程的截圖、學習前後對比、實際應用案例。加入「個人使用心得」段落，讀者會更信任真實的體驗分享。文末可放「常見問題 FAQ」區塊來提升 SEO。
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- LINE -->
-                    <div class="tut-channel" id="tut-line" style="display:none;">
-                        <div class="section-card" style="margin-bottom:16px;">
-                            <div class="section-header" style="color:#06c755;">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="#06c755"><path d="M10 2C5.58 2 2 4.92 2 8.45c0 3.17 2.81 5.82 6.6 6.32.26.06.61.17.7.39.08.2.05.51.03.72l-.11.66c-.04.2-.16.78.68.42s4.55-2.68 6.21-4.59C17.59 10.82 18 9.68 18 8.45 18 4.92 14.42 2 10 2z"/></svg>
-                                LINE 群組推廣策略
-                            </div>
-                            <div class="section-body" style="padding:20px;">
-                                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:14px;">
-                                    <div style="font-size:0.82rem;font-weight:700;color:#166534;margin-bottom:8px;">🎯 LINE 推廣的核心思維</div>
-                                    <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                        <p>LINE 是更<strong>私密、信任度更高</strong>的管道。在這裡推廣要格外注意「關係優先」的原則。</p>
-                                        <p style="margin-top:6px;">不要把 LINE 群組當作廣告看板，而是建立專業形象的場所。</p>
-                                    </div>
-                                </div>
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                                    <div style="background:#eff6ff;border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#1e40af;margin-bottom:8px;">✅ 建議做法</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p>① 先在群組中提供免費的 AI 小技巧</p>
-                                            <p>② 回答其他人的問題，建立專業感</p>
-                                            <p>③ 自然地分享「我正在學的課程」</p>
-                                            <p>④ 用 1 對 1 私訊推薦（對方有興趣時）</p>
-                                        </div>
-                                    </div>
-                                    <div style="background:#fef2f2;border-radius:10px;padding:16px;">
-                                        <div style="font-size:0.82rem;font-weight:700;color:#991b1b;margin-bottom:8px;">❌ 絕對避免</div>
-                                        <div style="font-size:0.78rem;color:#475569;line-height:1.8;">
-                                            <p>① 未經同意直接貼廣告連結</p>
-                                            <p>② 大量群發相同訊息</p>
-                                            <p>③ 加入群組後第一句就推銷</p>
-                                            <p>④ 用機器人或外掛自動發送</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;margin-top:14px;font-size:0.78rem;color:#92400e;line-height:1.7;">
-                                    <strong>🗣 推薦話術：</strong>「最近在學一堂 AI 課程，覺得蠻實用的，而且現在有折扣。你如果對 AI 有興趣可以看看，我可以分享連結給你。」
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- 底部：官方聯繫 -->
-                <div style="background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-                    <div style="flex:1;min-width:200px;">
-                        <div style="font-size:0.88rem;font-weight:700;color:#1e293b;">有推廣相關問題嗎？</div>
-                        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">歡迎隨時聯繫官方客服，我們會協助你擬定推廣策略</div>
-                    </div>
-                    <a href="https://lin.ee/77HaRyW" target="_blank" style="display:flex;align-items:center;gap:6px;padding:10px 20px;background:#06c755;color:#fff;border-radius:10px;text-decoration:none;font-size:0.82rem;font-weight:600;">
-                        <span class="material-symbols-outlined" style="font-size:18px;">chat</span> LINE 客服
-                    </a>
-                    <a href="mailto:service@tbr.digital" style="display:flex;align-items:center;gap:6px;padding:10px 20px;background:#1a73e8;color:#fff;border-radius:10px;text-decoration:none;font-size:0.82rem;font-weight:600;">
-                        <span class="material-symbols-outlined" style="font-size:18px;">mail</span> Email
-                    </a>
                 </div>
             </div>
-
             <!-- View: Account -->
             <div class="view-page" id="view-account">
                 <h2 class="page-title">帳戶管理</h2>
@@ -1886,24 +1866,134 @@
                 });
             });
 
-            // Tutorial channel tabs
+            // ── Tutorial: course-driven template generator ──
+            let tutCourses = [];
+            async function loadTutorialCourses() {
+                const { data } = await db.select('affiliate_courses', { filter: { is_active: 'eq.true' }, order: 'sort_order.asc' });
+                if (!data || !data.length) return;
+                tutCourses = data;
+                const sel = document.getElementById('tutCourseSelect');
+                data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    sel.appendChild(opt);
+                });
+            }
+            loadTutorialCourses();
+
+            document.getElementById('tutCourseSelect')?.addEventListener('change', function() {
+                const course = tutCourses.find(c => String(c.id) === this.value);
+                if (!course) {
+                    document.getElementById('tutTemplatesArea').style.display = 'none';
+                    document.getElementById('tutCourseInfo').style.display = 'none';
+                    return;
+                }
+                const coupon = affiliate.coupon_code || '';
+                const link = course.url;
+                const name = course.name;
+
+                // Show course info
+                const info = document.getElementById('tutCourseInfo');
+                info.style.display = 'block';
+                document.getElementById('tutCourseLink').href = link;
+                document.getElementById('tutCourseLink').textContent = link;
+                document.getElementById('tutCourseCoupon').textContent = coupon;
+
+                // Show templates area
+                document.getElementById('tutTemplatesArea').style.display = 'block';
+
+                // Generate templates
+                document.getElementById('tplFb').textContent =
+`最近花了一些時間研究 AI 工具的應用，發現一個很有系統的學習資源：
+
+「${name}」
+
+我自己上完之後，最大的收穫是能夠真的把 AI 用在日常工作裡，而不只是玩玩而已。課程裡面有很多實作的部分，跟著做就能直接產出成果。
+
+如果你也想提升 AI 的實戰能力，這門課蠻值得看看的：
+🔗 ${link}
+🎟 折扣碼 ${coupon}（結帳時輸入可享優惠）`;
+
+                document.getElementById('tplIg').textContent =
+`學了 AI 之後，我的工作方式完全不一樣了。
+
+以前要花半天做的報告，現在 20 分鐘搞定。
+以前看不懂的數據分析，現在 AI 幫我整理好摘要。
+
+這些都是我在「${name}」裡面學到的。
+
+課程不講空話，每一堂都有實作。
+適合想把 AI 真正用起來的人。
+
+連結放 Bio 👆
+折扣碼：${coupon}
+
+#AI實戰 #效率工作 #VibeCoding #自我投資 #數位轉型 #AI學習 #職場技能`;
+
+                document.getElementById('tplYt').textContent =
+`📌 ${name}
+
+這支影片分享我上完這門課之後的真實心得，包含我學到哪些東西、實際應用在工作上的效果，以及這門課適合什麼樣的人。
+
+⏱ 時間軸
+00:00 為什麼想學這門課
+02:30 課程內容重點整理
+06:00 我的實際應用成果
+09:00 適合誰 / 不適合誰
+11:00 折扣碼與報名方式
+
+🔗 課程連結：${link}
+🎟 折扣碼：${coupon}（結帳時輸入享優惠）
+
+如果你覺得這支影片有幫助，歡迎按讚訂閱，我會持續分享 AI 學習的內容。`;
+
+                document.getElementById('tplBlog').textContent =
+`標題建議：${name}｜真實上課心得與評價（附折扣碼）
+
+一、前言
+簡述你為什麼開始學 AI、遇到什麼瓶頸。
+
+二、課程內容
+介紹「${name}」的核心模組與教學方式。
+建議搭配課程截圖或你的學習筆記。
+
+三、學習收穫
+分享 2-3 個你實際應用在工作中的案例。
+例如：用 AI 自動產出週報、用 Vibe Coding 做出內部工具。
+
+四、誰適合這門課
+列出 3-4 種適合的對象，幫助讀者快速判斷。
+
+五、報名資訊
+課程連結：${link}
+折扣碼：${coupon}
+（輸入折扣碼即可享有優惠價）`;
+
+                document.getElementById('tplLine').textContent =
+`Hi～想跟你分享一個最近在學的東西。
+
+我最近開始上「${name}」，覺得內容蠻實用的，尤其是實作的部分，上完就可以直接用在工作上。
+
+如果你對 AI 有興趣，可以參考看看：
+${link}
+
+我有一組折扣碼 ${coupon}，結帳的時候輸入可以折抵一些，有需要的話可以用 🙂`;
+            });
+
+            // Tutorial channel tabs (underline style)
             const channelColors = { facebook:'#1877f2', instagram:'#e1306c', youtube:'#ff0000', blog:'#059669', line:'#06c755' };
             document.querySelectorAll('#tutorialTabs .tut-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const ch = tab.dataset.channel;
-                    // Reset all tabs
                     document.querySelectorAll('#tutorialTabs .tut-tab').forEach(t => {
-                        t.style.background = '#fff';
-                        t.style.color = '#64748b';
-                        t.style.borderColor = '#e2e8f0';
+                        t.style.color = '#94a3b8';
+                        t.style.borderBottomColor = 'transparent';
                         t.classList.remove('active');
                     });
-                    // Activate clicked tab
-                    tab.style.background = channelColors[ch] || '#1a73e8';
-                    tab.style.color = '#fff';
-                    tab.style.borderColor = 'transparent';
+                    tab.style.color = channelColors[ch] || '#1a73e8';
+                    tab.style.borderBottomColor = channelColors[ch] || '#1a73e8';
                     tab.classList.add('active');
-                    // Show matching content
                     document.querySelectorAll('.tut-channel').forEach(c => {
                         c.style.display = 'none';
                         c.classList.remove('active');
