@@ -338,10 +338,34 @@ export class Showcase {
                                 _scoredAt: new Date().toISOString()
                             };
 
-                            await db.update('submissions', {
+                            // ★ 用 upsert (與 stateManager.save 相同方式) 確保 state 正確寫入
+                            const upsertRecord = {
+                                session_id: sub.session_id,
+                                element_id: sub.element_id,
+                                student_name: sub.student_name,
+                                student_email: sub.student_email,
+                                student_group: sub.student_group || '',
+                                assignment_title: sub.assignment_title || assignmentTitle,
+                                type: sub.type || 'homework',
+                                content: sub.content || '',
+                                is_correct: sub.is_correct ?? null,
+                                score: String(score),
+                                state: mergedState,
                                 instructor_score: score,
-                                state: mergedState
-                            }, { id: `eq.${subId}` });
+                                submitted_at: sub.submitted_at || new Date().toISOString(),
+                            };
+
+                            const { data: upsertData, error: upsertErr } = await db.insert(
+                                'submissions',
+                                upsertRecord,
+                                { onConflict: 'session_id,element_id,student_email' }
+                            );
+
+                            if (upsertErr) {
+                                console.error('[Showcase] upsert failed:', upsertErr);
+                            } else {
+                                console.log('[Showcase] upsert succeeded, _awarded =', score);
+                            }
 
                             // UI saved 提示
                             const saved = card.querySelector('.showcase-score-saved');
@@ -384,6 +408,8 @@ export class Showcase {
                                             else window.app._lbScoreCache.set(studentEmail, { pts: newPts, rank: -1 });
                                         }
                                     }
+                                } else {
+                                    console.warn('[Showcase] lb-row not found for email:', studentEmail);
                                 }
                                 // 延遲 RPC 同步確保排序正確
                                 setTimeout(() => window.app.updateLeaderboard(), 2000);
