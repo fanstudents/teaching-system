@@ -167,6 +167,97 @@
             .stats-row { grid-template-columns: repeat(2, 1fr); }
             .project-mini-grid { grid-template-columns: 1fr; }
         }
+
+        /* ── Affiliate Management ── */
+        .aff-filter-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .aff-filter-btn {
+            padding: 6px 16px;
+            border: 1.5px solid var(--s79-border);
+            border-radius: 20px;
+            background: none;
+            font-size: 0.78rem;
+            font-family: inherit;
+            color: var(--text-3);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .aff-filter-btn:hover { border-color: var(--s79-border-strong); color: var(--text-2); }
+        .aff-filter-btn.active { border-color: var(--s79-primary); background: var(--s79-primary-light); color: var(--s79-primary); font-weight: 600; }
+
+        .aff-status {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .aff-status.pending { background: #fef7e0; color: #92400e; }
+        .aff-status.approved { background: #e6f4ea; color: #188038; }
+        .aff-status.rejected { background: #fce8e6; color: #c5221f; }
+
+        .aff-actions { display: flex; gap: 4px; }
+
+        .aff-btn {
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .aff-btn.approve { background: #e6f4ea; color: #188038; }
+        .aff-btn.approve:hover { background: #ceead6; }
+        .aff-btn.reject { background: #fce8e6; color: #c5221f; }
+        .aff-btn.reject:hover { background: #f5c6c2; }
+
+        .aff-detail-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .aff-detail-chip {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.68rem;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .aff-expand {
+            cursor: pointer;
+            color: var(--s79-primary);
+            font-size: 0.78rem;
+            background: none;
+            border: none;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .aff-expand .material-symbols-outlined { font-size: 16px; }
+
+        .aff-detail-row { display: none; }
+        .aff-detail-row.show { display: table-row; }
+
+        .aff-detail-cell {
+            padding: 12px 16px !important;
+            background: #f8fafc;
+            font-size: 0.8rem;
+            line-height: 1.7;
+        }
     </style>
 </head>
 
@@ -214,6 +305,10 @@
                 <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">people</span>
                 講師管理
             </button>
+            <button class="tab-btn" data-tab="affiliates">
+                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">handshake</span>
+                聯盟夥伴 <span id="affPendingBadge" style="display:none;background:#f59e0b;color:#fff;font-size:0.65rem;padding:1px 6px;border-radius:10px;margin-left:4px;"></span>
+            </button>
             <button class="tab-btn" data-tab="overview">
                 <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">grid_view</span>
                 全域專案總覽
@@ -253,6 +348,35 @@
             <div id="overviewContent">
                 <div class="empty-state">載入中...</div>
             </div>
+        </div>
+
+        <!-- Tab: 聯盟夥伴 -->
+        <div class="tab-panel" id="panel-affiliates">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3 style="margin:0;font-size:1rem;font-weight:600;">聯盟夥伴管理</h3>
+            </div>
+            <div class="aff-filter-bar">
+                <button class="aff-filter-btn active" data-aff-filter="all">全部</button>
+                <button class="aff-filter-btn" data-aff-filter="pending">待審核</button>
+                <button class="aff-filter-btn" data-aff-filter="approved">已通過</button>
+                <button class="aff-filter-btn" data-aff-filter="rejected">已拒絕</button>
+            </div>
+            <table class="data-table" id="affiliateTable">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>Email</th>
+                        <th>折扣碼</th>
+                        <th>推廣管道</th>
+                        <th>狀態</th>
+                        <th>申請時間</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="affiliateTableBody">
+                    <tr><td colspan="7" class="empty-state">載入中...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -318,11 +442,13 @@
                 loadInstructors(),
                 loadAllProjects(),
                 loadAllSessions(),
-                loadAllStudents()
+                loadAllStudents(),
+                loadAffiliates()
             ]);
             updateStats();
             renderInstructorTable();
             renderOverview();
+            renderAffiliateTable();
         }
 
         async function loadInstructors() {
@@ -520,6 +646,113 @@
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 2500);
         }
+
+        // ── Affiliate Management ──
+        let affiliates = [];
+        let affFilter = 'all';
+
+        async function loadAffiliates() {
+            const { data } = await db.select('affiliates', { order: 'created_at.desc' });
+            affiliates = data || [];
+            // Update pending badge
+            const pending = affiliates.filter(a => a.status === 'pending').length;
+            const badge = document.getElementById('affPendingBadge');
+            if (pending > 0) {
+                badge.textContent = pending;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function renderAffiliateTable() {
+            const tbody = document.getElementById('affiliateTableBody');
+            const filtered = affFilter === 'all' ? affiliates : affiliates.filter(a => a.status === affFilter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">沒有資料</td></tr>';
+                return;
+            }
+
+            const statusLabels = { pending: '待審核', approved: '已通過', rejected: '已拒絕' };
+
+            tbody.innerHTML = filtered.map((a, i) => {
+                const date = a.created_at ? new Date(a.created_at).toLocaleDateString('zh-TW') : '';
+                const courses = a.selected_courses || a.platforms || [];
+                const coursesPreview = Array.isArray(courses) ? courses.slice(0, 2).join('、') + (courses.length > 2 ? `…+${courses.length - 2}` : '') : '';
+
+                return `
+                <tr>
+                    <td style="font-weight:600;">${a.name || '—'}</td>
+                    <td>${a.email}</td>
+                    <td><code style="background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:0.8rem;">${a.coupon_code || '—'}</code></td>
+                    <td style="font-size:0.78rem;color:var(--text-3);">${a.channels || '—'}</td>
+                    <td><span class="aff-status ${a.status}">${statusLabels[a.status] || a.status}</span></td>
+                    <td>${date}</td>
+                    <td>
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <button class="aff-expand" data-aff-detail="${i}"><span class="material-symbols-outlined">info</span></button>
+                            ${a.status === 'pending' ? `
+                                <button class="aff-btn approve" data-aff-approve="${a.id}">核准</button>
+                                <button class="aff-btn reject" data-aff-reject="${a.id}">拒絕</button>
+                            ` : ''}
+                            ${a.status === 'rejected' ? `<button class="aff-btn approve" data-aff-approve="${a.id}">核准</button>` : ''}
+                            ${a.status === 'approved' ? `<button class="aff-btn reject" data-aff-reject="${a.id}">停用</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+                <tr class="aff-detail-row" id="affDetail-${i}">
+                    <td colspan="7" class="aff-detail-cell">
+                        <strong>推廣課程：</strong>
+                        <div class="aff-detail-chips" style="margin:4px 0 8px;">
+                            ${(Array.isArray(courses) ? courses : []).map(c => `<span class="aff-detail-chip">${c}</span>`).join('') || '全部課程'}
+                        </div>
+                        <strong>管道說明：</strong> ${a.channel_detail || '未填寫'}<br>
+                        <strong>佣金比例：</strong> ${Math.round((a.commission_rate || 0.20) * 100)}%
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Detail expand
+            tbody.querySelectorAll('[data-aff-detail]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const row = document.getElementById(`affDetail-${btn.dataset.affDetail}`);
+                    row.classList.toggle('show');
+                });
+            });
+
+            // Approve
+            tbody.querySelectorAll('[data-aff-approve]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    btn.disabled = true;
+                    await db.update('affiliates', { status: 'approved' }, { id: `eq.${btn.dataset.affApprove}` });
+                    await loadAffiliates();
+                    renderAffiliateTable();
+                    showToast('已核准');
+                });
+            });
+
+            // Reject
+            tbody.querySelectorAll('[data-aff-reject]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    btn.disabled = true;
+                    await db.update('affiliates', { status: 'rejected' }, { id: `eq.${btn.dataset.affReject}` });
+                    await loadAffiliates();
+                    renderAffiliateTable();
+                    showToast('已拒絕');
+                });
+            });
+        }
+
+        // Filter bar
+        document.querySelectorAll('[data-aff-filter]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.aff-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                affFilter = btn.dataset.affFilter;
+                renderAffiliateTable();
+            });
+        });
 
         // ── Start ──
         init();
