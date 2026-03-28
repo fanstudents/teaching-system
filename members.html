@@ -215,12 +215,16 @@
                 <button class="btn btn-outline" onclick="exportCSV()">
                     <span class="material-symbols-outlined" style="font-size:18px;">download</span> 匯出
                 </button>
+                <button class="btn" id="btnDeleteSelected" style="display:none;background:#ef4444;color:#fff;border-color:#ef4444;border-radius:20px;" onclick="deleteSelected()">
+                    <span class="material-symbols-outlined" style="font-size:18px;">delete</span> 刪除已勾選 (<span id="deleteCount">0</span>)
+                </button>
             </div>
 
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
+                            <th style="width:36px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)"></th>
                             <th>姓名</th>
                             <th>Email</th>
                             <th>電話</th>
@@ -229,11 +233,12 @@
                             <th>狀態</th>
                             <th>訂單編號</th>
                             <th>購買日期</th>
+                            <th style="width:60px;"></th>
                         </tr>
                     </thead>
                     <tbody id="memberTableBody">
                         <tr>
-                            <td colspan="8" class="empty-row">載入中...</td>
+                            <td colspan="10" class="empty-row">載入中...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -363,7 +368,7 @@
             if (course) filtered = filtered.filter(p => p.course_id === course);
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-row">沒有符合的結果</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-row">沒有符合的結果</td></tr>';
                 return;
             }
 
@@ -374,7 +379,9 @@
                 const date = p.paid_at || p.created_at;
                 const dateStr = date ? new Date(date).toLocaleDateString('zh-TW') : '-';
                 const safeEmail = (p.email || '').replace(/'/g, "\\'");
+                const safeId = (p.id || '').replace(/'/g, "\\'");
                 return `<tr>
+                    <td><input type="checkbox" class="row-check" data-id="${safeId}" data-email="${safeEmail}" onchange="updateDeleteBtn()"></td>
                     <td><b class="clickable" onclick="openMemberDetail('${safeEmail}')">${p.name || p.buyer_name || '-'}</b></td>
                     <td><span class="clickable" onclick="openMemberDetail('${safeEmail}')">${p.email || '-'}</span></td>
                     <td>${p.phone || '-'}</td>
@@ -383,6 +390,7 @@
                     <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
                     <td style="font-size:12px;color:#444746;">${p.order_id || '-'}</td>
                     <td style="font-size:12px;color:#444746;">${dateStr}</td>
+                    <td><button class="btn" style="padding:4px 8px;font-size:11px;border-radius:6px;background:none;border:1px solid #fca5a5;color:#ef4444;cursor:pointer;" onclick="deleteSingle('${safeId}','${safeEmail}','${(p.name||'').replace(/'/g,"\\\'")}')" title="刪除"><span class="material-symbols-outlined" style="font-size:14px;">delete</span></button></td>
                 </tr>`;
             }).join('');
         }
@@ -646,6 +654,71 @@
         document.getElementById('detailModal')?.addEventListener('click', e => {
             if (e.target.id === 'detailModal') e.target.classList.remove('show');
         });
+
+        // ── Delete functions ──
+        window.toggleSelectAll = function(el) {
+            document.querySelectorAll('.row-check').forEach(cb => { cb.checked = el.checked; });
+            updateDeleteBtn();
+        };
+
+        window.updateDeleteBtn = function() {
+            const checked = document.querySelectorAll('.row-check:checked').length;
+            const btn = document.getElementById('btnDeleteSelected');
+            const cnt = document.getElementById('deleteCount');
+            btn.style.display = checked > 0 ? '' : 'none';
+            cnt.textContent = checked;
+        };
+
+        window.deleteSingle = async function(id, email, name) {
+            if (!confirm(`確定要刪除「${name || email}」的購買紀錄嗎？\n同時會刪除該學員的 students 與 submissions 資料。`)) return;
+            await _deleteByEmailAndId(id, email);
+        };
+
+        window.deleteSelected = async function() {
+            const checked = document.querySelectorAll('.row-check:checked');
+            if (checked.length === 0) return;
+            const emails = [...new Set([...checked].map(cb => cb.dataset.email).filter(Boolean))];
+            if (!confirm(`確定要刪除 ${checked.length} 筆資料嗎？\n涉及 ${emails.length} 位學員，同時會刪除 students 與 submissions 資料。\n\n❗ 此操作無法復原`)) return;
+            let success = 0, errors = 0;
+            for (const cb of checked) {
+                try {
+                    await _deleteByEmailAndId(cb.dataset.id, cb.dataset.email, true);
+                    success++;
+                } catch { errors++; }
+            }
+            alert(`已刪除 ${success} 筆${errors > 0 ? `，${errors} 筆失敗` : ''}`);
+            // Reload
+            const { data } = await db.select('purchases', { order: 'created_at.desc' });
+            purchases = data || [];
+            updateStats();
+            renderTable();
+        };
+
+        async function _deleteByEmailAndId(purchaseId, email, silent = false) {
+            try {
+                // 1. 刪除 purchase 記錄
+                if (purchaseId) {
+                    await db.delete('purchases', { id: `eq.${purchaseId}` });
+                }
+                // 2. 刪除 students 記錄
+                if (email) {
+                    await db.delete('students', { email: `eq.${email}` });
+                    // 3. 刪除 submissions 記錄
+                    await db.delete('submissions', { student_email: `eq.${email}` });
+                }
+                if (!silent) {
+                    // Reload
+                    const { data } = await db.select('purchases', { order: 'created_at.desc' });
+                    purchases = data || [];
+                    updateStats();
+                    renderTable();
+                }
+            } catch (e) {
+                console.error('Delete failed:', e);
+                if (!silent) alert('刪除失敗: ' + (e.message || e));
+                throw e;
+            }
+        }
 
         init();
     </script>
