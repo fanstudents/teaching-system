@@ -336,14 +336,29 @@ export class Showcase {
 
                         // 4. 非同步寫入 DB + 廣播
                         try {
-                            // ★ 用 SECURITY DEFINER RPC 直接在 DB 端更新 state._awarded
-                            // 同時更新 session_id 到當前廣播 session，確保排行榜能查到
+                            // ★ 如果 submission 沒有 email，從排行榜 DOM 找
+                            let studentEmail = sub.student_email || '';
+                            if (!studentEmail && sub.student_name) {
+                                // 從排行榜 DOM 反查 email
+                                document.querySelectorAll('.lb-row').forEach(row => {
+                                    const nameEl = row.querySelector('.lb-name');
+                                    if (nameEl && nameEl.textContent.trim() === sub.student_name) {
+                                        studentEmail = row.dataset.email || '';
+                                    }
+                                });
+                                if (studentEmail) {
+                                    console.log('[Showcase] 從排行榜找到 email:', studentEmail, 'for', sub.student_name);
+                                }
+                            }
+
+                            // ★ 用 SECURITY DEFINER RPC 更新 state._awarded + 補 email
                             const { data: rpcResult, error: rpcErr } = await db.rpc(
                                 'instructor_score_submission',
                                 {
                                     p_submission_id: subId,
                                     p_score: score,
-                                    p_session_id: this.sessionCode || null
+                                    p_session_id: this.sessionCode || null,
+                                    p_student_email: studentEmail || null
                                 }
                             );
 
@@ -352,38 +367,6 @@ export class Showcase {
                             } else {
                                 const r = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
                                 console.log('[Showcase] RPC score OK:', r);
-
-                                // ★ 立即驗證：讀回該 submission + 呼叫 get_leaderboard
-                                try {
-                                    // 1. 讀回 submission 確認 state
-                                    const { data: checkRows } = await db.select('submissions', {
-                                        filter: { id: `eq.${subId}` },
-                                        select: 'id,session_id,student_email,state'
-                                    });
-                                    const row = checkRows?.[0];
-                                    let rowState = row?.state;
-                                    if (typeof rowState === 'string') { try { rowState = JSON.parse(rowState); } catch { rowState = {}; } }
-                                    console.log('[Showcase] ★ DB 回讀: session_id=', row?.session_id,
-                                        'email=', row?.student_email,
-                                        '_awarded=', rowState?._awarded,
-                                        '_instructorScored=', rowState?._instructorScored);
-
-                                    // 2. 呼叫 get_leaderboard 看 RPC 回什麼
-                                    const { data: lbData, error: lbErr } = await db.rpc('get_leaderboard', {
-                                        p_session_id: this.sessionCode
-                                    });
-                                    if (lbErr) {
-                                        console.error('[Showcase] ★ get_leaderboard error:', lbErr);
-                                    } else {
-                                        const entry = lbData?.find(e => e.email === row?.student_email);
-                                        console.log('[Showcase] ★ get_leaderboard for', row?.student_email,
-                                            '→ total_points=', entry?.total_points,
-                                            '(全部', lbData?.length, '筆, sessionCode=', this.sessionCode, ')');
-                                        if (!entry) {
-                                            console.log('[Showcase] ★ 所有 leaderboard entries:', lbData?.map(e => `${e.name}(${e.email}):${e.total_points}`));
-                                        }
-                                    }
-                                } catch (vErr) { console.warn('[Showcase] verify err:', vErr); }
                             }
 
                             // UI saved 提示
@@ -404,7 +387,6 @@ export class Showcase {
                             }
 
                             // DB 寫入完成後：樂觀更新排行榜 DOM
-                            const studentEmail = sub?.student_email || '';
                             if (studentEmail && window.app) {
                                 const lbRow = document.querySelector(`.lb-row[data-email="${studentEmail}"]`);
                                 if (lbRow) {
