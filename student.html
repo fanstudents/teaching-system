@@ -2400,6 +2400,18 @@
                 slideEl.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
                 slideEl.style.transformOrigin = 'top left';
                 slideEl.style.marginBottom = '0';
+
+                // ★ 手機端互動元素 counter-scale：讓它們以全寬顯示
+                const counterScale = 1 / scale;
+                slideEl.querySelectorAll('.interactive-element').forEach(el => {
+                    el.style.transform = `scale(${counterScale})`;
+                    el.style.transformOrigin = 'top left';
+                    el.style.width = '960px'; // = slide full width → after counter-scale fills viewport
+                    el.style.left = '0';
+                    el.style.height = 'auto';
+                    el.style.minHeight = '200px';
+                    el.style.zIndex = '100';
+                });
             } else if (isImmersive) {
                 const vw = window.innerWidth;
                 const vh = window.innerHeight;
