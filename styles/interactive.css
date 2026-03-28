@@ -4611,7 +4611,10 @@
         will-change: auto;
         -webkit-transform: none;
         transform: none;
-        overflow: auto;
+        overflow: visible;
+        height: auto !important;
+        min-height: 200px;
+        max-height: none !important;
     }
 
     /* 作業牆 grid 改為垂直滾動、wrap */
@@ -4621,9 +4624,10 @@
         overflow-y: auto;
         -webkit-transform: none;
         transform: none;
+        max-height: 60vh;
     }
 
-    /* 卡片寬度自適應（手機上不強制 280px） */
+    /* 卡片寬度自適應 */
     .showcase-work-card {
         flex: 0 0 auto;
         width: calc(50% - 7px);
@@ -4639,5 +4643,19 @@
     .showcase-status-row {
         padding: 4px 8px;
         gap: 4px;
+    }
+
+    /* 作業牆圖片在手機端自適應 */
+    .showcase-work-body img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* 更窄的螢幕（手機直立） */
+@media (max-width: 480px) {
+    .showcase-work-card {
+        width: 100%;
+        flex-basis: 100%;
     }
 }
