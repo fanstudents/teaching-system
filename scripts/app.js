@@ -3815,7 +3815,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         try {
             const { db } = await import('./supabase.js');
             const { error } = await db.delete('submissions', {
-                session_code: `eq.${this.sessionCode}`,
+                session_id: `eq.${this.sessionCode}`,
                 student_email: `eq.${email}`,
             });
             if (error) throw new Error(error.message);
