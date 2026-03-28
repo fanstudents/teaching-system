@@ -2228,7 +2228,7 @@
                         <li><span class="material-symbols-rounded">check_circle</span> 培訓成效追蹤報告</li>
                         <li><span class="material-symbols-rounded">check_circle</span> 課後持續支援</li>
                     </ul>
-                    <a class="price-btn pri" href="https://forms.gle/" target="_blank">填寫諮詢表單</a>
+                    <a class="price-btn pri" href="javascript:void(0)" onclick="openInquiryForm('training')">填寫諮詢表單</a>
                 </div>
                 <div class="price-card">
                     <h3>AI 系統導入</h3>
@@ -2239,10 +2239,10 @@
                         <li><span class="material-symbols-rounded">check_circle</span> 工具選型與架構規劃</li>
                         <li><span class="material-symbols-rounded">check_circle</span> AI 流程自動化建置</li>
                         <li><span class="material-symbols-rounded">check_circle</span> 一對一顧問輔導</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> AI Lobster 生態系導入</li>
+                        <li><span class="material-symbols-rounded">check_circle</span> AI 龍蝦生態系導入</li>
                         <li><span class="material-symbols-rounded">check_circle</span> 定期成效檢視與優化</li>
                     </ul>
-                    <a class="price-btn out" href="https://forms.gle/" target="_blank">填寫諮詢表單</a>
+                    <a class="price-btn out" href="javascript:void(0)" onclick="openInquiryForm('integration')">填寫諮詢表單</a>
                 </div>
             </div>
         </div>
@@ -2367,6 +2367,7 @@
         if (funnel) { const obs = new IntersectionObserver(e => { e.forEach(en => { if (en.isIntersecting) { funnel.classList.add('animate'); if (arrow1) setTimeout(() => arrow1.classList.add('show'), 600); if (salesCard) setTimeout(() => salesCard.classList.add('pulse'), 900); obs.unobserve(funnel) } }) }, { threshold: .3 }); obs.observe(funnel) }
         document.querySelectorAll('.faq-q').forEach(q => { q.addEventListener('click', () => { q.parentElement.classList.toggle('open') }) });
     </script>
+    <script src="scripts/inquiry-form.js"></script>
 </body>
 
 </html>

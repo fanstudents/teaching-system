@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業諮詢管理 — 教學系統</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/s79-theme.css">
+    <style>
+        body { margin: 0; background: #f4f6f9; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 28px 40px; }
+        .page-header {
+            padding: 24px 0 8px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .page-header h1 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin: 0; }
+        .page-header .meta { font-size: 0.78rem; color: #94a3b8; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+        .stat-card {
+            background: #fff; border: 1px solid #e8ecf1; border-radius: 12px; padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .stat-label { font-size: 0.72rem; color: #94a3b8; font-weight: 500; margin-bottom: 4px; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: #1e293b; }
+
+        .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 6px 16px; border: 1.5px solid #e2e8f0; border-radius: 20px;
+            background: #fff; font-size: .78rem; font-weight: 600; cursor: pointer;
+            color: #64748b; transition: all .2s; font-family: inherit;
+        }
+        .filter-btn.active { border-color: #da7756; color: #da7756; background: rgba(218,119,86,0.06); }
+        .filter-btn:hover { border-color: #cbd5e1; }
+
+        .table-wrap { background: #fff; border: 1px solid #e8ecf1; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        thead th { background: #f8fafc; padding: 12px 16px; text-align: left; font-weight: 600; color: #64748b; font-size: .72rem; text-transform: uppercase; border-bottom: 1px solid #e8ecf1; }
+        tbody td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; color: #1e293b; vertical-align: top; }
+        tbody tr:hover { background: #fafbfc; }
+        tbody tr:last-child td { border: none; }
+
+        .badge {
+            display: inline-block; padding: 2px 10px; border-radius: 12px;
+            font-size: .68rem; font-weight: 700;
+        }
+        .badge-new { background: #dbeafe; color: #1d4ed8; }
+        .badge-contacted { background: #fef7e0; color: #92400e; }
+        .badge-closed { background: #dcfce7; color: #166534; }
+        .badge-rejected { background: #fce8e6; color: #991b1b; }
+
+        .action-btn {
+            padding: 4px 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+            background: #fff; font-size: .72rem; cursor: pointer; color: #475569;
+            font-family: inherit; transition: all .15s;
+        }
+        .action-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .action-btn.pri { border-color: #da7756; color: #da7756; }
+        .action-btn.pri:hover { background: rgba(218,119,86,0.06); }
+
+        .empty-state { padding: 40px; text-align: center; color: #94a3b8; font-size: .85rem; }
+
+        .note-input {
+            width: 100%; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+            font-size: .78rem; font-family: inherit; margin-top: 4px;
+        }
+        .note-input:focus { border-color: #da7756; outline: none; }
+
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 10px 20px; border-radius: 8px; background: #1e293b; color: #fff; font-size: 0.82rem; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; z-index: 999; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px 40px; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            table { display: block; overflow-x: auto; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1>企業諮詢管理</h1>
+                    <div class="meta" id="headerMeta"></div>
+                </div>
+            </div>
+
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card"><div class="stat-label">全部諮詢</div><div class="stat-value" id="statAll">-</div></div>
+                <div class="stat-card"><div class="stat-label">待處理</div><div class="stat-value" id="statNew" style="color:#1d4ed8">-</div></div>
+                <div class="stat-card"><div class="stat-label">已聯繫</div><div class="stat-value" id="statContacted" style="color:#e37400">-</div></div>
+                <div class="stat-card"><div class="stat-label">已成交</div><div class="stat-value" id="statClosed" style="color:#16a34a">-</div></div>
+            </div>
+
+            <div class="filters" id="filters">
+                <button class="filter-btn active" data-status="all">全部</button>
+                <button class="filter-btn" data-status="new">待處理</button>
+                <button class="filter-btn" data-status="contacted">已聯繫</button>
+                <button class="filter-btn" data-status="closed">已成交</button>
+                <button class="filter-btn" data-status="rejected">不適合</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>姓名</th>
+                            <th>公司</th>
+                            <th>Email</th>
+                            <th>類型</th>
+                            <th>規模</th>
+                            <th>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inquiryList">
+                        <tr><td colspan="8" class="empty-state">載入中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { db, requireAuth } from './scripts/supabase.js';
+
+        const authResult = await requireAuth(['super_admin']);
+        if (!authResult) throw new Error('not authorized');
+
+        document.getElementById('headerMeta').textContent =
+            authResult.session.user.email + ' · ' +
+            new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        let allData = [];
+        let currentFilter = 'all';
+
+        const typeMap = { training: 'AI 內訓', integration: '系統導入', consulting: '顧問諮詢', other: '其他' };
+        const statusMap = { new: '待處理', contacted: '已聯繫', closed: '已成交', rejected: '不適合' };
+        const badgeMap = { new: 'badge-new', contacted: 'badge-contacted', closed: 'badge-closed', rejected: 'badge-rejected' };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function render(data) {
+            const tbody = document.getElementById('inquiryList');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">沒有諮詢紀錄</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map(r => `
+                <tr data-id="${r.id}">
+                    <td style="white-space:nowrap;font-size:.75rem;color:#94a3b8">${new Date(r.created_at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                    <td style="font-weight:600">${esc(r.name)}</td>
+                    <td>${esc(r.company || '-')}</td>
+                    <td><a href="mailto:${esc(r.email)}" style="color:#3b82f6;text-decoration:none">${esc(r.email)}</a>${r.phone ? `<br><span style="font-size:.72rem;color:#94a3b8">${esc(r.phone)}</span>` : ''}</td>
+                    <td>${typeMap[r.inquiry_type] || r.inquiry_type}</td>
+                    <td>${r.team_size || '-'}</td>
+                    <td>
+                        <select class="action-btn" onchange="updateStatus('${r.id}', this.value)">
+                            ${Object.entries(statusMap).map(([k, v]) => `<option value="${k}" ${r.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <button class="action-btn" onclick="toggleDetail('${r.id}')">詳情</button>
+                    </td>
+                </tr>
+                <tr class="detail-row" id="detail-${r.id}" style="display:none">
+                    <td colspan="8" style="background:#f8fafc;padding:16px 20px">
+                        <div style="margin-bottom:10px"><strong>需求說明：</strong><br>${esc(r.message || '（未填寫）')}</div>
+                        <div style="margin-bottom:10px"><strong>來源頁面：</strong> ${esc(r.source_page || '-')}</div>
+                        <div><strong>備註：</strong>
+                            <input class="note-input" value="${esc(r.notes || '')}" placeholder="紀錄跟進狀態..."
+                                onchange="updateNote('${r.id}', this.value)">
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        function updateStats() {
+            document.getElementById('statAll').textContent = allData.length;
+            document.getElementById('statNew').textContent = allData.filter(r => r.status === 'new').length;
+            document.getElementById('statContacted').textContent = allData.filter(r => r.status === 'contacted').length;
+            document.getElementById('statClosed').textContent = allData.filter(r => r.status === 'closed').length;
+        }
+
+        function applyFilter(status) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.status === status));
+            const filtered = status === 'all' ? allData : allData.filter(r => r.status === status);
+            render(filtered);
+        }
+
+        // Global functions
+        window.toggleDetail = function(id) {
+            const row = document.getElementById('detail-' + id);
+            if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+        };
+
+        window.updateStatus = async function(id, status) {
+            const { error } = await db.update('enterprise_inquiries',
+                { status, updated_at: new Date().toISOString() },
+                { id: `eq.${id}` }
+            );
+            if (error) return alert('更新失敗: ' + JSON.stringify(error));
+            const item = allData.find(r => r.id === id);
+            if (item) item.status = status;
+            updateStats();
+            applyFilter(currentFilter);
+            showToast('狀態已更新');
+        };
+
+        window.updateNote = async function(id, notes) {
+            const { error } = await db.update('enterprise_inquiries',
+                { notes, updated_at: new Date().toISOString() },
+                { id: `eq.${id}` }
+            );
+            if (error) return alert('更新失敗');
+            const item = allData.find(r => r.id === id);
+            if (item) item.notes = notes;
+            showToast('備註已儲存');
+        };
+
+        // Filters
+        document.getElementById('filters').addEventListener('click', e => {
+            if (e.target.classList.contains('filter-btn')) applyFilter(e.target.dataset.status);
+        });
+
+        // Init
+        async function init() {
+            const { data, error } = await db.select('enterprise_inquiries', {
+                order: 'created_at.desc'
+            });
+            if (error) {
+                document.getElementById('inquiryList').innerHTML =
+                    `<tr><td colspan="8" class="empty-state">載入失敗：${JSON.stringify(error)}</td></tr>`;
+                return;
+            }
+            allData = data || [];
+            updateStats();
+            render(allData);
+        }
+        init();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

@@ -291,8 +291,9 @@ export class Showcase {
                         const subId = card.querySelector('.showcase-score-bar')?.dataset.subId;
                         if (!subId) return;
 
-                        // 1. 先讀取舊的 _awarded 分數
+                        // 1. 讀取舊分數（只查一次）
                         let oldScore = 0;
+                        let existingState = {};
                         try {
                             const { data: rows } = await db.select('submissions', {
                                 filter: { id: `eq.${subId}` },
@@ -301,42 +302,34 @@ export class Showcase {
                             if (rows && rows[0]) {
                                 let st = rows[0].state;
                                 if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                                oldScore = parseInt(st?._awarded) || 0;
+                                existingState = st || {};
+                                oldScore = parseInt(existingState._awarded) || 0;
                             }
                         } catch { }
 
                         const delta = score - oldScore;
 
-                        // UI 回饋 — 星星填滿
+                        // 2. UI 回饋 — 星星填滿（先做，不等 DB）
                         card.querySelectorAll('.showcase-star-btn').forEach(b => {
                             const bScore = parseInt(b.dataset.score);
-                            const icon = b.querySelector('.material-symbols-outlined');
                             if (bScore <= score) {
                                 b.classList.add('filled');
                                 b.classList.remove('half');
                             } else {
                                 b.classList.remove('filled', 'half');
                             }
-                            icon.textContent = 'star';
                         });
                         const valueEl = card.querySelector('.showcase-score-value');
                         if (valueEl) valueEl.textContent = score + ' 分';
 
-                        try {
-                            // 2. 讀取完整 state 並合併更新
-                            let existingState = {};
-                            try {
-                                const { data: rows } = await db.select('submissions', {
-                                    filter: { id: `eq.${subId}` },
-                                    select: 'state'
-                                });
-                                if (rows && rows[0]) {
-                                    let st = rows[0].state;
-                                    if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                                    existingState = st || {};
-                                }
-                            } catch { }
+                        // 3. ★ 立即觸發動畫（不等 DB 回應）
+                        const sub = submissions[parseInt(card.dataset.index)];
+                        if (delta !== 0) {
+                            this._flyStarToLeaderboard(btn, delta);
+                        }
 
+                        // 4. 非同步寫入 DB + 廣播
+                        try {
                             const mergedState = {
                                 ...existingState,
                                 _awarded: score,
@@ -348,19 +341,16 @@ export class Showcase {
                             await db.update('submissions', {
                                 instructor_score: score,
                                 state: mergedState
-                            }, {
-                                filter: { id: `eq.${subId}` }
-                            });
+                            }, { id: `eq.${subId}` });
 
-                            // 3. UI 回饋
+                            // UI saved 提示
                             const saved = card.querySelector('.showcase-score-saved');
                             if (saved) {
                                 saved.style.display = 'inline';
                                 setTimeout(() => saved.style.display = 'none', 2000);
                             }
 
-                            // 4. 廣播（帶正確差值）
-                            const sub = submissions[parseInt(card.dataset.index)];
+                            // 廣播
                             if (sub && this.sessionCode) {
                                 realtime.publish(`session:${this.sessionCode}`, 'hw_scored', {
                                     studentName: sub.student_name,
@@ -376,16 +366,10 @@ export class Showcase {
                                 });
                             }
 
-                            // 5. ★ 星星飛到排行榜的動畫 + 排行榜加分動畫
-                            if (delta !== 0) {
-                                this._flyStarToLeaderboard(btn, delta);
-
-                                // 立即更新排行榜（DB 已寫入）
-                                if (window.app?.updateLeaderboard) {
-                                    window.app.updateLeaderboard();
-                                    // 動畫結束後再更新一次確保同步
-                                    setTimeout(() => window.app.updateLeaderboard(), 1800);
-                                }
+                            // DB 寫入完成後更新排行榜
+                            if (window.app?.updateLeaderboard) {
+                                window.app.updateLeaderboard();
+                                setTimeout(() => window.app.updateLeaderboard(), 1500);
                             }
 
                             console.log(`[Showcase] scored ${sub?.student_name}: ${oldScore} → ${score} (delta: ${delta > 0 ? '+' : ''}${delta})`);
@@ -799,13 +783,13 @@ export class Showcase {
             document.head.appendChild(style);
         }
 
-        // ═══ 1.5 秒後淡出移除 ═══
+        // ═══ 0.8 秒後淡出移除（加速） ═══
         setTimeout(() => {
             overlay.animate([
                 { opacity: 1 },
                 { opacity: 0 }
-            ], { duration: 500, fill: 'forwards' });
-            setTimeout(() => overlay.remove(), 550);
-        }, 1500);
+            ], { duration: 350, fill: 'forwards' });
+            setTimeout(() => overlay.remove(), 400);
+        }, 800);
     }
 }
