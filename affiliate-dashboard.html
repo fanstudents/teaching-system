@@ -162,8 +162,8 @@
 
         /* Right Form Panel */
         .login-form-panel {
-            width: 480px;
-            min-width: 480px;
+            width: 560px;
+            min-width: 560px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -185,7 +185,7 @@
 
         .login-form-wrapper {
             width: 100%;
-            max-width: 340px;
+            max-width: 460px;
             animation: fadeSlideUp 0.5s ease-out;
         }
 
@@ -711,14 +711,19 @@
                             </div>
                         </div>
 
-                        <!-- Section 2: 推廣課程 -->
+                        <!-- Section 2: 可推廣課程 -->
                         <div class="form-section">
                             <div class="form-section-title">
-                                <span class="material-symbols-outlined">menu_book</span> 想推廣的課程（可複選）<span class="req">*</span>
+                                <span class="material-symbols-outlined">menu_book</span> 可推廣課程
+                            </div>
+                            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                                <button type="button" class="chip" id="btnCourseAll" style="border-color:#1a73e8;background:rgba(26,115,232,0.08);color:#1a73e8;font-weight:600;" onclick="toggleCourseMode('all')">全部課程</button>
+                                <button type="button" class="chip" id="btnCoursePartial" onclick="toggleCourseMode('partial')">指定課程</button>
                             </div>
                             <div class="course-check-grid" id="regCourseGrid">
                                 <div class="course-loading">載入課程中…</div>
                             </div>
+                            <div class="field-hint" style="margin-top:8px;">預設可推廣全部課程，也可切換為指定課程。</div>
                         </div>
 
                         <!-- Section 3: 推廣管道 -->
@@ -1073,28 +1078,60 @@
             document.getElementById('regName').value = user.user_metadata?.full_name || user.user_metadata?.name || '';
             document.getElementById('regEmail').value = user.email;
 
-            // Load courses for checkbox list
+            // Load courses
             const grid = document.getElementById('regCourseGrid');
             const { data: courses } = await db.select('affiliate_courses', {
                 filter: { is_active: 'eq.true' }, order: 'sort_order.asc'
             });
-            const pl = { tbr: '數位簡報室', hahow: 'Hahow' };
-            if (courses && courses.length > 0) {
-                grid.innerHTML = courses.map(c => `
-                    <label class="course-check-item">
-                        <input type="checkbox" name="reg_course" value="${c.name}">
-                        <span class="course-name">${c.name}</span>
-                        <span class="course-platform">${pl[c.platform] || c.platform || ''}</span>
-                    </label>`).join('');
-            } else {
-                grid.innerHTML = '<div class="course-loading">暫無課程資料</div>';
-            }
+            window._regCourses = courses || [];
+            window._courseMode = 'all';
+            renderCourseList('all');
 
             // Register logout
             document.getElementById('btnRegLogout').addEventListener('click', async () => {
                 await auth.signOut();
                 location.href = 'affiliate-dashboard.html';
             });
+        }
+
+        const pl = { tbr: '數位簡報室', hahow: 'Hahow' };
+
+        function renderCourseList(mode) {
+            const grid = document.getElementById('regCourseGrid');
+            const courses = window._regCourses || [];
+            if (courses.length === 0) {
+                grid.innerHTML = '<div class="course-loading">暫無課程資料</div>';
+                return;
+            }
+            if (mode === 'all') {
+                grid.innerHTML = courses.map(c => `
+                    <div class="course-check-item" style="cursor:default;opacity:0.85;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;">check_circle</span>
+                        <span class="course-name">${c.name}</span>
+                        <span class="course-platform">${pl[c.platform] || c.platform || ''}</span>
+                    </div>`).join('');
+            } else {
+                grid.innerHTML = courses.map(c => `
+                    <label class="course-check-item">
+                        <input type="checkbox" name="reg_course" value="${c.name}" data-platform="${pl[c.platform] || c.platform || ''}">
+                        <span class="course-name">${c.name}</span>
+                        <span class="course-platform">${pl[c.platform] || c.platform || ''}</span>
+                    </label>`).join('');
+            }
+        }
+
+        function toggleCourseMode(mode) {
+            window._courseMode = mode;
+            const btnAll = document.getElementById('btnCourseAll');
+            const btnPartial = document.getElementById('btnCoursePartial');
+            if (mode === 'all') {
+                btnAll.style.cssText = 'border-color:#1a73e8;background:rgba(26,115,232,0.08);color:#1a73e8;font-weight:600;';
+                btnPartial.style.cssText = '';
+            } else {
+                btnPartial.style.cssText = 'border-color:#1a73e8;background:rgba(26,115,232,0.08);color:#1a73e8;font-weight:600;';
+                btnAll.style.cssText = '';
+            }
+            renderCourseList(mode);
         }
 
         function showPending() {
@@ -1390,18 +1427,24 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> 送出中…';
 
-            const selectedCourses = [...document.querySelectorAll('#phaseRegister input[name="reg_course"]:checked')].map(c => c.value);
+            let selectedCourses;
             const channels = [...document.querySelectorAll('#phaseRegister input[name="channel"]:checked')].map(c => c.value);
             const coupon = document.getElementById('regCoupon').value.trim().toUpperCase();
             const resetBtn = () => { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; };
 
-            if (selectedCourses.length === 0) { alert('請選擇至少一門想推廣的課程'); resetBtn(); return; }
+            if (window._courseMode === 'all') {
+                selectedCourses = (window._regCourses || []).map(c => c.name);
+            } else {
+                selectedCourses = [...document.querySelectorAll('#phaseRegister input[name="reg_course"]:checked')].map(c => c.value);
+                if (selectedCourses.length === 0) { alert('請選擇至少一門想推廣的課程'); resetBtn(); return; }
+            }
             if (channels.length === 0) { alert('請選擇推廣管道'); resetBtn(); return; }
 
-            // Derive platforms from selected course names
+            // Derive platforms
+            const allCourses = window._regCourses || [];
             const platforms = [...new Set(selectedCourses.map(name => {
-                const el = document.querySelector(`input[name="reg_course"][value="${CSS.escape(name)}"]`);
-                return el?.closest('.course-check-item')?.querySelector('.course-platform')?.textContent?.trim() || '';
+                const c = allCourses.find(x => x.name === name);
+                return c ? (pl[c.platform] || c.platform) : '';
             }).filter(Boolean))];
 
             const { error } = await db.insert('affiliates', {
