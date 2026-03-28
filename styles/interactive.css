@@ -2180,6 +2180,12 @@
     /* 排序 */
     .ordering-container {
         padding: 16px;
+        position: relative;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible;
+        flex-direction: column;
+        gap: 16px;
     }
 
     .ordering-slot {
@@ -2189,6 +2195,12 @@
     .ordering-chip {
         font-size: 0.8rem;
         padding: 6px 10px;
+    }
+
+    .ordering-source,
+    .ordering-slots {
+        width: 100%;
+        flex: none;
     }
 
     /* 選擇題 */
