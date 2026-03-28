@@ -322,11 +322,9 @@ export class Showcase {
                         const valueEl = card.querySelector('.showcase-score-value');
                         if (valueEl) valueEl.textContent = score + ' 分';
 
-                        // 3. ★ 立即觸發動畫（不等 DB 回應）
+                        // 3. ★ 立即觸發動畫（每次點擊都顯示）
                         const sub = submissions[parseInt(card.dataset.index)];
-                        if (delta !== 0) {
-                            this._flyStarToLeaderboard(btn, delta);
-                        }
+                        this._flyStarToLeaderboard(btn, delta || score);
 
                         // 4. 非同步寫入 DB + 廣播
                         try {
@@ -338,61 +336,17 @@ export class Showcase {
                                 _scoredAt: new Date().toISOString()
                             };
 
-                            // ★ 用 upsert (與 stateManager.save 相同方式) 確保 state 正確寫入
-                            const upsertRecord = {
-                                session_id: sub.session_id,
-                                element_id: sub.element_id,
-                                student_name: sub.student_name,
-                                student_email: sub.student_email,
-                                student_group: sub.student_group || '',
-                                assignment_title: sub.assignment_title || assignmentTitle,
-                                type: sub.type || 'homework',
-                                content: sub.content || '',
-                                is_correct: sub.is_correct ?? null,
-                                score: String(score),
-                                state: mergedState,
-                                submitted_at: sub.submitted_at || new Date().toISOString(),
-                            };
-
-                            const { data: upsertData, error: upsertErr } = await db.insert(
+                            // ★ 直接用 primary key 更新（最可靠，不依賴 conflict 欄位）
+                            const { data: updateData, error: updateErr } = await db.update(
                                 'submissions',
-                                upsertRecord,
-                                { onConflict: 'session_id,element_id,student_email' }
+                                { state: mergedState, score: String(score) },
+                                { id: `eq.${subId}` }
                             );
 
-                            if (upsertErr) {
-                                console.error('[Showcase] upsert failed:', upsertErr);
+                            if (updateErr) {
+                                console.error('[Showcase] update failed:', updateErr);
                             } else {
-                                console.log('[Showcase] upsert succeeded, _awarded =', score);
-                                // ★ 驗證：回讀 DB 確認 state._awarded 是否真的寫入
-                                try {
-                                    const { data: verifyRows } = await db.select('submissions', {
-                                        filter: {
-                                            session_id: `eq.${sub.session_id}`,
-                                            student_email: `eq.${sub.student_email}`
-                                        },
-                                        select: 'id,element_id,state,score'
-                                    });
-                                    console.log(`[Showcase] ★ 驗證: ${sub.student_name} 在此 session 有 ${verifyRows?.length} 筆 submissions:`);
-                                    verifyRows?.forEach((r, i) => {
-                                        let st = r.state;
-                                        if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                                        console.log(`  [${i}] id=${r.id}, element_id=${r.element_id}, _awarded=${st?._awarded}, score=${r.score}`);
-                                    });
-                                    const total = verifyRows?.reduce((sum, r) => {
-                                        let st = r.state;
-                                        if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                                        return sum + (parseInt(st?._awarded) || 0);
-                                    }, 0);
-                                    console.log(`[Showcase] ★ 驗證: JS 端加總 = ${total}`);
-
-                                    // 也檢查 RPC 回傳
-                                    const { data: rpcData } = await db.rpc('get_leaderboard', {
-                                        p_session_id: sub.session_id
-                                    });
-                                    const rpcEntry = rpcData?.find(r => r.email === sub.student_email);
-                                    console.log(`[Showcase] ★ 驗證: RPC 回傳 total_points =`, rpcEntry?.total_points, '(全部:', rpcData?.length, '筆)');
-                                } catch (vErr) { console.warn('[Showcase] verify failed:', vErr); }
+                                console.log('[Showcase] update OK, id=', subId, '_awarded=', score, 'returned:', updateData?.length, 'rows');
                             }
 
                             // UI saved 提示
@@ -410,36 +364,26 @@ export class Showcase {
                                     score,
                                     assignmentTitle
                                 });
-                                realtime.publish(`session:${this.sessionCode}`, 'leaderboard_update', {
-                                    studentName: sub.student_name,
-                                    studentEmail: sub.student_email || '',
-                                    pointsAdded: delta,
-                                    source: 'instructor_score'
-                                });
                             }
 
-                            // DB 寫入完成後：先樂觀更新 DOM，再觸發 RPC 同步
+                            // DB 寫入完成後：樂觀更新排行榜 DOM
                             const studentEmail = sub?.student_email || '';
-                            if (delta !== 0 && studentEmail && window.app) {
-                                // ★ 直接更新排行榜 DOM（不等 RPC）
+                            if (studentEmail && window.app) {
                                 const lbRow = document.querySelector(`.lb-row[data-email="${studentEmail}"]`);
                                 if (lbRow) {
                                     const ptsEl = lbRow.querySelector('.lb-pts');
-                                    if (ptsEl) {
+                                    if (ptsEl && delta !== 0) {
                                         const oldPts = parseInt(ptsEl.textContent) || 0;
                                         const newPts = oldPts + delta;
                                         ptsEl.textContent = newPts;
-                                        // 更新快取避免下次 poll 重複動畫
                                         if (window.app._lbScoreCache) {
                                             const c = window.app._lbScoreCache.get(studentEmail);
                                             if (c) c.pts = newPts;
                                             else window.app._lbScoreCache.set(studentEmail, { pts: newPts, rank: -1 });
                                         }
                                     }
-                                } else {
-                                    console.warn('[Showcase] lb-row not found for email:', studentEmail);
                                 }
-                                // 延遲 RPC 同步確保排序正確
+                                // 延遲 RPC 同步排序
                                 setTimeout(() => window.app.updateLeaderboard(), 2000);
                             }
 
