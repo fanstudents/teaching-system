@@ -892,13 +892,25 @@
                     }, 2000);
                 });
 
-                // ★ 監聽作業提交事件 — 即時更新計數器
+                // ★ 監聯作業提交事件 — 即時更新計數器
                 realtime.on('hw_submitted', (msg) => {
                     const p = msg.payload || msg;
                     document.querySelectorAll(`.hw-counter-badge[data-element-id="${p.elementId}"]`).forEach(badge => {
                         const num = badge.querySelector('.hw-counter-num');
                         if (num) num.textContent = p.totalSubmitted || (parseInt(num.textContent) + 1);
                     });
+                });
+
+                // ★ 監聽講師評分 — 若是自己的作業，顯示大動畫
+                realtime.on('hw_scored', async (msg) => {
+                    const p = msg.payload || msg;
+                    const myEmail = JSON.parse(sessionStorage.getItem('homework_user') || '{}').email;
+                    if (!myEmail || p.studentEmail !== myEmail) return;
+                    const score = p.score || 0;
+                    try {
+                        const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                        stateManager.showScorePopup(score);
+                    } catch (e) { console.warn('[hw_scored] popup failed:', e); }
                 });
 
                 // 頁面關閉時通知離線

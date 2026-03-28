@@ -366,10 +366,27 @@ export class Showcase {
                                 });
                             }
 
-                            // DB 寫入完成後更新排行榜
-                            if (window.app?.updateLeaderboard) {
-                                window.app.updateLeaderboard();
-                                setTimeout(() => window.app.updateLeaderboard(), 1500);
+                            // DB 寫入完成後：先樂觀更新 DOM，再觸發 RPC 同步
+                            const studentEmail = sub?.student_email || '';
+                            if (delta !== 0 && studentEmail && window.app) {
+                                // ★ 直接更新排行榜 DOM（不等 RPC）
+                                const lbRow = document.querySelector(`.lb-row[data-email="${studentEmail}"]`);
+                                if (lbRow) {
+                                    const ptsEl = lbRow.querySelector('.lb-pts');
+                                    if (ptsEl) {
+                                        const oldPts = parseInt(ptsEl.textContent) || 0;
+                                        const newPts = oldPts + delta;
+                                        ptsEl.textContent = newPts;
+                                        // 更新快取避免下次 poll 重複動畫
+                                        if (window.app._lbScoreCache) {
+                                            const c = window.app._lbScoreCache.get(studentEmail);
+                                            if (c) c.pts = newPts;
+                                            else window.app._lbScoreCache.set(studentEmail, { pts: newPts, rank: -1 });
+                                        }
+                                    }
+                                }
+                                // 延遲 RPC 同步確保排序正確
+                                setTimeout(() => window.app.updateLeaderboard(), 2000);
                             }
 
                             console.log(`[Showcase] scored ${sub?.student_name}: ${oldScore} → ${score} (delta: ${delta > 0 ? '+' : ''}${delta})`);
