@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單管理 — 數位簡報室</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans TC', 'Inter', sans-serif; background: #f5f6fa; color: #1e293b; }
+
+        /* Layout */
+        .page-header { background: #fff; border-bottom: 1px solid #e8ecf1; padding: 20px 32px; position: sticky; top: 0; z-index: 100; }
+        .page-header h1 { font-size: 1.2rem; font-weight: 700; }
+        .page-header p { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+
+        /* Tabs */
+        .tab-bar { display: flex; gap: 0; border-bottom: 1px solid #e8ecf1; background: #fff; padding: 0 32px; }
+        .tab-bar button { padding: 12px 24px; border: none; background: none; font-size: 0.85rem; font-weight: 600; color: #94a3b8; cursor: pointer; font-family: inherit; border-bottom: 2px solid transparent; transition: all 0.15s; }
+        .tab-bar button.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+        .tab-bar button:hover { color: #475569; }
+
+        /* Stats */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: #fff; border-radius: 10px; padding: 16px 20px; border: 1px solid #e8ecf1; }
+        .stat-card .label { font-size: 0.72rem; color: #94a3b8; margin-bottom: 4px; }
+        .stat-card .value { font-size: 1.3rem; font-weight: 700; color: #1e293b; }
+        .stat-card .value.green { color: #10b981; }
+
+        /* Filters */
+        .filter-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-bar input, .filter-bar select { padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: #fff; transition: border-color 0.15s; min-width: 180px; }
+        .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: #1a73e8; }
+        .filter-bar .filter-count { font-size: 0.75rem; color: #94a3b8; margin-left: auto; }
+
+        /* Table */
+        .table-wrap { background: #fff; border-radius: 10px; border: 1px solid #e8ecf1; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { padding: 10px 14px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; background: #f8fafc; border-bottom: 1px solid #e8ecf1; white-space: nowrap; }
+        td { padding: 10px 14px; border-bottom: 1px solid #f0f0f5; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #fafbff; }
+        .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.74rem; color: #64748b; }
+        .amount { font-weight: 700; color: #1e293b; }
+        .commission { font-weight: 700; color: #10b981; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; }
+        .badge-paid { background: #dcfce7; color: #16a34a; }
+        .badge-refund { background: #fef2f2; color: #dc2626; }
+        .badge-pending { background: #fefce8; color: #ca8a04; }
+        .coupon-tag { display: inline-block; padding: 2px 8px; background: #eff6ff; color: #1a73e8; border-radius: 4px; font-size: 0.72rem; font-weight: 600; font-family: 'SF Mono', monospace; }
+
+        /* Empty */
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; }
+        .pagination button { padding: 6px 14px; border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; font-size: 0.78rem; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+        .pagination button.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination .page-info { font-size: 0.75rem; color: #94a3b8; }
+
+        /* Back link */
+        .back-link { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; color: #64748b; text-decoration: none; font-size: 0.8rem; border-radius: 6px; transition: background 0.15s; }
+        .back-link:hover { background: #f1f5f9; }
+
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .filter-bar { flex-direction: column; }
+            .filter-bar input, .filter-bar select { width: 100%; min-width: auto; }
+            .page-header { padding: 14px 16px; }
+            .container { padding: 14px 12px; }
+            .tab-bar { padding: 0 12px; overflow-x: auto; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a href="admin-dashboard.html" class="back-link">
+                <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span> 返回
+            </a>
+            <div>
+                <h1>訂單管理</h1>
+                <p>全量訂單 + 推廣者訂單查詢</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <button class="active" data-tab="affiliate" onclick="switchTab('affiliate')">推廣者訂單</button>
+        <button data-tab="all" onclick="switchTab('all')">全部訂單</button>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card"><div class="label">總訂單數</div><div class="value" id="statTotal">-</div></div>
+            <div class="stat-card"><div class="label">總營收</div><div class="value" id="statRevenue">-</div></div>
+            <div class="stat-card"><div class="label">總佣金</div><div class="value green" id="statCommission">-</div></div>
+            <div class="stat-card"><div class="label">推廣者數</div><div class="value" id="statAffiliates">-</div></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+            <input type="text" id="filterEmail" placeholder="搜尋 Email..." oninput="applyFilters()">
+            <input type="text" id="filterName" placeholder="搜尋名字..." oninput="applyFilters()">
+            <input type="text" id="filterCoupon" placeholder="搜尋折扣碼..." oninput="applyFilters()">
+            <select id="filterStatus" onchange="applyFilters()">
+                <option value="">所有狀態</option>
+                <option value="Paid">已付款</option>
+                <option value="Refunded">已退款</option>
+            </select>
+            <span class="filter-count" id="filterCount"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="icon">📦</div>
+                <p>找不到符合條件的訂單</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        let currentTab = 'affiliate';
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const perPage = 50;
+
+        // ── Tab Switch ──
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-bar button').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tab);
+            });
+            currentPage = 1;
+            loadData();
+        };
+
+        // ── Load Data ──
+        async function loadData() {
+            const table = currentTab === 'affiliate' ? 'affiliate_orders' : 'orders';
+            const orderCol = currentTab === 'affiliate' ? 'payment_time.desc' : 'payment_time.desc';
+
+            try {
+                const { data } = await db.select(table, { order: orderCol });
+                allData = data || [];
+            } catch (e) {
+                console.error('Failed to load:', e);
+                allData = [];
+            }
+
+            applyFilters();
+        }
+
+        // ── Filters ──
+        window.applyFilters = function() {
+            const email = document.getElementById('filterEmail').value.toLowerCase().trim();
+            const name = document.getElementById('filterName').value.toLowerCase().trim();
+            const coupon = document.getElementById('filterCoupon').value.toLowerCase().trim();
+            const status = document.getElementById('filterStatus').value;
+
+            filteredData = allData.filter(o => {
+                if (email) {
+                    const e = currentTab === 'affiliate'
+                        ? (o.affiliate_email || '') + ' ' + (o.student_email || '')
+                        : (o.student_email || '');
+                    if (!e.toLowerCase().includes(email)) return false;
+                }
+                if (name) {
+                    const n = currentTab === 'affiliate'
+                        ? (o.affiliate_name || '') + ' ' + (o.student_name || '')
+                        : (o.student_name || '');
+                    if (!n.toLowerCase().includes(name)) return false;
+                }
+                if (coupon) {
+                    const c = (o.coupon_code || '') + ' ' + (o.affiliate_code || '');
+                    if (!c.toLowerCase().includes(coupon)) return false;
+                }
+                if (status && o.payment_status !== status) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderStats();
+            renderTable();
+            renderPagination();
+        };
+
+        // ── Stats ──
+        function renderStats() {
+            const data = filteredData;
+            document.getElementById('statTotal').textContent = data.length.toLocaleString();
+            document.getElementById('statRevenue').textContent = '$' + data.reduce((s, o) => s + (Number(o.amount) || 0), 0).toLocaleString();
+
+            if (currentTab === 'affiliate') {
+                document.getElementById('statCommission').textContent = '$' + data.reduce((s, o) => s + (Number(o.commission_amount) || 0), 0).toLocaleString();
+                document.getElementById('statAffiliates').textContent = new Set(data.map(o => o.affiliate_email)).size;
+            } else {
+                document.getElementById('statCommission').parentElement.querySelector('.label').textContent = '使用折扣碼';
+                document.getElementById('statCommission').textContent = data.filter(o => o.coupon_code).length;
+                document.getElementById('statAffiliates').parentElement.querySelector('.label').textContent = '課程數';
+                document.getElementById('statAffiliates').textContent = new Set(data.map(o => o.course_name).filter(Boolean)).size;
+            }
+
+            document.getElementById('filterCount').textContent = `顯示 ${data.length} / ${allData.length} 筆`;
+        }
+
+        // ── Table ──
+        function renderTable() {
+            const start = (currentPage - 1) * perPage;
+            const pageData = filteredData.slice(start, start + perPage);
+
+            // Header
+            const thead = document.getElementById('tableHead');
+            if (currentTab === 'affiliate') {
+                thead.innerHTML = '<tr><th>訂單編號</th><th>推廣者</th><th>折扣碼</th><th>學員</th><th>課程</th><th>金額</th><th>佣金</th><th>狀態</th><th>時間</th></tr>';
+            } else {
+                thead.innerHTML = '<tr><th>訂單編號</th><th>學員</th><th>Email</th><th>課程</th><th>折扣碼</th><th>金額</th><th>付款方式</th><th>狀態</th><th>時間</th></tr>';
+            }
+
+            // Body
+            const tbody = document.getElementById('tableBody');
+            const empty = document.getElementById('emptyState');
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+
+            if (currentTab === 'affiliate') {
+                tbody.innerHTML = pageData.map(o => {
+                    const d = o.payment_time ? new Date(o.payment_time).toLocaleDateString('zh-TW') : '-';
+                    const statusClass = o.payment_status === 'Paid' ? 'badge-paid' : o.payment_status === 'Refunded' ? 'badge-refund' : 'badge-pending';
+                    return `<tr>
+                        <td class="mono">${(o.transaction_id || '').slice(0, 16)}...</td>
+                        <td><strong>${o.affiliate_name || '-'}</strong><br><span class="mono" style="font-size:0.68rem;">${o.affiliate_email || ''}</span></td>
+                        <td><span class="coupon-tag">${o.coupon_code || '-'}</span></td>
+                        <td>${o.student_name || '-'}<br><span class="mono" style="font-size:0.68rem;">${o.student_email || ''}</span></td>
+                        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.course_name || '-'}</td>
+                        <td class="amount">$${(Number(o.amount) || 0).toLocaleString()}</td>
+                        <td class="commission">$${(Number(o.commission_amount) || 0).toLocaleString()}<br><span style="font-size:0.66rem;color:#94a3b8;">${Math.round((o.commission_rate || 0.2) * 100)}%</span></td>
+                        <td><span class="badge ${statusClass}">${o.payment_status || '-'}</span></td>
+                        <td class="mono">${d}</td>
+                    </tr>`;
+                }).join('');
+            } else {
+                tbody.innerHTML = pageData.map(o => {
+                    const d = o.payment_time ? new Date(o.payment_time).toLocaleDateString('zh-TW') : '-';
+                    const statusClass = o.payment_status === 'Paid' ? 'badge-paid' : o.payment_status === 'Refunded' ? 'badge-refund' : 'badge-pending';
+                    return `<tr>
+                        <td class="mono">${(o.transaction_id || '').slice(0, 16)}...</td>
+                        <td>${o.student_name || '-'}</td>
+                        <td class="mono" style="font-size:0.72rem;">${o.student_email || '-'}</td>
+                        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.course_name || '-'}</td>
+                        <td>${o.coupon_code ? `<span class="coupon-tag">${o.coupon_code}</span>` : '-'}</td>
+                        <td class="amount">$${(Number(o.amount) || 0).toLocaleString()}</td>
+                        <td style="font-size:0.76rem;color:#64748b;">${o.payment_method || '-'}</td>
+                        <td><span class="badge ${statusClass}">${o.payment_status || '-'}</span></td>
+                        <td class="mono">${d}</td>
+                    </tr>`;
+                }).join('');
+            }
+        }
+
+        // ── Pagination ──
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / perPage);
+            const pg = document.getElementById('pagination');
+            if (totalPages <= 1) { pg.innerHTML = ''; return; }
+
+            let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="window._goPage(${currentPage - 1})">上一頁</button>`;
+            html += `<span class="page-info">第 ${currentPage} / ${totalPages} 頁</span>`;
+            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="window._goPage(${currentPage + 1})">下一頁</button>`;
+            pg.innerHTML = html;
+        }
+
+        window._goPage = function(p) {
+            currentPage = p;
+            renderTable();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // ── Init ──
+        await loadData();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>

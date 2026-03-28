@@ -1613,9 +1613,9 @@
             // Last updated timestamp
             document.getElementById('lastUpdated').textContent = '更新於 ' + new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-            const { data: purchases } = await db.select('purchases', {
-                filter: { coupon_name: `eq.${couponCode}`, payment_state: 'eq.paid' },
-                order: 'created_at.desc'
+            const { data: purchases } = await db.select('affiliate_orders', {
+                filter: { affiliate_email: `eq.${affiliate.email}`, payment_status: 'eq.Paid' },
+                order: 'payment_time.desc'
             });
 
             if (!purchases || purchases.length === 0) {
@@ -1624,7 +1624,7 @@
             }
 
             const total = purchases.reduce((s, p) => s + (Number(p.amount) || 0), 0);
-            const commission = Math.round(total * rate);
+            const commission = purchases.reduce((s, p) => s + (Number(p.commission_amount) || 0), 0);
 
             document.getElementById('statSales').textContent = '$' + total.toLocaleString();
             document.getElementById('statCommission').textContent = '$' + commission.toLocaleString();
@@ -1640,12 +1640,12 @@
                 monthlyData[key] = { sales: 0, commission: 0, orders: 0 };
             }
             for (const p of purchases) {
-                const d = new Date(p.paid_at || p.created_at);
+                const d = new Date(p.payment_time || p.created_at);
                 const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
                 if (!monthlyData[key]) monthlyData[key] = { sales: 0, commission: 0, orders: 0 };
                 const amt = Number(p.amount) || 0;
                 monthlyData[key].sales += amt;
-                monthlyData[key].commission += Math.round(amt * rate);
+                monthlyData[key].commission += Number(p.commission_amount) || Math.round(amt * rate);
                 monthlyData[key].orders += 1;
             }
 
@@ -1746,12 +1746,13 @@
 
             // ── Tables ──
             const buildTable = (items) => {
-                let html = `<table class="s-table"><thead><tr><th>訂單編號</th><th>購買者</th><th>金額</th><th>佣金</th><th>日期</th></tr></thead><tbody>`;
+                let html = `<table class="s-table"><thead><tr><th>訂單編號</th><th>課程</th><th>購買者</th><th>金額</th><th>佣金</th><th>日期</th></tr></thead><tbody>`;
                 for (const p of items) {
                     const amt = Number(p.amount) || 0;
-                    const com = Math.round(amt * rate);
-                    const d = p.paid_at ? new Date(p.paid_at).toLocaleDateString('zh-TW') : '-';
-                    html += `<tr><td style="font-family:'SF Mono',monospace;font-size:0.78rem;color:var(--text-muted);">${p.order_id || '-'}</td><td>${p.name || p.email}</td><td class="amount">$${amt.toLocaleString()}</td><td class="commission">$${com.toLocaleString()}</td><td style="color:var(--text-muted);font-size:0.8rem;">${d}</td></tr>`;
+                    const com = Number(p.commission_amount) || Math.round(amt * rate);
+                    const d = p.payment_time ? new Date(p.payment_time).toLocaleDateString('zh-TW') : '-';
+                    const courseName = p.course_name ? (p.course_name.length > 20 ? p.course_name.slice(0,20) + '…' : p.course_name) : '-';
+                    html += `<tr><td style="font-family:'SF Mono',monospace;font-size:0.78rem;color:var(--text-muted);">${(p.transaction_id || '-').slice(0,14)}…</td><td style="font-size:0.76rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${courseName}</td><td>${p.student_name || p.student_email || '-'}</td><td class="amount">$${amt.toLocaleString()}</td><td class="commission">$${com.toLocaleString()}</td><td style="color:var(--text-muted);font-size:0.8rem;">${d}</td></tr>`;
                 }
                 return html + '</tbody></table>';
             };
