@@ -91,6 +91,7 @@ const NAV_ITEMS = [
         group: '系統',
         adminOnly: true,
         items: [
+            { label: '管理總覽', icon: 'dashboard', href: 'admin-dashboard.html' },
             { label: '會員管理', icon: 'group', href: 'members.html' },
             { label: '系統設置', icon: 'settings', href: 'settings.html' },
         ]

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者儀表板 — 教學系統</title>
+    <title>管理總覽 — 教學系統</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
@@ -15,367 +15,101 @@
     <link rel="stylesheet" href="styles/admin-layout.css">
     <link rel="stylesheet" href="styles/s79-theme.css">
     <style>
-        /* ── Dark Sidebar Layout ── */
-        :root {
-            --ad-sidebar-w: 230px;
-            --ad-sidebar-bg: #1e2a3a;
-            --ad-sidebar-active: rgba(255,255,255,0.12);
-            --ad-sidebar-hover: rgba(255,255,255,0.06);
-            --ad-sidebar-text: rgba(255,255,255,0.7);
-            --ad-sidebar-text-active: #fff;
-        }
-
         body { margin: 0; background: #f4f6f9; }
 
-        .ad-sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0;
-            width: var(--ad-sidebar-w);
-            background: var(--ad-sidebar-bg);
-            z-index: 200; display: flex; flex-direction: column;
-            transition: transform 0.3s ease;
+        .page-header {
+            padding: 24px 0 8px;
+            display: flex; align-items: center; justify-content: space-between;
         }
+        .page-header h1 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin: 0; }
+        .page-header .meta { font-size: 0.78rem; color: #94a3b8; }
 
-        .ad-sidebar-brand {
-            padding: 20px 16px; display: flex; align-items: center; gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .ad-sidebar-logo {
-            width: 34px; height: 34px; border-radius: 10px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; flex-shrink: 0;
-        }
-
-        .ad-sidebar-logo .material-symbols-outlined { font-size: 18px; }
-        .ad-sidebar-title { font-size: 14px; font-weight: 700; color: #fff; }
-        .ad-sidebar-subtitle { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; }
-
-        .ad-sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 10px; }
-
-        .ad-nav-group-label {
-            font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.35);
-            text-transform: uppercase; letter-spacing: 0.08em;
-            padding: 16px 12px 6px;
-        }
-
-        .ad-nav-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 12px; border-radius: 8px;
-            font-size: 13px; font-weight: 500;
-            color: var(--ad-sidebar-text);
-            border: none; background: none;
-            cursor: pointer; width: 100%;
-            text-align: left; font-family: inherit;
-            text-decoration: none;
-            transition: all 0.15s;
-            margin-bottom: 1px;
-            position: relative;
-        }
-
-        .ad-nav-item .material-symbols-outlined { font-size: 19px; }
-        .ad-nav-item:hover { background: var(--ad-sidebar-hover); color: var(--ad-sidebar-text-active); }
-
-        .ad-nav-item.active {
-            background: var(--ad-sidebar-active);
-            color: var(--ad-sidebar-text-active);
-            font-weight: 600;
-        }
-
-        .ad-badge {
-            background: #f59e0b; color: #fff;
-            font-size: 10px; font-weight: 700;
-            padding: 1px 6px; border-radius: 10px;
-            margin-left: auto;
-        }
-
-        .ad-sidebar-user {
-            padding: 12px 14px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-            flex-shrink: 0;
-        }
-
-        .ad-sidebar-user-info {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 11px; color: rgba(255,255,255,0.45);
-            margin-bottom: 6px;
-        }
-
-        .ad-logout-btn {
-            display: flex; align-items: center; gap: 6px;
-            width: 100%; padding: 7px 10px; margin-top: 6px;
-            border-radius: 6px; border: 1px solid rgba(255,255,255,0.12);
-            background: none; color: rgba(255,255,255,0.55);
-            font-size: 12px; font-family: inherit; cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .ad-logout-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-        .ad-logout-btn .material-symbols-outlined { font-size: 16px; }
-
-        /* Main Content */
-        .ad-main {
-            margin-left: var(--ad-sidebar-w);
-            min-height: 100vh;
-            padding: 0 28px 40px;
-        }
-
-        .ad-topbar {
-            display: flex; align-items: center; gap: 12px;
-            padding: 20px 0 8px;
-        }
-
-        .ad-page-title {
-            font-size: 1.25rem; font-weight: 700; color: #1e293b;
-            margin: 0;
-        }
-
-        .ad-hamburger {
-            display: none; border: none; background: none;
-            cursor: pointer; color: #64748b; padding: 4px;
-            border-radius: 6px;
-        }
-
-        .ad-hamburger:hover { background: #f1f5f9; }
-        .ad-hamburger .material-symbols-outlined { font-size: 22px; }
-
-        .ad-overlay {
-            position: fixed; inset: 0; z-index: 199;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-
-        .ad-overlay.open { opacity: 1; pointer-events: auto; }
-
-        .ad-view { display: none; padding-top: 12px; }
-        .ad-view.active { display: block; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 28px 40px; }
 
         /* Stats Cards */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
             margin-bottom: 28px;
         }
-
         .stat-card {
             background: #fff; border: 1px solid #e8ecf1;
-            border-radius: 12px; padding: 18px 20px;
+            border-radius: 12px; padding: 20px 22px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-
         .stat-icon {
-            width: 36px; height: 36px; border-radius: 10px;
+            width: 38px; height: 38px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-
-        .stat-icon .material-symbols-outlined { font-size: 18px; }
+        .stat-icon .material-symbols-outlined { font-size: 19px; }
         .stat-label { font-size: 0.75rem; color: #94a3b8; font-weight: 500; margin-bottom: 4px; }
-        .stat-value { font-size: 1.4rem; font-weight: 800; color: #1e293b; }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: #1e293b; }
 
-        /* Role/Status badges */
-        .role-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 2px 10px; border-radius: 20px;
-            font-size: 0.72rem; font-weight: 600;
-        }
-
-        .role-badge.super_admin { background: #fef7e0; color: #92400e; }
-        .role-badge.instructor { background: #d2e3fc; color: #3730a3; }
-
-        .status-dot {
-            display: inline-block; width: 8px; height: 8px;
-            border-radius: 50%; margin-right: 6px;
-        }
-
-        .status-dot.active { background: #10b981; }
-        .status-dot.inactive { background: #cbd5e1; }
-
-        .btn-danger-text {
-            background: none; border: none; color: #c5221f;
-            cursor: pointer; font-size: 0.78rem; padding: 4px 8px;
-            border-radius: 6px; transition: all 0.15s;
-        }
-
-        .btn-danger-text:hover { background: #fce8e6; }
-
-        /* Project cards */
-        .instructor-group { margin-bottom: 32px; }
-
-        .instructor-group-header {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 12px; padding: 8px 0;
-        }
-
-        .instructor-avatar {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: #e8f0fe; color: #1a73e8;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem; font-weight: 700;
-        }
-
-        .instructor-group-name { font-weight: 600; font-size: 1rem; }
-        .instructor-group-meta { font-size: 0.78rem; color: #94a3b8; }
-
-        .project-mini-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        /* Quick Links */
+        .section-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin: 28px 0 12px; }
+        .quick-links {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
         }
-
-        .project-mini-card {
+        .quick-link {
+            display: flex; align-items: center; gap: 14px;
             background: #fff; border: 1px solid #e8ecf1;
-            border-radius: 10px; padding: 16px;
+            border-radius: 10px; padding: 16px 18px;
+            text-decoration: none; color: #1e293b;
             transition: all 0.15s; cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-
-        .project-mini-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-color: #d0d5dd;
-            transform: translateY(-2px);
+        .quick-link:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border-color: #d0d5dd; transform: translateY(-1px);
         }
-
-        .pmc-name { font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; }
-
-        .pmc-stats { display: flex; gap: 16px; font-size: 0.78rem; color: #94a3b8; }
-        .pmc-stats span { display: flex; align-items: center; gap: 4px; }
-        .pmc-stats .material-symbols-outlined { font-size: 14px; }
-
-        /* Affiliate styles */
-        .aff-filter-bar { display: flex; gap: 6px; margin-bottom: 16px; }
-
-        .aff-filter-btn {
-            padding: 6px 16px; border: 1.5px solid #e8ecf1;
-            border-radius: 20px; background: none;
-            font-size: 0.78rem; font-family: inherit;
-            color: #94a3b8; cursor: pointer; transition: all 0.15s;
+        .quick-link .ql-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
+        .quick-link .ql-title { font-weight: 600; font-size: 0.88rem; }
+        .quick-link .ql-desc { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
 
-        .aff-filter-btn:hover { border-color: #d0d5dd; color: #64748b; }
-        .aff-filter-btn.active { border-color: #3b82f6; background: #eff6ff; color: #3b82f6; font-weight: 600; }
-
-        .aff-status {
-            display: inline-flex; padding: 2px 10px;
-            border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+        /* Pending affiliates alert */
+        .pending-alert {
+            display: none; align-items: center; gap: 12px;
+            background: #fef7e0; border: 1px solid #fde68a;
+            border-radius: 10px; padding: 14px 18px;
+            margin-bottom: 20px; font-size: 0.82rem; color: #92400e;
         }
+        .pending-alert.show { display: flex; }
+        .pending-alert .material-symbols-outlined { font-size: 20px; color: #f59e0b; }
+        .pending-alert a { color: #92400e; font-weight: 600; }
 
-        .aff-status.pending { background: #fef7e0; color: #92400e; }
-        .aff-status.approved { background: #e6f4ea; color: #188038; }
-        .aff-status.rejected { background: #fce8e6; color: #c5221f; }
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 10px 20px; border-radius: 8px; background: #1e293b; color: #fff; font-size: 0.82rem; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; z-index: 999; }
+        .toast.show { opacity: 1; transform: translateY(0); }
 
-        .aff-btn {
-            padding: 4px 12px; border-radius: 6px; border: none;
-            font-size: 0.75rem; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.15s;
-        }
-
-        .aff-btn.approve { background: #e6f4ea; color: #188038; }
-        .aff-btn.approve:hover { background: #ceead6; }
-        .aff-btn.reject { background: #fce8e6; color: #c5221f; }
-        .aff-btn.reject:hover { background: #f5c6c2; }
-
-        .aff-detail-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-
-        .aff-detail-chip {
-            padding: 2px 8px; border-radius: 10px;
-            font-size: 0.68rem; background: #f1f5f9;
-            color: #64748b; border: 1px solid #e2e8f0;
-        }
-
-        .aff-expand {
-            cursor: pointer; color: #3b82f6; font-size: 0.78rem;
-            background: none; border: none; font-family: inherit;
-            display: flex; align-items: center; gap: 2px;
-        }
-
-        .aff-expand .material-symbols-outlined { font-size: 16px; }
-
-        .aff-detail-row { display: none; }
-        .aff-detail-row.show { display: table-row; }
-
-        .aff-detail-cell {
-            padding: 12px 16px !important;
-            background: #f8fafc; font-size: 0.8rem; line-height: 1.7;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .ad-sidebar { transform: translateX(-100%); box-shadow: 4px 0 24px rgba(0,0,0,0.3); }
-            .ad-sidebar.open { transform: translateX(0); }
-            .ad-main { margin-left: 0; padding: 0 16px 40px; }
-            .ad-hamburger { display: flex; }
+            .container { padding: 0 16px 40px; }
             .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .project-mini-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
 <body>
-    <!-- Dark Sidebar -->
-    <aside class="ad-sidebar" id="adSidebar">
-        <div class="ad-sidebar-brand">
-        <div class="ad-sidebar-logo">
-                <img src="logo.png" alt="數位簡報室" style="width:34px;height:34px;border-radius:10px;">
+    <div class="admin-main">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1>管理總覽</h1>
+                    <div class="meta" id="headerMeta"></div>
+                </div>
             </div>
-            <div>
-                <div class="ad-sidebar-title">數位簡報室</div>
-                <div class="ad-sidebar-subtitle">Admin Dashboard</div>
+
+            <!-- Pending affiliates alert -->
+            <div class="pending-alert" id="pendingAlert">
+                <span class="material-symbols-outlined">warning</span>
+                <span>有 <strong id="pendingCount">0</strong> 位夥伴等待審核 — <a href="partners.html#affiliates">前往審核</a></span>
             </div>
-        </div>
-        <nav class="ad-sidebar-nav">
-            <div class="ad-nav-group-label">儀表板</div>
-            <button class="ad-nav-item active" data-view="overview">
-                <span class="material-symbols-outlined">dashboard</span> 總覽
-            </button>
 
-            <div class="ad-nav-group-label">管理</div>
-            <button class="ad-nav-item" data-view="instructors">
-                <span class="material-symbols-outlined">people</span> 講師管理
-            </button>
-            <button class="ad-nav-item" data-view="projects">
-                <span class="material-symbols-outlined">grid_view</span> 專案總覽
-            </button>
-            <a class="ad-nav-item" href="manage.html">
-                <span class="material-symbols-outlined">folder</span> 專案管理
-            </a>
-
-            <div class="ad-nav-group-label">聯盟</div>
-            <button class="ad-nav-item" data-view="affiliates">
-                <span class="material-symbols-outlined">handshake</span> 夥伴審核
-                <span class="ad-badge" id="affPendingBadge" style="display:none;"></span>
-            </button>
-        </nav>
-        <div class="ad-sidebar-user">
-            <div class="ad-sidebar-user-info">
-                <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
-                <span id="sidebarTime"></span>
-            </div>
-            <div class="ad-sidebar-user-info">
-                <span class="material-symbols-outlined" style="font-size:16px;">person</span>
-                <span id="userEmail"></span>
-            </div>
-            <button class="ad-logout-btn" id="logoutBtn">
-                <span class="material-symbols-outlined">logout</span> 登出
-            </button>
-        </div>
-    </aside>
-
-    <!-- Mobile hamburger overlay -->
-    <div class="ad-overlay" id="adOverlay"></div>
-
-    <!-- Main Content -->
-    <main class="ad-main">
-        <div class="ad-topbar">
-            <button class="ad-hamburger" id="adHamburger">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
-            <h1 class="ad-page-title" id="pageTitle">總覽</h1>
-        </div>
-
-        <!-- View: Overview -->
-        <div class="ad-view active" id="view-overview">
+            <!-- Stats -->
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-icon" style="background:#e8f0fe;color:#1a73e8;"><span class="material-symbols-outlined">people</span></div>
@@ -397,472 +131,98 @@
                     <div class="stat-label">總學員數</div>
                     <div class="stat-value" id="statStudents">-</div>
                 </div>
-            </div>
-        </div>
-
-        <!-- View: Instructors -->
-        <div class="ad-view" id="view-instructors">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <h3 style="margin:0;font-size:1rem;font-weight:600;">所有講師</h3>
-                <button class="btn btn-primary btn-sm" id="addInstructorBtn">
-                    <span class="material-symbols-outlined" style="font-size:16px;">person_add</span> 新增講師
-                </button>
-            </div>
-            <table class="data-table" id="instructorTable">
-                <thead>
-                    <tr>
-                        <th>名稱</th>
-                        <th>Email</th>
-                        <th>角色</th>
-                        <th>狀態</th>
-                        <th>專案數</th>
-                        <th>建立時間</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="instructorTableBody">
-                    <tr><td colspan="7" class="empty-state">載入中...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- View: Projects -->
-        <div class="ad-view" id="view-projects">
-            <div id="overviewContent">
-                <div class="empty-state">載入中...</div>
-            </div>
-        </div>
-
-        <!-- View: Affiliates -->
-        <div class="ad-view" id="view-affiliates">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <h3 style="margin:0;font-size:1rem;font-weight:600;">聯盟夥伴管理</h3>
-            </div>
-            <div class="aff-filter-bar">
-                <button class="aff-filter-btn active" data-aff-filter="all">全部</button>
-                <button class="aff-filter-btn" data-aff-filter="pending">待審核</button>
-                <button class="aff-filter-btn" data-aff-filter="approved">已通過</button>
-                <button class="aff-filter-btn" data-aff-filter="rejected">已拒絕</button>
-            </div>
-            <table class="data-table" id="affiliateTable">
-                <thead>
-                    <tr>
-                        <th>姓名</th>
-                        <th>Email</th>
-                        <th>折扣碼</th>
-                        <th>推廣管道</th>
-                        <th>狀態</th>
-                        <th>申請時間</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="affiliateTableBody">
-                    <tr><td colspan="7" class="empty-state">載入中...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-
-    <!-- Add Instructor Modal -->
-    <div class="modal-overlay" id="addInstructorModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>新增講師</h3>
-                <button class="modal-close" onclick="document.getElementById('addInstructorModal').classList.remove('active')">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Email <span style="color:var(--danger)">*</span></label>
-                    <input type="email" id="newInstructorEmail" placeholder="instructor@example.com">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#ede9fe;color:#7c3aed;"><span class="material-symbols-outlined">receipt_long</span></div>
+                    <div class="stat-label">總訂單數</div>
+                    <div class="stat-value" id="statOrders">-</div>
                 </div>
-                <div class="form-group">
-                    <label>顯示名稱</label>
-                    <input type="text" id="newInstructorName" placeholder="講師名稱">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><span class="material-symbols-outlined">payments</span></div>
+                    <div class="stat-label">總營收</div>
+                    <div class="stat-value" id="statRevenue">-</div>
                 </div>
-                <div class="form-group">
-                    <label>初始密碼 <span style="font-weight:400;color:var(--text-3)">（留空則自動產生）</span></label>
-                    <input type="text" id="newInstructorPassword" placeholder="至少 6 個字元">
-                </div>
-                <div id="createResult" style="display:none;padding:12px;border-radius:8px;font-size:0.82rem;margin-top:8px;"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn" onclick="document.getElementById('addInstructorModal').classList.remove('active')">取消</button>
-                <button class="btn btn-primary" id="saveInstructorBtn">建立帳號</button>
+
+            <!-- Quick Links -->
+            <div class="section-title">快速操作</div>
+            <div class="quick-links">
+                <a class="quick-link" href="manage.html">
+                    <div class="ql-icon" style="background:#e8f0fe;color:#1a73e8;"><span class="material-symbols-outlined">space_dashboard</span></div>
+                    <div><div class="ql-title">專案管理</div><div class="ql-desc">建立/編輯課程專案</div></div>
+                </a>
+                <a class="quick-link" href="partners.html#instructors">
+                    <div class="ql-icon" style="background:#fef7e0;color:#e37400;"><span class="material-symbols-outlined">school</span></div>
+                    <div><div class="ql-title">講師管理</div><div class="ql-desc">新增/管理講師帳號</div></div>
+                </a>
+                <a class="quick-link" href="partners.html#affiliates">
+                    <div class="ql-icon" style="background:#e6f4ea;color:#188038;"><span class="material-symbols-outlined">handshake</span></div>
+                    <div><div class="ql-title">夥伴審核</div><div class="ql-desc">審核聯盟推廣者申請</div></div>
+                </a>
+                <a class="quick-link" href="admin-orders.html">
+                    <div class="ql-icon" style="background:#ede9fe;color:#7c3aed;"><span class="material-symbols-outlined">receipt_long</span></div>
+                    <div><div class="ql-title">訂單管理</div><div class="ql-desc">推廣者訂單與全量訂單查詢</div></div>
+                </a>
+                <a class="quick-link" href="clients.html">
+                    <div class="ql-icon" style="background:#fce8e6;color:#c5221f;"><span class="material-symbols-outlined">business</span></div>
+                    <div><div class="ql-title">客戶管理</div><div class="ql-desc">企業客戶資料</div></div>
+                </a>
+                <a class="quick-link" href="members.html">
+                    <div class="ql-icon" style="background:#f1f5f9;color:#475569;"><span class="material-symbols-outlined">group</span></div>
+                    <div><div class="ql-title">會員管理</div><div class="ql-desc">管理系統使用者</div></div>
+                </a>
             </div>
         </div>
-    </div>
+    </div><!-- /admin-main -->
 
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { db, auth, functions, requireAuth, clearProfileCache } from './scripts/supabase.js';
+        import { db, requireAuth } from './scripts/supabase.js';
 
         // ── Auth Guard (super_admin only) ──
         const authResult = await requireAuth(['super_admin']);
         if (!authResult) throw new Error('not authorized');
-        const currentUser = authResult.session.user;
 
-        document.getElementById('userEmail').textContent = currentUser.email;
+        document.getElementById('headerMeta').textContent =
+            authResult.session.user.email + ' · ' +
+            new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await auth.signOut();
-            clearProfileCache();
-            location.href = 'login.html';
-        });
-
-        // ── Data ──
-        let instructors = [];
-        let allProjects = [];
-        let allSessions = [];
-        let allStudents = [];
-
-        // ── Init ──
+        // ── Load all stats ──
         async function init() {
-            await Promise.allSettled([
-                loadInstructors(),
-                loadAllProjects(),
-                loadAllSessions(),
-                loadAllStudents(),
-                loadAffiliates()
+            const [instructorsRes, projectsRes, sessionsRes, studentsRes, ordersRes, affRes] = await Promise.allSettled([
+                db.select('user_profiles', { select: 'id,role' }),
+                db.select('projects', { select: 'id' }),
+                db.select('project_sessions', { select: 'id' }),
+                db.select('students', { select: 'id' }),
+                db.select('orders', { select: 'id,amount' }),
+                db.select('affiliates', { select: 'id,status' })
             ]);
-            updateStats();
-            renderInstructorTable();
-            renderOverview();
-            renderAffiliateTable();
-        }
 
-        async function loadInstructors() {
-            const { data } = await db.select('user_profiles', { order: 'created_at.desc' });
-            instructors = data || [];
-        }
+            const instructors = instructorsRes.value?.data || [];
+            const projects = projectsRes.value?.data || [];
+            const sessions = sessionsRes.value?.data || [];
+            const students = studentsRes.value?.data || [];
+            const orders = ordersRes.value?.data || [];
+            const affiliates = affRes.value?.data || [];
 
-        async function loadAllProjects() {
-            const { data } = await db.select('projects', { order: 'created_at.desc' });
-            allProjects = data || [];
-        }
-
-        async function loadAllSessions() {
-            const { data } = await db.select('project_sessions', { order: 'date.desc' });
-            allSessions = data || [];
-        }
-
-        async function loadAllStudents() {
-            const { data } = await db.select('students', { select: 'id,session_id' });
-            allStudents = data || [];
-        }
-
-        function updateStats() {
             document.getElementById('statInstructors').textContent = instructors.filter(i => i.role === 'instructor').length;
-            document.getElementById('statProjects').textContent = allProjects.length;
-            document.getElementById('statSessions').textContent = allSessions.length;
-            document.getElementById('statStudents').textContent = allStudents.length;
-        }
+            document.getElementById('statProjects').textContent = projects.length;
+            document.getElementById('statSessions').textContent = sessions.length;
+            document.getElementById('statStudents').textContent = students.length;
+            document.getElementById('statOrders').textContent = orders.length.toLocaleString();
+            document.getElementById('statRevenue').textContent = '$' + orders.reduce((s, o) => s + (Number(o.amount) || 0), 0).toLocaleString();
 
-        // ── Sidebar Time ──
-        const updateTime = () => {
-            document.getElementById('sidebarTime').textContent = new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        };
-        updateTime();
-        setInterval(updateTime, 60000);
-
-        // ── Sidebar Nav ──
-        const viewTitles = { overview: '總覽', instructors: '講師管理', projects: '專案總覽', affiliates: '夥伴審核' };
-        document.querySelectorAll('.ad-nav-item[data-view]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const view = btn.dataset.view;
-                document.querySelectorAll('.ad-nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.ad-view').forEach(p => p.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(`view-${view}`)?.classList.add('active');
-                document.getElementById('pageTitle').textContent = viewTitles[view] || view;
-                // close mobile sidebar
-                document.getElementById('adSidebar').classList.remove('open');
-                document.getElementById('adOverlay').classList.remove('open');
-            });
-        });
-
-        // ── Mobile Hamburger ──
-        document.getElementById('adHamburger').addEventListener('click', () => {
-            document.getElementById('adSidebar').classList.toggle('open');
-            document.getElementById('adOverlay').classList.toggle('open');
-        });
-        document.getElementById('adOverlay').addEventListener('click', () => {
-            document.getElementById('adSidebar').classList.remove('open');
-            document.getElementById('adOverlay').classList.remove('open');
-        });
-
-        // ── Render Instructor Table ──
-        function renderInstructorTable() {
-            const tbody = document.getElementById('instructorTableBody');
-            if (instructors.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">尚無講師</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = instructors.map(inst => {
-                const projectCount = allProjects.filter(p => p.owner_id === inst.id).length;
-                const date = inst.created_at ? new Date(inst.created_at).toLocaleDateString('zh-TW') : '';
-                return `<tr>
-                    <td style="font-weight:600;">${inst.display_name || '—'}</td>
-                    <td>${inst.email}</td>
-                    <td><span class="role-badge ${inst.role}">${inst.role === 'super_admin' ? '管理者' : '講師'}</span></td>
-                    <td><span class="status-dot ${inst.is_active ? 'active' : 'inactive'}"></span>${inst.is_active ? '啟用' : '停用'}</td>
-                    <td>${projectCount}</td>
-                    <td>${date}</td>
-                    <td>
-                        ${inst.role !== 'super_admin' ? `<button class="btn-danger-text" data-toggle-id="${inst.id}" data-active="${inst.is_active}">${inst.is_active ? '停用' : '啟用'}</button>` : ''}
-                    </td>
-                </tr>`;
-            }).join('');
-
-            // Toggle active/inactive
-            tbody.querySelectorAll('[data-toggle-id]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.toggleId;
-                    const isActive = btn.dataset.active === 'true';
-                    await db.update('user_profiles', { is_active: !isActive }, { id: `eq.${id}` });
-                    await loadInstructors();
-                    renderInstructorTable();
-                    showToast(isActive ? '已停用' : '已啟用');
-                });
-            });
-        }
-
-        // ── Render Overview (projects grouped by instructor) ──
-        function renderOverview() {
-            const container = document.getElementById('overviewContent');
-
-            // Group projects by owner_id
-            const groups = new Map();
-            for (const p of allProjects) {
-                const ownerId = p.owner_id || 'unknown';
-                if (!groups.has(ownerId)) groups.set(ownerId, []);
-                groups.get(ownerId).push(p);
-            }
-
-            if (groups.size === 0) {
-                container.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">folder_off</span>尚無專案</div>';
-                return;
-            }
-
-            let html = '';
-            for (const [ownerId, projects] of groups) {
-                const inst = instructors.find(i => i.id === ownerId);
-                const name = inst?.display_name || inst?.email || '未知';
-                const initial = name.charAt(0).toUpperCase();
-
-                const sessionIds = allSessions.filter(s => projects.some(p => p.id === s.project_id)).map(s => s.id);
-                const studentCount = allStudents.filter(st => sessionIds.includes(st.session_id)).length;
-                const sessionCount = sessionIds.length;
-
-                html += `
-                <div class="instructor-group">
-                    <div class="instructor-group-header">
-                        <div class="instructor-avatar">${initial}</div>
-                        <div>
-                            <div class="instructor-group-name">${name}</div>
-                            <div class="instructor-group-meta">${projects.length} 專案 · ${sessionCount} 場次 · ${studentCount} 學員</div>
-                        </div>
-                    </div>
-                    <div class="project-mini-grid">
-                        ${projects.map(p => {
-                            const pSessions = allSessions.filter(s => s.project_id === p.id);
-                            const pStudents = allStudents.filter(st => pSessions.some(s => s.id === st.session_id));
-                            return `
-                            <div class="project-mini-card" onclick="window.open('editor.html?id=${p.id}#id=${p.id}','_blank')">
-                                <div class="pmc-name">${p.name || '未命名'}</div>
-                                <div class="pmc-stats">
-                                    <span><span class="material-symbols-outlined">event</span>${pSessions.length} 場次</span>
-                                    <span><span class="material-symbols-outlined">group</span>${pStudents.length} 學員</span>
-                                    <span><span class="material-symbols-outlined">tag</span>${p.join_code}</span>
-                                </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>`;
-            }
-
-            container.innerHTML = html;
-        }
-
-        // ── Add Instructor ──
-        document.getElementById('addInstructorBtn').addEventListener('click', () => {
-            document.getElementById('newInstructorEmail').value = '';
-            document.getElementById('newInstructorName').value = '';
-            document.getElementById('newInstructorPassword').value = '';
-            document.getElementById('createResult').style.display = 'none';
-            document.getElementById('addInstructorModal').classList.add('active');
-        });
-
-        document.getElementById('saveInstructorBtn').addEventListener('click', async () => {
-            const email = document.getElementById('newInstructorEmail').value.trim();
-            const display_name = document.getElementById('newInstructorName').value.trim();
-            const password = document.getElementById('newInstructorPassword').value.trim();
-            const resultEl = document.getElementById('createResult');
-
-            if (!email) {
-                resultEl.style.display = 'block';
-                resultEl.style.background = '#fce8e6';
-                resultEl.style.color = '#c5221f';
-                resultEl.textContent = '請輸入 Email';
-                return;
-            }
-
-            const btn = document.getElementById('saveInstructorBtn');
-            btn.disabled = true;
-            btn.textContent = '建立中...';
-
-            try {
-                const { data, error } = await functions.invoke('create-instructor', {
-                    body: { email, display_name, password: password || undefined }
-                });
-
-                if (error) throw new Error(error.message);
-
-                resultEl.style.display = 'block';
-                resultEl.style.background = '#e6f4ea';
-                resultEl.style.color = '#188038';
-                resultEl.innerHTML = `✅ ${data.message}<br>` +
-                    (data.temp_password && data.temp_password !== '(已使用隨機密碼)'
-                        ? `臨時密碼: <strong>${data.temp_password}</strong>（請通知講師修改）`
-                        : '');
-
-                await loadInstructors();
-                renderInstructorTable();
-                updateStats();
-                showToast('講師帳號已建立');
-            } catch (e) {
-                resultEl.style.display = 'block';
-                resultEl.style.background = '#fce8e6';
-                resultEl.style.color = '#c5221f';
-                resultEl.textContent = '建立失敗: ' + e.message;
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '建立帳號';
-            }
-        });
-
-        // ── Toast ──
-        function showToast(msg) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 2500);
-        }
-
-        // ── Affiliate Management ──
-        let affiliates = [];
-        let affFilter = 'all';
-
-        async function loadAffiliates() {
-            const { data } = await db.select('affiliates', { order: 'created_at.desc' });
-            affiliates = data || [];
-            // Update pending badge
+            // Pending affiliates
             const pending = affiliates.filter(a => a.status === 'pending').length;
-            const badge = document.getElementById('affPendingBadge');
             if (pending > 0) {
-                badge.textContent = pending;
-                badge.style.display = 'inline';
-            } else {
-                badge.style.display = 'none';
+                document.getElementById('pendingCount').textContent = pending;
+                document.getElementById('pendingAlert').classList.add('show');
             }
         }
 
-        function renderAffiliateTable() {
-            const tbody = document.getElementById('affiliateTableBody');
-            const filtered = affFilter === 'all' ? affiliates : affiliates.filter(a => a.status === affFilter);
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">沒有資料</td></tr>';
-                return;
-            }
-
-            const statusLabels = { pending: '待審核', approved: '已通過', rejected: '已拒絕' };
-
-            tbody.innerHTML = filtered.map((a, i) => {
-                const date = a.created_at ? new Date(a.created_at).toLocaleDateString('zh-TW') : '';
-                const courses = a.selected_courses || a.platforms || [];
-                const coursesPreview = Array.isArray(courses) ? courses.slice(0, 2).join('、') + (courses.length > 2 ? `…+${courses.length - 2}` : '') : '';
-
-                return `
-                <tr>
-                    <td style="font-weight:600;">${a.name || '—'}</td>
-                    <td>${a.email}</td>
-                    <td><code style="background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:0.8rem;">${a.coupon_code || '—'}</code></td>
-                    <td style="font-size:0.78rem;color:var(--text-3);">${a.channels || '—'}</td>
-                    <td><span class="aff-status ${a.status}">${statusLabels[a.status] || a.status}</span></td>
-                    <td>${date}</td>
-                    <td>
-                        <div style="display:flex;gap:4px;align-items:center;">
-                            <button class="aff-expand" data-aff-detail="${i}"><span class="material-symbols-outlined">info</span></button>
-                            ${a.status === 'pending' ? `
-                                <button class="aff-btn approve" data-aff-approve="${a.id}">核准</button>
-                                <button class="aff-btn reject" data-aff-reject="${a.id}">拒絕</button>
-                            ` : ''}
-                            ${a.status === 'rejected' ? `<button class="aff-btn approve" data-aff-approve="${a.id}">核准</button>` : ''}
-                            ${a.status === 'approved' ? `<button class="aff-btn reject" data-aff-reject="${a.id}">停用</button>` : ''}
-                        </div>
-                    </td>
-                </tr>
-                <tr class="aff-detail-row" id="affDetail-${i}">
-                    <td colspan="7" class="aff-detail-cell">
-                        <strong>推廣課程：</strong>
-                        <div class="aff-detail-chips" style="margin:4px 0 8px;">
-                            ${(Array.isArray(courses) ? courses : []).map(c => `<span class="aff-detail-chip">${c}</span>`).join('') || '全部課程'}
-                        </div>
-                        <strong>管道說明：</strong> ${a.channel_detail || '未填寫'}<br>
-                        <strong>佣金比例：</strong> ${Math.round((a.commission_rate || 0.20) * 100)}%
-                    </td>
-                </tr>`;
-            }).join('');
-
-            // Detail expand
-            tbody.querySelectorAll('[data-aff-detail]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const row = document.getElementById(`affDetail-${btn.dataset.affDetail}`);
-                    row.classList.toggle('show');
-                });
-            });
-
-            // Approve
-            tbody.querySelectorAll('[data-aff-approve]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    btn.disabled = true;
-                    await db.update('affiliates', { status: 'approved' }, { id: `eq.${btn.dataset.affApprove}` });
-                    await loadAffiliates();
-                    renderAffiliateTable();
-                    showToast('已核准');
-                });
-            });
-
-            // Reject
-            tbody.querySelectorAll('[data-aff-reject]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    btn.disabled = true;
-                    await db.update('affiliates', { status: 'rejected' }, { id: `eq.${btn.dataset.affReject}` });
-                    await loadAffiliates();
-                    renderAffiliateTable();
-                    showToast('已拒絕');
-                });
-            });
-        }
-
-        // Filter bar
-        document.querySelectorAll('[data-aff-filter]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.aff-filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                affFilter = btn.dataset.affFilter;
-                renderAffiliateTable();
-            });
-        });
-
-        // ── Start ──
         init();
     </script>
+    <script src="components/nav.js"></script>
 </body>
 
 </html>
