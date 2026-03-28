@@ -46,3 +46,20 @@ INSERT INTO public.affiliate_courses (name, url, platform, icon, sort_order) VAL
 ('網路行銷全方位入門實戰（23 小時）', 'https://hahow.in/cr/marketing', 'hahow', 'campaign', 100),
 ('Looker Studio 視覺化報表（6.3 小時）', 'https://hahow.in/cr/datastudio', 'hahow', 'bar_chart', 101),
 ('電商數據營運指標全攻略（3.3 小時）', 'https://hahow.in/cr/metrics100', 'hahow', 'shopping_cart', 102);
+
+-- 5. affiliate_referrals 表
+CREATE TABLE IF NOT EXISTS public.affiliate_referrals (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    affiliate_id UUID REFERENCES public.affiliates(id),
+    affiliate_name TEXT,
+    affiliate_email TEXT,
+    referral_type TEXT NOT NULL, -- '企業內訓' or '系統導入'
+    client_name TEXT NOT NULL,
+    contact TEXT NOT NULL,
+    notes TEXT,
+    status TEXT DEFAULT 'pending', -- pending, contacted, converted, closed
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.affiliate_referrals ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "allow_all_affiliate_referrals" ON public.affiliate_referrals FOR ALL USING (true) WITH CHECK (true);

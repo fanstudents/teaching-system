@@ -817,6 +817,9 @@
                 <button class="nav-item" data-view="courses">
                     <span class="material-symbols-outlined">menu_book</span> 可推廣課程
                 </button>
+                <button class="nav-item" data-view="referral">
+                    <span class="material-symbols-outlined">diversity_3</span> 企業引薦
+                </button>
                 <button class="nav-item" data-view="orders">
                     <span class="material-symbols-outlined">receipt_long</span> 訂單紀錄
                 </button>
@@ -914,10 +917,111 @@
             <!-- View: Courses -->
             <div class="view-page" id="view-courses">
                 <h2 class="page-title">可推廣課程</h2>
-                <p class="page-subtitle">以下課程皆可使用你的折扣碼推廣</p>
+                <p class="page-subtitle">課程分潤比例 <strong>20%</strong>，以下課程皆可使用你的折扣碼推廣</p>
+                <div id="coursesList" style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="empty-state"><span class="material-symbols-outlined">hourglass_empty</span>載入中…</div>
+                </div>
+            </div>
+
+            <!-- View: Referral -->
+            <div class="view-page" id="view-referral">
+                <h2 class="page-title">企業引薦</h2>
+                <p class="page-subtitle">企業內訓 & 系統導入引薦，分潤比例 <strong>15%</strong></p>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span class="material-symbols-outlined">school</span> 企業內訓
+                        </div>
+                        <div class="section-body" style="font-size:0.84rem;line-height:1.8;">
+                            <p>推薦企業客戶採購「數位簡報室」內訓課程，包含：</p>
+                            <p>• AI 職場應用內訓<br>• 數位行銷內訓<br>• Vibe Coding 企業工作坊<br>• 客製化課程設計</p>
+                            <div style="margin-top:10px;padding:10px 14px;background:#eff6ff;border-radius:8px;font-size:0.78rem;color:#1d4ed8;">
+                                💰 成功引薦內訓合約，可獲得合約金額 <strong>15%</strong> 分潤
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span class="material-symbols-outlined">integration_instructions</span> 系統導入
+                        </div>
+                        <div class="section-body" style="font-size:0.84rem;line-height:1.8;">
+                            <p>推薦企業採用「數位簡報室」教學系統導入，包含：</p>
+                            <p>• 互動教學簡報系統<br>• 學員管理 & 成果追蹤<br>• 課前/課後問卷自動化<br>• AI 教學助理整合</p>
+                            <div style="margin-top:10px;padding:10px 14px;background:#fefce8;border-radius:8px;font-size:0.78rem;color:#92400e;">
+                                💰 成功引薦系統導入，可獲得合約金額 <strong>15%</strong> 分潤
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推薦文案 -->
+                <div class="section-card" style="margin-bottom:20px;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">content_copy</span> 推薦文案（點擊複製）
+                    </div>
+                    <div class="section-body" style="padding:16px 20px;">
+                        <div id="referralCopy" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:0.82rem;line-height:1.8;cursor:pointer;transition:all 0.15s;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);">我想推薦「數位簡報室」的企業服務給你。
+
+他們提供 AI 職場應用、數位行銷、Vibe Coding 等專業內訓課程，以及互動教學簡報系統的企業導入服務。
+
+✨ 企業內訓：可客製化課程內容，包含 AI 應用、行銷數據、工作坊等
+💻 系統導入：互動教學簡報 + 學員管理 + AI 助理整合
+
+有興趣的話，可以直接跟他們聯繫：
+📧 service@tbr.digital
+📲 LINE 官方客服：https://lin.ee/77HaRyW</div>
+                        <div style="margin-top:8px;font-size:0.72rem;color:#94a3b8;">點擊上方文案即可複製</div>
+                    </div>
+                </div>
+
+                <!-- 推薦表單 -->
+                <div class="section-card" style="margin-bottom:20px;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">assignment</span> 推薦客戶表單
+                    </div>
+                    <div class="section-body">
+                        <form id="referralForm" style="display:flex;flex-direction:column;gap:12px;padding:16px 20px;">
+                            <div class="form-group">
+                                <label>引薦類型 <span class="req">*</span></label>
+                                <select id="refType" required style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:0.88rem;">
+                                    <option value="">請選擇</option>
+                                    <option value="企業內訓">企業內訓</option>
+                                    <option value="系統導入">系統導入</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>客戶名稱 <span class="req">*</span></label>
+                                <input type="text" id="refClientName" placeholder="公司或單位名稱" required>
+                            </div>
+                            <div class="form-group">
+                                <label>聯繫方式 <span class="req">*</span></label>
+                                <input type="text" id="refContact" placeholder="電話、Email 或 LINE ID" required>
+                            </div>
+                            <div class="form-group">
+                                <label>需求說明</label>
+                                <textarea id="refNotes" rows="3" placeholder="例：公司約 50 人，希望安排 AI 應用內訓..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit-register" id="refSubmitBtn" style="align-self:flex-start;">
+                                <span class="material-symbols-outlined">send</span> 提交推薦
+                            </button>
+                            <div id="refSuccessMsg" style="display:none;padding:10px 14px;background:#e6f4ea;border-radius:8px;font-size:0.82rem;color:#188038;">✅ 推薦已送出，我們會盡快聯繫該客戶！</div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 官方聯繫 -->
                 <div class="section-card">
-                    <div id="coursesList" style="padding:20px;">
-                        <div class="empty-state"><span class="material-symbols-outlined">hourglass_empty</span>載入中…</div>
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">support_agent</span> 官方聯繫方式
+                    </div>
+                    <div class="section-body" style="padding:16px 20px;display:flex;gap:16px;flex-wrap:wrap;">
+                        <a href="https://lin.ee/77HaRyW" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#06c755;color:#fff;border-radius:8px;text-decoration:none;font-size:0.84rem;font-weight:600;">
+                            <span class="material-symbols-outlined">chat</span> LINE 官方客服
+                        </a>
+                        <a href="mailto:service@tbr.digital" style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#1a73e8;color:#fff;border-radius:8px;text-decoration:none;font-size:0.84rem;font-weight:600;">
+                            <span class="material-symbols-outlined">mail</span> service@tbr.digital
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1179,7 +1283,7 @@
             document.getElementById('bankAccount').value = affiliate.bank_account || '';
 
             loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.20);
-            loadCourses();
+            loadCourses(affiliate.coupon_code);
             setupEvents(affiliate);
         }
 
@@ -1357,7 +1461,7 @@
             });
         }
 
-        async function loadCourses() {
+        async function loadCourses(couponCode) {
             const container = document.getElementById('coursesList');
             const { data: courses } = await db.select('affiliate_courses', {
                 filter: { is_active: 'eq.true' }, order: 'sort_order.asc'
@@ -1368,15 +1472,40 @@
                 return;
             }
 
-            const pl = { tbr: '數位簡報室', hahow: 'Hahow' };
-            container.innerHTML = '<div class="course-links">' +
-                courses.map(c => `
-                    <a class="course-link-item" href="${c.url}" target="_blank">
-                        <span class="material-symbols-outlined">${c.icon || 'school'}</span>
-                        ${c.name}
-                        <span class="platform-tag">${pl[c.platform] || ''}</span>
-                    </a>`).join('') +
-                '</div>';
+            const plNames = { tbr: '數位簡報室', hahow: 'Hahow' };
+            container.innerHTML = courses.map((c, i) => {
+                const affLink = c.url + (c.url.includes('?') ? '&' : '?') + 'coupon=' + (couponCode || '');
+                return `
+                <div class="section-card" style="margin-bottom:0;">
+                    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
+                        <span class="material-symbols-outlined" style="font-size:20px;color:#64748b;">${c.icon || 'school'}</span>
+                        <span style="flex:1;font-size:0.88rem;font-weight:600;color:#1e293b;">${c.name}</span>
+                        <span class="platform-tag">${plNames[c.platform] || ''}</span>
+                        <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
+                    </div>
+                    <div class="c-detail" style="display:none;padding:0 18px 14px;border-top:1px solid #f0f0f5;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding-top:12px;">
+                            <div>
+                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:4px;">推廣連結</div>
+                                <a href="${c.url}" target="_blank" style="font-size:0.78rem;color:#1a73e8;word-break:break-all;">${c.url}</a>
+                            </div>
+                            <div>
+                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:4px;">折扣碼</div>
+                                <span style="font-family:'SF Mono',monospace;font-size:0.88rem;font-weight:700;color:#1e293b;background:#f1f5f9;padding:3px 10px;border-radius:6px;cursor:pointer;" onclick="event.stopPropagation();navigator.clipboard.writeText('${couponCode||''}');this.textContent='✅ 已複製';setTimeout(()=>this.textContent='${couponCode||''}',1500)">${couponCode || '-'}</span>
+                            </div>
+                            <div>
+                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:4px;">分潤比例</div>
+                                <span style="font-size:0.88rem;font-weight:700;color:#10b981;">20%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Toggle expand style
+            const style = document.createElement('style');
+            style.textContent = '.c-detail.show { display:block!important; }';
+            document.head.appendChild(style);
         }
 
         // ── Events ──
@@ -1418,6 +1547,37 @@
                     setTimeout(() => msg.classList.remove('show'), 3000);
                 }
                 btn.disabled = false;
+            });
+
+            // Referral form
+            document.getElementById('referralForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('refSubmitBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> 提交中...';
+
+                const { error } = await db.insert('affiliate_referrals', {
+                    affiliate_id: affiliate.id,
+                    affiliate_name: affiliate.name,
+                    affiliate_email: affiliate.email,
+                    referral_type: document.getElementById('refType').value,
+                    client_name: document.getElementById('refClientName').value.trim(),
+                    contact: document.getElementById('refContact').value.trim(),
+                    notes: document.getElementById('refNotes').value.trim(),
+                    status: 'pending'
+                });
+
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">send</span> 提交推薦';
+
+                if (error) {
+                    alert('提交失敗：' + (error.message || ''));
+                    return;
+                }
+
+                document.getElementById('referralForm').reset();
+                document.getElementById('refSuccessMsg').style.display = 'block';
+                setTimeout(() => document.getElementById('refSuccessMsg').style.display = 'none', 5000);
             });
 
             // Logout
