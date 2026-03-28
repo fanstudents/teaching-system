@@ -337,9 +337,14 @@ export class Showcase {
                         // 4. 非同步寫入 DB + 廣播
                         try {
                             // ★ 用 SECURITY DEFINER RPC 直接在 DB 端更新 state._awarded
+                            // 同時更新 session_id 到當前廣播 session，確保排行榜能查到
                             const { data: rpcResult, error: rpcErr } = await db.rpc(
                                 'instructor_score_submission',
-                                { p_submission_id: subId, p_score: score }
+                                {
+                                    p_submission_id: subId,
+                                    p_score: score,
+                                    p_session_id: this.sessionCode || null
+                                }
                             );
 
                             if (rpcErr) {
