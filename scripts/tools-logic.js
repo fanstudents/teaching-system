@@ -1,17 +1,6 @@
 /**
- * tools-logic.js — 免費工具箱邏輯
+ * tools-logic.js — 免費工具箱邏輯（強化版）
  */
-
-// ── Sidebar nav ──
-document.querySelectorAll('.tool-item[data-tool]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.tool-item').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`panel-${btn.dataset.tool}`)?.classList.add('active');
-        document.querySelector('.tool-sidebar')?.classList.remove('open');
-    });
-});
 
 // ── Copy helper ──
 window.copyOutput = function(boxId) {
@@ -24,8 +13,30 @@ window.copyOutput = function(boxId) {
     });
 };
 
+// ── History helpers ──
+function saveHistory(key, item) {
+    const history = JSON.parse(localStorage.getItem('tools_' + key) || '[]');
+    history.unshift({ text: item, time: new Date().toLocaleString('zh-TW') });
+    if (history.length > 20) history.pop();
+    localStorage.setItem('tools_' + key, JSON.stringify(history));
+    renderHistory(key);
+}
+function renderHistory(key) {
+    const section = document.getElementById(key + '-history-section');
+    const list = document.getElementById(key + '-history');
+    if (!section || !list) return;
+    const history = JSON.parse(localStorage.getItem('tools_' + key) || '[]');
+    if (history.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    list.innerHTML = history.map(h => `<div class="history-item" onclick="navigator.clipboard.writeText('${h.text.replace(/'/g, "\\'")}')" title="點擊複製">${h.text}</div>`).join('');
+}
+window.clearHistory = function(key) {
+    localStorage.removeItem('tools_' + key);
+    renderHistory(key);
+};
+
 // ══════════════════════════════════
-// 1. UTM 連結產生器
+// 1. UTM 連結產生器（強化版）
 // ══════════════════════════════════
 window.generateUTM = function() {
     let url = document.getElementById('utm-url').value.trim();
@@ -44,6 +55,7 @@ window.generateUTM = function() {
     const result = url + sep + params.toString();
     document.getElementById('utm-result').textContent = result;
     document.getElementById('utm-output').style.display = 'block';
+    saveHistory('utm', result);
 };
 
 // ══════════════════════════════════
@@ -60,12 +72,13 @@ window.generateQR = function() {
     out.innerHTML = `
         <img src="${apiUrl}" alt="QR Code" style="border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.1);margin-bottom:16px;">
         <br><a href="${apiUrl}" download="qrcode.png" class="btn btn-secondary btn-sm" style="text-decoration:none;">
-            <span class="material-symbols-outlined" style="font-size:16px;">download</span> 下載 QR Code
-        </a>`;
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 下載 QR Code
+        </a>
+        <div style="margin-top:12px;font-size:.72rem;color:#9ca3af">內容：${text.length > 60 ? text.substring(0,60)+'...' : text}</div>`;
 };
 
 // ══════════════════════════════════
-// 3. 社群字數檢測器
+// 3. 社群字數檢測器（強化版）
 // ══════════════════════════════════
 const SOCIAL_LIMITS = { twitter: 280, fb: 63206, ig: 2200, li: 3000, threads: 500 };
 window.checkSocialLength = function() {
@@ -77,50 +90,81 @@ window.checkSocialLength = function() {
         document.getElementById(`sc-${key}`).textContent = `${len.toLocaleString()} / ${max.toLocaleString()}`;
         const bar = document.getElementById(`sc-${key}-bar`);
         bar.style.width = pct + '%';
-        if (pct > 100) bar.style.background = '#ef4444';
+        bar.style.background = pct > 100 ? '#ef4444' : bar.dataset.color || bar.style.background;
     });
+    // Extra analysis
+    const extra = document.getElementById('social-extra');
+    if (!extra) return;
+    const emojiCount = (text.match(/\p{Emoji}/gu) || []).length;
+    const hashCount = (text.match(/#\S+/g) || []).length;
+    const lineCount = text.split('\n').length;
+    const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+    if (len > 0) {
+        extra.innerHTML = `<div class="result-grid">
+            <div class="result-card"><div class="rc-label">Emoji 數量</div><div class="rc-value">${emojiCount}</div></div>
+            <div class="result-card"><div class="rc-label">Hashtag 數量</div><div class="rc-value">${hashCount}</div></div>
+            <div class="result-card"><div class="rc-label">行數</div><div class="rc-value">${lineCount}</div></div>
+            <div class="result-card"><div class="rc-label">詞數（約）</div><div class="rc-value">${wordCount}</div></div>
+        </div>`;
+    } else {
+        extra.innerHTML = '';
+    }
 };
 
 // ══════════════════════════════════
-// 4. Email 主旨評分器
+// 4. Email 主旨評分器（強化版+A/B）
 // ══════════════════════════════════
-window.scoreEmail = function() {
-    const subj = document.getElementById('email-subject').value.trim();
-    if (!subj) return alert('請輸入主旨');
+function analyzeSubject(subj) {
     let total = 0; const tips = [];
-    // Length
     const len = subj.length;
     if (len >= 20 && len <= 50) { total += 25; tips.push('✅ 長度適中 (20-50字)'); }
     else if (len < 20) { total += 10; tips.push('⚠️ 太短，建議 20-50 字'); }
     else { total += 10; tips.push('⚠️ 偏長，可能被手機截斷'); }
-    // Emoji
     if (/\p{Emoji}/u.test(subj)) { total += 15; tips.push('✅ 含 Emoji，有助提升開信率'); }
     else { total += 5; tips.push('💡 可加入 Emoji 增加注意力'); }
-    // Numbers
     if (/\d/.test(subj)) { total += 15; tips.push('✅ 含數字，增加具體感'); }
-    else { total += 5; tips.push('💡 加入數字提升說服力（如「3招」「50%」）'); }
-    // Urgency
+    else { total += 5; tips.push('💡 加入數字提升說服力'); }
     if (/限時|最後|倒數|今天|即將|馬上|立即|only|last/i.test(subj)) { total += 20; tips.push('✅ 含緊迫感詞彙'); }
-    else { total += 5; tips.push('💡 適當加入緊迫感可提高開信率'); }
-    // Personalization
+    else { total += 5; tips.push('💡 適當加入緊迫感'); }
     if (/你|您|專屬|獨享/.test(subj)) { total += 15; tips.push('✅ 含個人化用語'); }
-    else { total += 5; tips.push('💡 加入「你」「專屬」等詞增加親近感'); }
-    // Spam words
-    if (/免費|賺錢|恭喜|中獎|100%/i.test(subj)) { total -= 10; tips.push('🚨 含疑似垃圾信關鍵字，可能影響送達率'); }
+    else { total += 5; tips.push('💡 加入「你」「專屬」等詞'); }
+    if (/免費|賺錢|恭喜|中獎|100%/i.test(subj)) { total -= 10; tips.push('🚨 含疑似垃圾信關鍵字'); }
     total = Math.max(0, Math.min(100, total));
-
     const color = total >= 80 ? '#10b981' : total >= 50 ? '#f59e0b' : '#ef4444';
     const grade = total >= 80 ? 'A 優秀' : total >= 60 ? 'B 不錯' : total >= 40 ? 'C 普通' : 'D 需改善';
+    return { total, color, grade, tips, len };
+}
+
+function renderScore(r, label) {
+    return `<div style="margin-bottom:20px">
+        ${label ? `<div style="font-size:.82rem;font-weight:700;margin-bottom:8px">${label}</div>` : ''}
+        <div style="text-align:center;margin-bottom:12px">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:50%;border:5px solid ${r.color};font-size:1.6rem;font-weight:800;color:${r.color}">${r.total}</div>
+            <div style="font-size:.85rem;font-weight:700;margin-top:4px;color:${r.color}">${r.grade}</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:12px">
+            ${r.tips.map(t => `<div style="padding:3px 0;font-size:.78rem">${t}</div>`).join('')}
+        </div>
+    </div>`;
+}
+
+window.scoreEmail = function() {
+    const subj = document.getElementById('email-subject').value.trim();
+    if (!subj) return alert('請輸入主旨');
+    const subjB = document.getElementById('email-subject-b')?.value.trim();
+    const rA = analyzeSubject(subj);
     const out = document.getElementById('email-output');
     out.style.display = 'block';
-    out.innerHTML = `
-        <div style="text-align:center;margin-bottom:20px;">
-            <div style="display:inline-flex;align-items:center;justify-content:center;width:100px;height:100px;border-radius:50%;border:6px solid ${color};font-size:2rem;font-weight:800;color:${color};">${total}</div>
-            <div style="font-size:1rem;font-weight:700;margin-top:8px;color:${color};">${grade}</div>
-        </div>
-        <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
-            ${tips.map(t => `<div style="padding:4px 0;font-size:0.82rem;">${t}</div>`).join('')}
+    if (subjB) {
+        const rB = analyzeSubject(subjB);
+        const winner = rA.total >= rB.total ? 'A' : 'B';
+        out.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="border:2px solid ${winner==='A'?'#10b981':'transparent'};border-radius:12px;padding:12px">${renderScore(rA, '版本 A' + (winner==='A'?' 🏆':''))}</div>
+            <div style="border:2px solid ${winner==='B'?'#10b981':'transparent'};border-radius:12px;padding:12px">${renderScore(rB, '版本 B' + (winner==='B'?' 🏆':''))}</div>
         </div>`;
+    } else {
+        out.innerHTML = renderScore(rA);
+    }
 };
 
 // ══════════════════════════════════
@@ -137,12 +181,14 @@ const HASHTAG_DB = {
 window.generateHashtags = function() {
     const kw = document.getElementById('ht-keyword').value.trim();
     if (!kw) return alert('請輸入關鍵字');
+    const platform = document.getElementById('ht-platform').value;
     let tags = new Set();
     Object.entries(HASHTAG_DB).forEach(([cat, arr]) => {
         if (kw.includes(cat) || cat === 'default') arr.forEach(t => tags.add(t));
     });
     kw.split(/[,，、\s]+/).filter(Boolean).forEach(w => tags.add(w.replace(/\s/g,'')));
-    const result = [...tags].slice(0, 20);
+    const limits = { instagram: 30, threads: 5, twitter: 3, linkedin: 5 };
+    const result = [...tags].slice(0, limits[platform] || 20);
     const cloud = document.getElementById('ht-output');
     cloud.style.display = 'flex';
     cloud.innerHTML = result.map(t => `<span class="tag-item" onclick="this.classList.toggle('selected')">#${t}</span>`).join('');
@@ -152,65 +198,101 @@ window.generateHashtags = function() {
 };
 
 // ══════════════════════════════════
-// 6. 薪資試算器
+// 6. 薪資試算器（強化版 + 所得稅級距）
 // ══════════════════════════════════
 window.calcSalary = function() {
     const monthly = Number(document.getElementById('sal-monthly').value) || 0;
     if (!monthly) return alert('請輸入月薪');
     const overtime = Number(document.getElementById('sal-overtime').value) || 0;
     const bonus = Number(document.getElementById('sal-bonus').value) || 2;
+    const dependents = Number(document.getElementById('sal-dependents').value) || 0;
     const gross = monthly + overtime;
-    // 簡化計算
-    const laborIns = Math.round(gross * 0.115 * 0.2); // 勞保自付 ~2.3%
-    const healthIns = Math.round(gross * 0.0517 * 0.3); // 健保自付 ~1.55%
-    const laborPension = Math.round(gross * 0.06); // 勞退 6% 雇主提撥
+    const laborIns = Math.round(gross * 0.115 * 0.2);
+    const healthIns = Math.round(gross * 0.0517 * 0.3);
+    const laborPension = Math.round(gross * 0.06);
     const totalDeduct = laborIns + healthIns;
     const netMonthly = gross - totalDeduct;
     const annualGross = monthly * 12 + monthly * bonus + overtime * 12;
     const annualNet = netMonthly * 12 + monthly * bonus;
+    // 所得稅概估
+    const taxableIncome = annualGross - 92000 - (dependents * 92000) - 207000 - 200000;
+    let tax = 0;
+    if (taxableIncome > 0) {
+        if (taxableIncome <= 560000) tax = taxableIncome * 0.05;
+        else if (taxableIncome <= 1260000) tax = 28000 + (taxableIncome - 560000) * 0.12;
+        else if (taxableIncome <= 2520000) tax = 112000 + (taxableIncome - 1260000) * 0.20;
+        else if (taxableIncome <= 4720000) tax = 364000 + (taxableIncome - 2520000) * 0.30;
+        else tax = 1024000 + (taxableIncome - 4720000) * 0.40;
+    }
+    const monthlyTax = Math.round(Math.max(0, tax) / 12);
+
     const out = document.getElementById('salary-output');
     out.style.display = 'block';
     out.innerHTML = `
         <div class="result-grid">
             <div class="result-card"><div class="rc-label">月薪總額</div><div class="rc-value">$${gross.toLocaleString()}</div></div>
-            <div class="result-card"><div class="rc-label">勞保自付</div><div class="rc-value" style="color:#ef4444;">-$${laborIns.toLocaleString()}</div></div>
-            <div class="result-card"><div class="rc-label">健保自付</div><div class="rc-value" style="color:#ef4444;">-$${healthIns.toLocaleString()}</div></div>
-            <div class="result-card" style="border-color:#10b981;"><div class="rc-label">每月實領（約）</div><div class="rc-value" style="color:#10b981;">$${netMonthly.toLocaleString()}</div></div>
-            <div class="result-card"><div class="rc-label">年收入（含年終 ${bonus} 個月）</div><div class="rc-value">$${annualGross.toLocaleString()}</div></div>
-            <div class="result-card"><div class="rc-label">雇主勞退提撥/月</div><div class="rc-value" style="color:#2563eb;">$${laborPension.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">勞保自付</div><div class="rc-value" style="color:#ef4444">-$${laborIns.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">健保自付</div><div class="rc-value" style="color:#ef4444">-$${healthIns.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">所得稅預扣/月（約）</div><div class="rc-value" style="color:#f59e0b">-$${monthlyTax.toLocaleString()}</div></div>
+            <div class="result-card" style="border-color:#10b981"><div class="rc-label">每月實領（約）</div><div class="rc-value" style="color:#10b981">$${(netMonthly - monthlyTax).toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">年收入（含年終 ${bonus} 月）</div><div class="rc-value">$${annualGross.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">雇主勞退提撥/月</div><div class="rc-value" style="color:#2563eb">$${laborPension.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">年所得稅（約）</div><div class="rc-value" style="color:#f59e0b">$${Math.round(Math.max(0,tax)).toLocaleString()}</div></div>
         </div>
-        <div style="margin-top:12px;font-size:0.72rem;color:#9ca3af;">* 以上為概估值，實際金額依投保級距和個人條件而異。</div>`;
+        <div style="margin-top:16px;padding:14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px">
+            <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">薪資結構分析</div>
+            <div style="display:flex;height:12px;border-radius:6px;overflow:hidden;margin-bottom:6px">
+                <div style="width:${((netMonthly-monthlyTax)/gross*100).toFixed(1)}%;background:#10b981" title="實領"></div>
+                <div style="width:${(laborIns/gross*100).toFixed(1)}%;background:#ef4444" title="勞保"></div>
+                <div style="width:${(healthIns/gross*100).toFixed(1)}%;background:#f59e0b" title="健保"></div>
+                <div style="width:${(monthlyTax/gross*100).toFixed(1)}%;background:#8b5cf6" title="所得稅"></div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:.65rem;color:#6b7280;flex-wrap:wrap">
+                <span>🟢 實領 ${((netMonthly-monthlyTax)/gross*100).toFixed(1)}%</span>
+                <span>🔴 勞保 ${(laborIns/gross*100).toFixed(1)}%</span>
+                <span>🟡 健保 ${(healthIns/gross*100).toFixed(1)}%</span>
+                <span>🟣 稅 ${(monthlyTax/gross*100).toFixed(1)}%</span>
+            </div>
+        </div>
+        <div style="margin-top:8px;font-size:.72rem;color:#9ca3af">* 以上為概估值，實際金額依投保級距和個人條件而異。所得稅依 2024 年級距計算。</div>`;
 };
 
 // ══════════════════════════════════
-// 7. 會議成本計算器
+// 7. 會議成本計算器（強化版）
 // ══════════════════════════════════
 window.calcMeeting = function() {
     const people = Number(document.getElementById('mtg-people').value) || 1;
     const minutes = Number(document.getElementById('mtg-minutes').value) || 60;
     const salary = Number(document.getElementById('mtg-salary').value) || 50000;
-    const hourlyRate = salary / 22 / 8; // 22 working days, 8 hours
+    const hourlyRate = salary / 22 / 8;
     const meetingCost = Math.round(hourlyRate * (minutes / 60) * people);
     const perPerson = Math.round(meetingCost / people);
     const weeklyIf = meetingCost * 4;
     const yearlyIf = meetingCost * 50;
+    const personHours = Math.round(people * minutes / 60 * 10) / 10;
+    // Efficiency rating
+    let efficiency = '高效';let effColor = '#10b981';
+    if (minutes > 60 || people > 8) { efficiency = '需注意'; effColor = '#f59e0b'; }
+    if (minutes > 90 || people > 15) { efficiency = '偏低'; effColor = '#ef4444'; }
     const out = document.getElementById('meeting-output');
     out.style.display = 'block';
     out.innerHTML = `
         <div class="result-grid">
-            <div class="result-card" style="border-color:#ef4444;"><div class="rc-label">本次會議成本</div><div class="rc-value" style="color:#ef4444;">$${meetingCost.toLocaleString()}</div></div>
+            <div class="result-card" style="border-color:#ef4444"><div class="rc-label">本次會議成本</div><div class="rc-value" style="color:#ef4444">$${meetingCost.toLocaleString()}</div></div>
             <div class="result-card"><div class="rc-label">每人成本</div><div class="rc-value">$${perPerson.toLocaleString()}</div></div>
-            <div class="result-card"><div class="rc-label">若每週開一次/月</div><div class="rc-value" style="color:#f59e0b;">$${weeklyIf.toLocaleString()}</div></div>
-            <div class="result-card"><div class="rc-label">若每週開一次/年</div><div class="rc-value" style="color:#ef4444;">$${yearlyIf.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">若每週開一次/月</div><div class="rc-value" style="color:#f59e0b">$${weeklyIf.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">若每週開一次/年</div><div class="rc-value" style="color:#ef4444">$${yearlyIf.toLocaleString()}</div></div>
+            <div class="result-card"><div class="rc-label">消耗人力時數</div><div class="rc-value">${personHours} 小時</div></div>
+            <div class="result-card" style="border-color:${effColor}"><div class="rc-label">效率評估</div><div class="rc-value" style="color:${effColor}">${efficiency}</div></div>
         </div>
-        <div style="margin-top:16px;padding:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;font-size:0.82rem;color:#9a3412;">
-            💡 <strong>小提醒：</strong>${people} 人 × ${minutes} 分鐘的會議，等於消耗了 <strong>${Math.round(people*minutes/60*10)/10} 人小時</strong>的生產力。
-            確保每場會議都有明確議程和可執行的結論！
+        <div style="margin-top:16px;padding:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;font-size:.82rem;color:#9a3412">
+            💡 <strong>小提醒：</strong>${people} 人 × ${minutes} 分鐘的會議，等於消耗了 <strong>${personHours} 人小時</strong>的生產力。
+            ${minutes > 60 ? '<br>建議將會議拆分為 30 分鐘以內的專注議程。' : '確保每場會議都有明確議程和可執行的結論！'}
         </div>`;
 };
 
 // ══════════════════════════════════
-// 8. 年假計算器
+// 8. 年假計算器（強化版 + 對照表）
 // ══════════════════════════════════
 window.calcLeave = function() {
     const startDate = document.getElementById('leave-start').value;
@@ -229,21 +311,32 @@ window.calcLeave = function() {
     else if (years < 10) { days = 15; note = '5 年以上未滿 10 年：15 天'; }
     else { days = Math.min(30, 15 + Math.floor(years - 10)); note = `10 年以上：每年加 1 天（上限 30 天）`; }
     const seniority = years >= 1 ? `${Math.floor(years)} 年 ${Math.floor((years % 1) * 12)} 個月` : `${Math.floor(years * 12)} 個月`;
+    // Multi-year reference
+    const refs = [[0.5,3],[1,7],[2,10],[3,14],[5,15],[10,16],[15,21],[20,26],[25,30]];
+    const refRows = refs.map(([y,d]) => {
+        const isCurrent = years >= y && (y === 25 || years < refs[refs.indexOf([y,d])+1]?.[0]);
+        return `<div style="display:flex;justify-content:space-between;padding:4px 8px;background:${years>=y?'#ecfdf5':'#f8fafc'};border-radius:4px;font-size:.72rem;margin:2px 0${years>=y&&years<(refs[refs.indexOf(refs.find(r=>r[0]===y))+1]||[999])[0]?';border:1px solid #10b981':''}">
+            <span>${y >= 1 ? y + ' 年' : y*12 + ' 個月'}</span><span style="font-weight:700">${d} 天</span></div>`;
+    }).join('');
     const out = document.getElementById('leave-output');
     out.style.display = 'block';
     out.innerHTML = `
         <div class="result-grid">
             <div class="result-card"><div class="rc-label">年資</div><div class="rc-value">${seniority}</div></div>
-            <div class="result-card" style="border-color:#10b981;"><div class="rc-label">特休天數</div><div class="rc-value" style="color:#10b981;font-size:1.8rem;">${days} 天</div></div>
+            <div class="result-card" style="border-color:#10b981"><div class="rc-label">特休天數</div><div class="rc-value" style="color:#10b981;font-size:1.8rem">${days} 天</div></div>
         </div>
-        <div style="margin-top:12px;padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;font-size:0.82rem;color:#065f46;">
+        <div style="margin-top:12px;padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;font-size:.82rem;color:#065f46">
             📅 依勞基法第 38 條：${note}
         </div>
-        <div style="margin-top:8px;font-size:0.72rem;color:#9ca3af;">* 特休未休完，雇主應折算工資發給。</div>`;
+        <div style="margin-top:12px;padding:14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px">
+            <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">年資對照表</div>
+            ${refRows}
+        </div>
+        <div style="margin-top:8px;font-size:.72rem;color:#9ca3af">* 特休未休完，雇主應折算工資發給。</div>`;
 };
 
 // ══════════════════════════════════
-// 9. 面試題目產生器
+// 9. 面試題目產生器（強化版 + 評分標準）
 // ══════════════════════════════════
 const IQ_TEMPLATES = {
     behavior: [
@@ -251,7 +344,9 @@ const IQ_TEMPLATES = {
         '描述一次你與團隊成員意見不合的經驗，最後怎麼解決？',
         '請舉例說明你如何在壓力下完成一個重要的專案。',
         '談談你最自豪的一個工作成就，為什麼對你很重要？',
-        '描述一次你必須快速學習新技能的經驗。'
+        '描述一次你必須快速學習新技能的經驗。',
+        '請分享一個你主動發現並解決問題的經驗。',
+        '描述一次你如何說服他人接受你的想法。'
     ],
     technical: {
         junior: ['請說明你最熟悉的技術棧，並解釋為什麼選擇它？', '你如何進行程式碼除錯？請分享你的流程。', '請解釋 {skill} 的基本概念和應用場景。'],
@@ -272,19 +367,25 @@ window.generateInterviewQ = function() {
         { cat: '💻 技術能力', qs: techQs },
         { cat: '🤝 文化適配', qs: IQ_TEMPLATES.culture.sort(() => Math.random() - 0.5).slice(0, 2) }
     ];
+    const levelLabel = level === 'junior' ? '初階' : level === 'mid' ? '中階' : '資深';
     const out = document.getElementById('interview-output');
     out.style.display = 'block';
     out.innerHTML = `
-        <div style="font-size:0.88rem;font-weight:700;margin-bottom:12px;">📋 ${role}（${level === 'junior' ? '初階' : level === 'mid' ? '中階' : '資深'}）面試題目</div>
+        <div style="font-size:.88rem;font-weight:700;margin-bottom:12px">📋 ${role}（${levelLabel}）面試題目</div>
         ${allQs.map(g => `
-            <div style="margin-bottom:16px;">
-                <div style="font-size:0.8rem;font-weight:700;color:#4b5563;margin-bottom:8px;">${g.cat}</div>
-                ${g.qs.map((q, i) => `<div style="padding:10px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;font-size:0.82rem;">
-                    <span style="color:#9ca3af;margin-right:6px;">${i + 1}.</span>${q}
+            <div style="margin-bottom:16px">
+                <div style="font-size:.8rem;font-weight:700;color:#4b5563;margin-bottom:8px">${g.cat}</div>
+                ${g.qs.map((q, i) => `<div style="padding:10px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;font-size:.82rem">
+                    <div><span style="color:#9ca3af;margin-right:6px">${i + 1}.</span>${q}</div>
+                    <div style="font-size:.68rem;color:#9ca3af;margin-top:4px">📝 評分重點：邏輯清晰度、具體程度、反思能力</div>
                 </div>`).join('')}
             </div>
         `).join('')}
-        <button class="btn btn-secondary btn-sm" onclick="generateInterviewQ()"><span class="material-symbols-outlined" style="font-size:16px;">refresh</span> 重新產生</button>`;
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="generateInterviewQ()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 重新產生
+            </button>
+        </div>`;
 };
 
 // ══════════════════════════════════
@@ -330,11 +431,14 @@ ${dutyList.map((d, i) => `${i + 1}. ${d}`).join('\n')}
 • 彈性工時 / 遠端工作選項
 
 📩 應徵方式
-請將您的履歷寄至 hr@${company.toLowerCase().replace(/\s/g, '')}.com
+請將您的履歷寄至 hr@${company.toLowerCase().replace(/\s/g,'')}.com
 或透過人力銀行投遞履歷。
 
-#${title.replace(/\s/g, '')} #${industry} #${type} #招募 #徵才`;
+#${title.replace(/\s/g,'')} #${industry} #${type} #招募 #徵才`;
 
     document.getElementById('jd-result').textContent = jd;
     document.getElementById('jd-output').style.display = 'block';
 };
+
+// ── Init history on load ──
+document.addEventListener('DOMContentLoaded', () => { renderHistory('utm'); });

@@ -7,7 +7,6 @@
     <meta name="description" content="免費行銷工具與 HR 工具箱，包含 UTM 產生器、QR Code、薪資試算、會議成本計算等實用工具。">
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         :root{
@@ -26,19 +25,19 @@
         .sidebar{width:var(--sidebar-w);background:#0f172a;color:#fff;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
         .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
         .sidebar-brand h1{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:8px}
-        .sidebar-brand h1 .material-symbols-outlined{font-size:20px;color:#60a5fa}
+        .sidebar-brand h1 svg{width:20px;height:20px;color:#60a5fa}
         .sidebar-brand p{font-size:.65rem;color:rgba(255,255,255,0.4);margin-top:2px}
         .sidebar-nav{flex:1;overflow-y:auto;padding:12px 0}
         .nav-group-label{padding:12px 20px 6px;font-size:.6rem;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.1em}
         .nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:.78rem;color:rgba(255,255,255,0.55);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
         .nav-item:hover{color:#fff;background:rgba(255,255,255,0.05)}
         .nav-item.active{color:#fff;background:rgba(37,99,235,0.2);border-right:3px solid #3b82f6}
-        .nav-item .material-symbols-outlined{font-size:18px}
+        .nav-item svg{width:18px;height:18px;flex-shrink:0}
         .nav-badge{margin-left:auto;font-size:.58rem;padding:1px 6px;border-radius:6px;background:rgba(59,130,246,0.3);color:#93c5fd;font-weight:600}
         .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08)}
         .sidebar-footer a{font-size:.72rem;color:rgba(255,255,255,0.4);text-decoration:none;display:flex;align-items:center;gap:6px}
         .sidebar-footer a:hover{color:#fff}
-        .sidebar-footer a .material-symbols-outlined{font-size:14px}
+        .sidebar-footer a svg{width:14px;height:14px}
 
         /* ── Main ── */
         .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
@@ -47,23 +46,24 @@
         .main-header .breadcrumb{font-size:.72rem;color:var(--text-3)}
         .header-right{display:flex;align-items:center;gap:8px}
         .header-right a{font-size:.78rem;color:var(--primary);text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px}
-        .header-right a .material-symbols-outlined{font-size:16px}
+        .header-right a svg{width:16px;height:16px}
 
         .main-body{padding:24px 28px 48px}
 
-        /* ── Cards Grid (home) ── */
+        /* ── Cards Grid ── */
         .cards-home{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
         .tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
         .tool-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.06);border-color:var(--primary)}
         .tool-card .tc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
         .tc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center}
-        .tc-icon .material-symbols-outlined{font-size:22px;color:#fff}
+        .tc-icon svg{width:22px;height:22px;color:#fff}
         .tc-badge{font-size:.58rem;padding:2px 8px;border-radius:6px;font-weight:600}
         .tool-card h3{font-size:.9rem;font-weight:700;margin-bottom:6px}
         .tool-card p{font-size:.75rem;color:var(--text-2);line-height:1.5}
         .tc-tags{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}
         .tc-tag{font-size:.6rem;padding:2px 7px;border-radius:4px;background:#f3f4f6;color:var(--text-3);font-weight:500}
-        .tc-arrow{position:absolute;bottom:16px;right:16px;color:var(--text-3);font-size:18px;opacity:0;transition:all .2s}
+        .tc-arrow{position:absolute;bottom:16px;right:16px;color:var(--text-3);opacity:0;transition:all .2s}
+        .tc-arrow svg{width:18px;height:18px}
         .tool-card:hover .tc-arrow{opacity:1;transform:translateX(4px)}
 
         /* ── Tool Detail View ── */
@@ -71,10 +71,25 @@
         .tool-detail.active{display:block}
         .detail-back{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-2);cursor:pointer;margin-bottom:20px;padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);font-family:inherit;font-weight:500;transition:all .15s}
         .detail-back:hover{background:#f3f4f6;color:var(--text)}
-        .detail-back .material-symbols-outlined{font-size:16px}
-        .detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:720px}
-        .detail-card h2{font-size:1.2rem;font-weight:800;margin-bottom:6px}
+        .detail-back svg{width:16px;height:16px}
+        .detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:760px}
+        .detail-card h2{font-size:1.2rem;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+        .detail-card h2 svg{width:24px;height:24px;flex-shrink:0}
         .detail-card .desc{font-size:.82rem;color:var(--text-2);margin-bottom:24px;line-height:1.6}
+
+        /* ── Guide Toggle ── */
+        .guide-toggle{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:var(--primary);cursor:pointer;margin-bottom:16px;padding:6px 12px;border-radius:8px;border:1px solid #bfdbfe;background:var(--primary-bg);transition:all .15s}
+        .guide-toggle:hover{background:#dbeafe}
+        .guide-toggle svg{width:14px;height:14px;transition:transform .3s}
+        .guide-toggle.open svg{transform:rotate(180deg)}
+        .guide-content{max-height:0;overflow:hidden;transition:max-height .4s ease;margin-bottom:16px}
+        .guide-content.open{max-height:600px}
+        .guide-inner{padding:16px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;font-size:.78rem;color:var(--text-2);line-height:1.7}
+        .guide-inner h4{font-size:.82rem;font-weight:700;color:var(--text);margin:12px 0 6px}
+        .guide-inner h4:first-child{margin-top:0}
+        .guide-inner ol,.guide-inner ul{padding-left:20px;margin:4px 0}
+        .guide-inner li{margin:3px 0}
+        .guide-inner .tip{margin-top:10px;padding:8px 12px;background:#ecfdf5;border-radius:6px;color:#065f46;font-size:.72rem}
 
         /* ── Form ── */
         .form-group{margin-bottom:14px}
@@ -89,7 +104,10 @@
         .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:.78rem;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all .15s}
         .btn-primary{background:var(--primary);color:#fff}
         .btn-primary:hover{background:var(--primary-dark)}
+        .btn-secondary{background:#f3f4f6;color:var(--text);border:1px solid var(--border)}
+        .btn-secondary:hover{background:#e5e7eb}
         .btn-sm{padding:5px 12px;font-size:.72rem}
+        .btn svg{width:16px;height:16px}
 
         /* ── Output ── */
         .output-box{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;font-size:.78rem;line-height:1.6;position:relative;word-break:break-all}
@@ -117,6 +135,22 @@
         .range-row input[type=range]{flex:1}
         .range-val{font-weight:700;font-size:.85rem;min-width:60px;text-align:right}
 
+        /* ── History ── */
+        .history-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+        .history-title{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+        .history-clear{font-size:.65rem;color:var(--text-3);cursor:pointer;border:none;background:none;font-family:inherit}
+        .history-clear:hover{color:#ef4444}
+        .history-list{max-height:200px;overflow-y:auto}
+        .history-item{padding:8px 10px;background:#f8fafc;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;font-size:.72rem;color:var(--text-2);cursor:pointer;transition:background .15s;word-break:break-all}
+        .history-item:hover{background:#eff6ff}
+
+        /* ── Tab Bar ── */
+        .tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+        .tab-btn{padding:8px 16px;font-size:.75rem;font-weight:600;color:var(--text-3);cursor:pointer;border:none;background:none;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+        .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+        .tab-btn:hover{color:var(--text)}
+        .tab-panel{display:none}.tab-panel.active{display:block}
+
         /* ── Responsive ── */
         .mobile-sidebar-toggle{display:none}
         @media(max-width:768px){
@@ -134,29 +168,29 @@
 
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <h1><span class="material-symbols-outlined">construction</span> 工具箱</h1>
+        <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> 工具箱</h1>
         <p>行銷 · HR 免費工具</p>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-group-label">Dashboard</div>
-        <button class="nav-item active" data-tool="home"><span class="material-symbols-outlined">home</span> 全部工具</button>
+        <button class="nav-item active" data-tool="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 全部工具</button>
 
-        <div class="nav-group-label">📣 行銷工具</div>
-        <button class="nav-item" data-tool="utm"><span class="material-symbols-outlined">link</span> UTM 連結產生器<span class="nav-badge">熱門</span></button>
-        <button class="nav-item" data-tool="qrcode"><span class="material-symbols-outlined">qr_code_2</span> QR Code 產生器</button>
-        <button class="nav-item" data-tool="social-counter"><span class="material-symbols-outlined">chat</span> 社群字數檢測</button>
-        <button class="nav-item" data-tool="email-score"><span class="material-symbols-outlined">mail</span> Email 主旨評分</button>
-        <button class="nav-item" data-tool="hashtag"><span class="material-symbols-outlined">tag</span> Hashtag 產生器</button>
+        <div class="nav-group-label">行銷工具</div>
+        <button class="nav-item" data-tool="utm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> UTM 連結產生器<span class="nav-badge">熱門</span></button>
+        <button class="nav-item" data-tool="qrcode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><line x1="21" y1="14" x2="21" y2="14.01"/><line x1="21" y1="21" x2="21" y2="21.01"/><line x1="14" y1="21" x2="14" y2="21.01"/></svg> QR Code 產生器</button>
+        <button class="nav-item" data-tool="social-counter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 社群字數檢測</button>
+        <button class="nav-item" data-tool="email-score"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Email 主旨評分</button>
+        <button class="nav-item" data-tool="hashtag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg> Hashtag 產生器</button>
 
-        <div class="nav-group-label">👥 HR 工具</div>
-        <button class="nav-item" data-tool="salary"><span class="material-symbols-outlined">payments</span> 薪資試算器</button>
-        <button class="nav-item" data-tool="meeting-cost"><span class="material-symbols-outlined">groups</span> 會議成本計算<span class="nav-badge">熱門</span></button>
-        <button class="nav-item" data-tool="leave-calc"><span class="material-symbols-outlined">event_available</span> 年假計算器</button>
-        <button class="nav-item" data-tool="interview-q"><span class="material-symbols-outlined">quiz</span> 面試題目產生</button>
-        <button class="nav-item" data-tool="jd-gen"><span class="material-symbols-outlined">description</span> 職缺描述產生</button>
+        <div class="nav-group-label">HR 工具</div>
+        <button class="nav-item" data-tool="salary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> 薪資試算器</button>
+        <button class="nav-item" data-tool="meeting-cost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> 會議成本計算<span class="nav-badge">熱門</span></button>
+        <button class="nav-item" data-tool="leave-calc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg> 年假計算器</button>
+        <button class="nav-item" data-tool="interview-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 面試題目產生</button>
+        <button class="nav-item" data-tool="jd-gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> 職缺描述產生</button>
     </nav>
     <div class="sidebar-footer">
-        <a href="overview.html"><span class="material-symbols-outlined">arrow_back</span> 回到數位簡報室</a>
+        <a href="overview.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg> 回到數位簡報室</a>
     </div>
 </aside>
 
@@ -168,263 +202,91 @@
         </div>
         <div class="header-right">
             <button class="btn btn-sm mobile-sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:#f3f4f6;color:var(--text);border:1px solid var(--border);">
-                <span class="material-symbols-outlined" style="font-size:16px">menu</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <a href="overview.html"><span class="material-symbols-outlined">home</span> 首頁</a>
+            <a href="overview.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 首頁</a>
         </div>
     </header>
 
     <div class="main-body">
-        <!-- ── HOME: Tool Cards Grid ── -->
+        <!-- HOME -->
         <div id="view-home" class="tool-detail active">
             <div class="cards-home">
                 <div class="tool-card" onclick="openTool('utm')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#2563eb,#1d4ed8)"><span class="material-symbols-outlined">link</span></div><span class="tc-badge" style="background:#dbeafe;color:#2563eb">熱門</span></div>
-                    <h3>UTM 連結產生器</h3>
-                    <p>快速產生帶有追蹤參數的行銷連結，精準歸因流量來源</p>
-                    <div class="tc-tags"><span class="tc-tag">Google Analytics</span><span class="tc-tag">行銷追蹤</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#2563eb,#1d4ed8)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><span class="tc-badge" style="background:#dbeafe;color:#2563eb">熱門</span></div>
+                    <h3>UTM 連結產生器</h3><p>快速產生帶有追蹤參數的行銷連結，支援批次生成與範本，精準歸因流量來源</p>
+                    <div class="tc-tags"><span class="tc-tag">Google Analytics</span><span class="tc-tag">行銷追蹤</span><span class="tc-tag">批次生成</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('qrcode')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)"><span class="material-symbols-outlined">qr_code_2</span></div></div>
-                    <h3>QR Code 產生器</h3>
-                    <p>輸入網址或文字，即時產生可下載的 QR Code 圖片</p>
-                    <div class="tc-tags"><span class="tc-tag">圖片下載</span><span class="tc-tag">自訂顏色</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div></div>
+                    <h3>QR Code 產生器</h3><p>輸入網址或文字，即時產生可下載的 QR Code，支援自訂顏色與樣式</p>
+                    <div class="tc-tags"><span class="tc-tag">圖片下載</span><span class="tc-tag">自訂顏色</span><span class="tc-tag">vCard</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('social-counter')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)"><span class="material-symbols-outlined">chat</span></div></div>
-                    <h3>社群字數檢測器</h3>
-                    <p>即時檢測貼文字數，確保符合各平台字數限制</p>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div></div>
+                    <h3>社群貼文字數檢測器</h3><p>即時檢測貼文字數，含可讀性分析、Emoji 計數與最佳發文建議</p>
                     <div class="tc-tags"><span class="tc-tag">Twitter</span><span class="tc-tag">IG</span><span class="tc-tag">Threads</span><span class="tc-tag">LinkedIn</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('email-score')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><span class="material-symbols-outlined">mail</span></div></div>
-                    <h3>Email 主旨評分器</h3>
-                    <p>分析主旨行品質，提供長度、情緒、行動力等評分建議</p>
-                    <div class="tc-tags"><span class="tc-tag">開信率</span><span class="tc-tag">EDM</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div></div>
+                    <h3>Email 主旨評分器</h3><p>分析主旨行品質，提供長度、情緒、行動力等多維度評分與改善建議</p>
+                    <div class="tc-tags"><span class="tc-tag">開信率</span><span class="tc-tag">EDM</span><span class="tc-tag">A/B 測試</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('hashtag')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)"><span class="material-symbols-outlined">tag</span></div></div>
-                    <h3>Hashtag 產生器</h3>
-                    <p>輸入關鍵字，自動產生各社群平台適用的 Hashtag 組合</p>
-                    <div class="tc-tags"><span class="tc-tag">Instagram</span><span class="tc-tag">社群經營</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></div></div>
+                    <h3>Hashtag 產生器</h3><p>輸入關鍵字，自動產生各社群平台適用的 Hashtag 組合與策略建議</p>
+                    <div class="tc-tags"><span class="tc-tag">Instagram</span><span class="tc-tag">社群經營</span><span class="tc-tag">分平台策略</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
-
                 <div class="tool-card" onclick="openTool('salary')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#059669,#047857)"><span class="material-symbols-outlined">payments</span></div></div>
-                    <h3>薪資試算器</h3>
-                    <p>根據月薪計算勞健保自付額、所得稅、年度實領（台灣適用）</p>
-                    <div class="tc-tags"><span class="tc-tag">勞健保</span><span class="tc-tag">年終</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#059669,#047857)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div>
+                    <h3>薪資試算器</h3><p>根據月薪計算勞健保自付額、所得稅、年度實領（台灣 2024 適用）</p>
+                    <div class="tc-tags"><span class="tc-tag">勞健保</span><span class="tc-tag">年終</span><span class="tc-tag">所得稅</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('meeting-cost')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><span class="material-symbols-outlined">groups</span></div><span class="tc-badge" style="background:#fecaca;color:#dc2626">熱門</span></div>
-                    <h3>會議成本計算器</h3>
-                    <p>計算會議實際成本，讓團隊對時間的價值更有感</p>
-                    <div class="tc-tags"><span class="tc-tag">效率管理</span><span class="tc-tag">成本意識</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="tc-badge" style="background:#fecaca;color:#dc2626">熱門</span></div>
+                    <h3>會議成本計算器</h3><p>計算會議實際成本與效率評估，讓團隊對時間的價值更有感</p>
+                    <div class="tc-tags"><span class="tc-tag">效率管理</span><span class="tc-tag">成本意識</span><span class="tc-tag">報告匯出</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('leave-calc')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2)"><span class="material-symbols-outlined">event_available</span></div></div>
-                    <h3>年假計算器</h3>
-                    <p>根據到職日計算特休天數，依勞基法第 38 條規定</p>
-                    <div class="tc-tags"><span class="tc-tag">勞基法</span><span class="tc-tag">特休</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#06b6d4,#0891b2)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
+                    <h3>年假計算器</h3><p>根據到職日計算特休天數與歷史累積，依勞基法第 38 條規定</p>
+                    <div class="tc-tags"><span class="tc-tag">勞基法</span><span class="tc-tag">特休</span><span class="tc-tag">多年資對照</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('interview-q')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)"><span class="material-symbols-outlined">quiz</span></div></div>
-                    <h3>面試題目產生器</h3>
-                    <p>根據職位和能力需求，產生結構化面試題目組合</p>
-                    <div class="tc-tags"><span class="tc-tag">行為面試</span><span class="tc-tag">技術面試</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div>
+                    <h3>面試題目產生器</h3><p>根據職位產生結構化面試題目，含評分標準與 STAR 回答範本</p>
+                    <div class="tc-tags"><span class="tc-tag">行為面試</span><span class="tc-tag">技術面試</span><span class="tc-tag">評分標準</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
                 <div class="tool-card" onclick="openTool('jd-gen')">
-                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#f97316,#ea580c)"><span class="material-symbols-outlined">description</span></div></div>
-                    <h3>職缺描述產生器</h3>
-                    <p>快速產生專業職缺描述範本，節省招募文案撰寫時間</p>
-                    <div class="tc-tags"><span class="tc-tag">JD 範本</span><span class="tc-tag">招募</span></div>
-                    <span class="material-symbols-outlined tc-arrow">arrow_forward</span>
+                    <div class="tc-top"><div class="tc-icon" style="background:linear-gradient(135deg,#f97316,#ea580c)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div></div>
+                    <h3>職缺描述產生器</h3><p>快速產生專業職缺描述範本，含產業專用模板與 SEO 優化建議</p>
+                    <div class="tc-tags"><span class="tc-tag">JD 範本</span><span class="tc-tag">招募</span><span class="tc-tag">產業模板</span></div>
+                    <span class="tc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>
                 </div>
             </div>
         </div>
 
-        <!-- ── UTM ── -->
-        <div class="tool-detail" id="view-utm">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>🔗 UTM 連結產生器</h2>
-                <p class="desc">快速產生帶有 UTM 追蹤參數的網址，精準追蹤每個行銷渠道的流量來源。</p>
-                <div class="form-group"><label class="form-label">網站網址 *</label><input class="form-input" id="utm-url" placeholder="https://example.com/page"></div>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">Campaign Source *</label><input class="form-input" id="utm-source" placeholder="facebook, google"><div class="form-hint">流量來源平台</div></div>
-                    <div class="form-group"><label class="form-label">Campaign Medium *</label><input class="form-input" id="utm-medium" placeholder="cpc, email, social"><div class="form-hint">行銷媒介</div></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">Campaign Name</label><input class="form-input" id="utm-campaign" placeholder="spring_sale_2026"></div>
-                    <div class="form-group"><label class="form-label">Campaign Term</label><input class="form-input" id="utm-term" placeholder="付費關鍵字"></div>
-                </div>
-                <div class="form-group"><label class="form-label">Campaign Content</label><input class="form-input" id="utm-content" placeholder="區分不同素材 (banner_a)"></div>
-                <button class="btn btn-primary" onclick="generateUTM()"><span class="material-symbols-outlined" style="font-size:16px">bolt</span> 產生連結</button>
-                <div class="output-box" id="utm-output" style="display:none"><button class="copy-btn" onclick="copyOutput('utm-output')">複製</button><pre id="utm-result"></pre></div>
-            </div>
-        </div>
-
-        <!-- ── QR Code ── -->
-        <div class="tool-detail" id="view-qrcode">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>📱 QR Code 產生器</h2>
-                <p class="desc">輸入任何網址或文字，立即產生 QR Code 圖片，可下載使用。</p>
-                <div class="form-group"><label class="form-label">網址或文字 *</label><input class="form-input" id="qr-text" placeholder="https://example.com"></div>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">尺寸</label><select class="form-select" id="qr-size"><option value="200">200×200</option><option value="300" selected>300×300</option><option value="500">500×500</option></select></div>
-                    <div class="form-group"><label class="form-label">顏色</label><input type="color" id="qr-color" value="#000000" class="form-input" style="height:38px;padding:3px"></div>
-                </div>
-                <button class="btn btn-primary" onclick="generateQR()"><span class="material-symbols-outlined" style="font-size:16px">qr_code_2</span> 產生 QR Code</button>
-                <div id="qr-output" style="margin-top:16px;text-align:center;display:none"></div>
-            </div>
-        </div>
-
-        <!-- ── Social Counter ── -->
-        <div class="tool-detail" id="view-social-counter">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>💬 社群貼文字數檢測器</h2>
-                <p class="desc">即時檢測貼文字數，確保符合各社群平台的字數限制。</p>
-                <div class="form-group"><label class="form-label">貼文內容</label><textarea class="form-textarea" id="social-text" rows="5" placeholder="在此輸入你的貼文..." oninput="checkSocialLength()"></textarea></div>
-                <div class="result-grid" id="social-results">
-                    <div class="result-card"><div class="rc-label">字數</div><div class="rc-value" id="sc-chars">0</div></div>
-                    <div class="result-card"><div class="rc-label">Twitter / X</div><div class="rc-value" id="sc-twitter">0 / 280</div><div class="score-bar"><div class="score-fill" id="sc-twitter-bar" style="width:0;background:#1da1f2"></div></div></div>
-                    <div class="result-card"><div class="rc-label">Facebook</div><div class="rc-value" id="sc-fb">0 / 63,206</div><div class="score-bar"><div class="score-fill" id="sc-fb-bar" style="width:0;background:#1877f2"></div></div></div>
-                    <div class="result-card"><div class="rc-label">Instagram</div><div class="rc-value" id="sc-ig">0 / 2,200</div><div class="score-bar"><div class="score-fill" id="sc-ig-bar" style="width:0;background:#e4405f"></div></div></div>
-                    <div class="result-card"><div class="rc-label">LinkedIn</div><div class="rc-value" id="sc-li">0 / 3,000</div><div class="score-bar"><div class="score-fill" id="sc-li-bar" style="width:0;background:#0a66c2"></div></div></div>
-                    <div class="result-card"><div class="rc-label">Threads</div><div class="rc-value" id="sc-threads">0 / 500</div><div class="score-bar"><div class="score-fill" id="sc-threads-bar" style="width:0;background:#000"></div></div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── Email Score ── -->
-        <div class="tool-detail" id="view-email-score">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>📧 Email 主旨評分器</h2>
-                <p class="desc">分析 Email 主旨行品質，給出長度、情緒、行動力等評分建議。</p>
-                <div class="form-group"><label class="form-label">Email 主旨 *</label><input class="form-input" id="email-subject" placeholder="限時 3 天！AI 課程 5 折優惠"></div>
-                <button class="btn btn-primary" onclick="scoreEmail()"><span class="material-symbols-outlined" style="font-size:16px">analytics</span> 分析主旨</button>
-                <div id="email-output" style="display:none;margin-top:16px"></div>
-            </div>
-        </div>
-
-        <!-- ── Hashtag ── -->
-        <div class="tool-detail" id="view-hashtag">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>#️⃣ Hashtag 產生器</h2>
-                <p class="desc">輸入主題關鍵字，自動產生適合各社群平台的 Hashtag 組合。</p>
-                <div class="form-group"><label class="form-label">主題關鍵字 *</label><input class="form-input" id="ht-keyword" placeholder="AI教學、數位行銷"></div>
-                <div class="form-group"><label class="form-label">平台</label><select class="form-select" id="ht-platform"><option value="instagram">Instagram</option><option value="threads">Threads</option><option value="twitter">Twitter / X</option><option value="linkedin">LinkedIn</option></select></div>
-                <button class="btn btn-primary" onclick="generateHashtags()"><span class="material-symbols-outlined" style="font-size:16px">tag</span> 產生 Hashtag</button>
-                <div class="tag-cloud" id="ht-output" style="display:none"></div>
-                <div class="output-box" id="ht-copy-box" style="display:none"><button class="copy-btn" onclick="copyOutput('ht-copy-box')">複製</button><pre id="ht-result"></pre></div>
-            </div>
-        </div>
-
-        <!-- ── Salary ── -->
-        <div class="tool-detail" id="view-salary">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>💰 薪資試算器</h2>
-                <p class="desc">根據月薪計算勞健保自付額、所得稅預扣、實領薪資（台灣適用）。</p>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">月薪（TWD）*</label><input type="number" class="form-input" id="sal-monthly" placeholder="45000"></div>
-                    <div class="form-group"><label class="form-label">每月加班費</label><input type="number" class="form-input" id="sal-overtime" placeholder="0"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">扶養人數</label><select class="form-select" id="sal-dependents"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option></select></div>
-                    <div class="form-group"><label class="form-label">年終月數</label><input type="number" class="form-input" id="sal-bonus" placeholder="2" value="2"></div>
-                </div>
-                <button class="btn btn-primary" onclick="calcSalary()"><span class="material-symbols-outlined" style="font-size:16px">calculate</span> 計算</button>
-                <div id="salary-output" style="display:none;margin-top:16px"></div>
-            </div>
-        </div>
-
-        <!-- ── Meeting Cost ── -->
-        <div class="tool-detail" id="view-meeting-cost">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>⏱️ 會議成本計算器</h2>
-                <p class="desc">計算會議實際成本，讓團隊對時間的價值更有感。</p>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">參與人數 *</label><input type="number" class="form-input" id="mtg-people" placeholder="5" value="5"></div>
-                    <div class="form-group"><label class="form-label">會議時長（分鐘）*</label><input type="number" class="form-input" id="mtg-minutes" placeholder="60" value="60"></div>
-                </div>
-                <div class="form-group"><label class="form-label">平均月薪（TWD）</label>
-                    <div class="range-row"><input type="range" id="mtg-salary" min="30000" max="150000" step="5000" value="50000" oninput="document.getElementById('mtg-sal-val').textContent='$'+Number(this.value).toLocaleString()"><span class="range-val" id="mtg-sal-val">$50,000</span></div>
-                </div>
-                <button class="btn btn-primary" onclick="calcMeeting()"><span class="material-symbols-outlined" style="font-size:16px">calculate</span> 計算成本</button>
-                <div id="meeting-output" style="display:none;margin-top:16px"></div>
-            </div>
-        </div>
-
-        <!-- ── Leave Calc ── -->
-        <div class="tool-detail" id="view-leave-calc">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>🏖️ 年假計算器</h2>
-                <p class="desc">根據到職日計算特休天數（依勞基法規定）。</p>
-                <div class="form-group"><label class="form-label">到職日期 *</label><input type="date" class="form-input" id="leave-start"></div>
-                <button class="btn btn-primary" onclick="calcLeave()"><span class="material-symbols-outlined" style="font-size:16px">event_available</span> 計算特休</button>
-                <div id="leave-output" style="display:none;margin-top:16px"></div>
-            </div>
-        </div>
-
-        <!-- ── Interview Q ── -->
-        <div class="tool-detail" id="view-interview-q">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>🎤 面試題目產生器</h2>
-                <p class="desc">根據職位和能力需求，產生結構化面試題目組合。</p>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">職位名稱 *</label><input class="form-input" id="iq-role" placeholder="前端工程師"></div>
-                    <div class="form-group"><label class="form-label">年資要求</label><select class="form-select" id="iq-level"><option value="junior">初階 (0-2年)</option><option value="mid">中階 (3-5年)</option><option value="senior">資深 (5年+)</option></select></div>
-                </div>
-                <div class="form-group"><label class="form-label">關鍵技能（逗號分隔）</label><input class="form-input" id="iq-skills" placeholder="React, TypeScript, 溝通能力"></div>
-                <button class="btn btn-primary" onclick="generateInterviewQ()"><span class="material-symbols-outlined" style="font-size:16px">quiz</span> 產生題目</button>
-                <div id="interview-output" style="display:none;margin-top:16px"></div>
-            </div>
-        </div>
-
-        <!-- ── JD Gen ── -->
-        <div class="tool-detail" id="view-jd-gen">
-            <button class="detail-back" onclick="goHome()"><span class="material-symbols-outlined">arrow_back</span> 返回工具列表</button>
-            <div class="detail-card">
-                <h2>📋 職缺描述產生器</h2>
-                <p class="desc">快速產生專業的職缺描述範本。</p>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">職位名稱 *</label><input class="form-input" id="jd-title" placeholder="行銷企劃專員"></div>
-                    <div class="form-group"><label class="form-label">公司名稱</label><input class="form-input" id="jd-company" placeholder="ABC 科技"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">產業</label><select class="form-select" id="jd-industry"><option>科技業</option><option>金融業</option><option>零售業</option><option>教育業</option><option>醫療業</option><option>製造業</option><option>其他</option></select></div>
-                    <div class="form-group"><label class="form-label">工作型態</label><select class="form-select" id="jd-type"><option>全職</option><option>兼職</option><option>遠端</option><option>混合辦公</option></select></div>
-                </div>
-                <div class="form-group"><label class="form-label">核心職責（逗號分隔）</label><input class="form-input" id="jd-duties" placeholder="內容行銷, 社群經營, 數據分析"></div>
-                <button class="btn btn-primary" onclick="generateJD()"><span class="material-symbols-outlined" style="font-size:16px">description</span> 產生職缺描述</button>
-                <div class="output-box" id="jd-output" style="display:none"><button class="copy-btn" onclick="copyOutput('jd-output')">複製</button><pre id="jd-result"></pre></div>
-            </div>
-        </div>
+        <!-- Tool detail views will be injected by tools-detail.js -->
+        <div id="tool-views-container"></div>
     </div>
 </div>
 
 <script>
-// ── Navigation ──
+// ── Navigation with Hash Routing ──
 const TOOL_NAMES = {home:'全部工具',utm:'UTM 連結產生器',qrcode:'QR Code 產生器','social-counter':'社群字數檢測器','email-score':'Email 主旨評分器',hashtag:'Hashtag 產生器',salary:'薪資試算器','meeting-cost':'會議成本計算器','leave-calc':'年假計算器','interview-q':'面試題目產生器','jd-gen':'職缺描述產生器'};
 
 function openTool(id) {
+    // Update hash without triggering hashchange
+    history.replaceState(null, '', id === 'home' ? 'tools.html' : '#' + id);
     document.querySelectorAll('.tool-detail').forEach(v => v.classList.remove('active'));
     const view = document.getElementById('view-' + id);
     if (view) view.classList.add('active');
@@ -440,7 +302,22 @@ function goHome() { openTool('home'); }
 document.querySelectorAll('.nav-item[data-tool]').forEach(btn => {
     btn.addEventListener('click', () => openTool(btn.dataset.tool));
 });
+
+// Handle hash on load and change
+function handleHash() {
+    const hash = location.hash.replace('#', '');
+    if (hash && TOOL_NAMES[hash]) openTool(hash);
+}
+window.addEventListener('hashchange', handleHash);
+window.addEventListener('DOMContentLoaded', handleHash);
+
+// Guide toggle helper
+function toggleGuide(btn) {
+    btn.classList.toggle('open');
+    btn.nextElementSibling.classList.toggle('open');
+}
 </script>
+<script src="scripts/tools-views.js"></script>
 <script src="scripts/tools-logic.js"></script>
 </body>
 </html>
