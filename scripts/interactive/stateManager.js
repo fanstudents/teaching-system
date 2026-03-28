@@ -133,13 +133,9 @@ class InteractionState {
             }
         }
 
-        // 加分動畫（每次頁面載入的首次互動 + 有得分 + 非講師端）
-        const popupKey = `${elementId}::${email}`;
-        if (!this._shownPopups) this._shownPopups = new Set();
-        const showPts = isRetry ? firstAwardedPoints : awardedPoints;
-        if (showPts > 0 && !this._shownPopups.has(popupKey) && !document.querySelector('.presentation-slide')) {
-            this._shownPopups.add(popupKey);
-            this.showScorePopup(showPts);
+        // 加分動畫（真正首次作答 + 有得分 + 非講師端 + 非靜默儲存）
+        if (!isRetry && awardedPoints > 0 && !data._skipPopup && !document.querySelector('.presentation-slide')) {
+            this.showScorePopup(awardedPoints);
         }
 
         return { isRetry };

@@ -687,7 +687,8 @@
                         score: null,
                         points: 1,
                         participated: true,
-                        state: {}
+                        state: {},
+                        _skipPopup: true
                     });
                 } catch (e) { console.warn('[Join] bonus point failed:', e); }
 
@@ -2389,7 +2390,6 @@
 
             if (isMobile) {
                 // 手機版：slide 是 absolute + top:0 left:0
-                // 手動計算偏移量精確居中
                 const ww = wrapper.clientWidth;
                 const wh = wrapper.clientHeight;
                 const scale = Math.min(ww / 960, wh / 540);
@@ -2400,18 +2400,8 @@
                 slideEl.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
                 slideEl.style.transformOrigin = 'top left';
                 slideEl.style.marginBottom = '0';
-
-                // ★ 手機端互動元素 counter-scale：讓它們以全寬顯示
-                const counterScale = 1 / scale;
-                slideEl.querySelectorAll('.interactive-element').forEach(el => {
-                    el.style.transform = `scale(${counterScale})`;
-                    el.style.transformOrigin = 'top left';
-                    el.style.width = '960px'; // = slide full width → after counter-scale fills viewport
-                    el.style.left = '0';
-                    el.style.height = 'auto';
-                    el.style.minHeight = '200px';
-                    el.style.zIndex = '100';
-                });
+                // 讓互動元素可見（不被 overflow:hidden 裁掉）
+                slideEl.style.overflow = 'visible';
             } else if (isImmersive) {
                 const vw = window.innerWidth;
                 const vh = window.innerHeight;
