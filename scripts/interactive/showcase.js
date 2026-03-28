@@ -638,158 +638,235 @@ export class Showcase {
     _flyStarToLeaderboard(starBtn, delta) {
         const isPositive = delta > 0;
         const absDelta = Math.abs(delta);
-        const color = isPositive ? '#f59e0b' : '#dc2626';
-        const bgColor = isPositive ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.35)';
+        const accentColor = isPositive ? '#f59e0b' : '#ef4444';
+        const accentGlow = isPositive ? 'rgba(245,158,11,0.4)' : 'rgba(239,68,68,0.4)';
 
         // 找到對應學員名字
-        const card = starBtn.closest('.showcase-card');
-        const studentName = card?.querySelector('.showcase-name')?.textContent || '';
+        const card = starBtn.closest('.showcase-work-card');
+        const studentName = card?.querySelector('.showcase-work-name')?.textContent || '';
 
-        // ═══ 找到正確的掛載容器（全螢幕模式下必須掛在 fullscreenElement 內） ═══
+        // 掛載容器
         const mountTarget = document.fullscreenElement
             || document.webkitFullscreenElement
             || document.querySelector('.presentation-mode.active')
             || document.body;
 
-        // ═══ 全螢幕覆蓋層 ═══
+        // ═══ 注入 keyframes ═══
+        if (!document.getElementById('lb-anim-v2')) {
+            const style = document.createElement('style');
+            style.id = 'lb-anim-v2';
+            style.textContent = `
+                @keyframes scoreOverlayIn { from { opacity:0 } to { opacity:1 } }
+                @keyframes scorePulseRing {
+                    0% { transform:translate(-50%,-50%) scale(0.3); opacity:1 }
+                    100% { transform:translate(-50%,-50%) scale(2.5); opacity:0 }
+                }
+                @keyframes scoreNumIn {
+                    0% { transform:scale(0) rotate(-12deg); opacity:0 }
+                    60% { transform:scale(1.15) rotate(2deg); opacity:1 }
+                    80% { transform:scale(0.95) rotate(-1deg) }
+                    100% { transform:scale(1) rotate(0deg); opacity:1 }
+                }
+                @keyframes scoreStarPop {
+                    0% { transform:scale(0) rotate(-30deg); opacity:0 }
+                    60% { transform:scale(1.3) rotate(5deg); opacity:1 }
+                    100% { transform:scale(1) rotate(0deg); opacity:1 }
+                }
+                @keyframes scoreNameSlide {
+                    0% { transform:translateY(20px); opacity:0 }
+                    100% { transform:translateY(0); opacity:1 }
+                }
+                @keyframes scoreLabelFade {
+                    0% { transform:translateY(10px); opacity:0 }
+                    100% { transform:translateY(0); opacity:0.7 }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // ═══ 覆蓋層 ═══
         const overlay = document.createElement('div');
         overlay.style.cssText = `
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            background: ${bgColor};
-            animation: lbOverlayIn 0.2s ease-out;
+            position:fixed; inset:0; z-index:99999;
+            pointer-events:none;
+            display:flex; align-items:center; justify-content:center; flex-direction:column;
+            background:rgba(0,0,0,0.55);
+            backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+            animation: scoreOverlayIn 0.3s ease-out;
         `;
         mountTarget.appendChild(overlay);
-        // ═══ 中央大型分數 ═══
-        const scoreBox = document.createElement('div');
-        scoreBox.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            animation: lbScoreBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+        // ═══ 脈衝光環 ═══
+        for (let r = 0; r < 2; r++) {
+            const ring = document.createElement('div');
+            ring.style.cssText = `
+                position:fixed; left:50%; top:50%;
+                width:200px; height:200px; border-radius:50%;
+                border: 3px solid ${accentColor};
+                box-shadow: 0 0 40px ${accentGlow}, inset 0 0 40px ${accentGlow};
+                pointer-events:none;
+                animation: scorePulseRing 1s ${r * 0.3}s cubic-bezier(0.22,0.61,0.36,1) forwards;
+            `;
+            overlay.appendChild(ring);
+        }
+
+        // ═══ 中央內容區 ═══
+        const center = document.createElement('div');
+        center.style.cssText = `
+            display:flex; flex-direction:column; align-items:center; gap:6px;
+            position:relative; z-index:1;
+        `;
+
+        // 標籤
+        const label = document.createElement('div');
+        label.textContent = isPositive ? '作業評分' : '扣分';
+        label.style.cssText = `
+            color:rgba(255,255,255,0.6); font-size:14px; font-weight:500;
+            letter-spacing:4px; text-transform:uppercase;
+            font-family:'Inter','Noto Sans TC',sans-serif;
+            animation: scoreLabelFade 0.4s 0.1s ease-out both;
         `;
 
         // 學員名字
         const nameEl = document.createElement('div');
         nameEl.textContent = studentName;
         nameEl.style.cssText = `
-            color: rgba(255,255,255,0.9);
-            font-size: 16px;
-            font-weight: 600;
-            font-family: 'Noto Sans TC', sans-serif;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
-            letter-spacing: 1px;
+            color:#fff; font-size:22px; font-weight:700;
+            font-family:'Noto Sans TC',sans-serif;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+            animation: scoreNameSlide 0.5s 0.15s ease-out both;
         `;
 
         // 大數字
         const bigNum = document.createElement('div');
         bigNum.textContent = `${isPositive ? '+' : ''}${delta}`;
         bigNum.style.cssText = `
-            font-size: 72px;
-            font-weight: 900;
-            color: ${color};
-            text-shadow: 0 0 30px ${color}80, 0 4px 12px rgba(0,0,0,0.3);
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
+            font-size: min(28vw, 140px);
+            font-weight:900; line-height:1;
+            color:${accentColor};
+            text-shadow: 0 0 60px ${accentGlow}, 0 0 120px ${accentGlow}, 0 8px 32px rgba(0,0,0,0.4);
+            font-family:'Inter','Noto Sans TC',sans-serif;
+            font-variant-numeric:tabular-nums;
+            animation: scoreNumIn 0.6s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
         `;
 
-        // 星星圖示列
+        // 星星列
         const starsRow = document.createElement('div');
-        starsRow.style.cssText = 'display:flex;gap:4px;';
+        starsRow.style.cssText = 'display:flex; gap:8px; margin-top:4px;';
         for (let i = 0; i < 5; i++) {
             const s = document.createElement('span');
             s.className = 'material-symbols-outlined';
             s.textContent = 'star';
             const filled = i < absDelta;
             s.style.cssText = `
-                font-size: 28px;
-                color: ${filled ? color : 'rgba(255,255,255,0.15)'};
-                ${filled ? `filter: drop-shadow(0 0 6px ${color});` : ''}
-                transition: all 0.3s ${i * 0.08}s;
+                font-size:36px;
+                color: ${filled ? accentColor : 'rgba(255,255,255,0.12)'};
+                ${filled ? `filter: drop-shadow(0 0 12px ${accentColor}); text-shadow: 0 0 20px ${accentGlow};` : ''}
+                animation: ${filled ? `scoreStarPop 0.4s ${0.3 + i * 0.1}s cubic-bezier(0.34,1.56,0.64,1) both` : 'none'};
+                ${!filled ? 'opacity:0.3;' : ''}
             `;
             starsRow.appendChild(s);
         }
 
-        scoreBox.appendChild(nameEl);
-        scoreBox.appendChild(bigNum);
-        scoreBox.appendChild(starsRow);
-        overlay.appendChild(scoreBox);
+        // 分數標題
+        const ptsLabel = document.createElement('div');
+        ptsLabel.textContent = '分';
+        ptsLabel.style.cssText = `
+            color:rgba(255,255,255,0.5); font-size:18px; font-weight:500;
+            font-family:'Noto Sans TC',sans-serif;
+            margin-top:-8px;
+            animation: scoreLabelFade 0.4s 0.5s ease-out both;
+        `;
 
-        // ═══ 爆發粒子 ═══
+        center.appendChild(label);
+        center.appendChild(nameEl);
+        center.appendChild(bigNum);
+        center.appendChild(ptsLabel);
+        center.appendChild(starsRow);
+        overlay.appendChild(center);
+
+        // ═══ 金色粒子爆發 ═══
         const cx = window.innerWidth / 2;
         const cy = window.innerHeight / 2;
-        const particleCount = 15 + absDelta * 3;
+        const particleCount = 20 + absDelta * 5;
+        const shapes = ['star', 'circle', 'diamond'];
 
         for (let i = 0; i < particleCount; i++) {
-            const p = document.createElement('span');
-            p.className = 'material-symbols-outlined';
-            p.textContent = isPositive ? 'star' : 'star_half';
-            const size = 16 + Math.random() * 20;
-            const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
-            const dist = 150 + Math.random() * 300;
+            const p = document.createElement('div');
+            const shape = shapes[i % 3];
+            const size = 4 + Math.random() * 10;
+            const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.4;
+            const dist = 100 + Math.random() * 400;
             const dx = Math.cos(angle) * dist;
             const dy = Math.sin(angle) * dist;
-            const rot = (Math.random() - 0.5) * 720;
 
-            p.style.cssText = `
-                position: fixed;
-                left: ${cx - size / 2}px;
-                top: ${cy - size / 2}px;
-                font-size: ${size}px;
-                color: ${color};
-                filter: drop-shadow(0 0 4px ${color});
-                pointer-events: none;
-                z-index: 100000;
-            `;
+            if (shape === 'star') {
+                p.className = 'material-symbols-outlined';
+                p.textContent = 'star';
+                p.style.cssText = `
+                    position:fixed; left:${cx}px; top:${cy}px;
+                    font-size:${size + 8}px; color:${accentColor};
+                    filter:drop-shadow(0 0 4px ${accentColor});
+                    pointer-events:none; z-index:100000;
+                `;
+            } else {
+                p.style.cssText = `
+                    position:fixed; left:${cx}px; top:${cy}px;
+                    width:${size}px; height:${size}px;
+                    background:${isPositive ? ['#fbbf24','#f59e0b','#d97706','#fcd34d','#fff7ed'][i%5] : ['#ef4444','#f87171','#fca5a5'][i%3]};
+                    border-radius:${shape === 'circle' ? '50%' : '2px'};
+                    ${shape === 'diamond' ? 'transform:rotate(45deg);' : ''}
+                    pointer-events:none; z-index:100000;
+                    box-shadow: 0 0 6px ${accentGlow};
+                `;
+            }
             overlay.appendChild(p);
 
-            const delay = Math.random() * 200;
+            const delay = Math.random() * 250;
             setTimeout(() => {
                 p.animate([
-                    { transform: 'translate(0,0) scale(0) rotate(0deg)', opacity: 1 },
-                    { transform: `translate(${dx * 0.3}px,${dy * 0.3}px) scale(1.3) rotate(${rot * 0.4}deg)`, opacity: 1, offset: 0.25 },
-                    { transform: `translate(${dx}px,${dy}px) scale(0.3) rotate(${rot}deg)`, opacity: 0 }
+                    { transform: `translate(-50%,-50%) scale(0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translate(calc(-50% + ${dx*0.4}px), calc(-50% + ${dy*0.4}px)) scale(1.5) rotate(${(Math.random()-0.5)*360}deg)`, opacity: 1, offset: 0.3 },
+                    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0) rotate(${(Math.random()-0.5)*720}deg)`, opacity: 0 }
                 ], {
-                    duration: 900 + Math.random() * 400,
-                    easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+                    duration: 800 + Math.random() * 500,
+                    easing: 'cubic-bezier(0.22,0.61,0.36,1)',
                     fill: 'forwards'
                 });
             }, delay);
         }
 
-        // ═══ 注入 keyframes（如果尚未注入） ═══
-        if (!document.getElementById('lb-anim-styles')) {
-            const style = document.createElement('style');
-            style.id = 'lb-anim-styles';
-            style.textContent = `
-                @keyframes lbOverlayIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
+        // ═══ 音效 ═══
+        try {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) {
+                const ctx = new AC();
+                const play = (freq, t, dur) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(freq, ctx.currentTime + t);
+                    g.gain.setValueAtTime(0, ctx.currentTime + t);
+                    g.gain.linearRampToValueAtTime(0.08, ctx.currentTime + t + 0.03);
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + dur);
+                    o.connect(g); g.connect(ctx.destination);
+                    o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + dur);
+                };
+                if (isPositive) {
+                    play(523, 0, 0.2); play(659, 0.08, 0.2); play(784, 0.16, 0.2); play(1047, 0.24, 0.4);
+                } else {
+                    play(440, 0, 0.3); play(370, 0.15, 0.4);
                 }
-                @keyframes lbScoreBounce {
-                    0% { transform: scale(0.3); opacity: 0; }
-                    50% { transform: scale(1.1); opacity: 1; }
-                    100% { transform: scale(1); opacity: 1; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
+            }
+        } catch { /* silent */ }
 
-        // ═══ 0.8 秒後淡出移除（加速） ═══
+        // ═══ 1.2 秒後淡出 ═══
         setTimeout(() => {
             overlay.animate([
-                { opacity: 1 },
-                { opacity: 0 }
-            ], { duration: 350, fill: 'forwards' });
-            setTimeout(() => overlay.remove(), 400);
-        }, 800);
+                { opacity: 1, backdropFilter: 'blur(8px)' },
+                { opacity: 0, backdropFilter: 'blur(0px)' }
+            ], { duration: 400, fill: 'forwards' });
+            setTimeout(() => overlay.remove(), 450);
+        }, 1200);
     }
 }

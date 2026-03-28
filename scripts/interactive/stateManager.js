@@ -423,44 +423,158 @@ class InteractionState {
      * 顯示加分動畫
      */
     showScorePopup(points) {
-        // 掛載到 presentation-mode 容器（避免被 fullscreen 壓住）
         const mountTarget = document.querySelector('.presentation-mode.active') || document.body;
 
-        const popup = document.createElement('div');
-        popup.className = 'score-popup';
-        popup.innerHTML = `
-            <div class="score-popup-inner">
-                <span class="material-symbols-outlined">star</span>
-                +${points} 分
-            </div>
-        `;
-        mountTarget.appendChild(popup);
-
-        // JS 煙火粒子
-        const colors = ['#fbbf24', '#f59e0b', '#d97706', '#1a73e8', '#ec4899', '#22c55e'];
-        for (let i = 0; i < 16; i++) {
-            const p = document.createElement('div');
-            p.style.cssText = `
-                position:fixed;top:50%;left:50%;width:6px;height:6px;
-                border-radius:50%;pointer-events:none;z-index:10001;
-                background:${colors[i % colors.length]};
+        // 注入 keyframes
+        if (!document.getElementById('score-popup-v2')) {
+            const style = document.createElement('style');
+            style.id = 'score-popup-v2';
+            style.textContent = `
+                @keyframes spvOverlay { from{opacity:0} to{opacity:1} }
+                @keyframes spvBounce {
+                    0%{transform:scale(0) rotate(-8deg);opacity:0}
+                    60%{transform:scale(1.1) rotate(2deg);opacity:1}
+                    80%{transform:scale(0.95) rotate(-1deg)}
+                    100%{transform:scale(1) rotate(0);opacity:1}
+                }
+                @keyframes spvRing {
+                    0%{transform:translate(-50%,-50%) scale(0.2);opacity:1}
+                    100%{transform:translate(-50%,-50%) scale(3);opacity:0}
+                }
+                @keyframes spvLabel {
+                    0%{transform:translateY(12px);opacity:0}
+                    100%{transform:translateY(0);opacity:0.8}
+                }
             `;
-            mountTarget.appendChild(p);
-            const angle = (i / 16) * Math.PI * 2;
-            const dist = 60 + Math.random() * 80;
-            p.animate([
-                { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
-                { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px)) scale(0)`, opacity: 0 }
-            ], {
-                duration: 700 + Math.random() * 400,
-                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                fill: 'forwards',
-                delay: 100 + Math.random() * 150
-            });
-            setTimeout(() => p.remove(), 1300);
+            document.head.appendChild(style);
         }
 
-        setTimeout(() => popup.remove(), 2500);
+        // 覆蓋層
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position:fixed; inset:0; z-index:10000;
+            pointer-events:none;
+            display:flex; align-items:center; justify-content:center; flex-direction:column;
+            background:rgba(0,0,0,0.45);
+            backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+            animation: spvOverlay 0.25s ease-out;
+        `;
+        mountTarget.appendChild(overlay);
+
+        // 光環
+        const ring = document.createElement('div');
+        ring.style.cssText = `
+            position:fixed; left:50%; top:50%;
+            width:160px; height:160px; border-radius:50%;
+            border:3px solid #fbbf24;
+            box-shadow: 0 0 40px rgba(251,191,36,0.4), inset 0 0 40px rgba(251,191,36,0.2);
+            animation: spvRing 0.8s 0.1s cubic-bezier(0.22,0.61,0.36,1) forwards;
+        `;
+        overlay.appendChild(ring);
+
+        // 中央內容
+        const center = document.createElement('div');
+        center.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;z-index:1;';
+
+        // 標籤
+        const label = document.createElement('div');
+        label.textContent = '得分';
+        label.style.cssText = `
+            color:rgba(255,255,255,0.6); font-size:13px; font-weight:500;
+            letter-spacing:3px;
+            font-family:'Inter','Noto Sans TC',sans-serif;
+            animation: spvLabel 0.3s 0.15s ease-out both;
+        `;
+
+        // 大數字
+        const big = document.createElement('div');
+        big.textContent = `+${points}`;
+        big.style.cssText = `
+            font-size: min(24vw, 100px);
+            font-weight:900; line-height:1;
+            color:#fbbf24;
+            text-shadow: 0 0 40px rgba(251,191,36,0.5), 0 0 80px rgba(251,191,36,0.3), 0 4px 20px rgba(0,0,0,0.4);
+            font-family:'Inter','Noto Sans TC',sans-serif;
+            font-variant-numeric:tabular-nums;
+            animation: spvBounce 0.5s 0.08s cubic-bezier(0.34,1.56,0.64,1) both;
+        `;
+
+        // 分標
+        const unit = document.createElement('div');
+        unit.textContent = '分';
+        unit.style.cssText = `
+            color:rgba(255,255,255,0.5); font-size:16px; font-weight:500;
+            font-family:'Noto Sans TC',sans-serif;
+            animation: spvLabel 0.3s 0.4s ease-out both;
+        `;
+
+        center.appendChild(label);
+        center.appendChild(big);
+        center.appendChild(unit);
+        overlay.appendChild(center);
+
+        // 粒子爆發
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const colors = ['#fbbf24', '#f59e0b', '#d97706', '#fcd34d', '#22c55e', '#4A7AE8', '#ec4899'];
+        for (let i = 0; i < 24; i++) {
+            const p = document.createElement('div');
+            const size = 4 + Math.random() * 8;
+            const angle = (i / 24) * Math.PI * 2;
+            const dist = 80 + Math.random() * 250;
+            p.style.cssText = `
+                position:fixed; left:${cx}px; top:${cy}px;
+                width:${size}px; height:${size}px;
+                background:${colors[i % colors.length]};
+                border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+                pointer-events:none; z-index:10001;
+                box-shadow: 0 0 4px ${colors[i % colors.length]};
+            `;
+            overlay.appendChild(p);
+            const dx = Math.cos(angle) * dist;
+            const dy = Math.sin(angle) * dist;
+            setTimeout(() => {
+                p.animate([
+                    { transform: 'translate(-50%,-50%) scale(0)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${dx*0.4}px),calc(-50% + ${dy*0.4}px)) scale(1.5)`, opacity: 1, offset: 0.3 },
+                    { transform: `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 700 + Math.random() * 400,
+                    easing: 'cubic-bezier(0.22,0.61,0.36,1)',
+                    fill: 'forwards'
+                });
+            }, Math.random() * 150);
+            setTimeout(() => p.remove(), 1200);
+        }
+
+        // 音效
+        try {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) {
+                const ctx = new AC();
+                const play = (freq, t, dur) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(freq, ctx.currentTime + t);
+                    g.gain.setValueAtTime(0, ctx.currentTime + t);
+                    g.gain.linearRampToValueAtTime(0.06, ctx.currentTime + t + 0.03);
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + dur);
+                    o.connect(g); g.connect(ctx.destination);
+                    o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + dur);
+                };
+                play(659, 0, 0.15); play(784, 0.08, 0.15); play(1047, 0.16, 0.3);
+            }
+        } catch { /* silent */ }
+
+        // 1.5 秒後淡出
+        setTimeout(() => {
+            overlay.animate([
+                { opacity: 1, backdropFilter: 'blur(6px)' },
+                { opacity: 0, backdropFilter: 'blur(0px)' }
+            ], { duration: 350, fill: 'forwards' });
+            setTimeout(() => overlay.remove(), 400);
+        }, 1500);
     }
 }
 
