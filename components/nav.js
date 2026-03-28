@@ -83,6 +83,7 @@ const NAV_ITEMS = [
         adminOnly: true,
         items: [
             { label: '聯盟行銷', icon: 'campaign', href: 'partners.html#affiliates' },
+            { label: '訂單管理', icon: 'receipt_long', href: 'admin-orders.html' },
             { label: '講師管理', icon: 'school', href: 'partners.html#instructors' },
         ]
     },
