@@ -49,6 +49,36 @@
 
         /* Quick Links */
         .section-title { font-size: 0.85rem; font-weight: 700; color: #475569; margin: 28px 0 12px; }
+
+        /* Recent Sales Section */
+        .sales-summary {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 20px;
+        }
+        .sales-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px; padding: 20px 22px; color: #fff;
+            box-shadow: 0 4px 14px rgba(102,126,234,0.25);
+        }
+        .sales-card.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 14px rgba(17,153,142,0.25); }
+        .sales-card.orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 4px 14px rgba(245,87,108,0.25); }
+        .sales-card.blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); box-shadow: 0 4px 14px rgba(79,172,254,0.25); }
+        .sales-card .sc-label { font-size: 0.72rem; opacity: 0.85; margin-bottom: 6px; font-weight: 500; }
+        .sales-card .sc-value { font-size: 1.6rem; font-weight: 800; }
+        .sales-card .sc-sub { font-size: 0.72rem; opacity: 0.7; margin-top: 4px; }
+
+        .top-courses {
+            background: #fff; border: 1px solid #e8ecf1; border-radius: 12px;
+            padding: 18px 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .top-courses h3 { font-size: 0.82rem; color: #475569; font-weight: 600; margin-bottom: 12px; }
+        .top-course-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem;
+        }
+        .top-course-row:last-child { border: none; }
+        .top-course-name { color: #1e293b; font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 12px; }
+        .top-course-stats { color: #94a3b8; font-size: 0.75rem; white-space: nowrap; }
         .quick-links {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 12px;
@@ -143,6 +173,33 @@
                 </div>
             </div>
 
+            <!-- Recent Month Sales -->
+            <div class="section-title">📊 近 30 天銷售</div>
+            <div class="sales-summary">
+                <div class="sales-card">
+                    <div class="sc-label">近 30 天營收</div>
+                    <div class="sc-value" id="recentRevenue">-</div>
+                    <div class="sc-sub" id="recentRevenueCompare"></div>
+                </div>
+                <div class="sales-card green">
+                    <div class="sc-label">近 30 天訂單</div>
+                    <div class="sc-value" id="recentOrders">-</div>
+                    <div class="sc-sub" id="recentOrdersCompare"></div>
+                </div>
+                <div class="sales-card orange">
+                    <div class="sc-label">平均客單價</div>
+                    <div class="sc-value" id="recentAvg">-</div>
+                </div>
+                <div class="sales-card blue">
+                    <div class="sc-label">推廣佣金（近30天）</div>
+                    <div class="sc-value" id="recentCommission">-</div>
+                </div>
+            </div>
+            <div class="top-courses" id="topCoursesBox">
+                <h3>🏆 熱銷課程 TOP 5（近 30 天）</h3>
+                <div id="topCoursesList">載入中...</div>
+            </div>
+
             <!-- Quick Links -->
             <div class="section-title">快速操作</div>
             <div class="quick-links">
@@ -189,13 +246,22 @@
 
         // ── Load all stats ──
         async function init() {
-            const [instructorsRes, projectsRes, sessionsRes, studentsRes, ordersRes, affRes] = await Promise.allSettled([
+            const now = new Date();
+            const d30 = new Date(now); d30.setDate(d30.getDate() - 30);
+            const d60 = new Date(now); d60.setDate(d60.getDate() - 60);
+            const d30str = d30.toISOString();
+            const d60str = d60.toISOString();
+
+            const [instructorsRes, projectsRes, sessionsRes, studentsRes, ordersRes, affRes, recentOrdersRes, prevOrdersRes, recentCommRes] = await Promise.allSettled([
                 db.select('user_profiles', { select: 'id,role' }),
                 db.select('projects', { select: 'id' }),
                 db.select('project_sessions', { select: 'id' }),
                 db.select('students', { select: 'id' }),
                 db.select('orders', { select: 'id,amount' }),
-                db.select('affiliates', { select: 'id,status' })
+                db.select('affiliates', { select: 'id,status' }),
+                db.select('orders', { select: 'id,amount,course_name,payment_time', filter: { payment_time: `gte.${d30str}` } }),
+                db.select('orders', { select: 'id,amount', filter: { payment_time: `gte.${d60str}` } }),
+                db.select('affiliate_orders', { select: 'id,commission_amount,payment_time', filter: { payment_time: `gte.${d30str}` } })
             ]);
 
             const instructors = instructorsRes.value?.data || [];
@@ -204,13 +270,60 @@
             const students = studentsRes.value?.data || [];
             const orders = ordersRes.value?.data || [];
             const affiliates = affRes.value?.data || [];
+            const recentOrders = recentOrdersRes.value?.data || [];
+            const allPrev = prevOrdersRes.value?.data || [];
+            const recentComm = recentCommRes.value?.data || [];
 
+            // Overall stats
             document.getElementById('statInstructors').textContent = instructors.filter(i => i.role === 'instructor').length;
             document.getElementById('statProjects').textContent = projects.length;
             document.getElementById('statSessions').textContent = sessions.length;
             document.getElementById('statStudents').textContent = students.length;
             document.getElementById('statOrders').textContent = orders.length.toLocaleString();
             document.getElementById('statRevenue').textContent = '$' + orders.reduce((s, o) => s + (Number(o.amount) || 0), 0).toLocaleString();
+
+            // Recent 30-day stats
+            const recentRev = recentOrders.reduce((s, o) => s + (Number(o.amount) || 0), 0);
+            const recentCount = recentOrders.length;
+            const recentAvgVal = recentCount > 0 ? Math.round(recentRev / recentCount) : 0;
+            const commTotal = recentComm.reduce((s, o) => s + (Number(o.commission_amount) || 0), 0);
+
+            document.getElementById('recentRevenue').textContent = '$' + recentRev.toLocaleString();
+            document.getElementById('recentOrders').textContent = recentCount.toLocaleString();
+            document.getElementById('recentAvg').textContent = '$' + recentAvgVal.toLocaleString();
+            document.getElementById('recentCommission').textContent = '$' + commTotal.toLocaleString();
+
+            // Month-over-month: prev period = d60~d30
+            const prevOrders = allPrev.filter(o => {
+                const t = new Date(o.payment_time || 0).getTime();
+                return t >= new Date(d60str).getTime() && t < new Date(d30str).getTime();
+            });
+            const prevRev = prevOrders.reduce((s, o) => s + (Number(o.amount) || 0), 0);
+            if (prevRev > 0) {
+                const pct = Math.round((recentRev - prevRev) / prevRev * 100);
+                document.getElementById('recentRevenueCompare').textContent = `較前 30 天 ${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct)}%`;
+            }
+            if (prevOrders.length > 0) {
+                const pct = Math.round((recentCount - prevOrders.length) / prevOrders.length * 100);
+                document.getElementById('recentOrdersCompare').textContent = `較前 30 天 ${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct)}%`;
+            }
+
+            // Top 5 courses
+            const courseMap = new Map();
+            for (const o of recentOrders) {
+                const name = o.course_name || '未知課程';
+                const prev = courseMap.get(name) || { count: 0, revenue: 0 };
+                courseMap.set(name, { count: prev.count + 1, revenue: prev.revenue + (Number(o.amount) || 0) });
+            }
+            const top5 = [...courseMap.entries()].sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 5);
+            const el = document.getElementById('topCoursesList');
+            if (top5.length === 0) {
+                el.innerHTML = '<div style="color:#94a3b8;font-size:0.82rem;">無訂單資料</div>';
+            } else {
+                el.innerHTML = top5.map(([name, stats]) =>
+                    `<div class="top-course-row"><div class="top-course-name">${name}</div><div class="top-course-stats">${stats.count} 單 · $${stats.revenue.toLocaleString()}</div></div>`
+                ).join('');
+            }
 
             // Pending affiliates
             const pending = affiliates.filter(a => a.status === 'pending').length;
