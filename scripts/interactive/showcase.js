@@ -162,7 +162,11 @@ export class Showcase {
             }
 
             // 比較資料是否有變化，沒變就不重新渲染（避免重設捲動位置）
-            const dataHash = JSON.stringify(data.map(s => s.id + (s.submitted_at || '') + (s.instructor_score || '')));
+            const dataHash = JSON.stringify(data.map(s => {
+                let st = s.state;
+                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                return s.id + (s.submitted_at || '') + (st?._awarded || '');
+            }));
             if (this._lastDataHash && this._lastDataHash[cid] === dataHash) {
                 return; // 資料沒變，跳過
             }
@@ -213,7 +217,11 @@ export class Showcase {
 
         const cardsHtml = submissions.map((s, i) => {
             const preview = this.getPreview(s);
-            const existingScore = s.instructor_score;
+            const existingScore = (() => {
+                let st = s.state;
+                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                return (st?._instructorScored) ? (parseInt(st?._awarded) || 0) : 0;
+            })();
             const safeName = this.escapeHtml(s.student_name || '匿名');
             // 5 星評分（每星 = 1 分，滿分 5 分）
             const scoreHtml = isPresenter ? `
@@ -328,25 +336,17 @@ export class Showcase {
 
                         // 4. 非同步寫入 DB + 廣播
                         try {
-                            const mergedState = {
-                                ...existingState,
-                                _awarded: score,
-                                _maxPts: 5,
-                                _instructorScored: true,
-                                _scoredAt: new Date().toISOString()
-                            };
-
-                            // ★ 直接用 primary key 更新（最可靠，不依賴 conflict 欄位）
-                            const { data: updateData, error: updateErr } = await db.update(
-                                'submissions',
-                                { state: mergedState, score: String(score) },
-                                { id: `eq.${subId}` }
+                            // ★ 用 SECURITY DEFINER RPC 直接在 DB 端更新 state._awarded
+                            const { data: rpcResult, error: rpcErr } = await db.rpc(
+                                'instructor_score_submission',
+                                { p_submission_id: subId, p_score: score }
                             );
 
-                            if (updateErr) {
-                                console.error('[Showcase] update failed:', updateErr);
+                            if (rpcErr) {
+                                console.error('[Showcase] RPC score failed:', rpcErr);
                             } else {
-                                console.log('[Showcase] update OK, id=', subId, '_awarded=', score, 'returned:', updateData?.length, 'rows');
+                                const r = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
+                                console.log('[Showcase] RPC score OK:', r);
                             }
 
                             // UI saved 提示
