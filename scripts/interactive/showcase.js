@@ -352,6 +352,38 @@ export class Showcase {
                             } else {
                                 const r = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
                                 console.log('[Showcase] RPC score OK:', r);
+
+                                // ★ 立即驗證：讀回該 submission + 呼叫 get_leaderboard
+                                try {
+                                    // 1. 讀回 submission 確認 state
+                                    const { data: checkRows } = await db.select('submissions', {
+                                        filter: { id: `eq.${subId}` },
+                                        select: 'id,session_id,student_email,state'
+                                    });
+                                    const row = checkRows?.[0];
+                                    let rowState = row?.state;
+                                    if (typeof rowState === 'string') { try { rowState = JSON.parse(rowState); } catch { rowState = {}; } }
+                                    console.log('[Showcase] ★ DB 回讀: session_id=', row?.session_id,
+                                        'email=', row?.student_email,
+                                        '_awarded=', rowState?._awarded,
+                                        '_instructorScored=', rowState?._instructorScored);
+
+                                    // 2. 呼叫 get_leaderboard 看 RPC 回什麼
+                                    const { data: lbData, error: lbErr } = await db.rpc('get_leaderboard', {
+                                        p_session_id: this.sessionCode
+                                    });
+                                    if (lbErr) {
+                                        console.error('[Showcase] ★ get_leaderboard error:', lbErr);
+                                    } else {
+                                        const entry = lbData?.find(e => e.email === row?.student_email);
+                                        console.log('[Showcase] ★ get_leaderboard for', row?.student_email,
+                                            '→ total_points=', entry?.total_points,
+                                            '(全部', lbData?.length, '筆, sessionCode=', this.sessionCode, ')');
+                                        if (!entry) {
+                                            console.log('[Showcase] ★ 所有 leaderboard entries:', lbData?.map(e => `${e.name}(${e.email}):${e.total_points}`));
+                                        }
+                                    }
+                                } catch (vErr) { console.warn('[Showcase] verify err:', vErr); }
                             }
 
                             // UI saved 提示
