@@ -21,6 +21,7 @@ CREATE POLICY "Allow all affiliate_courses" ON public.affiliate_courses
 -- 2. affiliates 表新增欄位
 ALTER TABLE public.affiliates ADD COLUMN IF NOT EXISTS platforms text[];
 ALTER TABLE public.affiliates ADD COLUMN IF NOT EXISTS selected_courses text[];
+ALTER TABLE public.affiliates ADD COLUMN IF NOT EXISTS referral_services text[];
 
 -- 3. 插入初始課程資料
 INSERT INTO public.affiliate_courses (name, url, platform, icon, sort_order) VALUES

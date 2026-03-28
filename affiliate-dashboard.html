@@ -747,7 +747,19 @@
                             </div>
                         </div>
 
-                        <!-- Section 4: 折扣碼 -->
+                        <!-- Section 4: 引薦服務 -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <span class="material-symbols-outlined">diversity_3</span> 引薦服務（可選）
+                            </div>
+                            <div class="field-hint" style="margin-bottom:10px;">除了課程推廣（分潤 20%），也可參與企業服務引薦。</div>
+                            <div class="chip-grid">
+                                <label class="chip"><input type="checkbox" name="referral" value="企業內訓引薦"> 企業內訓引薦 <span style="font-size:0.7rem;color:#10b981;margin-left:4px;">分潤 20%</span></label>
+                                <label class="chip"><input type="checkbox" name="referral" value="系統導入引薦"> 系統導入引薦 <span style="font-size:0.7rem;color:#f59e0b;margin-left:4px;">分潤 15%</span></label>
+                            </div>
+                        </div>
+
+                        <!-- Section 5: 折扣碼 -->
                         <div class="form-section">
                             <div class="form-section-title">
                                 <span class="material-symbols-outlined">confirmation_number</span> 專屬折扣碼
@@ -791,7 +803,7 @@
         <aside class="saas-sidebar">
             <div class="sidebar-brand">
                 <div class="sidebar-brand-icon">
-                    <span class="material-symbols-outlined">cell_tower</span>
+                    <img src="logo.png" alt="數位簡報室" style="width:32px;height:32px;border-radius:8px;">
                 </div>
                 <div class="sidebar-brand-text">
                     數位簡報室
@@ -1447,6 +1459,9 @@
                 return c ? (pl[c.platform] || c.platform) : '';
             }).filter(Boolean))];
 
+            // Collect referral services
+            const referrals = [...document.querySelectorAll('#phaseRegister input[name="referral"]:checked')].map(c => c.value);
+
             const { error } = await db.insert('affiliates', {
                 name: document.getElementById('regName').value.trim(),
                 email: document.getElementById('regEmail').value.trim(),
@@ -1455,6 +1470,7 @@
                 channels: channels.join(', '),
                 channel_detail: document.getElementById('regChannelDetail').value.trim(),
                 selected_courses: selectedCourses,
+                referral_services: referrals,
                 status: 'pending'
             });
 
