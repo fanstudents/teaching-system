@@ -5136,6 +5136,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             document.head.appendChild(s);
         }
 
+        // 切頁時關閉作業牆展開的卡片
+        document.querySelector('.showcase-focus-overlay')?.remove();
+
         presentationSlide.innerHTML = '';
         // 第一頁不套用過場動畫（避免進入簡報時從小窗閃爍）
         if (this._presFirstRender) {
