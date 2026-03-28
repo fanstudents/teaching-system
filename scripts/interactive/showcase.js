@@ -364,6 +364,35 @@ export class Showcase {
                                 console.error('[Showcase] upsert failed:', upsertErr);
                             } else {
                                 console.log('[Showcase] upsert succeeded, _awarded =', score);
+                                // ★ 驗證：回讀 DB 確認 state._awarded 是否真的寫入
+                                try {
+                                    const { data: verifyRows } = await db.select('submissions', {
+                                        filter: {
+                                            session_id: `eq.${sub.session_id}`,
+                                            student_email: `eq.${sub.student_email}`
+                                        },
+                                        select: 'id,element_id,state,score'
+                                    });
+                                    console.log(`[Showcase] ★ 驗證: ${sub.student_name} 在此 session 有 ${verifyRows?.length} 筆 submissions:`);
+                                    verifyRows?.forEach((r, i) => {
+                                        let st = r.state;
+                                        if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                                        console.log(`  [${i}] id=${r.id}, element_id=${r.element_id}, _awarded=${st?._awarded}, score=${r.score}`);
+                                    });
+                                    const total = verifyRows?.reduce((sum, r) => {
+                                        let st = r.state;
+                                        if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                                        return sum + (parseInt(st?._awarded) || 0);
+                                    }, 0);
+                                    console.log(`[Showcase] ★ 驗證: JS 端加總 = ${total}`);
+
+                                    // 也檢查 RPC 回傳
+                                    const { data: rpcData } = await db.rpc('get_leaderboard', {
+                                        p_session_id: sub.session_id
+                                    });
+                                    const rpcEntry = rpcData?.find(r => r.email === sub.student_email);
+                                    console.log(`[Showcase] ★ 驗證: RPC 回傳 total_points =`, rpcEntry?.total_points, '(全部:', rpcData?.length, '筆)');
+                                } catch (vErr) { console.warn('[Showcase] verify failed:', vErr); }
                             }
 
                             // UI saved 提示
