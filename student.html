@@ -838,7 +838,7 @@
                 });
 
                 // ── 雷射筆：講師游標同步 ──
-                let laserDot = null;
+                // laserDot 已在外層宣告，這裡直接使用
                 let laserHideTimer = null;
                 function ensureLaserDot() {
                     if (laserDot) return laserDot;
@@ -1244,6 +1244,8 @@
         // ── animOrder (點擊淡入) 狀態 ──
         let _currentBuildStep = 0;
         let _maxBuildStep = 0;
+        // ★ laserDot 需在 renderSlide 可存取的作用域
+        let laserDot = null;
 
         function revealBuildStep(step) {
             slideEl.querySelectorAll(`[data-anim-order="${step}"]`).forEach(el => {
