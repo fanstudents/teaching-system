@@ -177,23 +177,29 @@
                     <h4 style="font-size:0.85rem;font-weight:600;color:var(--text-muted);margin-bottom:10px;">信件草稿
                     </h4>
                     <textarea class="email-textarea" id="emailContent"></textarea>
-                    <div class="email-actions">
-                        <button class="topbar-btn" id="regenEmailBtn" title="用新版 prompt 重新生成">
-                            <span class="material-symbols-rounded">refresh</span>
-                            重新生成
-                        </button>
-                        <button class="topbar-btn" onclick="copyEmail()">
-                            <span class="material-symbols-rounded">content_copy</span>
-                            複製
-                        </button>
-                        <button class="topbar-btn" onclick="saveEmail()">
-                            <span class="material-symbols-rounded">save</span>
-                            儲存草稿
-                        </button>
-                        <button class="topbar-btn primary" id="sendEmailBtn" onclick="sendEmail()">
-                            <span class="material-symbols-rounded">send</span>
-                            發送 Email
-                        </button>
+                    <div class="email-actions" style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+                        <button id="regenEmailBtn" onclick="regenEmail()" style="
+                            display:inline-flex;align-items:center;gap:5px;padding:8px 14px;
+                            border:1px solid #dadce0;border-radius:8px;background:#fff;
+                            font-family:inherit;font-size:0.82rem;color:#5f6368;cursor:pointer;
+                            transition:all .15s;
+                        ">🔄 重新生成</button>
+                        <button onclick="copyEmail()" style="
+                            display:inline-flex;align-items:center;gap:5px;padding:8px 14px;
+                            border:1px solid #dadce0;border-radius:8px;background:#fff;
+                            font-family:inherit;font-size:0.82rem;color:#5f6368;cursor:pointer;
+                        "><span class="material-symbols-rounded" style="font-size:16px;">content_copy</span> 複製</button>
+                        <button onclick="saveEmail()" style="
+                            display:inline-flex;align-items:center;gap:5px;padding:8px 14px;
+                            border:1px solid #dadce0;border-radius:8px;background:#fff;
+                            font-family:inherit;font-size:0.82rem;color:#5f6368;cursor:pointer;
+                        "><span class="material-symbols-rounded" style="font-size:16px;">save</span> 儲存草稿</button>
+                        <button onclick="sendEmail()" style="
+                            display:inline-flex;align-items:center;gap:5px;padding:8px 14px;
+                            border:none;border-radius:8px;background:var(--s79-primary);color:#fff;
+                            font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;
+                            box-shadow:0 2px 6px rgba(26,115,232,0.25);
+                        "><span class="material-symbols-rounded" style="font-size:16px;">send</span> 發送 Email</button>
                     </div>
                 </div>
             </div>
@@ -693,16 +699,17 @@
                     emailSection.style.display = 'none';
                 }
 
-                // 重新生成按鈕
-                const regenBtn = document.getElementById('regenEmailBtn');
-                if (regenBtn) regenBtn.onclick = () => generateEmail(email);
-
                 document.getElementById('detailModal').classList.add('active');
                 document.getElementById('detailModal').dataset.email = email;
             };
 
             window.closeModal = function () {
                 document.getElementById('detailModal').classList.remove('active');
+            };
+
+            window.regenEmail = function () {
+                const email = document.getElementById('detailModal').dataset.email;
+                if (email) generateEmail(email);
             };
 
             document.getElementById('detailModal').addEventListener('click', e => {
