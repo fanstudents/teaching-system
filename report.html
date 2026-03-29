@@ -342,13 +342,13 @@
                     const results = await Promise.all([
                         db.select('students', { order: 'name.asc', filter: studentFilter }),
                         db.select('checklist_items', { filter: jcFilter }),
-                        db.select('checklist_progress', { filter: studentFilter }),
+                        db.select('checklist_progress'),
                         db.select('survey_questions', { filter: jcFilter }),
-                        db.select('survey_responses', { filter: studentFilter }),
+                        db.select('survey_responses'),
                         db.select('submissions', { select: 'id,student_email,student_name,element_id,assignment_title,type,content,file_url,is_correct,score,state,submitted_at,created_at,session_id', filter: submissionFilter }),
                         db.select('email_drafts', { filter: emailDraftFilter }),
-                        db.select('exam_responses', { filter: studentFilter }),
-                        db.select('satisfaction_responses', { filter: studentFilter }),
+                        db.select('exam_responses'),
+                        db.select('satisfaction_responses'),
                         db.select('scheduled_emails', { filter: schedFilter, order: 'scheduled_at.asc' }).catch(() => ({ data: [] })),
                         db.select('email_events', { select: 'draft_id,student_email,event_type,url,created_at', filter: emailDraftFilter, order: 'created_at.desc' }).catch(() => ({ data: [] }))
                     ]);
