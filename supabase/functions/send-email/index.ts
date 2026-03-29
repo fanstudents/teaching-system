@@ -160,6 +160,21 @@ serve(async (req) => {
             ? `${SUPABASE_URL}/functions/v1/email-tracker?id=${draftId}`
             : undefined;
 
+        // ★ 連結追蹤：所有 <a href> 加 UTM 並經過 link-tracker
+        if (draftId) {
+            bodyHtml = bodyHtml.replace(
+                /href="(https?:\/\/[^"]+)"/g,
+                (_match: string, originalUrl: string) => {
+                    // 加 UTM 參數
+                    const sep = originalUrl.includes('?') ? '&' : '?';
+                    const utmUrl = `${originalUrl}${sep}utm_source=email&utm_medium=post_course&utm_campaign=teaching_system&utm_content=${encodeURIComponent(draftId)}`;
+                    // 經過 link-tracker redirect
+                    const trackedUrl = `${SUPABASE_URL}/functions/v1/link-tracker?id=${draftId}&url=${encodeURIComponent(utmUrl)}`;
+                    return `href="${trackedUrl}"`;
+                }
+            );
+        }
+
         const htmlContent = wrapInHtmlTemplate(bodyHtml, trackingUrl, footerText);
 
         // ── 透過 Resend API 發送 ──

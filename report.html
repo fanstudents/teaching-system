@@ -65,7 +65,11 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="statEmailOpened">—</div>
-                    <div class="stat-label">已開信</div>
+                    <div class="stat-label">開信率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statEmailClicked">—</div>
+                    <div class="stat-label">點擊率</div>
                 </div>
             </div>
 
@@ -309,6 +313,7 @@
             let surveyResponses = [];
             let submissions = [];
             let emailDrafts = [];
+            let emailEvents = [];
             let examResponses = [];
             let satisfactionResponses = [];
             let scheduledEmails = [];
@@ -353,12 +358,16 @@
                     examResponses = results[7].data || [];
                     satisfactionResponses = results[8].data || [];
 
-                    // Load scheduled emails
+                    // Load scheduled emails + email events
                     try {
                         const schedFilter = _sessionId ? { session_id: `eq.${_sessionId}` } : {};
                         const { data: schedData } = await db.select('scheduled_emails', { filter: schedFilter, order: 'scheduled_at.asc' });
                         scheduledEmails = schedData || [];
                     } catch (e) { scheduledEmails = []; }
+                    try {
+                        const { data: evData } = await db.select('email_events', { select: 'draft_id,student_email,event_type,url,created_at', order: 'created_at.desc' });
+                        emailEvents = evData || [];
+                    } catch (e) { emailEvents = []; }
 
                     updateStats();
                     populateFilters();
@@ -430,6 +439,9 @@
                 const openedCount = emailDrafts.filter(d => (d.open_count || 0) > 0).length;
                 document.getElementById('statEmailSent').textContent = sentCount > 0 ? sentCount : '—';
                 document.getElementById('statEmailOpened').textContent = sentCount > 0 ? `${openedCount}/${sentCount}` : '—';
+                const clickedCount = emailEvents.filter(e => e.event_type === 'click').length;
+                const clickedStudents = new Set(emailEvents.filter(e => e.event_type === 'click').map(e => e.student_email)).size;
+                document.getElementById('statEmailClicked').textContent = sentCount > 0 ? `${clickedStudents}/${sentCount}` : '—';
             }
 
             // ── CSV 匯出 ──
@@ -519,12 +531,22 @@
                                 if (isOpened) return 'done';
                                 if (isSent) return 'generated';
                                 return 'partial';
+                            })()}" title="${(() => {
+                                if (!d.emailDraft) return '';
+                                const clicks = emailEvents.filter(e => e.draft_id === d.emailDraft.id && e.event_type === 'click').length;
+                                const opens = d.emailDraft.open_count || 0;
+                                let t = '';
+                                if (opens > 0) t += `開信 ${opens} 次`;
+                                if (clicks > 0) t += (t ? '、' : '') + `點擊 ${clicks} 次`;
+                                if (d.emailDraft.first_opened_at) t += '\n首次開信：' + new Date(d.emailDraft.first_opened_at).toLocaleString('zh-TW');
+                                return t;
                             })()}">${(() => {
                                 if (!hasDraft) return '—';
                                 const isSent = d.emailDraft?.status === 'sent';
                                 const isOpened = (d.emailDraft?.open_count || 0) > 0;
                                 const openCount = d.emailDraft?.open_count || 0;
-                                if (isOpened) return `已開信 (${openCount})`;
+                                const clickCount = emailEvents.filter(e => e.draft_id === d.emailDraft.id && e.event_type === 'click').length;
+                                if (isOpened) return `已讀 ${openCount}` + (clickCount > 0 ? ` · 點${clickCount}` : '');
                                 if (isSent) return '已寄出';
                                 return '草稿';
                             })()}</span>
