@@ -256,12 +256,14 @@
                     const jcFilter = joinCode ? { session_code: `eq.${joinCode}` } : {};
                     const pidFilter = joinCode ? { project_id: `eq.${joinCode}` } : {};
                     const sidFilter = joinCode ? { session_id: `eq.${joinCode}` } : {};
-                    // If session ID is specified, filter students by session_id
-                    const studentFilter = _sessionId
-                        ? { session_id: `eq.${_sessionId}` }
+                    // If session is specified, use session_code to filter students
+                    // (students table stores session_code string, not session UUID)
+                    const _sessionCode = _sessionData?.session_code;
+                    const studentFilter = _sessionCode
+                        ? { session_code: `eq.${_sessionCode}` }
                         : pidFilter;
-                    const submissionFilter = _sessionData
-                        ? { session_id: `eq.${_sessionData.session_code}` }
+                    const submissionFilter = _sessionCode
+                        ? { session_id: `eq.${_sessionCode}` }
                         : sidFilter;
                     const results = await Promise.all([
                         db.select('students', { order: 'name.asc', filter: studentFilter }),
