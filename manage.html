@@ -920,8 +920,9 @@
             grid.innerHTML = filtered.map(p => {
                 const projectSessions = sessions.filter(s => s.project_id === p.id);
                 const projectStudents = students.filter(st => {
+                    const sessCodes = projectSessions.map(s => s.session_code);
                     const sessIds = projectSessions.map(s => s.id);
-                    return sessIds.includes(st.session_id);
+                    return sessIds.includes(st.session_id) || sessCodes.includes(st.session_code);
                 });
                 const sessionPhases = projectSessions.map(s => s.current_phase || 'pre-class');
                 const phase = sessionPhases.includes('in-class') ? 'in-class'
@@ -1170,7 +1171,7 @@
                 const loc = isOnline
                     ? (s.stream_url ? `<a href="${s.stream_url}" target="_blank" class="stream-link">直播連結</a>` : '—')
                     : (s.venue || '—');
-                const studentCount = students.filter(st => st.session_id === s.id).length;
+                const studentCount = students.filter(st => st.session_id === s.id || st.session_code === s.session_code).length;
 
                 return `
                 <div class="session-card">
@@ -1237,7 +1238,14 @@
         // ── Students ──
         async function loadStudents() {
             try {
-                const { data, error } = await db.select('students', { order: 'created_at.desc' });
+                // 只載入自己專案場次的學員
+                const sessionCodes = sessions.map(s => s.session_code).filter(Boolean);
+                const sessionIds = sessions.map(s => s.id).filter(Boolean);
+                let filter = {};
+                if (sessionCodes.length > 0) {
+                    filter = { session_code: `in.(${sessionCodes.join(',')})` };
+                }
+                const { data, error } = await db.select('students', { order: 'created_at.desc', filter });
                 if (error) throw error;
                 students = data || [];
 
