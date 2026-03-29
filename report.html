@@ -92,28 +92,63 @@
                 </div>
             </div>
 
-            <!-- Email Template Editor -->
-            <div class="template-section" id="templateSection">
+            <!-- AI Email 設定 -->
+            <div class="template-section" id="aiPromptSection">
                 <div class="template-toggle"
-                    onclick="document.getElementById('templateSection').classList.toggle('open')">
+                    onclick="document.getElementById('aiPromptSection').classList.toggle('open')">
                     <div class="template-toggle-left">
-                        <span class="material-symbols-rounded">edit_note</span>
-                        Email 模板設定
+                        <span class="material-symbols-rounded">psychology</span>
+                        AI Email 設定
                     </div>
                     <span class="material-symbols-rounded chevron">expand_more</span>
                 </div>
                 <div class="template-body">
-                    <textarea class="template-textarea" id="emailTemplate"></textarea>
-                    <div class="template-vars" id="templateVars"></div>
-                    <div class="template-actions">
-                        <button class="topbar-btn" onclick="resetTemplate()">
-                            <span class="material-symbols-rounded">restart_alt</span>
-                            還原預設
-                        </button>
-                        <button class="topbar-btn primary" onclick="saveTemplate()">
-                            <span class="material-symbols-rounded">save</span>
-                            儲存模板
-                        </button>
+                    <!-- 講師署名 -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">講師署名</label>
+                        <input type="text" id="aiSignature" placeholder="樊松蒲｜數位簡報室"
+                            style="width:100%;padding:10px 14px;border:1.5px solid #dadce0;border-radius:8px;font-family:inherit;font-size:0.88rem;">
+                    </div>
+
+                    <!-- System Prompt -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">
+                            AI 角色設定 <span style="font-weight:400;color:#9aa0a6;">（System Prompt）</span>
+                        </label>
+                        <textarea id="aiSystemPrompt" class="template-textarea" style="min-height:180px;font-family:inherit;font-size:0.85rem;"></textarea>
+                        <div style="font-size:0.75rem;color:#9aa0a6;margin-top:4px;">定義 AI 的角色、口吻與格式規範。可用 <code>${'${instructorName}'}</code> 代入講師署名</div>
+                    </div>
+
+                    <!-- 場次額外指示 -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">
+                            場次額外指示 <span style="font-weight:400;color:#9aa0a6;">（選填，會附加到 System Prompt 後面）</span>
+                        </label>
+                        <textarea id="aiExtraPrompt" class="template-textarea" style="min-height:80px;font-family:inherit;font-size:0.85rem;"
+                            placeholder="例如：這場是金融業的內訓，請多舉金融相關的 AI 應用案例"></textarea>
+                    </div>
+
+                    <!-- Fallback 模板 -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">
+                            Fallback 模板 <span style="font-weight:400;color:#9aa0a6;">（AI 失敗時使用的文字模板）</span>
+                        </label>
+                        <textarea id="emailTemplate" class="template-textarea" style="min-height:120px;font-family:'Menlo','Consolas',monospace;font-size:0.82rem;"></textarea>
+                        <div class="template-vars" id="templateVars"></div>
+                    </div>
+
+                    <div class="template-actions" style="display:flex;gap:8px;justify-content:flex-end;">
+                        <button onclick="resetAIPrompt()" style="
+                            display:inline-flex;align-items:center;gap:5px;padding:8px 14px;
+                            border:1px solid #dadce0;border-radius:8px;background:#fff;
+                            font-family:inherit;font-size:0.82rem;color:#5f6368;cursor:pointer;
+                        "><span class="material-symbols-rounded" style="font-size:16px;">restart_alt</span> 還原預設</button>
+                        <button onclick="saveAIPrompt()" style="
+                            display:inline-flex;align-items:center;gap:5px;padding:8px 14px;
+                            border:none;border-radius:8px;background:var(--s79-primary);color:#fff;
+                            font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;
+                            box-shadow:0 2px 6px rgba(26,115,232,0.25);
+                        "><span class="material-symbols-rounded" style="font-size:16px;">save</span> 儲存設定</button>
                     </div>
                 </div>
             </div>
@@ -312,7 +347,7 @@
                     populateFilters();
                     renderStudents();
                     renderScheduledEmails();
-                    initTemplateEditor();
+                    initAIPromptSettings();
                 } catch (err) {
                     document.getElementById('studentGrid').innerHTML =
                         `<div class="empty-msg" style="color:var(--accent-danger);">載入失敗：${err.message}</div>`;
@@ -735,6 +770,30 @@
                 { key: '{{prefer_tools}}', desc: '偏好工具' },
             ];
 
+            const DEFAULT_SYSTEM_PROMPT = `你是樊松蒲（Ting），數位簡報室的創辦人，也是這堂課的講師。你有豐富的企業 AI 內訓教學經驗。
+
+請用第一人稱，以溫暖、鼓勵的口吻寫一封課後信件給學員。像是一位用心的老師在課後跟學生聊天，不是在寫公文。
+
+信件結構（按照順序撰寫）：
+1. 開場與自我介紹
+2. 回應課前問卷的內容（表達有認真看）
+3. 課程內容回顧 — 條列式清單：這堂課教了什麼、學到的知識點、使用的工具（附連結）
+4. 學員的作業回顧 — 提及他們繳交的每一份作業名稱，給予具體讚賞
+5. 學習表現數據 — 自然融入（準備度、互動分數、排名）
+6. 下一步建議 — 具體可執行的 2-3 個行動
+7. 社群邀請 — 導向數位茶水間 club.tbr.digital 和社群分享
+
+重要守則：
+- 用「你」稱呼學員
+- 不要用 emoji、不要用 markdown 語法
+- 段落之間用空行分隔
+- 段落標題用「── xxx ──」格式
+- 條列式清單用數字編號（1. 2. 3.）
+- 如果某項資料是「未填寫」或「未參加」，就自然跳過
+- 整體要有「學習資料彙整」的紮實感，不要只有感性描述
+- 署名：\${instructorName}
+- 控制在 700-900 字`;
+
             const DEFAULT_TEMPLATE = `{{name}}{{company}} 您好，
 
 感謝參加「{{course_name}}」。以下是根據您的課前問卷、準備狀況與課堂表現，為您整理的學習回饋與建議。
@@ -758,18 +817,26 @@
 
 1. 將今天學到的一個技巧，實際應用在這週的工作中
 2. 建立自己的常用 Prompt 資料庫，記錄好用的模板
-3. 在社群與其他同學交流使用心得
+3. 加入「數位茶水間」社群 club.tbr.digital 與同學交流
 
-如果這堂課對您有幫助，歡迎在社群分享您的學習心得（Instagram / LinkedIn / Facebook），tag @tbr.digital，讓我知道您的進步。
+如果這堂課對您有幫助，歡迎在 Instagram / LinkedIn 分享心得，tag @tbr.digital
 
 如有任何問題，歡迎隨時回信。
 
 {{instructor_name}}`;
 
-            // Init template editor
-            function initTemplateEditor() {
-                const textarea = document.getElementById('emailTemplate');
-                textarea.value = localStorage.getItem(TEMPLATE_STORAGE_KEY) || DEFAULT_TEMPLATE;
+            // ── AI Prompt Settings 初始化 ──
+            function initAIPromptSettings() {
+                const signatureEl = document.getElementById('aiSignature');
+                const systemEl = document.getElementById('aiSystemPrompt');
+                const extraEl = document.getElementById('aiExtraPrompt');
+                const templateEl = document.getElementById('emailTemplate');
+
+                // 從 _sessionEmailConfig 載入（DB 優先），否則用預設
+                signatureEl.value = _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
+                systemEl.value = _sessionEmailConfig.system_prompt || DEFAULT_SYSTEM_PROMPT;
+                extraEl.value = _sessionEmailConfig.ai_prompt || '';
+                templateEl.value = _sessionEmailConfig.template || localStorage.getItem(TEMPLATE_STORAGE_KEY) || DEFAULT_TEMPLATE;
 
                 // Render variable tags
                 const varsEl = document.getElementById('templateVars');
@@ -787,16 +854,45 @@
                 ta.setSelectionRange(start + varKey.length, start + varKey.length);
             };
 
-            window.saveTemplate = function () {
-                localStorage.setItem(TEMPLATE_STORAGE_KEY, document.getElementById('emailTemplate').value);
-                showToast('模板已儲存');
+            window.saveAIPrompt = async function () {
+                const config = {
+                    signature: document.getElementById('aiSignature').value.trim(),
+                    system_prompt: document.getElementById('aiSystemPrompt').value.trim(),
+                    ai_prompt: document.getElementById('aiExtraPrompt').value.trim(),
+                    template: document.getElementById('emailTemplate').value.trim(),
+                };
+                
+                // 同步更新記憶體
+                Object.assign(_sessionEmailConfig, config);
+                localStorage.setItem(TEMPLATE_STORAGE_KEY, config.template);
+
+                // 寫入 DB（場次級）
+                if (_sessionId) {
+                    try {
+                        await db.update('project_sessions', 
+                            { post_email_template: config },
+                            { id: `eq.${_sessionId}` }
+                        );
+                        showToast('AI Email 設定已儲存');
+                    } catch (err) {
+                        showToast('儲存失敗：' + err.message, { type: 'error' });
+                    }
+                } else {
+                    showToast('設定已暫存（無場次 ID，僅本地）');
+                }
             };
 
-            window.resetTemplate = function () {
+            window.resetAIPrompt = function () {
+                document.getElementById('aiSignature').value = '樊松蒲｜數位簡報室';
+                document.getElementById('aiSystemPrompt').value = DEFAULT_SYSTEM_PROMPT;
+                document.getElementById('aiExtraPrompt').value = '';
                 document.getElementById('emailTemplate').value = DEFAULT_TEMPLATE;
-                localStorage.setItem(TEMPLATE_STORAGE_KEY, DEFAULT_TEMPLATE);
-                showToast('已還原預設模板');
+                showToast('已還原預設');
             };
+
+            // 兼容舊版
+            window.saveTemplate = window.saveAIPrompt;
+            window.resetTemplate = window.resetAIPrompt;
 
             function getEmailTemplate() {
                 return document.getElementById('emailTemplate')?.value
@@ -856,25 +952,16 @@
                 // ── Try AI generation ──
                 try {
                     const courseName = _proj?.name || '課程';
-                    const instructorName = _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
+                    const instructorName = document.getElementById('aiSignature')?.value?.trim() || _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
 
-                    let systemPrompt = `你是樊松蒲（Ting），數位簡報室的創辦人，也是這堂課的講師。你有豐富的企業 AI 內訓教學經驗。
+                    // ★ 從設定面板讀取 system prompt
+                    const rawSystemPrompt = document.getElementById('aiSystemPrompt')?.value?.trim() || _sessionEmailConfig.system_prompt || DEFAULT_SYSTEM_PROMPT;
+                    let systemPrompt = rawSystemPrompt.replace(/\$\{instructorName\}/g, instructorName);
 
-請用第一人稱，以溫暖、鼓勵的口吻寫一封課後信件給學員。像是一位用心的老師在課後跟學生聊天，不是在寫公文。
-
-重要守則：
-- 用「你」稱呼學員
-- 不要用 emoji
-- 不要用 markdown 語法
-- 段落之間用空行分隔
-- 段落標題用「── xxx ──」格式
-- 如果某項資料是「未填寫」或「未參加」，就自然跳過，不要提
-- 署名：${instructorName}
-- 控制在 500-700 字`;
-
-                    // ★ 附加場次級 AI 指令
-                    if (_sessionEmailConfig.ai_prompt) {
-                        systemPrompt += `\n\n講師針對此場次的額外指示：\n${_sessionEmailConfig.ai_prompt}`;
+                    // 附加場次級額外指示
+                    const extraPrompt = document.getElementById('aiExtraPrompt')?.value?.trim() || _sessionEmailConfig.ai_prompt || '';
+                    if (extraPrompt) {
+                        systemPrompt += `\n\n講師針對此場次的額外指示：\n${extraPrompt}`;
                     }
 
                     const totalScore = getTotalScore(d);
@@ -888,6 +975,55 @@
                         if (rank <= 3) rankText = `全班第 ${rank} 名（共 ${total} 人）`;
                         else if (rank <= Math.ceil(total * 0.3)) rankText = `排名前 ${Math.round(rank / total * 100)}%（全班 ${total} 人中第 ${rank} 名）`;
                         else rankText = `全班 ${total} 人中第 ${rank} 名`;
+                    }
+
+                    // ★ 從簡報投影片提取課程內容摘要
+                    let courseSummary = '';
+                    try {
+                        const slides = _sessionData?.slides || [];
+                        const slideData = typeof slides === 'string' ? JSON.parse(slides) : slides;
+                        if (slideData.length > 0) {
+                            // 提取投影片標題和內容關鍵字
+                            const topics = [];
+                            const tools = [];
+                            const toolLinks = {
+                                'ChatGPT': 'https://chatgpt.com',
+                                'Claude': 'https://claude.ai',
+                                'Gemini': 'https://gemini.google.com',
+                                'Gamma': 'https://gamma.app',
+                                'Make': 'https://make.com',
+                                'Notion AI': 'https://notion.so',
+                                'Midjourney': 'https://midjourney.com',
+                                'DALL-E': 'https://openai.com/dall-e',
+                                'Canva': 'https://canva.com',
+                                'Perplexity': 'https://perplexity.ai',
+                                'NotebookLM': 'https://notebooklm.google.com',
+                                'Suno': 'https://suno.com',
+                                'ElevenLabs': 'https://elevenlabs.io',
+                                'Runway': 'https://runwayml.com',
+                                'Sora': 'https://sora.com',
+                                'Napkin AI': 'https://napkin.ai',
+                            };
+                            slideData.forEach(slide => {
+                                // 收集投影片標題
+                                if (slide.title) topics.push(slide.title);
+                                // 掃描 elements 找工具名稱
+                                const slideText = JSON.stringify(slide);
+                                for (const [tool, link] of Object.entries(toolLinks)) {
+                                    if (slideText.includes(tool) && !tools.find(t => t.name === tool)) {
+                                        tools.push({ name: tool, link });
+                                    }
+                                }
+                            });
+                            if (topics.length > 0) {
+                                courseSummary += `\n課程大綱（投影片標題）：${topics.slice(0, 15).join('、')}`;
+                            }
+                            if (tools.length > 0) {
+                                courseSummary += `\n課堂使用的工具：${tools.map(t => `${t.name}（${t.link}）`).join('、')}`;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('[AI Email] Failed to extract slide content:', e);
                     }
 
                     // 收集作業詳情（含圖片 URL）
@@ -907,7 +1043,7 @@
 
                     const userPrompt = `寫一封課後回饋信給 ${student.name}，課程是「${courseName}」。
 
-以下是這位學員的資料，請自然地融入信件中（不要條列式複述）：
+以下是這位學員的完整資料：
 
 【學員背景】
 姓名：${student.name}
@@ -919,20 +1055,25 @@ ${wantToLearn ? `最想學到的：${wantToLearn}` : ''}
 ${yearGoal ? `未來一年目標：${yearGoal}` : ''}
 ${preferTools ? `想深入的工具：${preferTools}` : ''}
 
-【學習表現】
+【課程內容】${courseSummary || '\n（無投影片資料）'}
+
+【學員繳交的作業】
+${hwDetails.length > 0 ? hwDetails.map((h, i) => `${i+1}. ${h.title}${h.desc ? ' — Prompt: ' + h.desc.slice(0, 80) : ''}${h.imageUrl ? ' [有圖片作品]' : ''}`).join('\n') : '未繳交作業'}
+
+【學習表現數據】
 課前準備：${clPct}%（${d.checklistDone}/${d.checklistTotal} 項完成）
-作業繳交：${d.homework.length} 份${hwDetails.length > 0 ? '（' + hwDetails.map(h => h.title).join('、') + '）' : ''}
 互動得分：${totalScore >= 0 ? totalScore + ' 分' : '無紀錄'}${rankText ? '，' + rankText : ''}
 ${d.examResult ? `考試成績：${d.examResult.score} 分` : ''}
 ${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''}
 
-【信件要點】
-1. 先簡單自我介紹（我是 Ting，數位簡報室創辦人，很開心能在這堂課認識你）
-2. 自然地提到學員課前問卷寫的內容，表達你有認真看
-3. 根據學習表現給予具體的肯定和鼓勵${rankText ? '，提到排名讓他有成就感' : ''}
-4. 如果有繳交作業，讚賞他的創作
-5. 結尾導向社群：歡迎加入「數位茶水間」社群 club.tbr.digital，那裡有更多 AI 學習資源和同學交流
-6. 也歡迎在 Instagram / LinkedIn 分享心得，tag @tbr.digital`;
+【信件撰寫要求】
+1. 開場自我介紹（我是 Ting，數位簡報室創辦人）
+2. 回應課前問卷內容，表達你有認真看
+3. 用「── 課程回顧 ──」段落：條列這堂課教了什麼、用到哪些工具（附連結）、學到的知識點
+4. 用「── 你的作品 ──」段落：逐一提到學員繳交的每份作業名稱，給予具體讚賞${hwDetails.some(h => h.desc) ? '，如果有 Prompt 描述也提到' : ''}
+5. 自然融入學習數據${rankText ? '，提到排名讓他有成就感' : ''}
+6. 給 2-3 個具體的下一步建議
+7. 結尾導向「數位茶水間」社群 club.tbr.digital，也歡迎在 Instagram / LinkedIn 分享心得 tag @tbr.digital`;
 
                     draft = await ai.chat([
                         { role: 'system', content: systemPrompt },
