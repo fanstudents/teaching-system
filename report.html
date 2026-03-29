@@ -826,15 +826,32 @@
 {{instructor_name}}`;
 
             // ── AI Prompt Settings 初始化 ──
-            function initAIPromptSettings() {
+            let _emailPromptDbId = null; // system_prompts 表的 id（動態取得）
+
+            async function initAIPromptSettings() {
                 const signatureEl = document.getElementById('aiSignature');
                 const systemEl = document.getElementById('aiSystemPrompt');
                 const extraEl = document.getElementById('aiExtraPrompt');
                 const templateEl = document.getElementById('emailTemplate');
 
-                // 從 _sessionEmailConfig 載入（DB 優先），否則用預設
+                // ★ 從 system_prompts 表讀取 'AI Email 生成'（跟系統設定頁同步）
+                let dbPrompt = '';
+                try {
+                    const { data } = await db.select('system_prompts', {
+                        filter: { name: 'eq.AI Email 生成' },
+                        limit: 1
+                    });
+                    if (data?.[0]) {
+                        _emailPromptDbId = data[0].id;
+                        dbPrompt = data[0].prompt_text || '';
+                    }
+                } catch (e) {
+                    console.warn('[Report] Failed to load system_prompts:', e);
+                }
+
+                // 載入順序：session config > system_prompts DB > DEFAULT
                 signatureEl.value = _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
-                systemEl.value = _sessionEmailConfig.system_prompt || DEFAULT_SYSTEM_PROMPT;
+                systemEl.value = _sessionEmailConfig.system_prompt || dbPrompt || DEFAULT_SYSTEM_PROMPT;
                 extraEl.value = _sessionEmailConfig.ai_prompt || '';
                 templateEl.value = _sessionEmailConfig.template || localStorage.getItem(TEMPLATE_STORAGE_KEY) || DEFAULT_TEMPLATE;
 
@@ -866,6 +883,21 @@
                 Object.assign(_sessionEmailConfig, config);
                 localStorage.setItem(TEMPLATE_STORAGE_KEY, config.template);
 
+                let saved = false;
+
+                // ★ 同步寫入 system_prompts DB（跟系統設定頁同步）
+                if (_emailPromptDbId) {
+                    try {
+                        await db.update('system_prompts',
+                            { prompt_text: config.system_prompt, updated_at: new Date().toISOString() },
+                            { id: `eq.${_emailPromptDbId}` }
+                        );
+                        saved = true;
+                    } catch (err) {
+                        console.warn('[Report] Failed to update system_prompts:', err);
+                    }
+                }
+
                 // 寫入 DB（場次級）
                 if (_sessionId) {
                     try {
@@ -873,13 +905,13 @@
                             { post_email_template: config },
                             { id: `eq.${_sessionId}` }
                         );
-                        showToast('AI Email 設定已儲存');
+                        saved = true;
                     } catch (err) {
-                        showToast('儲存失敗：' + err.message, { type: 'error' });
+                        console.warn('[Report] Failed to update session config:', err);
                     }
-                } else {
-                    showToast('設定已暫存（無場次 ID，僅本地）');
                 }
+
+                showToast(saved ? 'AI Email 設定已儲存' : '儲存失敗', { type: saved ? 'success' : 'error' });
             };
 
             window.resetAIPrompt = function () {
