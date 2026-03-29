@@ -942,6 +942,7 @@ ${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''
                     console.log('[AI Email] generated for', student.name);
                 } catch (aiErr) {
                     console.warn('[AI Email] failed, using template fallback:', aiErr);
+                    showToast('AI 生成失敗：' + aiErr.message + '，使用模板替代', { type: 'error' });
                     // Fallback: 優先使用場次模板，其次使用全域模板
                     draft = _sessionEmailConfig.template || getEmailTemplate();
                     // 更新署名變數
@@ -976,10 +977,14 @@ ${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''
                     const { data } = await db.select('email_drafts');
                     emailDrafts = data || [];
 
-                    // Show in modal
+                    // ★ 先 showDetail 更新 modal 內容，再手動設定 textarea
+                    // （showDetail 會從 emailDrafts 載入 body，但我們要確保是最新的 draft）
                     showDetail(email);
                     document.getElementById('emailDraft').style.display = 'block';
-                    document.getElementById('emailContent').value = draft;
+                    // 用剛生成的 draft 覆蓋（避免 DB 延遲導致顯示舊值）
+                    setTimeout(() => {
+                        document.getElementById('emailContent').value = draft;
+                    }, 50);
                 } catch (err) {
                     showToast('生成失敗：' + err.message, { type: 'error' });
                 }
