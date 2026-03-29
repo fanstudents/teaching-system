@@ -254,8 +254,9 @@
             async function loadAll() {
                 try {
                     // ── 過濾邏輯 ──
-                    // 場次模式：用 session_code (T5A9YB) 過濾所有維度
-                    // 專案模式：用 project join_code 過濾
+                    // 場次模式：學員/checklist/survey 用 session_code
+                    //          submissions 用 joinCode（因為 stateManager 存的是 project join_code）
+                    // 專案模式：全用 joinCode
                     const _sessionCode = _sessionData?.session_code;
                     const jcFilter = _sessionCode
                         ? { session_code: `eq.${_sessionCode}` }
@@ -263,9 +264,10 @@
                     const studentFilter = _sessionCode
                         ? { session_code: `eq.${_sessionCode}` }
                         : (joinCode ? { project_id: `eq.${joinCode}` } : {});
-                    const submissionFilter = _sessionCode
-                        ? { session_id: `eq.${_sessionCode}` }
-                        : (joinCode ? { session_id: `eq.${joinCode}` } : {});
+                    // submissions.session_id = URL ?code= 值 = project join_code
+                    const submissionFilter = joinCode
+                        ? { session_id: `eq.${joinCode}` }
+                        : {};
 
                     const results = await Promise.all([
                         db.select('students', { order: 'name.asc', filter: studentFilter }),
