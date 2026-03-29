@@ -1,48 +1,48 @@
 /* =============================================
-   Admin Layout — M3 Navigation Drawer + Top App Bar
+   Admin Layout — Deep Blue Sidebar + Clean Header
+   Inspired by Meta Ads Dashboard
    ============================================= */
 
-/* ── Sidebar — M3 Navigation Drawer (white) ── */
+/* ── Sidebar — Deep Blue Gradient ── */
 .admin-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
     width: var(--sidebar-w);
-    background: #ffffff;
+    background: linear-gradient(180deg, #1e2a4a 0%, #162040 50%, #111832 100%);
     z-index: 200;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
-    border-right: 1px solid #dadce0;
+    border-right: none;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
 }
 
-/* No glow line in M3 */
-.admin-sidebar::after {
-    display: none;
-}
+.admin-sidebar::after { display: none; }
 
 /* ── Brand ── */
 .admin-sidebar-brand {
-    padding: 22px 20px 20px;
+    padding: 22px 20px 18px;
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid #e8eaed;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
 }
 
 .admin-sidebar-brand-icon {
     width: 36px;
     height: 36px;
-    border-radius: 12px;
-    background: #1a73e8;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .admin-sidebar-brand-icon .material-symbols-outlined {
@@ -51,40 +51,40 @@
 
 .admin-sidebar-brand-text {
     font-size: 15px;
-    font-weight: 500;
-    color: #1f1f1f;
-    letter-spacing: 0;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.01em;
 }
 
 /* ── Nav ── */
 .admin-sidebar-nav {
     flex: 1;
     overflow-y: auto;
-    padding: 14px 12px 24px;
+    padding: 12px 10px 24px;
 }
 
 .admin-sidebar-group {
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .admin-sidebar-group-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: #80868b;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.35);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 20px 16px 8px;
+    letter-spacing: 0.1em;
+    padding: 18px 16px 8px;
 }
 
 .admin-sidebar-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 16px;
-    border-radius: 24px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #444746;
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 450;
+    color: rgba(255, 255, 255, 0.65);
     text-decoration: none;
     transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
     position: relative;
@@ -95,63 +95,74 @@
 .admin-sidebar-item .material-symbols-outlined {
     font-size: 20px;
     flex-shrink: 0;
-    color: #444746;
+    color: rgba(255, 255, 255, 0.45);
     transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .admin-sidebar-item:hover {
-    background: #f1f3f4;
-    color: #1f1f1f;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.95);
 }
 
 .admin-sidebar-item:hover .material-symbols-outlined {
-    color: #1f1f1f;
+    color: rgba(255, 255, 255, 0.8);
 }
 
-/* Active state — M3 active indicator (pill shape) */
+/* Active — left accent bar */
 .admin-sidebar-item.active {
-    background: #e8f0fe;
-    color: #1a73e8;
+    background: rgba(99, 102, 241, 0.15);
+    color: #fff;
     font-weight: 500;
 }
 
 .admin-sidebar-item.active .material-symbols-outlined {
-    color: #1a73e8;
+    color: #a5b4fc;
 }
 
 .admin-sidebar-item.active::before {
-    display: none;
+    content: '';
+    position: absolute;
+    left: 0; top: 6px; bottom: 6px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: #818cf8;
 }
 
 .admin-sidebar-divider {
     height: 1px;
-    background: #e8eaed;
+    background: rgba(255, 255, 255, 0.06);
     margin: 8px 16px;
 }
 
 /* ── Footer ── */
 .admin-sidebar-footer {
-    padding: 14px 16px;
-    border-top: 1px solid #e8eaed;
+    padding: 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     flex-shrink: 0;
 }
 
 .admin-sidebar-footer .btn {
     width: 100%;
     justify-content: center;
-    background: transparent;
-    border: 1px solid #dadce0;
-    color: #444746;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 13px;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 8px 12px;
     transition: all 0.2s;
 }
 
 .admin-sidebar-footer .btn:hover {
-    background: #f1f3f4;
-    color: #1f1f1f;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
 }
+
+/* ── Sidebar Scrollbar ── */
+.admin-sidebar-nav::-webkit-scrollbar { width: 4px; }
+.admin-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.admin-sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
 /* ── Main Content Area ── */
 .admin-main {
@@ -161,11 +172,11 @@
     transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Header — M3 Top App Bar ── */
+/* ── Header — Clean top bar ── */
 .admin-header {
     background: #ffffff;
-    border-bottom: 1px solid #dadce0;
-    padding: 0 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 0 28px;
     height: var(--header-h);
     display: flex;
     align-items: center;
@@ -239,7 +250,7 @@
     .admin-sidebar {
         transform: translateX(-100%);
         z-index: 300;
-        box-shadow: 4px 0 32px rgba(0, 0, 0, 0.25);
+        box-shadow: 4px 0 32px rgba(0, 0, 0, 0.3);
     }
 
     .admin-sidebar.open {

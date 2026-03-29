@@ -7,88 +7,72 @@
 
 /* ── Design Tokens ── */
 :root {
-    /* Colors — Google M3 */
-    --s79-primary: #1a73e8;
-    --s79-primary-hover: #1765cc;
-    --s79-primary-light: #e8f0fe;
-    --s79-primary-subtle: rgba(26, 115, 232, 0.08);
-    --s79-primary-glow: rgba(26, 115, 232, 0.15);
-    --s79-success: #1e8e3e;
-    --s79-success-light: #e6f4ea;
-    --s79-warning: #f9ab00;
-    --s79-warning-light: #fef7e0;
-    --s79-error: #d93025;
-    --s79-error-light: #fce8e6;
+    /* Colors — Indigo System */
+    --s79-primary: #6366f1;
+    --s79-primary-hover: #4f46e5;
+    --s79-primary-light: #ede9fe;
+    --s79-primary-subtle: rgba(99, 102, 241, 0.08);
+    --s79-primary-glow: rgba(99, 102, 241, 0.15);
+    --s79-success: #10b981;
+    --s79-success-light: #d1fae5;
+    --s79-warning: #f59e0b;
+    --s79-warning-light: #fef3c7;
+    --s79-error: #ef4444;
+    --s79-error-light: #fee2e2;
 
-    /* Colors — M3 neutral */
-    --s79-bg: #f8f9fa;
+    /* Colors — Neutral */
+    --s79-bg: #f6f7f9;
     --s79-surface: #ffffff;
-    --s79-surface-hover: #f1f3f4;
-    --s79-surface-alt: #f1f3f4;
-    --s79-border: #dadce0;
-    --s79-border-strong: #bdc1c6;
-    --s79-text: #1f1f1f;
-    --s79-text-secondary: #444746;
-    --s79-text-muted: #80868b;
+    --s79-surface-hover: #f0f1f3;
+    --s79-surface-alt: #eef0f4;
+    --s79-border: #e2e5ea;
+    --s79-border-strong: #c4c8d0;
+    --s79-text: #1a1a2e;
+    --s79-text-secondary: #6b7280;
+    --s79-text-muted: #9ca3af;
 
     /* Typography */
     --s79-font: 'Google Sans', 'Roboto', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
 
-    /* Radius — M3 shape scale */
-    --s79-radius-sm: 8px;
-    --s79-radius-md: 12px;
+    /* Radius */
+    --s79-radius-sm: 10px;
+    --s79-radius-md: 14px;
     --s79-radius-lg: 16px;
     --s79-radius-xl: 28px;
     --s79-radius-full: 9999px;
 
-    /* Shadow — M3 elevation */
-    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
-    --s79-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
-    --s79-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
-    --s79-shadow-lg: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.1);
-    --s79-shadow-xl: 0 2px 6px rgba(0, 0, 0, 0.08), 0 16px 48px rgba(0, 0, 0, 0.14);
-    --s79-shadow-focus: 0 0 0 2px #e8f0fe;
-    --s79-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-    --s79-shadow-card-hover: 0 1px 3px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.08);
-    --s79-shadow-primary-glow: none;
+    /* Shadow */
+    --s79-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --s79-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --s79-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --s79-shadow-lg: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.08);
+    --s79-shadow-xl: 0 2px 6px rgba(0, 0, 0, 0.06), 0 16px 48px rgba(0, 0, 0, 0.12);
+    --s79-shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    --s79-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --s79-shadow-card-hover: 0 8px 24px rgba(99, 102, 241, 0.08);
+    --s79-shadow-primary-glow: 0 4px 16px rgba(99, 102, 241, 0.2);
 
     /* Duration */
     --s79-duration: 200ms;
     --s79-duration-md: 250ms;
     --s79-duration-lg: 350ms;
 
-    /* ── Override admin-layout.css variables ── */
-    --sidebar-w: 280px;
-    --sidebar-bg: #ffffff;
-    --sidebar-text: #444746;
-    --sidebar-text-hover: #1f1f1f;
-    --sidebar-active-bg: #e8f0fe;
-    --sidebar-active-text: #1a73e8;
-    --sidebar-accent: #1a73e8;
-    --sidebar-divider: #e8eaed;
-    --sidebar-group-text: #80868b;
-    --gradient-primary: #1a73e8;
+    /* ── Layout ── */
+    --sidebar-w: 260px;
+    --content-bg: #f6f7f9;
+    --border-color: #e2e5ea;
+    --text-primary: #1a1a2e;
+    --text-secondary: #6b7280;
+    --bg-hover: rgba(0, 0, 0, 0.03);
+    --header-h: 60px;
 
-    /* ── Override dashboard-style variables ── */
-    --radius-sm: 8px;
-    --content-bg: #f8f9fa;
-    --border-color: #dadce0;
-    --text-primary: #1f1f1f;
-    --text-secondary: #444746;
-    --bg-hover: rgba(0, 0, 0, 0.04);
-    --header-h: 64px;
-
-    /* ── Stat card accent colors ── */
-    --stat-color-1: #1a73e8;
-    --stat-color-2: #1e8e3e;
-    --stat-color-3: #f9ab00;
-    --stat-color-4: #e8710a;
-
-    /* ── text & border shortcuts ── */
-    --text-1: #1f1f1f;
-    --text-2: #444746;
-    --text-3: #80868b;
-    --border: #dadce0;
+    /* ── Shortcuts ── */
+    --primary: #6366f1;
+    --text-1: #1a1a2e;
+    --text-2: #6b7280;
+    --text-3: #9ca3af;
+    --border: #e2e5ea;
+    --bg-2: #eef0f4;
 }
 
 /* ── Base Reset ── */
@@ -398,59 +382,42 @@ button.primary-btn {
     margin: 0 auto 12px;
 }
 
-/* ── Stat Card — M3 Filled Card ── */
+/* ── Stat Card ── */
 .s79-stat,
 .stat-card {
     background: var(--s79-surface);
-    border: 1px solid var(--s79-border);
-    border-radius: var(--s79-radius-lg);
-    padding: 20px;
+    border: 1.5px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--s79-radius-md);
+    padding: 18px 20px;
     box-shadow: var(--s79-shadow-card);
-    transition: box-shadow var(--s79-duration-md) ease;
+    transition: all 0.25s cubic-bezier(.4,0,.2,1);
     position: relative;
     overflow: hidden;
 }
 
-.s79-stat::before,
-.stat-card::before {
-    display: none;
-}
-
-/* Color rotate — hidden in M3 */
-.stats-row .stat-card:nth-child(1)::before,
-.stats-grid .stat-card:nth-child(1)::before,
-.stats-bar .stat-card:nth-child(1)::before,
-.stats-row .stat-card:nth-child(2)::before,
-.stats-grid .stat-card:nth-child(2)::before,
-.stats-bar .stat-card:nth-child(2)::before,
-.stats-row .stat-card:nth-child(3)::before,
-.stats-grid .stat-card:nth-child(3)::before,
-.stats-bar .stat-card:nth-child(3)::before,
-.stats-row .stat-card:nth-child(4)::before,
-.stats-grid .stat-card:nth-child(4)::before,
-.stats-bar .stat-card:nth-child(4)::before {
-    display: none;
-}
-
 .s79-stat:hover,
 .stat-card:hover {
-    box-shadow: var(--s79-shadow-md);
+    transform: translateY(-2px);
+    box-shadow: var(--s79-shadow-card-hover);
 }
 
 .s79-stat-value,
 .stat-card .stat-value {
-    font-size: 28px;
-    font-weight: 500;
+    font-size: 1.5rem;
+    font-weight: 700;
     line-height: 1;
     margin-bottom: 4px;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.03em;
+    color: var(--s79-text);
 }
 
 .s79-stat-label,
 .stat-card .stat-label {
-    font-size: 12px;
+    font-size: 0.68rem;
     color: var(--s79-text-muted);
-    font-weight: 400;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 /* ── Pagination ── */
@@ -594,25 +561,28 @@ button.primary-btn {
 .stats-grid .stat-card:nth-child(4),
 .stats-bar .stat-card:nth-child(4) { animation-delay: 0.2s; }
 
-/* ── Override existing page-specific styles for M3 consistency ── */
+/* ── Override existing page-specific styles ── */
 
-/* Topbar overrides */
 .topbar {
     background: #ffffff !important;
     border-bottom: 1px solid var(--s79-border) !important;
     font-family: var(--s79-font);
 }
 
-/* Existing buttons in all pages */
 button, .btn, input[type="submit"] {
     font-family: var(--s79-font);
-    border-radius: 20px;
+    border-radius: 10px;
 }
 
-/* No hover lift in M3 */
 .btn-primary,
 .btn-dark {
-    box-shadow: none;
+    background: var(--s79-primary);
+    border-color: var(--s79-primary);
+}
+
+.btn-primary:hover,
+.btn-dark:hover {
+    background: var(--s79-primary-hover);
 }
 
 /* Table overrides for existing pages — M3 clean */
