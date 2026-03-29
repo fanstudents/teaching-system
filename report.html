@@ -181,6 +181,27 @@
             const _pnEl = document.getElementById('topbarProjectName');
             if (_pnEl) _pnEl.textContent = _proj?.name ? `— ${_proj.name}` : '';
 
+            // ── 場次級 Email 模板 ──
+            const _urlParams = new URLSearchParams(location.search);
+            const _sessionId = _urlParams.get('session');
+            let _sessionEmailConfig = {}; // { ai_prompt, template, signature }
+            let _sessionData = null;
+            if (_sessionId) {
+                try {
+                    const { data } = await db.select('project_sessions', {
+                        filter: { id: `eq.${_sessionId}` },
+                        limit: 1
+                    });
+                    if (data?.[0]) {
+                        _sessionData = data[0];
+                        _sessionEmailConfig = data[0].post_email_template || {};
+                        console.log('[Report] Session email config loaded:', _sessionEmailConfig);
+                    }
+                } catch (e) {
+                    console.warn('[Report] Failed to load session email config:', e);
+                }
+            }
+
             let allStudents = [];
             let checklistItems = [];
             let checklistProgress = [];
@@ -196,13 +217,20 @@
                     const jcFilter = joinCode ? { session_code: `eq.${joinCode}` } : {};
                     const pidFilter = joinCode ? { project_id: `eq.${joinCode}` } : {};
                     const sidFilter = joinCode ? { session_id: `eq.${joinCode}` } : {};
+                    // If session ID is specified, filter students by session_id
+                    const studentFilter = _sessionId
+                        ? { session_id: `eq.${_sessionId}` }
+                        : pidFilter;
+                    const submissionFilter = _sessionData
+                        ? { session_id: `eq.${_sessionData.session_code}` }
+                        : sidFilter;
                     const results = await Promise.all([
-                        db.select('students', { order: 'name.asc', filter: pidFilter }),
+                        db.select('students', { order: 'name.asc', filter: studentFilter }),
                         db.select('checklist_items', { filter: jcFilter }),
                         db.select('checklist_progress'),
                         db.select('survey_questions', { filter: jcFilter }),
                         db.select('survey_responses'),
-                        db.select('submissions', { select: 'id,student_email,student_name,element_id,type,content,is_correct,score,submitted_at,created_at,session_id', filter: sidFilter }),
+                        db.select('submissions', { select: 'id,student_email,student_name,element_id,type,content,is_correct,score,submitted_at,created_at,session_id', filter: submissionFilter }),
                         db.select('email_drafts'),
                         db.select('exam_responses', { filter: pidFilter }),
                         db.select('satisfaction_responses', { filter: pidFilter })
@@ -693,9 +721,9 @@
                 // ── Try AI generation ──
                 try {
                     const courseName = _proj?.name || '課程';
-                    const instructorName = '樊松蒲｜數位簡報室';
+                    const instructorName = _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
 
-                    const systemPrompt = `你是一位專業的企業內訓講師。請以第一人稱、溫暖但專業的口吻，撰寫一封課後回饋信件給學員。
+                    let systemPrompt = `你是一位專業的企業內訓講師。請以第一人稱、溫暖但專業的口吻，撰寫一封課後回饋信件給學員。
 
 寫作要求：
 - 用「你」稱呼學員，語氣像一位認真的導師在對自己重視的學生說話
@@ -719,6 +747,11 @@
 - 段落標題使用全形破折號包圍，例如「── 學習回饋 ──」
 - 署名：${instructorName}
 - 控制在 600-800 字`;
+
+                    // ★ 附加場次級 AI 指令
+                    if (_sessionEmailConfig.ai_prompt) {
+                        systemPrompt += `\n\n以下是講師針對此場次的額外指示，請務必遵循：\n${_sessionEmailConfig.ai_prompt}`;
+                    }
 
                     const userPrompt = `請根據以下學員資料撰寫個人化課後回饋信件：
 
@@ -762,8 +795,12 @@ ${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResul
                     console.log('[AI Email] generated for', student.name);
                 } catch (aiErr) {
                     console.warn('[AI Email] failed, using template fallback:', aiErr);
-                    // Fallback to template
-                    draft = getEmailTemplate();
+                    // Fallback: 優先使用場次模板，其次使用全域模板
+                    draft = _sessionEmailConfig.template || getEmailTemplate();
+                    // 更新署名變數
+                    if (_sessionEmailConfig.signature) {
+                        vars['{{instructor_name}}'] = _sessionEmailConfig.signature;
+                    }
                     for (const [key, value] of Object.entries(vars)) {
                         draft = draft.replaceAll(key, value);
                     }
