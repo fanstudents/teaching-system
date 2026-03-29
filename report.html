@@ -843,37 +843,37 @@
                     const courseName = _proj?.name || '課程';
                     const instructorName = _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
 
-                    let systemPrompt = `你是一位專業的企業內訓講師。請以第一人稱、溫暖但專業的口吻，撰寫一封課後回饋信件給學員。
+                    let systemPrompt = `你是樊松蒲（Ting），數位簡報室的創辦人，也是這堂課的講師。你有豐富的企業 AI 內訓教學經驗。
 
-寫作要求：
-- 用「你」稱呼學員，語氣像一位認真的導師在對自己重視的學生說話
-- 不要只列數據，要用描述性的方式提及學員的表現
-- 根據學員的問卷回答，給出具體、可操作的 2-3 個建議
-- 如果某項數據是「未填寫」，就跳過那段，不要提及
-- 如果課前準備完成度高，真誠讚賞；中等以上，肯定並鼓勵；偏低，溫和提醒
-- 如果有互動成績，描述學員的表現而非只報分數
+請用第一人稱，以溫暖、鼓勵的口吻寫一封課後信件給學員。像是一位用心的老師在課後跟學生聊天，不是在寫公文。
 
-段落結構（請用自然的段落銜接，不需要固定標題）：
-1. 開場問候與課前準備回饋
-2. 根據學員的應用場景和目標，給出具體建議
-3. 結合產業趨勢提供觀點（以「我觀察到」開頭）
-4. 詢問這堂課是否幫助更接近目標，邀請回信分享
-5. 社群分享邀請（Instagram / LinkedIn / Facebook，tag @tbr.digital）
-
-格式規範：
-- 純文字，不要使用 markdown 語法
-- 不要使用任何 emoji
+重要守則：
+- 用「你」稱呼學員
+- 不要用 emoji
+- 不要用 markdown 語法
 - 段落之間用空行分隔
-- 段落標題使用全形破折號包圍，例如「── 學習回饋 ──」
+- 段落標題用「── xxx ──」格式
+- 如果某項資料是「未填寫」或「未參加」，就自然跳過，不要提
 - 署名：${instructorName}
-- 控制在 600-800 字`;
+- 控制在 500-700 字`;
 
                     // ★ 附加場次級 AI 指令
                     if (_sessionEmailConfig.ai_prompt) {
-                        systemPrompt += `\n\n以下是講師針對此場次的額外指示，請務必遵循：\n${_sessionEmailConfig.ai_prompt}`;
+                        systemPrompt += `\n\n講師針對此場次的額外指示：\n${_sessionEmailConfig.ai_prompt}`;
                     }
 
                     const totalScore = getTotalScore(d);
+
+                    // 計算班級排名
+                    let rankText = '';
+                    if (totalScore > 0) {
+                        const allScores = allStudents.map(s => getTotalScore(getStudentData(s.email))).filter(sc => sc > 0).sort((a, b) => b - a);
+                        const rank = allScores.indexOf(totalScore) + 1;
+                        const total = allScores.length;
+                        if (rank <= 3) rankText = `全班第 ${rank} 名（共 ${total} 人）`;
+                        else if (rank <= Math.ceil(total * 0.3)) rankText = `排名前 ${Math.round(rank / total * 100)}%（全班 ${total} 人中第 ${rank} 名）`;
+                        else rankText = `全班 ${total} 人中第 ${rank} 名`;
+                    }
 
                     // 收集作業詳情（含圖片 URL）
                     const hwDetails = d.homework.map(s => {
@@ -890,41 +890,34 @@
                         return { title, desc, imageUrl, type: s.type };
                     });
 
-                    const userPrompt = `請根據以下學員資料撰寫個人化課後回饋信件：
+                    const userPrompt = `寫一封課後回饋信給 ${student.name}，課程是「${courseName}」。
 
-課程名稱：${courseName}
-學員姓名：${student.name}
+以下是這位學員的資料，請自然地融入信件中（不要條列式複述）：
+
+【學員背景】
+姓名：${student.name}
 公司/職級：${companyRole || '未提供'}
 
-課前準備：
-- 完成率：${clPct}%（${d.checklistDone}/${d.checklistTotal} 項）
-- 問卷：${d.surveyDone >= d.surveyTotal ? '已完成' : '未完成'}
+【課前問卷】
+${aiScenarios ? `想應用 AI 的場景：${aiScenarios}` : ''}
+${wantToLearn ? `最想學到的：${wantToLearn}` : ''}
+${yearGoal ? `未來一年目標：${yearGoal}` : ''}
+${preferTools ? `想深入的工具：${preferTools}` : ''}
 
-課前問卷回答：
-- AI 最可能應用的場景：${aiScenarios || '未填寫'}
-- 最想在課堂上學到的：${wantToLearn || '未填寫'}
-- 未來一年的目標：${yearGoal || '未填寫'}
-- 最想深入學習的工具：${preferTools || '未填寫'}
+【學習表現】
+課前準備：${clPct}%（${d.checklistDone}/${d.checklistTotal} 項完成）
+作業繳交：${d.homework.length} 份${hwDetails.length > 0 ? '（' + hwDetails.map(h => h.title).join('、') + '）' : ''}
+互動得分：${totalScore >= 0 ? totalScore + ' 分' : '無紀錄'}${rankText ? '，' + rankText : ''}
+${d.examResult ? `考試成績：${d.examResult.score} 分` : ''}
+${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''}
 
-課堂表現：
-- 繳交作業：${d.homework.length} 份
-- 互動成績：${totalScore >= 0 ? totalScore + ' 分（累計）' : '尚無紀錄'}
-${hwDetails.length > 0 ? '- 作業內容：\n' + hwDetails.map((h, i) => `  ${i+1}. ${h.title}${h.desc ? ' — ' + h.desc.slice(0, 100) : ''}${h.imageUrl ? ' [有圖片]' : ''}`).join('\n') : ''}
-
-課後考試：
-- 考試成績：${d.examResult ? d.examResult.score + ' 分' : '未參加'}
-
-滿意度問卷：
-- 平均評分：${d.satisfactionResult ? d.satisfactionResult.avg_rating + ' / 5' : '未填寫'}
-- NPS 推薦分數：${d.satisfactionResult ? d.satisfactionResult.nps_score + ' / 10' : '未填寫'}
-${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResult.responses); return `- 最喜歡的部分：${r['7'] || '未填寫'}\n- 建議改善的地方：${r['8'] || '未填寫'}`; } catch (e) { return ''; } })() : ''}
-
-注意事項：
-1. 結合學員的應用場景分享產業觀點
-2. 如果有考試成績，根據表現給予回饋
-3. 如果有滿意度數據，感謝回饋
-4. 如果學員有繳交作業（尤其有圖片），在信中提及並讚賞他們的創作
-5. 結尾邀請回信分享想法`;
+【信件要點】
+1. 先簡單自我介紹（我是 Ting，數位簡報室創辦人，很開心能在這堂課認識你）
+2. 自然地提到學員課前問卷寫的內容，表達你有認真看
+3. 根據學習表現給予具體的肯定和鼓勵${rankText ? '，提到排名讓他有成就感' : ''}
+4. 如果有繳交作業，讚賞他的創作
+5. 結尾導向社群：歡迎加入「數位茶水間」社群 club.tbr.digital，那裡有更多 AI 學習資源和同學交流
+6. 也歡迎在 Instagram / LinkedIn 分享心得，tag @tbr.digital`;
 
                     draft = await ai.chat([
                         { role: 'system', content: systemPrompt },
