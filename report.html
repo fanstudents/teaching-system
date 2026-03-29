@@ -103,6 +103,14 @@
                     <span class="material-symbols-rounded chevron">expand_more</span>
                 </div>
                 <div class="template-body">
+                    <!-- 信件標題 -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">信件標題</label>
+                        <input type="text" id="aiSubjectTemplate" placeholder="[課程名稱] 學員姓名 的學習回饋"
+                            style="width:100%;padding:10px 14px;border:1.5px solid #dadce0;border-radius:8px;font-family:inherit;font-size:0.88rem;">
+                        <div style="font-size:0.75rem;color:#9aa0a6;margin-top:4px;">可用 <code>${'${courseName}'}</code> 課程名稱、<code>${'${studentName}'}</code> 學員姓名</div>
+                    </div>
+
                     <!-- 講師署名 -->
                     <div style="margin-bottom:16px;">
                         <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">講師署名</label>
@@ -135,6 +143,15 @@
                         </label>
                         <textarea id="emailTemplate" class="template-textarea" style="min-height:120px;font-family:'Menlo','Consolas',monospace;font-size:0.82rem;"></textarea>
                         <div class="template-vars" id="templateVars"></div>
+                    </div>
+
+                    <!-- 信件底部 -->
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:0.82rem;font-weight:600;color:#5f6368;display:block;margin-bottom:6px;">
+                            信件底部文字 <span style="font-weight:400;color:#9aa0a6;">（HTML Email 的 Footer）</span>
+                        </label>
+                        <textarea id="aiFooterText" class="template-textarea" style="min-height:60px;font-family:inherit;font-size:0.85rem;"
+                            placeholder="此信件由 數位簡報室 系統自動發送"></textarea>
                     </div>
 
                     <div class="template-actions" style="display:flex;gap:8px;justify-content:flex-end;">
@@ -850,10 +867,12 @@
                 }
 
                 // 載入順序：session config > system_prompts DB > DEFAULT
+                document.getElementById('aiSubjectTemplate').value = _sessionEmailConfig.subject_template || '[${courseName}] ${studentName} 的學習回饋';
                 signatureEl.value = _sessionEmailConfig.signature || '樊松蒲｜數位簡報室';
                 systemEl.value = _sessionEmailConfig.system_prompt || dbPrompt || DEFAULT_SYSTEM_PROMPT;
                 extraEl.value = _sessionEmailConfig.ai_prompt || '';
                 templateEl.value = _sessionEmailConfig.template || localStorage.getItem(TEMPLATE_STORAGE_KEY) || DEFAULT_TEMPLATE;
+                document.getElementById('aiFooterText').value = _sessionEmailConfig.footer_text || '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件';
 
                 // Render variable tags
                 const varsEl = document.getElementById('templateVars');
@@ -873,10 +892,12 @@
 
             window.saveAIPrompt = async function () {
                 const config = {
+                    subject_template: document.getElementById('aiSubjectTemplate').value.trim(),
                     signature: document.getElementById('aiSignature').value.trim(),
                     system_prompt: document.getElementById('aiSystemPrompt').value.trim(),
                     ai_prompt: document.getElementById('aiExtraPrompt').value.trim(),
                     template: document.getElementById('emailTemplate').value.trim(),
+                    footer_text: document.getElementById('aiFooterText').value.trim(),
                 };
                 
                 // 同步更新記憶體
@@ -915,10 +936,12 @@
             };
 
             window.resetAIPrompt = function () {
+                document.getElementById('aiSubjectTemplate').value = '[${courseName}] ${studentName} 的學習回饋';
                 document.getElementById('aiSignature').value = '樊松蒲｜數位簡報室';
                 document.getElementById('aiSystemPrompt').value = DEFAULT_SYSTEM_PROMPT;
                 document.getElementById('aiExtraPrompt').value = '';
                 document.getElementById('emailTemplate').value = DEFAULT_TEMPLATE;
+                document.getElementById('aiFooterText').value = '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件';
                 showToast('已還原預設');
             };
 
@@ -1264,11 +1287,14 @@ ${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''
                         },
                         body: JSON.stringify({
                             to: student.email,
-                            subject: d.emailDraft.subject || `[AI 工作坊] ${student.name} 的學習回饋`,
+                            subject: d.emailDraft.subject || (_sessionEmailConfig.subject_template || '[${courseName}] ${studentName} 的學習回饋')
+                                .replace('${courseName}', _proj?.name || 'AI 工作坊')
+                                .replace('${studentName}', student.name),
                             body: d.emailDraft.body,
                             replyTo: 'service@teaching.tbr.digital',
                             draftId: d.emailDraft.id,
-                            homeworkImages  // ★ 作業圖片嵌入 Email
+                            homeworkImages,  // ★ 作業圖片嵌入 Email
+                            footerText: _sessionEmailConfig.footer_text || '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件'
                         })
                     });
                     if (!res.ok) throw new Error(`Send failed: ${res.status}`);

@@ -49,10 +49,12 @@ function textToHtml(text: string): string {
 }
 
 // ── HTML Email 模板 ──
-function wrapInHtmlTemplate(bodyHtml: string, trackingPixelUrl?: string): string {
+function wrapInHtmlTemplate(bodyHtml: string, trackingPixelUrl?: string, footerText?: string): string {
     const trackingImg = trackingPixelUrl
         ? `<img src="${trackingPixelUrl}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;" />`
         : '';
+
+    const footerLines = (footerText || '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件').split('\n').map(l => `<div>${l}</div>`).join('\n');
 
     return `<!DOCTYPE html>
 <html lang="zh-TW">
@@ -98,8 +100,7 @@ ${bodyHtml}
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
 <tr>
 <td style="font-size:11px;color:#999;line-height:1.6;">
-<div>此信件由<a href="https://tbr.digital" style="color:#6366f1;text-decoration:none;"> 數位簡報室 </a>系統自動發送</div>
-<div style="margin-top:4px;">如有任何問題，歡迎直接回覆此信件</div>
+${footerLines}
 </td>
 <td align="right" style="font-size:11px;color:#ccc;">
 <a href="https://www.instagram.com/tbr.digital/" style="color:#999;text-decoration:none;">Instagram</a>
@@ -126,7 +127,7 @@ serve(async (req) => {
     }
 
     try {
-        const { to, subject, body, replyTo, draftId, homeworkImages } = await req.json();
+        const { to, subject, body, replyTo, draftId, homeworkImages, footerText } = await req.json();
 
         if (!to || !body) {
             return new Response(
@@ -159,7 +160,7 @@ serve(async (req) => {
             ? `${SUPABASE_URL}/functions/v1/email-tracker?id=${draftId}`
             : undefined;
 
-        const htmlContent = wrapInHtmlTemplate(bodyHtml, trackingUrl);
+        const htmlContent = wrapInHtmlTemplate(bodyHtml, trackingUrl, footerText);
 
         // ── 透過 Resend API 發送 ──
         const resendRes = await fetch('https://api.resend.com/emails', {
