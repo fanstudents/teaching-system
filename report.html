@@ -315,6 +315,11 @@
                 const subs = submissions.filter(s => s.student_email === email);
                 const draft = emailDrafts.find(d => d.student_email === email);
 
+                // 所有互動類型
+                const interactiveTypes = ['matching', 'fillblank', 'quiz', 'truefalse', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'buzzer', 'wordcloud', 'join'];
+                const homework = subs.filter(s => ['text', 'image', 'link', 'video', 'audio', 'homework'].includes(s.type));
+                const interactive = subs.filter(s => interactiveTypes.includes(s.type));
+
                 return {
                     checklistDone: clDone.length,
                     checklistTotal: checklistItems.length,
@@ -322,7 +327,8 @@
                     surveyTotal: surveyQuestions.length,
                     surveyResponses: srDone,
                     submissions: subs,
-                    homework: subs.filter(s => ['text', 'image', 'link', 'video', 'audio'].includes(s.type)),
+                    homework,
+                    interactive,
                     matching: subs.filter(s => s.type === 'matching'),
                     fillblank: subs.filter(s => s.type === 'fillblank'),
                     emailDraft: draft,
@@ -518,12 +524,20 @@
                 }
             }
 
-            function getAvgScore(d) {
-                const scored = [...d.matching, ...d.fillblank].filter(s => s.score != null);
-                if (scored.length === 0) return -1;
-                const sum = scored.reduce((a, s) => a + parseFloat(s.score || 0), 0);
-                return Math.round(sum / scored.length);
+            // 計算累計總分（用 state._awarded，跟排行榜一致）
+            function getTotalScore(d) {
+                const items = d.interactive || [];
+                if (items.length === 0) return -1;
+                let total = 0;
+                items.forEach(s => {
+                    let st = s.state;
+                    if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                    total += parseInt(st?._awarded) || 0;
+                });
+                return total;
             }
+            // 向後兼容
+            function getAvgScore(d) { return getTotalScore(d); }
 
             // ── Detail Modal ──
             window.showDetail = function (email) {
@@ -538,9 +552,8 @@
                 const clTotal = checklistItems.length;
                 const clPct = clTotal > 0 ? Math.round(clDone / clTotal * 100) : 0;
                 const surveyComplete = d.surveyDone >= d.surveyTotal;
-                const interactive = [...d.matching, ...d.fillblank];
-                const scored = interactive.filter(s => s.score != null);
-                const avgScore = scored.length > 0 ? Math.round(scored.reduce((a, s) => a + parseFloat(s.score || 0), 0) / scored.length) : -1;
+                const interactive = d.interactive || [];
+                const totalScore = getTotalScore(d);
 
                 let html = '';
 
@@ -560,7 +573,7 @@
                         <div class="dash-stat-label">繳交作業</div>
                     </div>
                     <div class="dash-stat">
-                        <div class="dash-stat-num" style="color:${avgScore >= 70 ? 'var(--s79-success)' : avgScore >= 0 ? 'var(--s79-primary)' : 'var(--s79-text-muted)'}">${avgScore >= 0 ? avgScore + '分' : '—'}</div>
+                        <div class="dash-stat-num" style="color:${totalScore >= 30 ? 'var(--s79-success)' : totalScore >= 0 ? 'var(--s79-primary)' : 'var(--s79-text-muted)'}">${totalScore >= 0 ? totalScore + '分' : '—'}</div>
                         <div class="dash-stat-label">互動成績</div>
                     </div>
                 </div>`;
@@ -606,27 +619,60 @@
                     html += `<div class="dash-section">
                         <div class="dash-section-title">繳交作業</div>`;
                     d.homework.forEach(s => {
-                        html += `<div class="dash-hw">
-                            <strong>${s.assignment_title}</strong>
-                            <span style="color:#80868b;font-size:0.78rem;">${s.type}</span>
-                            <div style="color:#5f6368;font-size:0.82rem;margin-top:4px;word-break:break-all;">${s.content || s.file_url || '—'}</div>
+                        const title = s.assignment_title || s.element_id?.split('__')[0] || '作業';
+                        let contentHtml = '';
+                        // 解析 content — 可能是 JSON 字串或純文字
+                        let parsed = null;
+                        try { parsed = typeof s.content === 'string' ? JSON.parse(s.content) : s.content; } catch { parsed = null; }
+                        if (parsed && parsed.image) {
+                            // image+prompt 模式
+                            contentHtml = `<div style="margin-top:8px;"><img src="${parsed.image}" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;" onclick="window.open(this.src,'_blank')" />`;
+                            if (parsed.prompt) contentHtml += `<div style="margin-top:6px;padding:8px 12px;background:#f0f4ff;border-radius:6px;border:1px solid #c3d9fc;font-size:0.82rem;color:#1e293b;"><span style="color:#1a73e8;font-weight:600;">💬 Prompt:</span> ${parsed.prompt.replace(/</g,'&lt;')}</div>`;
+                            contentHtml += `</div>`;
+                        } else if (s.file_url && s.type === 'image') {
+                            contentHtml = `<div style="margin-top:8px;"><img src="${s.file_url}" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;" onclick="window.open(this.src,'_blank')" /></div>`;
+                        } else if (typeof s.content === 'string' && s.content.startsWith('http') && /\.(jpg|jpeg|png|gif|webp)/i.test(s.content)) {
+                            contentHtml = `<div style="margin-top:8px;"><img src="${s.content}" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;" onclick="window.open(this.src,'_blank')" /></div>`;
+                        } else if (s.content && s.content !== '(image)') {
+                            contentHtml = `<div style="color:#5f6368;font-size:0.85rem;margin-top:6px;line-height:1.5;white-space:pre-wrap;word-break:break-word;">${String(s.content).replace(/</g,'&lt;').slice(0, 500)}</div>`;
+                        }
+                        const typeIcon = { image: '🖼️', text: '📝', link: '🔗', video: '🎬', audio: '🎵' }[s.type] || '📄';
+                        html += `<div class="dash-hw" style="padding:12px;border:1px solid #f1f3f4;border-radius:10px;margin-bottom:8px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;">
+                                <strong style="font-size:0.9rem;">${title}</strong>
+                                <span style="color:#80868b;font-size:0.75rem;">${typeIcon} ${s.type}</span>
+                            </div>
+                            ${contentHtml}
                         </div>`;
                     });
                     html += `</div>`;
                 }
 
-                // ── Interactive Scores ──
+                // ── Interactive Scores (累計總分) ──
                 if (interactive.length > 0) {
+                    const typeLabels = { matching:'連連看', fillblank:'填空題', quiz:'選擇題', truefalse:'是非題', ordering:'排序題', hotspot:'熱點題', poll:'投票', opentext:'開放題', scale:'量表', buzzer:'搶答', wordcloud:'文字雲', join:'出席' };
+                    // 過濾掉 join bonus 等無分數項目，但保留有分的
+                    const visibleItems = interactive.filter(s => {
+                        let st = s.state;
+                        if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                        return (parseInt(st?._awarded) || 0) > 0 || s.score != null;
+                    });
                     html += `<div class="dash-section">
-                        <div class="dash-section-title">互動成績</div>
+                        <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;">互動成績 <span style="font-size:0.85rem;font-weight:700;color:var(--s79-primary);">${totalScore >= 0 ? totalScore + ' 分' : ''}</span></div>
                         <div class="dash-scores">`;
-                    interactive.forEach(s => {
-                        const typeLabel = s.type === 'matching' ? '連連看' : '填空題';
+                    visibleItems.forEach(s => {
+                        let st = s.state;
+                        if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                        const awarded = parseInt(st?._awarded) || 0;
+                        const maxPts = parseInt(st?._maxPts) || 0;
+                        const label = typeLabels[s.type] || s.type;
+                        const title = s.assignment_title || st?.title || label;
                         const correct = s.is_correct;
-                        html += `<div class="dash-score-item">
-                            <div class="dash-score-type">${typeLabel}</div>
-                            <div class="dash-score-title">${s.assignment_title}</div>
-                            <div class="dash-score-val" style="color:${correct ? 'var(--s79-success)' : 'var(--s79-error)'}">${s.score || '—'} 分</div>
+                        const barColor = correct === true ? 'var(--s79-success)' : correct === false ? 'var(--s79-error)' : 'var(--s79-primary)';
+                        html += `<div class="dash-score-item" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f8f9fa;">
+                            <div style="min-width:56px;font-size:0.75rem;color:#80868b;">${label}</div>
+                            <div style="flex:1;font-size:0.85rem;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+                            <div style="font-weight:700;font-size:0.9rem;color:${barColor};min-width:50px;text-align:right;">+${awarded}</div>
                         </div>`;
                     });
                     html += `</div></div>`;
@@ -827,6 +873,23 @@
                         systemPrompt += `\n\n以下是講師針對此場次的額外指示，請務必遵循：\n${_sessionEmailConfig.ai_prompt}`;
                     }
 
+                    const totalScore = getTotalScore(d);
+
+                    // 收集作業詳情（含圖片 URL）
+                    const hwDetails = d.homework.map(s => {
+                        const title = s.assignment_title || s.element_id?.split('__')[0] || '作業';
+                        let desc = '';
+                        let imageUrl = '';
+                        try {
+                            const p = typeof s.content === 'string' ? JSON.parse(s.content) : s.content;
+                            if (p?.image) { imageUrl = p.image; desc = p.prompt || ''; }
+                        } catch {
+                            if (s.file_url) imageUrl = s.file_url;
+                            else desc = s.content || '';
+                        }
+                        return { title, desc, imageUrl, type: s.type };
+                    });
+
                     const userPrompt = `請根據以下學員資料撰寫個人化課後回饋信件：
 
 課程名稱：${courseName}
@@ -845,7 +908,8 @@
 
 課堂表現：
 - 繳交作業：${d.homework.length} 份
-- 互動成績：${avgScore >= 0 ? avgScore + ' 分' : '尚無紀錄'}
+- 互動成績：${totalScore >= 0 ? totalScore + ' 分（累計）' : '尚無紀錄'}
+${hwDetails.length > 0 ? '- 作業內容：\n' + hwDetails.map((h, i) => `  ${i+1}. ${h.title}${h.desc ? ' — ' + h.desc.slice(0, 100) : ''}${h.imageUrl ? ' [有圖片]' : ''}`).join('\n') : ''}
 
 課後考試：
 - 考試成績：${d.examResult ? d.examResult.score + ' 分' : '未參加'}
@@ -859,7 +923,8 @@ ${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResul
 1. 結合學員的應用場景分享產業觀點
 2. 如果有考試成績，根據表現給予回饋
 3. 如果有滿意度數據，感謝回饋
-4. 結尾邀請回信分享想法`;
+4. 如果學員有繳交作業（尤其有圖片），在信中提及並讚賞他們的創作
+5. 結尾邀請回信分享想法`;
 
                     draft = await ai.chat([
                         { role: 'system', content: systemPrompt },
@@ -988,6 +1053,22 @@ ${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResul
                     return;
                 }
                 try {
+                    // 收集作業圖片 URLs
+                    const homeworkImages = [];
+                    d.homework.forEach(s => {
+                        const title = s.assignment_title || s.element_id?.split('__')[0] || '作業';
+                        let imageUrl = '';
+                        let prompt = '';
+                        try {
+                            const p = typeof s.content === 'string' ? JSON.parse(s.content) : s.content;
+                            if (p?.image) { imageUrl = p.image; prompt = p.prompt || ''; }
+                        } catch {
+                            if (s.file_url) imageUrl = s.file_url;
+                            else if (typeof s.content === 'string' && /\.(jpg|jpeg|png|gif|webp)/i.test(s.content)) imageUrl = s.content;
+                        }
+                        if (imageUrl) homeworkImages.push({ title, imageUrl, prompt });
+                    });
+
                     const res = await fetch(`https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/send-email`, {
                         method: 'POST',
                         headers: {
@@ -999,7 +1080,8 @@ ${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResul
                             subject: d.emailDraft.subject || `[AI 工作坊] ${student.name} 的學習回饋`,
                             body: d.emailDraft.body,
                             replyTo: 'service@tbr.digital',
-                            draftId: d.emailDraft.id  // ★ 開信追蹤用
+                            draftId: d.emailDraft.id,
+                            homeworkImages  // ★ 作業圖片嵌入 Email
                         })
                     });
                     if (!res.ok) throw new Error(`Send failed: ${res.status}`);

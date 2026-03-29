@@ -126,7 +126,7 @@ serve(async (req) => {
     }
 
     try {
-        const { to, subject, body, replyTo, draftId } = await req.json();
+        const { to, subject, body, replyTo, draftId, homeworkImages } = await req.json();
 
         if (!to || !body) {
             return new Response(
@@ -136,7 +136,23 @@ serve(async (req) => {
         }
 
         // 純文字 → HTML
-        const bodyHtml = textToHtml(body);
+        let bodyHtml = textToHtml(body);
+
+        // ★ 作業圖片嵌入
+        if (homeworkImages && Array.isArray(homeworkImages) && homeworkImages.length > 0) {
+            bodyHtml += `<div style="margin-top:28px;padding-top:20px;border-top:2px solid #e8e8f0;">
+                <h3 style="font-size:15px;font-weight:600;color:#1a1a2e;margin:0 0 16px;">📸 你的課堂作品</h3>`;
+            homeworkImages.forEach((hw: { title: string; imageUrl: string; prompt?: string }) => {
+                bodyHtml += `<div style="margin-bottom:16px;border:1px solid #e8e8f0;border-radius:12px;overflow:hidden;">
+                    <img src="${hw.imageUrl}" alt="${hw.title}" style="width:100%;max-height:400px;object-fit:contain;display:block;background:#f8f9fa;" />
+                    <div style="padding:12px 16px;">
+                        <div style="font-weight:600;font-size:13px;color:#1a1a2e;">${hw.title}</div>
+                        ${hw.prompt ? `<div style="margin-top:4px;font-size:12px;color:#6366f1;">💬 ${hw.prompt}</div>` : ''}
+                    </div>
+                </div>`;
+            });
+            bodyHtml += `</div>`;
+        }
 
         // Tracking pixel URL
         const trackingUrl = draftId
