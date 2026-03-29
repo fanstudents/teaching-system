@@ -8,6 +8,18 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://wsaknnhjgiqmkendey
 const FROM_EMAIL = 'service@teaching.tbr.digital';
 const FROM_NAME = '數位簡報室';
 
+// Token 產生（跟 unsubscribe function 共用邏輯）
+function simpleHash(email: string): string {
+    let hash = 0;
+    const str = email + (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'salt');
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+    }
+    return Math.abs(hash).toString(36);
+}
+
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -49,12 +61,16 @@ function textToHtml(text: string): string {
 }
 
 // ── HTML Email 模板 ──
-function wrapInHtmlTemplate(bodyHtml: string, trackingPixelUrl?: string, footerText?: string): string {
+function wrapInHtmlTemplate(bodyHtml: string, trackingPixelUrl?: string, footerText?: string, recipientEmail?: string): string {
     const trackingImg = trackingPixelUrl
         ? `<img src="${trackingPixelUrl}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;" />`
         : '';
 
     const footerLines = (footerText || '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件').split('\n').map(l => `<div>${l}</div>`).join('\n');
+
+    // 取消訂閱連結
+    const unsubToken = simpleHash(recipientEmail || '');
+    const unsubUrl = `${SUPABASE_URL}/functions/v1/unsubscribe?email=${encodeURIComponent(recipientEmail || '')}&token=${unsubToken}`;
 
     return `<!DOCTYPE html>
 <html lang="zh-TW">
@@ -109,6 +125,9 @@ ${footerLines}
 </td>
 </tr>
 </table>
+<div style="text-align:center;margin-top:12px;font-size:10px;">
+<a href="${unsubUrl}" style="color:#bbb;text-decoration:none;">取消訂閱</a>
+</div>
 ${trackingImg}
 </td>
 </tr>
@@ -175,7 +194,7 @@ serve(async (req) => {
             );
         }
 
-        const htmlContent = wrapInHtmlTemplate(bodyHtml, trackingUrl, footerText);
+        const htmlContent = wrapInHtmlTemplate(bodyHtml, trackingUrl, footerText, to);
 
         // ── 透過 Resend API 發送 ──
         const resendRes = await fetch('https://api.resend.com/emails', {
