@@ -71,6 +71,18 @@
                 <!-- 專案列表面板 -->
                 <div class="l1-panel active" id="l1-projects">
                     <div class="filter-bar">
+                        <div class="proj-status-tabs" style="display:flex;gap:0;margin-right:8px;">
+                            <button class="proj-status-tab active" data-pstatus="active" onclick="switchProjectStatus('active')" style="
+                                padding:6px 14px;font-size:0.82rem;border:1.5px solid var(--border);
+                                border-radius:8px 0 0 8px;background:var(--primary);color:#fff;
+                                font-family:inherit;cursor:pointer;font-weight:600;
+                            ">進行中</button>
+                            <button class="proj-status-tab" data-pstatus="archived" onclick="switchProjectStatus('archived')" style="
+                                padding:6px 14px;font-size:0.82rem;border:1.5px solid var(--border);
+                                border-left:none;border-radius:0 8px 8px 0;background:var(--bg-2);color:var(--text-2);
+                                font-family:inherit;cursor:pointer;
+                            ">已結束</button>
+                        </div>
                         <input type="text" id="projectSearch" placeholder="搜尋專案名稱…">
                         <select id="projectCategoryFilter" class="filter-select">
                             <option value="">全部分類</option>
@@ -901,12 +913,33 @@
             }
         }
 
+        let _projectStatusFilter = 'active'; // 'active' | 'archived'
+
+        window.switchProjectStatus = function(status) {
+            _projectStatusFilter = status;
+            document.querySelectorAll('.proj-status-tab').forEach(btn => {
+                const isActive = btn.dataset.pstatus === status;
+                btn.classList.toggle('active', isActive);
+                btn.style.background = isActive ? 'var(--primary)' : 'var(--bg-2)';
+                btn.style.color = isActive ? '#fff' : 'var(--text-2)';
+                btn.style.fontWeight = isActive ? '600' : '400';
+            });
+            renderProjects(document.getElementById('projectSearch')?.value || '');
+        };
+
         function renderProjects(filter = '') {
             const grid = document.getElementById('projectGrid');
             const catFilter = document.getElementById('projectCategoryFilter')?.value || '';
             let filtered = projects;
             if (catFilter) filtered = filtered.filter(p => (p.type || 'course') === catFilter);
             if (filter) filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(filter.toLowerCase()));
+
+            // 按 phase 過濾：active = 有任一場次非 post-class，archived = 所有場次都是 post-class 或無場次
+            filtered = filtered.filter(p => {
+                const projectSessions = sessions.filter(s => s.project_id === p.id);
+                const allPostClass = projectSessions.length > 0 && projectSessions.every(s => (s.current_phase || 'pre-class') === 'post-class');
+                return _projectStatusFilter === 'archived' ? allPostClass : !allPostClass;
+            });
 
             if (filtered.length === 0) {
                 grid.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">folder_off</span>${filter || catFilter ? '沒有符合的結果' : '尚無課程'}</div>`;
