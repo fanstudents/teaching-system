@@ -59,6 +59,14 @@
                     <div class="stat-value" id="statSubmissions">—</div>
                     <div class="stat-label">總繳交作業</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statEmailSent">—</div>
+                    <div class="stat-label">已發送信件</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statEmailOpened">—</div>
+                    <div class="stat-label">已開信</div>
+                </div>
             </div>
 
             <div class="filters" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -121,6 +129,36 @@
                 </div>
                 <div class="student-grid list-mode" id="studentGrid">
                     <div class="loading">載入中…</div>
+                </div>
+            </div>
+
+            <!-- 排程追蹤信面板 -->
+            <div class="template-section" id="scheduledSection">
+                <div class="template-toggle"
+                    onclick="document.getElementById('scheduledSection').classList.toggle('open')">
+                    <div class="template-toggle-left">
+                        <span class="material-symbols-rounded">schedule_send</span>
+                        排程追蹤信
+                        <span id="scheduledCount" style="font-size:0.75rem;color:#80868b;font-weight:400;margin-left:4px;"></span>
+                    </div>
+                    <span class="material-symbols-rounded chevron">expand_more</span>
+                </div>
+                <div class="template-body">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                        <label style="font-size:0.82rem;font-weight:500;color:#5f6368;">追蹤天數：</label>
+                        <select id="followupDays" style="padding:6px 10px;border:1.5px solid #dadce0;border-radius:8px;font-size:0.82rem;">
+                            <option value="3">3 天後</option>
+                            <option value="7" selected>7 天後</option>
+                            <option value="10">10 天後</option>
+                            <option value="14">14 天後</option>
+                            <option value="30">30 天後</option>
+                        </select>
+                        <button class="topbar-btn primary" id="scheduleAllBtn">
+                            <span class="material-symbols-rounded">schedule_send</span>
+                            為所有已發信學員排程追蹤信
+                        </button>
+                    </div>
+                    <div id="scheduledList" style="font-size:0.82rem;color:#5f6368;"></div>
                 </div>
             </div>
         </div>
@@ -211,6 +249,7 @@
             let emailDrafts = [];
             let examResponses = [];
             let satisfactionResponses = [];
+            let scheduledEmails = [];
 
             async function loadAll() {
                 try {
@@ -246,9 +285,17 @@
                     examResponses = results[7].data || [];
                     satisfactionResponses = results[8].data || [];
 
+                    // Load scheduled emails
+                    try {
+                        const schedFilter = _sessionId ? { session_id: `eq.${_sessionId}` } : {};
+                        const { data: schedData } = await db.select('scheduled_emails', { filter: schedFilter, order: 'scheduled_at.asc' });
+                        scheduledEmails = schedData || [];
+                    } catch (e) { scheduledEmails = []; }
+
                     updateStats();
                     populateFilters();
                     renderStudents();
+                    renderScheduledEmails();
                     initTemplateEditor();
                 } catch (err) {
                     document.getElementById('studentGrid').innerHTML =
@@ -303,6 +350,12 @@
                 }
 
                 document.getElementById('statSubmissions').textContent = submissions.length;
+
+                // Email stats
+                const sentCount = emailDrafts.filter(d => d.status === 'sent').length;
+                const openedCount = emailDrafts.filter(d => (d.open_count || 0) > 0).length;
+                document.getElementById('statEmailSent').textContent = sentCount > 0 ? sentCount : '—';
+                document.getElementById('statEmailOpened').textContent = sentCount > 0 ? `${openedCount}/${sentCount}` : '—';
             }
 
             // ── CSV 匯出 ──
@@ -385,7 +438,22 @@
                             <span class="list-status-badge ${clClass}">${clPct}%</span>
                             <span class="list-status-badge ${svClass}">${surveyComplete ? '已完成' : d.surveyDone + '/' + d.surveyTotal}</span>
                             <span>${d.homework.length} 份</span>
-                            <span class="list-status-badge ${hasDraft ? 'generated' : 'none'}">${hasDraft ? '已生成' : '—'}</span>
+                            <span class="list-status-badge ${(() => {
+                                if (!hasDraft) return 'none';
+                                const isSent = d.emailDraft?.status === 'sent';
+                                const isOpened = (d.emailDraft?.open_count || 0) > 0;
+                                if (isOpened) return 'done';
+                                if (isSent) return 'generated';
+                                return 'partial';
+                            })()}">${(() => {
+                                if (!hasDraft) return '—';
+                                const isSent = d.emailDraft?.status === 'sent';
+                                const isOpened = (d.emailDraft?.open_count || 0) > 0;
+                                const openCount = d.emailDraft?.open_count || 0;
+                                if (isOpened) return `已開信 (${openCount})`;
+                                if (isSent) return '已寄出';
+                                return '草稿';
+                            })()}</span>
                             <div class="list-actions">
                                 <button class="list-action-btn" onclick="showDetail('${s.email}')">
                                     <span class="material-symbols-rounded">visibility</span>
@@ -924,20 +992,156 @@ ${d.satisfactionResult ? (() => { try { const r = JSON.parse(d.satisfactionResul
                             to: student.email,
                             subject: d.emailDraft.subject || `[AI 工作坊] ${student.name} 的學習回饋`,
                             body: d.emailDraft.body,
-                            replyTo: 'service@tbr.digital'
+                            replyTo: 'service@tbr.digital',
+                            draftId: d.emailDraft.id  // ★ 開信追蹤用
                         })
                     });
                     if (!res.ok) throw new Error(`Send failed: ${res.status}`);
                     showToast(`已發送至 ${student.email}`);
-                    // Update status
-                    await db.update('email_drafts', { status: 'sent', sent_at: new Date().toISOString() }, { filter: { id: `eq.${d.emailDraft.id}` } });
+                    // Update status + session_id
+                    const updateData = { status: 'sent', sent_at: new Date().toISOString() };
+                    if (_sessionId) updateData.session_id = _sessionId;
+                    await db.update('email_drafts', updateData, { filter: { id: `eq.${d.emailDraft.id}` } });
+
+                    // ★ 自動排程追蹤信（預設 7 天）
+                    if (_sessionId) {
+                        const followupDays = parseInt(document.getElementById('followupDays')?.value || '7');
+                        const existingScheduled = scheduledEmails.find(se =>
+                            se.student_email === email && se.delay_days === followupDays && se.status === 'pending'
+                        );
+                        if (!existingScheduled) {
+                            try {
+                                await db.insert('scheduled_emails', {
+                                    session_id: _sessionId,
+                                    student_email: email,
+                                    student_name: student.name,
+                                    email_type: `followup_${followupDays}d`,
+                                    delay_days: followupDays,
+                                    scheduled_at: new Date(Date.now() + followupDays * 24 * 60 * 60 * 1000).toISOString(),
+                                    status: 'pending'
+                                });
+                            } catch (schedErr) {
+                                console.warn('[Schedule] Failed:', schedErr);
+                            }
+                        }
+                    }
+
                     const { data } = await db.select('email_drafts');
                     emailDrafts = data || [];
+                    // Reload scheduled
+                    try {
+                        const schedFilter = _sessionId ? { session_id: `eq.${_sessionId}` } : {};
+                        const { data: sd } = await db.select('scheduled_emails', { filter: schedFilter, order: 'scheduled_at.asc' });
+                        scheduledEmails = sd || [];
+                    } catch(e) {}
                     renderStudents();
+                    renderScheduledEmails();
                 } catch (err) {
                     showToast('發送失敗：' + err.message + '（請確認 send-email Edge Function 已部署）', { type: 'error' });
                 }
             };
+
+            // ── 排程追蹤信面板 ──
+            function renderScheduledEmails() {
+                const container = document.getElementById('scheduledList');
+                const countEl = document.getElementById('scheduledCount');
+                if (!container) return;
+
+                const pending = scheduledEmails.filter(s => s.status === 'pending');
+                const sent = scheduledEmails.filter(s => s.status === 'sent');
+                countEl.textContent = pending.length > 0 ? `（${pending.length} 封待發送）` : '';
+
+                if (scheduledEmails.length === 0) {
+                    container.innerHTML = '<div style="color:#80868b;padding:8px 0;">尚無排程追蹤信。發送信件後會自動排程。</div>';
+                    return;
+                }
+
+                const statusIcon = { pending: '⏳', sent: '✅', failed: '❌', cancelled: '🚫' };
+                const statusLabel = { pending: '待發送', sent: '已發送', failed: '失敗', cancelled: '已取消' };
+
+                container.innerHTML = `
+                    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+                        <thead>
+                            <tr style="border-bottom:1.5px solid #e8eaed;">
+                                <th style="text-align:left;padding:6px 0;font-weight:600;color:#5f6368;">學員</th>
+                                <th style="text-align:left;padding:6px 0;font-weight:600;color:#5f6368;">類型</th>
+                                <th style="text-align:left;padding:6px 0;font-weight:600;color:#5f6368;">排程時間</th>
+                                <th style="text-align:left;padding:6px 0;font-weight:600;color:#5f6368;">狀態</th>
+                                <th style="text-align:right;padding:6px 0;font-weight:600;color:#5f6368;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scheduledEmails.map(s => `
+                                <tr style="border-bottom:1px solid #f1f3f4;">
+                                    <td style="padding:8px 0;">${s.student_name || s.student_email}</td>
+                                    <td style="padding:8px 0;color:#80868b;">${s.delay_days} 天後追蹤</td>
+                                    <td style="padding:8px 0;color:#80868b;">${new Date(s.scheduled_at).toLocaleString('zh-TW')}</td>
+                                    <td style="padding:8px 0;">${statusIcon[s.status] || ''} ${statusLabel[s.status] || s.status}</td>
+                                    <td style="padding:8px 0;text-align:right;">
+                                        ${s.status === 'pending' ? `<button onclick="cancelScheduled('${s.id}')" style="background:none;border:1px solid #dadce0;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:0.78rem;color:#c5221f;">取消</button>` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            window.cancelScheduled = async function (id) {
+                try {
+                    await db.update('scheduled_emails', { status: 'cancelled' }, { filter: { id: `eq.${id}` } });
+                    const se = scheduledEmails.find(s => s.id === id);
+                    if (se) se.status = 'cancelled';
+                    renderScheduledEmails();
+                    showToast('已取消排程');
+                } catch (err) {
+                    showToast('取消失敗：' + err.message, { type: 'error' });
+                }
+            };
+
+            // ── 批量排程追蹤信 ──
+            document.getElementById('scheduleAllBtn')?.addEventListener('click', async () => {
+                const days = parseInt(document.getElementById('followupDays').value);
+                const sentDrafts = emailDrafts.filter(d => d.status === 'sent');
+                if (sentDrafts.length === 0) {
+                    showToast('沒有已發送的信件可排程', { type: 'error' });
+                    return;
+                }
+
+                let scheduled = 0;
+                for (const draft of sentDrafts) {
+                    // 檢查是否已排程相同天數
+                    const exists = scheduledEmails.find(se =>
+                        se.student_email === draft.student_email && se.delay_days === days && se.status === 'pending'
+                    );
+                    if (exists) continue;
+
+                    const student = allStudents.find(s => s.email === draft.student_email);
+                    try {
+                        await db.insert('scheduled_emails', {
+                            session_id: _sessionId || null,
+                            student_email: draft.student_email,
+                            student_name: student?.name || '',
+                            email_type: `followup_${days}d`,
+                            delay_days: days,
+                            scheduled_at: new Date((draft.sent_at ? new Date(draft.sent_at).getTime() : Date.now()) + days * 24 * 60 * 60 * 1000).toISOString(),
+                            status: 'pending'
+                        });
+                        scheduled++;
+                    } catch (e) {
+                        console.warn('[Schedule] Skip', draft.student_email, e);
+                    }
+                }
+
+                // Reload
+                try {
+                    const schedFilter = _sessionId ? { session_id: `eq.${_sessionId}` } : {};
+                    const { data: sd } = await db.select('scheduled_emails', { filter: schedFilter, order: 'scheduled_at.asc' });
+                    scheduledEmails = sd || [];
+                } catch(e) {}
+                renderScheduledEmails();
+                showToast(`已為 ${scheduled} 位學員排程 ${days} 天後的追蹤信`);
+            });
 
             // ── Filters ──
             document.getElementById('searchInput').addEventListener('input', () => renderStudents());
