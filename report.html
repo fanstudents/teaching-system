@@ -1266,7 +1266,7 @@ ${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''
                             to: student.email,
                             subject: d.emailDraft.subject || `[AI 工作坊] ${student.name} 的學習回饋`,
                             body: d.emailDraft.body,
-                            replyTo: 'service@tbr.digital',
+                            replyTo: 'service@teaching.tbr.digital',
                             draftId: d.emailDraft.id,
                             homeworkImages  // ★ 作業圖片嵌入 Email
                         })
