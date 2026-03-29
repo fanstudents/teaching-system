@@ -178,6 +178,10 @@
                     </h4>
                     <textarea class="email-textarea" id="emailContent"></textarea>
                     <div class="email-actions">
+                        <button class="topbar-btn" id="regenEmailBtn" title="用新版 prompt 重新生成">
+                            <span class="material-symbols-rounded">refresh</span>
+                            重新生成
+                        </button>
                         <button class="topbar-btn" onclick="copyEmail()">
                             <span class="material-symbols-rounded">content_copy</span>
                             複製
@@ -275,7 +279,7 @@
                         db.select('checklist_progress'),
                         db.select('survey_questions', { filter: jcFilter }),
                         db.select('survey_responses'),
-                        db.select('submissions', { select: 'id,student_email,student_name,element_id,type,content,is_correct,score,submitted_at,created_at,session_id', filter: submissionFilter }),
+                        db.select('submissions', { select: 'id,student_email,student_name,element_id,assignment_title,type,content,file_url,is_correct,score,state,submitted_at,created_at,session_id', filter: submissionFilter }),
                         db.select('email_drafts'),
                         db.select('exam_responses', { filter: studentFilter }),
                         db.select('satisfaction_responses', { filter: studentFilter })
@@ -688,6 +692,10 @@
                 } else {
                     emailSection.style.display = 'none';
                 }
+
+                // 重新生成按鈕
+                const regenBtn = document.getElementById('regenEmailBtn');
+                if (regenBtn) regenBtn.onclick = () => generateEmail(email);
 
                 document.getElementById('detailModal').classList.add('active');
                 document.getElementById('detailModal').dataset.email = email;
