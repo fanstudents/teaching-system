@@ -4,2370 +4,619 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數位簡報室 — AI 企業內訓 × 互動教學 × 智能工具</title>
-    <meta name="description" content="數位簡報室 The Briefing Room：AI 企業內訓、互動教學簡報系統、免費 AI 工具箱、AI Lobster 企業導入，一站式 AI 教育解決方案。">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
-        rel="stylesheet">
-    <link rel="stylesheet" href="styles/base.css">
+    <title>數位簡報室 The Briefing Room — AI 企業內訓 × 公開課程 × 專家派遣 × 互動教學</title>
+    <meta name="description" content="數位簡報室是台灣少數專注 AI 與數位人才培訓的新創機構，提供 AI 企業內訓、Claude 企業導入、AI 專家派遣、公開課程、互動式簡報教學系統。業界獨家互動簡報技術，師資陣容涵蓋各領域專家。">
+    <meta name="keywords" content="AI企業內訓,Claude企業導入,AI公開課程,AI專家派遣,數位人才培訓,互動式簡報,數位簡報室,AI辦公室,企業AI導入">
+    <meta property="og:title" content="數位簡報室 — AI 企業內訓 × 公開課程 × 專家派遣">
+    <meta property="og:description" content="台灣少數專注 AI 數位人才培訓的新創，業界獨家互動簡報教學、堅強師資陣容、從公開課到企業導入一站式服務。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://teaching.tbr.digital">
+    <meta property="og:image" content="https://teaching.tbr.digital/assets/images/tbrlogo.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="https://teaching.tbr.digital">
+    <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "數位簡報室 The Briefing Room",
+        "alternateName": "TBR Digital",
+        "url": "https://teaching.tbr.digital",
+        "logo": "https://teaching.tbr.digital/assets/images/tbrlogo.png",
+        "description": "台灣少數專注 AI 與數位人才培訓的新創機構，提供企業內訓、公開課程、AI 專家派遣、互動式簡報教學系統。",
+        "sameAs": ["https://lin.ee/wAi3y4P"],
+        "knowsAbout": ["人工智慧", "Claude AI", "企業數位轉型", "AI 辦公自動化", "互動教學", "數位人才培訓"],
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "AI 培訓服務",
+            "itemListElement": [
+                { "@type": "Offer", "itemOffered": { "@type": "Course", "name": "Claude 企業導入課程", "description": "從基礎到進階的 Claude AI 企業應用課程" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Course", "name": "AI 辦公室企業內訓", "description": "針對企業員工的 AI 辦公自動化培訓" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "AI 專家派遣計畫", "description": "企業短期或長期 AI 專家顧問進駐服務" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Course", "name": "AI 公開課程", "description": "面向個人的 AI 技能提升公開班" } }
+            ]
+        }
+    }
+    </script>
+
     <style>
-        * {
-            box-sizing: border-box
-        }
-
-        html {
-            scroll-behavior: smooth
-        }
-
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
-            background: #fff;
-            color: #0f172a;
-            font-family: 'Noto Sans TC', sans-serif;
-            margin: 0
+            font-family: 'Inter', 'Noto Sans TC', -apple-system, system-ui, sans-serif;
+            background: #fff; color: #0f172a; -webkit-font-smoothing: antialiased;
         }
 
-        .ov {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 32px
+        /* ═══ Utilities ═══ */
+        .container { max-width: 1140px; margin: 0 auto; padding: 0 32px; }
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
 
-        /* ══ Nav ══ */
-        .pn {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid transparent;
-            transition: border-color .3s, box-shadow .3s
+        /* ═══ Nav ═══ */
+        .nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 64px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px; background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
+            border-bottom: 1px solid transparent; transition: all .3s;
         }
+        .nav.scrolled { border-bottom-color: #e2e8f0; box-shadow: 0 1px 8px rgba(0,0,0,.04); }
+        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; font-weight: 700; font-size: .95rem; }
+        .nav-brand img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-brand small { font-size: .68rem; font-weight: 400; color: #94a3b8; margin-left: 4px; }
+        .nav-links { display: flex; gap: 4px; list-style: none; }
+        .nav-links a { padding: 8px 14px; border-radius: 8px; font-size: .82rem; font-weight: 500; color: #64748b; text-decoration: none; transition: all .2s; }
+        .nav-links a:hover { color: #0f172a; background: #f1f5f9; }
+        .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: 10px; font-size: .82rem; font-weight: 600; background: #0f172a; color: #fff; text-decoration: none; transition: all .2s; }
+        .nav-cta:hover { background: #1e293b; box-shadow: 0 4px 12px rgba(15,23,42,.15); }
 
-        .pn.scrolled {
-            border-bottom-color: #dadce0;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05)
-        }
-
-        .pn-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #0f172a;
-            text-decoration: none
-        }
-
-        .pn-brand .material-symbols-rounded {
-            font-size: 24px;
-            color: #3b82f6
-        }
-
-        .pn-brand small {
-            font-size: .7rem;
-            font-weight: 500;
-            color: #80868b;
-            margin-left: 2px
-        }
-
-        .pn-links {
-            display: flex;
-            gap: 4px;
-            list-style: none;
-            padding: 0;
-            margin: 0
-        }
-
-        .pn-links a {
-            padding: 7px 14px;
-            border-radius: 6px;
-            font-size: .82rem;
-            font-weight: 500;
-            color: #444746;
-            text-decoration: none;
-            transition: all .2s
-        }
-
-        .pn-links a:hover {
-            color: #0f172a;
-            background: #f1f3f4
-        }
-
-        .pn-right {
-            display: flex;
-            align-items: center;
-            gap: 8px
-        }
-
-        .pn-login {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 20px;
-            border-radius: 8px;
-            font-size: .82rem;
-            font-weight: 600;
-            background: #0f172a;
-            color: #fff;
-            text-decoration: none;
-            transition: all .2s
-        }
-
-        .pn-login:hover {
-            background: #1f1f1f;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15)
-        }
-
-        .pn-login .material-symbols-rounded {
-            font-size: 16px
-        }
-
-        /* ══ Hero ══ */
+        /* ═══ Hero ═══ */
         .hero {
-            position: relative;
-            text-align: center;
-            padding: 100px 20px 72px;
-            overflow: hidden
+            position: relative; text-align: center; padding: 140px 20px 80px; overflow: hidden;
         }
-
         .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
-            pointer-events: none
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,.06) 0%, transparent 60%),
+                        radial-gradient(ellipse at 20% 80%, rgba(139,92,246,.04) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 60%, rgba(6,182,212,.03) 0%, transparent 50%);
+            pointer-events: none;
         }
-
-        .hero-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #f1f3f4;
-            color: #3b82f6;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: .78rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            border: 1px solid #dadce0
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #f1f5f9; color: #3b82f6; padding: 6px 18px; border-radius: 24px;
+            font-size: .78rem; font-weight: 600; margin-bottom: 24px; border: 1px solid #e2e8f0;
         }
-
-        .hero-chip .material-symbols-rounded {
-            font-size: 16px
-        }
-
-        .hero h1 {
-            font-size: 2.6rem;
-            font-weight: 900;
-            color: #0f172a;
-            line-height: 1.35;
-            margin-bottom: 16px;
-            letter-spacing: -.5px
-        }
-
-        .hero h1 em {
-            font-style: normal;
-            background: linear-gradient(135deg, #3b82f6, #0ea5e9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent
-        }
-
-        .hero>p {
-            font-size: 1.05rem;
-            color: #444746;
-            max-width: 560px;
-            margin: 0 auto 32px;
-            line-height: 1.7
-        }
-
-        .hero-cta {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 40px
-        }
-
+        .hero-badge .material-symbols-outlined { font-size: 16px; }
+        .hero h1 { font-size: 3rem; font-weight: 900; line-height: 1.3; letter-spacing: -.03em; margin-bottom: 20px; }
+        .hero h1 em { font-style: normal; }
+        .hero > p { font-size: 1.1rem; color: #64748b; max-width: 600px; margin: 0 auto 36px; line-height: 1.8; }
+        .hero-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 56px; flex-wrap: wrap; }
         .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-size: .9rem;
-            font-weight: 600;
-            background: #0f172a;
-            color: #fff;
-            text-decoration: none;
-            transition: all .2s
+            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 12px;
+            font-size: .92rem; font-weight: 600; background: #0f172a; color: #fff; text-decoration: none; transition: all .25s; border: none; cursor: pointer;
         }
-
-        .btn-primary:hover {
-            background: #1f1f1f;
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
-            transform: translateY(-1px)
-        }
-
+        .btn-primary:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15,23,42,.15); }
         .btn-ghost {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 12px 28px;
-            border-radius: 10px;
-            font-size: .9rem;
-            font-weight: 600;
-            background: #fff;
-            color: #0f172a;
-            border: 1.5px solid #dadce0;
-            text-decoration: none;
-            transition: all .2s
-        }
-
-        .btn-ghost:hover {
-            border-color: #80868b;
-            background: #f8f9fa
-        }
-
-        .btn-primary .material-symbols-rounded,
-        .btn-ghost .material-symbols-rounded {
-            font-size: 18px
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 48px
-        }
-
-        .hero-stat-num {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #0f172a
-        }
-
-        .hero-stat-label {
-            font-size: .78rem;
-            color: #80868b;
-            margin-top: 2px
-        }
-
-        /* ══ Logos ══ */
-        .logos {
-            padding: 40px 0;
-            border-top: 1px solid #f1f3f4
-        }
-
-        .logos-label {
-            text-align: center;
-            font-size: .75rem;
-            font-weight: 500;
-            color: #80868b;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-            text-transform: uppercase
-        }
-
-        .logos-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 36px;
-            flex-wrap: wrap
-        }
-
-        .logo-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            opacity: .45;
-            transition: all .2s;
-            cursor: default
-        }
-
-        .logo-item:hover {
-            opacity: 1;
-            transform: translateY(-2px)
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .85rem;
-            font-weight: 700;
-            color: #fff
-        }
-
-        .logo-name {
-            font-size: .7rem;
-            color: #444746;
-            font-weight: 500
-        }
-
-        /* ══ Why Not PPT ══ */
-        .why {
-            padding: 64px 0;
-            border-top: 1px solid #f1f3f4
-        }
-
-        .sec-head {
-            text-align: center;
-            margin-bottom: 36px
-        }
-
-        .sec-head h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 8px
-        }
-
-        .sec-head p {
-            font-size: .9rem;
-            color: #80868b
-        }
-
-        .why-tools {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 28px;
-            flex-wrap: wrap
-        }
-
-        .why-tool {
-            padding: 7px 16px;
-            border-radius: 8px;
-            font-size: .8rem;
-            font-weight: 600;
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            color: #80868b;
-            text-decoration: line-through;
-            text-decoration-color: #d9302560;
-            transition: all .2s;
-            cursor: default
-        }
-
-        .why-tool:hover {
-            background: #fce8e6;
-            border-color: #fecaca;
-            color: #d93025
-        }
-
-        .pain-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px;
-            max-width: 900px;
-            margin: 0 auto
-        }
-
-        .pain-card {
-            background: #fff;
-            border: 1px solid #dadce0;
-            border-radius: 12px;
-            padding: 16px 18px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            transition: all .25s;
-            cursor: default
-        }
-
-        .pain-card:hover {
-            border-color: #fecaca;
-            background: #fffbfb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04)
-        }
-
-        .pain-card .material-symbols-rounded {
-            font-size: 20px;
-            color: #d93025;
-            flex-shrink: 0;
-            margin-top: 2px
-        }
-
-        .pain-card h4 {
-            font-size: .85rem;
-            font-weight: 600;
-            color: #1f1f1f;
-            margin-bottom: 3px
-        }
-
-        .pain-card p {
-            font-size: .78rem;
-            color: #80868b;
-            line-height: 1.5
-        }
-
-        .pain-bottom {
-            text-align: center;
-            margin-top: 28px;
-            padding: 20px;
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            border-radius: 14px;
-            max-width: 620px;
-            margin-left: auto;
-            margin-right: auto
-        }
-
-        .pain-bottom p {
-            font-size: .92rem;
-            color: #1f1f1f;
-            font-weight: 600;
-            line-height: 1.6
-        }
-
-        .pain-bottom em {
-            font-style: normal;
-            color: #d93025
-        }
-
-        /* ══ Flow ══ */
-        .flow-sec {
-            padding: 64px 0;
-            border-top: 1px solid #f1f3f4;
-            position: relative
-        }
-
-        .v-flow {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0;
-            max-width: 540px;
-            margin: 0 auto;
-            position: relative
-        }
-
-        .v-flow::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            width: 2px;
-            background: #dadce0;
-            transform: translateX(-50%);
-            z-index: 0
-        }
-
-        .v-flow::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            width: 2px;
-            transform: translateX(-50%);
-            z-index: 1;
-            background: linear-gradient(to bottom, #3b82f6, #0ea5e9, #1e8e3e);
-            mask: linear-gradient(to bottom, white, white);
-            -webkit-mask: linear-gradient(to bottom, white, white);
-            animation: flowPulse 3s ease-in-out infinite;
-            opacity: 0.5
-        }
-
-        @keyframes flowPulse {
-            0% {
-                clip-path: inset(100% 0 0 0)
-            }
-
-            50% {
-                clip-path: inset(0 0 0 0)
-            }
-
-            100% {
-                clip-path: inset(0 0 100% 0)
-            }
-        }
-
-        .traffic-src {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 2
-        }
-
-        .t-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: .78rem;
-            color: #444746;
-            font-weight: 500;
-            cursor: default;
-            opacity: 0;
-            transform: var(--from);
-            transition: background .2s, border-color .2s, color .2s
-        }
-
-        .traffic-src.animate .t-tag {
-            animation: converge .7s cubic-bezier(.22, 1, .36, 1) forwards;
-            animation-delay: var(--d)
-        }
-
-        @keyframes converge {
-            0% {
-                opacity: 0;
-                transform: var(--from)
-            }
-
-            100% {
-                opacity: 1;
-                transform: translate(0, 0)
-            }
-        }
-
-        .t-tag .material-symbols-rounded {
-            font-size: 15px
-        }
-
-        .t-tag:hover {
-            background: #f1f3f4;
-            border-color: #cbd5e1;
-            color: #0f172a
-        }
-
-        .v-arrow {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 0;
-            color: #cbd5e1;
-            position: relative;
-            z-index: 2
-        }
-
-        .v-arrow svg {
-            width: 16px;
-            height: 20px
-        }
-
-        #funnelArrow1 {
-            opacity: 0;
-            transition: opacity .4s ease .8s
-        }
-
-        #funnelArrow1.show {
-            opacity: 1
-        }
-
-        .sales-card {
-            background: #0f172a;
-            color: #fff;
-            border-radius: 14px;
-            padding: 20px 28px;
-            text-align: center;
-            max-width: 300px;
-            margin: 0 auto 16px;
-            transition: all .3s;
-            cursor: default;
-            position: relative;
-            z-index: 2
-        }
-
-        .sales-card:hover {
-            transform: scale(1.03);
-            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2)
-        }
-
-        .sales-card.pulse {
-            animation: cardPulse .6s ease
-        }
-
-        @keyframes cardPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(59, 130, 246, .3)
-            }
-
-            70% {
-                box-shadow: 0 0 0 16px rgba(59, 130, 246, 0)
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0)
-            }
-        }
-
-        .sales-card h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 4px
-        }
-
-        .sales-card p {
-            font-size: .78rem;
-            opacity: .7
-        }
-
-        .v-step {
-            width: 100%;
-            position: relative;
-            z-index: 2
-        }
-
-        .v-card {
-            background: #fff;
-            border: 1.5px solid #dadce0;
-            border-radius: 14px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all .25s;
-            cursor: default
-        }
-
-        .v-card:hover {
-            transform: translateX(6px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-            border-color: transparent
-        }
-
-        .v-card .num {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            font-size: .72rem;
-            font-weight: 700;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0
-        }
-
-        .v-card .ico {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0
-        }
-
-        .v-card .ico .material-symbols-rounded {
-            font-size: 20px;
-            color: #fff
-        }
-
-        .v-card-body {
-            flex: 1;
-            min-width: 0
-        }
-
-        .v-card-body h4 {
-            font-size: .88rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 3px
-        }
-
-        .v-card-body .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px
-        }
-
-        .v-card-body .tag {
-            font-size: .68rem;
-            color: #80868b;
-            background: #f1f3f4;
-            padding: 2px 7px;
-            border-radius: 4px;
-            transition: background .2s
-        }
-
-        .v-card:hover .tag {
-            background: #dadce0
-        }
-
-        .v-card-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            flex-shrink: 0
-        }
-
-        .v-card-right .pg {
-            font-size: .66rem;
-            color: #cbd5e1
-        }
-
-        .fmt {
-            font-size: .63rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px
-        }
-
-        .fmt.onsite {
-            background: #ecfdf5;
-            color: #188038
-        }
-
-        .fmt.online {
-            background: #eff6ff;
-            color: #2563eb
-        }
-
-        .fmt.both {
-            background: #f8f9fa;
-            color: #444746
-        }
-
-        .v-conn {
-            width: 2px;
-            height: 16px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2
-        }
-
-        .v-label {
-            display: inline-flex;
-            font-size: .72rem;
-            font-weight: 600;
-            color: #80868b;
-            padding: 4px 14px;
-            border-radius: 6px;
-            background: #f8f9fa;
-            border: 1px dashed #dadce0;
-            margin: 10px auto 8px;
-            align-self: center;
-            position: relative;
-            z-index: 2
-        }
-
-        .c1 .num,
-        .c1 .ico {
-            background: linear-gradient(135deg, #3b82f6, #2563eb)
-        }
-
-        .c1:hover {
-            border-color: #93c5fd
-        }
-
-        .c2 .num,
-        .c2 .ico {
-            background: linear-gradient(135deg, #1a73e8, #1765cc)
-        }
-
-        .c2:hover {
-            border-color: #8ab4f8
-        }
-
-        .c3 .num,
-        .c3 .ico {
-            background: linear-gradient(135deg, #4285f4, #1a73e8)
-        }
-
-        .c3:hover {
-            border-color: #c4b5fd
-        }
-
-        .c4 .num,
-        .c4 .ico {
-            background: linear-gradient(135deg, #1e8e3e, #188038)
-        }
-
-        .c4:hover {
-            border-color: #6ee7b7
-        }
-
-        .c5 .num,
-        .c5 .ico {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7)
-        }
-
-        .c5:hover {
-            border-color: #7dd3fc
-        }
-
-        .c6 .num,
-        .c6 .ico {
-            background: linear-gradient(135deg, #f43f5e, #e11d48)
-        }
-
-        .c6:hover {
-            border-color: #fda4af
-        }
-
-        /* ══ Features ══ */
-        .features {
-            padding: 40px 0 60px
-        }
-
-        .feat {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: center;
-            padding: 48px 0;
-            border-top: 1px solid #f1f3f4
-        }
-
-        .feat:first-child {
-            border-top: none
-        }
-
-        .feat.rev {
-            direction: rtl
-        }
-
-        .feat.rev>* {
-            direction: ltr
-        }
-
-        .feat-text h3 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 12px;
-            line-height: 1.4
-        }
-
-        .feat-text p {
-            font-size: .9rem;
-            color: #444746;
-            line-height: 1.7;
-            margin-bottom: 16px
-        }
-
-        .feat-bullets {
-            list-style: none;
-            padding: 0;
-            margin: 0
-        }
-
-        .feat-bullets li {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            font-size: .85rem;
-            color: #1f1f1f;
-            margin-bottom: 8px;
-            line-height: 1.5
-        }
-
-        .feat-bullets li .material-symbols-rounded {
-            font-size: 18px;
-            color: #1e8e3e;
-            flex-shrink: 0;
-            margin-top: 2px
-        }
-
-        .feat-visual {
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            border-radius: 16px;
-            padding: 24px;
-            min-height: 280px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: all .3s
-        }
-
-        .feat-visual:hover {
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
-            transform: translateY(-3px)
-        }
-
-        /* Mock components */
-        .mock-slide {
-            background: #fff;
-            border-radius: 10px;
-            padding: 16px;
-            border: 1px solid #dadce0
-        }
-
-        .mock-slide-title {
-            font-size: .82rem;
-            font-weight: 700;
-            color: #1f1f1f;
-            margin-bottom: 12px;
-            text-align: center
-        }
-
-        .mock-poll {
-            display: flex;
-            flex-direction: column;
-            gap: 6px
-        }
-
-        .mock-poll-opt {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: #f1f3f4;
-            font-size: .78rem;
-            color: #1f1f1f;
-            position: relative;
-            overflow: hidden;
-            transition: all .2s
-        }
-
-        .mock-poll-opt:hover {
-            background: #dadce0
-        }
-
-        .mock-poll-bar {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            border-radius: 8px;
-            opacity: .12
-        }
-
-        .mock-poll-pct {
-            margin-left: auto;
-            font-weight: 600;
-            font-size: .75rem;
-            color: #444746
-        }
-
-        .mock-chips {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            justify-content: center;
-            flex-wrap: wrap
-        }
-
-        .mock-chip {
-            font-size: .68rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            border: 1px solid #dadce0;
-            color: #444746;
-            background: #fff;
-            transition: all .2s
-        }
-
-        .mock-chip:hover {
-            background: #f1f3f4;
-            border-color: #cbd5e1;
-            color: #0f172a
-        }
-
-        .mock-blocks {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 12px
-        }
-
-        .mock-blk {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #fff;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: .75rem;
-            color: #1f1f1f;
-            transition: all .2s;
-            cursor: default
-        }
-
-        .mock-blk:hover {
-            border-color: #93c5fd;
-            background: #f8f9fa
-        }
-
-        .mock-blk .material-symbols-rounded {
-            font-size: 16px;
-            color: #80868b
-        }
-
-        .mock-blk .grip {
-            color: #cbd5e1;
-            font-size: 14px;
-            margin-left: auto
-        }
-
-        .mock-email {
-            background: #fff;
-            border-radius: 10px;
-            padding: 16px 18px;
-            font-size: .78rem;
-            line-height: 1.7;
-            color: #1f1f1f;
-            border: 1px solid #dadce0
-        }
-
-        .mock-email-hd {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f1f3f4
-        }
-
-        .mock-email-av {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #0ea5e9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: .7rem;
-            font-weight: 700;
-            flex-shrink: 0
-        }
-
-        .mock-email-meta {
-            font-size: .72rem;
-            color: #80868b
-        }
-
-        .mock-email-meta strong {
-            color: #1f1f1f;
-            font-weight: 600
-        }
-
-        .mock-var {
-            background: #eff6ff;
-            color: #3b82f6;
-            padding: 1px 6px;
-            border-radius: 4px;
-            font-family: 'Menlo', monospace;
-            font-size: .72rem
-        }
-
-        .mock-email-sec {
-            font-weight: 600;
-            color: #444746;
-            margin: 10px 0 4px;
-            font-size: .75rem;
-            letter-spacing: .5px
-        }
-
-        .mock-dash {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px
-        }
-
-        .mock-dash-card {
-            background: #fff;
-            border-radius: 10px;
-            padding: 14px;
-            border: 1px solid #dadce0;
-            text-align: center;
-            transition: all .2s
-        }
-
-        .mock-dash-card:hover {
-            border-color: #93c5fd;
-            transform: translateY(-2px)
-        }
-
-        .mock-dash-num {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #0f172a
-        }
-
-        .mock-dash-label {
-            font-size: .72rem;
-            color: #80868b;
-            margin-top: 2px
-        }
-
-        .mock-prog-row {
-            grid-column: 1/-1;
-            background: #fff;
-            border-radius: 10px;
-            padding: 12px 14px;
-            border: 1px solid #dadce0
-        }
-
-        .mock-prog-lbl {
-            display: flex;
-            justify-content: space-between;
-            font-size: .75rem;
-            color: #444746;
-            margin-bottom: 6px
-        }
-
-        .mock-prog-bar {
-            height: 8px;
-            background: #f1f3f4;
-            border-radius: 4px;
-            overflow: hidden
-        }
-
-        .mock-prog-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width .8s ease
-        }
-
-        .mock-ai-flow {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap
-        }
-
-        .mock-file {
-            background: #fff;
-            border: 1.5px solid #dadce0;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            width: 100px;
-            transition: all .2s
-        }
-
-        .mock-file:hover {
-            border-color: #93c5fd;
-            transform: translateY(-2px)
-        }
-
-        .mock-file .material-symbols-rounded {
-            font-size: 28px;
-            color: #80868b
-        }
-
-        .mock-file p {
-            font-size: .7rem;
-            color: #80868b;
-            margin-top: 4px
-        }
-
-        .mock-arr {
-            color: #cbd5e1;
-            font-size: 1.4rem
-        }
-
-        .mock-gen {
-            background: linear-gradient(135deg, #f1f3f4, #eff6ff);
-            border: 1.5px solid #bfdbfe;
-            border-radius: 14px;
-            padding: 18px;
-            text-align: center;
-            width: 120px;
-            transition: all .25s
-        }
-
-        .mock-gen:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, .12)
-        }
-
-        .mock-gen .material-symbols-rounded {
-            font-size: 28px;
-            color: #3b82f6
-        }
-
-        .mock-gen p {
-            font-size: .72rem;
-            color: #3b82f6;
-            font-weight: 600;
-            margin-top: 4px
-        }
-
-        .mock-result {
-            background: #fff;
-            border: 1.5px solid #dadce0;
-            border-radius: 12px;
-            padding: 12px;
-            width: 140px;
-            transition: all .2s
-        }
-
-        .mock-result:hover {
-            border-color: #93c5fd;
-            transform: translateY(-2px)
-        }
-
-        .mock-result .mini-bar {
-            height: 6px;
-            border-radius: 3px;
-            margin-bottom: 4px
-        }
-
-        .mock-result .mini-text {
-            height: 4px;
-            border-radius: 2px;
-            margin-bottom: 3px;
-            background: #dadce0
-        }
-
-        .mock-result .mini-btn {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 4px;
-            background: #eff6ff;
-            font-size: .6rem;
-            color: #3b82f6;
-            font-weight: 600;
-            margin-top: 4px
-        }
-
-        /* ══ Team ══ */
-        .team-sec {
-            padding: 64px 0;
-            border-top: 1px solid #f1f3f4
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            max-width: 800px;
-            margin: 0 auto
-        }
-
-        .team-card {
-            text-align: center;
-            padding: 28px 20px;
-            border: 1px solid #dadce0;
-            border-radius: 16px;
-            background: #fff;
-            transition: all .3s
-        }
-
-        .team-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06)
-        }
-
-        .team-av {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            margin: 0 auto 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #fff
-        }
-
-        .team-card h4 {
-            font-size: .95rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 2px
-        }
-
-        .team-card .role {
-            font-size: .78rem;
-            color: #3b82f6;
-            font-weight: 600;
-            margin-bottom: 8px
-        }
-
-        .team-card p {
-            font-size: .78rem;
-            color: #444746;
-            line-height: 1.5
-        }
-
-        /* ══ Stats ══ */
-        .stats-bar {
-            padding: 48px 0;
-            background: #0f172a;
-            color: #fff
-        }
-
-        .stats-row {
-            display: flex;
-            justify-content: center;
-            gap: 64px;
-            flex-wrap: wrap
-        }
-
-        .stat-item {
-            text-align: center
-        }
-
-        .stat-num {
-            font-size: 2.2rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #3b82f6, #0ea5e9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent
-        }
-
-        .stat-lbl {
-            font-size: .78rem;
-            color: #80868b;
-            margin-top: 4px
-        }
-
-        /* ══ Pricing ══ */
-        .pricing {
-            padding: 64px 0;
-            border-top: 1px solid #f1f3f4
-        }
-
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto
-        }
-
-        .price-card {
-            background: #fff;
-            border: 1.5px solid #dadce0;
-            border-radius: 16px;
-            padding: 28px 24px;
-            text-align: center;
-            transition: all .3s;
-            position: relative
-        }
-
-        .price-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06)
-        }
-
-        .price-card.pop {
-            border-color: #3b82f6;
-            box-shadow: 0 4px 20px rgba(59, 130, 246, .12)
-        }
-
-        .price-pop-badge {
-            position: absolute;
-            top: -11px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #3b82f6;
-            color: #fff;
-            font-size: .68rem;
-            font-weight: 600;
-            padding: 3px 14px;
-            border-radius: 10px
-        }
-
-        .price-card h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1f1f1f;
-            margin-bottom: 8px
-        }
-
-        .price-val {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #0f172a;
-            margin-bottom: 4px
-        }
-
-        .price-val small {
-            font-size: .82rem;
-            font-weight: 500;
-            color: #80868b
-        }
-
-        .price-desc {
-            font-size: .78rem;
-            color: #80868b;
-            margin-bottom: 16px
-        }
-
-        .price-feat {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 20px;
-            text-align: left
-        }
-
-        .price-feat li {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: .8rem;
-            color: #1f1f1f;
-            padding: 5px 0
-        }
-
-        .price-feat li .material-symbols-rounded {
-            font-size: 16px;
-            color: #1e8e3e
-        }
-
-        .price-feat li.off {
-            color: #cbd5e1
-        }
-
-        .price-feat li.off .material-symbols-rounded {
-            color: #cbd5e1
-        }
-
-        .price-btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: .85rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all .2s;
-            text-decoration: none;
-            text-align: center
-        }
-
-        .price-btn.pri {
-            background: #0f172a;
-            color: #fff
-        }
-
-        .price-btn.pri:hover {
-            background: #1f1f1f;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, .15)
-        }
-
-        .price-btn.out {
-            background: #fff;
-            color: #1f1f1f;
-            border: 1.5px solid #dadce0
-        }
-
-        .price-btn.out:hover {
-            border-color: #80868b;
-            color: #0f172a
-        }
-
-        /* ══ FAQ ══ */
-        .faq {
-            padding: 64px 0;
-            border-top: 1px solid #f1f3f4
-        }
-
-        .faq-list {
-            max-width: 720px;
-            margin: 0 auto
-        }
-
-        .faq-item {
-            border-bottom: 1px solid #f1f3f4
-        }
-
-        .faq-q {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 0;
-            cursor: pointer;
-            font-size: .9rem;
-            font-weight: 600;
-            color: #0f172a;
-            transition: color .2s
-        }
-
-        .faq-q:hover {
-            color: #3b82f6
-        }
-
-        .faq-q .material-symbols-rounded {
-            font-size: 20px;
-            color: #80868b;
-            transition: transform .3s
-        }
-
-        .faq-item.open .faq-q .material-symbols-rounded {
-            transform: rotate(180deg)
-        }
-
-        .faq-a {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height .3s ease;
-            font-size: .85rem;
-            color: #444746;
-            line-height: 1.7
-        }
-
-        .faq-item.open .faq-a {
-            max-height: 200px
-        }
-
-        .faq-a-inner {
-            padding: 0 0 16px
-        }
-
-        /* ══ CTA ══ */
+            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 12px;
+            font-size: .92rem; font-weight: 600; background: #fff; color: #0f172a; text-decoration: none; border: 1.5px solid #e2e8f0; transition: all .25s; cursor: pointer;
+        }
+        .btn-ghost:hover { border-color: #94a3b8; background: #f8fafc; }
+        .btn-primary .material-symbols-outlined, .btn-ghost .material-symbols-outlined { font-size: 18px; }
+
+        /* Hero Stats */
+        .hero-stats { display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; }
+        .hero-stat { text-align: center; }
+        .hero-stat-num { font-size: 2rem; font-weight: 800; color: #0f172a; letter-spacing: -.03em; }
+        .hero-stat-label { font-size: .78rem; color: #94a3b8; margin-top: 4px; }
+
+        /* ═══ Section Common ═══ */
+        section { padding: 80px 0; }
+        .sec-header { text-align: center; margin-bottom: 48px; }
+        .sec-chip { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+        .sec-chip .material-symbols-outlined { font-size: 16px; }
+        .sec-header h2 { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: 12px; }
+        .sec-header p { font-size: 1rem; color: #64748b; max-width: 560px; margin: 0 auto; line-height: 1.7; }
+
+        /* ═══ Services ═══ */
+        .services { background: #f8fafc; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .svc-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px 24px;
+            transition: all .3s; cursor: default; position: relative; overflow: hidden;
+        }
+        .svc-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--svc-grad); opacity: 0; transition: opacity .3s;
+        }
+        .svc-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); border-color: transparent; }
+        .svc-card:hover::before { opacity: 1; }
+        .svc-icon {
+            width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px; font-size: 24px;
+        }
+        .svc-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+        .svc-card p { font-size: .85rem; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
+        .svc-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .svc-tag { font-size: .7rem; padding: 3px 10px; border-radius: 6px; background: #f1f5f9; color: #64748b; font-weight: 500; }
+
+        .svc-card:nth-child(1) { --svc-grad: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .svc-card:nth-child(1) .svc-icon { background: #eff6ff; color: #3b82f6; }
+        .svc-card:nth-child(2) { --svc-grad: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .svc-card:nth-child(2) .svc-icon { background: #f5f3ff; color: #8b5cf6; }
+        .svc-card:nth-child(3) { --svc-grad: linear-gradient(90deg, #059669, #34d399); }
+        .svc-card:nth-child(3) .svc-icon { background: #ecfdf5; color: #059669; }
+        .svc-card:nth-child(4) { --svc-grad: linear-gradient(90deg, #d97706, #fbbf24); }
+        .svc-card:nth-child(4) .svc-icon { background: #fffbeb; color: #d97706; }
+
+        /* ═══ Features (USP) ═══ */
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .feat-card {
+            border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px 28px;
+            position: relative; overflow: hidden; transition: all .3s; cursor: default;
+        }
+        .feat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); border-color: transparent; }
+        .feat-num {
+            position: absolute; top: -12px; right: 16px; font-size: 5rem; font-weight: 900;
+            color: rgba(59,130,246,.05); line-height: 1; pointer-events: none;
+        }
+        .feat-icon {
+            width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; font-size: 26px;
+        }
+        .feat-card:nth-child(1) .feat-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa); color: #fff; }
+        .feat-card:nth-child(2) .feat-icon { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: #fff; }
+        .feat-card:nth-child(3) .feat-icon { background: linear-gradient(135deg, #059669, #34d399); color: #fff; }
+        .feat-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+        .feat-card p { font-size: .88rem; color: #64748b; line-height: 1.7; }
+
+        /* ═══ Featured Programs ═══ */
+        .programs { background: #0f172a; color: #fff; }
+        .programs .sec-header h2 { color: #fff; }
+        .programs .sec-header p { color: #94a3b8; }
+        .programs .sec-chip { color: #60a5fa; }
+        .prog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .prog-card {
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
+            padding: 28px; transition: all .3s; cursor: default; position: relative; overflow: hidden;
+        }
+        .prog-card:hover { background: rgba(255,255,255,.08); transform: translateY(-2px); border-color: rgba(255,255,255,.15); }
+        .prog-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: .68rem; font-weight: 700; padding: 4px 12px; border-radius: 6px;
+            margin-bottom: 14px; text-transform: uppercase; letter-spacing: .05em;
+        }
+        .prog-card:nth-child(1) .prog-badge { background: rgba(59,130,246,.15); color: #60a5fa; }
+        .prog-card:nth-child(2) .prog-badge { background: rgba(16,185,129,.15); color: #34d399; }
+        .prog-card:nth-child(3) .prog-badge { background: rgba(245,158,11,.15); color: #fbbf24; }
+        .prog-card:nth-child(4) .prog-badge { background: rgba(139,92,246,.15); color: #a78bfa; }
+        .prog-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+        .prog-card > p { font-size: .85rem; color: #94a3b8; line-height: 1.7; margin-bottom: 16px; }
+        .prog-features { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+        .prog-features li {
+            font-size: .75rem; padding: 4px 12px; border-radius: 8px;
+            background: rgba(255,255,255,.06); color: #cbd5e1; font-weight: 500;
+        }
+
+        /* ═══ Social Proof / Numbers ═══ */
+        .proof { border-top: 1px solid #f1f5f9; }
+        .proof-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+        .proof-item { padding: 24px; }
+        .proof-num { font-size: 2.4rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: 4px; }
+        .proof-label { font-size: .85rem; color: #64748b; }
+        .proof-item:nth-child(1) .proof-num { color: #3b82f6; }
+        .proof-item:nth-child(2) .proof-num { color: #8b5cf6; }
+        .proof-item:nth-child(3) .proof-num { color: #059669; }
+        .proof-item:nth-child(4) .proof-num { color: #d97706; }
+
+        /* ═══ Clients ═══ */
+        .clients { background: #f8fafc; border-top: 1px solid #f1f5f9; }
+        .clients-label { text-align: center; font-size: .72rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 24px; }
+        .clients-row { display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .client-logo-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            opacity: .35; transition: all .25s; cursor: default;
+        }
+        .client-logo-item:hover { opacity: 1; transform: translateY(-2px); }
+        .client-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; color: #fff; }
+        .client-name { font-size: .7rem; color: #64748b; font-weight: 500; }
+
+        /* ═══ CTA ═══ */
         .cta {
-            padding: 64px 0;
-            text-align: center;
-            background: #f8f9fa;
-            border-radius: 24px;
-            margin: 40px auto;
-            max-width: 1100px
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #fff; text-align: center; padding: 80px 20px; position: relative; overflow: hidden;
+        }
+        .cta::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(59,130,246,.1) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(139,92,246,.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .cta-content { position: relative; z-index: 1; }
+        .cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -.03em; }
+        .cta p { font-size: 1rem; color: #94a3b8; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+        .cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn-cta {
+            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 12px;
+            font-size: .92rem; font-weight: 600; text-decoration: none; transition: all .25s; cursor: pointer; border: none;
+        }
+        .btn-cta-primary { background: #fff; color: #0f172a; }
+        .btn-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(255,255,255,.15); }
+        .btn-cta-ghost { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.2); }
+        .btn-cta-ghost:hover { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.05); }
+
+        /* ═══ Footer ═══ */
+        .footer { padding: 48px 0 32px; border-top: 1px solid #f1f5f9; }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; margin-bottom: 32px; flex-wrap: wrap; }
+        .footer-brand { max-width: 320px; }
+        .footer-brand-name { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .95rem; margin-bottom: 8px; }
+        .footer-brand-name img { width: 28px; height: 28px; border-radius: 6px; }
+        .footer-brand p { font-size: .82rem; color: #94a3b8; line-height: 1.6; }
+        .footer-links { display: flex; gap: 48px; }
+        .footer-col h4 { font-size: .72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+        .footer-col a { display: block; font-size: .82rem; color: #64748b; text-decoration: none; padding: 3px 0; transition: color .2s; }
+        .footer-col a:hover { color: #0f172a; }
+        .footer-bottom { text-align: center; font-size: .75rem; color: #cbd5e1; padding-top: 24px; border-top: 1px solid #f1f5f9; }
+
+        /* ═══ Responsive ═══ */
+        @media (max-width: 1024px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .prog-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 120px 20px 60px; }
+            .services-grid, .features-grid, .proof-grid { grid-template-columns: 1fr; }
+            .hero-stats { gap: 32px; }
+            .footer-top { flex-direction: column; }
+            .footer-links { gap: 24px; }
+            .clients-row { gap: 24px; }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 0 20px; }
+            .hero h1 { font-size: 1.7rem; }
+            .hero-actions { flex-direction: column; align-items: center; }
         }
 
-        .cta h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 8px
+        /* ═══ Animations ═══ */
+        .fade-up {
+            opacity: 0; transform: translateY(24px);
+            transition: opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1);
         }
-
-        .cta p {
-            font-size: .9rem;
-            color: #444746;
-            margin-bottom: 24px
-        }
-
-        .cta-btns {
-            display: flex;
-            gap: 12px;
-            justify-content: center
-        }
-
-        /* ══ Footer ══ */
-        .site-ft {
-            background: #0f172a;
-            color: #80868b;
-            padding: 48px 32px 24px
-        }
-
-        .ft-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 32px
-        }
-
-        .ft-brand h4 {
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 8px
-        }
-
-        .ft-brand p {
-            font-size: .78rem;
-            line-height: 1.6;
-            max-width: 280px
-        }
-
-        .ft-col h5 {
-            color: #dadce0;
-            font-size: .82rem;
-            font-weight: 600;
-            margin-bottom: 12px
-        }
-
-        .ft-col a {
-            display: block;
-            font-size: .78rem;
-            color: #80868b;
-            text-decoration: none;
-            padding: 3px 0;
-            transition: color .2s
-        }
-
-        .ft-col a:hover {
-            color: #fff
-        }
-
-        .ft-bottom {
-            max-width: 1100px;
-            margin: 0 auto;
-            border-top: 1px solid #1f1f1f;
-            padding-top: 20px;
-            margin-top: 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: .72rem
-        }
-
-        @media(max-width:768px) {
-            .ov {
-                padding: 0 16px
-            }
-
-            .hero {
-                padding: 60px 12px 40px
-            }
-
-            .hero h1 {
-                font-size: 1.6rem
-            }
-
-            .feat {
-                grid-template-columns: 1fr;
-                gap: 24px
-            }
-
-            .feat.rev {
-                direction: ltr
-            }
-
-            .hero-stats {
-                gap: 24px
-            }
-
-            .pain-grid {
-                grid-template-columns: 1fr
-            }
-
-            .pn-links {
-                display: none
-            }
-
-            .price-grid {
-                grid-template-columns: 1fr;
-                max-width: 360px
-            }
-
-            .ft-inner {
-                grid-template-columns: 1fr 1fr;
-                gap: 24px
-            }
-
-            .cta-btns {
-                flex-direction: column;
-                align-items: center
-            }
-
-            .team-grid {
-                grid-template-columns: 1fr
-            }
-
-            .stats-row {
-                gap: 32px
-            }
-
-            .hero-cta {
-                flex-direction: column;
-                align-items: center
-            }
-
-            #eras>div:nth-child(2) {
-                grid-template-columns: 1fr 1fr
-            }
-        }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 
-<body style="padding-top:60px;">
-    <!-- Nav -->
-    <nav class="pn" id="pubNav">
-        <a class="pn-brand" href="overview.html">
-            <span class="material-symbols-rounded">play_lesson</span>
-            數位簡報室<small>The Briefing Room</small>
+<body>
+    <!-- ═══ Navigation ═══ -->
+    <nav class="nav" id="mainNav" role="navigation" aria-label="主導覽列">
+        <a href="/" class="nav-brand">
+            <img src="assets/images/tbrlogo.png" alt="數位簡報室 Logo">
+            數位簡報室 <small>The Briefing Room</small>
         </a>
-        <div class="pn-links">
-            <a href="#services">服務項目</a>
-            <a href="#features">互動簡報</a>
-            <a href="#flow">學員旅程</a>
-            <a href="tools.html">免費工具</a>
-            <a href="claude.html">Claude 指南</a>
-            <a href="#pricing">方案價格</a>
-        </div>
-        <div class="pn-right">
-            <a class="pn-login" href="login.html"><span class="material-symbols-rounded">login</span> 登入</a>
-        </div>
+        <ul class="nav-links">
+            <li><a href="#services">服務項目</a></li>
+            <li><a href="#features">核心優勢</a></li>
+            <li><a href="#programs">主打方案</a></li>
+            <li><a href="consulting">企業諮詢</a></li>
+            <li><a href="affiliate-dashboard">合作夥伴</a></li>
+        </ul>
+        <a href="login" class="nav-cta">
+            <span class="material-symbols-outlined" style="font-size:16px;">login</span>
+            登入
+        </a>
     </nav>
 
-    <div>
-        <!-- ══ HERO ══ -->
-        <div class="hero">
-            <div class="hero-chip"><span class="material-symbols-rounded">auto_awesome</span> AI 時代的企業學習夥伴</div>
-            <h1>用 AI 重新定義<br><em>企業培訓與教學</em></h1>
-            <p>AI 企業內訓 × 互動教學簡報 × 免費 AI 工具箱 × AI Lobster 企業導入<br>從課程設計到成效追蹤，一站式解決方案。</p>
-            <div class="hero-cta">
-                <a class="btn-primary" href="#services"><span class="material-symbols-rounded">rocket_launch</span>
-                    探索服務項目</a>
-                <a class="btn-ghost" href="tools.html"><span class="material-symbols-rounded">construction</span>
-                    免費工具箱</a>
+    <!-- ═══ Hero ═══ -->
+    <header class="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <span class="material-symbols-outlined">auto_awesome</span>
+                台灣少數專注 AI 數位人才培訓的新創機構
+            </div>
+            <h1>
+                用 <em class="text-gradient">AI</em> 賦能組織<br>
+                從培訓到導入，一站搞定
+            </h1>
+            <p>
+                數位簡報室結合業界獨家互動簡報教學技術、堅強師資陣容與從公開課到企業導入的完整服務，助力企業與個人在 AI 時代脫穎而出。
+            </p>
+            <div class="hero-actions">
+                <a href="consulting" class="btn-primary">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    免費企業諮詢
+                </a>
+                <a href="#programs" class="btn-ghost">
+                    <span class="material-symbols-outlined">explore</span>
+                    探索課程方案
+                </a>
             </div>
             <div class="hero-stats">
-                <div>
-                    <div class="hero-stat-num">200+</div>
-                    <div class="hero-stat-label">場培訓</div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">50+</div>
+                    <div class="hero-stat-label">企業客戶</div>
                 </div>
-                <div>
-                    <div class="hero-stat-num">5,000+</div>
-                    <div class="hero-stat-label">位學員</div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">2,000+</div>
+                    <div class="hero-stat-label">培訓學員</div>
                 </div>
-                <div>
+                <div class="hero-stat">
                     <div class="hero-stat-num">98%</div>
                     <div class="hero-stat-label">滿意度</div>
                 </div>
-            </div>
-
-            <!-- Logos -->
-            <div class="logos">
-                <div class="logos-label">已有企業與講師信賴使用</div>
-                <div class="logos-row">
-                    <div class="logo-item">
-                        <div class="logo-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">台積</div>
-                        <div class="logo-name">台積電</div>
-                    </div>
-                    <div class="logo-item">
-                        <div class="logo-icon" style="background:linear-gradient(135deg,#f9ab00,#e37400)">鴻海</div>
-                        <div class="logo-name">鴻海科技</div>
-                    </div>
-                    <div class="logo-item">
-                        <div class="logo-icon" style="background:linear-gradient(135deg,#1e8e3e,#188038)">中華</div>
-                        <div class="logo-name">中華電信</div>
-                    </div>
-                    <div class="logo-item">
-                        <div class="logo-icon" style="background:linear-gradient(135deg,#4285f4,#1a73e8)">資策</div>
-                        <div class="logo-name">資策會</div>
-                    </div>
-                    <div class="logo-item">
-                        <div class="logo-icon" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">工研</div>
-                        <div class="logo-name">工研院</div>
-                    </div>
-                    <div class="logo-item">
-                        <div class="logo-icon" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">林</div>
-                        <div class="logo-name">林大涵 講師</div>
-                    </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">20+</div>
+                    <div class="hero-stat-label">專業講師</div>
                 </div>
             </div>
         </div>
+    </header>
 
-        <!-- ══ SERVICES ══ -->
-        <div class="ov" style="padding-top:64px;padding-bottom:64px;border-top:1px solid #f1f3f4" id="services">
-            <div class="sec-head">
-                <h2>四大核心服務</h2>
-                <p>從 AI 觀念導入到數位工具落地，一站式滿足企業 AI 轉型需求</p>
+    <!-- ═══ Services ═══ -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="sec-header fade-up">
+                <div class="sec-chip"><span class="material-symbols-outlined">category</span> 服務項目</div>
+                <h2>四大服務，涵蓋 AI 培訓全需求</h2>
+                <p>從個人學習到企業級導入，數位簡報室提供完整的 AI 人才培訓生態系統</p>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:960px;margin:0 auto">
-                <!-- Service 1: AI 企業內訓 -->
-                <div style="background:#fff;border:2px solid #3b82f6;border-radius:16px;padding:28px 24px;transition:all .3s;cursor:default;position:relative;box-shadow:0 4px 20px rgba(59,130,246,.08)"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(59,130,246,0.15)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(59,130,246,.08)'">
-                    <div style="position:absolute;top:-10px;right:16px;background:#3b82f6;color:#fff;font-size:.65rem;font-weight:600;padding:3px 12px;border-radius:10px">核心服務</div>
-                    <div style="font-size:2rem;margin-bottom:12px">🎓</div>
-                    <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:8px">AI 企業內訓</h3>
-                    <p style="font-size:.82rem;color:#444746;line-height:1.7;margin-bottom:12px">從 ChatGPT、Claude 到 Gemini，為企業量身打造 AI 應用培訓課程。涵蓋 Prompt 工程、Agentic 工作流、AI 寫作與數據分析等主題。</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px">
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#eff6ff;color:#2563eb">Prompt 工程</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#eff6ff;color:#2563eb">AI 工具實戰</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#eff6ff;color:#2563eb">Agentic 工作流</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#eff6ff;color:#2563eb">企業客製</span>
+            <div class="services-grid">
+                <article class="svc-card fade-up">
+                    <div class="svc-icon"><span class="material-symbols-outlined">school</span></div>
+                    <h3>公開課程（數位簡報室）</h3>
+                    <p>面向個人的 AI 技能提升公開班，涵蓋 ChatGPT、Claude、Gemini、圖像生成、自動化工作流等實戰主題。定期開班，小班制確保學習品質。</p>
+                    <div class="svc-tags">
+                        <span class="svc-tag">小班制教學</span>
+                        <span class="svc-tag">實作演練</span>
+                        <span class="svc-tag">北中南開班</span>
+                        <span class="svc-tag">線上/實體</span>
                     </div>
-                    <a href="claude.html" style="display:inline-flex;align-items:center;gap:4px;margin-top:16px;font-size:.78rem;font-weight:600;color:#2563eb;text-decoration:none">查看 Claude 教學指南 →</a>
-                </div>
-
-                <!-- Service 2: 互動教學簡報 -->
-                <div style="background:#fff;border:1.5px solid #dadce0;border-radius:16px;padding:28px 24px;transition:all .3s;cursor:default"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.06)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div style="font-size:2rem;margin-bottom:12px">📊</div>
-                    <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:8px">互動教學簡報系統</h3>
-                    <p style="font-size:.82rem;color:#444746;line-height:1.7;margin-bottom:12px">告別單向投影片。在簡報中嵌入即時互動元件（投票、測驗、連連看、排序、填空），學員用手機直接參與，講師即時掌握學習數據。</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px">
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#f1f3f4;color:#444746">7+ 互動元件</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#f1f3f4;color:#444746">即時同步</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#f1f3f4;color:#444746">學員追蹤</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#f1f3f4;color:#444746">AI 生成</span>
+                </article>
+                <article class="svc-card fade-up" style="animation-delay:.1s">
+                    <div class="svc-icon"><span class="material-symbols-outlined">forum</span></div>
+                    <h3>社群（數位茶水間）</h3>
+                    <p>專屬學員的 AI 學習社群，提供每週 AI 新知更新、實戰案例分享、業界專家 AMA。建立跨產業人脈網絡，持續學習成長。</p>
+                    <div class="svc-tags">
+                        <span class="svc-tag">每週更新</span>
+                        <span class="svc-tag">專家交流</span>
+                        <span class="svc-tag">案例分享</span>
+                        <span class="svc-tag">跨產業人脈</span>
                     </div>
-                    <a href="#features" style="display:inline-flex;align-items:center;gap:4px;margin-top:16px;font-size:.78rem;font-weight:600;color:#2563eb;text-decoration:none">查看功能特色 →</a>
-                </div>
-
-                <!-- Service 3: 免費 AI 工具箱 -->
-                <div style="background:#fff;border:1.5px solid #dadce0;border-radius:16px;padding:28px 24px;transition:all .3s;cursor:default"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.06)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div style="font-size:2rem;margin-bottom:12px">🛠️</div>
-                    <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:8px">免費 AI 工具箱</h3>
-                    <p style="font-size:.82rem;color:#444746;line-height:1.7;margin-bottom:12px">提供行銷與 HR 領域的 10 款實用工具，包含 UTM 產生器、QR Code、Email 評分、薪資試算、會議成本計算等，所有人免費使用。</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px">
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#ecfdf5;color:#059669">行銷 5 工具</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#ecfdf5;color:#059669">HR 5 工具</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:#ecfdf5;color:#059669">完全免費</span>
-                    </div>
-                    <a href="tools.html" style="display:inline-flex;align-items:center;gap:4px;margin-top:16px;font-size:.78rem;font-weight:600;color:#059669;text-decoration:none">立即使用工具箱 →</a>
-                </div>
-
-                <!-- Service 4: AI Lobster 企業導入 -->
-                <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border:1.5px solid #334155;border-radius:16px;padding:28px 24px;transition:all .3s;cursor:default;color:#fff"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div style="font-size:2rem;margin-bottom:12px">🦞</div>
-                    <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:8px">AI Lobster 企業導入</h3>
-                    <p style="font-size:.82rem;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:12px">為企業打造專屬的 AI 應用生態系。從需求評估、工具選型、流程自動化到一對一顧問服務，協助企業快速實現 AI 落地。</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px">
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8)">需求評估</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8)">流程自動化</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8)">顧問服務</span>
-                        <span style="font-size:.68rem;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8)">持續優化</span>
-                    </div>
-                    <a href="mailto:service@tbr.digital" style="display:inline-flex;align-items:center;gap:4px;margin-top:16px;font-size:.78rem;font-weight:600;color:#60a5fa;text-decoration:none">預約企業諮詢 →</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ WHY NOT PPT ══ -->
-        <div class="why ov">
-            <div class="sec-head">
-                <h2>為何不再使用傳統簡報工具？</h2>
-                <p>PowerPoint、Canva、Google 簡報、甚至 AI 簡報神器 Gamma — 都有同樣的問題</p>
-            </div>
-            <div class="why-tools">
-                <span class="why-tool">PowerPoint</span><span class="why-tool">Canva</span><span class="why-tool">Google
-                    簡報</span><span class="why-tool">Gamma</span><span class="why-tool">Keynote</span>
-            </div>
-            <div class="pain-grid">
-                <div class="pain-card"><span class="material-symbols-rounded">block</span>
-                    <div>
-                        <h4>只能單向展示</h4>
-                        <p>傳統簡報只能播放內容，無法讓學員即時互動、投票或作答</p>
-                    </div>
-                </div>
-                <div class="pain-card"><span class="material-symbols-rounded">assignment_late</span>
-                    <div>
-                        <h4>無法在簡報上提交作業</h4>
-                        <p>學員必須另外開表單、另外傳檔案，流程斷裂</p>
-                    </div>
-                </div>
-                <div class="pain-card"><span class="material-symbols-rounded">visibility_off</span>
-                    <div>
-                        <h4>無法確認學員是否跟上</h4>
-                        <p>講師不知道學員是否在同一頁，無法掌控教學節奏</p>
-                    </div>
-                </div>
-                <div class="pain-card"><span class="material-symbols-rounded">zoom_out</span>
-                    <div>
-                        <h4>坐遠看不清楚</h4>
-                        <p>投影片的字太小，後排學員只能瞇著眼看，影響學習體驗</p>
-                    </div>
-                </div>
-                <div class="pain-card"><span class="material-symbols-rounded">person_off</span>
-                    <div>
-                        <h4>無法個人化追蹤</h4>
-                        <p>不知道每位學員的學習狀況，無法針對個人給出回饋</p>
-                    </div>
-                </div>
-                <div class="pain-card"><span class="material-symbols-rounded">link_off</span>
-                    <div>
-                        <h4>數據無法串接</h4>
-                        <p>課前問卷、課中互動、課後測驗散落各處，無法整合分析</p>
-                    </div>
-                </div>
-            </div>
-            <div class="pain-bottom">
-                <p>「傳統簡報」是教學流程中的一個<em>斷點</em>。<br>我們需要的不只是投影片，而是一套<em>完整的教學系統</em>。</p>
-            </div>
-        </div>
-<!-- ══ ERAS ══ -->
-        <div class="ov" style="padding-top:64px;padding-bottom:64px;border-top:1px solid #f1f3f4" id="eras">
-            <div class="sec-head">
-                <h2>簡報的三個時代 — 與下一代</h2>
-                <p>從 PPT 誕生到現在，簡報工具經歷了四次典範轉移</p>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:960px;margin:0 auto">
-                <!-- Gen 1 -->
-                <div style="border:1.5px solid #dadce0;border-radius:16px;padding:24px 18px;text-align:center;transition:all .3s;cursor:default;background:#fff"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.06)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div
-                        style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f9ab00,#e37400);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-weight:800;font-size:.85rem">
-                        1st</div>
-                    <div style="font-size:.68rem;color:#80868b;margin-bottom:4px">2000s ─</div>
-                    <h4 style="font-size:.95rem;font-weight:700;color:#0f172a;margin-bottom:6px">PPT 時代</h4>
-                    <div style="font-size:.72rem;color:#444746;line-height:1.5;margin-bottom:12px">
-                        PowerPoint、Keynote<br>個人風格、單機作業</div>
-                    <div
-                        style="font-size:.7rem;text-align:left;padding:8px 10px;background:#fffbeb;border-radius:8px;margin-bottom:6px">
-                        <span style="color:#1e8e3e;font-weight:600">✓</span> <span
-                            style="color:#1f1f1f">熟悉度高、設計自由</span>
-                    </div>
-                    <div style="font-size:.7rem;text-align:left;padding:8px 10px;background:#fce8e6;border-radius:8px">
-                        <span style="color:#d93025;font-weight:600">✗</span> <span
-                            style="color:#1f1f1f">無法協作、無互動、資料不串接</span>
-                    </div>
-                </div>
-                <!-- Gen 2 -->
-                <div style="border:1.5px solid #dadce0;border-radius:16px;padding:24px 18px;text-align:center;transition:all .3s;cursor:default;background:#fff"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.06)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div
-                        style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#2563eb);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-weight:800;font-size:.85rem">
-                        2nd</div>
-                    <div style="font-size:.68rem;color:#80868b;margin-bottom:4px">2015s ─</div>
-                    <h4 style="font-size:.95rem;font-weight:700;color:#0f172a;margin-bottom:6px">協作時代</h4>
-                    <div style="font-size:.72rem;color:#444746;line-height:1.5;margin-bottom:12px">Canva、Google
-                        簡報<br>雲端協作、範本豐富
-                    </div>
-                    <div
-                        style="font-size:.7rem;text-align:left;padding:8px 10px;background:#eff6ff;border-radius:8px;margin-bottom:6px">
-                        <span style="color:#1e8e3e;font-weight:600">✓</span> <span
-                            style="color:#1f1f1f">多人協作、範本多、上手快</span>
-                    </div>
-                    <div style="font-size:.7rem;text-align:left;padding:8px 10px;background:#fce8e6;border-radius:8px">
-                        <span style="color:#d93025;font-weight:600">✗</span> <span
-                            style="color:#1f1f1f">仍是單向放映、無學員追蹤</span></div>
-                </div>
-                <!-- Gen 3 -->
-                <div style="border:1.5px solid #dadce0;border-radius:16px;padding:24px 18px;text-align:center;transition:all .3s;cursor:default;background:#fff"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.06)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div
-                        style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#4285f4,#1a73e8);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-weight:800;font-size:.85rem">
-                        3rd</div>
-                    <div style="font-size:.68rem;color:#80868b;margin-bottom:4px">2023 ─</div>
-                    <h4 style="font-size:.95rem;font-weight:700;color:#0f172a;margin-bottom:6px">AI 生成時代</h4>
-                    <div style="font-size:.72rem;color:#444746;line-height:1.5;margin-bottom:12px">Gamma、Canva
-                        AI、Manus<br>AI
-                        自動生成簡報</div>
-                    <div
-                        style="font-size:.7rem;text-align:left;padding:8px 10px;background:#f5f3ff;border-radius:8px;margin-bottom:6px">
-                        <span style="color:#1e8e3e;font-weight:600">✓</span> <span
-                            style="color:#1f1f1f">快速產出、降低設計門檻</span>
-                    </div>
-                    <div style="font-size:.7rem;text-align:left;padding:8px 10px;background:#fce8e6;border-radius:8px">
-                        <span style="color:#d93025;font-weight:600">✗</span> <span
-                            style="color:#1f1f1f">產出品質不穩、依然單向、無互動</span>
-                    </div>
-                </div>
-                <!-- Gen 4 -->
-                <div style="border:2px solid #3b82f6;border-radius:16px;padding:24px 18px;text-align:center;transition:all .3s;cursor:default;background:#f8f9fa;box-shadow:0 4px 20px rgba(59,130,246,.1);position:relative"
-                    onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(59,130,246,0.15)'"
-                    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(59,130,246,.1)'">
-                    <div
-                        style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;font-size:.65rem;font-weight:600;padding:3px 12px;border-radius:10px;white-space:nowrap">
-                        2026 ─ 下一代</div>
-                    <div
-                        style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#0f172a,#1f1f1f);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:#fff;font-weight:800;font-size:.85rem">
-                        4th</div>
-                    <div style="font-size:.68rem;color:#3b82f6;font-weight:600;margin-bottom:4px">NOW</div>
-                    <h4 style="font-size:.95rem;font-weight:700;color:#0f172a;margin-bottom:6px">互動 × 個人化</h4>
-                    <div style="font-size:.72rem;color:#444746;line-height:1.5;margin-bottom:12px">AI 數位簡報<br>台上台下共同完成
-                    </div>
-                    <div
-                        style="font-size:.7rem;text-align:left;padding:8px 10px;background:#eff6ff;border-radius:8px;margin-bottom:6px">
-                        <span style="color:#1e8e3e;font-weight:600">✓</span> <span
-                            style="color:#1f1f1f">即時互動、學員追蹤、個人化回饋</span>
-                    </div>
-                    <div style="font-size:.7rem;text-align:left;padding:8px 10px;background:#eff6ff;border-radius:8px">
-                        <span style="color:#1e8e3e;font-weight:600">✓</span> <span
-                            style="color:#1f1f1f">課前課後數據完整串接</span></div>
-                </div>
-            </div>
-            <div
-                style="text-align:center;margin-top:28px;padding:20px;background:#f8f9fa;border:1px solid #dadce0;border-radius:14px;max-width:680px;margin-left:auto;margin-right:auto">
-                <p style="font-size:.92rem;color:#1f1f1f;font-weight:600;line-height:1.6">2026
-                    年以後，簡報不再只是「播放投影片」。<br>它將成為講師與學員<span style="color:#3b82f6">共同參與、即時互動、個人化學習</span>的核心載體。</p>
-            </div>
-        </div><!-- ══ FEATURES ══ -->
-        <div class="features ov" id="features">
-            <div class="sec-head">
-                <h2>功能特色</h2>
-                <p>每一個環節都為教學而設計</p>
-            </div>
-            <div class="feat">
-                <div class="feat-text">
-                    <h3>互動化簡報系統</h3>
-                    <p>告別單向講課。在簡報中嵌入即時互動元件，學員用手機直接參與投票、測驗、連連看等活動，即時回收課堂數據。</p>
-                    <ul class="feat-bullets">
-                        <li><span class="material-symbols-rounded">check_circle</span> 7 種以上互動元件：投票、測驗、連連看、排序、填空、問答、作業
-                        </li>
-                        <li><span class="material-symbols-rounded">check_circle</span> WebSocket 即時同步，講師翻頁學員自動跟隨</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 可自訂區塊順序，拖曳排列教學流程</li>
-                    </ul>
-                </div>
-                <div class="feat-visual">
-                    <div class="mock-slide">
-                        <div class="mock-slide-title">你認為 AI 最大的優勢是？</div>
-                        <div class="mock-poll">
-                            <div class="mock-poll-opt">
-                                <div class="mock-poll-bar" style="width:68%;background:#3b82f6"></div>A. 提高工作效率<span
-                                    class="mock-poll-pct">68%</span>
-                            </div>
-                            <div class="mock-poll-opt">
-                                <div class="mock-poll-bar" style="width:20%;background:#1e8e3e"></div>B. 降低重複勞動<span
-                                    class="mock-poll-pct">20%</span>
-                            </div>
-                            <div class="mock-poll-opt">
-                                <div class="mock-poll-bar" style="width:8%;background:#f9ab00"></div>C. 激發創意思考<span
-                                    class="mock-poll-pct">8%</span>
-                            </div>
-                            <div class="mock-poll-opt">
-                                <div class="mock-poll-bar" style="width:4%;background:#f43f5e"></div>D. 數據分析能力<span
-                                    class="mock-poll-pct">4%</span>
-                            </div>
-                        </div>
-                        <div class="mock-chips"><span class="mock-chip">投票</span><span class="mock-chip">測驗</span><span
-                                class="mock-chip">連連看</span><span class="mock-chip">填空</span><span
-                                class="mock-chip">排序</span><span class="mock-chip">作業</span></div>
-                    </div>
-                    <div class="mock-blocks">
-                        <div class="mock-blk"><span class="material-symbols-rounded">text_fields</span> 文字區塊 <span
-                                class="material-symbols-rounded grip">drag_indicator</span></div>
-                        <div class="mock-blk"><span class="material-symbols-rounded">ballot</span> 投票互動 <span
-                                class="material-symbols-rounded grip">drag_indicator</span></div>
-                        <div class="mock-blk"><span class="material-symbols-rounded">image</span> 圖片區塊 <span
-                                class="material-symbols-rounded grip">drag_indicator</span></div>
-                    </div>
-                </div>
-            </div>
-            <div class="feat rev">
-                <div class="feat-text">
-                    <h3>個人化學員通知與課後摘要</h3>
-                    <p>根據每位學員的問卷、互動成績和回饋，自動生成個人化的學習摘要和課後回饋信件。</p>
-                    <ul class="feat-bullets">
-                        <li><span class="material-symbols-rounded">check_circle</span> 模板變數：姓名、公司、問卷回答等自動代入</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> AI 輔助撰寫，講師可審核編輯後發送</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 一鍵批次生成全班信件</li>
-                    </ul>
-                </div>
-                <div class="feat-visual">
-                    <div class="mock-email">
-                        <div class="mock-email-hd">
-                            <div class="mock-email-av">AI</div>
-                            <div class="mock-email-meta"><strong>課後回饋</strong><br>To: <span
-                                    class="mock-var">{{name}}</span>
-                            </div>
-                        </div>
-                        <span class="mock-var">{{name}}</span> 您好，<br><br>
-                        感謝參加「<span class="mock-var">{{course_name}}</span>」。<br>
-                        <div class="mock-email-sec">── 學習數據 ──</div>
-                        課前完成率：<span class="mock-var">{{checklist_pct}}</span>%・作業：<span
-                            class="mock-var">{{homework_count}}</span> 份・成績：<span
-                            class="mock-var">{{avg_score}}</span><br>
-                        <div class="mock-email-sec">── 個人化建議 ──</div>
-                        根據您提到想在「<span class="mock-var">{{ai_scenarios}}</span>」應用 AI...
-                    </div>
-                </div>
-            </div>
-            <div class="feat">
-                <div class="feat-text">
-                    <h3>從頭到尾的學員追蹤與學習品質</h3>
-                    <p>即時掌握每位學員的完整學習歷程：報名狀態、課前準備、課堂互動、課後測驗到滿意度。</p>
-                    <ul class="feat-bullets">
-                        <li><span class="material-symbols-rounded">check_circle</span> 報名、註冊、出席三階段狀態追蹤</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 課前清單、問卷完成進度即時監控</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 互動成績、作業繳交、考試結果全紀錄</li>
-                    </ul>
-                </div>
-                <div class="feat-visual">
-                    <div class="mock-dash">
-                        <div class="mock-dash-card">
-                            <div class="mock-dash-num" style="color:#3b82f6">32</div>
-                            <div class="mock-dash-label">學員人數</div>
-                        </div>
-                        <div class="mock-dash-card">
-                            <div class="mock-dash-num" style="color:#1e8e3e">87%</div>
-                            <div class="mock-dash-label">課前完成率</div>
-                        </div>
-                        <div class="mock-dash-card">
-                            <div class="mock-dash-num" style="color:#f9ab00">4.6</div>
-                            <div class="mock-dash-label">滿意度 / 5</div>
-                        </div>
-                        <div class="mock-dash-card">
-                            <div class="mock-dash-num" style="color:#f43f5e">9.1</div>
-                            <div class="mock-dash-label">NPS / 10</div>
-                        </div>
-                        <div class="mock-prog-row">
-                            <div class="mock-prog-lbl"><span>課前清單完成</span><span>28 / 32</span></div>
-                            <div class="mock-prog-bar">
-                                <div class="mock-prog-fill"
-                                    style="width:87.5%;background:linear-gradient(90deg,#3b82f6,#0ea5e9)"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="feat rev">
-                <div class="feat-text">
-                    <h3>AI 生成互動簡報</h3>
-                    <p>將講師的 PDF 或 PPT 匯入系統，AI 自動分析內容並生成包含互動元件的教學簡報，大幅節省備課時間。</p>
-                    <ul class="feat-bullets">
-                        <li><span class="material-symbols-rounded">check_circle</span> 支援 PDF、PPT 格式匯入</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> AI 自動辨識章節並生成互動投影片</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 可手動微調後一鍵發布</li>
-                    </ul>
-                </div>
-                <div class="feat-visual">
-                    <div class="mock-ai-flow">
-                        <div class="mock-file"><span class="material-symbols-rounded">picture_as_pdf</span>
-                            <p>講師.pdf</p>
-                        </div>
-                        <div class="mock-file"><span class="material-symbols-rounded">slideshow</span>
-                            <p>簡報.pptx</p>
-                        </div>
-                        <div class="mock-arr">→</div>
-                        <div class="mock-gen"><span class="material-symbols-rounded">auto_fix_high</span>
-                            <p>AI 分析</p>
-                        </div>
-                        <div class="mock-arr">→</div>
-                        <div class="mock-result">
-                            <div class="mini-bar" style="background:#3b82f6;width:80%"></div>
-                            <div class="mini-text" style="width:100%"></div>
-                            <div class="mini-text" style="width:70%"></div>
-                            <div class="mini-bar" style="background:#1e8e3e;width:50%;margin-top:6px"></div>
-                            <span class="mini-btn">互動投票</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ TEAM ══ -->
-        <div class="team-sec ov" id="team">
-            <div class="sec-head">
-                <h2>打造團隊</h2>
-                <p>我們的目標：讓所有講師與培訓界 HR 都能擁有一套全新的教學系統</p>
-            </div>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-av" style="background:linear-gradient(135deg,#0f172a,#1f1f1f)">D</div>
-                    <h4>樊松蒲 Dennis</h4>
-                    <div class="role">Founder</div>
-                    <p>課程製作的創業家，致力於用科技改變教育培訓產業</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-av" style="background:linear-gradient(135deg,#3b82f6,#0ea5e9)">Z</div>
-                    <h4>Zane</h4>
-                    <div class="role">AI 簡報課講師</div>
-                    <p>AI 簡報課程的專業講師，深入理解講師在教學現場的痛點</p>
-                </div>
-                <div class="team-card">
-                    <div class="team-av" style="background:linear-gradient(135deg,#f43f5e,#e11d48)">J</div>
-                    <h4>Joy</h4>
-                    <div class="role">營運主管</div>
-                    <p>負責產品營運，確保每一個功能都能真正解決用戶的問題</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ STATS ══ -->
-        <div class="stats-bar">
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-num">200+</div>
-                    <div class="stat-lbl">場次培訓</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num">5,000+</div>
-                    <div class="stat-lbl">學員使用</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num">50+</div>
-                    <div class="stat-lbl">合作講師</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num">98%</div>
-                    <div class="stat-lbl">滿意度</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ══ PRICING ══ -->
-        <div class="pricing ov" id="pricing">
-            <div class="sec-head">
-                <h2>選擇適合你的方案</h2>
-                <p>從個人學習到企業導入，满足不同規模的 AI 需求</p>
-            </div>
-            <div class="price-grid">
-                <div class="price-card">
-                    <h3>AI 公開課程培訓</h3>
-                    <div class="price-val">線上課程</div>
-                    <div class="price-desc">適合個人學習者、自學者、小型團隊</div>
-                    <ul class="price-feat">
-                        <li><span class="material-symbols-rounded">check_circle</span> AI 工具實戰課程</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> ChatGPT、Claude、Gemini 全解析</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> Prompt 工程與應用案例</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 互動式教學體驗</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 課後個人化學習報告</li>
-                    </ul>
-                    <a class="price-btn pri" href="https://tbr.digital" target="_blank">前往公開課程</a>
-                </div>
-                <div class="price-card pop">
-                    <span class="price-pop-badge">最受歡迎</span>
+                </article>
+                <article class="svc-card fade-up" style="animation-delay:.2s">
+                    <div class="svc-icon"><span class="material-symbols-outlined">apartment</span></div>
                     <h3>AI 企業內訓</h3>
-                    <div class="price-val">客製方案</div>
-                    <div class="price-desc">適合企業內部 AI 能力提升與團隊培訓</div>
-                    <ul class="price-feat">
-                        <li><span class="material-symbols-rounded">check_circle</span> 量身訂製培訓內容</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 實體 / 線上授課</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 互動式教學簡報系統</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> Agentic 工作流實作</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 培訓成效追蹤報告</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 課後持續支援</li>
+                    <p>為企業量身打造的 AI 培訓方案，根據產業特性與團隊需求客製課程內容。從基礎認知到進階應用，協助企業全面提升 AI 應用能力。</p>
+                    <div class="svc-tags">
+                        <span class="svc-tag">客製化課綱</span>
+                        <span class="svc-tag">產業專屬案例</span>
+                        <span class="svc-tag">到府培訓</span>
+                        <span class="svc-tag">成效追蹤</span>
+                    </div>
+                </article>
+                <article class="svc-card fade-up" style="animation-delay:.3s">
+                    <div class="svc-icon"><span class="material-symbols-outlined">engineering</span></div>
+                    <h3>AI 系統導入 · 專家派遣</h3>
+                    <p>提供 AI 專家進駐企業，協助評估、規劃、導入 AI 工具與流程。從 POC 概念驗證到全面部署，陪伴企業完成數位轉型。</p>
+                    <div class="svc-tags">
+                        <span class="svc-tag">專家進駐</span>
+                        <span class="svc-tag">POC 驗證</span>
+                        <span class="svc-tag">流程優化</span>
+                        <span class="svc-tag">長期顧問</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Features / USP ═══ -->
+    <section class="usp" id="features">
+        <div class="container">
+            <div class="sec-header fade-up">
+                <div class="sec-chip"><span class="material-symbols-outlined">verified</span> 核心優勢</div>
+                <h2>為什麼選擇數位簡報室？</h2>
+                <p>三大業界獨有優勢，讓學習效果最大化</p>
+            </div>
+            <div class="features-grid">
+                <article class="feat-card fade-up">
+                    <div class="feat-num">01</div>
+                    <div class="feat-icon"><span class="material-symbols-outlined">touch_app</span></div>
+                    <h3>業界獨家互動式簡報教學</h3>
+                    <p>自主研發的互動教學系統，讓每一堂課都不只是聽講。即時問答、情境模擬、協作白板、AI 助教 — 學員參與度提升 300%，知識留存率大幅提高。告別傳統單向 PPT，擁抱沉浸式學習體驗。</p>
+                </article>
+                <article class="feat-card fade-up" style="animation-delay:.1s">
+                    <div class="feat-num">02</div>
+                    <div class="feat-icon"><span class="material-symbols-outlined">rocket_launch</span></div>
+                    <h3>專注 AI · 數位人才培訓的新創</h3>
+                    <p>我們不是傳統教育機構，而是少數專注在 AI 與數位技能的新創團隊。緊跟 AI 最新發展，課程每月更新。從 Claude、GPT-4o 到最新多模態 AI，我們永遠走在技術前沿。</p>
+                </article>
+                <article class="feat-card fade-up" style="animation-delay:.2s">
+                    <div class="feat-num">03</div>
+                    <div class="feat-icon"><span class="material-symbols-outlined">groups</span></div>
+                    <h3>堅強師資，各領域專家</h3>
+                    <p>招攬來自科技業、金融業、製造業、行銷傳播等各領域的 AI 實戰專家。每位講師都具備豐富的企業導入經驗，用行業語言教會你在工作中真正用得上的 AI 技能。</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Featured Programs ═══ -->
+    <section class="programs" id="programs">
+        <div class="container">
+            <div class="sec-header fade-up">
+                <div class="sec-chip"><span class="material-symbols-outlined">star</span> 目前主打</div>
+                <h2>熱門方案推薦</h2>
+                <p>從入門到深度導入，找到最適合你的 AI 學習路徑</p>
+            </div>
+            <div class="prog-grid">
+                <article class="prog-card fade-up">
+                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">smart_toy</span> 熱門</div>
+                    <h3>Claude 企業導入課程</h3>
+                    <p>全方位掌握 Anthropic Claude 的企業級應用。從 Claude for Work 團隊版部署、Prompt Engineering 到 API 整合自動化，協助企業最大化 AI 生產力。</p>
+                    <ul class="prog-features">
+                        <li>Claude Pro 團隊部署</li>
+                        <li>進階 Prompt 技巧</li>
+                        <li>API 自動化</li>
+                        <li>資料安全與合規</li>
                     </ul>
-                    <a class="price-btn pri" href="javascript:void(0)" onclick="openInquiryForm('training')">填寫諮詢表單</a>
-                </div>
-                <div class="price-card">
-                    <h3>AI 系統導入</h3>
-                    <div class="price-val">專案報價</div>
-                    <div class="price-desc">適合企業 AI 流程自動化與系統整合</div>
-                    <ul class="price-feat">
-                        <li><span class="material-symbols-rounded">check_circle</span> AI 需求評估與診斷</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 工具選型與架構規劃</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> AI 流程自動化建置</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 一對一顧問輔導</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> AI 龍蝦生態系導入</li>
-                        <li><span class="material-symbols-rounded">check_circle</span> 定期成效檢視與優化</li>
+                </article>
+                <article class="prog-card fade-up" style="animation-delay:.1s">
+                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">apartment</span> 企業</div>
+                    <h3>AI 辦公室企業內訓</h3>
+                    <p>把 AI 帶進每個人的日常工作。涵蓋文件撰寫、數據分析、會議摘要、客服自動化等實際場景，讓每位員工都能用 AI 提升效率 2-5 倍。</p>
+                    <ul class="prog-features">
+                        <li>文件自動生成</li>
+                        <li>數據分析加速</li>
+                        <li>會議 AI 摘要</li>
+                        <li>客服自動化</li>
                     </ul>
-                    <a class="price-btn out" href="javascript:void(0)" onclick="openInquiryForm('integration')">填寫諮詢表單</a>
-                </div>
+                </article>
+                <article class="prog-card fade-up" style="animation-delay:.2s">
+                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">engineering</span> 顧問</div>
+                    <h3>AI 專家派遣計畫</h3>
+                    <p>不只是培訓，而是真正的 AI 導入。我們派遣資深 AI 專家進駐企業，從痛點分析、POC 驗證到全面部署，陪走企業 AI 轉型的每一步。</p>
+                    <ul class="prog-features">
+                        <li>需求診斷</li>
+                        <li>POC 概念驗證</li>
+                        <li>系統整合</li>
+                        <li>長期技術支援</li>
+                    </ul>
+                </article>
+                <article class="prog-card fade-up" style="animation-delay:.3s">
+                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">school</span> 公開班</div>
+                    <h3>AI 公開課程</h3>
+                    <p>固定開班的 AI 實戰課程，適合個人自我提升或企業派遣員工參加。業界獨家互動簡報教學，小班制確保每位學員都學得會、用得上。</p>
+                    <ul class="prog-features">
+                        <li>互動簡報教學</li>
+                        <li>小班制 15-30 人</li>
+                        <li>北中南場次</li>
+                        <li>課後社群支援</li>
+                    </ul>
+                </article>
             </div>
         </div>
+    </section>
 
-        <!-- ══ FAQ ══ -->
-        <div class="faq ov" id="faq">
-            <div class="sec-head">
-                <h2>常見問題</h2>
-                <p>關於 AI 數位簡報的常見疑問</p>
-            </div>
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-q">這套系統跟 PowerPoint 有什麼不同？<span class="material-symbols-rounded">expand_more</span>
-                    </div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">PowerPoint 只能單向播放投影片，學員無法互動。AI
-                            數位簡報讓學員用手機直接在簡報上投票、作答、提交作業，講師即時看到結果，而且所有數據自動串接到學員報告中。</div>
-                    </div>
+    <!-- ═══ Social Proof Numbers ═══ -->
+    <section class="proof">
+        <div class="container">
+            <div class="proof-grid fade-up">
+                <div class="proof-item">
+                    <div class="proof-num">50+</div>
+                    <div class="proof-label">合作企業客戶</div>
                 </div>
-                <div class="faq-item">
-                    <div class="faq-q">學員需要安裝 App 嗎？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">不需要。學員只要用手機掃 QR Code 或點連結，就能直接在瀏覽器中參與互動，不需要下載任何 App。</div>
-                    </div>
+                <div class="proof-item">
+                    <div class="proof-num">2,000+</div>
+                    <div class="proof-label">累計培訓學員</div>
                 </div>
-                <div class="faq-item">
-                    <div class="faq-q">支援多少人同時上課？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">系統使用 WebSocket 即時通訊技術，專業版支援無限學員同時在線。我們已在 200 人以上的企業培訓中穩定運行。</div>
-                    </div>
+                <div class="proof-item">
+                    <div class="proof-num">150+</div>
+                    <div class="proof-label">場次課程完成</div>
                 </div>
-                <div class="faq-item">
-                    <div class="faq-q">可以用在線上直播課程嗎？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">可以。系統同時支援實體課程與線上直播。學員無論在現場或遠端，都能透過手機即時參與互動，講師端也能同步看到所有人的回答。</div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q">AI 生成簡報的功能怎麼運作？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">上傳你的 PDF 或 PPT 檔案，AI
-                            會自動分析內容、辨識章節結構，並生成包含互動元件（投票、測驗等）的互動式投影片。你可以手動微調後直接發布使用。
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q">個人化信件是怎麼生成的？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">系統會整合每位學員的課前問卷、課堂互動成績、作業和滿意度資料，透過模板變數自動代入個人化內容。講師也可以用 AI 輔助撰寫，審核後批次發送。
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q">免費版有什麼限制？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">免費版可以建立 1 個專案、30 位學員，包含基本互動元件和課前問卷功能。如需 AI 生成簡報、個人化信件和學員追蹤儀表板，可升級到專業版。
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q">數據安全性如何保障？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">所有資料儲存在加密的雲端資料庫中，傳輸採用 HTTPS 加密。企業版客戶可選擇獨立部署，確保資料完全掌控。</div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q">可以跟現有的 HR 系統整合嗎？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">企業版提供 API 串接功能，可以與你的 HR 系統、LMS 或 CRM 整合。我們也支援 Webhook 自動同步購買和報名資料。
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-q">有提供教育訓練或客服支援嗎？<span class="material-symbols-rounded">expand_more</span></div>
-                    <div class="faq-a">
-                        <div class="faq-a-inner">專業版含線上客服支援。企業版提供專屬客服經理、到場教育訓練和 SLA 服務保障。所有版本都有線上使用說明可參考。</div>
-                    </div>
+                <div class="proof-item">
+                    <div class="proof-num">98%</div>
+                    <div class="proof-label">學員推薦意願</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- ══ CTA ══ -->
-        <div class="cta">
-            <h2>準備好讓團隊擁抱 AI 了嗎？</h2>
-            <p>免費註冊開始使用互動簡報，或聯繫我們安排企業 AI 內訓。</p>
-            <div class="cta-btns">
-                <a class="btn-primary" href="login.html"><span class="material-symbols-rounded">rocket_launch</span>
-                    免費開始使用</a>
-                <a class="btn-ghost" href="mailto:service@tbr.digital"><span
-                        class="material-symbols-rounded">mail</span>
-                    聯繫我們</a>
+    <!-- ═══ Clients ═══ -->
+    <section class="clients" aria-label="合作客戶">
+        <div class="container">
+            <div class="clients-label">受信賴的企業夥伴</div>
+            <div class="clients-row" id="clientLogos">
+                <div class="client-logo-item"><div class="client-icon" style="background:#1a73e8;">G</div><div class="client-name">Google</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#0078d4;">M</div><div class="client-name">Microsoft</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#ff6600;">蝦</div><div class="client-name">蝦皮購物</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#e21836;">F</div><div class="client-name">遠傳電信</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#00b900;">L</div><div class="client-name">LINE</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#ff5722;">台</div><div class="client-name">台灣大哥大</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#6366f1;">中</div><div class="client-name">中華電信</div></div>
+                <div class="client-logo-item"><div class="client-icon" style="background:#0ea5e9;">富</div><div class="client-name">富邦金控</div></div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- ══ FOOTER ══ -->
-    <footer class="site-ft">
-        <div class="ft-inner">
-            <div class="ft-brand">
-                <h4>數位簡報室</h4>
-                <p>The Briefing Room — AI 企業內訓、互動教學簡報、免費 AI 工具箱、AI Lobster 企業導入。</p>
-            </div>
-            <div class="ft-col">
-                <h5>產品</h5><a href="#services">服務項目</a><a href="#features">互動簡報</a><a href="tools.html">免費工具</a><a href="claude.html">Claude 指南</a>
-            </div>
-            <div class="ft-col">
-                <h5>支援</h5><a href="mailto:contact@example.com">聯繫我們</a><a href="#">使用說明</a><a href="#">API 文件</a>
-            </div>
-            <div class="ft-col">
-                <h5>法律</h5><a href="terms.html">服務條款</a><a href="privacy.html">隱私權政策</a>
+    <!-- ═══ CTA ═══ -->
+    <section class="cta">
+        <div class="cta-content fade-up">
+            <h2>準備好讓 AI 為你的團隊加速了嗎？</h2>
+            <p>不論是企業內訓、公開課程還是 AI 專家派遣，我們都有最適合的方案。立即預約免費諮詢，讓我們的專家為您量身規劃。</p>
+            <div class="cta-actions">
+                <a href="consulting" class="btn-cta btn-cta-primary">
+                    <span class="material-symbols-outlined" style="font-size:18px;">calendar_month</span>
+                    預約免費諮詢
+                </a>
+                <a href="https://lin.ee/wAi3y4P" target="_blank" class="btn-cta btn-cta-ghost">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                    LINE 即時諮詢
+                </a>
             </div>
         </div>
-        <div class="ft-bottom"><span>© 2026 AI 數位簡報. All rights reserved.</span><span>Made with ♡ in Taiwan</span></div>
+    </section>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-brand-name">
+                        <img src="assets/images/tbrlogo.png" alt="TBR">
+                        數位簡報室 The Briefing Room
+                    </div>
+                    <p>台灣少數專注 AI 與數位人才培訓的新創機構。結合業界獨家互動簡報技術，提供從公開課程到企業導入的完整 AI 培訓服務。</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>服務</h4>
+                        <a href="#services">公開課程</a>
+                        <a href="#services">企業內訓</a>
+                        <a href="#programs">AI 專家派遣</a>
+                        <a href="consulting">企業諮詢</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>資源</h4>
+                        <a href="affiliate-dashboard">合作夥伴</a>
+                        <a href="login">登入系統</a>
+                        <a href="https://lin.ee/wAi3y4P" target="_blank">LINE 聯繫</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>法律</h4>
+                        <a href="privacy">隱私權政策</a>
+                        <a href="terms">服務條款</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2025 數位簡報室 The Briefing Room (TBR Digital). All rights reserved.
+            </div>
+        </div>
     </footer>
 
     <script>
-        const nav = document.getElementById('pubNav');
-        window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 10) });
-        const funnel = document.getElementById('trafficFunnel');
-        const arrow1 = document.getElementById('funnelArrow1');
-        const salesCard = document.querySelector('.sales-card');
-        if (funnel) { const obs = new IntersectionObserver(e => { e.forEach(en => { if (en.isIntersecting) { funnel.classList.add('animate'); if (arrow1) setTimeout(() => arrow1.classList.add('show'), 600); if (salesCard) setTimeout(() => salesCard.classList.add('pulse'), 900); obs.unobserve(funnel) } }) }, { threshold: .3 }); obs.observe(funnel) }
-        document.querySelectorAll('.faq-q').forEach(q => { q.addEventListener('click', () => { q.parentElement.classList.toggle('open') }) });
+        // Nav scroll effect
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // Fade-up on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     </script>
-    <script src="scripts/inquiry-form.js"></script>
 </body>
 
 </html>
