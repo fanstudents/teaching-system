@@ -691,14 +691,56 @@
             btn.closest('.c-faq-item').classList.toggle('open');
         }
 
-        // Form submit
-        function submitBooking(e) {
+        // Supabase config (same as inquiry-form.js)
+        const SB_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+
+        // Form submit → Supabase
+        async function submitBooking(e) {
             e.preventDefault();
-            const fd = new FormData(e.target);
-            const data = Object.fromEntries(fd);
-            data.department = fd.getAll('department');
-            console.log('Booking:', data);
-            e.target.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:3rem;margin-bottom:16px">✅</div><h3 style="font-size:1.2rem;font-weight:700;margin-bottom:10px">預約已送出！</h3><p style="color:#4a4a68;font-size:.92rem;line-height:1.7">感謝您的預約，我們會在 24 小時內與您聯繫。<br>您也可以直接透過 <a href="https://lin.ee/rs72Zfm" target="_blank" style="color:#06c755;font-weight:600">LINE 官方客服</a> 聯繫我們。</p></div>';
+            const form = e.target;
+            const btn = form.querySelector('.c-form-submit');
+            const fd = new FormData(form);
+            const departments = fd.getAll('department');
+
+            btn.disabled = true;
+            btn.textContent = '送出中...';
+
+            const payload = {
+                name: fd.get('name') || '',
+                company: fd.get('company') || '',
+                email: fd.get('email') || '',
+                phone: fd.get('phone') || '',
+                inquiry_type: 'onsite-consulting',
+                team_size: fd.get('size') || '',
+                message: [
+                    fd.get('title') ? `職稱：${fd.get('title')}` : '',
+                    departments.length ? `希望改善部門：${departments.join('、')}` : '',
+                    fd.get('message') || ''
+                ].filter(Boolean).join('\n'),
+                source_page: 'consulting.html'
+            };
+
+            try {
+                const res = await fetch(`${SB_URL}/rest/v1/enterprise_inquiries`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SB_KEY,
+                        'Authorization': `Bearer ${SB_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(await res.text());
+
+                form.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:3rem;margin-bottom:16px">✅</div><h3 style="font-size:1.2rem;font-weight:700;margin-bottom:10px">預約已送出！</h3><p style="color:#4a4a68;font-size:.92rem;line-height:1.7">感謝您的預約，我們會在 24 小時內與您聯繫。<br>您也可以直接透過 <a href="https://lin.ee/rs72Zfm" target="_blank" style="color:#06c755;font-weight:600">LINE 官方客服</a> 聯繫我們。</p></div>';
+            } catch (err) {
+                console.error('Booking error:', err);
+                alert('送出失敗，請稍後再試或直接透過 LINE 聯繫我們');
+                btn.disabled = false;
+                btn.textContent = '送出預約';
+            }
         }
 
         // Smooth scroll for nav links
