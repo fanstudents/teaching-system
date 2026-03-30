@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 到府執行顧問服務 — 派遣 AI 專家直接進駐您的公司｜數位簡報室</title>
+    <meta name="description" content="數位簡報室 AI 到府執行顧問服務：派遣專業 AI 顧問進駐貴公司，根據現有系統與流程，在真實工作環境中手把手帶領種子員工落地 AI 與自動化工具。每週到府一次，培育最多 2 名種子員工，不需任何系統權限。">
+    <meta name="keywords" content="AI 顧問,AI 導入,企業 AI,到府服務,AI 執行顧問,AI 培訓,數位轉型,自動化,AI 落地,企業數位化">
+    <meta property="og:title" content="AI 到府執行顧問服務 — 數位簡報室">
+    <meta property="og:description" content="派遣 AI 專家直接進駐您的公司，在真實環境中手把手落地 AI。不上課、不講投影片，直接動手做。">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://teaching.fanstudents.com/consulting.html">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="styles/consulting-page.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "AI 到府執行顧問服務",
+        "provider": {
+            "@type": "Organization",
+            "name": "數位簡報室"
+        },
+        "description": "派遣 AI 專家進駐企業，根據現有系統與流程，手把手帶領種子員工落地 AI 與自動化工具",
+        "areaServed": "TW",
+        "serviceType": "AI 企業導入顧問"
+    }
+    </script>
+</head>
+
+<body class="consulting-page">
+
+    <!-- Navigation -->
+    <nav class="c-nav" id="mainNav">
+        <div class="c-nav-inner">
+            <a href="/" class="c-nav-logo">
+                <img src="favicon.png" alt="數位簡報室">
+                <span>數位簡報室</span>
+            </a>
+            <div class="c-nav-links">
+                <a href="#service" class="c-nav-link">服務內容</a>
+                <a href="#team" class="c-nav-link">專家團隊</a>
+                <a href="#faq" class="c-nav-link">常見問題</a>
+            </div>
+            <button class="c-nav-cta" onclick="openBooking()">預約諮詢</button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="c-hero">
+        <div class="c-hero-inner">
+            <div class="c-fade-up">
+                <div class="c-hero-badge">
+                    <span class="dot"></span>
+                    接受預約中
+                </div>
+                <h1>
+                    預約您的專屬<br>
+                    <span class="accent">到府 AI 執行顧問</span>
+                </h1>
+                <p class="c-hero-desc">
+                    線上諮詢後，根據貴公司現況派遣最適合的 AI 專家，直接進駐辦公室、坐在您指定的員工旁邊，不需要任何系統權限，<strong>在真實工作環境中手把手落地 AI</strong>。
+                </p>
+                <div class="c-hero-actions">
+                    <button class="c-btn-primary" onclick="openBooking()">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem">calendar_month</span>
+                        免費預約諮詢
+                    </button>
+                    <a href="https://lin.ee/rs72Zfm" target="_blank" rel="noopener" class="c-btn-line">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                        LINE 聯繫客服
+                    </a>
+                </div>
+            </div>
+            <div class="c-hero-visual c-fade-up">
+                <div class="c-hero-card">
+                    <div class="c-hero-card-stats">
+                        <div class="c-stat-item">
+                            <div class="c-stat-number">每週 1 次</div>
+                            <div class="c-stat-label">到府駐點頻率</div>
+                        </div>
+                        <div class="c-stat-item">
+                            <div class="c-stat-number">2 人</div>
+                            <div class="c-stat-label">專屬種子員工培育</div>
+                        </div>
+                        <div class="c-stat-item">
+                            <div class="c-stat-number">1+1</div>
+                            <div class="c-stat-label">專家 + PM 雙配置</div>
+                        </div>
+                        <div class="c-stat-item">
+                            <div class="c-stat-number">0 權限</div>
+                            <div class="c-stat-label">不需系統存取權</div>
+                        </div>
+                    </div>
+                    <div class="c-hero-card-info">
+                        <div class="icon">🎯</div>
+                        <div class="text">
+                            <strong>我們離開後，種子員工有能力獨立推動 AI 文化</strong><br>
+                            這不是教學，是進去執行
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Overview -->
+    <section class="c-section" id="service">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">服務概覽</div>
+                <h2 class="c-section-title">白話文：派 AI 專家到你公司，直接動手做</h2>
+                <p class="c-section-desc">
+                    我們會根據貴公司的現有系統、工作流程與經營困境，派遣最適合的 AI 專家到辦公室。專家會坐在您指定的關鍵員工旁邊，不需要取得任何系統權限，直接以旁觀指導的方式，帶領種子員工使用 AI 與自動化工具來改造工作流程。
+                </p>
+            </div>
+            <div class="c-service-highlights c-fade-up">
+                <div class="c-highlight-card">
+                    <div class="c-highlight-icon">🏢</div>
+                    <h3>到府進駐</h3>
+                    <p>AI 專家直接到貴公司辦公室，每週固定一次。不是遠端會議，是面對面坐在員工旁邊一起工作、一起解決問題。</p>
+                </div>
+                <div class="c-highlight-card">
+                    <div class="c-highlight-icon">🤝</div>
+                    <h3>雙人配置</h3>
+                    <p>每次派遣 1 名 AI 領域專家 + 1 名專案經理（PM），專家負責技術執行，PM 負責進度管控與跨部門溝通協調。</p>
+                </div>
+                <div class="c-highlight-card">
+                    <div class="c-highlight-icon">🌱</div>
+                    <h3>種子培育</h3>
+                    <p>集中火力培育最多 2 名種子員工——通常是老闆本人加上 1 名指定的關鍵員工。讓他們具備獨立推動 AI 的能力。</p>
+                </div>
+                <div class="c-highlight-card">
+                    <div class="c-highlight-icon">🔒</div>
+                    <h3>零權限模式</h3>
+                    <p>我們的專家不需要任何系統帳號或存取權限。所有操作由貴公司員工自行執行，專家在旁指導。資安零疑慮。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pain Points -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">為什麼你需要這個服務</div>
+                <h2 class="c-section-title">上完課、買了工具，然後呢？</h2>
+                <p class="c-section-desc">大多數企業的 AI 導入卡在「最後一哩路」——不是不想做，而是沒人願意把手弄髒來做事。</p>
+            </div>
+            <div class="c-pain-grid c-fade-up">
+                <div class="c-pain-card">
+                    <div class="c-pain-icon red">😤</div>
+                    <h3>培訓完，還是沒人動手</h3>
+                    <p>上完 AI 課程，員工覺得很棒，但回到崗位一切照舊。因為「學會」和「落地」之間，差了一整個執行鏈。培訓給的是知識，但企業缺的是有人真正去執行。</p>
+                </div>
+                <div class="c-pain-card">
+                    <div class="c-pain-icon orange">🔒</div>
+                    <h3>資安與流程是硬限制</h3>
+                    <p>公司有資安政策、內部系統、組織慣性。外面買的通用 AI 方案根本套不上去，要有人實際了解現場、在你公司的限制條件下設想具體做法才行。</p>
+                </div>
+                <div class="c-pain-card">
+                    <div class="c-pain-icon yellow">🤷</div>
+                    <h3>老闆想推、員工不知道怎麼做</h3>
+                    <p>AI 的可能性太多，員工無法判斷從哪裡開始。需要有經驗豐富的專家走進現場，直接看完流程後指出「從這裡改、用這個工具、這樣操作」。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">合作流程</div>
+                <h2 class="c-section-title">從諮詢到落地，只需四步</h2>
+                <p class="c-section-desc">整個流程設計以「最低門檻、最快落地」為核心。從初次諮詢到專家進駐，通常 1-2 週內即可啟動。</p>
+            </div>
+            <div class="c-steps c-fade-up">
+                <div class="c-step">
+                    <div class="c-step-icon">📞</div>
+                    <h3>線上諮詢</h3>
+                    <p>了解貴公司的產業特性、痛點與現有工作流程，評估最適合的 AI 導入方向與優先順序</p>
+                </div>
+                <div class="c-step">
+                    <div class="c-step-icon">🎯</div>
+                    <h3>配對專家</h3>
+                    <p>根據現況，從我們的專家團隊中派遣最適合的 AI 顧問與專案經理，針對貴公司產業量身配對</p>
+                </div>
+                <div class="c-step">
+                    <div class="c-step-icon">🏢</div>
+                    <h3>進駐執行</h3>
+                    <p>每週到辦公室一次，坐在種子員工旁邊，直接在貴公司的真實工作環境中動手改造流程</p>
+                </div>
+                <div class="c-step">
+                    <div class="c-step-icon">🚀</div>
+                    <h3>獨立運作</h3>
+                    <p>種子員工具備獨立推動的能力，能自主導入新流程，持續擴散 AI 文化到整個組織</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expert Team -->
+    <section class="c-section" id="team">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">專家團隊</div>
+                <h2 class="c-section-title">由業界實戰專家組成的顧問團隊</h2>
+                <p class="c-section-desc">我們的顧問團隊由計畫主持人 AI 實戰家樊松蒲領軍，集結各領域的 AI 應用專家。依據貴公司的產業與需求，配對最適合的專家進駐。</p>
+            </div>
+            <div class="c-team-grid c-fade-up">
+                <div class="c-team-card c-team-lead">
+                    <div class="c-team-avatar">
+                        <span class="c-team-avatar-text">樊</span>
+                    </div>
+                    <div class="c-team-badge-lead">計畫主持人</div>
+                    <h3>樊松蒲</h3>
+                    <p class="c-team-role">AI 實戰家 ／ 數位簡報室創辦人</p>
+                    <p class="c-team-desc">專精 AI 企業導入策略規劃、工作流程自動化、AI 工具整合應用。帶領 14 名專家團隊，已協助數十家企業完成 AI 落地。</p>
+                    <div class="c-team-tags">
+                        <span>AI 策略</span><span>流程改造</span><span>企業導入</span>
+                    </div>
+                </div>
+                <div class="c-team-card">
+                    <div class="c-team-avatar">
+                        <span class="c-team-avatar-text">J</span>
+                    </div>
+                    <h3>Jane</h3>
+                    <p class="c-team-role">AI 行銷應用專家</p>
+                    <p class="c-team-desc">擅長運用 AI 工具優化行銷流程，包含數據分析自動化、內容生成、社群經營效率提升與廣告投放優化。</p>
+                    <div class="c-team-tags">
+                        <span>行銷自動化</span><span>數據分析</span><span>內容策略</span>
+                    </div>
+                </div>
+                <div class="c-team-card">
+                    <div class="c-team-avatar">
+                        <span class="c-team-avatar-text">J</span>
+                    </div>
+                    <h3>Joy</h3>
+                    <p class="c-team-role">AI 營運效率專家</p>
+                    <p class="c-team-desc">專精企業內部營運流程的 AI 改造，從報表自動化到跨部門協作效率提升，善於在既有系統限制下找到最佳解。</p>
+                    <div class="c-team-tags">
+                        <span>營運優化</span><span>流程自動化</span><span>效率提升</span>
+                    </div>
+                </div>
+                <div class="c-team-card">
+                    <div class="c-team-avatar">
+                        <span class="c-team-avatar-text">C</span>
+                    </div>
+                    <h3>Cablate</h3>
+                    <p class="c-team-role">AI 技術整合專家</p>
+                    <p class="c-team-desc">專精 AI 工具串接與技術架構規劃，擅長將市面上的 AI 工具與企業現有系統整合，打造可持續運作的自動化工作流。</p>
+                    <div class="c-team-tags">
+                        <span>技術架構</span><span>系統整合</span><span>自動化工具</span>
+                    </div>
+                </div>
+            </div>
+            <p class="c-team-note c-fade-up">以上為部分核心成員，完整團隊共 14 名各領域 AI 應用專家。<br>我們會根據貴公司的產業、部門與具體需求，配對最適合的專家組合。</p>
+        </div>
+    </section>
+
+    <!-- Why Not Training -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">我們的不同</div>
+                <h2 class="c-section-title">這不是培訓，是進去執行</h2>
+                <p class="c-section-desc">我們不上課、不講投影片。<strong>派人進去，面對你公司的真實限制，直接動手</strong>。</p>
+            </div>
+            <div class="c-diff-grid c-fade-up">
+                <div class="c-diff-card">
+                    <div class="c-diff-icon blue">🛡️</div>
+                    <div class="c-diff-content">
+                        <h3>零權限，零風險</h3>
+                        <p>不需要任何系統帳號或存取權限。我們的專家坐在員工旁邊，用指導的方式協作，資安完全不受影響。對於有嚴格資安規範的企業來說，這是最安全的 AI 導入方式。</p>
+                    </div>
+                </div>
+                <div class="c-diff-card">
+                    <div class="c-diff-icon green">🌱</div>
+                    <div class="c-diff-content">
+                        <h3>培養種子，不怕離職</h3>
+                        <p>最多培養 2 名種子員工（老闆本人 + 1 名指定員工）。為什麼是「最多 2 個人」？因為員工可能離職。集中火力在最關鍵的人身上，確保組織核心能力不流失。</p>
+                    </div>
+                </div>
+                <div class="c-diff-card">
+                    <div class="c-diff-icon purple">🔍</div>
+                    <div class="c-diff-content">
+                        <h3>面對真實限制</h3>
+                        <p>直接面對公司的生態限制、資安門檻、組織障礙。在真實的情況下設計 AI 導入的具體做法，不是在教室裡紙上談兵。每家公司的限制不同，所以解法也不同。</p>
+                    </div>
+                </div>
+                <div class="c-diff-card">
+                    <div class="c-diff-icon amber">📅</div>
+                    <div class="c-diff-content">
+                        <h3>每週一次，持續推進</h3>
+                        <p>不是一次性活動。每週到辦公室一次，確保執行不中斷，問題即時解決，成果持續累積。這種「陪伴式」的執行方式，才能讓改變真正發生。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">服務比較</div>
+                <h2 class="c-section-title">為什麼不是培訓？因為培訓完還是沒人做事</h2>
+            </div>
+            <div class="c-compare-table c-fade-up">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>一般 AI 培訓</th>
+                            <th class="highlight">AI 到府執行顧問 ✦</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="label">形式</td>
+                            <td>講課、投影片、工作坊</td>
+                            <td class="highlight">專家進駐辦公室，面對面協作</td>
+                        </tr>
+                        <tr>
+                            <td class="label">產出</td>
+                            <td>學到知識與概念</td>
+                            <td class="highlight">直接在公司環境中做出可用的成果</td>
+                        </tr>
+                        <tr>
+                            <td class="label">持續性</td>
+                            <td>一次性或短期課程</td>
+                            <td class="highlight">每週一次，持續陪伴直到獨立運作</td>
+                        </tr>
+                        <tr>
+                            <td class="label">客製化</td>
+                            <td>通用課程內容</td>
+                            <td class="highlight">完全針對貴公司流程與限制設計</td>
+                        </tr>
+                        <tr>
+                            <td class="label">資安</td>
+                            <td>可能需要範例資料</td>
+                            <td class="highlight">零權限模式，資安零風險</td>
+                        </tr>
+                        <tr>
+                            <td class="label">結果</td>
+                            <td>員工學完還是不知道怎麼開始</td>
+                            <td class="highlight">種子員工能獨立推動 AI 文化</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Case Example -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-example-box c-fade-up">
+                <div>
+                    <div class="c-example-title">實際案例場景</div>
+                    <h3>行銷部門<br>AI 落地改造</h3>
+                    <p style="font-size:.92rem;color:var(--c-text-secondary);line-height:1.7;margin-bottom:20px">
+                        以行銷部門為例，我們的專家會直接進去跟關鍵種子一起協作，在真實的行銷工作中導入 AI 工具：
+                    </p>
+                    <ul class="c-example-list">
+                        <li><span class="check">✓</span><span>現場打造超高效率的<strong>行銷報表自動化</strong>，3 小時的工作壓縮到 15 分鐘</span></li>
+                        <li><span class="check">✓</span><span>優化<strong>轉換漏斗</strong>分析流程，數據到洞察的速度提升 10 倍</span></li>
+                        <li><span class="check">✓</span><span>重塑<strong>素材製作</strong>流程，用 AI 工具把產出時間壓縮到 1/3</span></li>
+                        <li><span class="check">✓</span><span>建立可複製的 <strong>SEO 優化流程</strong>，種子員工能完全獨立操作</span></li>
+                    </ul>
+                </div>
+                <div class="c-example-visual">
+                    <div class="c-example-visual-item">
+                        <div class="icon" style="background:#eff6ff">📊</div>
+                        <div><div class="label">行銷報表</div><div class="desc">3 小時 → 15 分鐘自動化產出</div></div>
+                    </div>
+                    <div class="c-example-visual-item">
+                        <div class="icon" style="background:#ecfdf5">🎨</div>
+                        <div><div class="label">素材製作</div><div class="desc">AI 輔助設計，產量提升 3 倍</div></div>
+                    </div>
+                    <div class="c-example-visual-item">
+                        <div class="icon" style="background:#fff7ed">🔍</div>
+                        <div><div class="label">SEO 優化</div><div class="desc">建立標準化流程，員工可獨立執行</div></div>
+                    </div>
+                    <div class="c-example-visual-item">
+                        <div class="icon" style="background:#f5f3ff">📈</div>
+                        <div><div class="label">轉換漏斗</div><div class="desc">數據分析自動化，即時優化決策</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Applicable Departments -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">適用範圍</div>
+                <h2 class="c-section-title">不只行銷，各部門都能導入</h2>
+                <p class="c-section-desc">我們的 AI 執行顧問服務涵蓋企業各主要部門。無論您想從哪個部門開始，我們都能派遣對應領域的專家。</p>
+            </div>
+            <div class="c-dept-grid c-fade-up">
+                <div class="c-dept-card">
+                    <span class="c-dept-emoji">📢</span>
+                    <h3>行銷部門</h3>
+                    <p>報表自動化、內容生成、SEO 優化、素材製作、社群經營、廣告投放效率提升</p>
+                </div>
+                <div class="c-dept-card">
+                    <span class="c-dept-emoji">💼</span>
+                    <h3>業務部門</h3>
+                    <p>客戶管理自動化、報價流程優化、銷售數據分析、客戶溝通效率提升</p>
+                </div>
+                <div class="c-dept-card">
+                    <span class="c-dept-emoji">👥</span>
+                    <h3>人資行政</h3>
+                    <p>招募流程自動化、員工資料管理、出勤報表、行政文書處理效率化</p>
+                </div>
+                <div class="c-dept-card">
+                    <span class="c-dept-emoji">🎧</span>
+                    <h3>客服部門</h3>
+                    <p>智能客服建置、常見問題自動回覆、客訴分類處理、服務品質數據追蹤</p>
+                </div>
+                <div class="c-dept-card">
+                    <span class="c-dept-emoji">📊</span>
+                    <h3>財務會計</h3>
+                    <p>財務報表自動化、發票處理流程、費用核銷效率提升、數據視覺化</p>
+                </div>
+                <div class="c-dept-card">
+                    <span class="c-dept-emoji">⚙️</span>
+                    <h3>產品研發</h3>
+                    <p>市場調研分析、競品監測自動化、用戶反饋整理、開發流程效率化</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Message -->
+    <section class="c-key-message c-fade-up">
+        <div class="c-key-message-inner">
+            <h2>我們離開後，<br>種子員工有能力獨立推動 AI 文化</h2>
+            <p>關鍵不是「會不會 AI」，而是有沒有人在真實場景中，帶著你的員工真正做過一次。<br>做過了，就會了。會了，就能擴散到整個組織。</p>
+            <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+                <button class="c-btn-primary" onclick="openBooking()" style="background:#fff;color:#1a1a2e">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem">calendar_month</span>
+                    立即預約免費諮詢
+                </button>
+                <a href="https://lin.ee/rs72Zfm" target="_blank" rel="noopener" class="c-btn-line">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:22px;height:22px"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                    LINE 官方客服
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="c-section" id="faq">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">常見問題</div>
+                <h2 class="c-section-title">關於 AI 到府執行顧問，你可能想問</h2>
+            </div>
+            <div class="c-faq-list c-fade-up">
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>為什麼最多只帶 2 個人？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>因為員工可能離職。我們集中資源在最關鍵的 1-2 人身上，確保他們真正學會、能獨立運作。通常是老闆本人加上一名指定的關鍵種子員工。如果兩人都學會了，他們就能再往下傳授給其他同事。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>跟一般 AI 培訓有什麼不同？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>培訓是「教完就走」，你的員工學了知識、但還是得有人把手弄髒來實作。我們是「進去執行」——直接面對你的系統、流程、限制，動手做出來，同時教會種子員工。培訓給知識，我們給落地能力。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>需要給專家公司系統的權限嗎？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>完全不需要。我們的專家坐在您指定的員工旁邊，透過旁觀指導的方式協作。所有操作都由貴公司員工自行執行，專家不會碰到任何公司資料或系統。這是我們刻意設計的「零權限模式」，讓資安完全零風險。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>多久去一次？一次待多久？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>每週到辦公室一次，每次依據實際需求安排時長。持續的頻率確保進度不中斷，問題能在下一次到訪前就被記錄並規劃好解決方案。週期性的進駐比一次性集訓更有效。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>適合什麼規模的公司？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>從 5 人新創到百人中型企業都適合。我們會在初次諮詢時評估貴公司的規模與需求，配對最適合的專家組合。重點不在規模，而在是否有明確想改善的流程和負責推動的種子人選。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>費用怎麼計算？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>費用依據服務規模、產業難度與合作週期而定。我們會在免費諮詢後，根據貴公司的具體需求提供客製化報價。歡迎先預約諮詢，讓我們了解您的需求再報價。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>合作期間大概多久？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>視導入範圍而定，通常短則 4-6 週、長則 3-6 個月。目標是讓種子員工能夠獨立運作，不依賴我們的專家。一旦種子員工具備獨立推動能力，合作就可以結束。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>如果種子員工離職怎麼辦？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>這正是我們建議培育 2 名種子的原因。即使其中一人離職，另一人仍能維持 AI 文化的推動。此外，我們在合作過程中會建立標準化流程文件，讓新進人員也能快速上手。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>你們會用什麼 AI 工具？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>我們不綁定特定工具。會根據貴公司的需求、預算、資安規範，選擇最合適的 AI 工具組合。可能是 ChatGPT、Claude、Gemini 等大型語言模型，也可能是 Zapier、Make 等自動化工具，或是產業專用的 AI 解決方案。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>只有台北能服務嗎？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>我們的服務不限台北。北中南皆可安排，具體服務範圍與交通費用會在諮詢時一併說明。如果距離較遠，也可以搭配線上遠端的混合模式。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>可以只先做一個部門試試看嗎？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>當然可以。我們建議先從最有痛點的部門開始，快速看到成效後再擴展到其他部門。很多客戶就是從一個部門的成功經驗開始，逐步擴展到全公司的 AI 導入。</p></div>
+                </div>
+                <div class="c-faq-item">
+                    <button class="c-faq-q" onclick="toggleFaq(this)">
+                        <h3>我的員工完全不懂 AI，可以嗎？</h3><span class="arrow">▼</span>
+                    </button>
+                    <div class="c-faq-a"><p>完全沒問題。我們的服務本來就是針對「不知道怎麼開始」的企業設計的。專家會從員工最熟悉的日常工作出發，循序漸進地導入 AI 工具。不需要任何技術背景，只需要願意嘗試的心態。</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Service Description for SEO -->
+    <section class="c-section">
+        <div class="c-section-inner">
+            <div class="c-fade-up">
+                <div class="c-section-label">深入了解</div>
+                <h2 class="c-section-title">AI 到府執行顧問服務——完整說明</h2>
+            </div>
+            <div class="c-article c-fade-up">
+                <h3>什麼是「AI 到府執行顧問」？</h3>
+                <p>AI 到府執行顧問是由數位簡報室推出的企業級 AI 導入服務。有別於傳統的 AI 培訓課程或線上工作坊，我們採取「專家進駐」的模式——實際派遣經驗豐富的 AI 應用專家到貴公司辦公室，在您的真實工作環境中，與指定的種子員工一起工作，直接改造現有的工作流程。</p>
+
+                <h3>為什麼選擇「進駐執行」而非「培訓教學」？</h3>
+                <p>根據我們過去協助數十家企業的經驗，AI 培訓的最大問題在於「學完不知道怎麼做」。員工上完課覺得很棒，但回到日常工作中，面對公司特有的系統限制、資安規範、組織慣性，完全不知道如何將課堂上學到的知識應用到自己的工作中。</p>
+                <p>進駐執行的優勢在於，我們的專家會直接看到貴公司的「真實情況」——包括現有系統的限制、部門間的溝通障礙、員工的實際技能水平。在這些真實條件下，專家會找出最可行的 AI 導入方案，而不是給一個「理想狀態」的建議。</p>
+
+                <h3>「零權限模式」是什麼意思？</h3>
+                <p>資安是許多企業導入 AI 最大的顧慮之一。我們的「零權限模式」意味著：AI 專家在進駐期間不需要登入貴公司的任何系統、不需要存取任何公司資料、不需要取得任何帳號密碼。專家會坐在員工旁邊，透過口頭指導和示範（使用自己的設備），引導員工在自己的電腦上操作。所有資料和操作的主控權完全在貴公司手上。</p>
+
+                <h3>為什麼只培養「最多 2 人」？</h3>
+                <p>這是基於實務經驗的策略選擇。首先，員工可能離職，如果只培養一個人，一旦離職，所有投入就歸零。培養兩個人可以分散風險。其次，AI 導入需要「深度」而非「廣度」——與其讓 20 個人都懂一點皮毛，不如讓 2 個人完全精通、能獨立操作。這 2 個人成為組織內的「AI 推動者」，再向其他同事傳授經驗。</p>
+
+                <h3>合作結束後會發生什麼？</h3>
+                <p>我們的目標是讓種子員工具備「獨立推動 AI 文化」的能力。合作結束後，種子員工不只會使用 AI 工具，更能夠主動發現新的 AI 應用場景、教導其他同事、持續優化工作流程。這才是真正的 AI 文化落地。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="c-cta-section">
+        <div class="c-cta-inner c-fade-up">
+            <h2>準備好讓 AI 真正落地了嗎？</h2>
+            <p>歡迎預約免費諮詢，讓我們了解貴公司的需求，規劃最適合的專家組合。<br>或直接透過 LINE 官方客服與我們聯繫，我們會在 24 小時內回覆您。</p>
+            <div class="c-cta-buttons">
+                <button class="c-btn-primary" onclick="openBooking()">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem">calendar_month</span>
+                    預約免費諮詢
+                </button>
+                <a href="https://lin.ee/rs72Zfm" target="_blank" rel="noopener" class="c-btn-line">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:22px;height:22px"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                    LINE 官方客服
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="c-footer">
+        <p>© 2025 數位簡報室 — AI 培訓 / 導入機構｜<a href="privacy.html" style="color:inherit">隱私政策</a>｜<a href="terms.html" style="color:inherit">服務條款</a></p>
+    </footer>
+
+    <!-- Booking Modal -->
+    <div class="c-modal-overlay" id="bookingModal">
+        <div class="c-modal">
+            <div class="c-modal-header">
+                <div>
+                    <h2>預約免費諮詢</h2>
+                    <p>我們會在 24 小時內與您聯繫</p>
+                </div>
+                <button class="c-modal-close" onclick="closeBooking()">✕</button>
+            </div>
+            <div class="c-modal-body">
+                <form id="bookingForm" onsubmit="submitBooking(event)">
+                    <div class="c-form-row">
+                        <div class="c-form-group">
+                            <label>聯絡人姓名 <span class="req">*</span></label>
+                            <input type="text" class="c-form-input" name="name" required placeholder="例：王大明">
+                        </div>
+                        <div class="c-form-group">
+                            <label>職稱</label>
+                            <input type="text" class="c-form-input" name="title" placeholder="例：行銷總監">
+                        </div>
+                    </div>
+                    <div class="c-form-row">
+                        <div class="c-form-group">
+                            <label>公司名稱 <span class="req">*</span></label>
+                            <input type="text" class="c-form-input" name="company" required placeholder="貴公司全名">
+                        </div>
+                        <div class="c-form-group">
+                            <label>公司規模</label>
+                            <select class="c-form-select" name="size">
+                                <option value="">請選擇</option>
+                                <option>1-10 人</option>
+                                <option>11-50 人</option>
+                                <option>51-200 人</option>
+                                <option>200 人以上</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="c-form-row">
+                        <div class="c-form-group">
+                            <label>電話 <span class="req">*</span></label>
+                            <input type="tel" class="c-form-input" name="phone" required placeholder="09xx-xxx-xxx">
+                        </div>
+                        <div class="c-form-group">
+                            <label>Email</label>
+                            <input type="email" class="c-form-input" name="email" placeholder="your@email.com">
+                        </div>
+                    </div>
+                    <div class="c-form-group">
+                        <label>希望改善的部門或流程（可複選）</label>
+                        <div class="c-checkbox-grid">
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="行銷部門"><span>行銷部門</span></label>
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="業務部門"><span>業務部門</span></label>
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="人資行政"><span>人資行政</span></label>
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="客服部門"><span>客服部門</span></label>
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="財務會計"><span>財務會計</span></label>
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="產品研發"><span>產品研發</span></label>
+                            <label class="c-checkbox"><input type="checkbox" name="department" value="其他"><span>其他</span></label>
+                        </div>
+                    </div>
+                    <div class="c-form-group">
+                        <label>目前遇到的挑戰或期望</label>
+                        <textarea class="c-form-textarea" name="message" placeholder="簡述您目前在 AI 導入上遇到的困難，或希望改善的工作流程…"></textarea>
+                    </div>
+                    <button type="submit" class="c-form-submit">送出預約</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Nav scroll
+        window.addEventListener('scroll', () => {
+            document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 10);
+        });
+
+        // Fade-up observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.c-fade-up').forEach(el => observer.observe(el));
+
+        // Booking modal
+        function openBooking() {
+            document.getElementById('bookingModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeBooking() {
+            document.getElementById('bookingModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('bookingModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeBooking();
+        });
+
+        // FAQ toggle
+        function toggleFaq(btn) {
+            btn.closest('.c-faq-item').classList.toggle('open');
+        }
+
+        // Form submit
+        function submitBooking(e) {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const data = Object.fromEntries(fd);
+            data.department = fd.getAll('department');
+            console.log('Booking:', data);
+            e.target.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:3rem;margin-bottom:16px">✅</div><h3 style="font-size:1.2rem;font-weight:700;margin-bottom:10px">預約已送出！</h3><p style="color:#4a4a68;font-size:.92rem;line-height:1.7">感謝您的預約，我們會在 24 小時內與您聯繫。<br>您也可以直接透過 <a href="https://lin.ee/rs72Zfm" target="_blank" style="color:#06c755;font-weight:600">LINE 官方客服</a> 聯繫我們。</p></div>';
+        }
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.c-nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+
+</html>
