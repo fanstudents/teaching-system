@@ -6,82 +6,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登入 — 數位簡報室</title>
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" type="image/png" href="tbrlogo.png">
+    <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        :root {
+            --accent: #1a73e8;
+            --accent-dark: #1557b0;
+            --accent-glow: rgba(26,115,232,.15);
+            --accent-soft: rgba(26,115,232,.08);
+            --grad-1: #0a0a1a;
+            --grad-2: #0f1029;
+            --grad-3: #161638;
+            --orb-1: rgba(26,115,232,.12);
+            --orb-2: rgba(139,92,246,.08);
+            --shape-c: rgba(26,115,232,.08);
+            --title-grad: linear-gradient(135deg, #d2e3fc, #a8c7fa 30%, #8ab4f8 60%, #4285f4);
+            --sub-color: rgba(165,180,252,.5);
+            --feat-color: rgba(165,180,252,.35);
+            --feat-icon: rgba(66,133,244,.4);
+            --top-bar: linear-gradient(90deg, #1a73e8, #4285f4, #8b5cf6);
+        }
+
         body {
             font-family: 'Google Sans', 'Roboto', 'Noto Sans TC', -apple-system, system-ui, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            -webkit-font-smoothing: antialiased;
-            background: #0a0a0f;
-            overflow: hidden;
+            min-height: 100vh; display: flex;
+            -webkit-font-smoothing: antialiased; background: #0a0a0f; overflow: hidden;
         }
 
-        /* ── Left Panel — Brand Side ── */
+        /* ── Transitions for theme switching ── */
+        .login-brand, .login-brand::before, .login-brand::after,
+        .brand-title, .brand-subtitle, .brand-feature, .brand-feature .material-symbols-outlined,
+        .login-form-side::before, .btn-login, .role-tab.active,
+        .input-wrapper input:focus, .login-footer a {
+            transition: all .5s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* ── Left Panel ── */
         .login-brand {
             flex: 1;
-            background: linear-gradient(160deg, #0a0a1a 0%, #0f1029 40%, #161638 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 60px;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(160deg, var(--grad-1) 0%, var(--grad-2) 40%, var(--grad-3) 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 60px; position: relative; overflow: hidden;
         }
-
         .login-brand::before {
-            content: '';
-            position: absolute;
-            width: 600px; height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(26,115,232,.12) 0%, transparent 70%);
-            top: -100px; left: -150px;
-            pointer-events: none;
+            content: ''; position: absolute; width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, var(--orb-1) 0%, transparent 70%);
+            top: -100px; left: -150px; pointer-events: none;
         }
-
         .login-brand::after {
-            content: '';
-            position: absolute;
-            width: 500px; height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(139,92,246,.08) 0%, transparent 70%);
-            bottom: -80px; right: -100px;
-            pointer-events: none;
+            content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, var(--orb-2) 0%, transparent 70%);
+            bottom: -80px; right: -100px; pointer-events: none;
         }
-
         .brand-grid {
             position: absolute; inset: 0;
             background-image:
                 linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
+            background-size: 60px 60px; pointer-events: none;
         }
-
         .brand-shapes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
         .brand-shape {
-            position: absolute;
-            border: 1px solid rgba(26,115,232,.08);
-            border-radius: 4px;
-            animation: floatShape 20s ease-in-out infinite;
+            position: absolute; border: 1px solid var(--shape-c); border-radius: 4px;
+            animation: floatShape 20s ease-in-out infinite; transition: border-color .5s;
         }
         .brand-shape:nth-child(1) { width:80px;height:80px;top:15%;left:10%;transform:rotate(45deg); }
-        .brand-shape:nth-child(2) { width:120px;height:120px;top:60%;right:15%;border-radius:50%;border-color:rgba(139,92,246,.06);animation-delay:-7s;animation-duration:25s; }
-        .brand-shape:nth-child(3) { width:60px;height:60px;bottom:20%;left:25%;transform:rotate(15deg);border-color:rgba(26,115,232,.05);animation-delay:-12s; }
-        .brand-shape:nth-child(4) { width:40px;height:40px;top:30%;right:30%;border-radius:50%;border-color:rgba(168,85,247,.07);animation-delay:-4s;animation-duration:18s; }
-
+        .brand-shape:nth-child(2) { width:120px;height:120px;top:60%;right:15%;border-radius:50%;animation-delay:-7s;animation-duration:25s; }
+        .brand-shape:nth-child(3) { width:60px;height:60px;bottom:20%;left:25%;transform:rotate(15deg);animation-delay:-12s; }
+        .brand-shape:nth-child(4) { width:40px;height:40px;top:30%;right:30%;border-radius:50%;animation-delay:-4s;animation-duration:18s; }
         @keyframes floatShape {
             0%,100% { transform:translateY(0) rotate(0deg); opacity:.6; }
             25% { transform:translateY(-20px) rotate(5deg); opacity:1; }
             50% { transform:translateY(-10px) rotate(-3deg); opacity:.7; }
             75% { transform:translateY(-25px) rotate(8deg); opacity:.9; }
         }
-
         .brand-content { position:relative; z-index:2; max-width:480px; text-align:center; }
         .brand-icon {
             width:96px;height:96px;border-radius:24px;
@@ -90,14 +91,18 @@
             margin-bottom:32px;backdrop-filter:blur(20px);
             box-shadow:0 8px 32px rgba(0,0,0,.3);overflow:hidden;
         }
-        .brand-icon img { width:64px;height:64px;object-fit:contain;filter:brightness(1.15) drop-shadow(0 2px 12px rgba(26,115,232,.4)); }
-        .brand-title { font-size:2.2rem;font-weight:800;letter-spacing:-.04em;line-height:1.2;background:linear-gradient(135deg,#d2e3fc,#a8c7fa 30%,#8ab4f8 60%,#4285f4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px; }
-        .brand-subtitle { font-size:1rem;color:rgba(165,180,252,.5);line-height:1.7;font-weight:300;letter-spacing:-.01em; }
+        .brand-icon img { width:64px;height:64px;object-fit:contain;filter:brightness(1.15) drop-shadow(0 2px 12px var(--accent-glow)); }
+        .brand-title {
+            font-size:2.2rem;font-weight:800;letter-spacing:-.04em;line-height:1.2;
+            background:var(--title-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+            margin-bottom:16px;
+        }
+        .brand-subtitle { font-size:1rem;color:var(--sub-color);line-height:1.7;font-weight:300;letter-spacing:-.01em; }
         .brand-features { display:flex;gap:32px;margin-top:56px;position:relative;z-index:2; }
-        .brand-feature { display:flex;align-items:center;gap:10px;color:rgba(165,180,252,.35);font-size:.82rem;font-weight:400; }
-        .brand-feature .material-symbols-outlined { font-size:18px;color:rgba(66,133,244,.4); }
+        .brand-feature { display:flex;align-items:center;gap:10px;color:var(--feat-color);font-size:.82rem;font-weight:400; }
+        .brand-feature .material-symbols-outlined { font-size:18px;color:var(--feat-icon); }
 
-        /* ── Right Panel — Form Side ── */
+        /* ── Right Panel ── */
         .login-form-side {
             width:520px;min-width:520px;display:flex;flex-direction:column;
             justify-content:center;align-items:center;padding:60px;
@@ -105,211 +110,128 @@
         }
         .login-form-side::before {
             content:'';position:absolute;top:0;left:0;right:0;height:3px;
-            background:linear-gradient(90deg,#1a73e8,#4285f4,#8b5cf6);
+            background:var(--top-bar);
         }
         .login-form-wrapper { width:100%;max-width:380px;animation:formFadeIn .5s ease-out; }
+        @keyframes formFadeIn { from { opacity:0;transform:translateY(16px); } to { opacity:1;transform:translateY(0); } }
 
-        @keyframes formFadeIn {
-            from { opacity:0;transform:translateY(16px); }
-            to { opacity:1;transform:translateY(0); }
-        }
-
-        .form-header { margin-bottom:32px; text-align:center; }
-        .form-logo { width:48px;height:48px;object-fit:contain;margin-bottom:20px;border-radius:12px; }
-        .form-header h1 { font-size:1.5rem;font-weight:700;color:#0f172a;letter-spacing:-.03em;margin-bottom:6px; }
-        .form-header p { font-size:.88rem;color:#80868b;font-weight:400; }
+        .form-header { margin-bottom:28px; text-align:center; }
+        .form-logo { width:44px;height:44px;object-fit:contain;margin-bottom:16px;border-radius:12px; }
+        .form-header h1 { font-size:1.4rem;font-weight:700;color:#0f172a;letter-spacing:-.03em;margin-bottom:4px; }
+        .form-header p { font-size:.85rem;color:#80868b;font-weight:400; }
 
         /* ── Role Tabs ── */
         .role-tabs {
-            display: flex;
-            gap: 4px;
-            padding: 4px;
-            background: #f1f5f9;
-            border-radius: 14px;
-            margin-bottom: 28px;
+            display:flex;gap:4px;padding:4px;background:#f1f5f9;border-radius:14px;margin-bottom:24px;
         }
         .role-tab {
-            flex: 1;
-            padding: 10px 8px;
-            border: none;
-            border-radius: 10px;
-            font-size: .8rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            background: transparent;
-            color: #64748b;
-            transition: all .25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            flex:1;padding:10px 6px;border:none;border-radius:10px;
+            font-size:.78rem;font-weight:600;font-family:inherit;cursor:pointer;
+            background:transparent;color:#64748b;transition:all .25s;
+            display:flex;align-items:center;justify-content:center;gap:5px;
         }
-        .role-tab .material-symbols-outlined { font-size: 16px; }
-        .role-tab:hover { color: #334155; }
+        .role-tab .material-symbols-outlined { font-size:16px; }
+        .role-tab:hover { color:#334155; }
         .role-tab.active {
-            background: #ffffff;
-            color: #0f172a;
-            box-shadow: 0 1px 4px rgba(0,0,0,.08), 0 2px 12px rgba(0,0,0,.04);
+            background:#fff;color:#0f172a;
+            box-shadow:0 1px 4px rgba(0,0,0,.08),0 2px 12px rgba(0,0,0,.04);
         }
-        .role-tab.active .tab-dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            animation: dotPulse 2s infinite;
-        }
-        .role-tab[data-role="instructor"] .tab-dot { background: #3b82f6; }
-        .role-tab[data-role="affiliate"] .tab-dot { background: #10b981; }
-        .role-tab[data-role="student"] .tab-dot { background: #f59e0b; }
-
-        @keyframes dotPulse {
-            0%,100% { opacity:1; }
-            50% { opacity:.3; }
-        }
-
-        /* ── Role Panels ── */
-        .role-panel { display: none; }
-        .role-panel.active { display: block; animation: formFadeIn .3s ease-out; }
-
-        .role-description {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            margin-bottom: 24px;
-            font-size: .82rem;
-            color: #475569;
-            line-height: 1.5;
-        }
-        .role-description .material-symbols-outlined { font-size: 20px; color: #94a3b8; flex-shrink: 0; }
 
         /* ── Google Button ── */
         .btn-google {
-            width: 100%;
-            padding: 13px 16px;
-            border: 1.5px solid #dadce0;
-            border-radius: 12px;
-            background: #ffffff;
-            font-size: .9rem;
-            font-weight: 600;
-            font-family: inherit;
-            color: #3c4043;
-            cursor: pointer;
-            transition: all .2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            width:100%;padding:12px 16px;border:1.5px solid #dadce0;border-radius:12px;
+            background:#fff;font-size:.88rem;font-weight:600;font-family:inherit;color:#3c4043;
+            cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;
         }
-        .btn-google:hover {
-            background: #f8f9fa;
-            border-color: #c6c9cc;
-            box-shadow: 0 2px 8px rgba(0,0,0,.06);
-        }
-        .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .btn-google:hover { background:#f8f9fa;border-color:#c6c9cc;box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .btn-google svg { width:20px;height:20px;flex-shrink:0; }
 
-        /* ── Login Divider ── */
+        /* ── Divider ── */
         .login-divider {
-            display: flex; align-items: center; gap: 16px;
-            margin: 24px 0; color: #cbd5e1; font-size: .72rem;
-            letter-spacing: .05em; text-transform: uppercase; font-weight: 500;
+            display:flex;align-items:center;gap:16px;margin:20px 0;color:#cbd5e1;
+            font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;font-weight:500;
         }
-        .login-divider::before, .login-divider::after {
-            content: ''; flex: 1; height: 1px; background: #e2e8f0;
-        }
+        .login-divider::before, .login-divider::after { content:'';flex:1;height:1px;background:#e2e8f0; }
 
-        /* ── Email/Password Form ── */
-        .login-form-group { margin-bottom: 20px; }
+        /* ── Form ── */
+        .login-form-group { margin-bottom:18px; }
         .login-form-group label {
-            display: block; font-size: .78rem; font-weight: 600;
-            color: #1f1f1f; margin-bottom: 8px; letter-spacing: .02em;
+            display:block;font-size:.76rem;font-weight:600;color:#1f1f1f;margin-bottom:7px;letter-spacing:.02em;
         }
-        .input-wrapper { position: relative; }
+        .input-wrapper { position:relative; }
         .input-wrapper .material-symbols-outlined {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            font-size: 20px; color: #80868b; transition: color .2s; pointer-events: none;
+            position:absolute;left:14px;top:50%;transform:translateY(-50%);
+            font-size:20px;color:#80868b;transition:color .2s;pointer-events:none;
         }
         .input-wrapper input {
-            width: 100%; padding: 13px 16px 13px 46px;
-            border: 1.5px solid #dadce0; border-radius: 12px;
-            font-size: .9rem; font-family: inherit; color: #0f172a;
-            outline: none; transition: all .2s; background: #f8f9fa;
+            width:100%;padding:12px 16px 12px 46px;border:1.5px solid #dadce0;border-radius:12px;
+            font-size:.88rem;font-family:inherit;color:#0f172a;outline:none;transition:all .2s;background:#f8f9fa;
         }
-        .input-wrapper input::placeholder { color: #80868b; }
-        .input-wrapper input:focus {
-            border-color: #1a73e8; background: #fff;
-            box-shadow: 0 0 0 4px rgba(26,115,232,.08);
-        }
-        .input-wrapper input:focus ~ .material-symbols-outlined { color: #1a73e8; }
+        .input-wrapper input::placeholder { color:#80868b; }
+        .input-wrapper input:focus { border-color:var(--accent);background:#fff;box-shadow:0 0 0 4px var(--accent-soft); }
+        .input-wrapper input:focus ~ .material-symbols-outlined { color:var(--accent); }
         .password-toggle {
-            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; cursor: pointer; color: #80868b;
-            padding: 4px; display: flex; align-items: center; transition: color .15s;
+            position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;
+            cursor:pointer;color:#80868b;padding:4px;display:flex;align-items:center;transition:color .15s;
         }
-        .password-toggle:hover { color: #444746; }
-        .password-toggle .material-symbols-outlined { font-size: 20px; position: static; transform: none; }
+        .password-toggle:hover { color:#444746; }
+        .password-toggle .material-symbols-outlined { font-size:20px;position:static;transform:none; }
 
         .btn-login {
-            width: 100%; padding: 14px;
-            background: linear-gradient(135deg, #1a73e8, #1a73e8);
-            border: none; border-radius: 12px; color: #fff;
-            font-size: .92rem; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all .25s; letter-spacing: -.01em;
-            position: relative; overflow: hidden;
+            width:100%;padding:13px;background:var(--accent);border:none;border-radius:12px;color:#fff;
+            font-size:.9rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;
+            letter-spacing:-.01em;position:relative;overflow:hidden;margin-top:4px;
         }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(26,115,232,.4); }
-        .btn-login:active { transform: translateY(0); }
-        .btn-login:disabled { opacity: .6; cursor: not-allowed; transform: none !important; }
-        .btn-login-content { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-login:hover { filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 8px 25px -5px var(--accent-glow); }
+        .btn-login:active { transform:translateY(0); }
+        .btn-login:disabled { opacity:.6;cursor:not-allowed;transform:none !important; }
+        .btn-login-content { display:flex;align-items:center;justify-content:center;gap:8px; }
         .btn-spinner {
-            width: 18px; height: 18px;
-            border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
-            border-radius: 50%; animation: spin .6s linear infinite; display: none;
+            width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+            border-radius:50%;animation:spin .6s linear infinite;display:none;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .btn-login.loading .btn-spinner { display: block; }
-        .btn-login.loading .btn-text { display: none; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .btn-login.loading .btn-spinner { display:block; }
+        .btn-login.loading .btn-text { display:none; }
 
         /* ── Error ── */
         .login-error {
-            background: #fce8e6; border: 1px solid rgba(217,48,37,.15);
-            border-left: 3px solid #d93025; color: #c5221f;
-            padding: 12px 16px; border-radius: 10px; font-size: .82rem;
-            margin-bottom: 16px; display: none; align-items: center; gap: 10px; line-height: 1.5;
+            background:#fce8e6;border:1px solid rgba(217,48,37,.15);border-left:3px solid #d93025;color:#c5221f;
+            padding:11px 14px;border-radius:10px;font-size:.82rem;margin-bottom:14px;
+            display:none;align-items:center;gap:10px;line-height:1.5;
         }
-        .login-error .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
-        .login-error.show { display: flex; animation: errorSlide .3s ease-out; }
+        .login-error .material-symbols-outlined { font-size:18px;flex-shrink:0; }
+        .login-error.show { display:flex;animation:errorSlide .3s ease-out; }
         @keyframes errorSlide { from { opacity:0;transform:translateY(-8px); } }
 
         /* ── Footer ── */
-        .login-footer { text-align: center; margin-top: 32px; color: #80868b; font-size: .78rem; line-height: 1.6; }
-        .login-footer a { color: #1a73e8; text-decoration: none; font-weight: 500; }
-        .login-footer a:hover { text-decoration: underline; }
+        .login-footer { text-align:center;margin-top:28px;color:#80868b;font-size:.78rem;line-height:1.6; }
+        .login-footer a { color:var(--accent);text-decoration:none;font-weight:500; }
+        .login-footer a:hover { text-decoration:underline; }
         .login-bottom-brand {
-            position: absolute; bottom: 32px; left: 0; right: 0;
-            text-align: center; font-size: .72rem; color: #cbd5e1; letter-spacing: .02em;
+            position:absolute;bottom:28px;left:0;right:0;text-align:center;
+            font-size:.72rem;color:#cbd5e1;letter-spacing:.02em;
         }
 
         /* ── Responsive ── */
-        @media (max-width: 1024px) {
-            .login-brand { display: none; }
-            .login-form-side { width: 100%; min-width: unset; background: linear-gradient(180deg, #f8f9fa, #fff 30%); }
+        @media (max-width:1024px) {
+            .login-brand { display:none; }
+            .login-form-side { width:100%;min-width:unset;background:linear-gradient(180deg,#f8f9fa,#fff 30%); }
         }
-        @media (max-width: 480px) {
-            .login-form-side { padding: 40px 24px; }
-            .form-header h1 { font-size: 1.3rem; }
-            .role-tab { font-size: .72rem; padding: 8px 4px; }
+        @media (max-width:480px) {
+            .login-form-side { padding:40px 24px; }
+            .form-header h1 { font-size:1.2rem; }
+            .role-tab { font-size:.7rem;padding:8px 4px; }
         }
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        @media (prefers-reduced-motion:reduce) {
+            *,*::before,*::after { animation-duration:.01ms !important;transition-duration:.01ms !important; }
         }
     </style>
 </head>
 
 <body>
     <!-- Brand Panel -->
-    <div class="login-brand">
+    <div class="login-brand" id="loginBrand">
         <div class="brand-grid"></div>
         <div class="brand-shapes">
             <div class="brand-shape"></div>
@@ -319,25 +241,25 @@
         </div>
         <div class="brand-content">
             <div class="brand-icon">
-                <img src="tbrlogo.png" alt="TBR Digital">
+                <img src="assets/images/tbrlogo.png" alt="TBR Digital">
             </div>
-            <h2 class="brand-title" id="brandTitle">數位簡報室</h2>
+            <h2 class="brand-title" id="brandTitle">教學管理中心</h2>
             <p class="brand-subtitle" id="brandSubtitle">
-                互動教學系統<br>
-                打造沉浸式企業培訓體驗
+                一站式課程管理平台<br>
+                從簡報設計到互動教學，一氣呵成
             </p>
             <div class="brand-features" id="brandFeatures">
                 <div class="brand-feature">
-                    <span class="material-symbols-outlined">slideshow</span>
-                    <span>互動簡報</span>
+                    <span class="material-symbols-outlined">edit_note</span>
+                    <span>簡報編輯</span>
                 </div>
                 <div class="brand-feature">
-                    <span class="material-symbols-outlined">school</span>
-                    <span>即時教學</span>
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <span>數據分析</span>
                 </div>
                 <div class="brand-feature">
-                    <span class="material-symbols-outlined">auto_awesome</span>
-                    <span>AI 驅動</span>
+                    <span class="material-symbols-outlined">smart_toy</span>
+                    <span>AI 助教</span>
                 </div>
             </div>
         </div>
@@ -347,27 +269,24 @@
     <div class="login-form-side">
         <div class="login-form-wrapper">
             <div class="form-header">
-                <img src="tbrlogo.png" alt="Logo" class="form-logo">
-                <h1>歡迎回來</h1>
-                <p>選擇您的身份登入系統</p>
+                <img src="assets/images/tbrlogo.png" alt="Logo" class="form-logo">
+                <h1 id="formTitle">講師登入</h1>
+                <p id="formDesc">管理課程 · 編輯簡報 · 系統設定</p>
             </div>
 
             <!-- Role Tabs -->
-            <div class="role-tabs" id="roleTabs">
+            <div class="role-tabs">
                 <button class="role-tab active" data-role="instructor" onclick="switchRole('instructor')">
                     <span class="material-symbols-outlined">school</span>
                     講師
-                    <span class="tab-dot"></span>
                 </button>
                 <button class="role-tab" data-role="affiliate" onclick="switchRole('affiliate')">
                     <span class="material-symbols-outlined">handshake</span>
                     推廣夥伴
-                    <span class="tab-dot"></span>
                 </button>
                 <button class="role-tab" data-role="student" onclick="switchRole('student')">
                     <span class="material-symbols-outlined">person</span>
                     學員
-                    <span class="tab-dot"></span>
                 </button>
             </div>
 
@@ -376,62 +295,40 @@
                 <span id="loginErrorText"></span>
             </div>
 
-            <!-- ═══ Instructor Panel ═══ -->
-            <div class="role-panel active" id="panel-instructor">
-                <div class="role-description">
-                    <span class="material-symbols-outlined">info</span>
-                    <span>講師與管理員請使用帳號密碼登入管理後台</span>
-                </div>
-                <form id="loginForm">
-                    <div class="login-form-group">
-                        <label for="loginEmail">電子郵件</label>
-                        <div class="input-wrapper">
-                            <input type="email" id="loginEmail" placeholder="name@company.com" required autofocus autocomplete="email">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                    </div>
-                    <div class="login-form-group">
-                        <label for="loginPassword">密碼</label>
-                        <div class="input-wrapper">
-                            <input type="password" id="loginPassword" placeholder="請輸入密碼" required autocomplete="current-password">
-                            <span class="material-symbols-outlined">lock</span>
-                            <button type="button" class="password-toggle" id="togglePassword" tabindex="-1" aria-label="切換密碼顯示">
-                                <span class="material-symbols-outlined">visibility_off</span>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-login" id="loginBtn">
-                        <span class="btn-login-content">
-                            <span class="btn-text">登入管理後台</span>
-                            <span class="btn-spinner"></span>
-                        </span>
-                    </button>
-                </form>
-            </div>
+            <!-- Google Login (shared) -->
+            <button class="btn-google" id="btnGoogle" onclick="googleLogin()">
+                <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                使用 Google 帳號登入
+            </button>
 
-            <!-- ═══ Affiliate Panel ═══ -->
-            <div class="role-panel" id="panel-affiliate">
-                <div class="role-description">
-                    <span class="material-symbols-outlined">info</span>
-                    <span>使用 Google 帳號登入推廣夥伴儀表板，查看佣金收益與推廣數據</span>
-                </div>
-                <button class="btn-google" id="btnGoogleAffiliate" onclick="googleLogin('affiliate')">
-                    <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    使用 Google 帳號登入
-                </button>
-            </div>
+            <div class="login-divider">或使用帳號密碼</div>
 
-            <!-- ═══ Student Panel ═══ -->
-            <div class="role-panel" id="panel-student">
-                <div class="role-description">
-                    <span class="material-symbols-outlined">info</span>
-                    <span>使用 Google 帳號登入學習平台，查看課程進度與作業回饋</span>
+            <!-- Email/Password (shared) -->
+            <form id="loginForm">
+                <div class="login-form-group">
+                    <label for="loginEmail">電子郵件</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="loginEmail" placeholder="name@company.com" required autocomplete="email">
+                        <span class="material-symbols-outlined">mail</span>
+                    </div>
                 </div>
-                <button class="btn-google" id="btnGoogleStudent" onclick="googleLogin('student')">
-                    <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    使用 Google 帳號登入
+                <div class="login-form-group">
+                    <label for="loginPassword">密碼</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" placeholder="請輸入密碼" required autocomplete="current-password">
+                        <span class="material-symbols-outlined">lock</span>
+                        <button type="button" class="password-toggle" id="togglePassword" tabindex="-1">
+                            <span class="material-symbols-outlined">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-login-content">
+                        <span class="btn-text">登入</span>
+                        <span class="btn-spinner"></span>
+                    </span>
                 </button>
-            </div>
+            </form>
 
             <div class="login-footer">
                 如有帳號問題，請透過 <a href="https://lin.ee/wAi3y4P" target="_blank">LINE 官方帳號</a>聯繫我們
@@ -446,8 +343,10 @@
     <script type="module">
         import { auth, db, getUserProfile } from './scripts/supabase.js';
 
-        // ── Role switching ──
-        const roleConfig = {
+        // ── Role config: colors + content ──
+        let _currentRole = 'instructor';
+
+        const ROLES = {
             instructor: {
                 title: '講師登入',
                 desc: '管理課程 · 編輯簡報 · 系統設定',
@@ -457,7 +356,24 @@
                     { icon: 'edit_note', text: '簡報編輯' },
                     { icon: 'monitoring', text: '數據分析' },
                     { icon: 'smart_toy', text: 'AI 助教' }
-                ]
+                ],
+                css: {
+                    '--accent': '#1a73e8',
+                    '--accent-dark': '#1557b0',
+                    '--accent-glow': 'rgba(26,115,232,.15)',
+                    '--accent-soft': 'rgba(26,115,232,.08)',
+                    '--grad-1': '#0a0a1a',
+                    '--grad-2': '#0f1029',
+                    '--grad-3': '#161638',
+                    '--orb-1': 'rgba(26,115,232,.12)',
+                    '--orb-2': 'rgba(139,92,246,.08)',
+                    '--shape-c': 'rgba(26,115,232,.08)',
+                    '--title-grad': 'linear-gradient(135deg, #d2e3fc, #a8c7fa 30%, #8ab4f8 60%, #4285f4)',
+                    '--sub-color': 'rgba(165,180,252,.5)',
+                    '--feat-color': 'rgba(165,180,252,.35)',
+                    '--feat-icon': 'rgba(66,133,244,.4)',
+                    '--top-bar': 'linear-gradient(90deg, #1a73e8, #4285f4, #8b5cf6)'
+                }
             },
             affiliate: {
                 title: '推廣夥伴登入',
@@ -467,8 +383,25 @@
                 features: [
                     { icon: 'trending_up', text: '收益追蹤' },
                     { icon: 'link', text: '專屬連結' },
-                    { icon: 'payments', text: '佣金提領' }
-                ]
+                    { icon: 'payments', text: '佣金結算' }
+                ],
+                css: {
+                    '--accent': '#059669',
+                    '--accent-dark': '#047857',
+                    '--accent-glow': 'rgba(5,150,105,.15)',
+                    '--accent-soft': 'rgba(5,150,105,.08)',
+                    '--grad-1': '#021a0f',
+                    '--grad-2': '#042f1e',
+                    '--grad-3': '#064e32',
+                    '--orb-1': 'rgba(16,185,129,.12)',
+                    '--orb-2': 'rgba(52,211,153,.06)',
+                    '--shape-c': 'rgba(16,185,129,.08)',
+                    '--title-grad': 'linear-gradient(135deg, #d1fae5, #6ee7b7 30%, #34d399 60%, #10b981)',
+                    '--sub-color': 'rgba(167,243,208,.5)',
+                    '--feat-color': 'rgba(167,243,208,.35)',
+                    '--feat-icon': 'rgba(52,211,153,.5)',
+                    '--top-bar': 'linear-gradient(90deg, #059669, #10b981, #34d399)'
+                }
             },
             student: {
                 title: '學員登入',
@@ -479,24 +412,48 @@
                     { icon: 'play_circle', text: '課程回放' },
                     { icon: 'task_alt', text: '作業系統' },
                     { icon: 'emoji_events', text: '學習成就' }
-                ]
+                ],
+                css: {
+                    '--accent': '#d97706',
+                    '--accent-dark': '#b45309',
+                    '--accent-glow': 'rgba(217,119,6,.15)',
+                    '--accent-soft': 'rgba(217,119,6,.08)',
+                    '--grad-1': '#1a0f00',
+                    '--grad-2': '#2d1a04',
+                    '--grad-3': '#44290a',
+                    '--orb-1': 'rgba(245,158,11,.12)',
+                    '--orb-2': 'rgba(251,191,36,.06)',
+                    '--shape-c': 'rgba(245,158,11,.08)',
+                    '--title-grad': 'linear-gradient(135deg, #fef3c7, #fcd34d 30%, #fbbf24 60%, #f59e0b)',
+                    '--sub-color': 'rgba(253,230,138,.5)',
+                    '--feat-color': 'rgba(253,230,138,.35)',
+                    '--feat-icon': 'rgba(251,191,36,.5)',
+                    '--top-bar': 'linear-gradient(90deg, #d97706, #f59e0b, #fbbf24)'
+                }
             }
         };
 
         window.switchRole = function(role) {
-            const cfg = roleConfig[role];
-            // Tab states
-            document.querySelectorAll('.role-tab').forEach(t => {
-                t.classList.toggle('active', t.dataset.role === role);
-            });
-            document.querySelectorAll('.role-panel').forEach(p => {
-                p.classList.toggle('active', p.id === `panel-${role}`);
-            });
+            _currentRole = role;
+            const cfg = ROLES[role];
+            const root = document.documentElement;
+
+            // Apply CSS custom properties
+            for (const [prop, val] of Object.entries(cfg.css)) {
+                root.style.setProperty(prop, val);
+            }
+
+            // Tabs
+            document.querySelectorAll('.role-tab').forEach(t =>
+                t.classList.toggle('active', t.dataset.role === role)
+            );
+
+            // Right panel
+            document.getElementById('formTitle').textContent = cfg.title;
+            document.getElementById('formDesc').textContent = cfg.desc;
             document.getElementById('loginError').classList.remove('show');
-            // Right panel header
-            document.querySelector('.form-header h1').textContent = cfg.title;
-            document.querySelector('.form-header p').textContent = cfg.desc;
-            // Left panel brand content
+
+            // Left panel
             document.getElementById('brandTitle').textContent = cfg.brandTitle;
             document.getElementById('brandSubtitle').innerHTML = cfg.brandSub;
             document.getElementById('brandFeatures').innerHTML = cfg.features.map(f =>
@@ -504,17 +461,14 @@
             ).join('');
         };
 
-        // Check URL param for pre-selected role
+        // Pre-select from URL
         const urlRole = new URLSearchParams(location.search).get('role');
-        if (urlRole && ['instructor', 'affiliate', 'student'].includes(urlRole)) {
-            switchRole(urlRole);
-        }
+        if (urlRole && ROLES[urlRole]) switchRole(urlRole);
 
         // ── Google Login ──
-        window.googleLogin = function(role) {
-            // Store intended role before redirect
-            localStorage.setItem('_login_role', role);
-            const redirectUrl = `${location.origin}/login.html?callback=1&role=${role}`;
+        window.googleLogin = function() {
+            localStorage.setItem('_login_role', _currentRole);
+            const redirectUrl = `${location.origin}/login.html?callback=1&role=${_currentRole}`;
             auth.signInWithGoogle(redirectUrl);
         };
 
@@ -524,35 +478,7 @@
             if (user) {
                 const role = localStorage.getItem('_login_role') || 'student';
                 localStorage.removeItem('_login_role');
-                const email = user.email;
-
-                if (role === 'affiliate') {
-                    // Check affiliates table
-                    const { data: aff } = await db.from('affiliates')
-                        .select('*')
-                        .eq('email', email)
-                        .eq('status', 'approved')
-                        .single();
-
-                    if (aff) {
-                        location.replace('affiliate-dashboard.html');
-                    } else {
-                        showError('此帳號尚未加入推廣計畫，請先完成申請。');
-                        await auth.signOut();
-                    }
-                } else if (role === 'student') {
-                    // Students — all Google accounts OK, redirect to student area
-                    location.replace('student.html');
-                } else {
-                    // Instructor via Google (e.g. service@tbr.digital)
-                    const profile = await getUserProfile();
-                    if (profile?.role === 'super_admin' || profile?.role === 'admin' || profile?.role === 'instructor') {
-                        location.replace(profile.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html');
-                    } else {
-                        showError('此帳號沒有講師權限，請使用帳號密碼登入或聯繫管理員。');
-                        await auth.signOut();
-                    }
-                }
+                await routeUser(role, user.email);
             }
         }
 
@@ -566,15 +492,14 @@
         }
 
         // ── Password toggle ──
-        const toggleBtn = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('loginPassword');
-        toggleBtn.addEventListener('click', () => {
-            const is = passwordInput.type === 'password';
-            passwordInput.type = is ? 'text' : 'password';
-            toggleBtn.querySelector('.material-symbols-outlined').textContent = is ? 'visibility' : 'visibility_off';
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const inp = document.getElementById('loginPassword');
+            const is = inp.type === 'password';
+            inp.type = is ? 'text' : 'password';
+            document.querySelector('#togglePassword .material-symbols-outlined').textContent = is ? 'visibility' : 'visibility_off';
         });
 
-        // ── Email/Password form submit ──
+        // ── Email/Password submit ──
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
@@ -585,7 +510,6 @@
 
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-
             const { data, error } = await auth.signIn(email, password);
 
             if (error) {
@@ -595,12 +519,30 @@
                 return;
             }
 
-            const profile = await getUserProfile();
-            if (profile?.role) localStorage.setItem('_user_role', profile.role);
-            const defaultRedirect = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
-            const redirect = new URLSearchParams(location.search).get('redirect') || defaultRedirect;
-            location.replace(redirect);
+            await routeUser(_currentRole, email);
         });
+
+        // ── Route user based on role ──
+        async function routeUser(role, email) {
+            if (role === 'affiliate') {
+                const { data: aff } = await db.from('affiliates')
+                    .select('*').eq('email', email).eq('status', 'approved').single();
+                if (aff) {
+                    location.replace('affiliate-dashboard.html');
+                } else {
+                    showError('此帳號尚未加入推廣計畫，請先完成申請。');
+                    await auth.signOut();
+                }
+            } else if (role === 'student') {
+                location.replace('student.html');
+            } else {
+                // instructor / admin
+                const profile = await getUserProfile();
+                if (profile?.role) localStorage.setItem('_user_role', profile.role);
+                const dest = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
+                location.replace(dest);
+            }
+        }
 
         function showError(msg) {
             document.getElementById('loginErrorText').textContent = msg;
