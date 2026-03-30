@@ -986,14 +986,87 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Page Header ── */
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.03em;
+}
+
+/* ── Main Tabs — Pill Style (partners.html etc.) ── */
+.main-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 18px;
+    padding: 3px;
+    background: #eef0f4;
+    border-radius: 10px;
+    width: fit-content;
+    border: none;
+}
+
+.main-tab {
+    padding: 8px 18px;
+    text-align: center;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.main-tab:hover {
+    color: #374151;
+    background: rgba(255,255,255,0.5);
+}
+
+.main-tab.active {
+    color: #1a1a2e;
+    background: #fff;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.main-tab .material-symbols-outlined {
+    font-size: 16px;
+    opacity: 0.65;
+}
+
+.main-tab.active .material-symbols-outlined {
+    opacity: 1;
+}
+
+/* ── Tab Panel (partners.html etc.) ── */
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+    animation: contentFadeIn 0.2s ease;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
     .container { padding: 16px 12px; }
     .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .stats-bar .stat-card { padding: 14px 16px; }
     .stat-value { font-size: 1.4rem; }
-    .level1-tabs, .sub-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
-    .l1-tab, .sub-tab { font-size: 0.78rem; padding: 7px 12px; white-space: nowrap; }
+    .level1-tabs, .sub-tabs, .main-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
+    .l1-tab, .sub-tab, .main-tab { font-size: 0.78rem; padding: 7px 12px; white-space: nowrap; }
     .filter-bar { flex-wrap: wrap; gap: 8px; }
     .filter-bar input { min-width: 0; flex: 1 1 100%; }
     .project-card-grid { grid-template-columns: 1fr; }
