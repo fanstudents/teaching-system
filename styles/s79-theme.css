@@ -612,8 +612,21 @@ table tbody tr:hover td {
     background: var(--s79-surface);
     border: 1px solid var(--s79-border);
     border-radius: var(--s79-radius-md);
-    overflow: hidden;
+    overflow-x: auto;
     box-shadow: var(--s79-shadow-card);
+}
+
+.table-wrap table {
+    min-width: 900px;
+    width: 100%;
+}
+
+.table-wrap td,
+.table-wrap th {
+    white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Ensure all inputs get consistent styling */
