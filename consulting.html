@@ -593,73 +593,225 @@
 
     <!-- Booking Modal -->
     <div class="c-modal-overlay" id="bookingModal">
-        <div class="c-modal">
+        <div class="c-modal" style="max-width:580px;">
             <div class="c-modal-header">
                 <div>
-                    <h2>預約免費諮詢</h2>
-                    <p>我們會在 24 小時內與您聯繫</p>
+                    <h2 id="modalTitle">預約免費諮詢</h2>
+                    <p id="modalSubtitle">選擇您方便的日期與時段</p>
                 </div>
                 <button class="c-modal-close" onclick="closeBooking()">✕</button>
             </div>
+
+            <!-- Step indicator -->
+            <div class="c-booking-steps" id="bookingSteps">
+                <div class="c-step active" data-step="1"><span>1</span>選日期</div>
+                <div class="c-step" data-step="2"><span>2</span>選時段</div>
+                <div class="c-step" data-step="3"><span>3</span>填寫資料</div>
+            </div>
+
             <div class="c-modal-body">
-                <form id="bookingForm" onsubmit="submitBooking(event)">
-                    <div class="c-form-row">
-                        <div class="c-form-group">
-                            <label>聯絡人姓名 <span class="req">*</span></label>
-                            <input type="text" class="c-form-input" name="name" required placeholder="例：王大明">
-                        </div>
-                        <div class="c-form-group">
-                            <label>職稱</label>
-                            <input type="text" class="c-form-input" name="title" placeholder="例：行銷總監">
+                <!-- Step 1: Calendar -->
+                <div class="c-booking-step active" id="step1">
+                    <div class="c-calendar-nav">
+                        <button onclick="calendarNav(-1)" id="calPrev" class="c-cal-nav-btn">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <div class="c-cal-month" id="calMonthLabel"></div>
+                        <button onclick="calendarNav(1)" id="calNext" class="c-cal-nav-btn">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                    <div class="c-calendar-grid" id="calendarGrid">
+                        <div class="c-cal-loading">
+                            <div class="c-spinner"></div>
+                            <p>正在載入可用時段...</p>
                         </div>
                     </div>
-                    <div class="c-form-row">
-                        <div class="c-form-group">
-                            <label>公司名稱 <span class="req">*</span></label>
-                            <input type="text" class="c-form-input" name="company" required placeholder="貴公司全名">
+                </div>
+
+                <!-- Step 2: Time slots -->
+                <div class="c-booking-step" id="step2">
+                    <div class="c-selected-date" id="selectedDateLabel"></div>
+                    <div class="c-time-grid" id="timeGrid"></div>
+                    <button class="c-back-btn" onclick="goToStep(1)">
+                        <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> 重選日期
+                    </button>
+                </div>
+
+                <!-- Step 3: Form -->
+                <div class="c-booking-step" id="step3">
+                    <div class="c-booking-summary" id="bookingSummary"></div>
+                    <form id="bookingForm" onsubmit="submitBooking(event)">
+                        <div class="c-form-row">
+                            <div class="c-form-group">
+                                <label>聯絡人姓名 <span class="req">*</span></label>
+                                <input type="text" class="c-form-input" name="name" required placeholder="例：王大明">
+                            </div>
+                            <div class="c-form-group">
+                                <label>Email <span class="req">*</span></label>
+                                <input type="email" class="c-form-input" name="email" required placeholder="your@email.com">
+                            </div>
+                        </div>
+                        <div class="c-form-row">
+                            <div class="c-form-group">
+                                <label>電話</label>
+                                <input type="tel" class="c-form-input" name="phone" placeholder="09xx-xxx-xxx">
+                            </div>
+                            <div class="c-form-group">
+                                <label>公司名稱</label>
+                                <input type="text" class="c-form-input" name="company" placeholder="貴公司全名">
+                            </div>
+                        </div>
+                        <div class="c-form-row">
+                            <div class="c-form-group">
+                                <label>公司規模</label>
+                                <select class="c-form-select" name="headcount">
+                                    <option value="">請選擇</option>
+                                    <option>1-10 人</option>
+                                    <option>11-50 人</option>
+                                    <option>51-200 人</option>
+                                    <option>200 人以上</option>
+                                </select>
+                            </div>
+                            <div class="c-form-group">
+                                <label>LINE ID</label>
+                                <input type="text" class="c-form-input" name="lineId" placeholder="方便聯繫">
+                            </div>
                         </div>
                         <div class="c-form-group">
-                            <label>公司規模</label>
-                            <select class="c-form-select" name="size">
-                                <option value="">請選擇</option>
-                                <option>1-10 人</option>
-                                <option>11-50 人</option>
-                                <option>51-200 人</option>
-                                <option>200 人以上</option>
-                            </select>
+                            <label>目前遇到的挑戰或期望</label>
+                            <textarea class="c-form-textarea" name="message" rows="3" placeholder="簡述您目前在 AI 導入上遇到的困難…"></textarea>
                         </div>
-                    </div>
-                    <div class="c-form-row">
-                        <div class="c-form-group">
-                            <label>電話 <span class="req">*</span></label>
-                            <input type="tel" class="c-form-input" name="phone" required placeholder="09xx-xxx-xxx">
+                        <div class="c-form-actions">
+                            <button type="button" class="c-back-btn" onclick="goToStep(2)">
+                                <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> 重選時段
+                            </button>
+                            <button type="submit" class="c-form-submit" id="submitBtn">
+                                <span class="material-symbols-outlined" style="font-size:18px">event_available</span>
+                                確認預約
+                            </button>
                         </div>
-                        <div class="c-form-group">
-                            <label>Email</label>
-                            <input type="email" class="c-form-input" name="email" placeholder="your@email.com">
-                        </div>
-                    </div>
-                    <div class="c-form-group">
-                        <label>希望改善的部門或流程（可複選）</label>
-                        <div class="c-checkbox-grid">
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="行銷部門"><span>行銷部門</span></label>
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="業務部門"><span>業務部門</span></label>
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="人資行政"><span>人資行政</span></label>
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="客服部門"><span>客服部門</span></label>
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="財務會計"><span>財務會計</span></label>
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="產品研發"><span>產品研發</span></label>
-                            <label class="c-checkbox"><input type="checkbox" name="department" value="其他"><span>其他</span></label>
-                        </div>
-                    </div>
-                    <div class="c-form-group">
-                        <label>目前遇到的挑戰或期望</label>
-                        <textarea class="c-form-textarea" name="message" placeholder="簡述您目前在 AI 導入上遇到的困難，或希望改善的工作流程…"></textarea>
-                    </div>
-                    <button type="submit" class="c-form-submit">送出預約</button>
-                </form>
+                    </form>
+                </div>
+
+                <!-- Success -->
+                <div class="c-booking-step" id="stepSuccess" style="text-align:center;padding:40px 0;">
+                    <div style="font-size:3.5rem;margin-bottom:16px;">🎉</div>
+                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:10px;color:#1e293b;">預約成功！</h3>
+                    <p id="successDetail" style="color:#64748b;font-size:.92rem;line-height:1.7;margin-bottom:20px;"></p>
+                    <p style="color:#64748b;font-size:.85rem;">我們已發送行事曆邀請到您的信箱，也會在 24 小時內主動聯繫您。</p>
+                    <a href="https://lin.ee/rs72Zfm" target="_blank" rel="noopener" class="c-btn-line" style="display:inline-flex;margin-top:20px;">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                        LINE 即時聯繫
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+    /* ── Booking Steps ── */
+    .c-booking-steps {
+        display:flex; gap:0; padding:0 24px 16px; border-bottom:1px solid #f0f0f5;
+    }
+    .c-step {
+        flex:1; display:flex; align-items:center; gap:8px; padding:10px 0;
+        color:#94a3b8; font-size:.82rem; font-weight:500;
+    }
+    .c-step span {
+        width:24px; height:24px; border-radius:50%; background:#e2e8f0;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.75rem; font-weight:700; color:#64748b;
+        transition: all .3s;
+    }
+    .c-step.active span { background:linear-gradient(135deg,#3b82f6,#6366f1); color:#fff; }
+    .c-step.active { color:#1e293b; font-weight:600; }
+    .c-step.done span { background:#10b981; color:#fff; }
+    .c-step.done { color:#10b981; }
+
+    /* ── Calendar ── */
+    .c-booking-step { display:none; padding:20px 24px; }
+    .c-booking-step.active { display:block; }
+    .c-calendar-nav {
+        display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
+    }
+    .c-cal-month { font-size:1rem; font-weight:700; color:#1e293b; }
+    .c-cal-nav-btn {
+        background:none; border:1px solid #e2e8f0; border-radius:8px;
+        width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+        transition: all .2s;
+    }
+    .c-cal-nav-btn:hover { border-color:#3b82f6; color:#3b82f6; }
+    .c-cal-nav-btn:disabled { opacity:.3; cursor:not-allowed; }
+    .c-calendar-grid {
+        display:grid; grid-template-columns:repeat(7,1fr); gap:4px; min-height:240px;
+    }
+    .c-cal-head { text-align:center; font-size:.72rem; color:#94a3b8; font-weight:600; padding:8px 0; }
+    .c-cal-day {
+        aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+        border-radius:10px; font-size:.85rem; font-weight:600; cursor:pointer;
+        border:2px solid transparent; transition: all .2s; position:relative;
+    }
+    .c-cal-day:hover:not(.disabled):not(.empty) { border-color:#3b82f6; background:#eff6ff; }
+    .c-cal-day.selected { border-color:#3b82f6; background:#3b82f6; color:#fff; }
+    .c-cal-day.disabled { color:#cbd5e1; cursor:not-allowed; opacity:.4; }
+    .c-cal-day.empty { cursor:default; }
+    .c-cal-day .c-cal-dot {
+        width:5px; height:5px; border-radius:50%; background:#10b981; margin-top:2px;
+    }
+    .c-cal-day.selected .c-cal-dot { background:#a7f3d0; }
+    .c-cal-day.disabled .c-cal-dot { background:#cbd5e1; }
+    .c-cal-loading {
+        grid-column:1/-1; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; gap:12px; padding:40px 0;
+        color:#94a3b8; font-size:.85rem;
+    }
+    .c-spinner {
+        width:28px; height:28px; border:3px solid #e2e8f0; border-top-color:#3b82f6;
+        border-radius:50%; animation:spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Time Slots ── */
+    .c-selected-date {
+        font-size:.92rem; font-weight:600; color:#1e293b; margin-bottom:16px;
+        display:flex; align-items:center; gap:6px;
+    }
+    .c-time-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+    .c-time-slot {
+        padding:12px 8px; border:2px solid #e2e8f0; border-radius:10px; text-align:center;
+        font-size:.88rem; font-weight:600; cursor:pointer; transition:all .2s;
+    }
+    .c-time-slot:hover { border-color:#3b82f6; background:#eff6ff; }
+    .c-time-slot.selected { border-color:#3b82f6; background:#3b82f6; color:#fff; }
+    .c-time-slot .c-time-label { font-size:.72rem; color:#94a3b8; font-weight:400; margin-top:2px; }
+    .c-time-slot.selected .c-time-label { color:#bfdbfe; }
+
+    .c-back-btn {
+        background:none; border:none; color:#64748b; font-size:.85rem; cursor:pointer;
+        display:flex; align-items:center; gap:4px; padding:8px 0;
+    }
+    .c-back-btn:hover { color:#3b82f6; }
+
+    /* ── Booking Summary ── */
+    .c-booking-summary {
+        background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;
+        padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px;
+        font-size:.88rem; color:#1e293b;
+    }
+    .c-booking-summary .icon { font-size:1.3rem; }
+
+    /* ── Form Actions ── */
+    .c-form-actions {
+        display:flex; justify-content:space-between; align-items:center; margin-top:8px;
+    }
+
+    @media(max-width:600px) {
+        .c-time-grid { grid-template-columns:repeat(2,1fr); }
+        .c-form-actions { flex-direction:column-reverse; gap:12px; }
+        .c-form-actions .c-form-submit { width:100%; }
+    }
+    </style>
 
     <script>
         // Nav scroll
@@ -677,6 +829,7 @@
         function openBooking() {
             document.getElementById('bookingModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            if (!window._calData) loadCalendar();
         }
         function closeBooking() {
             document.getElementById('bookingModal').classList.remove('active');
@@ -691,55 +844,252 @@
             btn.closest('.c-faq-item').classList.toggle('open');
         }
 
-        // Supabase config (same as inquiry-form.js)
+        // Supabase config
         const SB_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
 
-        // Form submit → Supabase
+        // ── Calendar State ──
+        let _selectedDate = null;
+        let _selectedTime = null;
+        let _calViewMonth = null; // { year, month }
+
+        const DOW = ['日', '一', '二', '三', '四', '五', '六'];
+        const MONTH_NAMES = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+
+        function getTimeLabel(slot) {
+            const h = parseInt(slot);
+            if (h >= 9 && h <= 12) return '上午';
+            if (h >= 13 && h <= 17) return '下午';
+            return '晚間';
+        }
+
+        // ── Step Navigation ──
+        function goToStep(n) {
+            document.querySelectorAll('.c-booking-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${n}`)?.classList.add('active');
+            document.querySelectorAll('.c-step').forEach(s => {
+                const sn = parseInt(s.dataset.step);
+                s.classList.toggle('active', sn === n);
+                s.classList.toggle('done', sn < n);
+            });
+
+            if (n === 1) {
+                document.getElementById('modalTitle').textContent = '預約免費諮詢';
+                document.getElementById('modalSubtitle').textContent = '選擇您方便的日期';
+            } else if (n === 2) {
+                document.getElementById('modalTitle').textContent = '選擇時段';
+                document.getElementById('modalSubtitle').textContent = formatDateFull(_selectedDate);
+            } else if (n === 3) {
+                document.getElementById('modalTitle').textContent = '填寫聯繫資料';
+                document.getElementById('modalSubtitle').textContent = `${formatDateFull(_selectedDate)} ${_selectedTime}`;
+                document.getElementById('bookingSummary').innerHTML = `
+                    <span class="icon">📅</span>
+                    <span><strong>${formatDateFull(_selectedDate)}</strong>・${_selectedTime} 開始（約 1 小時）</span>
+                `;
+            }
+        }
+
+        function formatDateFull(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr + 'T00:00:00');
+            return `${d.getMonth() + 1}月${d.getDate()}日 (${DOW[d.getDay()]})`;
+        }
+
+        // ── Load Calendar Data ──
+        async function loadCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '<div class="c-cal-loading"><div class="c-spinner"></div><p>正在載入可用時段...</p></div>';
+
+            try {
+                const res = await fetch(`${SB_URL}/functions/v1/calendar-availability`, {
+                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+                });
+                const data = await res.json();
+
+                if (!data.calendarConnected || !data.dates?.length) {
+                    // Fallback: generate next 30 weekdays with all slots
+                    window._calData = generateFallbackDates();
+                } else {
+                    window._calData = data.dates;
+                }
+            } catch (err) {
+                console.warn('Calendar API error, using fallback:', err);
+                window._calData = generateFallbackDates();
+            }
+
+            const first = window._calData[0]?.date;
+            const d = new Date(first + 'T00:00:00');
+            _calViewMonth = { year: d.getFullYear(), month: d.getMonth() };
+            renderCalendar();
+        }
+
+        function generateFallbackDates() {
+            const dates = [];
+            const now = new Date();
+            let d = new Date(now);
+            d.setDate(d.getDate() + 1);
+            const defaultSlots = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','21:00','22:00','23:00'];
+            while (dates.length < 30) {
+                const day = d.getDay();
+                if (day !== 0 && day !== 6) {
+                    dates.push({
+                        date: d.toISOString().slice(0, 10),
+                        dow: day,
+                        slots: defaultSlots,
+                        availableCount: 11,
+                        allBusy: false
+                    });
+                }
+                d.setDate(d.getDate() + 1);
+            }
+            return dates;
+        }
+
+        // ── Render Calendar ──
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const { year, month } = _calViewMonth;
+            document.getElementById('calMonthLabel').textContent = `${year}年 ${MONTH_NAMES[month]}`;
+
+            // Determine available months range
+            const allDates = (window._calData || []).map(d => d.date);
+            const firstDate = allDates[0];
+            const lastDate = allDates[allDates.length - 1];
+            const fd = new Date(firstDate + 'T00:00:00');
+            const ld = new Date(lastDate + 'T00:00:00');
+
+            document.getElementById('calPrev').disabled = (year <= fd.getFullYear() && month <= fd.getMonth());
+            document.getElementById('calNext').disabled = (year >= ld.getFullYear() && month >= ld.getMonth());
+
+            // Map available dates
+            const dateMap = {};
+            for (const dd of (window._calData || [])) {
+                dateMap[dd.date] = dd;
+            }
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = DOW.map(d => `<div class="c-cal-head">${d}</div>`).join('');
+
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="c-cal-day empty"></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const info = dateMap[dateStr];
+                const isSelected = dateStr === _selectedDate;
+
+                if (!info || info.allBusy) {
+                    html += `<div class="c-cal-day disabled">${day}</div>`;
+                } else {
+                    html += `<div class="c-cal-day${isSelected ? ' selected' : ''}" onclick="selectDate('${dateStr}')" data-date="${dateStr}">
+                        ${day}
+                        <div class="c-cal-dot"></div>
+                    </div>`;
+                }
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function calendarNav(dir) {
+            _calViewMonth.month += dir;
+            if (_calViewMonth.month > 11) { _calViewMonth.month = 0; _calViewMonth.year++; }
+            if (_calViewMonth.month < 0) { _calViewMonth.month = 11; _calViewMonth.year--; }
+            renderCalendar();
+        }
+
+        // ── Select Date → Show Time Slots ──
+        function selectDate(dateStr) {
+            _selectedDate = dateStr;
+            renderCalendar();
+
+            const info = (window._calData || []).find(d => d.date === dateStr);
+            const slots = info?.slots || [];
+
+            document.getElementById('selectedDateLabel').innerHTML = `
+                <span class="material-symbols-outlined" style="font-size:20px;color:#3b82f6;">calendar_today</span>
+                ${formatDateFull(dateStr)} — 可用時段
+            `;
+
+            const timeGrid = document.getElementById('timeGrid');
+            if (slots.length === 0) {
+                timeGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#94a3b8;">此日無可用時段</div>';
+            } else {
+                timeGrid.innerHTML = slots.map(s => `
+                    <div class="c-time-slot" onclick="selectTime(this, '${s}')">
+                        ${s}
+                        <div class="c-time-label">${getTimeLabel(s)}</div>
+                    </div>
+                `).join('');
+            }
+
+            goToStep(2);
+        }
+
+        function selectTime(el, time) {
+            _selectedTime = time;
+            document.querySelectorAll('.c-time-slot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            // Auto advance after short delay
+            setTimeout(() => goToStep(3), 300);
+        }
+
+        // ── Submit Booking ──
         async function submitBooking(e) {
             e.preventDefault();
             const form = e.target;
-            const btn = form.querySelector('.c-form-submit');
+            const btn = document.getElementById('submitBtn');
             const fd = new FormData(form);
-            const departments = fd.getAll('department');
 
             btn.disabled = true;
-            btn.textContent = '送出中...';
+            btn.innerHTML = '<div class="c-spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></div>預約中...';
 
             const payload = {
-                name: fd.get('name') || '',
-                company: fd.get('company') || '',
-                email: fd.get('email') || '',
+                name: fd.get('name'),
+                email: fd.get('email'),
                 phone: fd.get('phone') || '',
-                inquiry_type: 'onsite-consulting',
-                team_size: fd.get('size') || '',
-                message: [
-                    fd.get('title') ? `職稱：${fd.get('title')}` : '',
-                    departments.length ? `希望改善部門：${departments.join('、')}` : '',
-                    fd.get('message') || ''
-                ].filter(Boolean).join('\n'),
-                source_page: 'consulting.html'
+                company: fd.get('company') || '',
+                headcount: fd.get('headcount') || '',
+                lineId: fd.get('lineId') || '',
+                message: fd.get('message') || '',
+                date: _selectedDate,
+                time: _selectedTime
             };
 
             try {
-                const res = await fetch(`${SB_URL}/rest/v1/enterprise_inquiries`, {
+                const res = await fetch(`${SB_URL}/functions/v1/create-booking`, {
                     method: 'POST',
                     headers: {
                         'apikey': SB_KEY,
                         'Authorization': `Bearer ${SB_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 });
-                if (!res.ok) throw new Error(await res.text());
 
-                form.innerHTML = '<div style="text-align:center;padding:40px 0"><div style="font-size:3rem;margin-bottom:16px">✅</div><h3 style="font-size:1.2rem;font-weight:700;margin-bottom:10px">預約已送出！</h3><p style="color:#4a4a68;font-size:.92rem;line-height:1.7">感謝您的預約，我們會在 24 小時內與您聯繫。<br>您也可以直接透過 <a href="https://lin.ee/rs72Zfm" target="_blank" style="color:#06c755;font-weight:600">LINE 官方客服</a> 聯繫我們。</p></div>';
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || '預約失敗');
+
+                // Show success
+                document.getElementById('successDetail').innerHTML = `
+                    您已成功預約 <strong>${formatDateFull(_selectedDate)} ${_selectedTime}</strong> 的線上諮詢。
+                `;
+
+                document.querySelectorAll('.c-booking-step').forEach(s => s.classList.remove('active'));
+                document.getElementById('stepSuccess').classList.add('active');
+                document.querySelectorAll('.c-step').forEach(s => s.classList.add('done'));
+                document.getElementById('modalTitle').textContent = '預約成功！';
+                document.getElementById('modalSubtitle').textContent = '';
+                document.getElementById('bookingSteps').style.display = 'none';
+
             } catch (err) {
                 console.error('Booking error:', err);
-                alert('送出失敗，請稍後再試或直接透過 LINE 聯繫我們');
+                alert('預約失敗：' + (err.message || '請稍後再試'));
                 btn.disabled = false;
-                btn.textContent = '送出預約';
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">event_available</span> 確認預約';
             }
         }
 

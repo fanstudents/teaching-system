@@ -290,6 +290,68 @@ serve(async (req) => {
                     }
                 }
 
+                // ── Sync to orders table ──
+                const couponCode = d.coupon_code || d.coupon_name || '';
+                const lineitem = d.lineitems?.[0] || {};
+                const courseName = lineitem.name || lineitem.item_name || d.course_name || '';
+                const planName = lineitem.plan_name || lineitem.item_plan_name || '';
+
+                await supabase.from('orders').upsert([{
+                    transaction_id: order_id || `wh-${Date.now()}`,
+                    amount,
+                    currency: d.currency || 'TWD',
+                    payment_time: d.paid_at || new Date().toISOString(),
+                    payment_status: 'Paid',
+                    payment_method: d.payment_method || '',
+                    coupon_code: couponCode,
+                    coupon_name: d.coupon_name || couponCode,
+                    course_name: courseName,
+                    plan_name: planName,
+                    student_email: email,
+                    student_name: name,
+                    student_phone: phone,
+                    source: 'webhook'
+                }], { onConflict: 'transaction_id' });
+
+                // ── Sync to affiliate_orders if coupon matches an affiliate ──
+                if (couponCode) {
+                    const { data: matchedAff } = await supabase
+                        .from('affiliates')
+                        .select('*')
+                        .eq('coupon_code', couponCode)
+                        .eq('status', 'approved')
+                        .limit(1);
+
+                    if (matchedAff?.length > 0) {
+                        const aff = matchedAff[0];
+                        const rate = Number(aff.commission_rate) || 0.20;
+                        const commissionAmount = Math.round(amount * rate);
+
+                        await supabase.from('affiliate_orders').upsert([{
+                            transaction_id: order_id || `wh-${Date.now()}`,
+                            amount,
+                            currency: d.currency || 'TWD',
+                            payment_time: d.paid_at || new Date().toISOString(),
+                            payment_status: 'Paid',
+                            coupon_code: couponCode,
+                            coupon_name: d.coupon_name || couponCode,
+                            course_name: courseName,
+                            plan_name: planName,
+                            student_name: name,
+                            student_email: email,
+                            student_phone: phone,
+                            affiliate_name: aff.name,
+                            affiliate_email: aff.email,
+                            affiliate_code: aff.coupon_code,
+                            commission_rate: rate,
+                            commission_amount: commissionAmount,
+                            commission_status: 'pending'
+                        }], { onConflict: 'transaction_id' });
+
+                        console.log(`[webhook] Affiliate order created for ${aff.name} (${aff.coupon_code}), commission: $${commissionAmount}`);
+                    }
+                }
+
                 return json({
                     success: true,
                     action: 'purchase_created',
