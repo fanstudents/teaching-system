@@ -6,21 +6,47 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'Content-Type, authorization, apikey'
 };
 
-// Google JWT for Service Account
-async function getAccessToken(serviceAccount, scope) {
-    const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+// ── Base64url helpers (safe for Deno) ──
+function base64url(str: string): string {
+    return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function base64urlFromBytes(buf: ArrayBuffer): string {
+    return btoa(String.fromCharCode(...new Uint8Array(buf)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// ── Google Service Account JWT ──
+async function getAccessToken(sa: any, scope: string): Promise<string> {
+    const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
     const now = Math.floor(Date.now() / 1000);
-    const claim = btoa(JSON.stringify({
-        iss: serviceAccount.client_email,
-        sub: Deno.env.get('GOOGLE_CALENDAR_ID'),
+
+    // For Service Account: iss = client_email, NO sub unless Domain-Wide Delegation
+    const claimSet = {
+        iss: sa.client_email,
         scope,
         aud: 'https://oauth2.googleapis.com/token',
         iat: now,
         exp: now + 3600
-    }));
+    };
+    const claim = base64url(JSON.stringify(claimSet));
 
-    const key = await importPrivateKey(serviceAccount.private_key);
-    const signature = await sign(`${header}.${claim}`, key);
+    // Import private key
+    const pemContents = sa.private_key
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+        .replace(/-----END PRIVATE KEY-----/g, '')
+        .replace(/\s/g, '');
+    const binaryKey = Uint8Array.from(atob(pemContents), (c: string) => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey(
+        'pkcs8', binaryKey,
+        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+        false, ['sign']
+    );
+
+    // Sign
+    const sigInput = new TextEncoder().encode(`${header}.${claim}`);
+    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, sigInput);
+    const signature = base64urlFromBytes(sig);
     const jwt = `${header}.${claim}.${signature}`;
 
     const res = await fetch('https://oauth2.googleapis.com/token', {
@@ -29,33 +55,18 @@ async function getAccessToken(serviceAccount, scope) {
         body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
     });
     const data = await res.json();
+
+    if (!data.access_token) {
+        console.error('[calendar] Token error:', JSON.stringify(data));
+        throw new Error(`Failed to get access token: ${data.error_description || data.error || 'unknown'}`);
+    }
     return data.access_token;
 }
 
-async function importPrivateKey(pem) {
-    const pemContents = pem
-        .replace(/-----BEGIN PRIVATE KEY-----/, '')
-        .replace(/-----END PRIVATE KEY-----/, '')
-        .replace(/\n/g, '');
-    const binaryKey = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
-    return await crypto.subtle.importKey(
-        'pkcs8', binaryKey,
-        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-        false, ['sign']
-    );
-}
-
-async function sign(input, key) {
-    const data = new TextEncoder().encode(input);
-    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, data);
-    return btoa(String.fromCharCode(...new Uint8Array(sig)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
 // In-memory cache
-let cache = { data: null, expiry: 0 };
+let cache: { data: any; expiry: number } = { data: null, expiry: 0 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
     if (req.method === 'OPTIONS') {
         return new Response(null, { status: 204, headers: corsHeaders });
     }
@@ -70,41 +81,67 @@ serve(async (req) => {
 
         const saKeyJson = Deno.env.get('GOOGLE_SERVICE_ACCOUNT_KEY');
         if (!saKeyJson) {
+            console.error('[calendar] GOOGLE_SERVICE_ACCOUNT_KEY not set');
             return new Response(JSON.stringify({
                 calendarConnected: false,
                 error: 'Service account not configured'
-            }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            });
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
-        const sa = JSON.parse(saKeyJson);
-        const accessToken = await getAccessToken(sa, 'https://www.googleapis.com/auth/calendar');
-        const calendarId = Deno.env.get('GOOGLE_CALENDAR_ID') || 'primary';
-        const extraIds = (Deno.env.get('GOOGLE_EXTRA_CALENDAR_IDS') || '').split(',').filter(Boolean);
+        let sa: any;
+        try {
+            sa = JSON.parse(saKeyJson);
+        } catch (e) {
+            console.error('[calendar] Failed to parse service account JSON:', e);
+            return new Response(JSON.stringify({
+                calendarConnected: false,
+                error: 'Invalid service account JSON'
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
 
-        // Build date range: next 30 weekdays
-        const dates = [];
-        const now = new Date();
-        let d = new Date(now);
-        d.setDate(d.getDate() + 1); // Start from tomorrow
+        if (!sa.private_key || !sa.client_email) {
+            console.error('[calendar] Missing private_key or client_email. Keys found:', Object.keys(sa).join(', '));
+            return new Response(JSON.stringify({
+                calendarConnected: false,
+                error: 'Invalid service account: missing private_key or client_email. You may have uploaded an OAuth client secret instead of a Service Account key.'
+            }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        console.log(`[calendar] Using service account: ${sa.client_email}`);
+
+        const accessToken = await getAccessToken(sa, 'https://www.googleapis.com/auth/calendar.readonly');
+        const calendarId = Deno.env.get('GOOGLE_CALENDAR_ID') || 'primary';
+        const extraIds = (Deno.env.get('GOOGLE_EXTRA_CALENDAR_IDS') || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+
+        console.log(`[calendar] Querying calendars: ${calendarId}, extras: ${extraIds.join(', ') || 'none'}`);
+
+        // Build date range: next 30 weekdays from tomorrow (Asia/Taipei)
+        // Use explicit timezone offset for Taipei (UTC+8)
+        const TAIPEI_OFFSET = 8 * 60 * 60 * 1000;
+        const nowMs = Date.now();
+        const taipeiNow = new Date(nowMs + TAIPEI_OFFSET);
+
+        const dates: Date[] = [];
+        let d = new Date(taipeiNow);
+        d.setUTCHours(0, 0, 0, 0);
+        d = new Date(d.getTime() + 24 * 60 * 60 * 1000); // tomorrow in Taipei
 
         while (dates.length < 30) {
-            const day = d.getDay();
+            const day = d.getUTCDay();
             if (day !== 0 && day !== 6) {
                 dates.push(new Date(d));
             }
-            d.setDate(d.getDate() + 1);
+            d = new Date(d.getTime() + 24 * 60 * 60 * 1000);
         }
 
-        const timeMin = dates[0].toISOString();
-        const timeMax = new Date(dates[dates.length - 1].getTime() + 24 * 60 * 60 * 1000).toISOString();
+        // timeMin/timeMax in RFC3339 for Google API
+        const firstDateUtc = new Date(dates[0].getTime() - TAIPEI_OFFSET);
+        const lastDateUtc = new Date(dates[dates.length - 1].getTime() + 24 * 60 * 60 * 1000 - TAIPEI_OFFSET);
+        const timeMin = firstDateUtc.toISOString();
+        const timeMax = lastDateUtc.toISOString();
 
         // FreeBusy query
-        const calendarItems = [{ id: calendarId }];
-        for (const eid of extraIds) {
-            calendarItems.push({ id: eid.trim() });
-        }
+        const calendarItems = [{ id: calendarId }, ...extraIds.map((id: string) => ({ id }))];
 
         const fbRes = await fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
             method: 'POST',
@@ -112,30 +149,24 @@ serve(async (req) => {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                timeMin,
-                timeMax,
-                timeZone: 'Asia/Taipei',
-                items: calendarItems
-            })
+            body: JSON.stringify({ timeMin, timeMax, timeZone: 'Asia/Taipei', items: calendarItems })
         });
 
         const fbData = await fbRes.json();
         if (!fbRes.ok) {
-            console.error('FreeBusy error:', JSON.stringify(fbData));
+            console.error('[calendar] FreeBusy error:', JSON.stringify(fbData));
             return new Response(JSON.stringify({
                 calendarConnected: false,
-                error: 'Calendar API error'
-            }), {
-                status: 500,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-            });
+                error: `Calendar API error: ${fbData.error?.message || 'unknown'}`
+            }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
-        // Collect all busy intervals
-        const allBusy = [];
-        for (const cal of Object.values(fbData.calendars || {})) {
-            for (const b of (cal.busy || [])) {
+        // Collect ALL busy intervals from ALL calendars
+        const allBusy: { start: number; end: number }[] = [];
+        for (const [calId, calData] of Object.entries(fbData.calendars || {})) {
+            const busyList = (calData as any).busy || [];
+            console.log(`[calendar] ${calId}: ${busyList.length} busy intervals`);
+            for (const b of busyList) {
                 allBusy.push({
                     start: new Date(b.start).getTime(),
                     end: new Date(b.end).getTime()
@@ -143,20 +174,26 @@ serve(async (req) => {
             }
         }
 
-        // Available slots: 09-17 (hourly) + 21-24 (hourly) = 11 slots per day
+        // Available time slots (in Asia/Taipei hours)
+        // Morning+Afternoon: 09-17, Evening: 21-23
         const slotHours = [9, 10, 11, 12, 13, 14, 15, 16, 21, 22, 23];
 
         const result = dates.map(date => {
-            const dateStr = date.toISOString().slice(0, 10);
+            // date is midnight Taipei (stored as UTC for that Taipei midnight)
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+
             const slots = slotHours.map(hour => {
-                const slotStart = new Date(date);
-                slotStart.setHours(hour, 0, 0, 0);
-                // Adjust for UTC+8
-                const startMs = slotStart.getTime() - (8 * 60 * 60 * 1000);
-                const endMs = startMs + 60 * 60 * 1000;
+                // Taipei hour → UTC timestamp
+                // date is midnight Taipei in UTC-adjusted form
+                // So Taipei 09:00 = date + 9h - 8h(offset) = date + 1h in UTC
+                const slotStartUtc = date.getTime() + (hour - 8) * 60 * 60 * 1000;
+                const slotEndUtc = slotStartUtc + 60 * 60 * 1000;
 
                 const isBusy = allBusy.some(b =>
-                    (startMs < b.end && endMs > b.start)
+                    (slotStartUtc < b.end && slotEndUtc > b.start)
                 );
 
                 const label = `${String(hour).padStart(2, '0')}:00`;
@@ -165,7 +202,7 @@ serve(async (req) => {
 
             return {
                 date: dateStr,
-                dow: date.getDay(),
+                dow: date.getUTCDay(),
                 slots: slots.filter(s => s.available).map(s => s.label),
                 availableCount: slots.filter(s => s.available).length,
                 allBusy: slots.every(s => !s.available)
@@ -175,6 +212,8 @@ serve(async (req) => {
         const responseData = {
             calendarConnected: true,
             timezone: 'Asia/Taipei',
+            totalDates: result.length,
+            totalBusyIntervals: allBusy.length,
             dates: result
         };
 
@@ -184,11 +223,11 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
 
-    } catch (err) {
-        console.error('Calendar availability error:', err);
+    } catch (err: any) {
+        console.error('[calendar] Error:', err?.message, err?.stack);
         return new Response(JSON.stringify({
             calendarConnected: false,
-            error: err.message
+            error: err?.message || 'Unknown error'
         }), {
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }

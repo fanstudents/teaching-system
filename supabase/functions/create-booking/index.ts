@@ -7,21 +7,41 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'Content-Type, authorization, apikey'
 };
 
-// Google JWT for Service Account (same as calendar-availability)
-async function getAccessToken(serviceAccount, scope) {
-    const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+// ── Base64url helpers ──
+function base64url(str: string): string {
+    return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function base64urlFromBytes(buf: ArrayBuffer): string {
+    return btoa(String.fromCharCode(...new Uint8Array(buf)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// Google Service Account JWT
+async function getAccessToken(sa: any, scope: string): Promise<string> {
+    const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
     const now = Math.floor(Date.now() / 1000);
-    const claim = btoa(JSON.stringify({
-        iss: serviceAccount.client_email,
-        sub: Deno.env.get('GOOGLE_CALENDAR_ID'),
+    const claim = base64url(JSON.stringify({
+        iss: sa.client_email,
         scope,
         aud: 'https://oauth2.googleapis.com/token',
         iat: now,
         exp: now + 3600
     }));
 
-    const key = await importPrivateKey(serviceAccount.private_key);
-    const signature = await sign(`${header}.${claim}`, key);
+    const pemContents = sa.private_key
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+        .replace(/-----END PRIVATE KEY-----/g, '')
+        .replace(/\s/g, '');
+    const binaryKey = Uint8Array.from(atob(pemContents), (c: string) => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey(
+        'pkcs8', binaryKey,
+        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+        false, ['sign']
+    );
+
+    const sigInput = new TextEncoder().encode(`${header}.${claim}`);
+    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, sigInput);
+    const signature = base64urlFromBytes(sig);
     const jwt = `${header}.${claim}.${signature}`;
 
     const res = await fetch('https://oauth2.googleapis.com/token', {
@@ -30,28 +50,12 @@ async function getAccessToken(serviceAccount, scope) {
         body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
     });
     const data = await res.json();
+    if (!data.access_token) {
+        throw new Error(`Token error: ${data.error_description || data.error}`);
+    }
     return data.access_token;
 }
 
-async function importPrivateKey(pem) {
-    const pemContents = pem
-        .replace(/-----BEGIN PRIVATE KEY-----/, '')
-        .replace(/-----END PRIVATE KEY-----/, '')
-        .replace(/\n/g, '');
-    const binaryKey = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
-    return await crypto.subtle.importKey(
-        'pkcs8', binaryKey,
-        { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-        false, ['sign']
-    );
-}
-
-async function sign(input, key) {
-    const data = new TextEncoder().encode(input);
-    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, data);
-    return btoa(String.fromCharCode(...new Uint8Array(sig)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
 
 serve(async (req) => {
     if (req.method === 'OPTIONS') {

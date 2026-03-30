@@ -604,9 +604,9 @@
 
             <!-- Step indicator -->
             <div class="c-booking-steps" id="bookingSteps">
-                <div class="c-step active" data-step="1"><span>1</span>選日期</div>
-                <div class="c-step" data-step="2"><span>2</span>選時段</div>
-                <div class="c-step" data-step="3"><span>3</span>填寫資料</div>
+                <div class="c-bk-step active" data-step="1"><span>1</span>選日期</div>
+                <div class="c-bk-step" data-step="2"><span>2</span>選時段</div>
+                <div class="c-bk-step" data-step="3"><span>3</span>填寫資料</div>
             </div>
 
             <div class="c-modal-body">
@@ -648,35 +648,39 @@
                                 <input type="text" class="c-form-input" name="name" required placeholder="例：王大明">
                             </div>
                             <div class="c-form-group">
-                                <label>Email <span class="req">*</span></label>
-                                <input type="email" class="c-form-input" name="email" required placeholder="your@email.com">
+                                <label>職稱</label>
+                                <input type="text" class="c-form-input" name="title" placeholder="例：行銷總監">
                             </div>
                         </div>
                         <div class="c-form-row">
+                            <div class="c-form-group">
+                                <label>Email <span class="req">*</span></label>
+                                <input type="email" class="c-form-input" name="email" required placeholder="your@email.com">
+                            </div>
                             <div class="c-form-group">
                                 <label>電話</label>
                                 <input type="tel" class="c-form-input" name="phone" placeholder="09xx-xxx-xxx">
                             </div>
-                            <div class="c-form-group">
-                                <label>公司名稱</label>
-                                <input type="text" class="c-form-input" name="company" placeholder="貴公司全名">
-                            </div>
                         </div>
                         <div class="c-form-row">
                             <div class="c-form-group">
-                                <label>公司規模</label>
-                                <select class="c-form-select" name="headcount">
-                                    <option value="">請選擇</option>
-                                    <option>1-10 人</option>
-                                    <option>11-50 人</option>
-                                    <option>51-200 人</option>
-                                    <option>200 人以上</option>
-                                </select>
+                                <label>公司名稱</label>
+                                <input type="text" class="c-form-input" name="company" placeholder="貴公司全名">
                             </div>
                             <div class="c-form-group">
                                 <label>LINE ID</label>
                                 <input type="text" class="c-form-input" name="lineId" placeholder="方便聯繫">
                             </div>
+                        </div>
+                        <div class="c-form-group">
+                            <label>公司規模</label>
+                            <select class="c-form-select" name="headcount" style="max-width:240px;">
+                                <option value="">請選擇</option>
+                                <option>1-10 人</option>
+                                <option>11-50 人</option>
+                                <option>51-200 人</option>
+                                <option>200 人以上</option>
+                            </select>
                         </div>
                         <div class="c-form-group">
                             <label>目前遇到的挑戰或期望</label>
@@ -714,20 +718,20 @@
     .c-booking-steps {
         display:flex; gap:0; padding:0 24px 16px; border-bottom:1px solid #f0f0f5;
     }
-    .c-step {
+    .c-bk-step {
         flex:1; display:flex; align-items:center; gap:8px; padding:10px 0;
         color:#94a3b8; font-size:.82rem; font-weight:500;
     }
-    .c-step span {
+    .c-bk-step span {
         width:24px; height:24px; border-radius:50%; background:#e2e8f0;
         display:flex; align-items:center; justify-content:center;
         font-size:.75rem; font-weight:700; color:#64748b;
         transition: all .3s;
     }
-    .c-step.active span { background:linear-gradient(135deg,#3b82f6,#6366f1); color:#fff; }
-    .c-step.active { color:#1e293b; font-weight:600; }
-    .c-step.done span { background:#10b981; color:#fff; }
-    .c-step.done { color:#10b981; }
+    .c-bk-step.active span { background:linear-gradient(135deg,#3b82f6,#6366f1); color:#fff; }
+    .c-bk-step.active { color:#1e293b; font-weight:600; }
+    .c-bk-step.done span { background:#10b981; color:#fff; }
+    .c-bk-step.done { color:#10b981; }
 
     /* ── Calendar ── */
     .c-booking-step { display:none; padding:20px 24px; }
@@ -867,7 +871,7 @@
         function goToStep(n) {
             document.querySelectorAll('.c-booking-step').forEach(s => s.classList.remove('active'));
             document.getElementById(`step${n}`)?.classList.add('active');
-            document.querySelectorAll('.c-step').forEach(s => {
+            document.querySelectorAll('.c-bk-step').forEach(s => {
                 const sn = parseInt(s.dataset.step);
                 s.classList.toggle('active', sn === n);
                 s.classList.toggle('done', sn < n);
@@ -1054,7 +1058,10 @@
                 company: fd.get('company') || '',
                 headcount: fd.get('headcount') || '',
                 lineId: fd.get('lineId') || '',
-                message: fd.get('message') || '',
+                message: [
+                    fd.get('title') ? `職稱：${fd.get('title')}` : '',
+                    fd.get('message') || ''
+                ].filter(Boolean).join('\n'),
                 date: _selectedDate,
                 time: _selectedTime
             };
@@ -1080,7 +1087,7 @@
 
                 document.querySelectorAll('.c-booking-step').forEach(s => s.classList.remove('active'));
                 document.getElementById('stepSuccess').classList.add('active');
-                document.querySelectorAll('.c-step').forEach(s => s.classList.add('done'));
+                document.querySelectorAll('.c-bk-step').forEach(s => s.classList.add('done'));
                 document.getElementById('modalTitle').textContent = '預約成功！';
                 document.getElementById('modalSubtitle').textContent = '';
                 document.getElementById('bookingSteps').style.display = 'none';
