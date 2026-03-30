@@ -321,12 +321,12 @@
             <div class="brand-icon">
                 <img src="tbrlogo.png" alt="TBR Digital">
             </div>
-            <h2 class="brand-title">數位簡報室</h2>
-            <p class="brand-subtitle">
+            <h2 class="brand-title" id="brandTitle">數位簡報室</h2>
+            <p class="brand-subtitle" id="brandSubtitle">
                 互動教學系統<br>
                 打造沉浸式企業培訓體驗
             </p>
-            <div class="brand-features">
+            <div class="brand-features" id="brandFeatures">
                 <div class="brand-feature">
                     <span class="material-symbols-outlined">slideshow</span>
                     <span>互動簡報</span>
@@ -447,7 +447,45 @@
         import { auth, db, getUserProfile } from './scripts/supabase.js';
 
         // ── Role switching ──
+        const roleConfig = {
+            instructor: {
+                title: '講師登入',
+                desc: '管理課程 · 編輯簡報 · 系統設定',
+                brandTitle: '教學管理中心',
+                brandSub: '一站式課程管理平台<br>從簡報設計到互動教學，一氣呵成',
+                features: [
+                    { icon: 'edit_note', text: '簡報編輯' },
+                    { icon: 'monitoring', text: '數據分析' },
+                    { icon: 'smart_toy', text: 'AI 助教' }
+                ]
+            },
+            affiliate: {
+                title: '推廣夥伴登入',
+                desc: '查看佣金 · 推廣數據 · 收益分析',
+                brandTitle: '推廣夥伴計畫',
+                brandSub: '分享好課程，賺取推廣收益<br>即時追蹤佣金與推廣成效',
+                features: [
+                    { icon: 'trending_up', text: '收益追蹤' },
+                    { icon: 'link', text: '專屬連結' },
+                    { icon: 'payments', text: '佣金提領' }
+                ]
+            },
+            student: {
+                title: '學員登入',
+                desc: '查看課程 · 學習進度 · 作業回饋',
+                brandTitle: 'AI 學習平台',
+                brandSub: '沉浸式互動學習體驗<br>掌握 AI 時代的核心技能',
+                features: [
+                    { icon: 'play_circle', text: '課程回放' },
+                    { icon: 'task_alt', text: '作業系統' },
+                    { icon: 'emoji_events', text: '學習成就' }
+                ]
+            }
+        };
+
         window.switchRole = function(role) {
+            const cfg = roleConfig[role];
+            // Tab states
             document.querySelectorAll('.role-tab').forEach(t => {
                 t.classList.toggle('active', t.dataset.role === role);
             });
@@ -455,14 +493,15 @@
                 p.classList.toggle('active', p.id === `panel-${role}`);
             });
             document.getElementById('loginError').classList.remove('show');
-            // Update header text
-            const headers = {
-                instructor: { title: '講師登入', desc: '管理課程 · 編輯簡報 · 系統設定' },
-                affiliate: { title: '推廣夥伴登入', desc: '查看佣金 · 推廣數據 · 收益分析' },
-                student: { title: '學員登入', desc: '查看課程 · 學習進度 · 作業回饋' }
-            };
-            document.querySelector('.form-header h1').textContent = headers[role].title;
-            document.querySelector('.form-header p').textContent = headers[role].desc;
+            // Right panel header
+            document.querySelector('.form-header h1').textContent = cfg.title;
+            document.querySelector('.form-header p').textContent = cfg.desc;
+            // Left panel brand content
+            document.getElementById('brandTitle').textContent = cfg.brandTitle;
+            document.getElementById('brandSubtitle').innerHTML = cfg.brandSub;
+            document.getElementById('brandFeatures').innerHTML = cfg.features.map(f =>
+                `<div class="brand-feature"><span class="material-symbols-outlined">${f.icon}</span><span>${f.text}</span></div>`
+            ).join('');
         };
 
         // Check URL param for pre-selected role
