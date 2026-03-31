@@ -897,7 +897,7 @@
 
         // ── Navigation (Level 1 tabs + Level 2 sub-tabs + back) ──
         function bindNavigation() {
-            // Level 1 tabs (專案 / 訂單)
+            // Level 1 tabs (專案 / 訂單 / 課程清單 / 數據分析)
             document.querySelectorAll('.l1-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     document.querySelectorAll('.l1-tab').forEach(t => t.classList.remove('active'));
@@ -906,6 +906,13 @@
                     document.getElementById(`l1-${tab.dataset.l1tab}`).classList.add('active');
                 });
             });
+
+            // URL ?tab= 參數自動切換
+            const urlTab = new URLSearchParams(location.search).get('tab');
+            if (urlTab) {
+                const targetTab = document.querySelector(`.l1-tab[data-l1tab="${urlTab}"]`);
+                if (targetTab) targetTab.click();
+            }
 
             // Level 2 sub-tabs (場次/學員/作業)
             document.querySelectorAll('.sub-tab').forEach(tab => {

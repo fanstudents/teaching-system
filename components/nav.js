@@ -92,6 +92,8 @@ const NAV_ITEMS = [
         group: '系統',
         adminOnly: true,
         items: [
+            { label: '課程清單', icon: 'storefront', href: 'manage.html?tab=courses' },
+            { label: '數據分析', icon: 'monitoring', href: 'manage.html?tab=analytics' },
             { label: '會員管理', icon: 'group', href: 'members.html' },
             { label: '系統設置', icon: 'settings', href: 'settings.html' },
         ]
