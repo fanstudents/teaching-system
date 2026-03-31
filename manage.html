@@ -66,6 +66,12 @@
                     <button class="l1-tab admin-only" data-l1tab="purchases">
                         <span class="material-symbols-outlined">receipt_long</span> 訂單
                     </button>
+                    <button class="l1-tab admin-only" data-l1tab="courses">
+                        <span class="material-symbols-outlined">storefront</span> 課程清單
+                    </button>
+                    <button class="l1-tab admin-only" data-l1tab="analytics">
+                        <span class="material-symbols-outlined">monitoring</span> 數據分析
+                    </button>
                 </div>
 
                 <!-- 專案列表面板 -->
@@ -138,9 +144,147 @@
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <!-- ═══════════ Level 2：專案詳情 ═══════════ -->
+                <!-- Teachify 課程清單面板 -->
+                <div class="l1-panel" id="l1-courses">
+                    <div class="filter-bar">
+                        <input type="text" id="courseSearch" placeholder="搜尋課程名稱或講師…">
+                        <select id="courseCategoryFilter" class="filter-select">
+                            <option value="">全部分類</option>
+                            <option value="ai">AI 應用</option>
+                            <option value="vibe">Vibe Coding</option>
+                            <option value="marketing">行銷</option>
+                            <option value="other">其他</option>
+                        </select>
+                        <button class="btn" id="btnRefreshCourses">
+                            <span class="material-symbols-outlined">refresh</span> 同步 Teachify
+                        </button>
+                    </div>
+                    <div class="data-table-wrap">
+                        <table class="data-table" id="courseTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:50px;">圖片</th>
+                                    <th>課程名稱</th>
+                                    <th>講師</th>
+                                    <th>價格</th>
+                                    <th>方案類型</th>
+                                    <th>課程編號</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courseTableBody">
+                                <tr><td colspan="7" class="td-empty">點擊「同步 Teachify」載入課程資料</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 數據分析面板 -->
+                <div class="l1-panel" id="l1-analytics">
+                    <div class="filter-bar" style="justify-content:space-between;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <select id="analyticsDateRange" class="filter-select" style="min-width:140px;">
+                                <option value="7">最近 7 天</option>
+                                <option value="14">最近 14 天</option>
+                                <option value="30" selected>最近 30 天</option>
+                                <option value="90">最近 90 天</option>
+                            </select>
+                            <button class="btn btn-dark" id="btnLoadAnalytics">
+                                <span class="material-symbols-outlined">sync</span> 載入數據
+                            </button>
+                        </div>
+                        <span id="analyticsLastUpdate" style="font-size:.72rem;color:#9ca3af;"></span>
+                    </div>
+
+                    <!-- GA4 區塊 -->
+                    <div style="margin-bottom:24px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                            <span class="material-symbols-outlined" style="font-size:18px;color:#4285f4;">analytics</span>
+                            <span style="font-size:.85rem;font-weight:600;color:#1a1a2e;">Google Analytics 4</span>
+                            <span style="font-size:.68rem;color:#9ca3af;">Property: 412879003</span>
+                        </div>
+                        <!-- GA4 Overview Stats -->
+                        <div class="stats-bar" id="ga4Stats" style="grid-template-columns:repeat(6,1fr);margin-bottom:16px;">
+                            <div class="stat-card"><div class="stat-label">活躍用戶</div><div class="stat-value" id="ga4Users">-</div></div>
+                            <div class="stat-card"><div class="stat-label">新用戶</div><div class="stat-value" id="ga4NewUsers">-</div></div>
+                            <div class="stat-card"><div class="stat-label">工作階段</div><div class="stat-value" id="ga4Sessions">-</div></div>
+                            <div class="stat-card"><div class="stat-label">瀏覽量</div><div class="stat-value" id="ga4PageViews">-</div></div>
+                            <div class="stat-card"><div class="stat-label">跳出率</div><div class="stat-value" id="ga4BounceRate">-</div></div>
+                            <div class="stat-card"><div class="stat-label">平均停留</div><div class="stat-value" id="ga4AvgDuration">-</div></div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <!-- 每日趨勢 -->
+                            <div class="data-table-wrap" style="padding:16px 20px;">
+                                <div style="font-size:.78rem;font-weight:600;color:#1a1a2e;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+                                    <span class="material-symbols-outlined" style="font-size:16px;color:#6366f1;">show_chart</span> 每日趨勢
+                                </div>
+                                <div id="ga4DailyChart" style="height:180px;position:relative;overflow:hidden;"></div>
+                            </div>
+                            <!-- 流量來源 -->
+                            <div class="data-table-wrap" style="padding:16px 20px;">
+                                <div style="font-size:.78rem;font-weight:600;color:#1a1a2e;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+                                    <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;">traffic</span> 流量來源
+                                </div>
+                                <div id="ga4Sources"></div>
+                            </div>
+                        </div>
+
+                        <!-- 熱門頁面 -->
+                        <div class="data-table-wrap" style="margin-top:16px;">
+                            <table class="data-table">
+                                <thead><tr>
+                                    <th>頁面路徑</th><th>頁面標題</th><th style="text-align:right;">瀏覽量</th><th style="text-align:right;">用戶</th>
+                                </tr></thead>
+                                <tbody id="ga4PagesBody">
+                                    <tr><td colspan="4" class="td-empty">尚無資料</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- GSC 區塊 -->
+                    <div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                            <span class="material-symbols-outlined" style="font-size:18px;color:#34a853;">travel_explore</span>
+                            <span style="font-size:.85rem;font-weight:600;color:#1a1a2e;">Google Search Console</span>
+                            <span style="font-size:.68rem;color:#9ca3af;">tbr.digital</span>
+                        </div>
+                        <!-- GSC Overview Stats -->
+                        <div class="stats-bar" id="gscStats" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;">
+                            <div class="stat-card"><div class="stat-label">總點擊</div><div class="stat-value" id="gscClicks">-</div></div>
+                            <div class="stat-card"><div class="stat-label">總曝光</div><div class="stat-value" id="gscImpressions">-</div></div>
+                            <div class="stat-card"><div class="stat-label">平均 CTR</div><div class="stat-value" id="gscCtr">-</div></div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <!-- 搜尋關鍵字 -->
+                            <div class="data-table-wrap">
+                                <table class="data-table">
+                                    <thead><tr>
+                                        <th>搜尋關鍵字</th><th style="text-align:right;">點擊</th><th style="text-align:right;">曝光</th><th style="text-align:right;">CTR</th><th style="text-align:right;">排名</th>
+                                    </tr></thead>
+                                    <tbody id="gscQueriesBody">
+                                        <tr><td colspan="5" class="td-empty">尚無資料</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- GSC 熱門頁面 -->
+                            <div class="data-table-wrap">
+                                <table class="data-table">
+                                    <thead><tr>
+                                        <th>頁面</th><th style="text-align:right;">點擊</th><th style="text-align:right;">曝光</th><th style="text-align:right;">排名</th>
+                                    </tr></thead>
+                                    <tbody id="gscPagesBody">
+                                        <tr><td colspan="4" class="td-empty">尚無資料</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="level2" style="display:none;">
                 <button class="breadcrumb-back" id="backToLevel1">
                     <span class="material-symbols-outlined">arrow_back</span> 回到所有專案
@@ -2457,6 +2601,407 @@
 
         // Load instructors on init
         loadInstructorsList();
+
+        // ══════════════════════════════════════════════════════
+        // ── 數據分析 (GA4 + GSC) ──
+        // ══════════════════════════════════════════════════════
+        let analyticsLoaded = false;
+
+        function getDateStr(offset) {
+            const d = new Date();
+            d.setDate(d.getDate() + offset);
+            return d.toISOString().split('T')[0];
+        }
+
+        async function loadAnalyticsData() {
+            const days = parseInt(document.getElementById('analyticsDateRange').value) || 30;
+            const startDate = getDateStr(-days);
+            const endDate = getDateStr(-1); // GSC data has ~2-3 day delay
+
+            // Show loading in all containers
+            ['ga4Users','ga4NewUsers','ga4Sessions','ga4PageViews','ga4BounceRate','ga4AvgDuration',
+             'gscClicks','gscImpressions','gscCtr'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '<span style="font-size:14px;" class="material-symbols-outlined" style="animation:spin .7s linear infinite;">progress_activity</span>';
+            });
+
+            try {
+                const { data, error } = await functions.invoke('analytics-data', {
+                    body: { type: 'both', dateRange: { startDate, endDate } }
+                });
+
+                if (error) throw new Error(error.message);
+
+                // Render GA4
+                if (data.ga4 && !data.ga4.error) {
+                    renderGA4Overview(data.ga4.overview);
+                    renderGA4DailyChart(data.ga4.dailyTrend);
+                    renderGA4Sources(data.ga4.trafficSources);
+                    renderGA4Pages(data.ga4.topPages);
+                } else {
+                    const errMsg = data.ga4?.error || 'GA4 資料載入失敗';
+                    document.getElementById('ga4Users').textContent = '!';
+                    showToast(`GA4 錯誤：${errMsg}`);
+                }
+
+                // Render GSC
+                if (data.gsc && !data.gsc.error) {
+                    renderGSCOverview(data.gsc.totals);
+                    renderGSCQueries(data.gsc.topQueries);
+                    renderGSCPages(data.gsc.topPages);
+                } else {
+                    const errMsg = data.gsc?.error || 'GSC 資料載入失敗';
+                    document.getElementById('gscClicks').textContent = '!';
+                    showToast(`GSC 錯誤：${errMsg}`);
+                }
+
+                analyticsLoaded = true;
+                document.getElementById('analyticsLastUpdate').textContent = `最後更新：${new Date().toLocaleString('zh-TW')}`;
+                showToast('數據已載入');
+
+            } catch (err) {
+                console.error('[analytics] Error:', err);
+                showToast(`數據載入失敗：${err.message}`);
+            }
+        }
+
+        function renderGA4Overview(ov) {
+            if (!ov) return;
+            document.getElementById('ga4Users').textContent = ov.activeUsers.toLocaleString();
+            document.getElementById('ga4NewUsers').textContent = ov.newUsers.toLocaleString();
+            document.getElementById('ga4Sessions').textContent = ov.sessions.toLocaleString();
+            document.getElementById('ga4PageViews').textContent = ov.pageViews.toLocaleString();
+            document.getElementById('ga4BounceRate').textContent = (ov.bounceRate * 100).toFixed(1) + '%';
+            const dur = ov.avgSessionDuration;
+            const mins = Math.floor(dur / 60);
+            const secs = Math.round(dur % 60);
+            document.getElementById('ga4AvgDuration').textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function renderGA4DailyChart(dailyTrend) {
+            const container = document.getElementById('ga4DailyChart');
+            if (!dailyTrend || dailyTrend.length === 0) {
+                container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9ca3af;font-size:.82rem;">無趨勢資料</div>';
+                return;
+            }
+
+            const maxVal = Math.max(...dailyTrend.map(d => d.pageViews), 1);
+            const w = container.clientWidth || 400;
+            const h = 180;
+            const pad = { top: 20, right: 10, bottom: 30, left: 40 };
+            const chartW = w - pad.left - pad.right;
+            const chartH = h - pad.top - pad.bottom;
+
+            const points = dailyTrend.map((d, i) => {
+                const x = pad.left + (i / Math.max(dailyTrend.length - 1, 1)) * chartW;
+                const y = pad.top + chartH - (d.pageViews / maxVal) * chartH;
+                return { x, y, ...d };
+            });
+
+            const linePoints = points.map(p => `${p.x},${p.y}`).join(' ');
+            const areaPoints = `${points[0].x},${pad.top + chartH} ${linePoints} ${points[points.length-1].x},${pad.top + chartH}`;
+
+            // Y axis labels
+            const yLabels = [0, Math.round(maxVal/2), maxVal].map((v, i) => {
+                const y = pad.top + chartH - (v / maxVal) * chartH;
+                return `<text x="${pad.left - 6}" y="${y + 3}" text-anchor="end" fill="#9ca3af" font-size="10">${v}</text>
+                        <line x1="${pad.left}" y1="${y}" x2="${w - pad.right}" y2="${y}" stroke="#f0f1f3" stroke-dasharray="3"/>`;
+            }).join('');
+
+            // X axis labels (show every Nth)
+            const step = Math.max(Math.floor(dailyTrend.length / 6), 1);
+            const xLabels = points.filter((_, i) => i % step === 0 || i === points.length - 1).map(p => {
+                const dateStr = p.date;
+                const label = dateStr.substring(4, 6) + '/' + dateStr.substring(6, 8);
+                return `<text x="${p.x}" y="${h - 6}" text-anchor="middle" fill="#9ca3af" font-size="10">${label}</text>`;
+            }).join('');
+
+            container.innerHTML = `
+                <svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">
+                    ${yLabels}
+                    ${xLabels}
+                    <defs>
+                        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.15"/>
+                            <stop offset="100%" stop-color="#6366f1" stop-opacity="0.01"/>
+                        </linearGradient>
+                    </defs>
+                    <polygon points="${areaPoints}" fill="url(#areaGrad)"/>
+                    <polyline points="${linePoints}" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    ${points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="2.5" fill="#6366f1" stroke="#fff" stroke-width="1.5"/>`).join('')}
+                </svg>`;
+        }
+
+        function renderGA4Sources(sources) {
+            const container = document.getElementById('ga4Sources');
+            if (!sources || sources.length === 0) {
+                container.innerHTML = '<div style="color:#9ca3af;font-size:.82rem;text-align:center;padding:16px;">無流量來源資料</div>';
+                return;
+            }
+
+            const maxSessions = Math.max(...sources.map(s => s.sessions), 1);
+            const colors = ['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6b7280'];
+
+            container.innerHTML = sources.map((s, i) => {
+                const pct = (s.sessions / maxSessions * 100).toFixed(0);
+                const color = colors[i % colors.length];
+                return `<div style="margin-bottom:8px;">
+                    <div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px;">
+                        <span style="font-weight:500;color:#1a1a2e;">${s.channel}</span>
+                        <span style="color:#6b7280;">${s.sessions} 工作階段 · ${s.users} 用戶</span>
+                    </div>
+                    <div style="height:6px;background:#f0f1f3;border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .6s ease;"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderGA4Pages(pages) {
+            const tbody = document.getElementById('ga4PagesBody');
+            if (!pages || pages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="td-empty">無頁面資料</td></tr>';
+                return;
+            }
+            tbody.innerHTML = pages.map(p => `<tr>
+                <td><code style="font-size:.75rem;background:#f8fafc;padding:2px 6px;border-radius:4px;">${p.path}</code></td>
+                <td style="font-size:.78rem;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.title}</td>
+                <td style="text-align:right;font-weight:600;">${p.views.toLocaleString()}</td>
+                <td style="text-align:right;">${p.users.toLocaleString()}</td>
+            </tr>`).join('');
+        }
+
+        function renderGSCOverview(totals) {
+            if (!totals) return;
+            document.getElementById('gscClicks').textContent = totals.clicks.toLocaleString();
+            document.getElementById('gscImpressions').textContent = totals.impressions.toLocaleString();
+            document.getElementById('gscCtr').textContent = (totals.ctr * 100).toFixed(1) + '%';
+        }
+
+        function renderGSCQueries(queries) {
+            const tbody = document.getElementById('gscQueriesBody');
+            if (!queries || queries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="td-empty">無搜尋關鍵字資料</td></tr>';
+                return;
+            }
+            tbody.innerHTML = queries.map((q, i) => {
+                const posColor = q.position <= 3 ? '#10b981' : q.position <= 10 ? '#3b82f6' : q.position <= 20 ? '#f59e0b' : '#9ca3af';
+                return `<tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:.62rem;font-weight:700;color:#9ca3af;min-width:16px;">${i + 1}</span>
+                            <span style="font-size:.82rem;font-weight:500;">${q.query}</span>
+                        </div>
+                    </td>
+                    <td style="text-align:right;font-weight:600;">${q.clicks}</td>
+                    <td style="text-align:right;">${q.impressions.toLocaleString()}</td>
+                    <td style="text-align:right;">${(q.ctr * 100).toFixed(1)}%</td>
+                    <td style="text-align:right;"><span style="font-weight:600;color:${posColor};">${q.position.toFixed(1)}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderGSCPages(pages) {
+            const tbody = document.getElementById('gscPagesBody');
+            if (!pages || pages.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="td-empty">無頁面資料</td></tr>';
+                return;
+            }
+            tbody.innerHTML = pages.map(p => {
+                // Shorten URL
+                const short = p.page.replace('https://tbr.digital', '').replace('https://www.tbr.digital', '') || '/';
+                return `<tr>
+                    <td><code style="font-size:.72rem;background:#f8fafc;padding:2px 6px;border-radius:4px;">${short}</code></td>
+                    <td style="text-align:right;font-weight:600;">${p.clicks}</td>
+                    <td style="text-align:right;">${p.impressions.toLocaleString()}</td>
+                    <td style="text-align:right;">${p.position.toFixed(1)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // 綁定事件
+        document.getElementById('btnLoadAnalytics')?.addEventListener('click', loadAnalyticsData);
+        document.getElementById('analyticsDateRange')?.addEventListener('change', () => {
+            if (analyticsLoaded) loadAnalyticsData();
+        });
+
+        // 切到 analytics tab 時自動載入
+        document.querySelectorAll('.l1-tab').forEach(tab => {
+            const origClick = tab._analyticsClick;
+            tab.addEventListener('click', () => {
+                if (tab.dataset.l1tab === 'analytics' && !analyticsLoaded) {
+                    loadAnalyticsData();
+                }
+            });
+        });
+
+        // ══════════════════════════════════════════════════════
+        // ── Teachify 課程清單 ──
+        // ══════════════════════════════════════════════════════
+        const TEACHIFY_API = 'https://teachify.io/admin/graphql';
+        const TEACHIFY_KEY = 'vsXiCQXFlNs95GjiRHW4Y3mwc9L6_oj6VdRiTj-3ymE';
+        const SCHOOL_URL = 'https://tbr.digital';
+        let teachifyCourses = [];
+        let teachifyLoaded = false;
+
+        function getTeachifyCategory(course) {
+            const name = (course.name || '').toLowerCase();
+            const slug = (course.slug || '').toLowerCase();
+            if (slug.includes('vibe') || name.includes('vibe')) return 'vibe';
+            if (slug.includes('ai') || name.includes('ai') || name.includes('人工智慧')) return 'ai';
+            if (name.includes('行銷') || name.includes('marketing') || name.includes('廣告') ||
+                name.includes('crm') || slug.includes('crm') || name.includes('email') ||
+                slug.includes('email') || name.includes('轉換率') || slug.includes('cro') ||
+                slug.includes('ads') || slug.includes('marketing')) return 'marketing';
+            return 'other';
+        }
+
+        function getCategoryLabel(cat) {
+            const map = { ai: 'AI 應用', vibe: 'Vibe Coding', marketing: '行銷', other: '其他' };
+            return map[cat] || cat;
+        }
+
+        function getPlanTypeLabel(t) {
+            const map = { pre_order: '預購', one_time_purchase: '一次購買', subscription: '訂閱' };
+            return map[t] || t || '-';
+        }
+
+        async function fetchTeachifyCourses() {
+            const tbody = document.getElementById('courseTableBody');
+            tbody.innerHTML = '<tr><td colspan="7" class="td-empty"><div class="loading-inline"><span class="material-symbols-outlined" style="animation:spin .7s linear infinite;font-size:18px;">progress_activity</span> 正在從 Teachify 同步課程…</div></td></tr>';
+
+            try {
+                const query = `{
+                    courses {
+                        nodes {
+                            id name slug image subtitle
+                            lecturer { name avatar }
+                            plans { id name amount compareAtPrice currency planType }
+                        }
+                    }
+                }`;
+
+                const res = await fetch(TEACHIFY_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Teachify-API-Key': TEACHIFY_KEY
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await res.json();
+                if (data.errors) throw new Error(data.errors[0].message);
+
+                teachifyCourses = data.data.courses.nodes;
+                teachifyLoaded = true;
+                renderTeachifyCourses();
+                showToast(`已同步 ${teachifyCourses.length} 門課程`);
+            } catch (err) {
+                console.error('Teachify fetch error:', err);
+                tbody.innerHTML = `<tr><td colspan="7" class="td-error">載入失敗：${err.message}</td></tr>`;
+            }
+        }
+
+        function renderTeachifyCourses() {
+            const tbody = document.getElementById('courseTableBody');
+            const searchVal = (document.getElementById('courseSearch')?.value || '').toLowerCase().trim();
+            const catFilter = document.getElementById('courseCategoryFilter')?.value || '';
+
+            let filtered = teachifyCourses;
+            if (catFilter) {
+                filtered = filtered.filter(c => getTeachifyCategory(c) === catFilter);
+            }
+            if (searchVal) {
+                filtered = filtered.filter(c =>
+                    c.name.toLowerCase().includes(searchVal) ||
+                    (c.subtitle || '').toLowerCase().includes(searchVal) ||
+                    (c.lecturer?.name || '').toLowerCase().includes(searchVal) ||
+                    c.slug.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="td-empty">沒有符合條件的課程</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(c => {
+                const plans = c.plans || [];
+                const cheapest = plans.length ? plans.reduce((min, p) => p.amount < min.amount ? p : min, plans[0]) : null;
+                const priceHtml = !cheapest ? '<span style="color:#9ca3af;">-</span>'
+                    : cheapest.amount === 0 ? '<span style="color:#10b981;font-weight:600;">免費</span>'
+                    : `<span style="font-weight:600;">NT$ ${cheapest.amount.toLocaleString()}</span>${cheapest.compareAtPrice ? `<br><s style="font-size:.72rem;color:#9ca3af;">NT$ ${cheapest.compareAtPrice.toLocaleString()}</s>` : ''}${plans.length > 1 ? '<span style="font-size:.68rem;color:#9ca3af;"> 起</span>' : ''}`;
+
+                const planType = cheapest?.planType || '';
+                const planLabel = getPlanTypeLabel(planType);
+                const planColor = planType === 'pre_order' ? '#f59e0b' : planType === 'subscription' ? '#8b5cf6' : '#10b981';
+                const cat = getTeachifyCategory(c);
+                const catColor = cat === 'ai' ? '#3b82f6' : cat === 'vibe' ? '#8b5cf6' : cat === 'marketing' ? '#f59e0b' : '#6b7280';
+                const courseUrl = `${SCHOOL_URL}/courses/${c.slug}`;
+                const lecturer = c.lecturer || {};
+
+                return `<tr>
+                    <td>
+                        ${c.image
+                            ? `<img src="${c.image}" alt="" style="width:48px;height:27px;object-fit:cover;border-radius:6px;border:1px solid #eef0f4;">`
+                            : '<div style="width:48px;height:27px;border-radius:6px;background:#f1f5f9;"></div>'
+                        }
+                    </td>
+                    <td>
+                        <div style="display:flex;flex-direction:column;gap:2px;">
+                            <span style="font-weight:600;font-size:.85rem;line-height:1.4;">${c.name}</span>
+                            <span style="font-size:.68rem;color:#9ca3af;">
+                                <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${catColor};margin-right:4px;"></span>
+                                ${getCategoryLabel(cat)} · /${c.slug}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            ${lecturer.avatar
+                                ? `<img src="${lecturer.avatar}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;">`
+                                : ''
+                            }
+                            <span style="font-size:.82rem;">${lecturer.name || '-'}</span>
+                        </div>
+                    </td>
+                    <td>${priceHtml}</td>
+                    <td><span class="status-badge" style="background:${planColor}15;color:${planColor};">${planLabel}</span></td>
+                    <td><code style="font-size:.68rem;background:#f8fafc;padding:2px 6px;border-radius:4px;color:#6b7280;">${c.id.substring(0, 8)}</code></td>
+                    <td>
+                        <a href="${courseUrl}" target="_blank" title="在 Teachify 開啟" style="display:inline-flex;align-items:center;gap:3px;font-size:.75rem;color:#6366f1;text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid #ede9fe;transition:all .15s;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">open_in_new</span> 開啟
+                        </a>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // 課程清單事件綁定
+        document.getElementById('btnRefreshCourses')?.addEventListener('click', fetchTeachifyCourses);
+        document.getElementById('courseSearch')?.addEventListener('input', renderTeachifyCourses);
+        document.getElementById('courseCategoryFilter')?.addEventListener('change', renderTeachifyCourses);
+
+        // 切換到課程清單 tab 時自動載入
+        document.querySelectorAll('.l1-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (tab.dataset.l1tab === 'courses' && !teachifyLoaded) {
+                    fetchTeachifyCourses();
+                }
+            });
+        });
+
+        // CSS 動畫（loading spinner 用）
+        if (!document.getElementById('teachifySpinStyle')) {
+            const style = document.createElement('style');
+            style.id = 'teachifySpinStyle';
+            style.textContent = `
+                @keyframes spin { to { transform: rotate(360deg); } }
+                .loading-inline { display: flex; align-items: center; gap: 8px; justify-content: center; }
+            `;
+            document.head.appendChild(style);
+        }
 
         init();
     </script>
