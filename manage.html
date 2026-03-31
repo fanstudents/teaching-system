@@ -283,6 +283,24 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- AI 產品分析 -->
+                    <div style="margin-top:28px;border-top:2px solid #eef0f4;padding-top:24px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;color:#8b5cf6;">auto_awesome</span>
+                            <span style="font-size:.92rem;font-weight:600;color:#1a1a2e;">AI 產品綜合分析</span>
+                            <span style="font-size:.68rem;color:#9ca3af;">業績 × GA4 × GSC 關鍵字</span>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                            <button class="btn btn-dark" id="btnGenerateReport" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;">
+                                <span class="material-symbols-outlined">auto_awesome</span> 生成分析報告
+                            </button>
+                            <span id="reportStatus" style="font-size:.75rem;color:#9ca3af;display:flex;align-items:center;gap:4px;"></span>
+                        </div>
+                        <div id="aiReportContainer" class="data-table-wrap" style="padding:24px;display:none;">
+                            <div id="aiReportContent" style="font-size:.85rem;line-height:1.7;color:#1a1a2e;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="level2" style="display:none;">
@@ -796,7 +814,7 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { db, storage, auth, functions, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
+        import { db, storage, auth, functions, ai, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
 
         // ── Auth Guard ──
         const authResult = await requireAuth();
@@ -2841,6 +2859,225 @@
                 }
             });
         });
+
+
+        // ══════════════════════════════════════════════════════
+        // ── AI 產品綜合分析 ──
+        // ══════════════════════════════════════════════════════
+        let _cachedAnalyticsData = null; // 快取數據分析結果
+
+        // Override loadAnalyticsData to cache results
+        const _origLoadAnalytics = loadAnalyticsData;
+        loadAnalyticsData = async function() {
+            const days = parseInt(document.getElementById('analyticsDateRange').value) || 30;
+            const startDate = getDateStr(-days);
+            const endDate = getDateStr(-1);
+
+            ['ga4Users','ga4NewUsers','ga4Sessions','ga4PageViews','ga4BounceRate','ga4AvgDuration',
+             'gscClicks','gscImpressions','gscCtr'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '<span class="material-symbols-outlined" style="animation:spin .7s linear infinite;font-size:14px;">progress_activity</span>';
+            });
+
+            try {
+                const { data, error } = await functions.invoke('analytics-data', {
+                    body: { type: 'both', dateRange: { startDate, endDate } }
+                });
+                if (error) throw new Error(error.message);
+
+                _cachedAnalyticsData = data; // 快取
+
+                if (data.ga4 && !data.ga4.error) {
+                    renderGA4Overview(data.ga4.overview);
+                    renderGA4DailyChart(data.ga4.dailyTrend);
+                    renderGA4Sources(data.ga4.trafficSources);
+                    renderGA4Pages(data.ga4.topPages);
+                } else {
+                    document.getElementById('ga4Users').textContent = '!';
+                    showToast(`GA4 錯誤：${data.ga4?.error || 'unknown'}`);
+                }
+
+                if (data.gsc && !data.gsc.error) {
+                    renderGSCOverview(data.gsc.totals);
+                    renderGSCQueries(data.gsc.topQueries);
+                    renderGSCPages(data.gsc.topPages);
+                } else {
+                    document.getElementById('gscClicks').textContent = '!';
+                    showToast(`GSC 錯誤：${data.gsc?.error || 'unknown'}`);
+                }
+
+                analyticsLoaded = true;
+                document.getElementById('analyticsLastUpdate').textContent = `最後更新：${new Date().toLocaleString('zh-TW')}`;
+                showToast('數據已載入');
+            } catch (err) {
+                console.error('[analytics] Error:', err);
+                showToast(`數據載入失敗：${err.message}`);
+            }
+        };
+
+        async function generateProductReport() {
+            const statusEl = document.getElementById('reportStatus');
+            const container = document.getElementById('aiReportContainer');
+            const content = document.getElementById('aiReportContent');
+            const btn = document.getElementById('btnGenerateReport');
+
+            btn.disabled = true;
+            statusEl.innerHTML = '<span class="material-symbols-outlined" style="animation:spin .7s linear infinite;font-size:14px;">progress_activity</span> 正在收集資料與分析中…(約 15-30 秒)';
+            container.style.display = 'none';
+
+            try {
+                // 1. 確保 analytics 已載入
+                if (!_cachedAnalyticsData) {
+                    statusEl.textContent = '正在載入 GA4 / GSC 資料…';
+                    await loadAnalyticsData();
+                }
+
+                // 2. 拉取訂單資料
+                statusEl.textContent = '正在拉取訂單資料…';
+                const { data: orders } = await db.select('orders', {
+                    select: 'course_name,plan_name,amount,payment_status,coupon_code,affiliate_code,payment_time',
+                    order: 'payment_time.desc',
+                    limit: 500
+                });
+
+                // 彙整訂單數據
+                const orderStats = {};
+                let totalRevenue = 0;
+                let totalOrders = 0;
+                const couponUsage = {};
+                const affiliateUsage = {};
+
+                (orders || []).forEach(o => {
+                    if (o.payment_status !== 'Paid') return;
+                    const course = o.course_name || '未知課程';
+                    if (!orderStats[course]) orderStats[course] = { revenue: 0, count: 0, plans: {} };
+                    orderStats[course].revenue += (o.amount || 0);
+                    orderStats[course].count += 1;
+                    totalRevenue += (o.amount || 0);
+                    totalOrders += 1;
+
+                    const plan = o.plan_name || '無方案';
+                    orderStats[course].plans[plan] = (orderStats[course].plans[plan] || 0) + 1;
+
+                    if (o.coupon_code) couponUsage[o.coupon_code] = (couponUsage[o.coupon_code] || 0) + 1;
+                    if (o.affiliate_code) affiliateUsage[o.affiliate_code] = (affiliateUsage[o.affiliate_code] || 0) + 1;
+                });
+
+                // 3. 組裝 prompt
+                const ga4 = _cachedAnalyticsData?.ga4 || {};
+                const gsc = _cachedAnalyticsData?.gsc || {};
+
+                const orderSummary = Object.entries(orderStats)
+                    .sort((a, b) => b[1].revenue - a[1].revenue)
+                    .map(([name, s]) => {
+                        const plans = Object.entries(s.plans).map(([p, c]) => `    - ${p}: ${c} 筆`).join('\n');
+                        return `- ${name}: ${s.count} 筆, 營收 NT$ ${s.revenue.toLocaleString()}\n${plans}`;
+                    }).join('\n');
+
+                const ga4Summary = ga4.overview ? `活躍用戶: ${ga4.overview.activeUsers}, 新用戶: ${ga4.overview.newUsers}, 工作階段: ${ga4.overview.sessions}, 瀏覽量: ${ga4.overview.pageViews}, 跳出率: ${(ga4.overview.bounceRate * 100).toFixed(1)}%, 平均停留: ${Math.round(ga4.overview.avgSessionDuration)}秒` : '無資料';
+
+                const topPagesStr = (ga4.topPages || []).slice(0, 10)
+                    .map(p => `  - ${p.path} (${p.views} views, ${p.users} users)`).join('\n');
+
+                const sourcesStr = (ga4.trafficSources || [])
+                    .map(s => `  - ${s.channel}: ${s.sessions} sessions, ${s.users} users`).join('\n');
+
+                const gscQueriesStr = (gsc.topQueries || []).slice(0, 15)
+                    .map(q => `  - "${q.query}": ${q.clicks} 點擊, ${q.impressions} 曝光, CTR ${(q.ctr * 100).toFixed(1)}%, 排名 ${q.position.toFixed(1)}`).join('\n');
+
+                const couponStr = Object.entries(couponUsage)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([c, n]) => `  - ${c}: ${n} 次`).join('\n');
+
+                const affiliateStr = Object.entries(affiliateUsage)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([a, n]) => `  - ${a}: ${n} 筆`).join('\n');
+
+                const days = document.getElementById('analyticsDateRange').value || 30;
+
+                statusEl.textContent = '正在生成 AI 分析報告…';
+
+                const prompt = `你是一位數位行銷與產品策略分析師。以下是「數位簡報室 The Briefing Room」(tbr.digital) 過去 ${days} 天的綜合數據。請用繁體中文生成一份專業的產品分析報告。
+
+## 訂單業績數據
+總訂單數: ${totalOrders}
+總營收: NT$ ${totalRevenue.toLocaleString()}
+
+### 各課程銷售明細
+${orderSummary || '無訂單資料'}
+
+### 優惠碼使用
+${couponStr || '無優惠碼使用'}
+
+### 聯盟行銷推廣
+${affiliateStr || '無聯盟行銷資料'}
+
+## GA4 流量數據
+${ga4Summary}
+
+### 熱門頁面
+${topPagesStr || '無頁面資料'}
+
+### 流量來源
+${sourcesStr || '無來源資料'}
+
+## Google Search Console 搜尋數據
+${gscQueriesStr || '無搜尋資料'}
+
+---
+
+請根據以上數據，生成以下格式的分析報告：
+
+1. **業績概覽** — 總營收、訂單數、客單價、各課程銷售占比
+2. **流量分析** — 網站流量趨勢、主要來源、跳出率評估
+3. **SEO 洞察** — 關鍵字表現、排名機會、搜尋意圖分析
+4. **產品策略建議** — 根據業績與流量的綜合分析，提出具體行動建議
+5. **重點關注** — 需要立即處理的問題或可以快速獲利的機會
+
+請用 markdown 格式輸出，包含表格、粗體重點、數據佐證。`;
+
+                const reportText = await ai.chat([
+                    { role: 'system', content: '你是專業的數位行銷分析師，擅長數據驅動的產品策略分析。回答時使用繁體中文，分析要具體且可操作。' },
+                    { role: 'user', content: prompt }
+                ], { temperature: 0.4, maxTokens: 4096 });
+
+                // 簡易 markdown 渲染
+                content.innerHTML = renderMarkdown(reportText);
+                container.style.display = 'block';
+                statusEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:#10b981;">check_circle</span> 報告已生成';
+
+            } catch (err) {
+                console.error('[report] Error:', err);
+                statusEl.textContent = `生成失敗：${err.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function renderMarkdown(md) {
+            return md
+                .replace(/^### (.+)$/gm, '<h4 style="font-size:.88rem;font-weight:600;color:#6366f1;margin:18px 0 8px;border-bottom:1px solid #eef0f4;padding-bottom:6px;">$1</h4>')
+                .replace(/^## (.+)$/gm, '<h3 style="font-size:.95rem;font-weight:700;color:#1a1a2e;margin:22px 0 10px;">$1</h3>')
+                .replace(/^# (.+)$/gm, '<h2 style="font-size:1.05rem;font-weight:700;color:#1a1a2e;margin:24px 0 12px;">$1</h2>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#1a1a2e;">$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`(.+?)`/g, '<code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.8rem;">$1</code>')
+                .replace(/^\- (.+)$/gm, '<div style="padding-left:16px;margin:3px 0;"><span style="color:#6366f1;margin-right:6px;">•</span>$1</div>')
+                .replace(/^\d+\. (.+)$/gm, '<div style="padding-left:16px;margin:3px 0;">$1</div>')
+                .replace(/\n{2,}/g, '<br><br>')
+                .replace(/\n/g, '<br>')
+                // Tables
+                .replace(/\|(.+)\|\n\|[-:| ]+\|\n((?:\|.+\|\n?)*)/g, (match, header, body) => {
+                    const ths = header.split('|').filter(Boolean).map(h => `<th style="padding:6px 10px;text-align:left;font-size:.72rem;font-weight:600;color:#8b8fa3;border-bottom:1px solid #eef0f4;">${h.trim()}</th>`).join('');
+                    const rows = body.trim().split('\n').map(row => {
+                        const tds = row.split('|').filter(Boolean).map(d => `<td style="padding:6px 10px;font-size:.8rem;border-bottom:1px solid #f8fafc;">${d.trim()}</td>`).join('');
+                        return `<tr>${tds}</tr>`;
+                    }).join('');
+                    return `<table style="width:100%;border-collapse:collapse;margin:10px 0;"><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+                });
+        }
+
+        document.getElementById('btnGenerateReport')?.addEventListener('click', generateProductReport);
 
         // ══════════════════════════════════════════════════════
         // ── Teachify 課程清單 ──
