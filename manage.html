@@ -796,7 +796,7 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { db, storage, auth, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
+        import { db, storage, auth, functions, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
 
         // ── Auth Guard ──
         const authResult = await requireAuth();

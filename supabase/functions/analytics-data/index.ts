@@ -57,7 +57,7 @@ async function getAccessToken(sa: any, scope: string): Promise<string> {
 // ── GA4 Property ID ──
 const GA4_PROPERTY_ID = '412879003';
 // ── GSC Site URL ──
-const GSC_SITE_URL = 'https://tbr.digital/';
+const GSC_SITE_URL = 'sc-domain:tbr.digital';
 
 serve(async (req) => {
     if (req.method === 'OPTIONS') {
@@ -99,6 +99,38 @@ serve(async (req) => {
                 gsc: gscResult.status === 'fulfilled' ? gscResult.value : { error: gscResult.reason?.message },
                 dateRange: { startDate, endDate }
             }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
+        } else if (type === 'debug') {
+            // Debug: show service account email and try a simple GA4 + GSC call
+            const accessToken = await getAccessToken(sa, 'https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/webmasters.readonly');
+            
+            const [ga4Test, gscTest] = await Promise.all([
+                fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runReport`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        dateRanges: [{ startDate: getDateStr(-7), endDate: getDateStr(-1) }],
+                        metrics: [{ name: 'activeUsers' }]
+                    })
+                }).then(r => r.json()),
+                fetch(`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(GSC_SITE_URL)}/searchAnalytics/query`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        startDate: getDateStr(-7), endDate: getDateStr(-1),
+                        dimensions: ['query'], rowLimit: 3
+                    })
+                }).then(r => r.json())
+            ]);
+
+            return new Response(JSON.stringify({
+                serviceAccount: sa.client_email,
+                ga4PropertyId: GA4_PROPERTY_ID,
+                gscSiteUrl: GSC_SITE_URL,
+                ga4RawResponse: ga4Test,
+                gscRawResponse: gscTest
+            }, null, 2), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
         } else {
