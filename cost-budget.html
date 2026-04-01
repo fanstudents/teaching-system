@@ -24,35 +24,35 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Noto Sans TC', 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
-        /* Page Header */
-        .page-header {
+        /* Page Header — override base.css */
+        .admin-main > .page-header {
             background: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a5b4fc 100%);
             padding: 24px 32px; position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 4px 20px rgba(99,102,241,.2);
+            box-shadow: 0 4px 20px rgba(99,102,241,.2); margin-bottom: 0;
         }
-        .page-header h1 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: #fff; }
-        .page-header h1 .material-symbols-outlined { color: rgba(255,255,255,.8); }
-        .page-header p { font-size: 0.76rem; color: rgba(255,255,255,.7); margin-top: 3px; }
+        .admin-main > .page-header h1 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: #fff; letter-spacing: -0.01em; }
+        .admin-main > .page-header h1 .material-symbols-outlined { color: rgba(255,255,255,.8); }
+        .admin-main > .page-header p { font-size: 0.76rem; color: rgba(255,255,255,.7); margin-top: 3px; }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 24px 24px; }
 
         /* Controls */
-        .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
-        .controls select { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.82rem; font-family: inherit; background: var(--card); box-shadow: var(--shadow-sm); }
-        .btn { display: inline-flex; align-items: center; gap: 5px; padding: 9px 20px; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
-        .btn-save { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3); }
-        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,.35); }
-        .btn-export { background: var(--card); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
-        .btn-export:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-sync { background: var(--text); color: #fff; box-shadow: var(--shadow-sm); }
-        .btn-sync:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,41,59,.2); }
-        .btn-sync:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-        .btn-sm { padding: 5px 12px; font-size: 0.76rem; border-radius: 8px; }
-        .btn-add { background: var(--card); color: var(--text-secondary); border: 1.5px dashed var(--border); }
-        .btn-add:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
-        .btn-del { background: none; color: var(--text-muted); border: none; padding: 4px; cursor: pointer; transition: color .15s; }
-        .btn-del:hover { color: var(--negative); }
-        .auto-saved { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 3px; }
+        .admin-main .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .admin-main .controls select { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 0.82rem; font-family: inherit; background: var(--card); box-shadow: var(--shadow-sm); }
+        .admin-main .btn { display: inline-flex; align-items: center; gap: 5px; padding: 9px 20px; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; min-height: unset; background: var(--card); color: var(--text-secondary); }
+        .admin-main .btn-save { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+        .admin-main .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,.35); background: linear-gradient(135deg, #4f46e5, #6366f1); }
+        .admin-main .btn-export { background: var(--card); color: var(--text-secondary); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+        .admin-main .btn-export:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .admin-main .btn-sync { background: var(--text); color: #fff; box-shadow: var(--shadow-sm); }
+        .admin-main .btn-sync:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,41,59,.2); background: #334155; }
+        .admin-main .btn-sync:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        .admin-main .btn-sm { padding: 5px 12px; font-size: 0.76rem; border-radius: 8px; }
+        .admin-main .btn-add { background: var(--card); color: var(--text-secondary); border: 1.5px dashed var(--border); }
+        .admin-main .btn-add:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+        .admin-main .btn-del { background: none; color: var(--text-muted); border: none; padding: 4px; cursor: pointer; transition: color .15s; min-height: unset; }
+        .admin-main .btn-del:hover { color: var(--negative); }
+        .admin-main .auto-saved { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 3px; }
 
         /* Summary Table */
         .summary-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 22px; box-shadow: var(--shadow-sm); }
@@ -65,21 +65,21 @@
         .summary-table tr:last-child td { border-bottom: none; }
 
         /* Section */
-        .section { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
-        .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px; background: linear-gradient(to bottom, #fafbfd, var(--card)); }
-        .section-header h3 { font-size: 0.88rem; font-weight: 700; }
-        .section-body { padding: 0 20px 16px; }
+        .admin-main .section { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        .admin-main .section-header { padding: 14px 20px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px; background: linear-gradient(to bottom, #fafbfd, var(--card)); }
+        .admin-main .section-header h3 { font-size: 0.88rem; font-weight: 700; }
+        .admin-main .section-body { padding: 0 20px 16px; }
 
         /* Tabs */
-        .tab-bar { display: flex; border-bottom: 2px solid var(--border-light); margin-bottom: 20px; gap: 0; background: var(--card); border-radius: var(--radius) var(--radius) 0 0; padding: 0 6px; box-shadow: var(--shadow-sm); }
-        .tab-btn { padding: 12px 22px; font-size: 0.84rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--text-muted); position: relative; font-family: inherit; transition: color .2s; display: flex; align-items: center; gap: 6px; }
-        .tab-btn:hover { color: var(--text-secondary); }
-        .tab-btn.active { color: var(--accent); }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 6px; right: 6px; height: 2.5px; background: linear-gradient(90deg, var(--accent), #818cf8); border-radius: 3px 3px 0 0; }
-        .tab-badge { font-size: 0.62rem; padding: 2px 7px; border-radius: 10px; background: var(--border-light); color: var(--text-secondary); font-weight: 700; }
-        .tab-btn.active .tab-badge { background: var(--accent-light); color: var(--accent); }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+        .admin-main .tab-bar { display: flex; border-bottom: 2px solid var(--border-light); margin-bottom: 20px; gap: 0; background: var(--card); border-radius: var(--radius) var(--radius) 0 0; padding: 0 6px; box-shadow: var(--shadow-sm); }
+        .admin-main .tab-btn { padding: 12px 22px; font-size: 0.84rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--text-muted); position: relative; font-family: inherit; transition: color .2s; display: flex; align-items: center; gap: 6px; min-height: unset; border-radius: 0; }
+        .admin-main .tab-btn:hover { color: var(--text-secondary); background: transparent; }
+        .admin-main .tab-btn.active { color: var(--accent); }
+        .admin-main .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 6px; right: 6px; height: 2.5px; background: linear-gradient(90deg, var(--accent), #818cf8); border-radius: 3px 3px 0 0; }
+        .admin-main .tab-badge { font-size: 0.62rem; padding: 2px 7px; border-radius: 10px; background: var(--border-light); color: var(--text-secondary); font-weight: 700; }
+        .admin-main .tab-btn.active .tab-badge { background: var(--accent-light); color: var(--accent); }
+        .admin-main .tab-panel { display: none; }
+        .admin-main .tab-panel.active { display: block; }
 
         /* Product table */
         .product-list { width: 100%; }
@@ -102,9 +102,9 @@
         .product-table tr.product-detail-row td { padding: 8px 12px 16px 36px; background: #fafbfd; }
         .product-detail-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
         .row-chevron { font-size: 18px; color: var(--text-muted); transition: transform .2s; flex-shrink: 0; }
-        .badge { font-size: 0.64rem; padding: 3px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap; background: var(--accent-light); color: var(--accent); margin-left: 6px; }
-        .badge-order { background: var(--accent-light); color: var(--accent); }
-        .badge-type { background: var(--border-light); color: var(--text-secondary); }
+        .admin-main .badge { font-size: 0.64rem; padding: 3px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap; background: var(--accent-light); color: var(--accent); margin-left: 6px; line-height: 1.4; }
+        .admin-main .badge-order { background: var(--accent-light); color: var(--accent); }
+        .admin-main .badge-type { background: var(--border-light); color: var(--text-secondary); }
 
         /* Session toggle */
         .sess-open > .sess-detail { display: block !important; }
