@@ -133,8 +133,15 @@ serve(async (req) => {
             }, null, 2), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
+        } else if (type === 'affiliate') {
+            const couponCode = body.couponCode;
+            if (!couponCode) throw new Error('couponCode required for affiliate type');
+            const data = await fetchAffiliateGA4(sa, startDate, endDate, couponCode);
+            return new Response(JSON.stringify({ affiliate: data, dateRange: { startDate, endDate } }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
         } else {
-            throw new Error('Invalid type. Use "ga4", "gsc", or "both".');
+            throw new Error('Invalid type. Use "ga4", "gsc", "both", or "affiliate".');
         }
 
     } catch (err) {
@@ -328,4 +335,108 @@ async function handleGSC(sa: any, startDate: string, endDate: string) {
     return new Response(JSON.stringify({ gsc: data, dateRange: { startDate, endDate } }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
+}
+
+// ══════════════════════════════════════════
+// ── Affiliate GA4 (filtered by utm_content) ──
+// ══════════════════════════════════════════
+async function fetchAffiliateGA4(sa: any, startDate: string, endDate: string, couponCode: string) {
+    const accessToken = await getAccessToken(sa, 'https://www.googleapis.com/auth/analytics.readonly');
+
+    const baseFilter = {
+        andGroup: {
+            expressions: [
+                { filter: { fieldName: 'sessionCampaignName', stringFilter: { matchType: 'EXACT', value: 'affiliate' } } },
+                { filter: { fieldName: 'sessionManualAdContent', stringFilter: { matchType: 'EXACT', value: couponCode, caseSensitive: false } } }
+            ]
+        }
+    };
+
+    const [overviewRes, dailyRes, sourceRes, pageRes] = await Promise.all([
+        // 1. Overview
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runReport`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dateRanges: [{ startDate, endDate }],
+                metrics: [
+                    { name: 'activeUsers' }, { name: 'sessions' },
+                    { name: 'screenPageViews' }, { name: 'bounceRate' },
+                    { name: 'averageSessionDuration' }, { name: 'newUsers' }
+                ],
+                dimensionFilter: baseFilter
+            })
+        }),
+        // 2. Daily trend
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runReport`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dateRanges: [{ startDate, endDate }],
+                dimensions: [{ name: 'date' }],
+                metrics: [{ name: 'activeUsers' }, { name: 'sessions' }, { name: 'screenPageViews' }],
+                dimensionFilter: baseFilter,
+                orderBys: [{ dimension: { dimensionName: 'date' }, desc: false }]
+            })
+        }),
+        // 3. Source breakdown (utm_source)
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runReport`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dateRanges: [{ startDate, endDate }],
+                dimensions: [{ name: 'sessionSource' }],
+                metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'screenPageViews' }],
+                dimensionFilter: baseFilter,
+                orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+                limit: 10
+            })
+        }),
+        // 4. Top landing pages
+        fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:runReport`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dateRanges: [{ startDate, endDate }],
+                dimensions: [{ name: 'pagePath' }],
+                metrics: [{ name: 'screenPageViews' }, { name: 'activeUsers' }],
+                dimensionFilter: baseFilter,
+                orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+                limit: 10
+            })
+        })
+    ]);
+
+    const [overview, daily, sources, pages] = await Promise.all([
+        overviewRes.json(), dailyRes.json(), sourceRes.json(), pageRes.json()
+    ]);
+
+    const ov = overview.rows?.[0]?.metricValues || [];
+    return {
+        overview: {
+            activeUsers: parseInt(ov[0]?.value || '0'),
+            sessions: parseInt(ov[1]?.value || '0'),
+            pageViews: parseInt(ov[2]?.value || '0'),
+            bounceRate: parseFloat(ov[3]?.value || '0'),
+            avgSessionDuration: parseFloat(ov[4]?.value || '0'),
+            newUsers: parseInt(ov[5]?.value || '0')
+        },
+        dailyTrend: (daily.rows || []).map((r: any) => ({
+            date: r.dimensionValues[0].value,
+            users: parseInt(r.metricValues[0].value),
+            sessions: parseInt(r.metricValues[1].value),
+            pageViews: parseInt(r.metricValues[2].value)
+        })),
+        sources: (sources.rows || []).map((r: any) => ({
+            source: r.dimensionValues[0].value,
+            sessions: parseInt(r.metricValues[0].value),
+            users: parseInt(r.metricValues[1].value),
+            pageViews: parseInt(r.metricValues[2].value)
+        })),
+        topPages: (pages.rows || []).map((r: any) => ({
+            path: r.dimensionValues[0].value,
+            views: parseInt(r.metricValues[0].value),
+            users: parseInt(r.metricValues[1].value)
+        }))
+    };
 }
