@@ -94,6 +94,10 @@
         .toggle-opt { padding: 4px 10px; font-size: 0.72rem; font-weight: 600; cursor: pointer; background: #fff; color: #94a3b8; transition: all .15s; border: none; font-family: inherit; }
         .toggle-opt.active { background: #6366f1; color: #fff; }
         .full-row { grid-column: 1 / -1; }
+        .date-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid #f0f1f3; margin-top: 4px; }
+        .type-tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+        .type-tag.onetime { background: #fef3c7; color: #d97706; }
+        .type-tag.monthly { background: #dbeafe; color: #2563eb; }
         .add-row { padding: 10px 6px; }
 
         /* Sub-section */
@@ -162,7 +166,7 @@
             <div class="section-body">
                 <div class="shared-row">
                     <div class="shared-item"><label>稅率</label><input type="number" class="shared-input" id="globalTaxRate" value="5" step="0.1"><span class="pct-label">%</span></div>
-                    <div class="shared-item"><label>金流手續費</label><input type="number" class="shared-input" id="globalPaymentRate" value="2.8" step="0.1"><span class="pct-label">%</span></div>
+                    <div class="shared-item" style="font-size:.76rem;color:#94a3b8;">公開課程金流手續費：5% + 15元/筆</div>
                 </div>
             </div>
         </div>
@@ -208,6 +212,13 @@
                         <div class="subsection-body">
                             <div class="product-list" id="bizDevProducts"></div>
                             <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('bizDev')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
+                        </div>
+                    </div>
+                    <div class="subsection">
+                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:#10b981;">engineering</span> 專家派遣</div>
+                        <div class="subsection-body">
+                            <div class="product-list" id="bizExpertProducts"></div>
+                            <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('bizExpert')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
                         </div>
                     </div>
                     <div class="cost-subtotal"><span>企業服務合計</span><span>收入 <span id="bizRevTotal" style="color:#3b82f6;">NT$ 0</span> ｜ 成本 <span id="bizCostTotal">NT$ 0</span> ｜ 利潤 <span id="bizProfitTotal" style="color:#10b981;">NT$ 0</span></span></div>
@@ -257,8 +268,9 @@ const TEACHIFY_API = 'https://teachify.io/admin/graphql';
 const TEACHIFY_KEY = 'vsXiCQXFlNs95GjiRHW4Y3mwc9L6_oj6VdRiTj-3ymE';
 const SERVICE_OWNER_ID = '60182dbe-09ea-4e92-b8d7-ed2c24b81eb9';
 
-const GROUPS = ['b2b', 'b2c', 'bizMarketing', 'bizDev'];
-let products = { b2b: [], b2c: [], bizMarketing: [], bizDev: [] };
+const GROUPS = ['b2b', 'b2c', 'bizMarketing', 'bizDev', 'bizExpert'];
+const BIZ_GROUPS = ['bizMarketing', 'bizDev', 'bizExpert'];
+let products = { b2b: [], b2c: [], bizMarketing: [], bizDev: [], bizExpert: [] };
 let ordersByCourseName = {};
 let nextId = 1;
 const STORE_KEY = 'tbr_cost_budget_v4';
@@ -345,12 +357,10 @@ async function autoSync(silent = false) {
         products.b2b = newB2b;
         products.b2c = newB2c;
         // Biz: restore from saved only
-        products.bizMarketing = (saved?.products?.bizMarketing || []).map(p => ({ ...p, id: nextId++ }));
-        products.bizDev = (saved?.products?.bizDev || []).map(p => ({ ...p, id: nextId++ }));
+        BIZ_GROUPS.forEach(g => { products[g] = (saved?.products?.[g] || []).map(p => ({ ...p, id: nextId++ })); });
 
         if (saved) {
             document.getElementById('globalTaxRate').value = saved.globalTaxRate ?? 5;
-            document.getElementById('globalPaymentRate').value = saved.globalPaymentRate ?? 2.8;
             if (saved.tools) Object.entries(saved.tools).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val || ''; });
         }
 
@@ -385,10 +395,12 @@ function getSavedMonth(month) {
 
 // ── Product CRUD ──
 window.addProduct = function(group) {
+    const isBizGroup = BIZ_GROUPS.includes(group);
     products[group].push({
         id: nextId++, name: '', courseName: '', revenue: 0,
         lecturerType: 'fixed', lecturerFee: 0, lecturerPercent: 0,
-        kol: 0, ads: 0, venue: 0, assistant: 0, transport: 0, material: 0, personnel: 0
+        kol: 0, ads: 0, venue: 0, assistant: 0, transport: 0, material: 0, personnel: 0,
+        revenueType: isBizGroup ? 'onetime' : '', serviceDate: ''
     });
     renderAll();
 };
@@ -396,19 +408,26 @@ window.removeProduct = function(group, id) { products[group] = products[group].f
 window.toggleLecturerType = function(group, id, type) { const p = products[group].find(p => p.id === id); if (p) { p.lecturerType = type; renderAll(); } };
 window.updateProduct = function(group, id, field, value) {
     const p = products[group].find(p => p.id === id);
-    if (p) { p[field] = (field === 'name' || field === 'courseName') ? value : (parseFloat(value) || 0); recalculate(); }
+    if (p) { p[field] = (field === 'name' || field === 'courseName' || field === 'revenueType' || field === 'serviceDate') ? value : (parseFloat(value) || 0); recalculate(); }
 };
 
-function calcCosts(p) {
+function calcCosts(p, group) {
     const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
-    const payRate = parseFloat(document.getElementById('globalPaymentRate').value) || 0;
+    const isB2c = group === 'b2c';
+    const isBiz = BIZ_GROUPS.includes(group);
     const rev = p.revenue || 0;
     const tax = Math.round(rev * taxRate / 100);
-    const payFee = Math.round(rev * payRate / 100);
+    // 金流手續費只有 B2C：5% + 15元/筆
+    const orderCount = p.orderCount || (isB2c && rev > 0 ? 1 : 0);
+    const payFee = isB2c ? Math.round(rev * 0.05 + orderCount * 15) : 0;
     const lecCost = p.lecturerType === 'percent' ? Math.round(rev * (p.lecturerPercent || 0) / 100) : (p.lecturerFee || 0);
-    const varCosts = (p.kol||0)+(p.ads||0)+(p.venue||0)+(p.assistant||0)+(p.transport||0)+(p.material||0)+(p.personnel||0);
-    const totalCost = tax + payFee + lecCost + varCosts;
-    return { rev, tax, payFee, lecCost, varCosts, totalCost, profit: rev - totalCost, taxRate, payRate };
+    // KOL/廣告/場地只有 B2C
+    const b2cCosts = isB2c ? ((p.kol||0)+(p.ads||0)+(p.venue||0)) : 0;
+    // 人事費只有企業服務
+    const personnelCost = isBiz ? (p.personnel||0) : 0;
+    const commonCosts = (p.assistant||0)+(p.transport||0)+(p.material||0);
+    const totalCost = tax + payFee + lecCost + b2cCosts + personnelCost + commonCosts;
+    return { rev, tax, payFee, lecCost, b2cCosts, personnelCost, commonCosts, totalCost, profit: rev - totalCost, taxRate, orderCount, isB2c, isBiz };
 }
 
 // ── Render ──
@@ -418,12 +437,11 @@ function renderProducts(group) {
     const container = document.getElementById(`${group}Products`);
     const list = products[group];
     const isB2b = group === 'b2b';
-    const isBiz = group === 'bizMarketing' || group === 'bizDev';
-    const countEl = document.getElementById(`${group === 'bizMarketing' || group === 'bizDev' ? 'biz' : group}Count`);
+    const isBiz = BIZ_GROUPS.includes(group);
+    const countEl = document.getElementById(`${isBiz ? 'biz' : group}Count`);
 
-    if (group === 'bizMarketing' || group === 'bizDev') {
-        // biz count = marketing + dev
-        document.getElementById('bizCount').textContent = products.bizMarketing.length + products.bizDev.length;
+    if (isBiz) {
+        document.getElementById('bizCount').textContent = BIZ_GROUPS.reduce((s,g) => s + products[g].length, 0);
     } else {
         countEl.textContent = list.length;
     }
@@ -434,16 +452,18 @@ function renderProducts(group) {
     }
 
     container.innerHTML = list.map(p => {
-        const c = calcCosts(p);
+        const c = calcCosts(p, group);
         const orderBadge = p.orderCount ? `<span class="badge badge-order">${p.orderCount} 筆 NT$${(p.orderRevenue||0).toLocaleString()}</span>` : '';
         const subLabel = isB2b && p.courseName ? `<span class="row-sub">${p.courseName}</span>` : '';
+        const typeTag = isBiz && p.revenueType ? `<span class="type-tag ${p.revenueType}">${p.revenueType==='monthly'?'每月':'一次性'}</span>` : '';
+        const dateLabel = isBiz && p.serviceDate ? `<span class="row-sub">${p.serviceDate}</span>` : '';
         const profitClass = c.profit >= 0 ? 'pos' : 'neg';
 
         return `<div class="product-row">
             <div class="product-row-header" onclick="toggleRow(this)">
                 <span class="material-symbols-outlined row-chevron">chevron_right</span>
                 <span class="row-name">${p.name || '未命名'}</span>
-                ${subLabel}
+                ${subLabel}${typeTag}${dateLabel}
                 <div class="row-right">
                     ${orderBadge}
                     <span class="row-rev">NT$ ${c.rev.toLocaleString()}</span>
@@ -454,9 +474,18 @@ function renderProducts(group) {
             <div class="product-detail">
                 <div class="field"><span class="field-label">📝 ${isB2b ? '客戶名稱' : '名稱'}</span><input type="text" class="field-input" value="${p.name}" oninput="updateProduct('${group}',${p.id},'name',this.value)"></div>
                 ${isB2b ? `<div class="field"><span class="field-label">📚 課程名稱</span><input type="text" class="field-input" value="${p.courseName||''}" oninput="updateProduct('${group}',${p.id},'courseName',this.value)"></div>` : '<div></div>'}
+                ${isBiz ? `<div class="date-row">
+                    <span class="field-label">📅 日期</span>
+                    <input type="date" class="field-input" style="width:150px;text-align:left;" value="${p.serviceDate||''}" oninput="updateProduct('${group}',${p.id},'serviceDate',this.value)">
+                    <span class="field-label" style="min-width:auto;">💼 類型</span>
+                    <div class="toggle-wrap">
+                        <button class="toggle-opt ${p.revenueType==='onetime'?'active':''}" onclick="updateProduct('${group}',${p.id},'revenueType','onetime');renderAll()">一次性</button>
+                        <button class="toggle-opt ${p.revenueType==='monthly'?'active':''}" onclick="updateProduct('${group}',${p.id},'revenueType','monthly');renderAll()">每月</button>
+                    </div>
+                </div>` : ''}
                 <div class="field"><span class="field-label">💰 實收金額</span><input type="number" class="field-input rev-input" value="${p.revenue||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'revenue',this.value)"></div>
                 <div class="field"><span class="field-label" style="color:#94a3b8;">🧾 稅金 ${c.taxRate}%</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${c.tax.toLocaleString()}</div></div>
-                <div class="field"><span class="field-label" style="color:#94a3b8;">💳 手續費 ${c.payRate}%</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${c.payFee.toLocaleString()}</div></div>
+                ${c.isB2c ? `<div class="field"><span class="field-label" style="color:#94a3b8;">💳 金流 5%+15/筆</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${c.payFee.toLocaleString()} (${c.orderCount}筆)</div></div>` : ''}
                 <div class="lecturer-row">
                     <span class="field-label">🎓 講師費</span>
                     <div class="toggle-wrap">
@@ -467,13 +496,15 @@ function renderProducts(group) {
                         ? `<input type="number" class="field-input" style="width:120px;" value="${p.lecturerFee||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'lecturerFee',this.value)">`
                         : `<input type="number" class="field-input" style="width:80px;" value="${p.lecturerPercent||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'lecturerPercent',this.value)"><span class="pct-label">% = NT$ ${c.lecCost.toLocaleString()}</span>`}
                 </div>
+                ${c.isB2c ? `
                 <div class="field"><span class="field-label">📣 KOL 推廣</span><input type="number" class="field-input" value="${p.kol||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'kol',this.value)"></div>
                 <div class="field"><span class="field-label">📢 廣告費</span><input type="number" class="field-input" value="${p.ads||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'ads',this.value)"></div>
                 <div class="field"><span class="field-label">📍 場地費</span><input type="number" class="field-input" value="${p.venue||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'venue',this.value)"></div>
+                ` : ''}
                 <div class="field"><span class="field-label">👤 助教費</span><input type="number" class="field-input" value="${p.assistant||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'assistant',this.value)"></div>
                 <div class="field"><span class="field-label">🚗 車馬費</span><input type="number" class="field-input" value="${p.transport||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'transport',this.value)"></div>
                 <div class="field"><span class="field-label">📖 教材費</span><input type="number" class="field-input" value="${p.material||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'material',this.value)"></div>
-                ${isBiz ? `<div class="field"><span class="field-label">👥 人事費</span><input type="number" class="field-input" value="${p.personnel||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'personnel',this.value)"></div>` : ''}
+                ${c.isBiz ? `<div class="field"><span class="field-label">👥 人事費</span><input type="number" class="field-input" value="${p.personnel||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'personnel',this.value)"></div>` : ''}
             </div>
         </div>`;
     }).join('');
@@ -484,12 +515,12 @@ function recalculate() {
     let grandRev = 0, grandCost = 0;
 
     // Per-category subtotals
-    const catGroups = { b2b: ['b2b'], b2c: ['b2c'], biz: ['bizMarketing', 'bizDev'] };
+    const catGroups = { b2b: ['b2b'], b2c: ['b2c'], biz: BIZ_GROUPS };
     Object.entries(catGroups).forEach(([cat, groups]) => {
         let cRev = 0, cCost = 0;
         groups.forEach(g => {
             products[g].forEach(p => {
-                const c = calcCosts(p);
+                const c = calcCosts(p, g);
                 cRev += c.rev; cCost += c.totalCost;
             });
         });
@@ -553,7 +584,6 @@ function saveAll() {
     [...toolIds,...platIds].forEach(id => { toolsData[id] = parseFloat(document.getElementById(id)?.value) || 0; });
     all[month] = {
         globalTaxRate: parseFloat(document.getElementById('globalTaxRate').value) || 0,
-        globalPaymentRate: parseFloat(document.getElementById('globalPaymentRate').value) || 0,
         products: JSON.parse(JSON.stringify(products)),
         tools: toolsData
     };
@@ -564,15 +594,17 @@ function saveAll() {
 function exportCSV() {
     const month = monthSelect.value;
     const rows = [['類別','名稱','項目','金額(NT$)']];
-    const labels = { b2b: '企業內訓', b2c: '公開課程', bizMarketing: '行銷代操', bizDev: '系統開發' };
+    const labels = { b2b: '企業內訓', b2c: '公開課程', bizMarketing: '行銷代操', bizDev: '系統開發', bizExpert: '專家派遣' };
     GROUPS.forEach(g => {
         products[g].forEach(p => {
-            const c = calcCosts(p);
+            const c = calcCosts(p, g);
             rows.push([labels[g], p.name||'未命名', '實收金額', c.rev]);
             rows.push([labels[g], p.name, `稅金 ${c.taxRate}%`, c.tax]);
-            rows.push([labels[g], p.name, `手續費 ${c.payRate}%`, c.payFee]);
+            if (c.isB2c) rows.push([labels[g], p.name, '金流手續費 5%+15', c.payFee]);
             rows.push([labels[g], p.name, '講師費', c.lecCost]);
-            ['kol','ads','venue','assistant','transport','material'].forEach(k => rows.push([labels[g], p.name, k, p[k]||0]));
+            if (c.isB2c) ['kol','ads','venue'].forEach(k => rows.push([labels[g], p.name, k, p[k]||0]));
+            ['assistant','transport','material'].forEach(k => rows.push([labels[g], p.name, k, p[k]||0]));
+            if (c.isBiz) rows.push([labels[g], p.name, '人事費', p.personnel||0]);
         });
     });
     const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
@@ -588,7 +620,7 @@ document.getElementById('btnSave').addEventListener('click', saveAll);
 document.getElementById('btnExport').addEventListener('click', exportCSV);
 monthSelect.addEventListener('change', () => autoSync(false));
 document.getElementById('globalTaxRate').addEventListener('input', () => renderAll());
-document.getElementById('globalPaymentRate').addEventListener('input', () => renderAll());
+
 document.querySelectorAll('.tool-input').forEach(el => el.addEventListener('input', recalculate));
 
 autoSync(false);
