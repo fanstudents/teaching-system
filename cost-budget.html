@@ -38,11 +38,13 @@
         .auto-saved { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 3px; }
 
         /* Summary cards */
-        .profit-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-        .profit-card { background: var(--card); border-radius: 12px; padding: 16px 18px; border: 1px solid var(--border); }
-        .pc-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 3px; }
-        .pc-value { font-size: 1.3rem; font-weight: 700; color: var(--text); }
-        .pc-value.green { color: var(--positive); } .pc-value.red { color: var(--negative); }
+        .summary-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+        .summary-table th { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); padding: 10px 16px; text-align: right; border-bottom: 1px solid var(--border); background: var(--bg); }
+        .summary-table th:first-child { text-align: left; }
+        .summary-table td { font-size: 1rem; font-weight: 700; padding: 12px 16px; text-align: right; font-family: 'Inter', monospace; }
+        .summary-table td:first-child { text-align: left; font-family: inherit; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+        .summary-table td.pos { color: var(--positive); }
+        .summary-table td.neg { color: var(--negative); }
 
         /* Section */
         .section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 18px; overflow: hidden; }
@@ -185,13 +187,16 @@
             <span class="auto-saved" id="autoSaved"></span>
         </div>
 
-        <!-- Profit -->
-        <div class="profit-bar">
-            <div class="profit-card"><div class="pc-label">總收入</div><div class="pc-value" id="totalRevenue">NT$ 0</div></div>
-            <div class="profit-card"><div class="pc-label">總成本</div><div class="pc-value red" id="totalCost">NT$ 0</div></div>
-            <div class="profit-card"><div class="pc-label">淨利潤</div><div class="pc-value green" id="netProfit">NT$ 0</div></div>
-            <div class="profit-card"><div class="pc-label">利潤率</div><div class="pc-value" id="profitMargin">0%</div></div>
-        </div>
+        <!-- Summary Table -->
+        <table class="summary-table" id="summaryTable">
+            <thead><tr><th>指標</th><th>企業內訓</th><th>公開課程</th><th>企業服務</th><th>合計</th></tr></thead>
+            <tbody>
+                <tr><td>總收入</td><td id="b2bRev">0</td><td id="b2cRev">0</td><td id="bizRev">0</td><td id="totalRevenue">0</td></tr>
+                <tr><td>總成本</td><td id="b2bCost">0</td><td id="b2cCost">0</td><td id="bizCost">0</td><td id="totalCost" class="neg">0</td></tr>
+                <tr><td>淨利潤</td><td id="b2bProfit">0</td><td id="b2cProfit">0</td><td id="bizProfit">0</td><td id="netProfit">0</td></tr>
+                <tr><td>利潤率</td><td id="b2bMargin">-</td><td id="b2cMargin">-</td><td id="bizMargin">-</td><td id="profitMargin">0%</td></tr>
+            </tbody>
+        </table>
 
         <!-- Settings loaded from system settings -->
         <input type="hidden" id="globalTaxRate" value="5">
@@ -991,54 +996,131 @@ function recalculate() {
                 cRev += c.rev; cCost += c.totalCost;
             });
         });
+        const cProfit = cRev - cCost;
+        const cMargin = cRev > 0 ? (cProfit / cRev * 100) : 0;
         document.getElementById(`${cat}RevTotal`).textContent = `NT$ ${cRev.toLocaleString()}`;
         document.getElementById(`${cat}CostTotal`).textContent = `NT$ ${cCost.toLocaleString()}`;
-        document.getElementById(`${cat}ProfitTotal`).textContent = `NT$ ${(cRev - cCost).toLocaleString()}`;
+        document.getElementById(`${cat}ProfitTotal`).textContent = `NT$ ${cProfit.toLocaleString()}`;
+        // Summary table cells
+        document.getElementById(`${cat}Rev`).textContent = cRev.toLocaleString();
+        document.getElementById(`${cat}Cost`).textContent = cCost.toLocaleString();
+        const profEl = document.getElementById(`${cat}Profit`);
+        profEl.textContent = cProfit.toLocaleString();
+        profEl.className = cProfit >= 0 ? 'pos' : 'neg';
+        document.getElementById(`${cat}Margin`).textContent = cRev > 0 ? cMargin.toFixed(1) + '%' : '-';
         grandRev += cRev; grandCost += cCost;
     });
 
     const netProfit = grandRev - grandCost;
     const margin = grandRev > 0 ? (netProfit / grandRev * 100) : 0;
-    document.getElementById('totalRevenue').textContent = `NT$ ${grandRev.toLocaleString()}`;
-    document.getElementById('totalCost').textContent = `NT$ ${grandCost.toLocaleString()}`;
-    const pe = document.getElementById('netProfit'); pe.textContent = `NT$ ${netProfit.toLocaleString()}`; pe.className = `pc-value ${netProfit>=0?'green':'red'}`;
-    const me = document.getElementById('profitMargin'); me.textContent = margin.toFixed(1)+'%'; me.className = `pc-value ${margin>=0?'green':'red'}`;
-    renderProfitChart(grandRev, grandCost);
+    document.getElementById('totalRevenue').textContent = grandRev.toLocaleString();
+    document.getElementById('totalCost').textContent = grandCost.toLocaleString();
+    const npe = document.getElementById('netProfit');
+    npe.textContent = netProfit.toLocaleString();
+    npe.className = netProfit >= 0 ? 'pos' : 'neg';
+    document.getElementById('profitMargin').textContent = margin.toFixed(1) + '%';
+
+    // Cache current month data
+    monthlyCache[monthSelect.value] = JSON.parse(JSON.stringify(products));
     renderOverview();
 }
 
-function renderProfitChart() { /* removed */ }
+// ── Monthly Cache for multi-month pivot ──
+const monthlyCache = {};
 
 function renderOverview() {
     const panel = document.getElementById('overviewPanel');
-    const catDefs = [
-        { key: 'b2b', label: '企業內訓', icon: 'business', groups: ['b2b'], cols: ['項目','應收','講師費','其他費用','利潤'] },
-        { key: 'b2c', label: '公開課程', icon: 'school', groups: ['b2c'], cols: ['項目','應收','講師費','其他費用','利潤'] },
-        { key: 'biz', label: '企業服務', icon: 'handshake', groups: BIZ_GROUPS, cols: ['項目','應收','成本','利潤'] }
-    ];
-    let html = '';
-    catDefs.forEach(cat => {
-        let rows = [];
-        cat.groups.forEach(g => {
-            products[g].forEach(p => {
-                const c = calcCosts(p, g);
-                const profCls = c.profit >= 0 ? 'pos' : 'neg';
-                if (cat.key === 'biz') {
-                    rows.push(`<tr><td>${p.name || '未命名'}</td><td class="num">${c.rev.toLocaleString()}</td><td class="num">${c.totalCost.toLocaleString()}</td><td class="num ${profCls}">${c.profit.toLocaleString()}</td></tr>`);
-                } else {
-                    const otherCost = c.totalCost - c.lecCost;
-                    rows.push(`<tr><td>${p.name || '未命名'}</td><td class="num">${c.rev.toLocaleString()}</td><td class="num">${c.lecCost.toLocaleString()}</td><td class="num">${otherCost.toLocaleString()}</td><td class="num ${profCls}">${c.profit.toLocaleString()}</td></tr>`);
-                }
+    const selectedMonths = [...document.querySelectorAll('.month-pill.active')].map(p => p.dataset.month).sort();
+    if (selectedMonths.length === 0) { panel.innerHTML = ''; return; }
+
+    // Collect all projects across selected months
+    const allProjects = new Map(); // name → { group, months: { month → {rev, cost, profit} } }
+    selectedMonths.forEach(month => {
+        const prods = monthlyCache[month] || (month === monthSelect.value ? products : null);
+        if (!prods) return;
+        GROUPS.forEach(g => {
+            (prods[g] || []).forEach(p => {
+                const key = p.name || '未命名';
+                if (!allProjects.has(key)) allProjects.set(key, { group: g, months: {} });
+                const c = calcCostsFromProduct(p, g);
+                allProjects.get(key).months[month] = { rev: c.rev, cost: c.totalCost, profit: c.profit };
             });
         });
-        if (rows.length === 0) return;
-        const thHtml = cat.cols.map((col, i) => `<th${i > 0 ? ' class="num"' : ''}>${col}</th>`).join('');
-        html += `<div class="overview-group">
-            <div class="overview-group-label"><span class="material-symbols-outlined" style="font-size:16px;">${cat.icon}</span> ${cat.label}</div>
-            <table class="overview-table"><thead><tr>${thHtml}</tr></thead><tbody>${rows.join('')}</tbody></table>
-        </div>`;
     });
-    panel.innerHTML = html || '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:.82rem;">尚無項目，請在分類頁籤中新增</div>';
+
+    if (allProjects.size === 0) {
+        panel.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:.82rem;">尚無項目</div>';
+        return;
+    }
+
+    const monthLabels = selectedMonths.map(m => { const [y, mo] = m.split('-'); return `${parseInt(mo)}月`; });
+
+    // Build pivot table header
+    let thCols = '<th style="text-align:left;">專案名稱</th>';
+    selectedMonths.forEach((m, i) => {
+        thCols += `<th colspan="3" style="text-align:center;border-left:2px solid var(--border);">${monthLabels[i]}</th>`;
+    });
+    let thSub = '<th></th>';
+    selectedMonths.forEach(() => {
+        thSub += '<th class="num" style="border-left:2px solid var(--border);font-size:.62rem;">收入</th><th class="num" style="font-size:.62rem;">成本</th><th class="num" style="font-size:.62rem;">利潤</th>';
+    });
+
+    // Group by category
+    const catOrder = { b2b: '企業內訓', b2c: '公開課程', bizMarketing: '企業服務', bizDev: '企業服務', bizExpert: '企業服務' };
+    const grouped = {};
+    allProjects.forEach((data, name) => {
+        const catLabel = catOrder[data.group] || '其他';
+        if (!grouped[catLabel]) grouped[catLabel] = [];
+        grouped[catLabel].push({ name, ...data });
+    });
+
+    let bodyHtml = '';
+    Object.entries(grouped).forEach(([catLabel, items]) => {
+        bodyHtml += `<tr><td colspan="${1 + selectedMonths.length * 3}" style="font-size:.72rem;font-weight:700;color:var(--text-secondary);background:var(--bg);padding:6px 12px;">${catLabel}</td></tr>`;
+        items.forEach(item => {
+            bodyHtml += '<tr><td style="text-align:left;font-weight:500;">' + item.name + '</td>';
+            selectedMonths.forEach(m => {
+                const d = item.months[m] || { rev: 0, cost: 0, profit: 0 };
+                const profCls = d.profit >= 0 ? 'pos' : 'neg';
+                bodyHtml += `<td class="num" style="border-left:2px solid var(--border);">${d.rev.toLocaleString()}</td><td class="num">${d.cost.toLocaleString()}</td><td class="num ${profCls}">${d.profit.toLocaleString()}</td>`;
+            });
+            bodyHtml += '</tr>';
+        });
+    });
+
+    // Total row
+    bodyHtml += `<tr style="border-top:2px solid var(--border);font-weight:700;"><td style="text-align:left;">合計</td>`;
+    selectedMonths.forEach(m => {
+        let tRev = 0, tCost = 0;
+        allProjects.forEach(data => { const d = data.months[m] || { rev: 0, cost: 0 }; tRev += d.rev; tCost += d.cost; });
+        const tProfit = tRev - tCost;
+        const profCls = tProfit >= 0 ? 'pos' : 'neg';
+        bodyHtml += `<td class="num" style="border-left:2px solid var(--border);">${tRev.toLocaleString()}</td><td class="num">${tCost.toLocaleString()}</td><td class="num ${profCls}">${tProfit.toLocaleString()}</td>`;
+    });
+    bodyHtml += '</tr>';
+
+    panel.innerHTML = `<div style="overflow-x:auto;"><table class="overview-table"><thead><tr>${thCols}</tr><tr>${thSub}</tr></thead><tbody>${bodyHtml}</tbody></table></div>`;
+}
+
+// Helper: calc costs from a cached product snapshot
+function calcCostsFromProduct(p, group) {
+    const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
+    const isB2c = group === 'b2c';
+    const isBiz = BIZ_GROUPS.includes(group);
+    const rev = (p.revenue || 0) > 0 ? (p.revenue || 0) : (parseFloat(p.estimatedRevenue) || 0);
+    const tax = Math.round(rev * taxRate / 100);
+    const orderCount = p.orderCount || (isB2c && rev > 0 ? 1 : 0);
+    const payFee = isB2c ? Math.round(rev * 0.05 + orderCount * 15) : 0;
+    const lecCost = p.lecturerType === 'percent' ? Math.round(rev * (p.lecturerPercent || 0) / 100) : 0;
+    const sharedCosts = (isB2c ? (toTwd(p.kol||0,p.cur_kol) + toTwd(p.ads||0,p.cur_ads)) : 0) + (isBiz ? toTwd(p.personnel||0,p.cur_personnel) : 0);
+    let sessionCosts = 0;
+    (p.sessions || []).forEach(s => {
+        sessionCosts += toTwd(s.venue||0,s.cur_venue) + toTwd(s.lecturerFee||0,s.cur_lecturerFee) + toTwd(s.assistant||0,s.cur_assistant) + toTwd(s.transport||0,s.cur_transport) + toTwd(s.material||0,s.cur_material);
+    });
+    const hasSessions = (p.sessions || []).length > 0;
+    const fallbackCosts = !hasSessions ? (p.lecturerType==='fixed' ? toTwd(p.lecturerFee||0,p.cur_lecturerFee) : 0) + toTwd(p.venue||0,p.cur_venue) + toTwd(p.assistant||0,p.cur_assistant) + toTwd(p.transport||0,p.cur_transport) + toTwd(p.material||0,p.cur_material) : 0;
+    const totalCost = tax + payFee + lecCost + sharedCosts + sessionCosts + fallbackCosts;
+    return { rev, totalCost, profit: rev - totalCost };
 }
 
 // ── Save / Export ──
