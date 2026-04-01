@@ -1065,7 +1065,7 @@
                 <p>推廣全站課程，賺取高額佣金回饋。<br>即時追蹤你的推廣成效與收益。</p>
                 <div class="login-stats">
                     <div class="login-stat-item">
-                        <div class="login-stat-value">20%</div>
+                        <div class="login-stat-value" id="loginStatRate">20%</div>
                         <div class="login-stat-label">銷售分潤比例</div>
                     </div>
                     <div class="login-stat-item">
@@ -1142,7 +1142,7 @@
                         <div class="benefits-title">夥伴計畫概要</div>
                         <div class="benefit-row">
                             <span class="benefit-label">課程分潤</span>
-                            <span>每筆銷售可獲得 <strong style="color:#059669;">20%</strong> 佣金</span>
+                            <span>每筆銷售可獲得 <strong style="color:#059669;" class="dynamic-rate">20%</strong> 佣金</span>
                         </div>
                         <div class="benefit-row">
                             <span class="benefit-label">企業引薦</span>
@@ -1410,7 +1410,7 @@
             <!-- View: Courses -->
             <div class="view-page" id="view-courses">
                 <h2 class="page-title">可推廣課程</h2>
-                <p class="page-subtitle">課程分潤比例 <strong>20%</strong>，以下課程皆可使用你的折扣碼推廣</p>
+                <p class="page-subtitle">課程分潤比例 <strong class="dynamic-rate">20%</strong>，以下課程皆可使用你的折扣碼推廣</p>
                 <div id="coursesList" style="display:flex;flex-direction:column;gap:8px;">
                     <div class="empty-state"><span class="material-symbols-outlined">hourglass_empty</span>載入中…</div>
                 </div>
@@ -1624,7 +1624,7 @@
                         <div class="coupon-code-box" id="couponDisplay" title="點擊複製"></div>
                         <div class="coupon-meta">
                             <p>透過此折扣碼購買的訂單將自動計入你的銷售。</p>
-                            <p>佣金比例：<strong id="commissionRateText">20%</strong></p>
+                            <p>佣金比例：<strong id="commissionRateText" class="dynamic-rate">20%</strong></p>
                         </div>
                     </div>
                 </div>
@@ -1633,7 +1633,7 @@
                         <span class="material-symbols-outlined">info</span> 推廣須知
                     </div>
                     <div class="section-body" style="font-size:0.84rem;color:var(--text-secondary);line-height:1.8;">
-                        <p>• 佣金比例為銷售金額的 <strong>20%</strong></p>
+                        <p>• 佣金比例為銷售金額的 <strong class="dynamic-rate">20%</strong></p>
                         <p>• 每月 <strong>10 日</strong>核對上月銷售金額</p>
                         <p>• 每月 <strong>25 日</strong>撥款至您提供的銀行帳戶</p>
                         <p>• 訂單成交時您將立即收到 Email 通知</p>
@@ -1667,7 +1667,7 @@
                                 </div>
                                 <div>
                                     <div style="font-size:0.72rem;color:#94a3b8;">分潤</div>
-                                    <span style="font-weight:700;color:#10b981;font-size:0.88rem;">20%</span>
+                                    <span style="font-weight:700;color:#10b981;font-size:0.88rem;" class="dynamic-rate">20%</span>
                                 </div>
                             </div>
                         </div>
@@ -2129,6 +2129,8 @@
             const rate = Math.round((affiliate.commission_rate || 0.20) * 100);
             document.getElementById('statRate').textContent = rate + '%';
             document.getElementById('commissionRateText').textContent = rate + '%';
+            document.getElementById('loginStatRate').textContent = rate + '%';
+            document.querySelectorAll('.dynamic-rate').forEach(el => el.textContent = rate + '%');
 
             // Bank
             document.getElementById('bankName').value = affiliate.bank_name || '';
@@ -2136,7 +2138,7 @@
             document.getElementById('bankAccount').value = affiliate.bank_account || '';
 
             loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.20);
-            loadCourses(affiliate.coupon_code);
+            loadCourses(affiliate.coupon_code, affiliate.commission_rate || 0.20);
             setupEvents(affiliate);
         }
 
@@ -2315,7 +2317,8 @@
             });
         }
 
-        async function loadCourses(couponCode) {
+        async function loadCourses(couponCode, commissionRate) {
+            const ratePercent = Math.round((commissionRate || 0.20) * 100);
             const container = document.getElementById('coursesList');
             const { data: courses } = await db.select('affiliate_courses', {
                 filter: { is_active: 'eq.true' }, order: 'sort_order.asc'
@@ -2345,8 +2348,19 @@
                     </button>`;
                 }).join('');
 
+                const imgHtml = c.image_url
+                    ? `<img src="${c.image_url}" alt="${c.name}" style="width:100%;height:160px;object-fit:cover;border-radius:10px 10px 0 0;">`
+                    : '';
+                const descHtml = c.description
+                    ? `<div style="font-size:0.78rem;color:#64748b;line-height:1.6;margin-bottom:10px;">${c.description}</div>`
+                    : '';
+                const instrHtml = c.instructor
+                    ? `<div style="font-size:0.72rem;color:#94a3b8;margin-bottom:8px;"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">person</span> ${c.instructor}</div>`
+                    : '';
+
                 return `
-                <div class="section-card" style="margin-bottom:0;">
+                <div class="section-card" style="margin-bottom:0;overflow:hidden;">
+                    ${imgHtml}
                     <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
                         <span class="material-symbols-outlined" style="font-size:20px;color:#64748b;">${c.icon || 'school'}</span>
                         <span style="flex:1;font-size:0.88rem;font-weight:600;color:#1e293b;">${c.name}</span>
@@ -2354,14 +2368,16 @@
                         <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
                     </div>
                     <div class="c-detail" style="display:none;padding:0 18px 14px;border-top:1px solid #f0f0f5;">
-                        <div style="display:flex;align-items:center;gap:10px;padding-top:12px;margin-bottom:12px;">
+                        ${descHtml}
+                        ${instrHtml}
+                        <div style="display:flex;align-items:center;gap:10px;padding-top:8px;margin-bottom:12px;">
                             <div style="flex:1;">
                                 <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px;">折扣碼</div>
                                 <span style="font-family:'SF Mono',monospace;font-size:0.88rem;font-weight:700;color:#1e293b;background:#f1f5f9;padding:3px 10px;border-radius:6px;cursor:pointer;" onclick="event.stopPropagation();navigator.clipboard.writeText('${couponCode||''}');this.textContent='✅ 已複製';setTimeout(()=>this.textContent='${couponCode||''}',1500)">${couponCode || '-'}</span>
                             </div>
                             <div>
                                 <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px;">分潤</div>
-                                <span style="font-size:0.88rem;font-weight:700;color:#10b981;">20%</span>
+                                <span style="font-size:0.88rem;font-weight:700;color:#10b981;">${ratePercent}%</span>
                             </div>
                         </div>
                         <div style="font-size:0.72rem;color:#64748b;margin-bottom:8px;font-weight:600;">推廣連結（點擊複製，已含折扣碼 + UTM）</div>
