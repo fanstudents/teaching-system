@@ -490,3 +490,17 @@ CREATE INDEX IF NOT EXISTS idx_news_articles_category ON news_articles(category)
 ALTER TABLE news_articles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "news_articles_read" ON news_articles FOR SELECT USING (true);
 CREATE POLICY "news_articles_write" ON news_articles FOR ALL USING (true);
+
+-- ══════════════════════════════════════
+-- 23. cost_budgets (成本預算存檔)
+-- ══════════════════════════════════════
+CREATE TABLE IF NOT EXISTS public.cost_budgets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  month text NOT NULL UNIQUE,  -- e.g. '2026-04'
+  data jsonb NOT NULL DEFAULT '{}',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_cost_budgets_month ON public.cost_budgets(month);
+ALTER TABLE public.cost_budgets ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anon full access" ON public.cost_budgets FOR ALL TO anon USING (true) WITH CHECK (true);

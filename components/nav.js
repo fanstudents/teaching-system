@@ -93,7 +93,7 @@ const NAV_ITEMS = [
         adminOnly: true,
         items: [
             { label: '成本預算', icon: 'calculate', href: 'cost-budget.html' },
-            { label: '費用支出', icon: 'payments', href: 'expenses.html' },
+            { label: '營運費用', icon: 'account_balance', href: 'expenses.html' },
         ]
     },
     {
