@@ -83,7 +83,7 @@ const NAV_ITEMS = [
         group: '合作管理',
         adminOnly: true,
         items: [
-            { label: '聯盟行銷', icon: 'campaign', href: 'partners.html#affiliates' },
+            { label: '聯盟行銷', icon: 'campaign', href: 'partners.html#affiliates', badgeId: 'navBadgeAffiliate' },
             { label: '訂單管理', icon: 'receipt_long', href: 'admin-orders.html' },
             { label: '講師管理', icon: 'school', href: 'partners.html#instructors' },
         ]
@@ -165,6 +165,7 @@ function createAdminSidebar() {
                    href="${item.href}">
                     <span class="material-symbols-outlined">${item.icon}</span>
                     ${item.label}
+                    ${item.badgeId ? `<span class="nav-badge" id="${item.badgeId}" style="display:none;"></span>` : ''}
                 </a>`;
     }).join('')}
         </div>
@@ -212,7 +213,33 @@ function createAdminSidebar() {
         location.replace('login.html');
     });
 
+    // Fetch pending badges
+    fetchPendingBadges();
+
     return { overlay, sidebar };
+}
+
+async function fetchPendingBadges() {
+    try {
+        const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+        const token = localStorage.getItem('_at') || sessionStorage.getItem('_at');
+        if (!token) return;
+
+        // Pending affiliates count
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/affiliates?status=eq.pending&select=id`, {
+            headers: {
+                'apikey': 'sb_publishable_RRbhQpB2zcqeHc6Cds8fgA_jVWyvdyF',
+                'Authorization': `Bearer ${token}`,
+                'Prefer': 'count=exact'
+            }
+        });
+        const count = parseInt(res.headers.get('content-range')?.split('/')[1] || '0');
+        const badge = document.getElementById('navBadgeAffiliate');
+        if (badge && count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline-flex';
+        }
+    } catch (e) { /* silent */ }
 }
 
 function injectHamburger() {
@@ -277,6 +304,28 @@ if (!STUDENT_PAGES.includes(_currentFile)) {
     }
     createAdminSidebar();
     injectHamburger();
+
+    // Badge CSS
+    const badgeStyle = document.createElement('style');
+    badgeStyle.textContent = `
+        .nav-badge {
+            margin-left: auto;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 10px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+    `;
+    document.head.appendChild(badgeStyle);
 }
 
 // Expose for external use
