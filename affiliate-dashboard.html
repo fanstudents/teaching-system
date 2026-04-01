@@ -1991,6 +1991,10 @@
                 return showPending();
             }
 
+            if (affiliate && affiliate.status === 'rejected') {
+                return showRejected();
+            }
+
             // Not registered — show register form
             return showRegisterForm(user);
         }
@@ -2086,6 +2090,24 @@
             document.getElementById('loginScreen').classList.add('centered');
             document.getElementById('phaseLogin').style.display = 'none';
             document.getElementById('phasePending').style.display = 'block';
+        }
+
+        function showRejected() {
+            showLogin();
+            document.getElementById('loginScreen').classList.add('centered');
+            document.getElementById('phaseLogin').style.display = 'none';
+            // Reuse pending card area for rejected state
+            document.getElementById('phasePending').style.display = 'block';
+            const card = document.querySelector('#phasePending .pending-card');
+            if (card) {
+                card.innerHTML = `
+                    <div class="pending-icon" style="background:rgba(239,68,68,0.1);">
+                        <span class="material-symbols-outlined" style="color:#ef4444;">block</span>
+                    </div>
+                    <h2>申請未通過</h2>
+                    <p>很抱歉，您的推廣夥伴申請未通過審核。<br>如有疑問，請聯繫 <a href="mailto:service@tbr.digital">service@tbr.digital</a> 或 <a href="https://lin.ee/77HaRyW" target="_blank">LINE 官方客服</a>。</p>
+                `;
+            }
         }
 
         function showDashboard(affiliate, user) {
