@@ -174,7 +174,7 @@
 
         <!-- Chart -->
         <div class="section">
-            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;color:#8b5cf6;">donut_large</span><h3>利潤結構</h3></div>
+            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;color:var(--text-secondary);">donut_large</span><h3>利潤結構</h3></div>
             <div class="section-body"><div class="chart-wrap" id="profitChart"></div></div>
         </div>
 
@@ -203,7 +203,7 @@
                 <div class="section-body">
                     <div class="product-list" id="b2bProducts"></div>
                     <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('b2b')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
-                    <div class="cost-subtotal"><span>企業內訓合計</span><span>收入 <span id="b2bRevTotal" style="color:#3b82f6;">NT$ 0</span> ｜ 成本 <span id="b2bCostTotal">NT$ 0</span> ｜ 利潤 <span id="b2bProfitTotal" style="color:#10b981;">NT$ 0</span></span></div>
+                    <div class="cost-subtotal"><span>企業內訓合計</span><span>收入 <span id="b2bRevTotal" style="color:var(--accent);">NT$ 0</span> ｜ 成本 <span id="b2bCostTotal">NT$ 0</span> ｜ 利潤 <span id="b2bProfitTotal" style="color:var(--positive);">NT$ 0</span></span></div>
                 </div>
             </div>
 
@@ -212,7 +212,7 @@
                 <div class="section-body">
                     <div class="product-list" id="b2cProducts"></div>
                     <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('b2c')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
-                    <div class="cost-subtotal"><span>公開課程合計</span><span>收入 <span id="b2cRevTotal" style="color:#3b82f6;">NT$ 0</span> ｜ 成本 <span id="b2cCostTotal">NT$ 0</span> ｜ 利潤 <span id="b2cProfitTotal" style="color:#10b981;">NT$ 0</span></span></div>
+                    <div class="cost-subtotal"><span>公開課程合計</span><span>收入 <span id="b2cRevTotal" style="color:var(--accent);">NT$ 0</span> ｜ 成本 <span id="b2cCostTotal">NT$ 0</span> ｜ 利潤 <span id="b2cProfitTotal" style="color:var(--positive);">NT$ 0</span></span></div>
                 </div>
             </div>
 
@@ -220,27 +220,27 @@
             <div class="tab-panel" id="panel-biz">
                 <div class="section-body">
                     <div class="subsection">
-                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:#f59e0b;">campaign</span> 行銷代操</div>
+                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:var(--text-secondary);">campaign</span> 行銷代操</div>
                         <div class="subsection-body">
                             <div class="product-list" id="bizMarketingProducts"></div>
                             <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('bizMarketing')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
                         </div>
                     </div>
                     <div class="subsection">
-                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:#3b82f6;">code</span> 系統開發</div>
+                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:var(--text-secondary);">code</span> 系統開發</div>
                         <div class="subsection-body">
                             <div class="product-list" id="bizDevProducts"></div>
                             <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('bizDev')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
                         </div>
                     </div>
                     <div class="subsection">
-                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:#10b981;">engineering</span> 專家派遣</div>
+                        <div class="subsection-header"><span class="material-symbols-outlined" style="font-size:15px;color:var(--text-secondary);">engineering</span> 專家派遣</div>
                         <div class="subsection-body">
                             <div class="product-list" id="bizExpertProducts"></div>
                             <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('bizExpert')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
                         </div>
                     </div>
-                    <div class="cost-subtotal"><span>企業服務合計</span><span>收入 <span id="bizRevTotal" style="color:#3b82f6;">NT$ 0</span> ｜ 成本 <span id="bizCostTotal">NT$ 0</span> ｜ 利潤 <span id="bizProfitTotal" style="color:#10b981;">NT$ 0</span></span></div>
+                    <div class="cost-subtotal"><span>企業服務合計</span><span>收入 <span id="bizRevTotal" style="color:var(--accent);">NT$ 0</span> ｜ 成本 <span id="bizCostTotal">NT$ 0</span> ｜ 利潤 <span id="bizProfitTotal" style="color:var(--positive);">NT$ 0</span></span></div>
                 </div>
             </div>
         </div>
@@ -845,7 +845,7 @@ function renderProductRow(p, group, isB2b, isBiz) {
         '</div>';
     } else if (!hasSessions) {
         lecturerRow = '<div class="lecturer-row">' +
-            '<span class="field-label">🎓 講師費</span>' +
+            '<span class="field-label">講師費</span>' +
             '<div class="toggle-wrap">' +
                 '<button class="toggle-opt active" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'fixed\')">固定</button>' +
                 '<button class="toggle-opt" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'percent\')">分潤%</button>' +
@@ -855,7 +855,7 @@ function renderProductRow(p, group, isB2b, isBiz) {
         '</div>';
     } else {
         lecturerRow = '<div class="lecturer-row">' +
-            '<span class="field-label">🎓 講師費</span>' +
+            '<span class="field-label">講師費</span>' +
             '<span class="pct-label">各場次獨立計算</span>' +
             '<div class="toggle-wrap" style="margin-left:auto;">' +
                 '<button class="toggle-opt" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'percent\')">改分潤%</button>' +
@@ -891,7 +891,7 @@ function renderProductRow(p, group, isB2b, isBiz) {
             return renderSessionRow(s, si, group, p.id);
         }).join('');
         costSection = '<div class="full-row" style="margin-top:8px;border-top:1px solid #e8ecf1;padding-top:8px;">' +
-            '<div style="font-size:.76rem;font-weight:600;color:#3b82f6;margin-bottom:6px;display:flex;align-items:center;gap:4px;">' +
+            '<div style="font-size:.76rem;font-weight:600;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:4px;">' +
                 '<span class="material-symbols-outlined" style="font-size:16px;">event</span> 場次成本明細' +
                 '<span class="pct-label" style="margin-left:auto;">共 ' + (p.sessions||[]).length + ' 場 ｜ 場次成本合計 NT$ ' + c.sessionCosts.toLocaleString() + '</span>' +
             '</div>' +
@@ -1018,7 +1018,7 @@ async function saveAll() {
         localStorage.setItem(STORE_KEY, JSON.stringify(all));
 
         showToast('已儲存至雲端 ✓');
-        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:#10b981;">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
+        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
     } catch (err) {
         console.error('[save]', err);
         // Supabase 失敗時 fallback 到 localStorage
