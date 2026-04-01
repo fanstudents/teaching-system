@@ -245,8 +245,8 @@
                         <input type="text" id="affDetailCoupon" placeholder="例：JRTING">
                     </div>
                     <div class="form-group">
-                        <label>佣金比例</label>
-                        <input type="text" id="affDetailRate" readonly>
+                        <label>佣金比例 <span style="color:#94a3b8;font-weight:400;">(%)</span></label>
+                        <input type="number" id="affDetailRate" placeholder="例：20" min="0" max="100" step="1">
                     </div>
                 </div>
 
@@ -650,7 +650,7 @@
             document.getElementById('affDetailName').value = a.name || '';
             document.getElementById('affDetailEmail').value = a.email || '';
             document.getElementById('affDetailCoupon').value = a.coupon_code || '';
-            document.getElementById('affDetailRate').value = `${((a.commission_rate || 0.1) * 100).toFixed(0)}%`;
+            document.getElementById('affDetailRate').value = ((a.commission_rate || 0.2) * 100).toFixed(0);
             document.getElementById('affDetailBank').value = a.bank_name || '';
             document.getElementById('affDetailHolder').value = a.account_holder || '';
             document.getElementById('affDetailAccount').value = a.bank_account || '';
@@ -714,7 +714,8 @@
             btn.textContent = '儲存中…';
 
             try {
-                const updateData = { status, notes, coupon_code: couponCode };
+                const rateVal = parseFloat(document.getElementById('affDetailRate').value) || 20;
+                const updateData = { status, notes, coupon_code: couponCode, commission_rate: rateVal / 100 };
 
                 // Generate login token when approving
                 const a = affiliates.find(x => x.id === id);
