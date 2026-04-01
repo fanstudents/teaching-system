@@ -490,7 +490,6 @@
                     const role = localStorage.getItem('_login_role') || _currentRole || 'student';
                     localStorage.removeItem('_login_role');
                     await routeUser(role, user.email);
-                    return; // stop further execution
                 }
             }
         } catch (e) {
