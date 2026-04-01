@@ -1215,14 +1215,28 @@ async function saveAll() {
     };
 
     try {
-        // 存到 Supabase cost_budgets 表
-        const { error } = await db.insert('cost_budgets', {
-            month,
-            data: payload,
-            updated_at: new Date().toISOString()
-        }, { onConflict: 'month' });
+        // 先查詢是否已有此月資料
+        const existing = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
+        let result;
+        if (existing.data && existing.data.length > 0) {
+            // UPDATE
+            result = await db.update('cost_budgets', {
+                data: payload,
+                updated_at: new Date().toISOString()
+            }, { month: `eq.${month}` });
+        } else {
+            // INSERT
+            result = await db.insert('cost_budgets', {
+                month,
+                data: payload,
+                updated_at: new Date().toISOString()
+            });
+        }
 
-        if (error) throw new Error(error.message || JSON.stringify(error));
+        if (result.error) {
+            console.error('[save] DB error:', result.error);
+            throw new Error(typeof result.error === 'string' ? result.error : JSON.stringify(result.error));
+        }
 
         // 也存 localStorage 做快取
         const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
