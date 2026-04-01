@@ -610,9 +610,9 @@
 
         /* Benefits card */
         .benefits-card {
-            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 40%, #eff6ff 100%);
-            border: 1px solid #d1fae5;
-            border-radius: 16px;
+            background: #fff;
+            border: 1px solid #e8ecf1;
+            border-radius: 14px;
             padding: 24px 28px;
             margin-bottom: 32px;
             position: relative;
@@ -622,43 +622,110 @@
         .benefits-card::before {
             content: '';
             position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #1a73e8, #10b981);
+            border-radius: 3px 0 0 3px;
         }
 
         .benefits-title {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: #065f46;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1e293b;
             margin-bottom: 16px;
+            padding-left: 2px;
+            letter-spacing: 0.01em;
+        }
+
+        .benefit-row {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             gap: 8px;
-        }
-
-        .benefit-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
+            padding: 7px 0;
             font-size: 0.8rem;
-            color: #334155;
-            line-height: 1.55;
-            padding: 6px 0;
+            color: #475569;
+            line-height: 1.5;
+            border-bottom: 1px solid #f5f5f5;
         }
 
-        .benefit-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
+        .benefit-row:last-child {
+            border-bottom: none;
+        }
+
+        .benefit-label {
+            font-weight: 600;
+            color: #1e293b;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+
+        /* Course platform group */
+        .course-group-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 12px 0 6px;
+            padding-bottom: 4px;
+        }
+
+        .course-group-title:first-child {
+            margin-top: 0;
+        }
+
+        /* Referral card item */
+        .referral-option {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafbfc;
+            user-select: none;
+        }
+
+        .referral-option:hover {
+            border-color: #cbd5e1;
+            background: #f8f9fa;
+        }
+
+        .referral-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a73e8;
             flex-shrink: 0;
-            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .referral-option:has(input:checked) {
+            border-color: #1a73e8;
+            background: rgba(26, 115, 232, 0.03);
+        }
+
+        .referral-option .ref-title {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .referral-option .ref-desc {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .referral-option .ref-rate {
+            margin-left: auto;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #10b981;
+            flex-shrink: 0;
         }
 
         /* ── Pending Screen ── */
@@ -707,7 +774,17 @@
 
         /* When form is centered (register / pending) */
         .login-screen.centered .login-brand-panel { display: none; }
-        .login-screen.centered .login-form-panel { width: 100%; min-width: unset; }
+        .login-screen.centered .login-form-panel {
+            width: 100%; min-width: unset;
+            background: #f8f9fb;
+            background-image:
+                radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
+            background-size: 28px 28px;
+        }
+
+        .login-screen.centered .login-form-wrapper {
+            max-width: 520px;
+        }
 
         @media (max-width: 1024px) {
             .login-brand-panel { display: none; }
@@ -814,39 +891,26 @@
 
                     <!-- Benefits Card -->
                     <div class="benefits-card">
-                        <div class="benefits-title">
-                            <span style="font-size:20px;">&#x2728;</span>
-                            加入夥伴計畫的四大優勢
+                        <div class="benefits-title">夥伴計畫概要</div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">課程分潤</span>
+                            <span>每筆銷售可獲得 <strong style="color:#059669;">20%</strong> 佣金</span>
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                            <div class="benefit-item">
-                                <div class="benefit-icon" style="background:rgba(16,185,129,0.1);">&#x1F4B0;</div>
-                                <div>
-                                    <div style="font-weight:700;color:#059669;margin-bottom:2px;">20% 高佣金</div>
-                                    <div style="font-size:0.72rem;color:#64748b;">課程銷售 20%，企業引薦 15%</div>
-                                </div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon" style="background:rgba(99,102,241,0.1);">&#x1F3AF;</div>
-                                <div>
-                                    <div style="font-weight:700;color:#4f46e5;margin-bottom:2px;">自動追蹤</div>
-                                    <div style="font-size:0.72rem;color:#64748b;">專屬折扣碼，每筆自動結算</div>
-                                </div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon" style="background:rgba(245,158,11,0.1);">&#x1F4C5;</div>
-                                <div>
-                                    <div style="font-weight:700;color:#d97706;margin-bottom:2px;">準時撥款</div>
-                                    <div style="font-size:0.72rem;color:#64748b;">每月 10 日結算，25 日入帳</div>
-                                </div>
-                            </div>
-                            <div class="benefit-item">
-                                <div class="benefit-icon" style="background:rgba(236,72,153,0.1);">&#x1F4CA;</div>
-                                <div>
-                                    <div style="font-weight:700;color:#db2777;margin-bottom:2px;">即時儀表板</div>
-                                    <div style="font-size:0.72rem;color:#64748b;">隨時查看推廣成效與收益</div>
-                                </div>
-                            </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">企業引薦</span>
+                            <span>內訓或系統導入成交可獲得 <strong style="color:#059669;">15%</strong></span>
+                        </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">折扣碼</span>
+                            <span>專屬折扣碼，每筆成交自動追蹤與結算</span>
+                        </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">撥款週期</span>
+                            <span>每月 10 日結算，25 日撥款至您的帳戶</span>
+                        </div>
+                        <div class="benefit-row">
+                            <span class="benefit-label">推廣後台</span>
+                            <span>即時查看推廣數據、收益明細與文案範本</span>
                         </div>
                     </div>
 
@@ -855,7 +919,6 @@
                         <div class="form-section">
                             <div class="form-section-title">
                                 <span class="material-symbols-outlined">person</span> 基本資料
-                                <span class="step-num">1</span>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
@@ -873,7 +936,6 @@
                         <div class="form-section">
                             <div class="form-section-title">
                                 <span class="material-symbols-outlined">menu_book</span> 可推廣課程
-                                <span class="step-num">2</span>
                             </div>
                             <div class="course-mode-toggle">
                                 <button type="button" class="course-mode-btn active" id="btnCourseAll" data-mode="all">全部課程</button>
@@ -889,7 +951,6 @@
                         <div class="form-section">
                             <div class="form-section-title">
                                 <span class="material-symbols-outlined">share</span> 推廣管道（可複選）<span class="req">*</span>
-                                <span class="step-num">3</span>
                             </div>
                             <div class="chip-grid">
                                 <label class="chip"><input type="checkbox" name="channel" value="Instagram"> Instagram</label>
@@ -911,12 +972,25 @@
                         <div class="form-section">
                             <div class="form-section-title">
                                 <span class="material-symbols-outlined">diversity_3</span> 引薦服務（可選）
-                                <span class="step-num">4</span>
                             </div>
-                            <div class="field-hint" style="margin-bottom:12px;">除了課程推廣（分潤 20%），也可參與企業服務引薦（分潤 15%）。</div>
-                            <div class="chip-grid">
-                                <label class="chip"><input type="checkbox" name="referral" value="企業內訓引薦"> 企業內訓引薦 <span style="font-size:0.7rem;color:#f59e0b;margin-left:4px;">分潤 15%</span></label>
-                                <label class="chip"><input type="checkbox" name="referral" value="系統導入引薦"> 系統導入引薦 <span style="font-size:0.7rem;color:#f59e0b;margin-left:4px;">分潤 15%</span></label>
+                            <div class="field-hint" style="margin-bottom:14px;">除了課程推廣（分潤 20%），也可參與企業服務引薦（分潤 15%）。</div>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <label class="referral-option">
+                                    <input type="checkbox" name="referral" value="企業內訓引薦">
+                                    <div style="flex:1;">
+                                        <div class="ref-title">企業內訓引薦</div>
+                                        <div class="ref-desc">推薦企業客戶接受內部教育訓練</div>
+                                    </div>
+                                    <span class="ref-rate">分潤 15%</span>
+                                </label>
+                                <label class="referral-option">
+                                    <input type="checkbox" name="referral" value="系統導入引薦">
+                                    <div style="flex:1;">
+                                        <div class="ref-title">系統導入引薦</div>
+                                        <div class="ref-desc">推薦企業採用簡報系統或數位工具</div>
+                                    </div>
+                                    <span class="ref-rate">分潤 15%</span>
+                                </label>
                             </div>
                         </div>
 
@@ -924,7 +998,6 @@
                         <div class="form-section">
                             <div class="form-section-title">
                                 <span class="material-symbols-outlined">confirmation_number</span> 專屬折扣碼
-                                <span class="step-num">5</span>
                             </div>
                             <div class="form-group">
                                 <label>希望的折扣碼 <span class="req">*</span></label>
@@ -1702,21 +1775,33 @@
                 grid.innerHTML = '<div class="course-loading">暫無課程資料</div>';
                 return;
             }
-            if (mode === 'all') {
-                grid.innerHTML = courses.map(c => `
-                    <div class="course-check-item" style="cursor:default;opacity:0.85;">
-                        <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;">check_circle</span>
-                        <span class="course-name">${c.name}</span>
-                        <span class="course-platform">${pl[c.platform] || c.platform || ''}</span>
-                    </div>`).join('');
-            } else {
-                grid.innerHTML = courses.map(c => `
-                    <label class="course-check-item">
-                        <input type="checkbox" name="reg_course" value="${c.name}" data-platform="${pl[c.platform] || c.platform || ''}">
-                        <span class="course-name">${c.name}</span>
-                        <span class="course-platform">${pl[c.platform] || c.platform || ''}</span>
-                    </label>`).join('');
+
+            // Group by platform
+            const groups = {};
+            for (const c of courses) {
+                const pName = pl[c.platform] || c.platform || '其他';
+                if (!groups[pName]) groups[pName] = [];
+                groups[pName].push(c);
             }
+
+            let html = '';
+            for (const [platform, items] of Object.entries(groups)) {
+                html += `<div class="course-group-title">${platform}</div>`;
+                if (mode === 'all') {
+                    html += items.map(c => `
+                        <div class="course-check-item" style="cursor:default;opacity:0.85;">
+                            <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;">check_circle</span>
+                            <span class="course-name">${c.name}</span>
+                        </div>`).join('');
+                } else {
+                    html += items.map(c => `
+                        <label class="course-check-item">
+                            <input type="checkbox" name="reg_course" value="${c.name}" data-platform="${pl[c.platform] || c.platform || ''}">
+                            <span class="course-name">${c.name}</span>
+                        </label>`).join('');
+                }
+            }
+            grid.innerHTML = html;
         }
 
         function toggleCourseMode(mode) {
