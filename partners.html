@@ -285,6 +285,11 @@
                     <label>申請時間</label>
                     <input type="text" id="affDetailAppliedAt" readonly style="color:#999;font-size:0.82rem;">
                 </div>
+                <!-- Threads 口碑行銷 -->
+                <div id="threadsInfoSection" class="form-group" style="display:none;">
+                    <label>Threads 口碑行銷</label>
+                    <div id="threadsInfoContent" style="background:#f8fafc;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.8;color:#374151;"></div>
+                </div>
                 <div class="form-group">
                     <label>備註</label>
                     <textarea id="affDetailNotes" placeholder="管理員備註"></textarea>
@@ -817,6 +822,24 @@
             document.getElementById('affDetailAppliedAt').value = a.created_at
                 ? new Date(a.created_at).toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
                 : '';
+
+            // Threads 口碑行銷
+            const tSec = document.getElementById('threadsInfoSection');
+            if (a.threads_enabled) {
+                tSec.style.display = '';
+                document.getElementById('threadsInfoContent').innerHTML = `
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                        <span style="background:#6366f1;color:#fff;padding:1px 8px;border-radius:10px;font-size:0.68rem;font-weight:700;">已啟用</span>
+                    </div>
+                    <div><strong>帳號：</strong>@${a.threads_handle || '—'}</div>
+                    <div><strong>追蹤數：</strong>${a.threads_followers ? a.threads_followers.toLocaleString() : '—'}</div>
+                    <div><strong>領域：</strong>${a.threads_domain || '—'}</div>
+                    <div><strong>文章報價：</strong>${a.threads_post_price ? 'NT$ ' + a.threads_post_price.toLocaleString() : '—'}</div>
+                    <div><strong>留言報價：</strong>${a.threads_comment_price ? 'NT$ ' + a.threads_comment_price.toLocaleString() : '—'}</div>
+                `;
+            } else {
+                tSec.style.display = 'none';
+            }
 
             // Channels as tag chips
             const channels = (a.channels || '').split(',').map(s => s.trim()).filter(Boolean);
