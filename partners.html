@@ -699,6 +699,17 @@
                 return;
             }
 
+            // Check coupon uniqueness
+            if (couponCode) {
+                const existing = affiliates.find(x => x.id !== id && x.coupon_code && x.coupon_code.toUpperCase() === couponCode.toUpperCase());
+                if (existing) {
+                    showToast(`折扣碼「${couponCode}」已被 ${existing.name} 使用`);
+                    document.getElementById('affDetailCoupon').focus();
+                    document.getElementById('affDetailCoupon').style.borderColor = '#ef4444';
+                    return;
+                }
+            }
+
             btn.disabled = true;
             btn.textContent = '儲存中…';
 
@@ -725,11 +736,11 @@
                 if (isNewApproval && a) {
                     const dashUrl = `${location.origin}/affiliate-dashboard.html`;
                     const coupon = a.coupon_code || '';
-                    const rate = `${((a.commission_rate || 0.1) * 100).toFixed(0)}%`;
+                    const rate = `${((a.commission_rate || 0.2) * 100).toFixed(0)}%`;
 
                     const emailBody = `Hi ${a.name}，
 
-恭喜！🎉 您的推廣夥伴申請已經通過審核。
+恭喜！您的推廣夥伴申請已經通過審核。
 
 ── 您的推廣資訊 ──
 
@@ -765,7 +776,7 @@
                             },
                             body: JSON.stringify({
                                 to: a.email,
-                                subject: '🎉 推廣夥伴申請已通過 — 數位簡報室',
+                                subject: '推廣夥伴申請已通過 — 數位簡報室',
                                 body: emailBody,
                                 footerText: '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件'
                             })

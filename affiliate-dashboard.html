@@ -2616,6 +2616,12 @@ ${link}
                 }
 
                 document.getElementById('referralForm').reset();
+                document.getElementById('refType').value = '';
+                // Reset radio card visual
+                document.querySelectorAll('#refTypeCards label').forEach(l => {
+                    l.style.borderColor = '#e2e8f0';
+                    l.style.background = '#fff';
+                });
                 document.getElementById('refSuccessMsg').style.display = 'block';
                 setTimeout(() => document.getElementById('refSuccessMsg').style.display = 'none', 5000);
             });
