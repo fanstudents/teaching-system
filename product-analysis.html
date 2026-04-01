@@ -21,14 +21,15 @@
 
         /* Controls */
         .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
-        .controls select, .controls input { padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: #fff; }
-        .controls select:focus, .controls input:focus { outline: none; border-color: #6366f1; }
-        .controls .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .controls select { padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: #fff; }
+        .controls select:focus { outline: none; border-color: #6366f1; }
+        .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,.3); }
         .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-ai { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
         .btn-ai:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,11,.3); }
+        .btn-ai:disabled { opacity: .5; cursor: not-allowed; transform: none; }
         .last-update { font-size: 0.72rem; color: #94a3b8; margin-left: auto; }
 
         /* Stats Grid */
@@ -50,12 +51,11 @@
         .section-header h3 { font-size: 0.88rem; font-weight: 600; }
         .section-header .icon { font-size: 18px; }
         .section-body { padding: 20px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 
         /* Chart */
         .chart-container { height: 220px; position: relative; }
-
-        /* Two columns */
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
         /* Table */
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
@@ -64,21 +64,27 @@
         tr:last-child td { border-bottom: none; }
         tr:hover { background: #fafbff; }
         .td-right { text-align: right; }
-        .td-mono { font-family: 'SF Mono', monospace; font-size: 0.76rem; color: #64748b; }
         .td-empty { text-align: center; padding: 32px; color: #94a3b8; }
 
         /* Progress bar */
         .progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .progress-label { min-width: 140px; font-size: 0.78rem; font-weight: 500; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .progress-label { min-width: 130px; font-size: 0.78rem; font-weight: 500; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .progress-bar { flex: 1; height: 8px; background: #f0f1f3; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
         .progress-val { min-width: 80px; font-size: 0.72rem; color: #64748b; text-align: right; }
 
-        /* AI Report */
-        .ai-report { font-size: 0.85rem; line-height: 1.75; color: #1e293b; }
-        .ai-report h2 { font-size: 1rem; font-weight: 700; margin: 24px 0 10px; }
-        .ai-report h3 { font-size: 0.92rem; font-weight: 600; color: #6366f1; margin: 18px 0 8px; border-bottom: 1px solid #eef0f4; padding-bottom: 6px; }
-        .ai-report h4 { font-size: 0.85rem; font-weight: 600; color: #8b5cf6; margin: 14px 0 6px; }
+        /* AI Report Cards */
+        .ai-report-area { display: none; }
+        .ai-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .ai-card { background: #fafbff; border: 1px solid #e8ecf1; border-radius: 10px; padding: 16px 18px; border-left: 3px solid; }
+        .ai-card.c-blue { border-left-color: #3b82f6; }
+        .ai-card.c-green { border-left-color: #10b981; }
+        .ai-card.c-purple { border-left-color: #8b5cf6; }
+        .ai-card.c-amber { border-left-color: #f59e0b; }
+        .ai-card.c-red { border-left-color: #ef4444; }
+        .ai-card-title { font-size: 0.82rem; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .ai-card-body { font-size: 0.8rem; line-height: 1.7; color: #374151; }
+        .ai-card-body strong { color: #1e293b; }
 
         /* Rank badge */
         .rank { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 0.62rem; font-weight: 700; }
@@ -87,12 +93,19 @@
         .rank-3 { background: #fde8d8; color: #c2410c; }
         .rank-n { background: #f0f1f3; color: #94a3b8; }
 
-        /* Loading */
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner { animation: spin .7s linear infinite; }
 
-        @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } .two-col { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .page-header { padding: 14px 16px; } .container { padding: 14px 12px; } }
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .two-col, .three-col { grid-template-columns: 1fr; }
+            .ai-cards { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .page-header { padding: 14px 16px; }
+            .container { padding: 14px 12px; }
+        }
     </style>
 </head>
 
@@ -125,8 +138,22 @@
             <span class="last-update" id="lastUpdate"></span>
         </div>
 
+        <!-- ═══ AI 策略報告 (最上方) ═══ -->
+        <div class="ai-report-area" id="aiReportArea">
+            <div class="section" style="border: 1.5px solid #e8d5b5; background: linear-gradient(180deg, #fffbf5 0%, #fff 100%);">
+                <div class="section-header" style="border-bottom-color:#f0e6d4;">
+                    <span class="material-symbols-outlined icon" style="color:#f59e0b;">auto_awesome</span>
+                    <h3>AI 策略分析報告</h3>
+                    <span id="aiStatus" style="font-size:0.72rem;color:#94a3b8;margin-left:auto;"></span>
+                </div>
+                <div class="section-body" id="aiReportBody">
+                    <!-- SVG 圖表 + AI 洞察卡片 -->
+                </div>
+            </div>
+        </div>
+
         <!-- 概覽指標 -->
-        <div class="stats-grid" id="statsGrid">
+        <div class="stats-grid">
             <div class="stat-card c1">
                 <div class="stat-label"><span class="material-symbols-outlined" style="font-size:14px;">group</span> 活躍用戶</div>
                 <div class="stat-value" id="sUsers">-</div>
@@ -166,18 +193,13 @@
         </div>
 
         <div class="two-col">
-            <!-- 流量來源轉換 -->
             <div class="section">
                 <div class="section-header">
                     <span class="material-symbols-outlined icon" style="color:#10b981;">traffic</span>
                     <h3>流量來源 & 轉換</h3>
                 </div>
-                <div class="section-body" id="sourceSection">
-                    <div class="td-empty">尚無資料</div>
-                </div>
+                <div class="section-body" id="sourceSection"><div class="td-empty">尚無資料</div></div>
             </div>
-
-            <!-- 各課程銷售 -->
             <div class="section">
                 <div class="section-header">
                     <span class="material-symbols-outlined icon" style="color:#f59e0b;">school</span>
@@ -193,7 +215,6 @@
         </div>
 
         <div class="two-col">
-            <!-- GSC 搜尋關鍵字 -->
             <div class="section">
                 <div class="section-header">
                     <span class="material-symbols-outlined icon" style="color:#3b82f6;">travel_explore</span>
@@ -206,8 +227,6 @@
                     </table>
                 </div>
             </div>
-
-            <!-- 熱門頁面 -->
             <div class="section">
                 <div class="section-header">
                     <span class="material-symbols-outlined icon" style="color:#8b5cf6;">web</span>
@@ -221,25 +240,13 @@
                 </div>
             </div>
         </div>
-
-        <!-- AI 策略報告 -->
-        <div class="section" id="aiSection" style="display:none;">
-            <div class="section-header">
-                <span class="material-symbols-outlined icon" style="color:#f59e0b;">auto_awesome</span>
-                <h3>AI 策略分析報告</h3>
-                <span id="aiStatus" style="font-size:0.72rem;color:#94a3b8;margin-left:auto;"></span>
-            </div>
-            <div class="section-body">
-                <div class="ai-report" id="aiReport"></div>
-            </div>
-        </div>
     </div>
 </div>
 
 <script type="module">
     import { db, functions, ai } from './scripts/supabase.js';
 
-    let cachedData = null; // { ga4, gsc, orders, dateRange }
+    let cachedData = null;
 
     function getDateStr(offset) {
         const d = new Date();
@@ -259,44 +266,31 @@
         btn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size:16px;">progress_activity</span> 載入中…';
 
         try {
-            // Parallel: analytics + orders
             const [analyticsResult, ordersResult] = await Promise.all([
-                functions.invoke('analytics-data', {
-                    body: { type: 'both', dateRange: { startDate, endDate } }
-                }),
-                db.select('orders', {
-                    select: 'course_name,plan_name,amount,payment_status,coupon_code,affiliate_code,payment_time',
-                    order: 'payment_time.desc',
-                    limit: 1000
-                })
+                functions.invoke('analytics-data', { body: { type: 'both', dateRange: { startDate, endDate } } }),
+                db.select('orders', { select: 'course_name,plan_name,amount,payment_status,coupon_code,affiliate_code,payment_time', order: 'payment_time.desc', limit: 1000 })
             ]);
-
             if (analyticsResult.error) throw new Error(analyticsResult.error.message);
 
-            // Filter orders by date range
             const allOrders = (ordersResult.data || []).filter(o => {
-                if (o.payment_status !== 'Paid') return false;
-                if (!o.payment_time) return false;
+                if (o.payment_status !== 'Paid' || !o.payment_time) return false;
                 const t = o.payment_time.split('T')[0];
                 return t >= startDate && t <= endDate;
             });
 
             const ga4 = analyticsResult.data?.ga4 || {};
             const gsc = analyticsResult.data?.gsc || {};
-
             cachedData = { ga4, gsc, orders: allOrders, dateRange: { startDate, endDate, days } };
 
-            // Render
             renderOverview(ga4, allOrders);
             renderDailyChart(ga4.dailyTrend || [], allOrders);
             renderSources(ga4.trafficSources || [], allOrders);
             renderCourses(allOrders);
             renderKeywords(gsc.topQueries || []);
             renderPages(ga4.topPages || []);
-
             document.getElementById('lastUpdate').textContent = `最後更新：${new Date().toLocaleString('zh-TW')}`;
         } catch (err) {
-            console.error('[analysis] Error:', err);
+            console.error('[analysis]', err);
             alert('載入失敗: ' + err.message);
         } finally {
             btn.disabled = false;
@@ -304,16 +298,12 @@
         }
     }
 
-    // ══════════════════════════════════
-    // ── Overview Stats ──
-    // ══════════════════════════════════
     function renderOverview(ga4, orders) {
         const ov = ga4.overview || {};
         const totalRevenue = orders.reduce((s, o) => s + (o.amount || 0), 0);
         const sessions = ov.sessions || 0;
         const convRate = sessions > 0 ? (orders.length / sessions * 100) : 0;
         const avgOrder = orders.length > 0 ? totalRevenue / orders.length : 0;
-
         document.getElementById('sUsers').textContent = (ov.activeUsers || 0).toLocaleString();
         document.getElementById('sNewUsers').textContent = `新用戶 ${(ov.newUsers || 0).toLocaleString()}`;
         document.getElementById('sPageViews').textContent = (ov.pageViews || 0).toLocaleString();
@@ -322,207 +312,79 @@
         document.getElementById('sRevenue').textContent = `NT$ ${totalRevenue.toLocaleString()}`;
         document.getElementById('sConversion').textContent = convRate.toFixed(2) + '%';
         document.getElementById('sAvgOrder').textContent = `NT$ ${Math.round(avgOrder).toLocaleString()}`;
-        document.getElementById('sBounce').textContent = `跳出率 ${(ov.bounceRate * 100 || 0).toFixed(1)}%`;
+        document.getElementById('sBounce').textContent = `跳出率 ${((ov.bounceRate || 0) * 100).toFixed(1)}%`;
     }
 
-    // ══════════════════════════════════
-    // ── Daily Chart (SVG) ──
-    // ══════════════════════════════════
     function renderDailyChart(dailyTrend, orders) {
         const container = document.getElementById('dailyChart');
-        if (!dailyTrend.length) {
-            container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">無趨勢資料</div>';
-            return;
-        }
-
-        // Count orders by date
+        if (!dailyTrend.length) { container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">無趨勢資料</div>'; return; }
         const ordersByDate = {};
-        orders.forEach(o => {
-            if (!o.payment_time) return;
-            const d = o.payment_time.split('T')[0].replace(/-/g, '');
-            ordersByDate[d] = (ordersByDate[d] || 0) + 1;
-        });
-
-        const w = container.clientWidth || 800;
-        const h = 220;
+        orders.forEach(o => { if (!o.payment_time) return; const d = o.payment_time.split('T')[0].replace(/-/g, ''); ordersByDate[d] = (ordersByDate[d] || 0) + 1; });
+        const w = container.clientWidth || 800, h = 220;
         const pad = { top: 24, right: 50, bottom: 32, left: 50 };
-        const cW = w - pad.left - pad.right;
-        const cH = h - pad.top - pad.bottom;
-
+        const cW = w - pad.left - pad.right, cH = h - pad.top - pad.bottom;
         const maxViews = Math.max(...dailyTrend.map(d => d.pageViews), 1);
         const maxOrders = Math.max(...dailyTrend.map(d => ordersByDate[d.date] || 0), 1);
-
         const pts = dailyTrend.map((d, i) => {
             const x = pad.left + (i / Math.max(dailyTrend.length - 1, 1)) * cW;
-            const yViews = pad.top + cH - (d.pageViews / maxViews) * cH;
-            const ordersCount = ordersByDate[d.date] || 0;
-            const yOrders = pad.top + cH - (ordersCount / maxOrders) * cH;
-            return { x, yViews, yOrders, ...d, orders: ordersCount };
+            return { x, yV: pad.top + cH - (d.pageViews / maxViews) * cH, yO: pad.top + cH - ((ordersByDate[d.date] || 0) / maxOrders) * cH, ...d, ord: ordersByDate[d.date] || 0 };
         });
-
-        const viewsLine = pts.map(p => `${p.x},${p.yViews}`).join(' ');
-        const viewsArea = `${pts[0].x},${pad.top + cH} ${viewsLine} ${pts[pts.length-1].x},${pad.top + cH}`;
-        const ordersLine = pts.map(p => `${p.x},${p.yOrders}`).join(' ');
-
-        // Grid lines
-        const gridY = [0, 0.25, 0.5, 0.75, 1].map(pct => {
-            const y = pad.top + cH * (1 - pct);
-            const val = Math.round(maxViews * pct);
-            return `<line x1="${pad.left}" y1="${y}" x2="${w - pad.right}" y2="${y}" stroke="#f0f1f3" stroke-dasharray="3"/>
-                    <text x="${pad.left - 8}" y="${y + 3}" text-anchor="end" fill="#94a3b8" font-size="10">${val}</text>`;
-        }).join('');
-
-        // Right Y axis (orders)
-        const gridYR = [0, 0.5, 1].map(pct => {
-            const y = pad.top + cH * (1 - pct);
-            const val = Math.round(maxOrders * pct);
-            return `<text x="${w - pad.right + 8}" y="${y + 3}" text-anchor="start" fill="#10b981" font-size="10">${val}</text>`;
-        }).join('');
-
-        // X labels
+        const vL = pts.map(p => `${p.x},${p.yV}`).join(' ');
+        const vA = `${pts[0].x},${pad.top+cH} ${vL} ${pts[pts.length-1].x},${pad.top+cH}`;
+        const oL = pts.map(p => `${p.x},${p.yO}`).join(' ');
+        const gridY = [0,.25,.5,.75,1].map(p => { const y = pad.top+cH*(1-p); return `<line x1="${pad.left}" y1="${y}" x2="${w-pad.right}" y2="${y}" stroke="#f0f1f3" stroke-dasharray="3"/><text x="${pad.left-8}" y="${y+3}" text-anchor="end" fill="#94a3b8" font-size="10">${Math.round(maxViews*p)}</text>`; }).join('');
+        const gridYR = [0,.5,1].map(p => { const y = pad.top+cH*(1-p); return `<text x="${w-pad.right+8}" y="${y+3}" text-anchor="start" fill="#10b981" font-size="10">${Math.round(maxOrders*p)}</text>`; }).join('');
         const step = Math.max(Math.floor(dailyTrend.length / 8), 1);
-        const xLabels = pts.filter((_, i) => i % step === 0 || i === pts.length - 1).map(p => {
-            const label = p.date.substring(4, 6) + '/' + p.date.substring(6, 8);
-            return `<text x="${p.x}" y="${h - 8}" text-anchor="middle" fill="#94a3b8" font-size="10">${label}</text>`;
-        }).join('');
-
-        container.innerHTML = `
-            <svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">
-                ${gridY}${gridYR}${xLabels}
-                <defs>
-                    <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#6366f1" stop-opacity="0.12"/>
-                        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.01"/>
-                    </linearGradient>
-                </defs>
-                <polygon points="${viewsArea}" fill="url(#viewsGrad)"/>
-                <polyline points="${viewsLine}" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <polyline points="${ordersLine}" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round"/>
-                ${pts.map(p => `<circle cx="${p.x}" cy="${p.yViews}" r="2.5" fill="#6366f1" stroke="#fff" stroke-width="1"/>`).join('')}
-                ${pts.filter(p => p.orders > 0).map(p => `<circle cx="${p.x}" cy="${p.yOrders}" r="3.5" fill="#10b981" stroke="#fff" stroke-width="1.5"/>`).join('')}
-                <!-- Legend -->
-                <circle cx="${pad.left + 10}" cy="10" r="4" fill="#6366f1"/>
-                <text x="${pad.left + 20}" y="13" fill="#64748b" font-size="10">瀏覽量</text>
-                <line x1="${pad.left + 65}" y1="10" x2="${pad.left + 85}" y2="10" stroke="#10b981" stroke-width="2" stroke-dasharray="4 2"/>
-                <text x="${pad.left + 90}" y="13" fill="#10b981" font-size="10">訂單數</text>
-            </svg>`;
+        const xL = pts.filter((_,i) => i%step===0||i===pts.length-1).map(p => `<text x="${p.x}" y="${h-8}" text-anchor="middle" fill="#94a3b8" font-size="10">${p.date.substring(4,6)}/${p.date.substring(6,8)}</text>`).join('');
+        container.innerHTML = `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">${gridY}${gridYR}${xL}<defs><linearGradient id="vG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity="0.12"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.01"/></linearGradient></defs><polygon points="${vA}" fill="url(#vG)"/><polyline points="${vL}" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${oL}" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map(p=>`<circle cx="${p.x}" cy="${p.yV}" r="2.5" fill="#6366f1" stroke="#fff" stroke-width="1"/>`).join('')}${pts.filter(p=>p.ord>0).map(p=>`<circle cx="${p.x}" cy="${p.yO}" r="3.5" fill="#10b981" stroke="#fff" stroke-width="1.5"/>`).join('')}<circle cx="${pad.left+10}" cy="10" r="4" fill="#6366f1"/><text x="${pad.left+20}" y="13" fill="#64748b" font-size="10">瀏覽量</text><line x1="${pad.left+65}" y1="10" x2="${pad.left+85}" y2="10" stroke="#10b981" stroke-width="2" stroke-dasharray="4 2"/><text x="${pad.left+90}" y="13" fill="#10b981" font-size="10">訂單數</text></svg>`;
     }
 
-    // ══════════════════════════════════
-    // ── Sources + Conversion ──
-    // ══════════════════════════════════
     function renderSources(sources, orders) {
         const el = document.getElementById('sourceSection');
         if (!sources.length) { el.innerHTML = '<div class="td-empty">無流量來源資料</div>'; return; }
-
-        const totalSessions = sources.reduce((s, src) => s + src.sessions, 0);
-        const convRate = totalSessions > 0 ? (orders.length / totalSessions * 100) : 0;
+        const tot = sources.reduce((s, src) => s + src.sessions, 0);
+        const conv = tot > 0 ? (orders.length / tot * 100) : 0;
         const colors = ['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6b7280'];
         const maxS = Math.max(...sources.map(s => s.sessions));
-
-        el.innerHTML = `
-            <div style="font-size:.72rem;color:#94a3b8;margin-bottom:14px;">
-                整體轉換率 <strong style="color:#10b981;font-size:.85rem;">${convRate.toFixed(2)}%</strong>
-                <span style="margin-left:8px;">（${orders.length} 訂單 ÷ ${totalSessions.toLocaleString()} 工作階段）</span>
-            </div>
-            ${sources.map((s, i) => {
-                const pct = (s.sessions / maxS * 100).toFixed(0);
-                const sharePct = (s.sessions / totalSessions * 100).toFixed(1);
-                const c = colors[i % colors.length];
-                return `<div class="progress-wrap">
-                    <div class="progress-label">${s.channel}</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${c};"></div></div>
-                    <div class="progress-val">${s.sessions} <span style="color:#c0c5ce;">(${sharePct}%)</span></div>
-                </div>`;
-            }).join('')}`;
+        el.innerHTML = `<div style="font-size:.72rem;color:#94a3b8;margin-bottom:14px;">整體轉換率 <strong style="color:#10b981;font-size:.85rem;">${conv.toFixed(2)}%</strong> <span style="margin-left:8px;">(${orders.length} 訂單 ÷ ${tot.toLocaleString()} 工作階段)</span></div>${sources.map((s,i) => { const pct=(s.sessions/maxS*100).toFixed(0); const sh=(s.sessions/tot*100).toFixed(1); return `<div class="progress-wrap"><div class="progress-label">${s.channel}</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${colors[i%colors.length]};"></div></div><div class="progress-val">${s.sessions} <span style="color:#c0c5ce;">(${sh}%)</span></div></div>`; }).join('')}`;
     }
 
-    // ══════════════════════════════════
-    // ── Course Sales ──
-    // ══════════════════════════════════
     function renderCourses(orders) {
         const tbody = document.getElementById('courseTable');
         if (!orders.length) { tbody.innerHTML = '<tr><td colspan="4" class="td-empty">無訂單</td></tr>'; return; }
-
-        const stats = {};
-        let total = 0;
-        orders.forEach(o => {
-            const name = o.course_name || '未知課程';
-            if (!stats[name]) stats[name] = { count: 0, revenue: 0 };
-            stats[name].count++;
-            stats[name].revenue += (o.amount || 0);
-            total += (o.amount || 0);
-        });
-
-        const sorted = Object.entries(stats).sort((a, b) => b[1].revenue - a[1].revenue);
-        tbody.innerHTML = sorted.map(([name, s]) => {
-            const share = total > 0 ? (s.revenue / total * 100).toFixed(1) : '0';
-            return `<tr>
-                <td style="font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</td>
-                <td class="td-right" style="font-weight:600;">${s.count}</td>
-                <td class="td-right" style="font-weight:700;">NT$ ${s.revenue.toLocaleString()}</td>
-                <td class="td-right"><span style="background:#eff6ff;color:#3b82f6;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600;">${share}%</span></td>
-            </tr>`;
-        }).join('');
+        const stats = {}; let total = 0;
+        orders.forEach(o => { const n = o.course_name||'未知'; if (!stats[n]) stats[n] = {count:0,revenue:0}; stats[n].count++; stats[n].revenue += (o.amount||0); total += (o.amount||0); });
+        tbody.innerHTML = Object.entries(stats).sort((a,b)=>b[1].revenue-a[1].revenue).map(([name,s]) => { const sh = total>0?(s.revenue/total*100).toFixed(1):'0'; return `<tr><td style="font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</td><td class="td-right" style="font-weight:600;">${s.count}</td><td class="td-right" style="font-weight:700;">NT$ ${s.revenue.toLocaleString()}</td><td class="td-right"><span style="background:#eff6ff;color:#3b82f6;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600;">${sh}%</span></td></tr>`; }).join('');
     }
 
-    // ══════════════════════════════════
-    // ── Keywords ──
-    // ══════════════════════════════════
     function renderKeywords(queries) {
         const tbody = document.getElementById('keywordTable');
         if (!queries.length) { tbody.innerHTML = '<tr><td colspan="6" class="td-empty">無搜尋資料</td></tr>'; return; }
-
-        tbody.innerHTML = queries.map((q, i) => {
-            const rankClass = i < 1 ? 'rank-1' : i < 2 ? 'rank-2' : i < 3 ? 'rank-3' : 'rank-n';
-            const posColor = q.position <= 3 ? '#10b981' : q.position <= 10 ? '#3b82f6' : q.position <= 20 ? '#f59e0b' : '#94a3b8';
-            return `<tr>
-                <td><span class="rank ${rankClass}">${i + 1}</span></td>
-                <td style="font-weight:500;">${q.query}</td>
-                <td class="td-right" style="font-weight:600;">${q.clicks}</td>
-                <td class="td-right">${q.impressions.toLocaleString()}</td>
-                <td class="td-right">${(q.ctr * 100).toFixed(1)}%</td>
-                <td class="td-right"><span style="font-weight:600;color:${posColor};">${q.position.toFixed(1)}</span></td>
-            </tr>`;
-        }).join('');
+        tbody.innerHTML = queries.map((q,i) => { const rc = i<1?'rank-1':i<2?'rank-2':i<3?'rank-3':'rank-n'; const pc = q.position<=3?'#10b981':q.position<=10?'#3b82f6':q.position<=20?'#f59e0b':'#94a3b8'; return `<tr><td><span class="rank ${rc}">${i+1}</span></td><td style="font-weight:500;">${q.query}</td><td class="td-right" style="font-weight:600;">${q.clicks}</td><td class="td-right">${q.impressions.toLocaleString()}</td><td class="td-right">${(q.ctr*100).toFixed(1)}%</td><td class="td-right"><span style="font-weight:600;color:${pc};">${q.position.toFixed(1)}</span></td></tr>`; }).join('');
     }
 
-    // ══════════════════════════════════
-    // ── Top Pages ──
-    // ══════════════════════════════════
     function renderPages(pages) {
         const tbody = document.getElementById('pageTable');
         if (!pages.length) { tbody.innerHTML = '<tr><td colspan="4" class="td-empty">無頁面資料</td></tr>'; return; }
-
-        tbody.innerHTML = pages.slice(0, 15).map((p, i) => {
-            const rankClass = i < 1 ? 'rank-1' : i < 2 ? 'rank-2' : i < 3 ? 'rank-3' : 'rank-n';
-            return `<tr>
-                <td><span class="rank ${rankClass}">${i + 1}</span></td>
-                <td><code style="font-size:.74rem;background:#f1f5f9;padding:2px 6px;border-radius:4px;">${p.path}</code>
-                    <div style="font-size:.7rem;color:#94a3b8;margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.title}</div>
-                </td>
-                <td class="td-right" style="font-weight:600;">${p.views.toLocaleString()}</td>
-                <td class="td-right">${p.users.toLocaleString()}</td>
-            </tr>`;
-        }).join('');
+        tbody.innerHTML = pages.slice(0,15).map((p,i) => { const rc = i<1?'rank-1':i<2?'rank-2':i<3?'rank-3':'rank-n'; return `<tr><td><span class="rank ${rc}">${i+1}</span></td><td><code style="font-size:.74rem;background:#f1f5f9;padding:2px 6px;border-radius:4px;">${p.path}</code><div style="font-size:.7rem;color:#94a3b8;margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.title}</div></td><td class="td-right" style="font-weight:600;">${p.views.toLocaleString()}</td><td class="td-right">${p.users.toLocaleString()}</td></tr>`; }).join('');
     }
 
-    // ══════════════════════════════════
-    // ── AI Report ──
-    // ══════════════════════════════════
+    // ══════════════════════════════════════════════
+    // ── AI Report (SVG 圖表 + 洞察卡片) ──
+    // ══════════════════════════════════════════════
     async function generateAiReport() {
         if (!cachedData) { alert('請先載入分析資料'); return; }
 
-        const section = document.getElementById('aiSection');
-        const report = document.getElementById('aiReport');
+        const area = document.getElementById('aiReportArea');
+        const body = document.getElementById('aiReportBody');
         const status = document.getElementById('aiStatus');
         const btn = document.getElementById('btnAiReport');
 
-        section.style.display = 'block';
+        area.style.display = 'block';
         btn.disabled = true;
-        status.textContent = '正在生成 AI 策略報告…(約 15-30 秒)';
-        report.innerHTML = '<div style="text-align:center;padding:40px;"><span class="material-symbols-outlined spinner" style="font-size:32px;color:#6366f1;">progress_activity</span></div>';
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        status.textContent = '正在生成…';
+        body.innerHTML = '<div style="text-align:center;padding:50px;"><span class="material-symbols-outlined spinner" style="font-size:36px;color:#f59e0b;">progress_activity</span><div style="margin-top:12px;font-size:.82rem;color:#94a3b8;">正在分析數據並生成圖表…(約 15-30 秒)</div></div>';
+        area.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         try {
             const { ga4, gsc, orders, dateRange } = cachedData;
@@ -530,94 +392,187 @@
             const totalRevenue = orders.reduce((s, o) => s + (o.amount || 0), 0);
             const sessions = ov.sessions || 0;
             const convRate = sessions > 0 ? (orders.length / sessions * 100) : 0;
+            const avgOrder = orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0;
 
-            // Course breakdown
+            // ── SVG 圖表區 ──
+            const funnelSvg = buildFunnelChart(ov.activeUsers || 0, sessions, ov.pageViews || 0, orders.length, totalRevenue);
+            const donutSvg = buildDonutChart(orders);
+            const sourceBarSvg = buildSourceBarChart(ga4.trafficSources || []);
+
+            // ── AI 洞察 ──
             const courseStats = {};
-            orders.forEach(o => {
-                const n = o.course_name || '未知';
-                if (!courseStats[n]) courseStats[n] = { count: 0, revenue: 0 };
-                courseStats[n].count++;
-                courseStats[n].revenue += (o.amount || 0);
-            });
-            const courseStr = Object.entries(courseStats).sort((a, b) => b[1].revenue - a[1].revenue)
-                .map(([n, s]) => `- ${n}: ${s.count} 筆, NT$ ${s.revenue.toLocaleString()}`).join('\n');
+            orders.forEach(o => { const n = o.course_name||'未知'; if (!courseStats[n]) courseStats[n]={count:0,revenue:0}; courseStats[n].count++; courseStats[n].revenue+=(o.amount||0); });
+            const courseStr = Object.entries(courseStats).sort((a,b)=>b[1].revenue-a[1].revenue).map(([n,s])=>`- ${n}: ${s.count}筆, NT$${s.revenue.toLocaleString()}`).join('\n');
+            const srcStr = (ga4.trafficSources||[]).map(s=>`- ${s.channel}: ${s.sessions} sessions`).join('\n');
+            const kwStr = (gsc.topQueries||[]).slice(0,15).map(q=>`- "${q.query}": ${q.clicks}clicks, 排名${q.position.toFixed(1)}`).join('\n');
 
-            const sourcesStr = (ga4.trafficSources || []).map(s =>
-                `- ${s.channel}: ${s.sessions} sessions, ${s.users} users`).join('\n');
+            const prompt = `你是數位行銷策略分析師。根據以下數據，以 JSON 格式輸出 5 個洞察卡片。
 
-            const keywordsStr = (gsc.topQueries || []).slice(0, 20).map(q =>
-                `- "${q.query}": ${q.clicks} 點擊, ${q.impressions} 曝光, CTR ${(q.ctr*100).toFixed(1)}%, 排名 ${q.position.toFixed(1)}`).join('\n');
+數據(${dateRange.days}天)：用戶${ov.activeUsers||0} 工作階段${sessions} 瀏覽量${ov.pageViews||0} 訂單${orders.length} 營收NT$${totalRevenue.toLocaleString()} 轉換率${convRate.toFixed(2)}% 客單價NT$${avgOrder} 跳出率${((ov.bounceRate||0)*100).toFixed(1)}%
 
-            const topPagesStr = (ga4.topPages || []).slice(0, 10).map(p =>
-                `- ${p.path}: ${p.views} views, ${p.users} users`).join('\n');
+課程: ${courseStr||'無'}
+流量: ${srcStr||'無'}  
+關鍵字: ${kwStr||'無'}
 
-            const prompt = `你是數位行銷產品策略分析師。分析「數位簡報室 The Briefing Room」(tbr.digital) 過去 ${dateRange.days} 天數據，生成繁體中文策略報告。
+輸出格式（純 JSON，不要 markdown code block）：
+[
+  {"icon":"trending_up","title":"業績摘要","color":"blue","points":["重點1","重點2","重點3"]},
+  {"icon":"filter_alt","title":"流量漏斗","color":"green","points":["重點1","重點2","重點3"]},
+  {"icon":"search","title":"SEO 機會","color":"purple","points":["重點1","重點2","重點3"]},
+  {"icon":"rocket_launch","title":"策略建議","color":"amber","points":["重點1","重點2","重點3"]},
+  {"icon":"bolt","title":"快速致勝","color":"red","points":["立即行動1","立即行動2","立即行動3"]}
+]
 
-## 核心指標
-- 活躍用戶: ${ov.activeUsers || 0}, 新用戶: ${ov.newUsers || 0}
-- 工作階段: ${sessions}, 瀏覽量: ${ov.pageViews || 0}
-- 跳出率: ${((ov.bounceRate || 0) * 100).toFixed(1)}%, 平均停留: ${Math.round(ov.avgSessionDuration || 0)}秒
-- 訂單數: ${orders.length}, 營收: NT$ ${totalRevenue.toLocaleString()}
-- 轉換率: ${convRate.toFixed(2)}%, 客單價: NT$ ${orders.length ? Math.round(totalRevenue/orders.length).toLocaleString() : 0}
+每個 point 用繁體中文，要具體、含數據、可執行。每條控制在 40 字內。`;
 
-## 各課程銷售
-${courseStr || '無'}
-
-## 流量來源
-${sourcesStr || '無'}
-
-## 搜尋關鍵字 (GSC)
-${keywordsStr || '無'}
-
-## 熱門頁面
-${topPagesStr || '無'}
-
----
-請產出：
-1. **業績摘要** — 數據重點、客單價分析
-2. **流量漏斗分析** — 從流量到轉換的漏斗、各來源效率
-3. **SEO 機會** — 關鍵字排名機會、可優化方向
-4. **產品策略建議** — 具體可執行的優化行動 (短期/中期)
-5. **⚡ 快速致勝** — 3 個可以立即執行的高 ROI 行動
-
-用 markdown 格式，重點用粗體，數據佐證。`;
-
-            const text = await ai.chat([
-                { role: 'system', content: '你是頂級數位行銷策略顧問，擅長數據驅動的產品優化。回答用繁體中文，分析具體可操作。' },
+            const raw = await ai.chat([
+                { role: 'system', content: '你是數據分析師。只輸出純 JSON array，不要任何其他文字。' },
                 { role: 'user', content: prompt }
-            ], { temperature: 0.3, maxTokens: 4096 });
+            ], { temperature: 0.3, maxTokens: 2048 });
 
-            report.innerHTML = renderMd(text);
+            let cards = [];
+            try {
+                const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                cards = JSON.parse(cleaned);
+            } catch { cards = [{ icon: 'info', title: '分析結果', color: 'blue', points: [raw.substring(0, 200)] }]; }
+
+            // ── 組合輸出 ──
+            const cardsHtml = cards.map(c => `
+                <div class="ai-card c-${c.color}">
+                    <div class="ai-card-title">
+                        <span class="material-symbols-outlined" style="font-size:18px;">${c.icon}</span>
+                        ${c.title}
+                    </div>
+                    <div class="ai-card-body">
+                        ${c.points.map(p => `<div style="margin:4px 0;display:flex;gap:6px;"><span style="color:#6366f1;flex-shrink:0;">•</span><span>${p.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</span></div>`).join('')}
+                    </div>
+                </div>`).join('');
+
+            body.innerHTML = `
+                <div class="three-col" style="margin-bottom:20px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:.75rem;font-weight:600;color:#64748b;margin-bottom:8px;">轉換漏斗</div>
+                        ${funnelSvg}
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:.75rem;font-weight:600;color:#64748b;margin-bottom:8px;">營收組成</div>
+                        ${donutSvg}
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:.75rem;font-weight:600;color:#64748b;margin-bottom:8px;">流量來源 Sessions</div>
+                        ${sourceBarSvg}
+                    </div>
+                </div>
+                <div class="ai-cards">${cardsHtml}</div>`;
+
             status.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:#10b981;">check_circle</span> 報告已生成';
         } catch (err) {
-            report.innerHTML = `<div style="color:#ef4444;padding:20px;">生成失敗: ${err.message}</div>`;
+            body.innerHTML = `<div style="color:#ef4444;padding:20px;">生成失敗: ${err.message}</div>`;
             status.textContent = '生成失敗';
-        } finally {
-            btn.disabled = false;
-        }
+        } finally { btn.disabled = false; }
     }
 
-    function renderMd(md) {
-        return md
-            .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-            .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-            .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-            .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.+?)\*/g, '<em>$1</em>')
-            .replace(/`(.+?)`/g, '<code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.8rem;">$1</code>')
-            .replace(/^- (.+)$/gm, '<div style="padding-left:16px;margin:3px 0;"><span style="color:#6366f1;margin-right:6px;">•</span>$1</div>')
-            .replace(/^\d+\. (.+)$/gm, '<div style="padding-left:16px;margin:4px 0;">$1</div>')
-            .replace(/\n{2,}/g, '<br><br>')
-            .replace(/\n/g, '<br>');
+    // ── SVG: 轉換漏斗 ──
+    function buildFunnelChart(users, sessions, pageViews, orders, revenue) {
+        const w = 280, h = 240;
+        const stages = [
+            { label: '用戶', value: users, color: '#6366f1' },
+            { label: '工作階段', value: sessions, color: '#3b82f6' },
+            { label: '瀏覽量', value: pageViews, color: '#8b5cf6' },
+            { label: '訂單', value: orders, color: '#10b981' }
+        ];
+        const maxVal = Math.max(...stages.map(s => s.value), 1);
+        const barH = 36, gap = 14, startY = 10;
+        const maxBarW = w - 100;
+
+        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+            ${stages.map((s, i) => {
+                const barW = Math.max((s.value / maxVal) * maxBarW, 30);
+                const x = (w - barW) / 2;
+                const y = startY + i * (barH + gap);
+                const pct = i > 0 ? ((s.value / stages[i-1].value) * 100).toFixed(0) : '100';
+                return `
+                    <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="6" fill="${s.color}" opacity="0.85"/>
+                    <text x="${w/2}" y="${y + barH/2 + 4}" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">${s.value.toLocaleString()}</text>
+                    <text x="${x - 4}" y="${y + barH/2 + 4}" text-anchor="end" fill="#64748b" font-size="10">${s.label}</text>
+                    ${i > 0 ? `<text x="${x + barW + 4}" y="${y + barH/2 + 4}" text-anchor="start" fill="${s.color}" font-size="10" font-weight="600">${pct}%</text>` : ''}
+                    ${i > 0 ? `<line x1="${w/2}" y1="${y - gap + 2}" x2="${w/2}" y2="${y - 2}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3"/>` : ''}`;
+            }).join('')}
+            <text x="${w/2}" y="${h - 8}" text-anchor="middle" fill="#64748b" font-size="10">營收 NT$ ${revenue.toLocaleString()}</text>
+        </svg>`;
+    }
+
+    // ── SVG: 營收甜甜圈 ──
+    function buildDonutChart(orders) {
+        const stats = {};
+        orders.forEach(o => { const n = (o.course_name||'未知').substring(0,12); if (!stats[n]) stats[n]=0; stats[n]+=(o.amount||0); });
+        const sorted = Object.entries(stats).sort((a,b) => b[1]-a[1]).slice(0,5);
+        const total = sorted.reduce((s,e)=>s+e[1],0) || 1;
+        const colors = ['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444'];
+        const w = 280, h = 240, cx = 110, cy = 105, r = 70, r2 = 42;
+
+        let angle = -90;
+        const arcs = sorted.map(([ ,val], i) => {
+            const pct = val / total;
+            const sweep = pct * 360;
+            const startAngle = angle;
+            angle += sweep;
+            const endAngle = angle;
+            const largeArc = sweep > 180 ? 1 : 0;
+            const toRad = a => a * Math.PI / 180;
+            const x1 = cx + r * Math.cos(toRad(startAngle));
+            const y1 = cy + r * Math.sin(toRad(startAngle));
+            const x2 = cx + r * Math.cos(toRad(endAngle));
+            const y2 = cy + r * Math.sin(toRad(endAngle));
+            const x3 = cx + r2 * Math.cos(toRad(endAngle));
+            const y3 = cy + r2 * Math.sin(toRad(endAngle));
+            const x4 = cx + r2 * Math.cos(toRad(startAngle));
+            const y4 = cy + r2 * Math.sin(toRad(startAngle));
+            return `<path d="M${x1},${y1} A${r},${r} 0 ${largeArc},1 ${x2},${y2} L${x3},${y3} A${r2},${r2} 0 ${largeArc},0 ${x4},${y4} Z" fill="${colors[i]}"/>`;
+        });
+
+        // Center text
+        const centerText = `<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="#1e293b" font-size="14" font-weight="700">NT$ ${(total/1000).toFixed(total>=10000?0:1)}k</text><text x="${cx}" y="${cy + 12}" text-anchor="middle" fill="#94a3b8" font-size="9">營收</text>`;
+
+        // Legend
+        const legend = sorted.map(([name, val], i) => {
+            const y = 16 + i * 16;
+            const pct = (val / total * 100).toFixed(0);
+            return `<circle cx="${w - 60}" cy="${y}" r="4" fill="${colors[i]}"/><text x="${w - 52}" y="${y + 3}" fill="#64748b" font-size="9">${name.substring(0,6)} ${pct}%</text>`;
+        }).join('');
+
+        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${arcs.join('')}${centerText}${legend}</svg>`;
+    }
+
+    // ── SVG: 流量來源柱狀圖 ──
+    function buildSourceBarChart(sources) {
+        if (!sources.length) return '<div style="color:#94a3b8;font-size:.8rem;">無資料</div>';
+        const top = sources.slice(0, 6);
+        const w = 280, h = 240;
+        const pad = { top: 10, bottom: 20, left: 10, right: 10 };
+        const barW = Math.min(36, (w - pad.left - pad.right) / top.length - 8);
+        const maxVal = Math.max(...top.map(s => s.sessions), 1);
+        const chartH = h - pad.top - pad.bottom - 50;
+        const colors = ['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'];
+
+        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+            ${top.map((s, i) => {
+                const barH = (s.sessions / maxVal) * chartH;
+                const x = pad.left + 20 + i * ((w - pad.left - pad.right - 40) / top.length);
+                const y = pad.top + chartH - barH + 10;
+                const labelShort = s.channel.replace('Organic ','').replace('Paid ','P.').substring(0,8);
+                return `
+                    <rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="${colors[i]}"/>
+                    <text x="${x + barW/2}" y="${y - 5}" text-anchor="middle" fill="${colors[i]}" font-size="10" font-weight="600">${s.sessions}</text>
+                    <text x="${x + barW/2}" y="${h - pad.bottom}" text-anchor="middle" fill="#64748b" font-size="8" transform="rotate(-25,${x+barW/2},${h-pad.bottom})">${labelShort}</text>`;
+            }).join('')}
+        </svg>`;
     }
 
     // ── Events ──
     document.getElementById('btnLoad').addEventListener('click', loadAll);
     document.getElementById('btnAiReport').addEventListener('click', generateAiReport);
-    document.getElementById('dateRange').addEventListener('change', () => {
-        if (cachedData) loadAll();
-    });
+    document.getElementById('dateRange').addEventListener('change', () => { if (cachedData) loadAll(); });
 </script>
 <script src="components/nav.js"></script>
 </body>
