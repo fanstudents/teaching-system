@@ -19,15 +19,19 @@
         .page-header p { font-size: 0.76rem; color: #94a3b8; margin-top: 2px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
 
-        /* Controls */
         .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .controls select { padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: #fff; }
         .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .btn-save { background: linear-gradient(135deg, #10b981, #34d399); color: #fff; }
         .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,.3); }
         .btn-export { background: #fff; color: #64748b; border: 1.5px solid #e2e8f0; }
-        .btn-export:hover { background: #f8fafc; border-color: #6366f1; color: #6366f1; }
-        .auto-saved { font-size: 0.72rem; color: #10b981; margin-left: auto; display: flex; align-items: center; gap: 4px; }
+        .btn-export:hover { border-color: #6366f1; color: #6366f1; }
+        .btn-sm { padding: 5px 12px; font-size: 0.76rem; border-radius: 6px; }
+        .btn-add { background: #eff6ff; color: #3b82f6; border: 1px dashed #93c5fd; }
+        .btn-add:hover { background: #dbeafe; }
+        .btn-del { background: none; color: #94a3b8; border: none; padding: 4px; }
+        .btn-del:hover { color: #ef4444; }
+        .auto-saved { font-size: 0.72rem; color: #94a3b8; margin-left: auto; }
 
         /* Profit Summary */
         .profit-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
@@ -48,36 +52,57 @@
         .section-header h3 { font-size: 0.88rem; font-weight: 600; }
         .section-body { padding: 16px 20px; }
 
-        /* Two col layout */
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        /* Shared cost row */
+        .shared-row { display: flex; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+        .shared-item { display: flex; align-items: center; gap: 8px; }
+        .shared-item label { font-size: 0.8rem; font-weight: 500; color: #374151; white-space: nowrap; }
+        .shared-input { width: 120px; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: 'Inter', monospace; text-align: right; }
+        .shared-input:focus { outline: none; border-color: #6366f1; }
+        .pct-label { font-size: 0.72rem; color: #94a3b8; }
 
-        /* Cost input rows */
-        .cost-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .cost-label { min-width: 110px; font-size: 0.82rem; font-weight: 500; color: #374151; display: flex; align-items: center; gap: 6px; }
-        .cost-label .material-symbols-outlined { font-size: 16px; color: #94a3b8; }
-        .cost-input { flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: 'Inter', monospace; text-align: right; transition: border-color .15s; background: #fff; }
-        .cost-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.08); }
-        .cost-input.revenue { border-color: #93c5fd; background: #eff6ff; }
-        .cost-input.revenue:focus { border-color: #3b82f6; }
-        .cost-subtotal { font-size: 0.78rem; font-weight: 700; color: #ef4444; text-align: right; padding: 10px 0; border-top: 1px solid #f0f1f3; display: flex; justify-content: space-between; }
+        /* Product card */
+        .product-list { display: flex; flex-direction: column; gap: 12px; }
+        .product-card { border: 1px solid #e8ecf1; border-radius: 10px; overflow: hidden; }
+        .product-card-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f8fafc; cursor: pointer; }
+        .product-card-header input { flex: 1; border: none; background: transparent; font-size: 0.84rem; font-weight: 600; font-family: inherit; color: #1e293b; outline: none; }
+        .product-card-header input::placeholder { color: #c0c5ce; }
+        .product-tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+        .product-card-body { padding: 12px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+        .field { display: flex; align-items: center; gap: 6px; }
+        .field-label { font-size: 0.76rem; color: #64748b; min-width: 75px; white-space: nowrap; }
+        .field-input { flex: 1; padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; font-family: 'Inter', monospace; text-align: right; }
+        .field-input:focus { outline: none; border-color: #6366f1; }
+        .field-input.rev-input { border-color: #93c5fd; background: #eff6ff; }
+        .field-input.rev-input:focus { border-color: #3b82f6; }
 
-        /* Monthly section */
+        /* Lecturer fee toggle */
+        .lecturer-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid #f0f1f3; margin-top: 4px; }
+        .toggle-wrap { display: flex; border: 1.5px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .toggle-opt { padding: 4px 10px; font-size: 0.72rem; font-weight: 600; cursor: pointer; background: #fff; color: #94a3b8; transition: all .15s; border: none; font-family: inherit; }
+        .toggle-opt.active { background: #6366f1; color: #fff; }
+
+        /* Product summary */
+        .product-summary { grid-column: 1 / -1; display: flex; justify-content: space-between; padding: 8px 0 2px; border-top: 1px solid #f0f1f3; margin-top: 4px; font-size: 0.78rem; font-weight: 700; }
+        .product-summary .cost-val { color: #ef4444; }
+        .product-summary .profit-val { color: #10b981; }
+
+        /* Chart */
+        .chart-wrap { display: flex; justify-content: center; padding: 10px 0; }
+
+        /* Monthly tools */
         .monthly-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .tool-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 10px; border-radius: 8px; background: #f8fafc; }
         .tool-icon { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
         .tool-name { flex: 1; font-size: 0.8rem; font-weight: 500; }
         .tool-input { width: 110px; padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; font-family: 'Inter', monospace; text-align: right; }
         .tool-input:focus { outline: none; border-color: #6366f1; }
+        .cost-subtotal { font-size: 0.78rem; font-weight: 700; color: #ef4444; text-align: right; padding: 10px 0; border-top: 1px solid #f0f1f3; display: flex; justify-content: space-between; }
 
-        /* Chart */
-        .chart-wrap { display: flex; justify-content: center; padding: 10px 0; }
-
-        /* Toast */
         .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: .82rem; transform: translateY(100px); opacity: 0; transition: all .3s; z-index: 999; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
-        @media (max-width: 1024px) { .two-col, .monthly-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) { .profit-bar { grid-template-columns: repeat(2, 1fr); } .page-header { padding: 14px 16px; } .container { padding: 14px 12px; } }
+        @media (max-width: 1024px) { .monthly-grid { grid-template-columns: 1fr; } .product-card-body { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .profit-bar { grid-template-columns: repeat(2, 1fr); } .page-header { padding: 14px 16px; } .container { padding: 14px 12px; } .shared-row { flex-direction: column; } }
     </style>
 </head>
 
@@ -88,40 +113,23 @@
             <span class="material-symbols-outlined" style="color:#6366f1;">calculate</span>
             成本預算管理
         </h1>
-        <p>產品成本分析 × 月度工具費用 × 利潤計算</p>
+        <p>依產品細分成本 × 月度工具費用 × 利潤計算</p>
     </div>
 
     <div class="container">
-        <!-- Controls -->
         <div class="controls">
             <select id="monthSelect"></select>
-            <button class="btn btn-save" id="btnSave">
-                <span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存
-            </button>
-            <button class="btn btn-export" id="btnExport">
-                <span class="material-symbols-outlined" style="font-size:16px;">download</span> 匯出 CSV
-            </button>
+            <button class="btn btn-save" id="btnSave"><span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存</button>
+            <button class="btn btn-export" id="btnExport"><span class="material-symbols-outlined" style="font-size:16px;">download</span> 匯出 CSV</button>
             <span class="auto-saved" id="autoSaved"></span>
         </div>
 
         <!-- 利潤概覽 -->
         <div class="profit-bar">
-            <div class="profit-card rev">
-                <div class="pc-label">💰 總收入</div>
-                <div class="pc-value" id="totalRevenue">NT$ 0</div>
-            </div>
-            <div class="profit-card cost">
-                <div class="pc-label">📊 總成本</div>
-                <div class="pc-value red" id="totalCost">NT$ 0</div>
-            </div>
-            <div class="profit-card profit">
-                <div class="pc-label">📈 淨利潤</div>
-                <div class="pc-value green" id="netProfit">NT$ 0</div>
-            </div>
-            <div class="profit-card margin">
-                <div class="pc-label">⚡ 利潤率</div>
-                <div class="pc-value" id="profitMargin">0%</div>
-            </div>
+            <div class="profit-card rev"><div class="pc-label">💰 總收入</div><div class="pc-value" id="totalRevenue">NT$ 0</div></div>
+            <div class="profit-card cost"><div class="pc-label">📊 總成本</div><div class="pc-value red" id="totalCost">NT$ 0</div></div>
+            <div class="profit-card profit"><div class="pc-label">📈 淨利潤</div><div class="pc-value green" id="netProfit">NT$ 0</div></div>
+            <div class="profit-card margin"><div class="pc-label">⚡ 利潤率</div><div class="pc-value" id="profitMargin">0%</div></div>
         </div>
 
         <!-- 利潤結構圖 -->
@@ -130,200 +138,100 @@
                 <span class="material-symbols-outlined" style="font-size:18px;color:#8b5cf6;">donut_large</span>
                 <h3>利潤結構</h3>
             </div>
+            <div class="section-body"><div class="chart-wrap" id="profitChart"></div></div>
+        </div>
+
+        <!-- 全域費率 -->
+        <div class="section">
+            <div class="section-header">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#64748b;">tune</span>
+                <h3>全域設定（稅金 & 金流手續費）</h3>
+            </div>
             <div class="section-body">
-                <div class="chart-wrap" id="profitChart"></div>
+                <div class="shared-row">
+                    <div class="shared-item">
+                        <label>稅率</label>
+                        <input type="number" class="shared-input" id="globalTaxRate" value="5" step="0.1">
+                        <span class="pct-label">%（自動從實收扣除）</span>
+                    </div>
+                    <div class="shared-item">
+                        <label>金流手續費率</label>
+                        <input type="number" class="shared-input" id="globalPaymentRate" value="2.8" step="0.1">
+                        <span class="pct-label">%（自動從實收扣除）</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 兩種產品 -->
-        <div class="two-col">
-            <!-- 企業內訓 -->
-            <div class="section">
-                <div class="section-header" style="background: linear-gradient(90deg, #eff6ff 0%, #fff 100%);">
-                    <span class="material-symbols-outlined" style="font-size:18px;color:#3b82f6;">business</span>
-                    <h3>企業內訓</h3>
-                </div>
-                <div class="section-body">
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">payments</span> 實收金額</div>
-                        <input type="number" class="cost-input revenue" id="b2b_revenue" placeholder="0" data-group="b2b" data-type="revenue">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">receipt_long</span> 稅金</div>
-                        <input type="number" class="cost-input" id="b2b_tax" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">credit_card</span> 金流手續費</div>
-                        <input type="number" class="cost-input" id="b2b_payment_fee" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">campaign</span> KOL 推廣費</div>
-                        <input type="number" class="cost-input" id="b2b_kol" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">ads_click</span> 廣告費</div>
-                        <input type="number" class="cost-input" id="b2b_ads" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">location_on</span> 場地費</div>
-                        <input type="number" class="cost-input" id="b2b_venue" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">person</span> 助教費</div>
-                        <input type="number" class="cost-input" id="b2b_assistant" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">directions_car</span> 車馬費</div>
-                        <input type="number" class="cost-input" id="b2b_transport" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">menu_book</span> 教材費</div>
-                        <input type="number" class="cost-input" id="b2b_material" placeholder="0" data-group="b2b">
-                    </div>
-                    <div class="cost-subtotal">
-                        <span>小計成本</span>
-                        <span id="b2b_subtotal">NT$ 0</span>
-                    </div>
+        <!-- 企業內訓 -->
+        <div class="section">
+            <div class="section-header" style="background:linear-gradient(90deg,#eff6ff,#fff);">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#3b82f6;">business</span>
+                <h3>企業內訓</h3>
+                <span style="font-size:.72rem;color:#94a3b8;margin-left:4px;" id="b2bCount">0 項</span>
+                <button class="btn btn-sm btn-add" style="margin-left:auto;" onclick="addProduct('b2b')">
+                    <span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增產品
+                </button>
+            </div>
+            <div class="section-body">
+                <div class="product-list" id="b2bProducts"></div>
+                <div class="cost-subtotal" style="margin-top:12px;">
+                    <span>企業內訓合計</span>
+                    <span>收入 <span id="b2bRevTotal" style="color:#3b82f6;">NT$ 0</span> ｜ 成本 <span id="b2bCostTotal">NT$ 0</span> ｜ 利潤 <span id="b2bProfitTotal" style="color:#10b981;">NT$ 0</span></span>
                 </div>
             </div>
+        </div>
 
-            <!-- 公開課程 -->
-            <div class="section">
-                <div class="section-header" style="background: linear-gradient(90deg, #f0fdf4 0%, #fff 100%);">
-                    <span class="material-symbols-outlined" style="font-size:18px;color:#10b981;">school</span>
-                    <h3>公開課程</h3>
-                </div>
-                <div class="section-body">
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">payments</span> 實收金額</div>
-                        <input type="number" class="cost-input revenue" id="b2c_revenue" placeholder="0" data-group="b2c" data-type="revenue">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">receipt_long</span> 稅金</div>
-                        <input type="number" class="cost-input" id="b2c_tax" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">credit_card</span> 金流手續費</div>
-                        <input type="number" class="cost-input" id="b2c_payment_fee" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">campaign</span> KOL 推廣費</div>
-                        <input type="number" class="cost-input" id="b2c_kol" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">ads_click</span> 廣告費</div>
-                        <input type="number" class="cost-input" id="b2c_ads" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">location_on</span> 場地費</div>
-                        <input type="number" class="cost-input" id="b2c_venue" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">person</span> 助教費</div>
-                        <input type="number" class="cost-input" id="b2c_assistant" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">directions_car</span> 車馬費</div>
-                        <input type="number" class="cost-input" id="b2c_transport" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-row">
-                        <div class="cost-label"><span class="material-symbols-outlined">menu_book</span> 教材費</div>
-                        <input type="number" class="cost-input" id="b2c_material" placeholder="0" data-group="b2c">
-                    </div>
-                    <div class="cost-subtotal">
-                        <span>小計成本</span>
-                        <span id="b2c_subtotal">NT$ 0</span>
-                    </div>
+        <!-- 公開課程 -->
+        <div class="section">
+            <div class="section-header" style="background:linear-gradient(90deg,#f0fdf4,#fff);">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#10b981;">school</span>
+                <h3>公開課程</h3>
+                <span style="font-size:.72rem;color:#94a3b8;margin-left:4px;" id="b2cCount">0 項</span>
+                <button class="btn btn-sm btn-add" style="margin-left:auto;" onclick="addProduct('b2c')">
+                    <span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增產品
+                </button>
+            </div>
+            <div class="section-body">
+                <div class="product-list" id="b2cProducts"></div>
+                <div class="cost-subtotal" style="margin-top:12px;">
+                    <span>公開課程合計</span>
+                    <span>收入 <span id="b2cRevTotal" style="color:#3b82f6;">NT$ 0</span> ｜ 成本 <span id="b2cCostTotal">NT$ 0</span> ｜ 利潤 <span id="b2cProfitTotal" style="color:#10b981;">NT$ 0</span></span>
                 </div>
             </div>
         </div>
 
         <!-- 底層月度費用 -->
         <div class="section">
-            <div class="section-header" style="background: linear-gradient(90deg, #faf5ff 0%, #fff 100%);">
+            <div class="section-header" style="background:linear-gradient(90deg,#faf5ff,#fff);">
                 <span class="material-symbols-outlined" style="font-size:18px;color:#8b5cf6;">subscriptions</span>
                 <h3>底層月度費用</h3>
                 <span style="font-size:.72rem;color:#94a3b8;margin-left:auto;">每月固定支出</span>
             </div>
             <div class="section-body">
                 <div class="monthly-grid">
-                    <!-- AI 工具 -->
                     <div>
                         <div style="font-size:.78rem;font-weight:600;color:#8b5cf6;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
                             <span class="material-symbols-outlined" style="font-size:16px;">smart_toy</span> AI 工具使用費
                         </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#4285f4;">G</div>
-                            <div class="tool-name">Google Workspace</div>
-                            <input type="number" class="tool-input" id="tool_google" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#10a37f;">C</div>
-                            <div class="tool-name">ChatGPT</div>
-                            <input type="number" class="tool-input" id="tool_chatgpt" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#d97757;">C</div>
-                            <div class="tool-name">Claude</div>
-                            <input type="number" class="tool-input" id="tool_claude" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#00c4cc;">C</div>
-                            <div class="tool-name">Canva</div>
-                            <input type="number" class="tool-input" id="tool_canva" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#000;">N</div>
-                            <div class="tool-name">Notion</div>
-                            <input type="number" class="tool-input" id="tool_notion" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#8b5cf6;">G</div>
-                            <div class="tool-name">Gamma</div>
-                            <input type="number" class="tool-input" id="tool_gamma" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#e74c3c;">M</div>
-                            <div class="tool-name">Manus</div>
-                            <input type="number" class="tool-input" id="tool_manus" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#3b82f6;">L</div>
-                            <div class="tool-name">Lovable</div>
-                            <input type="number" class="tool-input" id="tool_lovable" placeholder="0" data-group="tools">
-                        </div>
-                        <div class="cost-subtotal" style="margin-top:8px;">
-                            <span>AI 工具小計</span>
-                            <span id="tools_subtotal">NT$ 0</span>
-                        </div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#4285f4;">G</div><div class="tool-name">Google Workspace</div><input type="number" class="tool-input" id="tool_google" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#10a37f;">C</div><div class="tool-name">ChatGPT</div><input type="number" class="tool-input" id="tool_chatgpt" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#d97757;">C</div><div class="tool-name">Claude</div><input type="number" class="tool-input" id="tool_claude" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#00c4cc;">C</div><div class="tool-name">Canva</div><input type="number" class="tool-input" id="tool_canva" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#000;">N</div><div class="tool-name">Notion</div><input type="number" class="tool-input" id="tool_notion" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#8b5cf6;">G</div><div class="tool-name">Gamma</div><input type="number" class="tool-input" id="tool_gamma" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#e74c3c;">M</div><div class="tool-name">Manus</div><input type="number" class="tool-input" id="tool_manus" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#3b82f6;">L</div><div class="tool-name">Lovable</div><input type="number" class="tool-input" id="tool_lovable" placeholder="0"></div>
+                        <div class="cost-subtotal" style="margin-top:8px;"><span>AI 工具小計</span><span id="tools_subtotal">NT$ 0</span></div>
                     </div>
-
-                    <!-- 系統平台 -->
                     <div>
                         <div style="font-size:.78rem;font-weight:600;color:#3b82f6;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
                             <span class="material-symbols-outlined" style="font-size:16px;">dns</span> 系統平台使用費
                         </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#6366f1;">T</div>
-                            <div class="tool-name">Teachify</div>
-                            <input type="number" class="tool-input" id="plat_teachify" placeholder="0" data-group="platform">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#f59e0b;">K</div>
-                            <div class="tool-name">Kit</div>
-                            <input type="number" class="tool-input" id="plat_kit" placeholder="0" data-group="platform">
-                        </div>
-                        <div class="tool-row">
-                            <div class="tool-icon" style="background:#6366f1;">Z</div>
-                            <div class="tool-name">Zeabur</div>
-                            <input type="number" class="tool-input" id="plat_zeabur" placeholder="0" data-group="platform">
-                        </div>
-                        <div class="cost-subtotal" style="margin-top:8px;">
-                            <span>平台小計</span>
-                            <span id="platform_subtotal">NT$ 0</span>
-                        </div>
-
-                        <!-- 底層總計 -->
+                        <div class="tool-row"><div class="tool-icon" style="background:#6366f1;">T</div><div class="tool-name">Teachify</div><input type="number" class="tool-input" id="plat_teachify" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#f59e0b;">K</div><div class="tool-name">Kit</div><input type="number" class="tool-input" id="plat_kit" placeholder="0"></div>
+                        <div class="tool-row"><div class="tool-icon" style="background:#6366f1;">Z</div><div class="tool-name">Zeabur</div><input type="number" class="tool-input" id="plat_zeabur" placeholder="0"></div>
+                        <div class="cost-subtotal" style="margin-top:8px;"><span>平台小計</span><span id="platform_subtotal">NT$ 0</span></div>
                         <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,#faf5ff,#eff6ff);border-radius:10px;border:1px solid #e8ecf1;">
                             <div style="font-size:.72rem;color:#64748b;margin-bottom:4px;">每月底層費用總計</div>
                             <div style="font-size:1.2rem;font-weight:700;color:#8b5cf6;" id="monthlyTotal">NT$ 0</div>
@@ -337,7 +245,12 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
+<script>
+    // ── State ──
+    let products = { b2b: [], b2c: [] };
+    let nextId = 1;
+    const STORE_KEY = 'tbr_cost_budget_v2';
+
     // ── Month Selector ──
     const monthSelect = document.getElementById('monthSelect');
     const now = new Date();
@@ -348,200 +261,288 @@
         monthSelect.innerHTML += `<option value="${val}" ${i === 0 ? 'selected' : ''}>${label}</option>`;
     }
 
-    const STORE_KEY = 'tbr_cost_budget';
-
-    function getAllData() {
-        try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; }
-    }
-
-    function getCurrentData() {
-        const month = monthSelect.value;
-        const all = getAllData();
-        return all[month] || {};
-    }
-
-    function saveCurrentData() {
-        const month = monthSelect.value;
-        const all = getAllData();
-        const data = {};
-        document.querySelectorAll('.cost-input, .tool-input').forEach(input => {
-            data[input.id] = parseFloat(input.value) || 0;
-        });
-        all[month] = data;
-        localStorage.setItem(STORE_KEY, JSON.stringify(all));
-        showToast('已儲存');
-    }
-
-    function loadMonth() {
-        const data = getCurrentData();
-        document.querySelectorAll('.cost-input, .tool-input').forEach(input => {
-            input.value = data[input.id] || '';
-        });
+    // ── Product Management ──
+    window.addProduct = function(group, data = null) {
+        const id = nextId++;
+        const p = data || {
+            id, name: '', revenue: 0,
+            lecturerType: 'fixed', // 'fixed' or 'percent'
+            lecturerFee: 0, lecturerPercent: 0,
+            kol: 0, ads: 0, venue: 0, assistant: 0, transport: 0, material: 0
+        };
+        p.id = id;
+        products[group].push(p);
+        renderProducts(group);
         recalculate();
+    };
+
+    window.removeProduct = function(group, id) {
+        products[group] = products[group].filter(p => p.id !== id);
+        renderProducts(group);
+        recalculate();
+    };
+
+    window.toggleLecturerType = function(group, id, type) {
+        const p = products[group].find(p => p.id === id);
+        if (p) { p.lecturerType = type; renderProducts(group); recalculate(); }
+    };
+
+    window.updateProduct = function(group, id, field, value) {
+        const p = products[group].find(p => p.id === id);
+        if (p) { p[field] = field === 'name' ? value : (parseFloat(value) || 0); recalculate(); }
+    };
+
+    function renderProducts(group) {
+        const container = document.getElementById(`${group}Products`);
+        const list = products[group];
+        const colors = group === 'b2b'
+            ? { tag: 'background:#eff6ff;color:#3b82f6;', border: '#dbeafe' }
+            : { tag: 'background:#f0fdf4;color:#10b981;', border: '#d1fae5' };
+
+        document.getElementById(`${group}Count`).textContent = `${list.length} 項`;
+
+        if (!list.length) {
+            container.innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8;font-size:.82rem;">點擊「新增產品」開始設定</div>';
+            return;
+        }
+
+        container.innerHTML = list.map(p => {
+            const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
+            const payRate = parseFloat(document.getElementById('globalPaymentRate').value) || 0;
+            const rev = p.revenue || 0;
+            const tax = Math.round(rev * taxRate / 100);
+            const payFee = Math.round(rev * payRate / 100);
+            const lecturerCost = p.lecturerType === 'percent'
+                ? Math.round(rev * (p.lecturerPercent || 0) / 100)
+                : (p.lecturerFee || 0);
+            const varCosts = (p.kol||0) + (p.ads||0) + (p.venue||0) + (p.assistant||0) + (p.transport||0) + (p.material||0);
+            const totalCost = tax + payFee + lecturerCost + varCosts;
+            const profit = rev - totalCost;
+
+            return `<div class="product-card">
+                <div class="product-card-header">
+                    <span class="material-symbols-outlined" style="font-size:16px;color:#94a3b8;">drag_indicator</span>
+                    <input type="text" value="${p.name}" placeholder="產品名稱…" oninput="updateProduct('${group}',${p.id},'name',this.value)">
+                    <span class="product-tag" style="${colors.tag}">NT$ ${rev.toLocaleString()}</span>
+                    <button class="btn-del" onclick="removeProduct('${group}',${p.id})" title="刪除">
+                        <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+                    </button>
+                </div>
+                <div class="product-card-body">
+                    <div class="field">
+                        <span class="field-label">💰 實收金額</span>
+                        <input type="number" class="field-input rev-input" value="${p.revenue||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'revenue',this.value)">
+                    </div>
+                    <div class="field">
+                        <span class="field-label" style="color:#94a3b8;">🧾 稅金 ${taxRate}%</span>
+                        <div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${tax.toLocaleString()}</div>
+                    </div>
+                    <div class="field">
+                        <span class="field-label" style="color:#94a3b8;">💳 手續費 ${payRate}%</span>
+                        <div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${payFee.toLocaleString()}</div>
+                    </div>
+
+                    <!-- 講師費 -->
+                    <div class="lecturer-row">
+                        <span class="field-label">🎓 講師費</span>
+                        <div class="toggle-wrap">
+                            <button class="toggle-opt ${p.lecturerType==='fixed'?'active':''}" onclick="toggleLecturerType('${group}',${p.id},'fixed')">固定金額</button>
+                            <button class="toggle-opt ${p.lecturerType==='percent'?'active':''}" onclick="toggleLecturerType('${group}',${p.id},'percent')">分潤 %</button>
+                        </div>
+                        ${p.lecturerType === 'fixed'
+                            ? `<input type="number" class="field-input" style="width:120px;" value="${p.lecturerFee||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'lecturerFee',this.value)">`
+                            : `<input type="number" class="field-input" style="width:80px;" value="${p.lecturerPercent||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'lecturerPercent',this.value)"><span class="pct-label">% = NT$ ${lecturerCost.toLocaleString()}</span>`
+                        }
+                    </div>
+
+                    <div class="field"><span class="field-label">📣 KOL 推廣</span><input type="number" class="field-input" value="${p.kol||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'kol',this.value)"></div>
+                    <div class="field"><span class="field-label">📢 廣告費</span><input type="number" class="field-input" value="${p.ads||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'ads',this.value)"></div>
+                    <div class="field"><span class="field-label">📍 場地費</span><input type="number" class="field-input" value="${p.venue||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'venue',this.value)"></div>
+                    <div class="field"><span class="field-label">👤 助教費</span><input type="number" class="field-input" value="${p.assistant||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'assistant',this.value)"></div>
+                    <div class="field"><span class="field-label">🚗 車馬費</span><input type="number" class="field-input" value="${p.transport||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'transport',this.value)"></div>
+                    <div class="field"><span class="field-label">📖 教材費</span><input type="number" class="field-input" value="${p.material||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'material',this.value)"></div>
+
+                    <div class="product-summary">
+                        <span>成本 <span class="cost-val">NT$ ${totalCost.toLocaleString()}</span></span>
+                        <span>利潤 <span class="profit-val" style="color:${profit>=0?'#10b981':'#ef4444'}">NT$ ${profit.toLocaleString()}</span></span>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
     }
 
     // ── Recalculate ──
     function recalculate() {
+        const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
+        const payRate = parseFloat(document.getElementById('globalPaymentRate').value) || 0;
+
+        let grandRev = 0, grandCost = 0;
+
+        ['b2b', 'b2c'].forEach(group => {
+            let gRev = 0, gCost = 0;
+            products[group].forEach(p => {
+                const rev = p.revenue || 0;
+                const tax = Math.round(rev * taxRate / 100);
+                const payFee = Math.round(rev * payRate / 100);
+                const lecturerCost = p.lecturerType === 'percent'
+                    ? Math.round(rev * (p.lecturerPercent || 0) / 100) : (p.lecturerFee || 0);
+                const varCosts = (p.kol||0) + (p.ads||0) + (p.venue||0) + (p.assistant||0) + (p.transport||0) + (p.material||0);
+                gRev += rev;
+                gCost += tax + payFee + lecturerCost + varCosts;
+            });
+            document.getElementById(`${group}RevTotal`).textContent = `NT$ ${gRev.toLocaleString()}`;
+            document.getElementById(`${group}CostTotal`).textContent = `NT$ ${gCost.toLocaleString()}`;
+            document.getElementById(`${group}ProfitTotal`).textContent = `NT$ ${(gRev - gCost).toLocaleString()}`;
+            grandRev += gRev;
+            grandCost += gCost;
+        });
+
+        // Tools + Platform
         const val = id => parseFloat(document.getElementById(id)?.value) || 0;
-
-        // B2B
-        const b2bRev = val('b2b_revenue');
-        const b2bCosts = ['b2b_tax','b2b_payment_fee','b2b_kol','b2b_ads','b2b_venue','b2b_assistant','b2b_transport','b2b_material'].reduce((s, id) => s + val(id), 0);
-        document.getElementById('b2b_subtotal').textContent = `NT$ ${b2bCosts.toLocaleString()}`;
-
-        // B2C
-        const b2cRev = val('b2c_revenue');
-        const b2cCosts = ['b2c_tax','b2c_payment_fee','b2c_kol','b2c_ads','b2c_venue','b2c_assistant','b2c_transport','b2c_material'].reduce((s, id) => s + val(id), 0);
-        document.getElementById('b2c_subtotal').textContent = `NT$ ${b2cCosts.toLocaleString()}`;
-
-        // AI Tools
-        const toolsCost = ['tool_google','tool_chatgpt','tool_claude','tool_canva','tool_notion','tool_gamma','tool_manus','tool_lovable'].reduce((s, id) => s + val(id), 0);
-        document.getElementById('tools_subtotal').textContent = `NT$ ${toolsCost.toLocaleString()}`;
-
-        // Platform
-        const platCost = ['plat_teachify','plat_kit','plat_zeabur'].reduce((s, id) => s + val(id), 0);
-        document.getElementById('platform_subtotal').textContent = `NT$ ${platCost.toLocaleString()}`;
-
-        // Monthly total
+        const toolIds = ['tool_google','tool_chatgpt','tool_claude','tool_canva','tool_notion','tool_gamma','tool_manus','tool_lovable'];
+        const platIds = ['plat_teachify','plat_kit','plat_zeabur'];
+        const toolsCost = toolIds.reduce((s, id) => s + val(id), 0);
+        const platCost = platIds.reduce((s, id) => s + val(id), 0);
         const monthlyTotal = toolsCost + platCost;
+
+        document.getElementById('tools_subtotal').textContent = `NT$ ${toolsCost.toLocaleString()}`;
+        document.getElementById('platform_subtotal').textContent = `NT$ ${platCost.toLocaleString()}`;
         document.getElementById('monthlyTotal').textContent = `NT$ ${monthlyTotal.toLocaleString()}`;
 
-        // Grand totals
-        const totalRevenue = b2bRev + b2cRev;
-        const totalCost = b2bCosts + b2cCosts + monthlyTotal;
-        const netProfit = totalRevenue - totalCost;
-        const margin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
+        grandCost += monthlyTotal;
+        const netProfit = grandRev - grandCost;
+        const margin = grandRev > 0 ? (netProfit / grandRev * 100) : 0;
 
-        document.getElementById('totalRevenue').textContent = `NT$ ${totalRevenue.toLocaleString()}`;
-        document.getElementById('totalCost').textContent = `NT$ ${totalCost.toLocaleString()}`;
-
+        document.getElementById('totalRevenue').textContent = `NT$ ${grandRev.toLocaleString()}`;
+        document.getElementById('totalCost').textContent = `NT$ ${grandCost.toLocaleString()}`;
         const profitEl = document.getElementById('netProfit');
         profitEl.textContent = `NT$ ${netProfit.toLocaleString()}`;
         profitEl.className = `pc-value ${netProfit >= 0 ? 'green' : 'red'}`;
-
         const marginEl = document.getElementById('profitMargin');
         marginEl.textContent = margin.toFixed(1) + '%';
         marginEl.className = `pc-value ${margin >= 0 ? 'green' : 'red'}`;
 
-        // Chart
-        renderProfitChart(b2bRev, b2bCosts, b2cRev, b2cCosts, toolsCost, platCost);
+        renderProfitChart(grandRev, grandCost, toolsCost, platCost);
     }
 
-    // ── SVG Profit Chart ──
-    function renderProfitChart(b2bRev, b2bCost, b2cRev, b2cCost, tools, plat) {
+    // ── Chart ──
+    function renderProfitChart(totalRev, totalCost, tools, plat) {
         const container = document.getElementById('profitChart');
-        const totalRev = b2bRev + b2cRev;
-        const totalCost = b2bCost + b2cCost + tools + plat;
-        const profit = totalRev - totalCost;
-
         if (totalRev === 0 && totalCost === 0) {
             container.innerHTML = '<div style="color:#94a3b8;font-size:.82rem;padding:20px;">輸入數據後自動生成圖表</div>';
             return;
         }
-
-        const w = 700, h = 200;
+        const profit = totalRev - totalCost;
+        const productCost = totalCost - tools - plat;
+        const w = 700, h = 160, padL = 80, barMaxW = w - padL - 80, barH = 30;
         const maxVal = Math.max(totalRev, totalCost, 1);
-        const barH = 32;
 
-        // Revenue breakdown
-        const revItems = [
-            { label: '企業內訓', value: b2bRev, color: '#3b82f6' },
-            { label: '公開課程', value: b2cRev, color: '#10b981' }
-        ];
-        // Cost breakdown
+        const revW = (totalRev / maxVal) * barMaxW;
         const costItems = [
-            { label: '企業內訓', value: b2bCost, color: '#f87171' },
-            { label: '公開課程', value: b2cCost, color: '#fb923c' },
+            { label: '產品成本', value: productCost, color: '#f87171' },
             { label: 'AI 工具', value: tools, color: '#a78bfa' },
             { label: '系統平台', value: plat, color: '#60a5fa' }
         ];
-
-        const padL = 80;
-        const barMaxW = w - padL - 60;
-
-        function stackedBar(items, y, total) {
-            let x = padL;
-            return items.filter(i => i.value > 0).map(item => {
-                const bw = (item.value / maxVal) * barMaxW;
-                const rect = `<rect x="${x}" y="${y}" width="${Math.max(bw, 2)}" height="${barH}" rx="4" fill="${item.color}"/>`;
-                const mid = x + bw / 2;
-                const text = bw > 40 ? `<text x="${mid}" y="${y + barH/2 + 4}" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">${item.label}</text>` : '';
-                x += bw;
-                return rect + text;
-            }).join('');
-        }
+        let cx = padL;
+        const costBars = costItems.filter(i => i.value > 0).map(item => {
+            const bw = (item.value / maxVal) * barMaxW;
+            const rect = `<rect x="${cx}" y="60" width="${Math.max(bw,2)}" height="${barH}" rx="4" fill="${item.color}"/>`;
+            const txt = bw > 35 ? `<text x="${cx+bw/2}" y="79" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">${item.label}</text>` : '';
+            cx += bw;
+            return rect + txt;
+        }).join('');
 
         const profitW = Math.abs(profit / maxVal) * barMaxW;
         const profitColor = profit >= 0 ? '#10b981' : '#ef4444';
-        const revW = (totalRev / maxVal) * barMaxW;
-        const costW = (totalCost / maxVal) * barMaxW;
 
         container.innerHTML = `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" style="max-width:700px;">
-            <!-- Labels -->
-            <text x="${padL - 8}" y="30" text-anchor="end" fill="#64748b" font-size="11" font-weight="600">收入</text>
-            <text x="${padL - 8}" y="82" text-anchor="end" fill="#64748b" font-size="11" font-weight="600">成本</text>
-            <text x="${padL - 8}" y="134" text-anchor="end" fill="#64748b" font-size="11" font-weight="600">淨利</text>
-
-            <!-- Revenue bar -->
-            ${stackedBar(revItems, 14, totalRev)}
-            <text x="${padL + revW + 6}" y="34" fill="#1e293b" font-size="11" font-weight="700">NT$ ${totalRev.toLocaleString()}</text>
-
-            <!-- Cost bar -->
-            ${stackedBar(costItems, 66, totalCost)}
-            <text x="${padL + costW + 6}" y="86" fill="#ef4444" font-size="11" font-weight="700">NT$ ${totalCost.toLocaleString()}</text>
-
-            <!-- Profit bar -->
-            <rect x="${padL}" y="118" width="${Math.max(profitW, 2)}" height="${barH}" rx="4" fill="${profitColor}" opacity="0.85"/>
-            <text x="${padL + profitW + 6}" y="138" fill="${profitColor}" font-size="11" font-weight="700">NT$ ${profit.toLocaleString()}</text>
-
-            <!-- Legend -->
-            ${[...revItems, ...costItems].map((item, i) => {
-                const x = padL + (i % 6) * 100;
-                const y = 172 + Math.floor(i / 6) * 16;
-                return `<rect x="${x}" y="${y - 6}" width="10" height="10" rx="2" fill="${item.color}"/><text x="${x + 14}" y="${y + 3}" fill="#64748b" font-size="9">${item.label}</text>`;
-            }).join('')}
+            <text x="${padL-8}" y="24" text-anchor="end" fill="#64748b" font-size="11" font-weight="600">收入</text>
+            <rect x="${padL}" y="10" width="${Math.max(revW,2)}" height="${barH}" rx="4" fill="#3b82f6" opacity=".85"/>
+            <text x="${padL+revW+6}" y="30" fill="#1e293b" font-size="11" font-weight="700">NT$ ${totalRev.toLocaleString()}</text>
+            <text x="${padL-8}" y="79" text-anchor="end" fill="#64748b" font-size="11" font-weight="600">成本</text>
+            ${costBars}
+            <text x="${cx+6}" y="79" fill="#ef4444" font-size="11" font-weight="700">NT$ ${totalCost.toLocaleString()}</text>
+            <text x="${padL-8}" y="130" text-anchor="end" fill="#64748b" font-size="11" font-weight="600">淨利</text>
+            <rect x="${padL}" y="116" width="${Math.max(profitW,2)}" height="${barH}" rx="4" fill="${profitColor}" opacity=".85"/>
+            <text x="${padL+profitW+6}" y="135" fill="${profitColor}" font-size="11" font-weight="700">NT$ ${profit.toLocaleString()}</text>
         </svg>`;
     }
 
-    // ── Export CSV ──
+    // ── Save / Load ──
+    function saveAll() {
+        const month = monthSelect.value;
+        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+        const toolIds = ['tool_google','tool_chatgpt','tool_claude','tool_canva','tool_notion','tool_gamma','tool_manus','tool_lovable'];
+        const platIds = ['plat_teachify','plat_kit','plat_zeabur'];
+        const toolsData = {};
+        [...toolIds, ...platIds].forEach(id => { toolsData[id] = parseFloat(document.getElementById(id)?.value) || 0; });
+        all[month] = {
+            globalTaxRate: parseFloat(document.getElementById('globalTaxRate').value) || 0,
+            globalPaymentRate: parseFloat(document.getElementById('globalPaymentRate').value) || 0,
+            products: JSON.parse(JSON.stringify(products)),
+            tools: toolsData
+        };
+        localStorage.setItem(STORE_KEY, JSON.stringify(all));
+        showToast('已儲存 ✓');
+    }
+
+    function loadMonth() {
+        const month = monthSelect.value;
+        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+        const data = all[month];
+        if (data) {
+            document.getElementById('globalTaxRate').value = data.globalTaxRate ?? 5;
+            document.getElementById('globalPaymentRate').value = data.globalPaymentRate ?? 2.8;
+            products = data.products || { b2b: [], b2c: [] };
+            nextId = Math.max(...[...products.b2b, ...products.b2c].map(p => p.id || 0), 0) + 1;
+            if (data.tools) {
+                Object.entries(data.tools).forEach(([id, val]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = val || '';
+                });
+            }
+        } else {
+            products = { b2b: [], b2c: [] };
+            nextId = 1;
+            document.querySelectorAll('.tool-input').forEach(el => el.value = '');
+        }
+        renderProducts('b2b');
+        renderProducts('b2c');
+        recalculate();
+    }
+
+    // ── Export ──
     function exportCSV() {
         const month = monthSelect.value;
-        const rows = [['類別', '項目', '金額(NT$)']];
+        const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
+        const payRate = parseFloat(document.getElementById('globalPaymentRate').value) || 0;
+        const rows = [['類別', '產品', '項目', '金額(NT$)']];
+
+        ['b2b', 'b2c'].forEach(group => {
+            const label = group === 'b2b' ? '企業內訓' : '公開課程';
+            products[group].forEach(p => {
+                const rev = p.revenue || 0;
+                const tax = Math.round(rev * taxRate / 100);
+                const payFee = Math.round(rev * payRate / 100);
+                const lec = p.lecturerType === 'percent' ? Math.round(rev * (p.lecturerPercent||0) / 100) : (p.lecturerFee||0);
+                rows.push([label, p.name || '未命名', '實收金額', rev]);
+                rows.push([label, p.name || '未命名', `稅金 ${taxRate}%`, tax]);
+                rows.push([label, p.name || '未命名', `金流手續費 ${payRate}%`, payFee]);
+                rows.push([label, p.name || '未命名', `講師費(${p.lecturerType==='percent'?p.lecturerPercent+'%':'固定'})`, lec]);
+                rows.push([label, p.name || '未命名', 'KOL 推廣費', p.kol||0]);
+                rows.push([label, p.name || '未命名', '廣告費', p.ads||0]);
+                rows.push([label, p.name || '未命名', '場地費', p.venue||0]);
+                rows.push([label, p.name || '未命名', '助教費', p.assistant||0]);
+                rows.push([label, p.name || '未命名', '車馬費', p.transport||0]);
+                rows.push([label, p.name || '未命名', '教材費', p.material||0]);
+            });
+        });
+
         const val = id => parseFloat(document.getElementById(id)?.value) || 0;
+        [['AI 工具','Google Workspace','tool_google'],['AI 工具','ChatGPT','tool_chatgpt'],['AI 工具','Claude','tool_claude'],['AI 工具','Canva','tool_canva'],['AI 工具','Notion','tool_notion'],['AI 工具','Gamma','tool_gamma'],['AI 工具','Manus','tool_manus'],['AI 工具','Lovable','tool_lovable'],['系統平台','Teachify','plat_teachify'],['系統平台','Kit','plat_kit'],['系統平台','Zeabur','plat_zeabur']].forEach(([cat,name,id]) => {
+            rows.push([cat, '', name, val(id)]);
+        });
 
-        const items = [
-            ['企業內訓', '實收金額', val('b2b_revenue')],
-            ['企業內訓', '稅金', val('b2b_tax')],
-            ['企業內訓', '金流手續費', val('b2b_payment_fee')],
-            ['企業內訓', 'KOL 推廣費', val('b2b_kol')],
-            ['企業內訓', '廣告費', val('b2b_ads')],
-            ['企業內訓', '場地費', val('b2b_venue')],
-            ['企業內訓', '助教費', val('b2b_assistant')],
-            ['企業內訓', '車馬費', val('b2b_transport')],
-            ['企業內訓', '教材費', val('b2b_material')],
-            ['公開課程', '實收金額', val('b2c_revenue')],
-            ['公開課程', '稅金', val('b2c_tax')],
-            ['公開課程', '金流手續費', val('b2c_payment_fee')],
-            ['公開課程', 'KOL 推廣費', val('b2c_kol')],
-            ['公開課程', '廣告費', val('b2c_ads')],
-            ['公開課程', '場地費', val('b2c_venue')],
-            ['公開課程', '助教費', val('b2c_assistant')],
-            ['公開課程', '車馬費', val('b2c_transport')],
-            ['公開課程', '教材費', val('b2c_material')],
-            ['AI 工具', 'Google Workspace', val('tool_google')],
-            ['AI 工具', 'ChatGPT', val('tool_chatgpt')],
-            ['AI 工具', 'Claude', val('tool_claude')],
-            ['AI 工具', 'Canva', val('tool_canva')],
-            ['AI 工具', 'Notion', val('tool_notion')],
-            ['AI 工具', 'Gamma', val('tool_gamma')],
-            ['AI 工具', 'Manus', val('tool_manus')],
-            ['AI 工具', 'Lovable', val('tool_lovable')],
-            ['系統平台', 'Teachify', val('plat_teachify')],
-            ['系統平台', 'Kit', val('plat_kit')],
-            ['系統平台', 'Zeabur', val('plat_zeabur')]
-        ];
-
-        items.forEach(r => rows.push(r));
         const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a');
@@ -558,14 +559,13 @@
     }
 
     // ── Events ──
-    document.querySelectorAll('.cost-input, .tool-input').forEach(input => {
-        input.addEventListener('input', recalculate);
-    });
-    document.getElementById('btnSave').addEventListener('click', saveCurrentData);
+    document.getElementById('btnSave').addEventListener('click', saveAll);
     document.getElementById('btnExport').addEventListener('click', exportCSV);
     monthSelect.addEventListener('change', loadMonth);
+    document.getElementById('globalTaxRate').addEventListener('input', () => { renderProducts('b2b'); renderProducts('b2c'); recalculate(); });
+    document.getElementById('globalPaymentRate').addEventListener('input', () => { renderProducts('b2b'); renderProducts('b2c'); recalculate(); });
+    document.querySelectorAll('.tool-input').forEach(el => el.addEventListener('input', recalculate));
 
-    // Init
     loadMonth();
 </script>
 <script src="components/nav.js"></script>
