@@ -634,6 +634,15 @@ function makeSession(sessionId, name, existing) {
 function getSavedMonth(month) {
     try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}')[month] || null; } catch { return null; }
 }
+// ── Auto-save (debounced 3s) ──
+let _autoSaveTimer = null;
+function scheduleAutoSave() {
+    if (_autoSaveTimer) clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(async () => {
+        await saveAll();
+        showToast('已自動儲存');
+    }, 3000);
+}
 
 // ── Product CRUD ──
 window.addProduct = function(group) {
@@ -648,18 +657,20 @@ window.addProduct = function(group) {
         sessions: []
     });
     renderAll();
+    scheduleAutoSave();
 };
-window.removeProduct = function(group, id) { products[group] = products[group].filter(p => p.id !== id); renderAll(); };
+window.removeProduct = function(group, id) { products[group] = products[group].filter(p => p.id !== id); renderAll(); scheduleAutoSave(); };
 window.addSession = function(group, productId) {
     const p = products[group].find(p => p.id === productId);
     if (!p) return;
     if (!p.sessions) p.sessions = [];
     p.sessions.push(makeSession('', '新場次', {}));
     renderAll();
+    scheduleAutoSave();
 };
 window.removeSession = function(group, productId, idx) {
     const p = products[group].find(p => p.id === productId);
-    if (p && p.sessions) { p.sessions.splice(idx, 1); renderAll(); }
+    if (p && p.sessions) { p.sessions.splice(idx, 1); renderAll(); scheduleAutoSave(); }
 };
 window.updateSession = function(group, productId, idx, field, value) {
     const p = products[group].find(p => p.id === productId);
@@ -667,6 +678,7 @@ window.updateSession = function(group, productId, idx, field, value) {
     const strFields = ['name','cur_venue','cur_lecturerFee','cur_assistant','cur_transport','cur_material'];
     p.sessions[idx][field] = strFields.includes(field) ? value : (parseFloat(value) || 0);
     recalculate();
+    scheduleAutoSave();
 };
 window.toggleSessionCurrency = function(group, productId, idx, field) {
     const p = products[group].find(pp => pp.id === productId);
@@ -674,14 +686,16 @@ window.toggleSessionCurrency = function(group, productId, idx, field) {
     const curField = `cur_${field}`;
     p.sessions[idx][curField] = p.sessions[idx][curField] === 'usd' ? 'twd' : 'usd';
     renderAll();
+    scheduleAutoSave();
 };
-window.toggleLecturerType = function(group, id, type) { const p = products[group].find(p => p.id === id); if (p) { p.lecturerType = type; renderAll(); } };
+window.toggleLecturerType = function(group, id, type) { const p = products[group].find(p => p.id === id); if (p) { p.lecturerType = type; renderAll(); scheduleAutoSave(); } };
 window.updateProduct = function(group, id, field, value) {
     const p = products[group].find(p => p.id === id);
     if (!p) return;
     const strFields = ['name','courseName','revenueType','serviceDate','cur_lecturerFee','cur_kol','cur_ads','cur_venue','cur_assistant','cur_transport','cur_material','cur_personnel'];
     p[field] = strFields.includes(field) ? value : (parseFloat(value) || 0);
     recalculate();
+    scheduleAutoSave();
 };
 window.toggleCurrency = function(group, id, field) {
     const p = products[group].find(p => p.id === id);
@@ -689,6 +703,7 @@ window.toggleCurrency = function(group, id, field) {
     const curField = `cur_${field}`;
     p[curField] = p[curField] === 'usd' ? 'twd' : 'usd';
     renderAll();
+    scheduleAutoSave();
 };
 function getUsdRate() {
     return parseFloat(document.getElementById('globalUsdRate')?.value) || 32.5;
