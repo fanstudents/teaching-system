@@ -276,6 +276,9 @@
 <script type="module">
 import { db } from './scripts/supabase.js';
 
+const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+
 const TEACHIFY_API = 'https://teachify.io/admin/graphql';
 const TEACHIFY_KEY = 'vsXiCQXFlNs95GjiRHW4Y3mwc9L6_oj6VdRiTj-3ymE';
 const SERVICE_OWNER_ID = '60182dbe-09ea-4e92-b8d7-ed2c24b81eb9';
@@ -1197,69 +1200,45 @@ function calcCostsFromProduct(p, group) {
 async function saveAll() {
     const btn = document.getElementById('btnSave');
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;animation:spin .7s linear infinite;">progress_activity</span> 儲存中…';
-
+    btn.textContent = '儲存中…';
     const month = monthSelect.value;
-    // 清理 products 移除不需要存的大物件
     const cleanProducts = JSON.parse(JSON.stringify(products));
-    ['b2c'].forEach(g => {
-        (cleanProducts[g] || []).forEach(p => {
-            delete p.ordersList;
-        });
-    });
-
+    ['b2c'].forEach(g => { (cleanProducts[g] || []).forEach(p => { delete p.ordersList; }); });
     const payload = {
         globalTaxRate: parseFloat(document.getElementById('globalTaxRate').value) || 0,
         globalUsdRate: parseFloat(document.getElementById('globalUsdRate').value) || 32.5,
         products: cleanProducts
     };
-
+    const hdr = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+    const base = SUPABASE_URL + '/rest/v1';
     try {
-        // 先查詢是否已有此月資料
-        const existing = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
-        console.log('[save] existing:', existing);
-        let result;
-        if (existing.data && existing.data.length > 0) {
-            // UPDATE
-            result = await db.update('cost_budgets', {
-                data: payload,
-                updated_at: new Date().toISOString()
-            }, { month: `eq.${month}` });
+        const chk = await fetch(base + '/cost_budgets?month=eq.' + month + '&select=id&limit=1', { headers: hdr });
+        const rows = await chk.json();
+        let res;
+        if (rows && rows.length > 0) {
+            res = await fetch(base + '/cost_budgets?month=eq.' + month, {
+                method: 'PATCH', headers: { ...hdr, 'Prefer': 'return=representation' },
+                body: JSON.stringify({ data: payload, updated_at: new Date().toISOString() })
+            });
         } else {
-            // INSERT
-            result = await db.insert('cost_budgets', {
-                month,
-                data: payload,
-                updated_at: new Date().toISOString()
+            res = await fetch(base + '/cost_budgets', {
+                method: 'POST', headers: { ...hdr, 'Prefer': 'return=representation' },
+                body: JSON.stringify([{ month, data: payload, updated_at: new Date().toISOString() }])
             });
         }
-        console.log('[save] result:', result);
-
-        if (result.error) {
-            console.error('[save] DB error:', result.error);
-            throw new Error(typeof result.error === 'string' ? result.error : JSON.stringify(result.error));
-        }
-
-        // 也存 localStorage 做快取
-        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-        all[month] = payload;
-        localStorage.setItem(STORE_KEY, JSON.stringify(all));
-
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'HTTP ' + res.status); }
         showToast('已儲存至雲端 ✓');
-        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
+        document.getElementById('autoSaved').innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ' + new Date().toLocaleTimeString('zh-TW') + ' 已儲存';
     } catch (err) {
-        console.error('[save] FAILED:', err);
-        // Supabase 失敗時 fallback 到 localStorage
-        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-        all[month] = payload;
-        localStorage.setItem(STORE_KEY, JSON.stringify(all));
-        showToast('雲端失敗(' + (err.message||'').substring(0,30) + ')，已存本地');
-        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--negative);">cloud_off</span> 本地已存，雲端失敗`;
+        console.error('[save]', err);
+        showToast('儲存失敗: ' + (err.message || '').substring(0, 40));
+        document.getElementById('autoSaved').innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:var(--negative);">cloud_off</span> 儲存失敗';
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存';
+        btn.textContent = '儲存';
     }
 }
+
 
 function exportCSV() {
     const month = monthSelect.value;
