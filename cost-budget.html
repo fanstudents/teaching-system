@@ -87,6 +87,9 @@
         .badge { font-size: 0.62rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; white-space: nowrap; background: #f1f5f9; color: var(--text-secondary); margin-left: 6px; }
         .badge-order { background: #f1f5f9; color: var(--text-secondary); }
         .badge-type { background: #f1f5f9; color: var(--text-secondary); }
+        /* Session toggle */
+        .sess-open > .sess-detail { display: block !important; }
+        .sess-open > div:first-child .material-symbols-outlined { transform: rotate(90deg); }
         .field { display: flex; align-items: center; gap: 6px; }
         .field-label { font-size: 0.76rem; color: var(--text-secondary); min-width: 78px; white-space: nowrap; }
         .field-input { flex: 1; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.8rem; font-family: 'Inter', monospace; text-align: right; }
@@ -621,6 +624,7 @@ function mergeProduct(id, name, courseName, sourceId, sourceSlug, existing, orde
 function makeSession(sessionId, name, existing) {
     return {
         sessionId: sessionId || '', name: name || '未命名場次',
+        revenue: existing?.revenue || 0, cur_revenue: existing?.cur_revenue || 'twd',
         venue: existing?.venue || 0, lecturerFee: existing?.lecturerFee || 0,
         assistant: existing?.assistant || 0, transport: existing?.transport || 0,
         material: existing?.material || 0,
@@ -675,7 +679,7 @@ window.removeSession = function(group, productId, idx) {
 window.updateSession = function(group, productId, idx, field, value) {
     const p = products[group].find(p => p.id === productId);
     if (!p || !p.sessions || !p.sessions[idx]) return;
-    const strFields = ['name','cur_venue','cur_lecturerFee','cur_assistant','cur_transport','cur_material'];
+    const strFields = ['name','cur_venue','cur_lecturerFee','cur_assistant','cur_transport','cur_material','cur_revenue'];
     p.sessions[idx][field] = strFields.includes(field) ? value : (parseFloat(value) || 0);
     recalculate();
     scheduleAutoSave();
@@ -715,8 +719,15 @@ function toTwd(amount, currency) {
 function calcCosts(p, group) {
     const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
     const isB2c = group === 'b2c';
+    const isB2b = group === 'b2b';
     const isBiz = BIZ_GROUPS.includes(group);
-    const rev = (p.revenue || 0) > 0 ? (p.revenue || 0) : (parseFloat(p.estimatedRevenue) || 0);
+    // B2B with sessions: sum session revenues
+    let sessionRevTotal = 0;
+    if (isB2b && (p.sessions || []).length > 0) {
+        (p.sessions || []).forEach(s => { sessionRevTotal += toTwd(s.revenue || 0, s.cur_revenue || 'twd'); });
+    }
+    const baseRev = (p.revenue || 0) > 0 ? (p.revenue || 0) : (parseFloat(p.estimatedRevenue) || 0);
+    const rev = (isB2b && sessionRevTotal > 0) ? sessionRevTotal : baseRev;
     const tax = Math.round(rev * taxRate / 100);
     const orderCount = p.orderCount || (isB2c && rev > 0 ? 1 : 0);
     const payFee = isB2c ? Math.round(rev * 0.05 + orderCount * 15) : 0;
@@ -815,7 +826,9 @@ function renderCurLabel(amount, currency) {
 
 function renderSessionRow(s, si, group, productId) {
     var sessCost = toTwd(s.venue||0,s.cur_venue) + toTwd(s.lecturerFee||0,s.cur_lecturerFee) + toTwd(s.assistant||0,s.cur_assistant) + toTwd(s.transport||0,s.cur_transport) + toTwd(s.material||0,s.cur_material);
-    var revLabel = s.orderCount ? '<span class="badge badge-order" style="font-size:.66rem;">' + s.orderCount + '筆 NT$' + (s.orderRevenue||0).toLocaleString() + '</span>' : '';
+    var sessRev = toTwd(s.revenue||0, s.cur_revenue||'twd');
+    var sessProfit = sessRev - sessCost;
+    var isB2b = group === 'b2b';
     var g = group, pid = productId;
     var cb = function(f){ return renderCurToggle('session', g, pid, si, f); };
     var cl = function(f){ return renderCurLabel(s[f], s['cur_'+f]); };
@@ -825,23 +838,38 @@ function renderSessionRow(s, si, group, productId) {
             cb(f) + cl(f) + '</div>';
     };
 
-    return '<div class="product-row" style="border:1px solid var(--border);border-radius:8px;margin:4px 0;">' +
-        '<div class="product-row-header" onclick="toggleRow(this)" style="padding:6px 10px;background:var(--bg);">' +
-            '<span class="material-symbols-outlined row-chevron" style="font-size:16px;">chevron_right</span>' +
+    // Session header summary
+    var headerRight = '';
+    if (isB2b && sessRev > 0) {
+        headerRight += '<span style="font-size:.72rem;color:var(--accent);font-weight:600;margin-right:8px;">收入 ' + sessRev.toLocaleString() + '</span>';
+    }
+    headerRight += '<span style="font-size:.72rem;color:var(--negative);font-weight:600;">成本 ' + sessCost.toLocaleString() + '</span>';
+    if (isB2b && sessRev > 0) {
+        headerRight += '<span style="font-size:.72rem;font-weight:600;margin-left:8px;color:' + (sessProfit >= 0 ? 'var(--positive)' : 'var(--negative)') + ';">利潤 ' + sessProfit.toLocaleString() + '</span>';
+    }
+
+    // Revenue input (B2B only)
+    var revInput = isB2b ? inp('revenue', '場次收入') : '';
+
+    return '<div style="border:1px solid var(--border);border-radius:8px;margin:4px 0;">' +
+        '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg);cursor:pointer;border-radius:8px 8px 0 0;" onclick="this.parentElement.classList.toggle(\'sess-open\')">' +
+            '<span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted);">chevron_right</span>' +
             '<span style="font-size:.78rem;font-weight:600;">' + (s.name || '場次 '+(si+1)) + '</span>' +
-            revLabel +
-            '<div class="row-right">' +
-                '<span style="font-size:.72rem;color:var(--negative);font-weight:600;">成本 NT$ ' + sessCost.toLocaleString() + '</span>' +
+            '<div style="margin-left:auto;display:flex;gap:4px;align-items:center;">' +
+                headerRight +
                 '<button class="btn-del" onclick="event.stopPropagation();removeSession(\'' + g + '\',' + pid + ',' + si + ')" title="刪除場次"><span class="material-symbols-outlined" style="font-size:14px;">close</span></button>' +
             '</div>' +
         '</div>' +
-        '<div class="product-detail" style="padding:8px 12px;">' +
-            '<div class="field"><span class="field-label">場次名稱</span><input type="text" class="field-input" value="' + (s.name||'') + '" oninput="updateSession(\'' + g + '\',' + pid + ',' + si + ',\'name\',this.value)"></div>' +
-            inp('venue', '場地費') +
-            inp('lecturerFee', '講師費') +
-            inp('assistant', '助教費') +
-            inp('transport', '車馬費') +
-            inp('material', '教材費') +
+        '<div style="display:none;padding:8px 12px;" class="sess-detail">' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;">' +
+                '<div class="field"><span class="field-label">場次名稱</span><input type="text" class="field-input" value="' + (s.name||'') + '" oninput="updateSession(\'' + g + '\',' + pid + ',' + si + ',\'name\',this.value)"></div>' +
+                revInput +
+                inp('venue', '場地費') +
+                inp('lecturerFee', '講師費') +
+                inp('assistant', '助教費') +
+                inp('transport', '車馬費') +
+                inp('material', '教材費') +
+            '</div>' +
         '</div>' +
     '</div>';
 }
@@ -972,8 +1000,10 @@ function renderProductRow(p, group, isB2b, isBiz) {
         }).join('');
         costSection = '<div class="full-row" style="margin-top:8px;border-top:1px solid #e8ecf1;padding-top:8px;">' +
             '<div style="font-size:.76rem;font-weight:600;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:4px;">' +
-                '<span class="material-symbols-outlined" style="font-size:16px;">event</span> 場次成本明細' +
-                '<span class="pct-label" style="margin-left:auto;">共 ' + (p.sessions||[]).length + ' 場 ｜ 場次成本合計 NT$ ' + c.sessionCosts.toLocaleString() + '</span>' +
+                '<span class="material-symbols-outlined" style="font-size:16px;">event</span> 場次明細' +
+                '<span class="pct-label" style="margin-left:auto;">共 ' + (p.sessions||[]).length + ' 場' +
+                (isB2b && c.rev > 0 ? ' ｜ 收入合計 NT$ ' + c.rev.toLocaleString() : '') +
+                ' ｜ 成本合計 NT$ ' + c.sessionCosts.toLocaleString() + '</span>' +
             '</div>' +
             sessHtml +
             '<button style="margin-top:6px;padding:4px 12px;border:1.5px dashed #cbd5e1;border-radius:6px;background:none;color:#64748b;font-size:.76rem;cursor:pointer;font-family:inherit;" onclick="addSession(\'' + group + '\',' + p.id + ')">' +
