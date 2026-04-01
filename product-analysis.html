@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品分析 — 數位簡報室</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans TC', 'Inter', sans-serif; background: #f5f6fa; color: #1e293b; }
+
+        .page-header { background: #fff; border-bottom: 1px solid #e8ecf1; padding: 20px 32px; position: sticky; top: 0; z-index: 100; }
+        .page-header h1 { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .page-header p { font-size: 0.76rem; color: #94a3b8; margin-top: 2px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+
+        /* Controls */
+        .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .controls select, .controls input { padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: #fff; }
+        .controls select:focus, .controls input:focus { outline: none; border-color: #6366f1; }
+        .controls .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,.3); }
+        .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-ai { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; }
+        .btn-ai:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,158,11,.3); }
+        .last-update { font-size: 0.72rem; color: #94a3b8; margin-left: auto; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: #fff; border-radius: 12px; padding: 18px 20px; border: 1px solid #e8ecf1; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .stat-card.c1::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+        .stat-card.c2::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .stat-card.c3::before { background: linear-gradient(90deg, #10b981, #34d399); }
+        .stat-card.c4::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .stat-card.c5::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .stat-label { font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: #1e293b; }
+        .stat-sub { font-size: 0.68rem; color: #94a3b8; margin-top: 4px; }
+
+        /* Section */
+        .section { background: #fff; border-radius: 12px; border: 1px solid #e8ecf1; margin-bottom: 20px; overflow: hidden; }
+        .section-header { padding: 16px 20px; border-bottom: 1px solid #f0f1f3; display: flex; align-items: center; gap: 8px; }
+        .section-header h3 { font-size: 0.88rem; font-weight: 600; }
+        .section-header .icon { font-size: 18px; }
+        .section-body { padding: 20px; }
+
+        /* Chart */
+        .chart-container { height: 220px; position: relative; }
+
+        /* Two columns */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { padding: 8px 14px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; background: #f8fafc; border-bottom: 1px solid #e8ecf1; white-space: nowrap; }
+        td { padding: 8px 14px; border-bottom: 1px solid #f0f0f5; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #fafbff; }
+        .td-right { text-align: right; }
+        .td-mono { font-family: 'SF Mono', monospace; font-size: 0.76rem; color: #64748b; }
+        .td-empty { text-align: center; padding: 32px; color: #94a3b8; }
+
+        /* Progress bar */
+        .progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .progress-label { min-width: 140px; font-size: 0.78rem; font-weight: 500; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .progress-bar { flex: 1; height: 8px; background: #f0f1f3; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+        .progress-val { min-width: 80px; font-size: 0.72rem; color: #64748b; text-align: right; }
+
+        /* AI Report */
+        .ai-report { font-size: 0.85rem; line-height: 1.75; color: #1e293b; }
+        .ai-report h2 { font-size: 1rem; font-weight: 700; margin: 24px 0 10px; }
+        .ai-report h3 { font-size: 0.92rem; font-weight: 600; color: #6366f1; margin: 18px 0 8px; border-bottom: 1px solid #eef0f4; padding-bottom: 6px; }
+        .ai-report h4 { font-size: 0.85rem; font-weight: 600; color: #8b5cf6; margin: 14px 0 6px; }
+
+        /* Rank badge */
+        .rank { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 0.62rem; font-weight: 700; }
+        .rank-1 { background: #fef3c7; color: #d97706; }
+        .rank-2 { background: #e8ecf1; color: #64748b; }
+        .rank-3 { background: #fde8d8; color: #c2410c; }
+        .rank-n { background: #f0f1f3; color: #94a3b8; }
+
+        /* Loading */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { animation: spin .7s linear infinite; }
+
+        @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } .two-col { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .page-header { padding: 14px 16px; } .container { padding: 14px 12px; } }
+    </style>
+</head>
+
+<body>
+<div class="admin-main">
+    <div class="page-header">
+        <h1>
+            <span class="material-symbols-outlined" style="color:#6366f1;">insights</span>
+            商品分析
+        </h1>
+        <p>GA4 流量 × 訂單轉換 × GSC 搜尋關鍵字綜合分析</p>
+    </div>
+
+    <div class="container">
+        <!-- 控制列 -->
+        <div class="controls">
+            <select id="dateRange">
+                <option value="7">最近 7 天</option>
+                <option value="14">最近 14 天</option>
+                <option value="30" selected>最近 30 天</option>
+                <option value="60">最近 60 天</option>
+                <option value="90">最近 90 天</option>
+            </select>
+            <button class="btn btn-primary" id="btnLoad">
+                <span class="material-symbols-outlined" style="font-size:16px;">sync</span> 載入分析
+            </button>
+            <button class="btn btn-ai" id="btnAiReport">
+                <span class="material-symbols-outlined" style="font-size:16px;">auto_awesome</span> AI 策略報告
+            </button>
+            <span class="last-update" id="lastUpdate"></span>
+        </div>
+
+        <!-- 概覽指標 -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card c1">
+                <div class="stat-label"><span class="material-symbols-outlined" style="font-size:14px;">group</span> 活躍用戶</div>
+                <div class="stat-value" id="sUsers">-</div>
+                <div class="stat-sub" id="sNewUsers"></div>
+            </div>
+            <div class="stat-card c2">
+                <div class="stat-label"><span class="material-symbols-outlined" style="font-size:14px;">visibility</span> 瀏覽量</div>
+                <div class="stat-value" id="sPageViews">-</div>
+                <div class="stat-sub" id="sSessions"></div>
+            </div>
+            <div class="stat-card c3">
+                <div class="stat-label"><span class="material-symbols-outlined" style="font-size:14px;">shopping_cart</span> 訂單數</div>
+                <div class="stat-value" id="sOrders">-</div>
+                <div class="stat-sub" id="sRevenue"></div>
+            </div>
+            <div class="stat-card c4">
+                <div class="stat-label"><span class="material-symbols-outlined" style="font-size:14px;">conversion_path</span> 轉換率</div>
+                <div class="stat-value" id="sConversion">-</div>
+                <div class="stat-sub">訂單 ÷ 工作階段</div>
+            </div>
+            <div class="stat-card c5">
+                <div class="stat-label"><span class="material-symbols-outlined" style="font-size:14px;">payments</span> 客單價</div>
+                <div class="stat-value" id="sAvgOrder">-</div>
+                <div class="stat-sub" id="sBounce"></div>
+            </div>
+        </div>
+
+        <!-- 每日趨勢 -->
+        <div class="section">
+            <div class="section-header">
+                <span class="material-symbols-outlined icon" style="color:#6366f1;">show_chart</span>
+                <h3>每日流量 & 訂單趨勢</h3>
+            </div>
+            <div class="section-body">
+                <div class="chart-container" id="dailyChart"></div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <!-- 流量來源轉換 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="material-symbols-outlined icon" style="color:#10b981;">traffic</span>
+                    <h3>流量來源 & 轉換</h3>
+                </div>
+                <div class="section-body" id="sourceSection">
+                    <div class="td-empty">尚無資料</div>
+                </div>
+            </div>
+
+            <!-- 各課程銷售 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="material-symbols-outlined icon" style="color:#f59e0b;">school</span>
+                    <h3>各課程銷售</h3>
+                </div>
+                <div class="section-body">
+                    <table>
+                        <thead><tr><th>課程名稱</th><th class="td-right">訂單</th><th class="td-right">營收</th><th class="td-right">占比</th></tr></thead>
+                        <tbody id="courseTable"><tr><td colspan="4" class="td-empty">尚無資料</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <!-- GSC 搜尋關鍵字 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="material-symbols-outlined icon" style="color:#3b82f6;">travel_explore</span>
+                    <h3>搜尋關鍵字表現</h3>
+                </div>
+                <div class="section-body">
+                    <table>
+                        <thead><tr><th></th><th>關鍵字</th><th class="td-right">點擊</th><th class="td-right">曝光</th><th class="td-right">CTR</th><th class="td-right">排名</th></tr></thead>
+                        <tbody id="keywordTable"><tr><td colspan="6" class="td-empty">尚無資料</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 熱門頁面 -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="material-symbols-outlined icon" style="color:#8b5cf6;">web</span>
+                    <h3>熱門頁面</h3>
+                </div>
+                <div class="section-body">
+                    <table>
+                        <thead><tr><th></th><th>頁面</th><th class="td-right">瀏覽量</th><th class="td-right">用戶</th></tr></thead>
+                        <tbody id="pageTable"><tr><td colspan="4" class="td-empty">尚無資料</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI 策略報告 -->
+        <div class="section" id="aiSection" style="display:none;">
+            <div class="section-header">
+                <span class="material-symbols-outlined icon" style="color:#f59e0b;">auto_awesome</span>
+                <h3>AI 策略分析報告</h3>
+                <span id="aiStatus" style="font-size:0.72rem;color:#94a3b8;margin-left:auto;"></span>
+            </div>
+            <div class="section-body">
+                <div class="ai-report" id="aiReport"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { db, functions, ai } from './scripts/supabase.js';
+
+    let cachedData = null; // { ga4, gsc, orders, dateRange }
+
+    function getDateStr(offset) {
+        const d = new Date();
+        d.setDate(d.getDate() + offset);
+        return d.toISOString().split('T')[0];
+    }
+
+    // ══════════════════════════════════
+    // ── Main Load ──
+    // ══════════════════════════════════
+    async function loadAll() {
+        const days = parseInt(document.getElementById('dateRange').value) || 30;
+        const startDate = getDateStr(-days);
+        const endDate = getDateStr(-1);
+        const btn = document.getElementById('btnLoad');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size:16px;">progress_activity</span> 載入中…';
+
+        try {
+            // Parallel: analytics + orders
+            const [analyticsResult, ordersResult] = await Promise.all([
+                functions.invoke('analytics-data', {
+                    body: { type: 'both', dateRange: { startDate, endDate } }
+                }),
+                db.select('orders', {
+                    select: 'course_name,plan_name,amount,payment_status,coupon_code,affiliate_code,payment_time',
+                    order: 'payment_time.desc',
+                    limit: 1000
+                })
+            ]);
+
+            if (analyticsResult.error) throw new Error(analyticsResult.error.message);
+
+            // Filter orders by date range
+            const allOrders = (ordersResult.data || []).filter(o => {
+                if (o.payment_status !== 'Paid') return false;
+                if (!o.payment_time) return false;
+                const t = o.payment_time.split('T')[0];
+                return t >= startDate && t <= endDate;
+            });
+
+            const ga4 = analyticsResult.data?.ga4 || {};
+            const gsc = analyticsResult.data?.gsc || {};
+
+            cachedData = { ga4, gsc, orders: allOrders, dateRange: { startDate, endDate, days } };
+
+            // Render
+            renderOverview(ga4, allOrders);
+            renderDailyChart(ga4.dailyTrend || [], allOrders);
+            renderSources(ga4.trafficSources || [], allOrders);
+            renderCourses(allOrders);
+            renderKeywords(gsc.topQueries || []);
+            renderPages(ga4.topPages || []);
+
+            document.getElementById('lastUpdate').textContent = `最後更新：${new Date().toLocaleString('zh-TW')}`;
+        } catch (err) {
+            console.error('[analysis] Error:', err);
+            alert('載入失敗: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">sync</span> 載入分析';
+        }
+    }
+
+    // ══════════════════════════════════
+    // ── Overview Stats ──
+    // ══════════════════════════════════
+    function renderOverview(ga4, orders) {
+        const ov = ga4.overview || {};
+        const totalRevenue = orders.reduce((s, o) => s + (o.amount || 0), 0);
+        const sessions = ov.sessions || 0;
+        const convRate = sessions > 0 ? (orders.length / sessions * 100) : 0;
+        const avgOrder = orders.length > 0 ? totalRevenue / orders.length : 0;
+
+        document.getElementById('sUsers').textContent = (ov.activeUsers || 0).toLocaleString();
+        document.getElementById('sNewUsers').textContent = `新用戶 ${(ov.newUsers || 0).toLocaleString()}`;
+        document.getElementById('sPageViews').textContent = (ov.pageViews || 0).toLocaleString();
+        document.getElementById('sSessions').textContent = `${sessions.toLocaleString()} 工作階段`;
+        document.getElementById('sOrders').textContent = orders.length.toLocaleString();
+        document.getElementById('sRevenue').textContent = `NT$ ${totalRevenue.toLocaleString()}`;
+        document.getElementById('sConversion').textContent = convRate.toFixed(2) + '%';
+        document.getElementById('sAvgOrder').textContent = `NT$ ${Math.round(avgOrder).toLocaleString()}`;
+        document.getElementById('sBounce').textContent = `跳出率 ${(ov.bounceRate * 100 || 0).toFixed(1)}%`;
+    }
+
+    // ══════════════════════════════════
+    // ── Daily Chart (SVG) ──
+    // ══════════════════════════════════
+    function renderDailyChart(dailyTrend, orders) {
+        const container = document.getElementById('dailyChart');
+        if (!dailyTrend.length) {
+            container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;">無趨勢資料</div>';
+            return;
+        }
+
+        // Count orders by date
+        const ordersByDate = {};
+        orders.forEach(o => {
+            if (!o.payment_time) return;
+            const d = o.payment_time.split('T')[0].replace(/-/g, '');
+            ordersByDate[d] = (ordersByDate[d] || 0) + 1;
+        });
+
+        const w = container.clientWidth || 800;
+        const h = 220;
+        const pad = { top: 24, right: 50, bottom: 32, left: 50 };
+        const cW = w - pad.left - pad.right;
+        const cH = h - pad.top - pad.bottom;
+
+        const maxViews = Math.max(...dailyTrend.map(d => d.pageViews), 1);
+        const maxOrders = Math.max(...dailyTrend.map(d => ordersByDate[d.date] || 0), 1);
+
+        const pts = dailyTrend.map((d, i) => {
+            const x = pad.left + (i / Math.max(dailyTrend.length - 1, 1)) * cW;
+            const yViews = pad.top + cH - (d.pageViews / maxViews) * cH;
+            const ordersCount = ordersByDate[d.date] || 0;
+            const yOrders = pad.top + cH - (ordersCount / maxOrders) * cH;
+            return { x, yViews, yOrders, ...d, orders: ordersCount };
+        });
+
+        const viewsLine = pts.map(p => `${p.x},${p.yViews}`).join(' ');
+        const viewsArea = `${pts[0].x},${pad.top + cH} ${viewsLine} ${pts[pts.length-1].x},${pad.top + cH}`;
+        const ordersLine = pts.map(p => `${p.x},${p.yOrders}`).join(' ');
+
+        // Grid lines
+        const gridY = [0, 0.25, 0.5, 0.75, 1].map(pct => {
+            const y = pad.top + cH * (1 - pct);
+            const val = Math.round(maxViews * pct);
+            return `<line x1="${pad.left}" y1="${y}" x2="${w - pad.right}" y2="${y}" stroke="#f0f1f3" stroke-dasharray="3"/>
+                    <text x="${pad.left - 8}" y="${y + 3}" text-anchor="end" fill="#94a3b8" font-size="10">${val}</text>`;
+        }).join('');
+
+        // Right Y axis (orders)
+        const gridYR = [0, 0.5, 1].map(pct => {
+            const y = pad.top + cH * (1 - pct);
+            const val = Math.round(maxOrders * pct);
+            return `<text x="${w - pad.right + 8}" y="${y + 3}" text-anchor="start" fill="#10b981" font-size="10">${val}</text>`;
+        }).join('');
+
+        // X labels
+        const step = Math.max(Math.floor(dailyTrend.length / 8), 1);
+        const xLabels = pts.filter((_, i) => i % step === 0 || i === pts.length - 1).map(p => {
+            const label = p.date.substring(4, 6) + '/' + p.date.substring(6, 8);
+            return `<text x="${p.x}" y="${h - 8}" text-anchor="middle" fill="#94a3b8" font-size="10">${label}</text>`;
+        }).join('');
+
+        container.innerHTML = `
+            <svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}">
+                ${gridY}${gridYR}${xLabels}
+                <defs>
+                    <linearGradient id="viewsGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#6366f1" stop-opacity="0.12"/>
+                        <stop offset="100%" stop-color="#6366f1" stop-opacity="0.01"/>
+                    </linearGradient>
+                </defs>
+                <polygon points="${viewsArea}" fill="url(#viewsGrad)"/>
+                <polyline points="${viewsLine}" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="${ordersLine}" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round"/>
+                ${pts.map(p => `<circle cx="${p.x}" cy="${p.yViews}" r="2.5" fill="#6366f1" stroke="#fff" stroke-width="1"/>`).join('')}
+                ${pts.filter(p => p.orders > 0).map(p => `<circle cx="${p.x}" cy="${p.yOrders}" r="3.5" fill="#10b981" stroke="#fff" stroke-width="1.5"/>`).join('')}
+                <!-- Legend -->
+                <circle cx="${pad.left + 10}" cy="10" r="4" fill="#6366f1"/>
+                <text x="${pad.left + 20}" y="13" fill="#64748b" font-size="10">瀏覽量</text>
+                <line x1="${pad.left + 65}" y1="10" x2="${pad.left + 85}" y2="10" stroke="#10b981" stroke-width="2" stroke-dasharray="4 2"/>
+                <text x="${pad.left + 90}" y="13" fill="#10b981" font-size="10">訂單數</text>
+            </svg>`;
+    }
+
+    // ══════════════════════════════════
+    // ── Sources + Conversion ──
+    // ══════════════════════════════════
+    function renderSources(sources, orders) {
+        const el = document.getElementById('sourceSection');
+        if (!sources.length) { el.innerHTML = '<div class="td-empty">無流量來源資料</div>'; return; }
+
+        const totalSessions = sources.reduce((s, src) => s + src.sessions, 0);
+        const convRate = totalSessions > 0 ? (orders.length / totalSessions * 100) : 0;
+        const colors = ['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#6b7280'];
+        const maxS = Math.max(...sources.map(s => s.sessions));
+
+        el.innerHTML = `
+            <div style="font-size:.72rem;color:#94a3b8;margin-bottom:14px;">
+                整體轉換率 <strong style="color:#10b981;font-size:.85rem;">${convRate.toFixed(2)}%</strong>
+                <span style="margin-left:8px;">（${orders.length} 訂單 ÷ ${totalSessions.toLocaleString()} 工作階段）</span>
+            </div>
+            ${sources.map((s, i) => {
+                const pct = (s.sessions / maxS * 100).toFixed(0);
+                const sharePct = (s.sessions / totalSessions * 100).toFixed(1);
+                const c = colors[i % colors.length];
+                return `<div class="progress-wrap">
+                    <div class="progress-label">${s.channel}</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${c};"></div></div>
+                    <div class="progress-val">${s.sessions} <span style="color:#c0c5ce;">(${sharePct}%)</span></div>
+                </div>`;
+            }).join('')}`;
+    }
+
+    // ══════════════════════════════════
+    // ── Course Sales ──
+    // ══════════════════════════════════
+    function renderCourses(orders) {
+        const tbody = document.getElementById('courseTable');
+        if (!orders.length) { tbody.innerHTML = '<tr><td colspan="4" class="td-empty">無訂單</td></tr>'; return; }
+
+        const stats = {};
+        let total = 0;
+        orders.forEach(o => {
+            const name = o.course_name || '未知課程';
+            if (!stats[name]) stats[name] = { count: 0, revenue: 0 };
+            stats[name].count++;
+            stats[name].revenue += (o.amount || 0);
+            total += (o.amount || 0);
+        });
+
+        const sorted = Object.entries(stats).sort((a, b) => b[1].revenue - a[1].revenue);
+        tbody.innerHTML = sorted.map(([name, s]) => {
+            const share = total > 0 ? (s.revenue / total * 100).toFixed(1) : '0';
+            return `<tr>
+                <td style="font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</td>
+                <td class="td-right" style="font-weight:600;">${s.count}</td>
+                <td class="td-right" style="font-weight:700;">NT$ ${s.revenue.toLocaleString()}</td>
+                <td class="td-right"><span style="background:#eff6ff;color:#3b82f6;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600;">${share}%</span></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ══════════════════════════════════
+    // ── Keywords ──
+    // ══════════════════════════════════
+    function renderKeywords(queries) {
+        const tbody = document.getElementById('keywordTable');
+        if (!queries.length) { tbody.innerHTML = '<tr><td colspan="6" class="td-empty">無搜尋資料</td></tr>'; return; }
+
+        tbody.innerHTML = queries.map((q, i) => {
+            const rankClass = i < 1 ? 'rank-1' : i < 2 ? 'rank-2' : i < 3 ? 'rank-3' : 'rank-n';
+            const posColor = q.position <= 3 ? '#10b981' : q.position <= 10 ? '#3b82f6' : q.position <= 20 ? '#f59e0b' : '#94a3b8';
+            return `<tr>
+                <td><span class="rank ${rankClass}">${i + 1}</span></td>
+                <td style="font-weight:500;">${q.query}</td>
+                <td class="td-right" style="font-weight:600;">${q.clicks}</td>
+                <td class="td-right">${q.impressions.toLocaleString()}</td>
+                <td class="td-right">${(q.ctr * 100).toFixed(1)}%</td>
+                <td class="td-right"><span style="font-weight:600;color:${posColor};">${q.position.toFixed(1)}</span></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ══════════════════════════════════
+    // ── Top Pages ──
+    // ══════════════════════════════════
+    function renderPages(pages) {
+        const tbody = document.getElementById('pageTable');
+        if (!pages.length) { tbody.innerHTML = '<tr><td colspan="4" class="td-empty">無頁面資料</td></tr>'; return; }
+
+        tbody.innerHTML = pages.slice(0, 15).map((p, i) => {
+            const rankClass = i < 1 ? 'rank-1' : i < 2 ? 'rank-2' : i < 3 ? 'rank-3' : 'rank-n';
+            return `<tr>
+                <td><span class="rank ${rankClass}">${i + 1}</span></td>
+                <td><code style="font-size:.74rem;background:#f1f5f9;padding:2px 6px;border-radius:4px;">${p.path}</code>
+                    <div style="font-size:.7rem;color:#94a3b8;margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.title}</div>
+                </td>
+                <td class="td-right" style="font-weight:600;">${p.views.toLocaleString()}</td>
+                <td class="td-right">${p.users.toLocaleString()}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ══════════════════════════════════
+    // ── AI Report ──
+    // ══════════════════════════════════
+    async function generateAiReport() {
+        if (!cachedData) { alert('請先載入分析資料'); return; }
+
+        const section = document.getElementById('aiSection');
+        const report = document.getElementById('aiReport');
+        const status = document.getElementById('aiStatus');
+        const btn = document.getElementById('btnAiReport');
+
+        section.style.display = 'block';
+        btn.disabled = true;
+        status.textContent = '正在生成 AI 策略報告…(約 15-30 秒)';
+        report.innerHTML = '<div style="text-align:center;padding:40px;"><span class="material-symbols-outlined spinner" style="font-size:32px;color:#6366f1;">progress_activity</span></div>';
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        try {
+            const { ga4, gsc, orders, dateRange } = cachedData;
+            const ov = ga4.overview || {};
+            const totalRevenue = orders.reduce((s, o) => s + (o.amount || 0), 0);
+            const sessions = ov.sessions || 0;
+            const convRate = sessions > 0 ? (orders.length / sessions * 100) : 0;
+
+            // Course breakdown
+            const courseStats = {};
+            orders.forEach(o => {
+                const n = o.course_name || '未知';
+                if (!courseStats[n]) courseStats[n] = { count: 0, revenue: 0 };
+                courseStats[n].count++;
+                courseStats[n].revenue += (o.amount || 0);
+            });
+            const courseStr = Object.entries(courseStats).sort((a, b) => b[1].revenue - a[1].revenue)
+                .map(([n, s]) => `- ${n}: ${s.count} 筆, NT$ ${s.revenue.toLocaleString()}`).join('\n');
+
+            const sourcesStr = (ga4.trafficSources || []).map(s =>
+                `- ${s.channel}: ${s.sessions} sessions, ${s.users} users`).join('\n');
+
+            const keywordsStr = (gsc.topQueries || []).slice(0, 20).map(q =>
+                `- "${q.query}": ${q.clicks} 點擊, ${q.impressions} 曝光, CTR ${(q.ctr*100).toFixed(1)}%, 排名 ${q.position.toFixed(1)}`).join('\n');
+
+            const topPagesStr = (ga4.topPages || []).slice(0, 10).map(p =>
+                `- ${p.path}: ${p.views} views, ${p.users} users`).join('\n');
+
+            const prompt = `你是數位行銷產品策略分析師。分析「數位簡報室 The Briefing Room」(tbr.digital) 過去 ${dateRange.days} 天數據，生成繁體中文策略報告。
+
+## 核心指標
+- 活躍用戶: ${ov.activeUsers || 0}, 新用戶: ${ov.newUsers || 0}
+- 工作階段: ${sessions}, 瀏覽量: ${ov.pageViews || 0}
+- 跳出率: ${((ov.bounceRate || 0) * 100).toFixed(1)}%, 平均停留: ${Math.round(ov.avgSessionDuration || 0)}秒
+- 訂單數: ${orders.length}, 營收: NT$ ${totalRevenue.toLocaleString()}
+- 轉換率: ${convRate.toFixed(2)}%, 客單價: NT$ ${orders.length ? Math.round(totalRevenue/orders.length).toLocaleString() : 0}
+
+## 各課程銷售
+${courseStr || '無'}
+
+## 流量來源
+${sourcesStr || '無'}
+
+## 搜尋關鍵字 (GSC)
+${keywordsStr || '無'}
+
+## 熱門頁面
+${topPagesStr || '無'}
+
+---
+請產出：
+1. **業績摘要** — 數據重點、客單價分析
+2. **流量漏斗分析** — 從流量到轉換的漏斗、各來源效率
+3. **SEO 機會** — 關鍵字排名機會、可優化方向
+4. **產品策略建議** — 具體可執行的優化行動 (短期/中期)
+5. **⚡ 快速致勝** — 3 個可以立即執行的高 ROI 行動
+
+用 markdown 格式，重點用粗體，數據佐證。`;
+
+            const text = await ai.chat([
+                { role: 'system', content: '你是頂級數位行銷策略顧問，擅長數據驅動的產品優化。回答用繁體中文，分析具體可操作。' },
+                { role: 'user', content: prompt }
+            ], { temperature: 0.3, maxTokens: 4096 });
+
+            report.innerHTML = renderMd(text);
+            status.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:#10b981;">check_circle</span> 報告已生成';
+        } catch (err) {
+            report.innerHTML = `<div style="color:#ef4444;padding:20px;">生成失敗: ${err.message}</div>`;
+            status.textContent = '生成失敗';
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function renderMd(md) {
+        return md
+            .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+            .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+            .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code style="background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.8rem;">$1</code>')
+            .replace(/^- (.+)$/gm, '<div style="padding-left:16px;margin:3px 0;"><span style="color:#6366f1;margin-right:6px;">•</span>$1</div>')
+            .replace(/^\d+\. (.+)$/gm, '<div style="padding-left:16px;margin:4px 0;">$1</div>')
+            .replace(/\n{2,}/g, '<br><br>')
+            .replace(/\n/g, '<br>');
+    }
+
+    // ── Events ──
+    document.getElementById('btnLoad').addEventListener('click', loadAll);
+    document.getElementById('btnAiReport').addEventListener('click', generateAiReport);
+    document.getElementById('dateRange').addEventListener('change', () => {
+        if (cachedData) loadAll();
+    });
+</script>
+<script src="components/nav.js"></script>
+</body>
+
+</html>
