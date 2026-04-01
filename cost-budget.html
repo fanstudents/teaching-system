@@ -89,16 +89,32 @@
         .field-input:focus { outline: none; border-color: #6366f1; }
         .field-input.rev-input { border-color: #93c5fd; background: #eff6ff; }
         .field-input.rev-input:focus { border-color: #3b82f6; }
+        .field-input.rev-readonly { border-color: #93c5fd; background: #f0f9ff; color: #1e40af; cursor: default; }
         .lecturer-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid #f0f1f3; margin-top: 4px; }
         .toggle-wrap { display: flex; border: 1.5px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
         .toggle-opt { padding: 4px 10px; font-size: 0.72rem; font-weight: 600; cursor: pointer; background: #fff; color: #94a3b8; transition: all .15s; border: none; font-family: inherit; }
         .toggle-opt.active { background: #6366f1; color: #fff; }
+        .cur-toggle { display: inline-flex; border: 1.5px solid #e2e8f0; border-radius: 5px; overflow: hidden; margin-left: 4px; flex-shrink: 0; }
+        .cur-opt { padding: 2px 7px; font-size: 0.62rem; font-weight: 700; cursor: pointer; background: #fff; color: #94a3b8; border: none; font-family: inherit; transition: all .15s; }
+        .cur-opt.active { background: #f59e0b; color: #fff; }
+        .cur-opt.twd.active { background: #6366f1; color: #fff; }
         .full-row { grid-column: 1 / -1; }
         .date-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid #f0f1f3; margin-top: 4px; }
         .type-tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
         .type-tag.onetime { background: #fef3c7; color: #d97706; }
         .type-tag.monthly { background: #dbeafe; color: #2563eb; }
+        .badge-matched { background: #dcfce7; color: #16a34a; }
+        .badge-unmatched { background: #fef3c7; color: #d97706; }
         .add-row { padding: 10px 6px; }
+
+        /* Order detail mini-table */
+        .order-detail-table { width: 100%; grid-column: 1 / -1; margin: 6px 0; font-size: 0.74rem; border: 1px solid #e8ecf1; border-radius: 6px; overflow: hidden; }
+        .order-detail-table th { padding: 5px 10px; font-size: .66rem; background: #f0f9ff; color: #3b82f6; border-bottom: 1px solid #e8ecf1; }
+        .order-detail-table td { padding: 4px 10px; border-bottom: 1px solid #f0f1f3; }
+        .order-detail-table tr:last-child td { border-bottom: none; }
+        .order-detail-table .plan-name { font-weight: 600; color: #1e293b; }
+        .order-detail-table .plan-count { color: #3b82f6; font-weight: 600; }
+        .order-detail-table .plan-rev { font-weight: 700; color: #1e293b; }
 
         /* Sub-section */
         .subsection { margin: 10px 0; border: 1px solid #f0f1f3; border-radius: 8px; overflow: hidden; }
@@ -166,7 +182,8 @@
             <div class="section-body">
                 <div class="shared-row">
                     <div class="shared-item"><label>稅率</label><input type="number" class="shared-input" id="globalTaxRate" value="5" step="0.1"><span class="pct-label">%</span></div>
-                    <div class="shared-item" style="font-size:.76rem;color:#94a3b8;">公開課程金流手續費：5% + 15元/筆</div>
+                    <div class="shared-item"><label>🇺🇸 USD 匯率</label><input type="number" class="shared-input" id="globalUsdRate" value="32.5" step="0.1"><span class="pct-label">TWD</span></div>
+                    <div class="shared-item" style="font-size:.76rem;color:#94a3b8;">公開課程金流手續費：5% + 15元/筆 ｜ 成本填 USD 時自動換算</div>
                 </div>
             </div>
         </div>
@@ -272,8 +289,10 @@ const GROUPS = ['b2b', 'b2c', 'bizMarketing', 'bizDev', 'bizExpert'];
 const BIZ_GROUPS = ['bizMarketing', 'bizDev', 'bizExpert'];
 let products = { b2b: [], b2c: [], bizMarketing: [], bizDev: [], bizExpert: [] };
 let ordersByCourseName = {};
+// B2C 訂單明細：{ 'courseName': [ {course_name, plan_name, amount, payment_time, student_name, student_email}, ... ] }
+let b2cOrderDetails = {};
 let nextId = 1;
-const STORE_KEY = 'tbr_cost_budget_v4';
+const STORE_KEY = 'tbr_cost_budget_v5';
 
 // ── Month Selector ──
 const monthSelect = document.getElementById('monthSelect');
@@ -299,6 +318,28 @@ window.toggleRow = function(el) {
     el.closest('.product-row').classList.toggle('open');
 };
 
+// ── 模糊比對：找出 orders 的 course_name 屬於哪個 Teachify 課程 ──
+function fuzzyMatchCourse(orderCourseName, teachifyCourses) {
+    if (!orderCourseName) return null;
+    const lcName = orderCourseName.toLowerCase();
+    // 1. 完全一致
+    for (const c of teachifyCourses) {
+        if (c.name === orderCourseName) return c;
+    }
+    // 2. 訂單 course_name 包含 Teachify 課程名（或反向）
+    for (const c of teachifyCourses) {
+        const lcCourse = (c.name || '').toLowerCase();
+        if (lcName.includes(lcCourse) || lcCourse.includes(lcName)) return c;
+    }
+    // 3. plan name 比對
+    for (const c of teachifyCourses) {
+        for (const p of (c.plans || [])) {
+            if ((p.name || '').toLowerCase().includes(lcName) || lcName.includes((p.name || '').toLowerCase())) return c;
+        }
+    }
+    return null;
+}
+
 // ══ Auto Sync ══
 async function autoSync(silent = false) {
     const btn = document.getElementById('btnSync');
@@ -311,18 +352,46 @@ async function autoSync(silent = false) {
     const nextMon = mon === 12 ? `${year+1}-01-01` : `${year}-${String(mon+1).padStart(2,'0')}-01`;
 
     try {
-        const [projResult, orgResult, teachifyResult, ordersResult] = await Promise.all([
+        const [projResult, orgResult, sessionsResult, teachifyResult, ordersResult, savedResult] = await Promise.all([
             db.select('projects', { select: 'id,name,organization_id', filter: { owner_id: `eq.${SERVICE_OWNER_ID}` }, order: 'created_at.desc', limit: 100 }),
             db.select('organizations', { select: 'id,name', limit: 200 }),
+            db.select('project_sessions', { select: 'id,project_id,session_code,date,time,venue,status', limit: 500 }),
             fetch(TEACHIFY_API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Teachify-API-Key': TEACHIFY_KEY }, body: JSON.stringify({ query: `{ courses { nodes { id name slug plans { id name amount } } } }` }) }).then(r => r.json()).catch(() => null),
-            db.select('orders', { select: 'course_name,amount,payment_status,payment_time', filter: { payment_status: 'eq.Paid', payment_time: `gte.${monthStart}` }, order: 'payment_time.desc', limit: 1000 })
+            db.select('orders', {
+                select: 'course_name,plan_name,amount,payment_status,payment_time,student_name,student_email,coupon_code',
+                filter: { payment_status: 'eq.Paid', payment_time: `gte.${monthStart}` },
+                order: 'payment_time.desc', limit: 2000
+            }),
+            db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 }).catch(() => ({ data: null }))
         ]);
 
         const orgMap = {};
         (orgResult.data || []).forEach(o => { orgMap[o.id] = o.name; });
 
-        ordersByCourseName = {};
+        // ── 建立 B2B project → sessions 對應 ──
+        const projSessionsMap = {}; // project_id → [{id, date, time, venue, session_code}]
+        (sessionsResult.data || []).forEach(s => {
+            if (!projSessionsMap[s.project_id]) projSessionsMap[s.project_id] = [];
+            projSessionsMap[s.project_id].push(s);
+        });
+
+        // ── 讀取已存檔的成本資料 (Supabase 優先，localStorage fallback) ──
+        let saved = null;
+        if (savedResult.data && savedResult.data.length > 0) {
+            saved = savedResult.data[0].data;
+        }
+        if (!saved) saved = getSavedMonth(month);
+
+        // ── 過濾當月訂單 ──
         const monthOrders = (ordersResult.data || []).filter(o => o.payment_time && o.payment_time >= monthStart && o.payment_time < nextMon);
+        const teachifyCourses = teachifyResult?.data?.courses?.nodes || [];
+
+        // ── 建立 B2B 專案名稱 set（用來排除非公開課程的訂單）──
+        const b2bProjectNames = new Set();
+        (projResult.data || []).forEach(proj => { if (proj.name) b2bProjectNames.add(proj.name); });
+
+        // ── 處理 B2B 訂單對應 ──
+        ordersByCourseName = {};
         monthOrders.forEach(o => {
             const n = o.course_name || '未知';
             if (!ordersByCourseName[n]) ordersByCourseName[n] = { count: 0, revenue: 0 };
@@ -330,29 +399,152 @@ async function autoSync(silent = false) {
             ordersByCourseName[n].revenue += (o.amount || 0);
         });
 
-        const saved = getSavedMonth(month);
+        // ── 處理 B2C：以訂單為主，配對 Teachify 課程 ──
+        // 把 orders 歸組到 Teachify 課程下（或未配對組）
+        const courseOrderMap = {}; // teachifyCourseId → { course, orders: [], revenue, count }
+        const unmatchedOrders = []; // 沒有配對到任何 Teachify 課程的訂單
+        b2cOrderDetails = {};
+
+        monthOrders.forEach(order => {
+            const courseName = order.course_name || '未知';
+            // 嘗試配對 Teachify 課程
+            const matched = fuzzyMatchCourse(courseName, teachifyCourses);
+            if (matched) {
+                const key = matched.id;
+                if (!courseOrderMap[key]) {
+                    courseOrderMap[key] = {
+                        course: matched,
+                        orders: [],
+                        revenue: 0,
+                        count: 0,
+                        planBreakdown: {} // plan_name → { count, revenue }
+                    };
+                }
+                courseOrderMap[key].orders.push(order);
+                courseOrderMap[key].revenue += (order.amount || 0);
+                courseOrderMap[key].count++;
+                const planKey = order.plan_name || order.course_name || '預設方案';
+                if (!courseOrderMap[key].planBreakdown[planKey]) {
+                    courseOrderMap[key].planBreakdown[planKey] = { count: 0, revenue: 0 };
+                }
+                courseOrderMap[key].planBreakdown[planKey].count++;
+                courseOrderMap[key].planBreakdown[planKey].revenue += (order.amount || 0);
+            } else {
+                // 只有不在 B2B 專案名稱裡的才算公開課程
+                if (!b2bProjectNames.has(courseName)) {
+                    unmatchedOrders.push(order);
+                }
+            }
+        });
+
+        // 也加上有課程但當月沒訂單的 Teachify 課程（讓使用者仍可輸入成本）
+        teachifyCourses.forEach(c => {
+            if (!courseOrderMap[c.id]) {
+                courseOrderMap[c.id] = { course: c, orders: [], revenue: 0, count: 0, planBreakdown: {} };
+            }
+        });
+
+        // 把未配對訂單按 course_name 群組化
+        const unmatchedGrouped = {};
+        unmatchedOrders.forEach(o => {
+            const n = o.course_name || '未知';
+            if (!unmatchedGrouped[n]) unmatchedGrouped[n] = { orders: [], revenue: 0, count: 0, planBreakdown: {} };
+            unmatchedGrouped[n].orders.push(o);
+            unmatchedGrouped[n].revenue += (o.amount || 0);
+            unmatchedGrouped[n].count++;
+            const planKey = o.plan_name || o.course_name || '預設方案';
+            if (!unmatchedGrouped[n].planBreakdown[planKey]) {
+                unmatchedGrouped[n].planBreakdown[planKey] = { count: 0, revenue: 0 };
+            }
+            unmatchedGrouped[n].planBreakdown[planKey].count++;
+            unmatchedGrouped[n].planBreakdown[planKey].revenue += (o.amount || 0);
+        });
+
         const makeSavedMap = (list) => { const m = {}; (list || []).forEach(p => { m[p.sourceId || p.name] = p; }); return m; };
         const sB2b = makeSavedMap(saved?.products?.b2b);
         const sB2c = makeSavedMap(saved?.products?.b2c);
 
-        // B2B: 客戶名稱
+        // ── B2B: 客戶名稱＋場次 ──
         const newB2b = [];
         (projResult.data || []).forEach(proj => {
             const courseName = proj.name || '未命名';
             const clientName = (proj.organization_id && orgMap[proj.organization_id]) || '';
             const e = sB2b[proj.id] || sB2b[courseName];
             const oi = ordersByCourseName[courseName] || { count: 0, revenue: 0 };
-            newB2b.push(mergeProduct(nextId++, clientName || courseName, courseName, proj.id, null, e, oi));
+            const p = mergeProduct(nextId++, clientName || courseName, courseName, proj.id, null, e, oi);
+            // B2B 場次：從 project_sessions 自動建立，合併已存檔
+            const projSessions = projSessionsMap[proj.id] || [];
+            const savedSessions = e?.sessions || [];
+            const savedSessMap = {};
+            savedSessions.forEach(s => { savedSessMap[s.sessionId || s.name] = s; });
+            if (projSessions.length > 0) {
+                p.sessions = projSessions.map(ps => {
+                    const es = savedSessMap[ps.id] || savedSessMap[ps.session_code] || {};
+                    return makeSession(ps.id, `${ps.date || ''} ${ps.venue || ps.session_code}`.trim(), es);
+                });
+            } else if (savedSessions.length > 0) {
+                p.sessions = savedSessions.map(s => makeSession(s.sessionId, s.name, s));
+            }
+            newB2b.push(p);
         });
 
-        // B2C: 課程名稱
+        // ── B2C: 以訂單為核心，配對 Teachify 課程 ──
         const newB2c = [];
-        (teachifyResult?.data?.courses?.nodes || []).forEach(c => {
-            const name = c.name || '未命名';
-            const e = sB2c[c.id] || sB2c[name];
-            const oi = ordersByCourseName[name] || { count: 0, revenue: 0 };
-            newB2c.push(mergeProduct(nextId++, name, null, c.id, c.slug, e, oi));
-        });
+        // 有配對到 Teachify 的
+        Object.entries(courseOrderMap)
+            .sort((a,b) => b[1].revenue - a[1].revenue)
+            .forEach(([courseId, data]) => {
+                const name = data.course.name || '未命名';
+                const e = sB2c[courseId] || sB2c[name];
+                const oi = { count: data.count, revenue: data.revenue };
+                const p = mergeProduct(nextId++, name, null, courseId, data.course.slug, e, oi);
+                p.revenue = data.revenue;
+                p.orderRevenue = data.revenue;
+                p.orderCount = data.count;
+                p.planBreakdown = data.planBreakdown;
+                p.matchedTeachify = true;
+                p.ordersList = data.orders;
+                b2cOrderDetails[p.id] = data.orders;
+                // B2C 場次：從 plan breakdown 自動建立
+                const savedSessions = e?.sessions || [];
+                const savedSessMap = {};
+                savedSessions.forEach(s => { savedSessMap[s.sessionId || s.name] = s; });
+                p.sessions = Object.entries(data.planBreakdown).map(([planName, info]) => {
+                    const es = savedSessMap[planName] || {};
+                    const s = makeSession(planName, planName, es);
+                    s.orderCount = info.count;
+                    s.orderRevenue = info.revenue;
+                    return s;
+                });
+                newB2c.push(p);
+            });
+
+        // 未配對的訂單群組
+        Object.entries(unmatchedGrouped)
+            .sort((a,b) => b[1].revenue - a[1].revenue)
+            .forEach(([courseName, data]) => {
+                const e = sB2c[courseName];
+                const oi = { count: data.count, revenue: data.revenue };
+                const p = mergeProduct(nextId++, courseName, null, `unmatched_${courseName}`, null, e, oi);
+                p.revenue = data.revenue;
+                p.orderRevenue = data.revenue;
+                p.orderCount = data.count;
+                p.planBreakdown = data.planBreakdown;
+                p.matchedTeachify = false;
+                p.ordersList = data.orders;
+                b2cOrderDetails[p.id] = data.orders;
+                const savedSessions = e?.sessions || [];
+                const savedSessMap = {};
+                savedSessions.forEach(s => { savedSessMap[s.sessionId || s.name] = s; });
+                p.sessions = Object.entries(data.planBreakdown).map(([planName, info]) => {
+                    const es = savedSessMap[planName] || {};
+                    const s = makeSession(planName, planName, es);
+                    s.orderCount = info.count;
+                    s.orderRevenue = info.revenue;
+                    return s;
+                });
+                newB2c.push(p);
+            });
 
         products.b2b = newB2b;
         products.b2c = newB2c;
@@ -361,11 +553,13 @@ async function autoSync(silent = false) {
 
         if (saved) {
             document.getElementById('globalTaxRate').value = saved.globalTaxRate ?? 5;
+            document.getElementById('globalUsdRate').value = saved.globalUsdRate ?? 32.5;
             if (saved.tools) Object.entries(saved.tools).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val || ''; });
         }
 
         renderAll();
-        if (!silent) showToast(`已同步 ${newB2b.length} 專案、${newB2c.length} 課程、${monthOrders.length} 訂單`);
+        const totalB2cOrders = Object.values(courseOrderMap).reduce((s,d) => s + d.count, 0) + unmatchedOrders.length;
+        if (!silent) showToast(`已同步 ${newB2b.length} 專案、${newB2c.length} 課程、${totalB2cOrders} 筆公開課程訂單`);
         document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> ${new Date().toLocaleTimeString('zh-TW')} 已同步`;
     } catch (err) {
         console.error('[sync]', err);
@@ -385,7 +579,26 @@ function mergeProduct(id, name, courseName, sourceId, sourceSlug, existing, orde
         lecturerFee: existing?.lecturerFee || 0, lecturerPercent: existing?.lecturerPercent || 0,
         kol: existing?.kol || 0, ads: existing?.ads || 0,
         venue: existing?.venue || 0, assistant: existing?.assistant || 0,
-        transport: existing?.transport || 0, material: existing?.material || 0, personnel: existing?.personnel || 0
+        transport: existing?.transport || 0, material: existing?.material || 0, personnel: existing?.personnel || 0,
+        cur_lecturerFee: existing?.cur_lecturerFee || 'twd',
+        cur_kol: existing?.cur_kol || 'twd', cur_ads: existing?.cur_ads || 'twd',
+        cur_venue: existing?.cur_venue || 'twd', cur_assistant: existing?.cur_assistant || 'twd',
+        cur_transport: existing?.cur_transport || 'twd', cur_material: existing?.cur_material || 'twd',
+        cur_personnel: existing?.cur_personnel || 'twd',
+        sessions: existing?.sessions || [] // 場次級別成本
+    };
+}
+
+function makeSession(sessionId, name, existing) {
+    return {
+        sessionId: sessionId || '', name: name || '未命名場次',
+        venue: existing?.venue || 0, lecturerFee: existing?.lecturerFee || 0,
+        assistant: existing?.assistant || 0, transport: existing?.transport || 0,
+        material: existing?.material || 0,
+        cur_venue: existing?.cur_venue || 'twd', cur_lecturerFee: existing?.cur_lecturerFee || 'twd',
+        cur_assistant: existing?.cur_assistant || 'twd', cur_transport: existing?.cur_transport || 'twd',
+        cur_material: existing?.cur_material || 'twd',
+        orderCount: existing?.orderCount || 0, orderRevenue: existing?.orderRevenue || 0
     };
 }
 
@@ -400,16 +613,60 @@ window.addProduct = function(group) {
         id: nextId++, name: '', courseName: '', revenue: 0,
         lecturerType: 'fixed', lecturerFee: 0, lecturerPercent: 0,
         kol: 0, ads: 0, venue: 0, assistant: 0, transport: 0, material: 0, personnel: 0,
-        revenueType: isBizGroup ? 'onetime' : '', serviceDate: ''
+        cur_lecturerFee:'twd', cur_kol:'twd', cur_ads:'twd', cur_venue:'twd',
+        cur_assistant:'twd', cur_transport:'twd', cur_material:'twd', cur_personnel:'twd',
+        revenueType: isBizGroup ? 'onetime' : '', serviceDate: '',
+        sessions: []
     });
     renderAll();
 };
 window.removeProduct = function(group, id) { products[group] = products[group].filter(p => p.id !== id); renderAll(); };
+window.addSession = function(group, productId) {
+    const p = products[group].find(p => p.id === productId);
+    if (!p) return;
+    if (!p.sessions) p.sessions = [];
+    p.sessions.push(makeSession('', '新場次', {}));
+    renderAll();
+};
+window.removeSession = function(group, productId, idx) {
+    const p = products[group].find(p => p.id === productId);
+    if (p && p.sessions) { p.sessions.splice(idx, 1); renderAll(); }
+};
+window.updateSession = function(group, productId, idx, field, value) {
+    const p = products[group].find(p => p.id === productId);
+    if (!p || !p.sessions || !p.sessions[idx]) return;
+    const strFields = ['name','cur_venue','cur_lecturerFee','cur_assistant','cur_transport','cur_material'];
+    p.sessions[idx][field] = strFields.includes(field) ? value : (parseFloat(value) || 0);
+    recalculate();
+};
+window.toggleSessionCurrency = function(group, productId, idx, field) {
+    const p = products[group].find(pp => pp.id === productId);
+    if (!p || !p.sessions || !p.sessions[idx]) return;
+    const curField = `cur_${field}`;
+    p.sessions[idx][curField] = p.sessions[idx][curField] === 'usd' ? 'twd' : 'usd';
+    renderAll();
+};
 window.toggleLecturerType = function(group, id, type) { const p = products[group].find(p => p.id === id); if (p) { p.lecturerType = type; renderAll(); } };
 window.updateProduct = function(group, id, field, value) {
     const p = products[group].find(p => p.id === id);
-    if (p) { p[field] = (field === 'name' || field === 'courseName' || field === 'revenueType' || field === 'serviceDate') ? value : (parseFloat(value) || 0); recalculate(); }
+    if (!p) return;
+    const strFields = ['name','courseName','revenueType','serviceDate','cur_lecturerFee','cur_kol','cur_ads','cur_venue','cur_assistant','cur_transport','cur_material','cur_personnel'];
+    p[field] = strFields.includes(field) ? value : (parseFloat(value) || 0);
+    recalculate();
 };
+window.toggleCurrency = function(group, id, field) {
+    const p = products[group].find(p => p.id === id);
+    if (!p) return;
+    const curField = `cur_${field}`;
+    p[curField] = p[curField] === 'usd' ? 'twd' : 'usd';
+    renderAll();
+};
+function getUsdRate() {
+    return parseFloat(document.getElementById('globalUsdRate')?.value) || 32.5;
+}
+function toTwd(amount, currency) {
+    return currency === 'usd' ? Math.round(amount * getUsdRate()) : amount;
+}
 
 function calcCosts(p, group) {
     const taxRate = parseFloat(document.getElementById('globalTaxRate').value) || 0;
@@ -417,33 +674,52 @@ function calcCosts(p, group) {
     const isBiz = BIZ_GROUPS.includes(group);
     const rev = p.revenue || 0;
     const tax = Math.round(rev * taxRate / 100);
-    // 金流手續費只有 B2C：5% + 15元/筆
     const orderCount = p.orderCount || (isB2c && rev > 0 ? 1 : 0);
     const payFee = isB2c ? Math.round(rev * 0.05 + orderCount * 15) : 0;
-    const lecCost = p.lecturerType === 'percent' ? Math.round(rev * (p.lecturerPercent || 0) / 100) : (p.lecturerFee || 0);
-    // KOL/廣告/場地只有 B2C
-    const b2cCosts = isB2c ? ((p.kol||0)+(p.ads||0)+(p.venue||0)) : 0;
-    // 人事費只有企業服務
-    const personnelCost = isBiz ? (p.personnel||0) : 0;
-    const commonCosts = (p.assistant||0)+(p.transport||0)+(p.material||0);
-    const totalCost = tax + payFee + lecCost + b2cCosts + personnelCost + commonCosts;
-    return { rev, tax, payFee, lecCost, b2cCosts, personnelCost, commonCosts, totalCost, profit: rev - totalCost, taxRate, orderCount, isB2c, isBiz };
+
+    // 講師費（課程級，若用分潤）
+    const lecCostCourse = p.lecturerType === 'percent' ? Math.round(rev * (p.lecturerPercent || 0) / 100) : 0;
+    // 課程級共享成本
+    const sharedCosts = (isB2c ? (toTwd(p.kol||0, p.cur_kol) + toTwd(p.ads||0, p.cur_ads)) : 0)
+                      + (isBiz ? toTwd(p.personnel||0, p.cur_personnel) : 0);
+
+    // 場次級成本加總
+    let sessionCosts = 0;
+    (p.sessions || []).forEach(s => {
+        sessionCosts += toTwd(s.venue||0, s.cur_venue)
+                     + toTwd(s.lecturerFee||0, s.cur_lecturerFee)
+                     + toTwd(s.assistant||0, s.cur_assistant)
+                     + toTwd(s.transport||0, s.cur_transport)
+                     + toTwd(s.material||0, s.cur_material);
+    });
+
+    // 若沒有場次，就用課程級的費用（向下相容）
+    const hasSessions = (p.sessions || []).length > 0;
+    const fallbackCosts = !hasSessions
+        ? (p.lecturerType === 'fixed' ? toTwd(p.lecturerFee||0, p.cur_lecturerFee) : 0)
+          + toTwd(p.venue||0, p.cur_venue) + toTwd(p.assistant||0, p.cur_assistant)
+          + toTwd(p.transport||0, p.cur_transport) + toTwd(p.material||0, p.cur_material)
+        : 0;
+
+    const totalCost = tax + payFee + lecCostCourse + sharedCosts + sessionCosts + fallbackCosts;
+    return { rev, tax, payFee, lecCost: lecCostCourse + (hasSessions ? 0 : (p.lecturerType==='fixed'?toTwd(p.lecturerFee||0,p.cur_lecturerFee):0)),
+             sharedCosts, sessionCosts, totalCost, profit: rev - totalCost, taxRate, orderCount, isB2c, isBiz, hasSessions };
 }
 
 // ── Render ──
 function renderAll() { GROUPS.forEach(g => renderProducts(g)); recalculate(); }
 
 function renderProducts(group) {
-    const container = document.getElementById(`${group}Products`);
+    const container = document.getElementById(group + 'Products');
     const list = products[group];
     const isB2b = group === 'b2b';
     const isBiz = BIZ_GROUPS.includes(group);
-    const countEl = document.getElementById(`${isBiz ? 'biz' : group}Count`);
 
     if (isBiz) {
-        document.getElementById('bizCount').textContent = BIZ_GROUPS.reduce((s,g) => s + products[g].length, 0);
+        document.getElementById('bizCount').textContent = BIZ_GROUPS.reduce(function(s,g){ return s + products[g].length; }, 0);
     } else {
-        countEl.textContent = list.length;
+        var countEl = document.getElementById((isBiz ? 'biz' : group) + 'Count');
+        if (countEl) countEl.textContent = list.length;
     }
 
     if (!list.length) {
@@ -451,65 +727,220 @@ function renderProducts(group) {
         return;
     }
 
-    container.innerHTML = list.map(p => {
-        const c = calcCosts(p, group);
-        const orderBadge = p.orderCount ? `<span class="badge badge-order">${p.orderCount} 筆 NT$${(p.orderRevenue||0).toLocaleString()}</span>` : '';
-        const subLabel = isB2b && p.courseName ? `<span class="row-sub">${p.courseName}</span>` : '';
-        const typeTag = isBiz && p.revenueType ? `<span class="type-tag ${p.revenueType}">${p.revenueType==='monthly'?'每月':'一次性'}</span>` : '';
-        const dateLabel = isBiz && p.serviceDate ? `<span class="row-sub">${p.serviceDate}</span>` : '';
-        const profitClass = c.profit >= 0 ? 'pos' : 'neg';
-
-        return `<div class="product-row">
-            <div class="product-row-header" onclick="toggleRow(this)">
-                <span class="material-symbols-outlined row-chevron">chevron_right</span>
-                <span class="row-name">${p.name || '未命名'}</span>
-                ${subLabel}${typeTag}${dateLabel}
-                <div class="row-right">
-                    ${orderBadge}
-                    <span class="row-rev">NT$ ${c.rev.toLocaleString()}</span>
-                    <span class="row-profit ${profitClass}">利潤 NT$ ${c.profit.toLocaleString()}</span>
-                    <button class="btn-del" onclick="event.stopPropagation();removeProduct('${group}',${p.id})" title="刪除"><span class="material-symbols-outlined" style="font-size:16px;">close</span></button>
-                </div>
-            </div>
-            <div class="product-detail">
-                <div class="field"><span class="field-label">📝 ${isB2b ? '客戶名稱' : '名稱'}</span><input type="text" class="field-input" value="${p.name}" oninput="updateProduct('${group}',${p.id},'name',this.value)"></div>
-                ${isB2b ? `<div class="field"><span class="field-label">📚 課程名稱</span><input type="text" class="field-input" value="${p.courseName||''}" oninput="updateProduct('${group}',${p.id},'courseName',this.value)"></div>` : '<div></div>'}
-                ${isBiz ? `<div class="date-row">
-                    <span class="field-label">📅 日期</span>
-                    <input type="date" class="field-input" style="width:150px;text-align:left;" value="${p.serviceDate||''}" oninput="updateProduct('${group}',${p.id},'serviceDate',this.value)">
-                    <span class="field-label" style="min-width:auto;">💼 類型</span>
-                    <div class="toggle-wrap">
-                        <button class="toggle-opt ${p.revenueType==='onetime'?'active':''}" onclick="updateProduct('${group}',${p.id},'revenueType','onetime');renderAll()">一次性</button>
-                        <button class="toggle-opt ${p.revenueType==='monthly'?'active':''}" onclick="updateProduct('${group}',${p.id},'revenueType','monthly');renderAll()">每月</button>
-                    </div>
-                </div>` : ''}
-                <div class="field"><span class="field-label">💰 實收金額</span><input type="number" class="field-input rev-input" value="${p.revenue||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'revenue',this.value)"></div>
-                <div class="field"><span class="field-label" style="color:#94a3b8;">🧾 稅金 ${c.taxRate}%</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${c.tax.toLocaleString()}</div></div>
-                ${c.isB2c ? `<div class="field"><span class="field-label" style="color:#94a3b8;">💳 金流 5%+15/筆</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ${c.payFee.toLocaleString()} (${c.orderCount}筆)</div></div>` : ''}
-                <div class="lecturer-row">
-                    <span class="field-label">🎓 講師費</span>
-                    <div class="toggle-wrap">
-                        <button class="toggle-opt ${p.lecturerType==='fixed'?'active':''}" onclick="toggleLecturerType('${group}',${p.id},'fixed')">固定</button>
-                        <button class="toggle-opt ${p.lecturerType==='percent'?'active':''}" onclick="toggleLecturerType('${group}',${p.id},'percent')">分潤%</button>
-                    </div>
-                    ${p.lecturerType === 'fixed'
-                        ? `<input type="number" class="field-input" style="width:120px;" value="${p.lecturerFee||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'lecturerFee',this.value)">`
-                        : `<input type="number" class="field-input" style="width:80px;" value="${p.lecturerPercent||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'lecturerPercent',this.value)"><span class="pct-label">% = NT$ ${c.lecCost.toLocaleString()}</span>`}
-                </div>
-                ${c.isB2c ? `
-                <div class="field"><span class="field-label">📣 KOL 推廣</span><input type="number" class="field-input" value="${p.kol||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'kol',this.value)"></div>
-                <div class="field"><span class="field-label">📢 廣告費</span><input type="number" class="field-input" value="${p.ads||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'ads',this.value)"></div>
-                <div class="field"><span class="field-label">📍 場地費</span><input type="number" class="field-input" value="${p.venue||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'venue',this.value)"></div>
-                ` : ''}
-                <div class="field"><span class="field-label">👤 助教費</span><input type="number" class="field-input" value="${p.assistant||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'assistant',this.value)"></div>
-                <div class="field"><span class="field-label">🚗 車馬費</span><input type="number" class="field-input" value="${p.transport||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'transport',this.value)"></div>
-                <div class="field"><span class="field-label">📖 教材費</span><input type="number" class="field-input" value="${p.material||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'material',this.value)"></div>
-                ${c.isBiz ? `<div class="field"><span class="field-label">👥 人事費</span><input type="number" class="field-input" value="${p.personnel||''}" placeholder="0" oninput="updateProduct('${group}',${p.id},'personnel',this.value)"></div>` : ''}
-            </div>
-        </div>`;
-    }).join('');
+    container.innerHTML = list.map(function(p) { return renderProductRow(p, group, isB2b, isBiz); }).join('');
 }
 
+function renderCurToggle(type, group, id, idxOrField, field) {
+    // type: 'product' or 'session'
+    var cur, onclick1, onclick2;
+    if (type === 'session') {
+        var sess = null;
+        var prod = products[group].find(function(pp){ return pp.id === id; });
+        if (prod && prod.sessions) sess = prod.sessions[idxOrField];
+        cur = (sess && sess['cur_' + field]) || 'twd';
+        onclick1 = "event.stopPropagation();toggleSessionCurrency('" + group + "'," + id + "," + idxOrField + ",'" + field + "')";
+        onclick2 = onclick1;
+    } else {
+        var prod2 = products[group].find(function(pp){ return pp.id === id; });
+        cur = (prod2 && prod2['cur_' + idxOrField]) || 'twd';
+        onclick1 = "event.stopPropagation();toggleCurrency('" + group + "'," + id + ",'" + idxOrField + "')";
+        onclick2 = onclick1;
+    }
+    return '<div class="cur-toggle">' +
+        '<button class="cur-opt twd ' + (cur==='twd'?'active':'') + '" onclick="' + onclick1 + '">NT$</button>' +
+        '<button class="cur-opt ' + (cur==='usd'?'active':'') + '" onclick="' + onclick2 + '">US$</button>' +
+    '</div>';
+}
+
+function renderCurLabel(amount, currency) {
+    if (currency === 'usd') {
+        return '<span class="pct-label">≈ NT$ ' + toTwd(amount || 0, 'usd').toLocaleString() + '</span>';
+    }
+    return '';
+}
+
+function renderSessionRow(s, si, group, productId) {
+    var sessCost = toTwd(s.venue||0,s.cur_venue) + toTwd(s.lecturerFee||0,s.cur_lecturerFee) + toTwd(s.assistant||0,s.cur_assistant) + toTwd(s.transport||0,s.cur_transport) + toTwd(s.material||0,s.cur_material);
+    var revLabel = s.orderCount ? '<span class="badge badge-order" style="font-size:.66rem;">' + s.orderCount + '筆 NT$' + (s.orderRevenue||0).toLocaleString() + '</span>' : '';
+    var g = group, pid = productId;
+    var cb = function(f){ return renderCurToggle('session', g, pid, si, f); };
+    var cl = function(f){ return renderCurLabel(s[f], s['cur_'+f]); };
+    var inp = function(f, label, emoji){
+        return '<div class="field"><span class="field-label">' + emoji + ' ' + label + '</span>' +
+            '<input type="number" class="field-input" value="' + (s[f]||'') + '" placeholder="0" oninput="updateSession(\'' + g + '\',' + pid + ',' + si + ',\'' + f + '\',this.value)">' +
+            cb(f) + cl(f) + '</div>';
+    };
+
+    return '<div class="product-row" style="border:1px solid #e8ecf1;border-radius:8px;margin:4px 0;">' +
+        '<div class="product-row-header" onclick="toggleRow(this)" style="padding:6px 10px;background:#fafbfc;">' +
+            '<span class="material-symbols-outlined row-chevron" style="font-size:16px;">chevron_right</span>' +
+            '<span style="font-size:.78rem;font-weight:600;">📍 ' + (s.name || '場次 '+(si+1)) + '</span>' +
+            revLabel +
+            '<div class="row-right">' +
+                '<span style="font-size:.72rem;color:#ef4444;font-weight:600;">成本 NT$ ' + sessCost.toLocaleString() + '</span>' +
+                '<button class="btn-del" onclick="event.stopPropagation();removeSession(\'' + g + '\',' + pid + ',' + si + ')" title="刪除場次"><span class="material-symbols-outlined" style="font-size:14px;">close</span></button>' +
+            '</div>' +
+        '</div>' +
+        '<div class="product-detail" style="padding:8px 12px;">' +
+            '<div class="field"><span class="field-label">📍 場次名稱</span><input type="text" class="field-input" value="' + (s.name||'') + '" oninput="updateSession(\'' + g + '\',' + pid + ',' + si + ',\'name\',this.value)"></div>' +
+            inp('venue', '場地費', '🏢') +
+            inp('lecturerFee', '講師費', '🎓') +
+            inp('assistant', '助教費', '👤') +
+            inp('transport', '車馬費', '🚗') +
+            inp('material', '教材費', '📖') +
+        '</div>' +
+    '</div>';
+}
+
+function renderProductRow(p, group, isB2b, isBiz) {
+    var c = calcCosts(p, group);
+    var isB2c = group === 'b2c';
+    var hasSessions = (p.sessions || []).length > 0;
+
+    // Badges
+    var orderBadge = p.orderCount ? '<span class="badge badge-order">' + p.orderCount + ' 筆 NT$' + (p.orderRevenue||0).toLocaleString() + '</span>' : '';
+    var matchBadge = '';
+    if (isB2c && p.matchedTeachify !== undefined) {
+        matchBadge = p.matchedTeachify ? '<span class="badge badge-matched">已配對</span>' : '<span class="badge badge-unmatched">未配對</span>';
+    }
+    var subLabel = isB2b && p.courseName ? '<span class="row-sub">' + p.courseName + '</span>' : '';
+    var typeTag = isBiz && p.revenueType ? '<span class="type-tag ' + p.revenueType + '">' + (p.revenueType==='monthly'?'每月':'一次性') + '</span>' : '';
+    var dateLabel = isBiz && p.serviceDate ? '<span class="row-sub">' + p.serviceDate + '</span>' : '';
+    var profitClass = c.profit >= 0 ? 'pos' : 'neg';
+
+    // Plan table (B2C only)
+    var planTable = '';
+    if (isB2c && p.planBreakdown && Object.keys(p.planBreakdown).length > 0) {
+        var planRows = Object.entries(p.planBreakdown)
+            .sort(function(a,b){ return b[1].revenue - a[1].revenue; })
+            .map(function(e){ return '<tr><td class="plan-name">' + e[0] + '</td><td class="plan-count">' + e[1].count + ' 筆</td><td class="plan-rev">NT$ ' + e[1].revenue.toLocaleString() + '</td></tr>'; })
+            .join('');
+        planTable = '<table class="order-detail-table"><thead><tr><th>方案/場次</th><th>訂單數</th><th>營收</th></tr></thead><tbody>' + planRows + '</tbody></table>';
+    }
+
+    // Currency toggle helpers (product level)
+    var cb = function(f){ return renderCurToggle('product', group, p.id, f); };
+    var cl = function(f){ return renderCurLabel(p[f], p['cur_'+f]); };
+
+    // Delete button
+    var delBtn = (!isB2c || !p.matchedTeachify) ? '<button class="btn-del" onclick="event.stopPropagation();removeProduct(\'' + group + '\',' + p.id + ')" title="刪除"><span class="material-symbols-outlined" style="font-size:16px;">close</span></button>' : '';
+
+    // Revenue field
+    var revField = isB2c
+        ? '<div class="field"><span class="field-label">💰 訂單營收</span><input type="number" class="field-input rev-input rev-readonly" value="' + (p.revenue||0) + '" readonly title="自動來自訂單資料"></div>'
+        : '<div class="field"><span class="field-label">💰 實收金額</span><input type="number" class="field-input rev-input" value="' + (p.revenue||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'revenue\',this.value)"></div>';
+
+    // Biz date/type row
+    var bizRow = '';
+    if (isBiz) {
+        bizRow = '<div class="date-row">' +
+            '<span class="field-label">📅 日期</span>' +
+            '<input type="date" class="field-input" style="width:150px;text-align:left;" value="' + (p.serviceDate||'') + '" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'serviceDate\',this.value)">' +
+            '<span class="field-label" style="min-width:auto;">💼 類型</span>' +
+            '<div class="toggle-wrap">' +
+                '<button class="toggle-opt ' + (p.revenueType==='onetime'?'active':'') + '" onclick="updateProduct(\'' + group + '\',' + p.id + ',\'revenueType\',\'onetime\');renderAll()">一次性</button>' +
+                '<button class="toggle-opt ' + (p.revenueType==='monthly'?'active':'') + '" onclick="updateProduct(\'' + group + '\',' + p.id + ',\'revenueType\',\'monthly\');renderAll()">每月</button>' +
+            '</div>' +
+        '</div>';
+    }
+
+    // Lecturer row
+    var lecturerRow = '';
+    if (p.lecturerType === 'percent') {
+        lecturerRow = '<div class="lecturer-row">' +
+            '<span class="field-label">🎓 講師分潤</span>' +
+            '<input type="number" class="field-input" style="width:80px;" value="' + (p.lecturerPercent||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'lecturerPercent\',this.value)">' +
+            '<span class="pct-label">% = NT$ ' + c.lecCost.toLocaleString() + '</span>' +
+            '<div class="toggle-wrap" style="margin-left:auto;">' +
+                '<button class="toggle-opt active" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'fixed\')">改固定</button>' +
+            '</div>' +
+        '</div>';
+    } else if (!hasSessions) {
+        lecturerRow = '<div class="lecturer-row">' +
+            '<span class="field-label">🎓 講師費</span>' +
+            '<div class="toggle-wrap">' +
+                '<button class="toggle-opt active" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'fixed\')">固定</button>' +
+                '<button class="toggle-opt" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'percent\')">分潤%</button>' +
+            '</div>' +
+            '<input type="number" class="field-input" style="width:120px;" value="' + (p.lecturerFee||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'lecturerFee\',this.value)">' +
+            cb('lecturerFee') + cl('lecturerFee') +
+        '</div>';
+    } else {
+        lecturerRow = '<div class="lecturer-row">' +
+            '<span class="field-label">🎓 講師費</span>' +
+            '<span class="pct-label">各場次獨立計算</span>' +
+            '<div class="toggle-wrap" style="margin-left:auto;">' +
+                '<button class="toggle-opt" onclick="toggleLecturerType(\'' + group + '\',' + p.id + ',\'percent\')">改分潤%</button>' +
+            '</div>' +
+        '</div>';
+    }
+
+    // Shared costs (course level)
+    var sharedFields = '';
+    if (isB2c) {
+        sharedFields += '<div class="field"><span class="field-label">📣 KOL 推廣</span><input type="number" class="field-input" value="' + (p.kol||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'kol\',this.value)">' + cb('kol') + cl('kol') + '</div>';
+        sharedFields += '<div class="field"><span class="field-label">📢 廣告費</span><input type="number" class="field-input" value="' + (p.ads||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'ads\',this.value)">' + cb('ads') + cl('ads') + '</div>';
+    }
+    if (isBiz) {
+        sharedFields += '<div class="field"><span class="field-label">👥 人事費</span><input type="number" class="field-input" value="' + (p.personnel||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'personnel\',this.value)">' + cb('personnel') + cl('personnel') + '</div>';
+    }
+
+    // Per-session or fallback cost fields
+    var costSection = '';
+    if (!hasSessions) {
+        // No sessions - show flat cost fields
+        var fields = '';
+        if (!isB2c) {
+            fields += '<div class="field"><span class="field-label">📍 場地費</span><input type="number" class="field-input" value="' + (p.venue||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'venue\',this.value)">' + cb('venue') + cl('venue') + '</div>';
+        }
+        fields += '<div class="field"><span class="field-label">👤 助教費</span><input type="number" class="field-input" value="' + (p.assistant||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'assistant\',this.value)">' + cb('assistant') + cl('assistant') + '</div>';
+        fields += '<div class="field"><span class="field-label">🚗 車馬費</span><input type="number" class="field-input" value="' + (p.transport||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'transport\',this.value)">' + cb('transport') + cl('transport') + '</div>';
+        fields += '<div class="field"><span class="field-label">📖 教材費</span><input type="number" class="field-input" value="' + (p.material||'') + '" placeholder="0" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'material\',this.value)">' + cb('material') + cl('material') + '</div>';
+        costSection = fields;
+    } else {
+        // Has sessions - show session sub-rows
+        var sessHtml = (p.sessions || []).map(function(s, si) {
+            return renderSessionRow(s, si, group, p.id);
+        }).join('');
+        costSection = '<div class="full-row" style="margin-top:8px;border-top:1px solid #e8ecf1;padding-top:8px;">' +
+            '<div style="font-size:.76rem;font-weight:600;color:#3b82f6;margin-bottom:6px;display:flex;align-items:center;gap:4px;">' +
+                '<span class="material-symbols-outlined" style="font-size:16px;">event</span> 場次成本明細' +
+                '<span class="pct-label" style="margin-left:auto;">共 ' + (p.sessions||[]).length + ' 場 ｜ 場次成本合計 NT$ ' + c.sessionCosts.toLocaleString() + '</span>' +
+            '</div>' +
+            sessHtml +
+            '<button style="margin-top:6px;padding:4px 12px;border:1.5px dashed #cbd5e1;border-radius:6px;background:none;color:#64748b;font-size:.76rem;cursor:pointer;font-family:inherit;" onclick="addSession(\'' + group + '\',' + p.id + ')">' +
+                '<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">add</span> 新增場次' +
+            '</button>' +
+        '</div>';
+    }
+
+    // Assemble
+    return '<div class="product-row">' +
+        '<div class="product-row-header" onclick="toggleRow(this)">' +
+            '<span class="material-symbols-outlined row-chevron">chevron_right</span>' +
+            '<span class="row-name">' + (p.name || '未命名') + '</span>' +
+            subLabel + typeTag + dateLabel +
+            '<div class="row-right">' +
+                matchBadge + orderBadge +
+                '<span class="row-rev">NT$ ' + c.rev.toLocaleString() + '</span>' +
+                '<span class="row-profit ' + profitClass + '">利潤 NT$ ' + c.profit.toLocaleString() + '</span>' +
+                delBtn +
+            '</div>' +
+        '</div>' +
+        '<div class="product-detail">' +
+            '<div class="field"><span class="field-label">📝 ' + (isB2b ? '客戶名稱' : '名稱') + '</span><input type="text" class="field-input" value="' + p.name + '" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'name\',this.value)"></div>' +
+            (isB2b ? '<div class="field"><span class="field-label">📚 課程名稱</span><input type="text" class="field-input" value="' + (p.courseName||'') + '" oninput="updateProduct(\'' + group + '\',' + p.id + ',\'courseName\',this.value)"></div>' : '<div></div>') +
+            bizRow +
+            revField +
+            planTable +
+            '<div class="field"><span class="field-label" style="color:#94a3b8;">🧾 稅金 ' + c.taxRate + '%</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ' + c.tax.toLocaleString() + '</div></div>' +
+            (c.isB2c ? '<div class="field"><span class="field-label" style="color:#94a3b8;">💳 金流 5%+15/筆</span><div style="flex:1;text-align:right;font-size:.82rem;font-weight:600;color:#94a3b8;">NT$ ' + c.payFee.toLocaleString() + ' (' + c.orderCount + '筆)</div></div>' : '') +
+            lecturerRow +
+            sharedFields +
+            costSection +
+        '</div>' +
+    '</div>';
+}
 // ── Recalculate ──
 function recalculate() {
     let grandRev = 0, grandCost = 0;
@@ -575,36 +1006,88 @@ function renderProfitChart(totalRev, totalCost, tools, plat) {
 }
 
 // ── Save / Export ──
-function saveAll() {
+async function saveAll() {
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;animation:spin .7s linear infinite;">progress_activity</span> 儲存中…';
+
     const month = monthSelect.value;
-    const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
     const toolIds = ['tool_google','tool_chatgpt','tool_claude','tool_canva','tool_notion','tool_gamma','tool_manus','tool_lovable'];
     const platIds = ['plat_teachify','plat_kit','plat_zeabur'];
     const toolsData = {};
     [...toolIds,...platIds].forEach(id => { toolsData[id] = parseFloat(document.getElementById(id)?.value) || 0; });
-    all[month] = {
+
+    // 清理 products 移除不需要存的大物件
+    const cleanProducts = JSON.parse(JSON.stringify(products));
+    ['b2c'].forEach(g => {
+        (cleanProducts[g] || []).forEach(p => {
+            delete p.ordersList; // 不存訂單明細（太大）
+        });
+    });
+
+    const payload = {
         globalTaxRate: parseFloat(document.getElementById('globalTaxRate').value) || 0,
-        products: JSON.parse(JSON.stringify(products)),
+        globalUsdRate: parseFloat(document.getElementById('globalUsdRate').value) || 32.5,
+        products: cleanProducts,
         tools: toolsData
     };
-    localStorage.setItem(STORE_KEY, JSON.stringify(all));
-    showToast('已儲存 ✓');
+
+    try {
+        // 存到 Supabase cost_budgets 表
+        const { error } = await db.insert('cost_budgets', {
+            month,
+            data: payload,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'month' });
+
+        if (error) throw new Error(error.message || JSON.stringify(error));
+
+        // 也存 localStorage 做快取
+        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+        all[month] = payload;
+        localStorage.setItem(STORE_KEY, JSON.stringify(all));
+
+        showToast('已儲存至雲端 ✓');
+        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:#10b981;">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
+    } catch (err) {
+        console.error('[save]', err);
+        // Supabase 失敗時 fallback 到 localStorage
+        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+        all[month] = payload;
+        localStorage.setItem(STORE_KEY, JSON.stringify(all));
+        showToast('雲端儲存失敗，已存到本地 ⚠️');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存';
+    }
 }
 
 function exportCSV() {
     const month = monthSelect.value;
-    const rows = [['類別','名稱','項目','金額(NT$)']];
+    const rows = [['類別','名稱','項目','幣別','金額','折合NT$']];
     const labels = { b2b: '企業內訓', b2c: '公開課程', bizMarketing: '行銷代操', bizDev: '系統開發', bizExpert: '專家派遣' };
     GROUPS.forEach(g => {
         products[g].forEach(p => {
             const c = calcCosts(p, g);
-            rows.push([labels[g], p.name||'未命名', '實收金額', c.rev]);
-            rows.push([labels[g], p.name, `稅金 ${c.taxRate}%`, c.tax]);
-            if (c.isB2c) rows.push([labels[g], p.name, '金流手續費 5%+15', c.payFee]);
-            rows.push([labels[g], p.name, '講師費', c.lecCost]);
-            if (c.isB2c) ['kol','ads','venue'].forEach(k => rows.push([labels[g], p.name, k, p[k]||0]));
-            ['assistant','transport','material'].forEach(k => rows.push([labels[g], p.name, k, p[k]||0]));
-            if (c.isBiz) rows.push([labels[g], p.name, '人事費', p.personnel||0]);
+            rows.push([labels[g], p.name||'未命名', '實收金額', 'TWD', c.rev, c.rev]);
+            rows.push([labels[g], p.name, `稅金 ${c.taxRate}%`, 'TWD', c.tax, c.tax]);
+            if (c.isB2c) rows.push([labels[g], p.name, '金流手續費 5%+15', 'TWD', c.payFee, c.payFee]);
+            const lCur = p.cur_lecturerFee || 'twd';
+            rows.push([labels[g], p.name, '講師費', lCur.toUpperCase(), p.lecturerType==='fixed'?(p.lecturerFee||0):c.lecCost, c.lecCost]);
+            if (c.isB2c) {
+                ['kol','ads','venue'].forEach(k => {
+                    const cur = p[`cur_${k}`]||'twd';
+                    rows.push([labels[g], p.name, k, cur.toUpperCase(), p[k]||0, toTwd(p[k]||0, cur)]);
+                });
+            }
+            ['assistant','transport','material'].forEach(k => {
+                const cur = p[`cur_${k}`]||'twd';
+                rows.push([labels[g], p.name, k, cur.toUpperCase(), p[k]||0, toTwd(p[k]||0, cur)]);
+            });
+            if (c.isBiz) {
+                const cur = p.cur_personnel||'twd';
+                rows.push([labels[g], p.name, '人事費', cur.toUpperCase(), p.personnel||0, toTwd(p.personnel||0, cur)]);
+            }
         });
     });
     const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
@@ -616,10 +1099,11 @@ function showToast(msg) { const t=document.getElementById('toast'); t.textConten
 
 // ── Events ──
 document.getElementById('btnSync').addEventListener('click', () => autoSync(false));
-document.getElementById('btnSave').addEventListener('click', saveAll);
+document.getElementById('btnSave').addEventListener('click', () => saveAll());
 document.getElementById('btnExport').addEventListener('click', exportCSV);
 monthSelect.addEventListener('change', () => autoSync(false));
 document.getElementById('globalTaxRate').addEventListener('input', () => renderAll());
+document.getElementById('globalUsdRate').addEventListener('input', () => renderAll());
 
 document.querySelectorAll('.tool-input').forEach(el => el.addEventListener('input', recalculate));
 
