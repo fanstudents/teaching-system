@@ -898,7 +898,7 @@
                         </div>
                         <div class="benefit-row">
                             <span class="benefit-label">企業引薦</span>
-                            <span>內訓引薦分潤<strong style="color:#64748b;">另議</strong>，系統導入 <strong style="color:#059669;">12%</strong></span>
+                            <span>內訓引薦分潤<strong style="color:#64748b;">另議</strong>，系統導入 <strong style="color:#059669;">12%</strong>，Threads 代操 <strong style="color:#059669;">8%</strong>/月</span>
                         </div>
                         <div class="benefit-row">
                             <span class="benefit-label">折扣碼</span>
@@ -990,6 +990,14 @@
                                         <div class="ref-desc">推薦企業採用簡報系統或數位工具</div>
                                     </div>
                                     <span class="ref-rate">分潤 12%</span>
+                                </label>
+                                <label class="referral-option">
+                                    <input type="checkbox" name="referral" value="Threads 代操引薦">
+                                    <div style="flex:1;">
+                                        <div class="ref-title">Threads 代操引薦</div>
+                                        <div class="ref-desc">推薦客戶使用 Threads 社群代操服務</div>
+                                    </div>
+                                    <span class="ref-rate">每月 8%</span>
                                 </label>
                             </div>
                         </div>
@@ -1269,7 +1277,7 @@
                             <!-- 引薦類型 Card Selector -->
                             <div style="margin-bottom:16px;">
                                 <div style="font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:8px;">選擇引薦類型 <span style="color:#ef4444;">*</span></div>
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="refTypeCards">
+                                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;" id="refTypeCards">
                                     <label style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s;background:#fff;">
                                         <input type="radio" name="refTypeRadio" value="AI 培訓" required style="display:none;">
                                         <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1288,6 +1296,16 @@
                                         <div>
                                             <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">企業導入</div>
                                             <div style="font-size:0.68rem;color:#94a3b8;">儀表板 · 官網 · 系統改造</div>
+                                        </div>
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s;background:#fff;">
+                                        <input type="radio" name="refTypeRadio" value="Threads 代操" style="display:none;">
+                                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#000,#333);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <span class="material-symbols-outlined" style="color:#fff;font-size:18px;">forum</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">Threads 代操</div>
+                                            <div style="font-size:0.68rem;color:#94a3b8;">社群經營·內容策劃</div>
                                         </div>
                                     </label>
                                 </div>
