@@ -2305,8 +2305,24 @@
             }
 
             const plNames = { tbr: '數位簡報室', hahow: 'Hahow' };
+            const utmChannels = [
+                { key: 'threads', label: 'Threads', icon: 'forum', medium: 'social' },
+                { key: 'facebook', label: 'Facebook', icon: 'group', medium: 'social' },
+                { key: 'instagram', label: 'Instagram', icon: 'photo_camera', medium: 'social' },
+                { key: 'newsletter', label: '電子報', icon: 'mail', medium: 'email' },
+                { key: 'blog', label: '部落格', icon: 'article', medium: 'referral' },
+                { key: 'other', label: '其他', icon: 'link', medium: 'referral' },
+            ];
+
             container.innerHTML = courses.map((c, i) => {
-                const affLink = c.url + (c.url.includes('?') ? '&' : '?') + 'coupon=' + (couponCode || '');
+                const baseUrl = c.url + (c.url.includes('?') ? '&' : '?') + 'coupon=' + (couponCode || '');
+                const utmBtns = utmChannels.map(ch => {
+                    const fullUrl = `${baseUrl}&utm_source=${ch.key}&utm_medium=${ch.medium}&utm_campaign=affiliate`;
+                    return `<button class="utm-btn" onclick="event.stopPropagation();navigator.clipboard.writeText('${fullUrl}');this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:14px;\\'>check</span> 已複製';this.classList.add('copied');setTimeout(()=>{this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:14px;\\'>${ch.icon}</span> ${ch.label}';this.classList.remove('copied');},1500)">
+                        <span class="material-symbols-outlined" style="font-size:14px;">${ch.icon}</span> ${ch.label}
+                    </button>`;
+                }).join('');
+
                 return `
                 <div class="section-card" style="margin-bottom:0;">
                     <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
@@ -2316,28 +2332,42 @@
                         <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
                     </div>
                     <div class="c-detail" style="display:none;padding:0 18px 14px;border-top:1px solid #f0f0f5;">
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding-top:12px;">
-                            <div>
-                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:4px;">推廣連結</div>
-                                <a href="${c.url}" target="_blank" style="font-size:0.78rem;color:#1a73e8;word-break:break-all;">${c.url}</a>
-                            </div>
-                            <div>
-                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:4px;">折扣碼</div>
+                        <div style="display:flex;align-items:center;gap:10px;padding-top:12px;margin-bottom:12px;">
+                            <div style="flex:1;">
+                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px;">折扣碼</div>
                                 <span style="font-family:'SF Mono',monospace;font-size:0.88rem;font-weight:700;color:#1e293b;background:#f1f5f9;padding:3px 10px;border-radius:6px;cursor:pointer;" onclick="event.stopPropagation();navigator.clipboard.writeText('${couponCode||''}');this.textContent='✅ 已複製';setTimeout(()=>this.textContent='${couponCode||''}',1500)">${couponCode || '-'}</span>
                             </div>
                             <div>
-                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:4px;">分潤比例</div>
+                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px;">分潤</div>
                                 <span style="font-size:0.88rem;font-weight:700;color:#10b981;">20%</span>
                             </div>
+                        </div>
+                        <div style="font-size:0.72rem;color:#64748b;margin-bottom:8px;font-weight:600;">推廣連結（點擊複製，已含折扣碼 + UTM）</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            ${utmBtns}
                         </div>
                     </div>
                 </div>`;
             }).join('');
 
-            // Toggle expand style
-            const style = document.createElement('style');
-            style.textContent = '.c-detail.show { display:block!important; }';
-            document.head.appendChild(style);
+            // UTM button CSS + toggle
+            if (!document.getElementById('utmBtnCSS')) {
+                const style = document.createElement('style');
+                style.id = 'utmBtnCSS';
+                style.textContent = `
+                    .c-detail.show { display:block!important; }
+                    .utm-btn {
+                        display:inline-flex; align-items:center; gap:4px;
+                        padding: 6px 12px; border: 1.5px solid #e2e8f0;
+                        border-radius: 8px; background: #fafbfc; font-size: 0.72rem;
+                        font-weight: 600; color: #475569; cursor: pointer;
+                        font-family: inherit; transition: all 0.15s;
+                    }
+                    .utm-btn:hover { border-color: #1a73e8; color: #1a73e8; background: #eff6ff; }
+                    .utm-btn.copied { border-color: #10b981; color: #10b981; background: #ecfdf5; }
+                `;
+                document.head.appendChild(style);
+            }
         }
 
         // ── Events ──

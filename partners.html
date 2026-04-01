@@ -222,12 +222,12 @@
 
     <!-- Affiliate Detail Modal -->
     <div class="modal-overlay" id="affDetailOverlay">
-        <div class="modal" style="max-width:580px;">
+        <div class="modal" style="max-width:580px;max-height:90vh;display:flex;flex-direction:column;">
             <div class="modal-header">
                 <h3>聯盟行銷申請詳情</h3>
                 <button class="modal-close" onclick="closeModal('affDetailOverlay')">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y:auto;flex:1;">
                 <input type="hidden" id="affDetailId">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
@@ -241,8 +241,8 @@
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
-                        <label>折扣碼</label>
-                        <input type="text" id="affDetailCoupon" readonly>
+                        <label>折扣碼 <span style="color:#ef4444;">*核准時必填</span></label>
+                        <input type="text" id="affDetailCoupon" placeholder="例：JRTING">
                     </div>
                     <div class="form-group">
                         <label>佣金比例</label>
@@ -688,12 +688,22 @@
             const id = document.getElementById('affDetailId').value;
             const status = document.getElementById('affDetailStatus').value;
             const notes = document.getElementById('affDetailNotes').value.trim();
+            const couponCode = document.getElementById('affDetailCoupon').value.trim();
             const btn = document.getElementById('affDetailSave');
+
+            // Validate coupon when approving
+            if (status === 'approved' && !couponCode) {
+                showToast('核准時必須填寫折扣碼');
+                document.getElementById('affDetailCoupon').focus();
+                document.getElementById('affDetailCoupon').style.borderColor = '#ef4444';
+                return;
+            }
+
             btn.disabled = true;
             btn.textContent = '儲存中…';
 
             try {
-                const updateData = { status, notes };
+                const updateData = { status, notes, coupon_code: couponCode };
 
                 // Generate login token when approving
                 const a = affiliates.find(x => x.id === id);
