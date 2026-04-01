@@ -558,6 +558,7 @@
             const statusEl = document.getElementById('couponStatus');
             if (!code) { statusEl.innerHTML = ''; return; }
             statusEl.innerHTML = '<span style="color:#94a3b8;">驗證中…</span>';
+            teachifyCoupons = null; // always fetch fresh
             const coupons = await fetchTeachifyCoupons();
             const match = coupons.find(c => c.code.toUpperCase() === code.toUpperCase());
             if (match) {
@@ -582,6 +583,7 @@
                 if (listEl.style.display !== 'none') { listEl.style.display = 'none'; return; }
                 listEl.innerHTML = '<div style="padding:10px;color:#94a3b8;font-size:0.78rem;">載入中…</div>';
                 listEl.style.display = 'block';
+                teachifyCoupons = null; // bust cache
                 const coupons = await fetchTeachifyCoupons();
                 const activeCoupons = coupons.filter(c => c.active);
                 if (activeCoupons.length === 0) {
