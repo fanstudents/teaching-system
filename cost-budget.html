@@ -395,7 +395,9 @@ async function autoSync(silent = false) {
                 filter: { payment_status: 'eq.Paid', payment_time: `gte.${monthStart}` },
                 order: 'payment_time.desc', limit: 2000
             }),
-            db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 }).catch(() => ({ data: null }))
+            fetch(SUPABASE_URL + '/rest/v1/cost_budgets?month=eq.' + month + '&limit=1', {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+            }).then(r => r.json()).catch(() => null)
         ]);
 
         const orgMap = {};
@@ -410,7 +412,9 @@ async function autoSync(silent = false) {
 
         // ── 讀取已存檔的成本資料 (Supabase 優先，localStorage fallback) ──
         let saved = null;
-        if (savedResult.data && savedResult.data.length > 0) {
+        if (Array.isArray(savedResult) && savedResult.length > 0) {
+            saved = savedResult[0].data;
+        } else if (savedResult && savedResult.data && savedResult.data.length > 0) {
             saved = savedResult.data[0].data;
         }
         if (!saved) saved = getSavedMonth(month);
