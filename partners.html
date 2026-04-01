@@ -242,7 +242,14 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
                         <label>折扣碼 <span style="color:#ef4444;">*核准時必填</span></label>
-                        <input type="text" id="affDetailCoupon" placeholder="例：JRTING">
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="text" id="affDetailCoupon" placeholder="輸入或從 Teachify 選擇" style="flex:1;">
+                            <button type="button" id="btnTeachifyCoupon" style="white-space:nowrap;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fafbfc;font-size:0.72rem;font-weight:600;color:#475569;cursor:pointer;font-family:inherit;" title="從 Teachify 載入折扣碼">
+                                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">list</span> Teachify
+                            </button>
+                        </div>
+                        <div id="couponStatus" style="font-size:0.7rem;margin-top:4px;min-height:18px;"></div>
+                        <div id="teachifyCouponList" style="display:none;max-height:180px;overflow-y:auto;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;margin-top:4px;"></div>
                     </div>
                     <div class="form-group">
                         <label>佣金比例 <span style="color:#94a3b8;font-weight:400;">(%)</span></label>
@@ -525,6 +532,83 @@
         let affCourses = [];
         let instrCourseIds = []; // temp state for course id tags
 
+        // ── Teachify Coupon API ──
+        const TEACHIFY_API = 'https://tbr.digital/admin/graphql';
+        const TEACHIFY_KEY = 'vsXiCQXFlNs95GjiRHW4Y3mwc9L6_oj6VdRiTj-3ymE';
+        let teachifyCoupons = null; // cached
+
+        async function fetchTeachifyCoupons() {
+            if (teachifyCoupons) return teachifyCoupons;
+            try {
+                const res = await fetch(TEACHIFY_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Teachify-API-Key': TEACHIFY_KEY },
+                    body: JSON.stringify({ query: `{ coupons(perPage: 200) { nodes { id name code amount couponType active state appliedCount } } }` })
+                });
+                const json = await res.json();
+                teachifyCoupons = json?.data?.coupons?.nodes || [];
+                return teachifyCoupons;
+            } catch (e) {
+                console.error('[Teachify Coupon]', e);
+                return [];
+            }
+        }
+
+        async function validateCouponOnTeachify(code) {
+            const statusEl = document.getElementById('couponStatus');
+            if (!code) { statusEl.innerHTML = ''; return; }
+            statusEl.innerHTML = '<span style="color:#94a3b8;">驗證中…</span>';
+            const coupons = await fetchTeachifyCoupons();
+            const match = coupons.find(c => c.code.toUpperCase() === code.toUpperCase());
+            if (match) {
+                const typeLabel = match.couponType === 'percentage' ? `${match.amount}%` : `$${match.amount}`;
+                const stateColor = match.active ? '#10b981' : '#f59e0b';
+                const stateText = match.active ? '啟用中' : '未啟用';
+                statusEl.innerHTML = `<span style="color:${stateColor};font-weight:600;">✓ Teachify 已建立</span> — ${match.name} (${typeLabel}，${stateText}，已使用 ${match.appliedCount} 次)`;
+            } else {
+                statusEl.innerHTML = '<span style="color:#ef4444;font-weight:600;">✗ Teachify 尚未建立此折扣碼</span> <span style="color:#94a3b8;">— 請先到 Teachify 後台建立</span>';
+            }
+        }
+
+        function setupTeachifyCouponUI() {
+            // Validate on blur
+            document.getElementById('affDetailCoupon').addEventListener('blur', (e) => {
+                validateCouponOnTeachify(e.target.value.trim());
+            });
+
+            // Teachify dropdown button
+            document.getElementById('btnTeachifyCoupon').addEventListener('click', async () => {
+                const listEl = document.getElementById('teachifyCouponList');
+                if (listEl.style.display !== 'none') { listEl.style.display = 'none'; return; }
+                listEl.innerHTML = '<div style="padding:10px;color:#94a3b8;font-size:0.78rem;">載入中…</div>';
+                listEl.style.display = 'block';
+                const coupons = await fetchTeachifyCoupons();
+                const activeCoupons = coupons.filter(c => c.active);
+                if (activeCoupons.length === 0) {
+                    listEl.innerHTML = '<div style="padding:10px;color:#94a3b8;font-size:0.78rem;">Teachify 尚無啟用中的折扣碼</div>';
+                    return;
+                }
+                listEl.innerHTML = activeCoupons.map(c => {
+                    const typeLabel = c.couponType === 'percentage' ? `${c.amount}%` : `$${c.amount}`;
+                    return `<div class="teachify-coupon-item" data-code="${c.code}" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f5;font-size:0.78rem;display:flex;justify-content:space-between;align-items:center;transition:background 0.1s;">
+                        <div><span style="font-weight:700;font-family:'SF Mono',monospace;">${c.code}</span> <span style="color:#64748b;">— ${c.name}</span></div>
+                        <span style="color:#10b981;font-weight:600;font-size:0.72rem;">${typeLabel}</span>
+                    </div>`;
+                }).join('');
+
+                // Click to select
+                listEl.querySelectorAll('.teachify-coupon-item').forEach(item => {
+                    item.addEventListener('mouseenter', () => item.style.background = '#f8fafc');
+                    item.addEventListener('mouseleave', () => item.style.background = '#fff');
+                    item.addEventListener('click', () => {
+                        document.getElementById('affDetailCoupon').value = item.dataset.code;
+                        listEl.style.display = 'none';
+                        validateCouponOnTeachify(item.dataset.code);
+                    });
+                });
+            });
+        }
+
         // ── Toast ──
         function showToast(msg) {
             const t = document.getElementById('toast');
@@ -682,7 +766,13 @@
                 : '<span style="color:#ccc;font-size:0.82rem;">未選擇</span>';
 
             document.getElementById('affDetailOverlay').classList.add('active');
+            // Validate existing coupon
+            if (a.coupon_code) validateCouponOnTeachify(a.coupon_code);
+            else document.getElementById('couponStatus').innerHTML = '';
+            document.getElementById('teachifyCouponList').style.display = 'none';
         };
+
+        setupTeachifyCouponUI();
 
         document.getElementById('affDetailSave').addEventListener('click', async () => {
             const id = document.getElementById('affDetailId').value;
