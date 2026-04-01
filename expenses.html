@@ -17,39 +17,36 @@
         .page-header h1 .material-symbols-outlined { color: var(--text-secondary); }
         .page-header p { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
-
         .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
         .controls select { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: var(--card); }
         .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .btn-save { background: var(--accent); color: #fff; }
         .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,.25); }
         .auto-saved { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 3px; }
-
-        /* Summary */
-        .summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+        .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
         .summary-card { background: var(--card); border-radius: 12px; padding: 16px 18px; border: 1px solid var(--border); }
         .sc-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 3px; }
         .sc-value { font-size: 1.3rem; font-weight: 700; color: var(--negative); }
-
-        /* 2-column grid */
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-
-        /* Section */
-        .section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .sc-value.total { color: var(--text); }
+        .section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 18px; }
         .section-header { padding: 12px 18px; border-bottom: 1px solid #f0f1f3; display: flex; align-items: center; gap: 8px; }
         .section-header h3 { font-size: 0.86rem; font-weight: 600; }
         .section-body { padding: 10px 14px; }
-
-        /* Tool rows */
-        .tool-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; padding: 7px 10px; border-radius: 8px; transition: background .15s; }
-        .tool-row:hover { background: var(--bg); }
+        /* Tool table */
+        .tool-table { width: 100%; border-collapse: collapse; }
+        .tool-table thead th { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--border); }
+        .tool-table thead th:first-child { text-align: left; }
+        .tool-table tbody td { padding: 6px 8px; vertical-align: middle; }
+        .tool-table tbody tr { transition: background .15s; }
+        .tool-table tbody tr:hover { background: var(--bg); }
+        .tool-cell { display: flex; align-items: center; gap: 8px; }
         .tool-logo { width: 22px; height: 22px; border-radius: 5px; object-fit: contain; flex-shrink: 0; }
         .tool-logo-fallback { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
-        .tool-name { flex: 1; font-size: 0.8rem; font-weight: 500; }
-        .tool-input { width: 100px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.8rem; font-family: 'Inter', monospace; text-align: right; }
+        .tool-name { font-size: 0.8rem; font-weight: 500; }
+        .tool-input { width: 90px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.8rem; font-family: 'Inter', monospace; text-align: right; }
         .tool-input:focus { outline: none; border-color: var(--accent); }
+        .row-total { font-size: 0.78rem; font-weight: 600; color: var(--negative); text-align: right; min-width: 80px; }
         .cost-subtotal { font-size: 0.8rem; font-weight: 700; color: var(--negative); text-align: right; padding: 8px 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
-
         /* Personnel */
         .personnel-row { display: grid; grid-template-columns: 1fr 100px 100px 32px; gap: 6px; align-items: center; padding: 6px 10px; border-radius: 8px; margin-bottom: 4px; transition: background .15s; }
         .personnel-row:hover { background: var(--bg); }
@@ -61,18 +58,16 @@
         .btn-add:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
         .btn-del { background: none; color: var(--text-muted); border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-del:hover { color: var(--negative); }
-
         .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 10px 20px; border-radius: 10px; font-size: .82rem; transform: translateY(100px); opacity: 0; transition: all .3s; z-index: 999; }
         .toast.show { transform: translateY(0); opacity: 1; }
-
-        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .summary-bar { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .summary-bar { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
 <div class="admin-main">
     <div class="page-header">
         <h1><span class="material-symbols-outlined">account_balance</span> 營運費用</h1>
-        <p>系統訂閱、平臺服務與人事費用的月度管理</p>
+        <p>系統訂閱、平臺服務與人事費用的月度管理（基本月費 + 額外費用 + 一次性費用）</p>
     </div>
     <div class="container">
         <div class="controls">
@@ -82,21 +77,22 @@
         </div>
 
         <div class="summary-bar">
-            <div class="summary-card"><div class="sc-label">系統費用</div><div class="sc-value" id="systemTotal">NT$ 0</div></div>
-            <div class="summary-card"><div class="sc-label">平臺費用</div><div class="sc-value" id="platformTotal">NT$ 0</div></div>
-            <div class="summary-card"><div class="sc-label">人事費用</div><div class="sc-value" id="personnelTotal">NT$ 0</div></div>
+            <div class="summary-card"><div class="sc-label">每月固定費用</div><div class="sc-value" id="monthlyTotal">NT$ 0</div></div>
+            <div class="summary-card"><div class="sc-label">每月額外費用</div><div class="sc-value" id="extraTotal">NT$ 0</div></div>
+            <div class="summary-card"><div class="sc-label">一次性費用</div><div class="sc-value" id="onetimeTotal">NT$ 0</div></div>
+            <div class="summary-card"><div class="sc-label">本月合計</div><div class="sc-value total" id="grandTotal">NT$ 0</div></div>
         </div>
 
-        <!-- 2-column: System + Platform -->
-        <div class="two-col" style="margin-bottom:18px;">
-            <div class="section">
-                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">smart_toy</span><h3>系統費用</h3></div>
-                <div class="section-body" id="systemTools"></div>
-            </div>
-            <div class="section">
-                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">dns</span><h3>平臺費用</h3></div>
-                <div class="section-body" id="platformTools"></div>
-            </div>
+        <!-- System Tools -->
+        <div class="section">
+            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">smart_toy</span><h3>系統費用</h3></div>
+            <div class="section-body" id="systemTools"></div>
+        </div>
+
+        <!-- Platform -->
+        <div class="section">
+            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">dns</span><h3>平臺費用</h3></div>
+            <div class="section-body" id="platformTools"></div>
         </div>
 
         <!-- Personnel (full-width) -->
@@ -123,10 +119,10 @@
 <script type="module">
 import { db } from './scripts/supabase.js';
 
-const STORE_KEY = 'op_expenses';
+const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
 const monthSelect = document.getElementById('monthSelect');
 
-// Tool definitions with real logos
 const SYSTEM_TOOLS = [
     { id: 'tool_google', name: 'Google Workspace', logo: 'https://www.gstatic.com/images/branding/product/2x/hh_google_apps_icon_dp.png' },
     { id: 'tool_chatgpt', name: 'ChatGPT', logo: 'assets/tool-logos/chatgpt.svg' },
@@ -163,15 +159,33 @@ function initMonths() {
     monthSelect.addEventListener('change', loadData);
 }
 
-// ── Render Tool Rows ──
+// ── Render Tool Table ──
 function renderToolSection(containerId, tools) {
     const container = document.getElementById(containerId);
-    container.innerHTML = tools.map(t => {
+    const rows = tools.map(t => {
         const icon = t.logo
             ? `<img class="tool-logo" src="${t.logo}" alt="${t.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="tool-logo-fallback" style="display:none;background:${t.fallback?.color||'#94a3b8'};">${t.fallback?.letter||t.name[0]}</div>`
             : `<div class="tool-logo-fallback" style="background:${t.fallback.color};">${t.fallback.letter}</div>`;
-        return `<div class="tool-row">${icon}<div class="tool-name">${t.name}</div><input type="number" class="tool-input" id="${t.id}" placeholder="0" oninput="window.recalculate()"></div>`;
-    }).join('') + `<div class="cost-subtotal"><span>小計</span><span id="${containerId}_subtotal">NT$ 0</span></div>`;
+        return `<tr>
+            <td><div class="tool-cell">${icon}<div class="tool-name">${t.name}</div></div></td>
+            <td><input type="number" class="tool-input" id="${t.id}_monthly" placeholder="0" oninput="window.recalculate()"></td>
+            <td><input type="number" class="tool-input" id="${t.id}_extra" placeholder="0" oninput="window.recalculate()"></td>
+            <td><input type="number" class="tool-input" id="${t.id}_onetime" placeholder="0" oninput="window.recalculate()"></td>
+            <td class="row-total" id="${t.id}_total">0</td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML = `<table class="tool-table">
+        <thead><tr>
+            <th style="min-width:140px;">工具</th>
+            <th>基本月費</th>
+            <th>額外費用</th>
+            <th>一次性</th>
+            <th>小計</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+    </table>
+    <div class="cost-subtotal"><span>小計</span><span id="${containerId}_subtotal">NT$ 0</span></div>`;
 }
 
 // ── Personnel ──
@@ -211,38 +225,68 @@ window.removePersonnel = function(i) {
 // ── Recalculate ──
 function recalculate() {
     const val = id => parseFloat(document.getElementById(id)?.value) || 0;
-    const systemCost = SYSTEM_TOOLS.reduce((s, t) => s + val(t.id), 0);
-    const platformCost = PLATFORM_TOOLS.reduce((s, t) => s + val(t.id), 0);
+    let totalMonthly = 0, totalExtra = 0, totalOnetime = 0;
+
+    [...SYSTEM_TOOLS, ...PLATFORM_TOOLS].forEach(t => {
+        const m = val(t.id + '_monthly');
+        const e = val(t.id + '_extra');
+        const o = val(t.id + '_onetime');
+        const sum = m + e + o;
+        totalMonthly += m;
+        totalExtra += e;
+        totalOnetime += o;
+        const el = document.getElementById(t.id + '_total');
+        if (el) el.textContent = sum > 0 ? sum.toLocaleString() : '0';
+    });
+
+    // Subtotals per section
+    const calcSection = (tools) => {
+        let sm = 0, se = 0, so = 0;
+        tools.forEach(t => { sm += val(t.id+'_monthly'); se += val(t.id+'_extra'); so += val(t.id+'_onetime'); });
+        return sm + se + so;
+    };
+    document.getElementById('systemTools_subtotal').textContent = 'NT$ ' + calcSection(SYSTEM_TOOLS).toLocaleString();
+    document.getElementById('platformTools_subtotal').textContent = 'NT$ ' + calcSection(PLATFORM_TOOLS).toLocaleString();
+
     const personnelCost = personnelData.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
+    document.getElementById('personnel_subtotal').textContent = 'NT$ ' + personnelCost.toLocaleString();
 
-    document.getElementById('systemTools_subtotal').textContent = `NT$ ${systemCost.toLocaleString()}`;
-    document.getElementById('platformTools_subtotal').textContent = `NT$ ${platformCost.toLocaleString()}`;
-    document.getElementById('personnel_subtotal').textContent = `NT$ ${personnelCost.toLocaleString()}`;
-
-    document.getElementById('systemTotal').textContent = `NT$ ${systemCost.toLocaleString()}`;
-    document.getElementById('platformTotal').textContent = `NT$ ${platformCost.toLocaleString()}`;
-    document.getElementById('personnelTotal').textContent = `NT$ ${personnelCost.toLocaleString()}`;
+    document.getElementById('monthlyTotal').textContent = 'NT$ ' + totalMonthly.toLocaleString();
+    document.getElementById('extraTotal').textContent = 'NT$ ' + totalExtra.toLocaleString();
+    document.getElementById('onetimeTotal').textContent = 'NT$ ' + totalOnetime.toLocaleString();
+    document.getElementById('grandTotal').textContent = 'NT$ ' + (totalMonthly + totalExtra + totalOnetime + personnelCost).toLocaleString();
 }
 window.recalculate = recalculate;
 
-// ── Load / Save ──
+// ── Load / Save (anon key for RLS) ──
+const hdr = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+const base = SUPABASE_URL + '/rest/v1';
+
 async function loadData() {
     const month = monthSelect.value;
     let saved = null;
     try {
-        const result = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
-        if (result.data?.[0]?.data?.opExpenses) saved = result.data[0].data.opExpenses;
+        const res = await fetch(base + '/cost_budgets?month=eq.' + month + '&limit=1', { headers: hdr });
+        const rows = await res.json();
+        if (rows && rows.length > 0 && rows[0].data?.opExpenses) {
+            saved = rows[0].data.opExpenses;
+        }
     } catch (e) { console.warn('[load]', e); }
 
-    if (!saved) {
-        const local = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-        saved = local[month] || null;
-    }
-
+    // Populate inputs
     [...SYSTEM_TOOLS, ...PLATFORM_TOOLS].forEach(t => {
-        const el = document.getElementById(t.id);
-        if (el) el.value = saved?.tools?.[t.id] || '';
+        ['monthly', 'extra', 'onetime'].forEach(suffix => {
+            const el = document.getElementById(t.id + '_' + suffix);
+            if (el) el.value = saved?.tools?.[t.id + '_' + suffix] || '';
+        });
     });
+    // Backward compat: old format stored tools as { tool_id: value }
+    if (saved?.tools && !saved.tools.tool_google_monthly && saved.tools.tool_google !== undefined) {
+        [...SYSTEM_TOOLS, ...PLATFORM_TOOLS].forEach(t => {
+            const el = document.getElementById(t.id + '_monthly');
+            if (el && saved.tools[t.id]) el.value = saved.tools[t.id];
+        });
+    }
     personnelData = saved?.personnel || [];
     renderPersonnel();
     recalculate();
@@ -251,36 +295,43 @@ async function loadData() {
 async function saveAll() {
     const btn = document.getElementById('btnSave');
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;animation:spin .7s linear infinite;">progress_activity</span> 儲存中…';
-
+    btn.textContent = '儲存中…';
     const month = monthSelect.value;
+
     const toolsData = {};
     [...SYSTEM_TOOLS, ...PLATFORM_TOOLS].forEach(t => {
-        toolsData[t.id] = parseFloat(document.getElementById(t.id)?.value) || 0;
+        ['monthly', 'extra', 'onetime'].forEach(suffix => {
+            toolsData[t.id + '_' + suffix] = parseFloat(document.getElementById(t.id + '_' + suffix)?.value) || 0;
+        });
     });
     const payload = { tools: toolsData, personnel: personnelData };
 
     try {
-        const existing = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
-        let existingData = existing.data?.[0]?.data || {};
-        existingData.opExpenses = payload;
-        const { error } = await db.insert('cost_budgets', { month, data: existingData, updated_at: new Date().toISOString() }, { onConflict: 'month' });
-        if (error) throw new Error(error.message || JSON.stringify(error));
-
-        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-        all[month] = payload;
-        localStorage.setItem(STORE_KEY, JSON.stringify(all));
+        // Read existing cost_budgets row
+        const chk = await fetch(base + '/cost_budgets?month=eq.' + month + '&limit=1', { headers: hdr });
+        const existing = await chk.json();
+        let res;
+        if (existing && existing.length > 0) {
+            const merged = { ...existing[0].data, opExpenses: payload };
+            res = await fetch(base + '/cost_budgets?month=eq.' + month, {
+                method: 'PATCH', headers: { ...hdr, 'Prefer': 'return=representation' },
+                body: JSON.stringify({ data: merged, updated_at: new Date().toISOString() })
+            });
+        } else {
+            res = await fetch(base + '/cost_budgets', {
+                method: 'POST', headers: { ...hdr, 'Prefer': 'return=representation' },
+                body: JSON.stringify([{ month, data: { opExpenses: payload }, updated_at: new Date().toISOString() }])
+            });
+        }
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || 'HTTP ' + res.status); }
         showToast('已儲存至雲端 ✓');
-        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
+        document.getElementById('autoSaved').innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ' + new Date().toLocaleTimeString('zh-TW') + ' 已儲存';
     } catch (err) {
         console.error('[save]', err);
-        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-        all[month] = payload;
-        localStorage.setItem(STORE_KEY, JSON.stringify(all));
-        showToast('雲端儲存失敗，已存到本地 ⚠️');
+        showToast('儲存失敗: ' + (err.message || '').substring(0, 40));
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存';
+        btn.textContent = '儲存';
     }
 }
 

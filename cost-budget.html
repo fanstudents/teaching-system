@@ -669,6 +669,19 @@ window.addProduct = function(group) {
     });
     renderAll();
     scheduleAutoSave();
+    // Auto-expand the newly added row and focus name input
+    const container = document.getElementById(group + 'Products');
+    const rows = container.querySelectorAll('tr.product-header-row');
+    const lastRow = rows[rows.length - 1];
+    if (lastRow) {
+        lastRow.classList.add('open');
+        const detailRow = lastRow.nextElementSibling;
+        if (detailRow) detailRow.classList.add('open');
+        setTimeout(() => {
+            const nameInput = detailRow?.querySelector('input[type="text"]');
+            if (nameInput) nameInput.focus();
+        }, 50);
+    }
 };
 window.removeProduct = function(group, id) { products[group] = products[group].filter(p => p.id !== id); renderAll(); scheduleAutoSave(); };
 window.addSession = function(group, productId) {
