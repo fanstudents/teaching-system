@@ -122,7 +122,7 @@
     <div class="container">
         <div class="controls">
             <select id="monthSelect"></select>
-            <button class="btn btn-sync" id="btnSync"><span class="material-symbols-outlined" style="font-size:16px;">sync</span> 同步產品</button>
+            <button class="btn btn-sync" id="btnSync"><span class="material-symbols-outlined" style="font-size:16px;">sync</span> 重新整理</button>
             <button class="btn btn-save" id="btnSave"><span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存</button>
             <button class="btn btn-export" id="btnExport"><span class="material-symbols-outlined" style="font-size:16px;">download</span> 匯出 CSV</button>
             <span class="auto-saved" id="autoSaved"></span>
@@ -252,14 +252,16 @@
 <script type="module">
     import { db } from './scripts/supabase.js';
 
-    // ── Teachify Config ──
+    // ── Config ──
     const TEACHIFY_API = 'https://teachify.io/admin/graphql';
     const TEACHIFY_KEY = 'vsXiCQXFlNs95GjiRHW4Y3mwc9L6_oj6VdRiTj-3ymE';
+    const SERVICE_OWNER_ID = '60182dbe-09ea-4e92-b8d7-ed2c24b81eb9'; // service@tbr.digital
 
     // ── State ──
     let products = { b2b: [], b2c: [] };
+    let ordersByCourseName = {}; // { courseName: { count, revenue } }
     let nextId = 1;
-    const STORE_KEY = 'tbr_cost_budget_v2';
+    const STORE_KEY = 'tbr_cost_budget_v3';
 
     // ── Month Selector ──
     const monthSelect = document.getElementById('monthSelect');
@@ -271,79 +273,140 @@
         monthSelect.innerHTML += `<option value="${val}" ${i === 0 ? 'selected' : ''}>${label}</option>`;
     }
 
-    // ══════════════════════════════════
-    // ── Sync Products (Teachify + Projects) ──
-    // ══════════════════════════════════
-    async function syncProducts() {
+    // ══════════════════════════════════════════
+    // ── Auto Sync (Projects + Teachify + Orders) ──
+    // ══════════════════════════════════════════
+    async function autoSync(silent = false) {
         const btn = document.getElementById('btnSync');
         btn.disabled = true;
         btn.innerHTML = '<span class="material-symbols-outlined spinner" style="font-size:16px;">progress_activity</span> 同步中…';
 
-        let addedB2b = 0, addedB2c = 0;
+        const month = monthSelect.value;
+        const [year, mon] = month.split('-').map(Number);
+        const monthStart = `${year}-${String(mon).padStart(2,'0')}-01`;
+        const nextMon = mon === 12 ? `${year+1}-01-01` : `${year}-${String(mon+1).padStart(2,'0')}-01`;
 
         try {
-            // 1. Sync 企業內訓 from Supabase projects
-            const { data: projectsData } = await db.select('projects', {
-                select: 'id,name,description,course_type',
-                order: 'created_at.desc',
-                limit: 50
-            });
-            if (projectsData?.length) {
-                const existingNames = new Set(products.b2b.map(p => p.name));
-                projectsData.forEach(proj => {
-                    const name = proj.name || '未命名專案';
-                    if (!existingNames.has(name)) {
-                        const id = nextId++;
-                        products.b2b.push({
-                            id, name, sourceId: proj.id, revenue: 0,
-                            lecturerType: 'fixed', lecturerFee: 0, lecturerPercent: 0,
-                            kol: 0, ads: 0, venue: 0, assistant: 0, transport: 0, material: 0
-                        });
-                        existingNames.add(name);
-                        addedB2b++;
-                    }
-                });
-            }
+            // Parallel fetch: projects + teachify + orders
+            const [projResult, teachifyResult, ordersResult] = await Promise.all([
+                db.select('projects', {
+                    select: 'id,name,description,course_type',
+                    filter: { owner_id: `eq.${SERVICE_OWNER_ID}` },
+                    order: 'created_at.desc',
+                    limit: 100
+                }),
+                fetch(TEACHIFY_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Teachify-API-Key': TEACHIFY_KEY },
+                    body: JSON.stringify({ query: `{ courses { nodes { id name slug plans { id name amount } } } }` })
+                }).then(r => r.json()).catch(() => null),
+                db.select('orders', {
+                    select: 'course_name,amount,payment_status,payment_time',
+                    filter: {
+                        payment_status: 'eq.Paid',
+                        payment_time: `gte.${monthStart}`,
+                    },
+                    order: 'payment_time.desc',
+                    limit: 1000
+                })
+            ]);
 
-            // 2. Sync 公開課程 from Teachify
-            const res = await fetch(TEACHIFY_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Teachify-API-Key': TEACHIFY_KEY },
-                body: JSON.stringify({ query: `{ courses { nodes { id name slug plans { id name amount } } } }` })
+            // ── Build order stats for selected month ──
+            ordersByCourseName = {};
+            const monthOrders = (ordersResult.data || []).filter(o => {
+                if (!o.payment_time) return false;
+                return o.payment_time >= monthStart && o.payment_time < nextMon;
             });
-            const tData = await res.json();
-            if (tData.data?.courses?.nodes) {
-                const courses = tData.data.courses.nodes;
-                const existingNames = new Set(products.b2c.map(p => p.name));
-                courses.forEach(course => {
-                    const name = course.name || '未命名課程';
-                    if (!existingNames.has(name)) {
-                        const id = nextId++;
-                        // Use the first plan's amount as default revenue hint
-                        const defaultAmount = course.plans?.[0]?.amount || 0;
-                        products.b2c.push({
-                            id, name, sourceId: course.id, sourceSlug: course.slug, revenue: 0,
-                            lecturerType: 'fixed', lecturerFee: 0, lecturerPercent: 0,
-                            kol: 0, ads: 0, venue: 0, assistant: 0, transport: 0, material: 0
-                        });
-                        existingNames.add(name);
-                        addedB2c++;
-                    }
+            monthOrders.forEach(o => {
+                const name = o.course_name || '未知';
+                if (!ordersByCourseName[name]) ordersByCourseName[name] = { count: 0, revenue: 0 };
+                ordersByCourseName[name].count++;
+                ordersByCourseName[name].revenue += (o.amount || 0);
+            });
+
+            // ── Load saved cost data for this month ──
+            const saved = getSavedMonth(month);
+            const savedB2bMap = {};
+            const savedB2cMap = {};
+            (saved?.products?.b2b || []).forEach(p => { savedB2bMap[p.name] = p; });
+            (saved?.products?.b2c || []).forEach(p => { savedB2cMap[p.name] = p; });
+
+            // ── Merge: Projects → B2B ──
+            const newB2b = [];
+            (projResult.data || []).forEach(proj => {
+                const name = proj.name || '未命名專案';
+                const existing = savedB2bMap[name];
+                const id = nextId++;
+                const orderInfo = ordersByCourseName[name] || { count: 0, revenue: 0 };
+                newB2b.push({
+                    id, name, sourceId: proj.id,
+                    revenue: existing?.revenue || orderInfo.revenue,
+                    orderCount: orderInfo.count, orderRevenue: orderInfo.revenue,
+                    lecturerType: existing?.lecturerType || 'fixed',
+                    lecturerFee: existing?.lecturerFee || 0,
+                    lecturerPercent: existing?.lecturerPercent || 0,
+                    kol: existing?.kol || 0, ads: existing?.ads || 0,
+                    venue: existing?.venue || 0, assistant: existing?.assistant || 0,
+                    transport: existing?.transport || 0, material: existing?.material || 0
                 });
+            });
+
+            // ── Merge: Teachify → B2C ──
+            const newB2c = [];
+            const courses = teachifyResult?.data?.courses?.nodes || [];
+            courses.forEach(course => {
+                const name = course.name || '未命名課程';
+                const existing = savedB2cMap[name];
+                const id = nextId++;
+                const orderInfo = ordersByCourseName[name] || { count: 0, revenue: 0 };
+                newB2c.push({
+                    id, name, sourceId: course.id, sourceSlug: course.slug,
+                    revenue: orderInfo.revenue || existing?.revenue || 0,
+                    orderCount: orderInfo.count, orderRevenue: orderInfo.revenue,
+                    lecturerType: existing?.lecturerType || 'fixed',
+                    lecturerFee: existing?.lecturerFee || 0,
+                    lecturerPercent: existing?.lecturerPercent || 0,
+                    kol: existing?.kol || 0, ads: existing?.ads || 0,
+                    venue: existing?.venue || 0, assistant: existing?.assistant || 0,
+                    transport: existing?.transport || 0, material: existing?.material || 0
+                });
+            });
+
+            products.b2b = newB2b;
+            products.b2c = newB2c;
+
+            // Restore global rates
+            if (saved) {
+                document.getElementById('globalTaxRate').value = saved.globalTaxRate ?? 5;
+                document.getElementById('globalPaymentRate').value = saved.globalPaymentRate ?? 2.8;
+                if (saved.tools) {
+                    Object.entries(saved.tools).forEach(([id, val]) => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = val || '';
+                    });
+                }
             }
 
             renderProducts('b2b');
             renderProducts('b2c');
             recalculate();
-            showToast(`同步完成：企業內訓 +${addedB2b}、公開課程 +${addedB2c}`);
+
+            const totalOrders = monthOrders.length;
+            if (!silent) showToast(`已同步 ${newB2b.length} 個專案、${newB2c.length} 門課程、${totalOrders} 筆訂單`);
+            document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> ${new Date().toLocaleTimeString('zh-TW')} 已同步`;
 
         } catch (err) {
-            console.error('[sync]', err);
-            showToast('同步失敗: ' + err.message);
+            console.error('[autoSync]', err);
+            if (!silent) showToast('同步失敗: ' + err.message);
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">sync</span> 同步產品';
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">sync</span> 重新整理';
         }
+    }
+
+    function getSavedMonth(month) {
+        try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}')[month] || null; }
+        catch { return null; }
     }
 
     // ── Product Management ──
@@ -404,12 +467,14 @@
             const totalCost = tax + payFee + lecturerCost + varCosts;
             const profit = rev - totalCost;
             const syncBadge = p.sourceId ? `<span style="font-size:.62rem;background:#f0fdf4;color:#10b981;padding:1px 6px;border-radius:3px;">已同步</span>` : '';
+            const orderBadge = p.orderCount ? `<span style="font-size:.62rem;background:#eff6ff;color:#3b82f6;padding:1px 6px;border-radius:3px;">${p.orderCount} 筆訂單 NT$${(p.orderRevenue||0).toLocaleString()}</span>` : '';
 
             return `<div class="product-card">
                 <div class="product-card-header">
                     <span class="material-symbols-outlined" style="font-size:16px;color:#94a3b8;">drag_indicator</span>
                     <input type="text" value="${p.name}" placeholder="產品名稱…" oninput="updateProduct('${group}',${p.id},'name',this.value)">
                     ${syncBadge}
+                    ${orderBadge}
                     <span class="product-tag" style="${colors.tag}">NT$ ${rev.toLocaleString()}</span>
                     <button class="btn-del" onclick="removeProduct('${group}',${p.id})" title="刪除">
                         <span class="material-symbols-outlined" style="font-size:16px;">close</span>
@@ -571,30 +636,7 @@
         showToast('已儲存 ✓');
     }
 
-    function loadMonth() {
-        const month = monthSelect.value;
-        const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-        const data = all[month];
-        if (data) {
-            document.getElementById('globalTaxRate').value = data.globalTaxRate ?? 5;
-            document.getElementById('globalPaymentRate').value = data.globalPaymentRate ?? 2.8;
-            products = data.products || { b2b: [], b2c: [] };
-            nextId = Math.max(...[...products.b2b, ...products.b2c].map(p => p.id || 0), 0) + 1;
-            if (data.tools) {
-                Object.entries(data.tools).forEach(([id, val]) => {
-                    const el = document.getElementById(id);
-                    if (el) el.value = val || '';
-                });
-            }
-        } else {
-            products = { b2b: [], b2c: [] };
-            nextId = 1;
-            document.querySelectorAll('.tool-input').forEach(el => el.value = '');
-        }
-        renderProducts('b2b');
-        renderProducts('b2c');
-        recalculate();
-    }
+    // loadMonth removed — autoSync handles loading + syncing
 
     // ── Export ──
     function exportCSV() {
@@ -644,15 +686,16 @@
     }
 
     // ── Events ──
-    document.getElementById('btnSync').addEventListener('click', syncProducts);
+    document.getElementById('btnSync').addEventListener('click', () => autoSync(false));
     document.getElementById('btnSave').addEventListener('click', saveAll);
     document.getElementById('btnExport').addEventListener('click', exportCSV);
-    monthSelect.addEventListener('change', loadMonth);
+    monthSelect.addEventListener('change', () => autoSync(false));
     document.getElementById('globalTaxRate').addEventListener('input', () => { renderProducts('b2b'); renderProducts('b2c'); recalculate(); });
     document.getElementById('globalPaymentRate').addEventListener('input', () => { renderProducts('b2b'); renderProducts('b2c'); recalculate(); });
     document.querySelectorAll('.tool-input').forEach(el => el.addEventListener('input', recalculate));
 
-    loadMonth();
+    // ── Auto-sync on load ──
+    autoSync(false);
 </script>
 <script src="components/nav.js"></script>
 </body>
