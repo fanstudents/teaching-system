@@ -725,9 +725,8 @@
             document.getElementById('affDetailEmail').value = a.email || '';
             document.getElementById('affDetailCoupon').value = a.coupon_code || '';
             document.getElementById('affDetailRate').value = ((a.commission_rate || 0.2) * 100).toFixed(0);
-            document.getElementById('affDetailBank').value = a.bank_name || '';
-            document.getElementById('affDetailHolder').value = a.account_holder || '';
-            document.getElementById('affDetailAccount').value = a.bank_account || '';
+
+
             document.getElementById('affDetailNotes').value = a.notes || '';
             document.getElementById('affDetailStatus').value = a.status || 'pending';
             document.getElementById('affDetailAppliedAt').value = a.created_at
