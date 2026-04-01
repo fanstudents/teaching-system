@@ -693,6 +693,32 @@
                         <p>填寫以下資料完成申請</p>
                     </div>
 
+                    <!-- Benefits Card -->
+                    <div style="background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 50%,#f0f9ff 100%);border:1px solid #d1fae5;border-radius:14px;padding:20px 24px;margin-bottom:28px;">
+                        <div style="font-size:0.88rem;font-weight:700;color:#065f46;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+                            <span class="material-symbols-outlined" style="font-size:18px;color:#10b981;">stars</span>
+                            加入夥伴計畫的好處
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#334155;line-height:1.5;">
+                                <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;flex-shrink:0;margin-top:1px;">payments</span>
+                                <span>課程銷售 <strong style="color:#059669;">20% 佣金</strong>，企業引薦 15%</span>
+                            </div>
+                            <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#334155;line-height:1.5;">
+                                <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;flex-shrink:0;margin-top:1px;">confirmation_number</span>
+                                <span>專屬折扣碼，每筆成交<strong>自動追蹤</strong></span>
+                            </div>
+                            <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#334155;line-height:1.5;">
+                                <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;flex-shrink:0;margin-top:1px;">calendar_month</span>
+                                <span>每月 10 日結算，<strong>25 日準時撥款</strong></span>
+                            </div>
+                            <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#334155;line-height:1.5;">
+                                <span class="material-symbols-outlined" style="font-size:16px;color:#10b981;flex-shrink:0;margin-top:1px;">dashboard</span>
+                                <span>即時儀表板，<strong>隨時查看收益</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <form id="registerForm">
                         <!-- Section 1: 基本資料 -->
                         <div class="form-section">
@@ -1570,6 +1596,7 @@
             }
             renderCourseList(mode);
         }
+        window.toggleCourseMode = toggleCourseMode;
 
         function showPending() {
             showLogin();
