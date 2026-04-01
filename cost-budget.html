@@ -178,17 +178,9 @@
             <div class="section-body"><div class="chart-wrap" id="profitChart"></div></div>
         </div>
 
-        <!-- Global Rates -->
-        <div class="section">
-            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;color:#64748b;">tune</span><h3>全域設定</h3></div>
-            <div class="section-body">
-                <div class="shared-row">
-                    <div class="shared-item"><label>稅率</label><input type="number" class="shared-input" id="globalTaxRate" value="5" step="0.1"><span class="pct-label">%</span></div>
-                    <div class="shared-item"><label>🇺🇸 USD 匯率</label><input type="number" class="shared-input" id="globalUsdRate" value="32.5" step="0.1"><span class="pct-label">TWD</span></div>
-                    <div class="shared-item" style="font-size:.76rem;color:#94a3b8;">公開課程金流手續費：5% + 15元/筆 ｜ 成本填 USD 時自動換算</div>
-                </div>
-            </div>
-        </div>
+        <!-- Settings loaded from system settings -->
+        <input type="hidden" id="globalTaxRate" value="5">
+        <input type="hidden" id="globalUsdRate" value="32.5">
 
         <!-- TABS -->
         <div class="section">
@@ -1067,15 +1059,15 @@ function exportCSV() {
 
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 
-// ── Events ──
+// Load finance settings from system settings
+const financeSettings = JSON.parse(localStorage.getItem('finance_settings') || '{}');
+document.getElementById('globalTaxRate').value = financeSettings.taxRate ?? 5;
+document.getElementById('globalUsdRate').value = financeSettings.usdRate ?? 32.5;
+
 document.getElementById('btnSync').addEventListener('click', () => autoSync(false));
 document.getElementById('btnSave').addEventListener('click', () => saveAll());
 document.getElementById('btnExport').addEventListener('click', exportCSV);
 monthSelect.addEventListener('change', () => autoSync(false));
-document.getElementById('globalTaxRate').addEventListener('input', () => renderAll());
-document.getElementById('globalUsdRate').addEventListener('input', () => renderAll());
-
-document.querySelectorAll('.tool-input').forEach(el => el.addEventListener('input', recalculate));
 
 autoSync(false);
 </script>

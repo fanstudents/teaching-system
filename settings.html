@@ -418,6 +418,10 @@
                 <span class="material-symbols-outlined">webhook</span>
                 Webhook 設定
             </div>
+            <div class="settings-tab" data-tab="finance">
+                <span class="material-symbols-outlined">account_balance</span>
+                帳務設定
+            </div>
         </div>
 
         <!-- Tab: AI Prompts -->
@@ -543,6 +547,36 @@
                 </div>
                 <div class="wh-modal-body">
                     <pre id="whRawContent"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Finance Settings -->
+        <div class="tab-pane webhook-container" id="tab-finance">
+            <div class="wh-card">
+                <div class="wh-card-header">
+                    <h3><span class="material-symbols-outlined">tune</span> 帳務全域設定</h3>
+                </div>
+                <div class="wh-card-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:500px;">
+                        <div>
+                            <label style="font-size:13px;font-weight:500;color:#444746;display:block;margin-bottom:6px;">稅率 (%)</label>
+                            <input type="number" id="financeTaxRate" value="5" step="0.1" style="width:100%;padding:8px 12px;border:1px solid #dadce0;border-radius:8px;font-size:14px;font-family:inherit;">
+                            <div style="font-size:11px;color:#80868b;margin-top:4px;">成本預算頁自動套用此稅率</div>
+                        </div>
+                        <div>
+                            <label style="font-size:13px;font-weight:500;color:#444746;display:block;margin-bottom:6px;">USD → TWD 匯率</label>
+                            <input type="number" id="financeUsdRate" value="32.5" step="0.1" style="width:100%;padding:8px 12px;border:1px solid #dadce0;border-radius:8px;font-size:14px;font-family:inherit;">
+                            <div style="font-size:11px;color:#80868b;margin-top:4px;">成本填 USD 時自動換算 TWD</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;padding:12px 16px;background:#f8f9fa;border-radius:8px;font-size:12px;color:#444746;line-height:1.7;">
+                        <b>公開課程金流手續費：</b>5% + 15 元/筆（自動計算，不需設定）
+                    </div>
+                    <div style="margin-top:16px;">
+                        <button class="btn-save" id="btnSaveFinance" onclick="window.saveFinanceSettings()">儲存帳務設定</button>
+                        <span id="finSaveStatus" style="margin-left:12px;font-size:13px;color:#80868b;"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -780,14 +814,36 @@
             });
         };
 
+        // ── Finance Settings ──
+        function loadFinanceSettings() {
+            const fs = JSON.parse(localStorage.getItem('finance_settings') || '{}');
+            document.getElementById('financeTaxRate').value = fs.taxRate ?? 5;
+            document.getElementById('financeUsdRate').value = fs.usdRate ?? 32.5;
+        }
+
+        window.saveFinanceSettings = function() {
+            const payload = {
+                taxRate: parseFloat(document.getElementById('financeTaxRate').value) || 5,
+                usdRate: parseFloat(document.getElementById('financeUsdRate').value) || 32.5
+            };
+            localStorage.setItem('finance_settings', JSON.stringify(payload));
+            const st = document.getElementById('finSaveStatus');
+            st.textContent = '✅ 已儲存';
+            st.style.color = '#1e8e3e';
+            setTimeout(() => { st.textContent = ''; }, 2000);
+        };
+
         // ── Init ──
         loadPrompts();
+        loadFinanceSettings();
 
         // Check URL hash for direct tab access
         if (location.hash === '#webhook') {
             document.querySelector('.settings-tab[data-tab="webhook"]').click();
         } else if (location.hash === '#tools') {
             document.querySelector('.settings-tab[data-tab="tools"]').click();
+        } else if (location.hash === '#finance') {
+            document.querySelector('.settings-tab[data-tab="finance"]').click();
         }
     </script>
     <script src="components/nav.js"></script>

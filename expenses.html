@@ -18,7 +18,6 @@
         .page-header p { font-size: 0.76rem; color: var(--text-muted); margin-top: 2px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px; }
 
-        /* Controls */
         .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
         .controls select { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.82rem; font-family: inherit; background: var(--card); }
         .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
@@ -26,52 +25,47 @@
         .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,.25); }
         .auto-saved { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; display: flex; align-items: center; gap: 3px; }
 
-        /* Summary cards */
+        /* Summary */
         .summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
         .summary-card { background: var(--card); border-radius: 12px; padding: 16px 18px; border: 1px solid var(--border); }
         .sc-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 3px; }
         .sc-value { font-size: 1.3rem; font-weight: 700; color: var(--negative); }
 
-        /* Tabs */
-        .tab-bar { display: flex; border-bottom: 2px solid #f0f1f3; margin-bottom: 18px; gap: 0; }
-        .tab-btn { padding: 10px 20px; font-size: 0.84rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--text-muted); position: relative; font-family: inherit; transition: color .15s; display: flex; align-items: center; gap: 6px; }
-        .tab-btn:hover { color: var(--text-secondary); }
-        .tab-btn.active { color: var(--accent); }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 2px 2px 0 0; }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+        /* 2-column grid */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
         /* Section */
-        .section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 18px; overflow: hidden; }
+        .section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
         .section-header { padding: 12px 18px; border-bottom: 1px solid #f0f1f3; display: flex; align-items: center; gap: 8px; }
         .section-header h3 { font-size: 0.86rem; font-weight: 600; }
-        .section-body { padding: 14px 18px; }
+        .section-body { padding: 10px 14px; }
 
         /* Tool rows */
-        .tool-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 8px 12px; border-radius: 8px; background: var(--bg); transition: background .15s; }
-        .tool-row:hover { background: var(--accent-light); }
-        .tool-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
-        .tool-name { flex: 1; font-size: 0.82rem; font-weight: 500; }
-        .tool-input { width: 120px; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.82rem; font-family: 'Inter', monospace; text-align: right; }
+        .tool-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; padding: 7px 10px; border-radius: 8px; transition: background .15s; }
+        .tool-row:hover { background: var(--bg); }
+        .tool-logo { width: 22px; height: 22px; border-radius: 5px; object-fit: contain; flex-shrink: 0; }
+        .tool-logo-fallback { width: 22px; height: 22px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .tool-name { flex: 1; font-size: 0.8rem; font-weight: 500; }
+        .tool-input { width: 100px; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.8rem; font-family: 'Inter', monospace; text-align: right; }
         .tool-input:focus { outline: none; border-color: var(--accent); }
-        .cost-subtotal { font-size: 0.82rem; font-weight: 700; color: var(--negative); text-align: right; padding: 10px 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .cost-subtotal { font-size: 0.8rem; font-weight: 700; color: var(--negative); text-align: right; padding: 8px 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
 
-        /* Personnel table */
-        .personnel-row { display: grid; grid-template-columns: 1fr 120px 120px 80px; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 8px; background: var(--bg); margin-bottom: 6px; }
-        .personnel-row:hover { background: var(--accent-light); }
-        .personnel-header { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; padding: 4px 12px; }
-        .p-input { width: 100%; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.82rem; font-family: inherit; }
+        /* Personnel */
+        .personnel-row { display: grid; grid-template-columns: 1fr 100px 100px 32px; gap: 6px; align-items: center; padding: 6px 10px; border-radius: 8px; margin-bottom: 4px; transition: background .15s; }
+        .personnel-row:hover { background: var(--bg); }
+        .personnel-header { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; padding: 4px 10px; }
+        .p-input { width: 100%; padding: 5px 8px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.8rem; font-family: inherit; }
         .p-input:focus { outline: none; border-color: var(--accent); }
         .p-input-num { text-align: right; font-family: 'Inter', monospace; }
-        .btn-add { background: var(--bg); color: var(--text-secondary); border: 1px dashed var(--border); padding: 8px 16px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-add { background: var(--bg); color: var(--text-secondary); border: 1px dashed var(--border); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; }
         .btn-add:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
-        .btn-del { background: none; color: var(--text-muted); border: none; padding: 4px; cursor: pointer; }
+        .btn-del { background: none; color: var(--text-muted); border: none; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-del:hover { color: var(--negative); }
 
         .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 10px 20px; border-radius: 10px; font-size: .82rem; transform: translateY(100px); opacity: 0; transition: all .3s; z-index: 999; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
-        @media (max-width: 768px) { .summary-bar { grid-template-columns: 1fr; } .personnel-row { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .summary-bar { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -81,66 +75,45 @@
         <p>系統訂閱、平臺服務與人事費用的月度管理</p>
     </div>
     <div class="container">
-        <!-- Controls -->
         <div class="controls">
             <select id="monthSelect"></select>
             <button class="btn btn-save" id="btnSave"><span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存</button>
             <span class="auto-saved" id="autoSaved"></span>
         </div>
 
-        <!-- Summary -->
         <div class="summary-bar">
             <div class="summary-card"><div class="sc-label">系統費用</div><div class="sc-value" id="systemTotal">NT$ 0</div></div>
             <div class="summary-card"><div class="sc-label">平臺費用</div><div class="sc-value" id="platformTotal">NT$ 0</div></div>
             <div class="summary-card"><div class="sc-label">人事費用</div><div class="sc-value" id="personnelTotal">NT$ 0</div></div>
         </div>
 
-        <!-- Tabs -->
-        <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('system')">系統費用</button>
-            <button class="tab-btn" onclick="switchTab('platform')">平臺費用</button>
-            <button class="tab-btn" onclick="switchTab('personnel')">人事費用</button>
-        </div>
-
-        <!-- Tab: 系統費用 -->
-        <div class="tab-panel active" id="panel-system">
+        <!-- 2-column: System + Platform -->
+        <div class="two-col" style="margin-bottom:18px;">
             <div class="section">
-                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">smart_toy</span><h3>AI 與生產力工具</h3></div>
-                <div class="section-body" id="systemTools">
-                    <!-- Rendered by JS -->
-                </div>
+                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">smart_toy</span><h3>系統費用</h3></div>
+                <div class="section-body" id="systemTools"></div>
+            </div>
+            <div class="section">
+                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">dns</span><h3>平臺費用</h3></div>
+                <div class="section-body" id="platformTools"></div>
             </div>
         </div>
 
-        <!-- Tab: 平臺費用 -->
-        <div class="tab-panel" id="panel-platform">
-            <div class="section">
-                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">dns</span><h3>平臺與基礎服務</h3></div>
-                <div class="section-body" id="platformTools">
-                    <!-- Rendered by JS -->
+        <!-- Personnel (full-width) -->
+        <div class="section">
+            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">group</span><h3>人事費用</h3></div>
+            <div class="section-body">
+                <div class="personnel-row personnel-header">
+                    <span>姓名 / 角色</span>
+                    <span style="text-align:right;">費用類型</span>
+                    <span style="text-align:right;">金額</span>
+                    <span></span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Tab: 人事費用 -->
-        <div class="tab-panel" id="panel-personnel">
-            <div class="section">
-                <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;">group</span><h3>人事與合作夥伴費用</h3></div>
-                <div class="section-body">
-                    <div class="personnel-row personnel-header">
-                        <span>姓名 / 角色</span>
-                        <span style="text-align:right;">費用類型</span>
-                        <span style="text-align:right;">金額</span>
-                        <span></span>
-                    </div>
-                    <div id="personnelList">
-                        <!-- Rendered by JS -->
-                    </div>
-                    <button class="btn-add" onclick="addPersonnel()" style="margin-top:8px;">
-                        <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">add</span> 新增人員
-                    </button>
-                    <div class="cost-subtotal" style="margin-top:12px;"><span>人事費用小計</span><span id="personnel_subtotal">NT$ 0</span></div>
-                </div>
+                <div id="personnelList"></div>
+                <button class="btn-add" onclick="window.addPersonnel()" style="margin-top:6px;">
+                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;">add</span> 新增人員
+                </button>
+                <div class="cost-subtotal" style="margin-top:10px;"><span>人事費用小計</span><span id="personnel_subtotal">NT$ 0</span></div>
             </div>
         </div>
     </div>
@@ -153,25 +126,25 @@ import { db } from './scripts/supabase.js';
 const STORE_KEY = 'op_expenses';
 const monthSelect = document.getElementById('monthSelect');
 
-// Default tool definitions
+// Tool definitions with real logos
 const SYSTEM_TOOLS = [
-    { id: 'tool_google', name: 'Google Workspace', color: '#4285f4', letter: 'G' },
-    { id: 'tool_chatgpt', name: 'ChatGPT', color: '#10a37f', letter: 'C' },
-    { id: 'tool_claude', name: 'Claude', color: '#d97757', letter: 'C' },
-    { id: 'tool_canva', name: 'Canva', color: '#00c4cc', letter: 'C' },
-    { id: 'tool_notion', name: 'Notion', color: '#1e1e1e', letter: 'N' },
-    { id: 'tool_gamma', name: 'Gamma', color: '#6366f1', letter: 'G' },
-    { id: 'tool_manus', name: 'Manus', color: '#e74c3c', letter: 'M' },
-    { id: 'tool_lovable', name: 'Lovable', color: '#3b82f6', letter: 'L' },
-    { id: 'tool_antigravity', name: 'Antigravity', color: '#1e293b', letter: 'A' },
+    { id: 'tool_google', name: 'Google Workspace', logo: 'https://www.gstatic.com/images/branding/product/2x/hh_google_apps_icon_dp.png' },
+    { id: 'tool_chatgpt', name: 'ChatGPT', logo: 'assets/tool-logos/chatgpt.svg' },
+    { id: 'tool_claude', name: 'Claude', logo: 'assets/tool-logos/claude.png' },
+    { id: 'tool_canva', name: 'Canva', logo: 'assets/tool-logos/canva.svg' },
+    { id: 'tool_notion', name: 'Notion', logo: 'assets/tool-logos/notion.png' },
+    { id: 'tool_gamma', name: 'Gamma', logo: 'assets/tool-logos/gamma.ico' },
+    { id: 'tool_manus', name: 'Manus', fallback: { color: '#e74c3c', letter: 'M' } },
+    { id: 'tool_lovable', name: 'Lovable', logo: 'assets/tool-logos/lovable.png' },
+    { id: 'tool_antigravity', name: 'Antigravity', fallback: { color: '#1e293b', letter: 'A' } },
 ];
 
 const PLATFORM_TOOLS = [
-    { id: 'plat_teachify', name: 'Teachify', color: '#6366f1', letter: 'T' },
-    { id: 'plat_kit', name: 'Kit (ConvertKit)', color: '#f59e0b', letter: 'K' },
-    { id: 'plat_zeabur', name: 'Zeabur', color: '#4f46e5', letter: 'Z' },
-    { id: 'plat_supabase', name: 'Supabase', color: '#3ecf8e', letter: 'S' },
-    { id: 'plat_make', name: 'Make', color: '#6d28d9', letter: 'M' },
+    { id: 'plat_teachify', name: 'Teachify', fallback: { color: '#6366f1', letter: 'T' } },
+    { id: 'plat_kit', name: 'Kit (ConvertKit)', fallback: { color: '#f59e0b', letter: 'K' } },
+    { id: 'plat_zeabur', name: 'Zeabur', fallback: { color: '#4f46e5', letter: 'Z' } },
+    { id: 'plat_supabase', name: 'Supabase', fallback: { color: '#3ecf8e', letter: 'S' } },
+    { id: 'plat_make', name: 'Make', logo: 'assets/tool-logos/make.svg' },
 ];
 
 let personnelData = [];
@@ -193,13 +166,12 @@ function initMonths() {
 // ── Render Tool Rows ──
 function renderToolSection(containerId, tools) {
     const container = document.getElementById(containerId);
-    container.innerHTML = tools.map(t =>
-        `<div class="tool-row">
-            <div class="tool-icon" style="background:${t.color};">${t.letter}</div>
-            <div class="tool-name">${t.name}</div>
-            <input type="number" class="tool-input" id="${t.id}" placeholder="0" oninput="window.recalculate()">
-        </div>`
-    ).join('') + `<div class="cost-subtotal"><span>小計</span><span id="${containerId}_subtotal">NT$ 0</span></div>`;
+    container.innerHTML = tools.map(t => {
+        const icon = t.logo
+            ? `<img class="tool-logo" src="${t.logo}" alt="${t.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="tool-logo-fallback" style="display:none;background:${t.fallback?.color||'#94a3b8'};">${t.fallback?.letter||t.name[0]}</div>`
+            : `<div class="tool-logo-fallback" style="background:${t.fallback.color};">${t.fallback.letter}</div>`;
+        return `<div class="tool-row">${icon}<div class="tool-name">${t.name}</div><input type="number" class="tool-input" id="${t.id}" placeholder="0" oninput="window.recalculate()"></div>`;
+    }).join('') + `<div class="cost-subtotal"><span>小計</span><span id="${containerId}_subtotal">NT$ 0</span></div>`;
 }
 
 // ── Personnel ──
@@ -208,7 +180,7 @@ function renderPersonnel() {
     list.innerHTML = personnelData.map((p, i) =>
         `<div class="personnel-row">
             <input type="text" class="p-input" value="${p.name || ''}" placeholder="姓名 / 角色" oninput="window.updatePersonnel(${i},'name',this.value)">
-            <select class="p-input" onchange="window.updatePersonnel(${i},'type',this.value)">
+            <select class="p-input" onchange="window.updatePersonnel(${i},'type',this.value)" style="font-size:.76rem;">
                 <option value="講師費" ${p.type==='講師費'?'selected':''}>講師費</option>
                 <option value="助教費" ${p.type==='助教費'?'selected':''}>助教費</option>
                 <option value="專案執行" ${p.type==='專案執行'?'selected':''}>專案執行</option>
@@ -217,7 +189,7 @@ function renderPersonnel() {
                 <option value="其他" ${p.type==='其他'?'selected':''}>其他</option>
             </select>
             <input type="number" class="p-input p-input-num" value="${p.amount || ''}" placeholder="0" oninput="window.updatePersonnel(${i},'amount',this.value)">
-            <button class="btn-del" onclick="window.removePersonnel(${i})"><span class="material-symbols-outlined" style="font-size:16px;">close</span></button>
+            <button class="btn-del" onclick="window.removePersonnel(${i})"><span class="material-symbols-outlined" style="font-size:15px;">close</span></button>
         </div>`
     ).join('');
     recalculate();
@@ -227,12 +199,10 @@ window.addPersonnel = function() {
     personnelData.push({ name: '', type: '講師費', amount: 0 });
     renderPersonnel();
 };
-
 window.updatePersonnel = function(i, field, value) {
     personnelData[i][field] = field === 'amount' ? (parseFloat(value) || 0) : value;
     recalculate();
 };
-
 window.removePersonnel = function(i) {
     personnelData.splice(i, 1);
     renderPersonnel();
@@ -255,26 +225,13 @@ function recalculate() {
 }
 window.recalculate = recalculate;
 
-// ── Tab ──
-window.switchTab = function(tab) {
-    document.querySelectorAll('.tab-btn').forEach((b, i) => {
-        const panels = ['system', 'platform', 'personnel'];
-        b.classList.toggle('active', panels[i] === tab);
-    });
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + tab).classList.add('active');
-};
-
 // ── Load / Save ──
 async function loadData() {
     const month = monthSelect.value;
     let saved = null;
-
     try {
         const result = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
-        if (result.data && result.data.length > 0 && result.data[0].data?.opExpenses) {
-            saved = result.data[0].data.opExpenses;
-        }
+        if (result.data?.[0]?.data?.opExpenses) saved = result.data[0].data.opExpenses;
     } catch (e) { console.warn('[load]', e); }
 
     if (!saved) {
@@ -282,12 +239,10 @@ async function loadData() {
         saved = local[month] || null;
     }
 
-    // Apply values
     [...SYSTEM_TOOLS, ...PLATFORM_TOOLS].forEach(t => {
         const el = document.getElementById(t.id);
         if (el) el.value = saved?.tools?.[t.id] || '';
     });
-
     personnelData = saved?.personnel || [];
     renderPersonnel();
     recalculate();
@@ -303,30 +258,18 @@ async function saveAll() {
     [...SYSTEM_TOOLS, ...PLATFORM_TOOLS].forEach(t => {
         toolsData[t.id] = parseFloat(document.getElementById(t.id)?.value) || 0;
     });
-
-    const payload = {
-        tools: toolsData,
-        personnel: personnelData
-    };
+    const payload = { tools: toolsData, personnel: personnelData };
 
     try {
-        // Read existing cost_budgets record, merge opExpenses into it
         const existing = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
-        let existingData = (existing.data && existing.data.length > 0) ? existing.data[0].data : {};
+        let existingData = existing.data?.[0]?.data || {};
         existingData.opExpenses = payload;
-
-        const { error } = await db.insert('cost_budgets', {
-            month,
-            data: existingData,
-            updated_at: new Date().toISOString()
-        }, { onConflict: 'month' });
-
+        const { error } = await db.insert('cost_budgets', { month, data: existingData, updated_at: new Date().toISOString() }, { onConflict: 'month' });
         if (error) throw new Error(error.message || JSON.stringify(error));
 
         const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
         all[month] = payload;
         localStorage.setItem(STORE_KEY, JSON.stringify(all));
-
         showToast('已儲存至雲端 ✓');
         document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
     } catch (err) {
@@ -347,7 +290,6 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Init ──
 renderToolSection('systemTools', SYSTEM_TOOLS);
 renderToolSection('platformTools', PLATFORM_TOOLS);
 initMonths();
