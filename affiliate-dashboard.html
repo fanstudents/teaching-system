@@ -776,14 +776,262 @@
         .login-screen.centered .login-brand-panel { display: none; }
         .login-screen.centered .login-form-panel {
             width: 100%; min-width: unset;
-            background: #f8f9fb;
-            background-image:
-                radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
-            background-size: 28px 28px;
+            background: #0a0e1a;
+            position: relative;
+            overflow: hidden;
+            padding: 48px 24px;
         }
 
+        /* Mesh grid overlay */
+        .login-screen.centered .login-form-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Gradient top bar */
+        .login-screen.centered .login-form-panel::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #1a73e8, #34d399, #a78bfa, #1a73e8);
+            background-size: 200% 100%;
+            animation: gradientShift 4s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        /* Floating gradient orbs */
         .login-screen.centered .login-form-wrapper {
-            max-width: 520px;
+            max-width: 560px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-screen.centered .login-form-wrapper::before {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(26, 115, 232, 0.12) 0%, transparent 65%);
+            top: -80px;
+            left: -120px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .login-screen.centered .login-form-wrapper::after {
+            content: '';
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.08) 0%, transparent 65%);
+            bottom: -60px;
+            right: -80px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Form header override for dark bg */
+        .login-screen.centered .login-form-header h2 {
+            color: #e2e8f0;
+        }
+
+        .login-screen.centered .login-form-header p {
+            color: #64748b;
+        }
+
+        /* Logout button on dark bg */
+        .login-screen.centered #btnRegLogout {
+            color: #64748b !important;
+        }
+
+        .login-screen.centered #btnRegLogout:hover {
+            color: #94a3b8 !important;
+        }
+
+        /* Benefits card on dark bg */
+        .login-screen.centered .benefits-card {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+        }
+
+        .login-screen.centered .benefits-card::before {
+            background: linear-gradient(180deg, rgba(26,115,232,0.6), rgba(52,211,153,0.4));
+        }
+
+        .login-screen.centered .benefits-title {
+            color: #e2e8f0;
+        }
+
+        .login-screen.centered .benefit-row {
+            border-bottom-color: rgba(255,255,255,0.05);
+            color: #94a3b8;
+        }
+
+        .login-screen.centered .benefit-label {
+            color: #cbd5e1;
+        }
+
+        /* Form sections on dark bg */
+        .login-screen.centered .form-section {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+        }
+
+        .login-screen.centered .form-section:hover {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .login-screen.centered .form-section-title {
+            color: #e2e8f0;
+            border-bottom-color: rgba(255,255,255,0.06);
+        }
+
+        .login-screen.centered .form-section-title .material-symbols-outlined {
+            background: rgba(26, 115, 232, 0.15);
+            color: #8ab4f8;
+        }
+
+        .login-screen.centered .form-group label {
+            color: #94a3b8;
+        }
+
+        .login-screen.centered .form-group input,
+        .login-screen.centered .form-group textarea {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+            color: #e2e8f0;
+        }
+
+        .login-screen.centered .form-group input:focus,
+        .login-screen.centered .form-group textarea:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .login-screen.centered .form-group input[readonly] {
+            color: #64748b;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .login-screen.centered .form-group input::placeholder,
+        .login-screen.centered .form-group textarea::placeholder {
+            color: #475569;
+        }
+
+        .login-screen.centered .field-hint {
+            color: #64748b;
+        }
+
+        /* Chips on dark bg */
+        .login-screen.centered .chip {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+            color: #94a3b8;
+        }
+
+        .login-screen.centered .chip:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .login-screen.centered .chip:has(input:checked) {
+            background: rgba(26, 115, 232, 0.12);
+            border-color: rgba(26, 115, 232, 0.4);
+            color: #8ab4f8;
+        }
+
+        /* Course items on dark bg */
+        .login-screen.centered .course-check-item {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .login-screen.centered .course-check-item:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .login-screen.centered .course-check-item .course-name {
+            color: #cbd5e1;
+        }
+
+        .login-screen.centered .course-group-title {
+            color: #64748b;
+        }
+
+        .login-screen.centered .course-mode-toggle {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .login-screen.centered .course-mode-btn {
+            color: #64748b;
+        }
+
+        .login-screen.centered .course-mode-btn.active {
+            background: rgba(255,255,255,0.1);
+            color: #8ab4f8;
+            box-shadow: none;
+        }
+
+        /* Referral options on dark bg */
+        .login-screen.centered .referral-option {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .login-screen.centered .referral-option:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .login-screen.centered .referral-option:has(input:checked) {
+            border-color: rgba(26, 115, 232, 0.4);
+            background: rgba(26, 115, 232, 0.06);
+        }
+
+        .login-screen.centered .referral-option .ref-title {
+            color: #cbd5e1;
+        }
+
+        .login-screen.centered .referral-option .ref-desc {
+            color: #64748b;
+        }
+
+        /* Footer note on dark bg */
+        .login-screen.centered .login-footer-note {
+            color: #475569;
+        }
+
+        .login-screen.centered .login-footer-note a {
+            color: #8ab4f8;
+        }
+
+        /* Submit button enhancement on dark */
+        .login-screen.centered .btn-submit-register {
+            box-shadow: 0 4px 20px rgba(26, 115, 232, 0.35);
+        }
+
+        .login-screen.centered .btn-submit-register:hover {
+            box-shadow: 0 8px 32px rgba(26, 115, 232, 0.45);
         }
 
         @media (max-width: 1024px) {
