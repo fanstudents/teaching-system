@@ -71,13 +71,16 @@
         .product-row.open .row-chevron { transform: rotate(90deg); }
         .row-name { font-size: 0.84rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .row-sub { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; margin-left: 4px; }
-        .row-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .row-right { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
         .badge { font-size: 0.62rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; white-space: nowrap; background: #f1f5f9; color: var(--text-secondary); }
         .badge-order { background: #f1f5f9; color: var(--text-secondary); }
         .badge-type { background: #f1f5f9; color: var(--text-secondary); }
-        .row-rev { font-size: 0.78rem; font-weight: 700; color: var(--text); white-space: nowrap; }
-        .row-profit { font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
-        .row-profit.pos { color: var(--positive); } .row-profit.neg { color: var(--negative); }
+        .row-metrics { display: flex; gap: 4px; align-items: center; }
+        .row-chip { font-size: 0.68rem; padding: 2px 8px; border-radius: 4px; white-space: nowrap; background: #f1f5f9; color: var(--text-secondary); font-weight: 500; }
+        .row-chip b { font-weight: 700; color: var(--text); margin-left: 2px; }
+        .row-chip.profit { font-weight: 700; }
+        .row-chip.profit.pos { background: #ecfdf5; color: var(--positive); }
+        .row-chip.profit.neg { background: #fef2f2; color: var(--negative); }
         .product-detail { display: none; padding: 6px 6px 14px 30px; }
         .product-row.open .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
         .field { display: flex; align-items: center; gap: 6px; }
@@ -124,7 +127,24 @@
         .subsection-body { padding: 0 12px; }
 
         /* Chart */
-        .chart-wrap { display: flex; justify-content: center; padding: 10px 0; }
+        /* Month pills */
+        .month-pills { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+        .month-pill { padding: 4px 12px; border-radius: 6px; font-size: 0.76rem; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--card); color: var(--text-secondary); transition: all .15s; user-select: none; }
+        .month-pill:hover { border-color: var(--accent); color: var(--accent); }
+        .month-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* Overview table */
+        .overview-group { margin-bottom: 14px; }
+        .overview-group-label { font-size: 0.76rem; font-weight: 600; color: var(--text-secondary); padding: 6px 12px; display: flex; align-items: center; gap: 6px; }
+        .overview-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .overview-table th { text-align: left; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); padding: 6px 12px; border-bottom: 1px solid var(--border); }
+        .overview-table th.num { text-align: right; }
+        .overview-table td { padding: 8px 12px; border-bottom: 1px solid #f0f1f3; }
+        .overview-table td.num { text-align: right; font-family: 'Inter', monospace; font-weight: 600; }
+        .overview-table tr:hover td { background: var(--bg); }
+        .overview-table .pos { color: var(--positive); }
+        .overview-table .neg { color: var(--negative); }
+        .month-tag { font-size: 0.62rem; padding: 1px 6px; border-radius: 3px; background: #f1f5f9; color: var(--text-muted); margin-left: 4px; }
 
         /* Monthly tools */
         .monthly-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -157,7 +177,8 @@
     <div class="container">
         <!-- Controls -->
         <div class="controls">
-            <select id="monthSelect"></select>
+            <div class="month-pills" id="monthPills"></div>
+            <input type="hidden" id="monthSelect" value="">
             <button class="btn btn-sync" id="btnSync"><span class="material-symbols-outlined" style="font-size:16px;">sync</span> 重新整理</button>
             <button class="btn btn-save" id="btnSave"><span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存</button>
             <button class="btn btn-export" id="btnExport"><span class="material-symbols-outlined" style="font-size:16px;">download</span> CSV</button>
@@ -172,12 +193,6 @@
             <div class="profit-card"><div class="pc-label">利潤率</div><div class="pc-value" id="profitMargin">0%</div></div>
         </div>
 
-        <!-- Chart -->
-        <div class="section">
-            <div class="section-header"><span class="material-symbols-outlined" style="font-size:18px;color:var(--text-secondary);">donut_large</span><h3>利潤結構</h3></div>
-            <div class="section-body"><div class="chart-wrap" id="profitChart"></div></div>
-        </div>
-
         <!-- Settings loaded from system settings -->
         <input type="hidden" id="globalTaxRate" value="5">
         <input type="hidden" id="globalUsdRate" value="32.5">
@@ -185,13 +200,19 @@
         <!-- TABS -->
         <div class="section">
             <div class="tab-bar">
-                <button class="tab-btn active" data-tab="b2b"><span class="material-symbols-outlined" style="font-size:16px;">business</span> 企業內訓 <span class="tab-badge" id="b2bCount">0</span></button>
+                <button class="tab-btn active" data-tab="overview"><span class="material-symbols-outlined" style="font-size:16px;">calendar_month</span> 月份總覽</button>
+                <button class="tab-btn" data-tab="b2b"><span class="material-symbols-outlined" style="font-size:16px;">business</span> 企業內訓 <span class="tab-badge" id="b2bCount">0</span></button>
                 <button class="tab-btn" data-tab="b2c"><span class="material-symbols-outlined" style="font-size:16px;">school</span> 公開課程 <span class="tab-badge" id="b2cCount">0</span></button>
                 <button class="tab-btn" data-tab="biz"><span class="material-symbols-outlined" style="font-size:16px;">handshake</span> 企業服務 <span class="tab-badge" id="bizCount">0</span></button>
             </div>
 
+            <!-- Monthly Overview Panel -->
+            <div class="tab-panel active" id="panel-overview">
+                <div class="section-body" id="overviewPanel" style="padding:14px 0;"></div>
+            </div>
+
             <!-- B2B Panel -->
-            <div class="tab-panel active" id="panel-b2b">
+            <div class="tab-panel" id="panel-b2b">
                 <div class="section-body">
                     <div class="product-list" id="b2bProducts"></div>
                     <div class="add-row"><button class="btn btn-sm btn-add" onclick="addProduct('b2b')"><span class="material-symbols-outlined" style="font-size:14px;">add</span> 新增</button></div>
@@ -260,12 +281,42 @@ const STORE_KEY = 'tbr_cost_budget_v5';
 
 // ── Month Selector ──
 const monthSelect = document.getElementById('monthSelect');
+const monthPills = document.getElementById('monthPills');
 const now = new Date();
+const allMonths = [];
 for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    monthSelect.innerHTML += `<option value="${val}" ${i===0?'selected':''}>${d.getFullYear()} 年 ${d.getMonth()+1} 月</option>`;
+    const label = `${d.getMonth()+1} 月`;
+    allMonths.push({ val, label, year: d.getFullYear() });
 }
+// Render pills
+let lastYear = null;
+allMonths.forEach((m, i) => {
+    if (m.year !== lastYear) {
+        const yearSpan = document.createElement('span');
+        yearSpan.style.cssText = 'font-size:.68rem;color:var(--text-muted);padding:4px 2px;font-weight:600;';
+        yearSpan.textContent = m.year;
+        monthPills.appendChild(yearSpan);
+        lastYear = m.year;
+    }
+    const pill = document.createElement('span');
+    pill.className = 'month-pill' + (i === 0 ? ' active' : '');
+    pill.dataset.month = m.val;
+    pill.textContent = m.label;
+    pill.addEventListener('click', () => {
+        pill.classList.toggle('active');
+        // Ensure at least one is selected
+        const actives = monthPills.querySelectorAll('.month-pill.active');
+        if (actives.length === 0) { pill.classList.add('active'); return; }
+        // Primary = most recent active month
+        const sorted = [...actives].map(p => p.dataset.month).sort().reverse();
+        monthSelect.value = sorted[0];
+        autoSync(false);
+    });
+    monthPills.appendChild(pill);
+});
+monthSelect.value = allMonths[0].val;
 
 // ── TABS ──
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -902,8 +953,12 @@ function renderProductRow(p, group, isB2b, isBiz) {
             subLabel + typeTag + dateLabel +
             '<div class="row-right">' +
                 matchBadge + orderBadge +
-                '<span class="row-rev">NT$ ' + c.rev.toLocaleString() + '</span>' +
-                '<span class="row-profit ' + profitClass + '">利潤 NT$ ' + c.profit.toLocaleString() + '</span>' +
+                '<div class="row-metrics">' +
+                    '<span class="row-chip">應收<b>' + c.rev.toLocaleString() + '</b></span>' +
+                    (c.lecCost > 0 ? '<span class="row-chip">講師<b>' + c.lecCost.toLocaleString() + '</b></span>' : '') +
+                    (isBiz ? '<span class="row-chip">成本<b>' + c.totalCost.toLocaleString() + '</b></span>' : '<span class="row-chip">費用<b>' + (c.totalCost - c.lecCost).toLocaleString() + '</b></span>') +
+                    '<span class="row-chip profit ' + profitClass + '">利潤 ' + c.profit.toLocaleString() + '</span>' +
+                '</div>' +
                 delBtn +
             '</div>' +
         '</div>' +
@@ -949,28 +1004,41 @@ function recalculate() {
     const pe = document.getElementById('netProfit'); pe.textContent = `NT$ ${netProfit.toLocaleString()}`; pe.className = `pc-value ${netProfit>=0?'green':'red'}`;
     const me = document.getElementById('profitMargin'); me.textContent = margin.toFixed(1)+'%'; me.className = `pc-value ${margin>=0?'green':'red'}`;
     renderProfitChart(grandRev, grandCost);
+    renderOverview();
 }
 
-function renderProfitChart(totalRev, totalCost) {
-    const c = document.getElementById('profitChart');
-    if (!totalRev && !totalCost) { c.innerHTML = '<div style="color:var(--text-muted);font-size:.82rem;padding:20px;">輸入數據後生成圖表</div>'; return; }
-    const profit = totalRev - totalCost, productCost = totalCost;
-    const w = 700, h = 160, padL = 80, barMaxW = w - padL - 80, barH = 28;
-    const maxVal = Math.max(totalRev, totalCost, 1);
-    const revW = (totalRev/maxVal)*barMaxW;
-    const costW = (totalCost/maxVal)*barMaxW;
-    const pW=Math.abs(profit/maxVal)*barMaxW, pC=profit>=0?'var(--positive)':'var(--negative)';
-    c.innerHTML = `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" style="max-width:700px;">
-        <text x="${padL-8}" y="22" text-anchor="end" fill="var(--text-secondary)" font-size="11" font-weight="600">收入</text>
-        <rect x="${padL}" y="8" width="${Math.max(revW,2)}" height="${barH}" rx="4" fill="var(--accent)" opacity=".85"/>
-        <text x="${padL+revW+6}" y="27" fill="var(--text)" font-size="11" font-weight="700">NT$ ${totalRev.toLocaleString()}</text>
-        <text x="${padL-8}" y="76" text-anchor="end" fill="var(--text-secondary)" font-size="11" font-weight="600">成本</text>
-        <rect x="${padL}" y="58" width="${Math.max(costW,2)}" height="${barH}" rx="4" fill="var(--negative)" opacity=".7"/>
-        <text x="${padL+costW+6}" y="76" fill="var(--negative)" font-size="11" font-weight="700">NT$ ${totalCost.toLocaleString()}</text>
-        <text x="${padL-8}" y="128" text-anchor="end" fill="var(--text-secondary)" font-size="11" font-weight="600">淨利</text>
-        <rect x="${padL}" y="114" width="${Math.max(pW,2)}" height="${barH}" rx="4" fill="${pC}" opacity=".85"/>
-        <text x="${padL+pW+6}" y="132" fill="${pC}" font-size="11" font-weight="700">NT$ ${profit.toLocaleString()}</text>
-    </svg>`;
+function renderProfitChart() { /* removed */ }
+
+function renderOverview() {
+    const panel = document.getElementById('overviewPanel');
+    const catDefs = [
+        { key: 'b2b', label: '企業內訓', icon: 'business', groups: ['b2b'], cols: ['項目','應收','講師費','其他費用','利潤'] },
+        { key: 'b2c', label: '公開課程', icon: 'school', groups: ['b2c'], cols: ['項目','應收','講師費','其他費用','利潤'] },
+        { key: 'biz', label: '企業服務', icon: 'handshake', groups: BIZ_GROUPS, cols: ['項目','應收','成本','利潤'] }
+    ];
+    let html = '';
+    catDefs.forEach(cat => {
+        let rows = [];
+        cat.groups.forEach(g => {
+            products[g].forEach(p => {
+                const c = calcCosts(p, g);
+                const profCls = c.profit >= 0 ? 'pos' : 'neg';
+                if (cat.key === 'biz') {
+                    rows.push(`<tr><td>${p.name || '未命名'}</td><td class="num">${c.rev.toLocaleString()}</td><td class="num">${c.totalCost.toLocaleString()}</td><td class="num ${profCls}">${c.profit.toLocaleString()}</td></tr>`);
+                } else {
+                    const otherCost = c.totalCost - c.lecCost;
+                    rows.push(`<tr><td>${p.name || '未命名'}</td><td class="num">${c.rev.toLocaleString()}</td><td class="num">${c.lecCost.toLocaleString()}</td><td class="num">${otherCost.toLocaleString()}</td><td class="num ${profCls}">${c.profit.toLocaleString()}</td></tr>`);
+                }
+            });
+        });
+        if (rows.length === 0) return;
+        const thHtml = cat.cols.map((col, i) => `<th${i > 0 ? ' class="num"' : ''}>${col}</th>`).join('');
+        html += `<div class="overview-group">
+            <div class="overview-group-label"><span class="material-symbols-outlined" style="font-size:16px;">${cat.icon}</span> ${cat.label}</div>
+            <table class="overview-table"><thead><tr>${thHtml}</tr></thead><tbody>${rows.join('')}</tbody></table>
+        </div>`;
+    });
+    panel.innerHTML = html || '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:.82rem;">尚無項目，請在分類頁籤中新增</div>';
 }
 
 // ── Save / Export ──
@@ -1067,7 +1135,6 @@ document.getElementById('globalUsdRate').value = financeSettings.usdRate ?? 32.5
 document.getElementById('btnSync').addEventListener('click', () => autoSync(false));
 document.getElementById('btnSave').addEventListener('click', () => saveAll());
 document.getElementById('btnExport').addEventListener('click', exportCSV);
-monthSelect.addEventListener('change', () => autoSync(false));
 
 autoSync(false);
 </script>
