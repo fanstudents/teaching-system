@@ -1721,27 +1721,52 @@
                 <h2 class="page-title">Threads 口碑行銷</h2>
                 <p class="page-subtitle">加入口碑行銷計畫，透過你的 Threads 影響力為品牌創造真實推薦</p>
 
-                <!-- 啟用開關 -->
+                <!-- 類別開關 -->
                 <div class="section-card" style="margin-bottom:16px;padding:20px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div>
-                            <div style="font-size:0.88rem;font-weight:700;color:#1e293b;">
-                                <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:#6366f1;">campaign</span>
-                                啟用 Threads 口碑行銷
+                    <div style="font-size:0.88rem;font-weight:700;color:#1e293b;margin-bottom:4px;">
+                        <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:#6366f1;">campaign</span>
+                        選擇你想接的口碑行銷類別
+                    </div>
+                    <div style="font-size:0.72rem;color:#64748b;margin-bottom:14px;">開啟後，該類別的品牌方將可以看到你的 Threads 資料並邀請合作</div>
+
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                        <label class="threads-cat-card" id="catCardCourse">
+                            <input type="checkbox" id="threadsCatCourse" onchange="saveThreadsProfile()" style="display:none;">
+                            <div class="tcc-inner">
+                                <span class="material-symbols-outlined tcc-icon" style="color:#6366f1;">school</span>
+                                <div class="tcc-title">課程・知識產品</div>
+                                <div class="tcc-desc">線上課程、講座、電子書、工作坊</div>
                             </div>
-                            <div style="font-size:0.75rem;color:#64748b;margin-top:4px;">開啟後，品牌方將可以看到你的 Threads 資料並邀請合作</div>
-                        </div>
-                        <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer;">
-                            <input type="checkbox" id="threadsEnabled" style="opacity:0;width:0;height:0;" onchange="saveThreadsProfile()">
-                            <span style="position:absolute;top:0;left:0;right:0;bottom:0;background:#e2e8f0;border-radius:13px;transition:0.3s;"></span>
-                            <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.15);"></span>
+                        </label>
+                        <label class="threads-cat-card" id="catCardFood">
+                            <input type="checkbox" id="threadsCatFood" onchange="saveThreadsProfile()" style="display:none;">
+                            <div class="tcc-inner">
+                                <span class="material-symbols-outlined tcc-icon" style="color:#f59e0b;">restaurant</span>
+                                <div class="tcc-title">餐飲・食品</div>
+                                <div class="tcc-desc">餐廳、飲品、零食、保健食品</div>
+                            </div>
+                        </label>
+                        <label class="threads-cat-card" id="catCardBeauty">
+                            <input type="checkbox" id="threadsCatBeauty" onchange="saveThreadsProfile()" style="display:none;">
+                            <div class="tcc-inner">
+                                <span class="material-symbols-outlined tcc-icon" style="color:#ec4899;">spa</span>
+                                <div class="tcc-title">美妝・醫美・保養</div>
+                                <div class="tcc-desc">保養品、彩妝、醫美療程</div>
+                            </div>
                         </label>
                     </div>
                 </div>
 
                 <style>
-                    #threadsEnabled:checked + span { background: #6366f1; }
-                    #threadsEnabled:checked + span + span { transform: translateX(22px); }
+                    .threads-cat-card{cursor:pointer;display:block;}
+                    .tcc-inner{border:1.5px solid #e2e8f0;border-radius:12px;padding:16px 14px;text-align:center;transition:all .2s;background:#fafbfc;}
+                    .tcc-inner:hover{border-color:#c7d2fe;background:#f5f3ff;}
+                    .threads-cat-card input:checked ~ .tcc-inner{border-color:#6366f1;background:linear-gradient(135deg,#eef2ff,#f5f3ff);box-shadow:0 0 0 2px rgba(99,102,241,0.15);}
+                    .tcc-icon{font-size:28px;display:block;margin:0 auto 6px;}
+                    .tcc-title{font-size:0.78rem;font-weight:700;color:#1e293b;margin-bottom:2px;}
+                    .tcc-desc{font-size:0.62rem;color:#94a3b8;line-height:1.4;}
+                    .threads-cat-card input:checked ~ .tcc-inner .tcc-title{color:#4338ca;}
+                    .threads-cat-card input:checked ~ .tcc-inner::after{content:'✓ 已開啟';display:block;margin-top:6px;font-size:0.62rem;font-weight:700;color:#6366f1;}
                 </style>
 
                 <!-- 帳號資訊 -->
@@ -2713,8 +2738,14 @@
             if (!currentAffiliateId) return;
             clearTimeout(threadsSaveTimeout);
             threadsSaveTimeout = setTimeout(async () => {
+                const catCourse = document.getElementById('threadsCatCourse').checked;
+                const catFood = document.getElementById('threadsCatFood').checked;
+                const catBeauty = document.getElementById('threadsCatBeauty').checked;
                 const data = {
-                    threads_enabled: document.getElementById('threadsEnabled').checked,
+                    threads_enabled: catCourse || catFood || catBeauty,
+                    threads_cat_course: catCourse,
+                    threads_cat_food: catFood,
+                    threads_cat_beauty: catBeauty,
                     threads_handle: document.getElementById('threadsHandle').value.trim(),
                     threads_followers: parseInt(document.getElementById('threadsFollowers').value) || null,
                     threads_domain: document.getElementById('threadsDomain').value.trim(),
@@ -2733,7 +2764,9 @@
         };
 
         function loadThreadsProfile(affiliate) {
-            document.getElementById('threadsEnabled').checked = affiliate.threads_enabled || false;
+            document.getElementById('threadsCatCourse').checked = affiliate.threads_cat_course || false;
+            document.getElementById('threadsCatFood').checked = affiliate.threads_cat_food || false;
+            document.getElementById('threadsCatBeauty').checked = affiliate.threads_cat_beauty || false;
             document.getElementById('threadsHandle').value = affiliate.threads_handle || '';
             document.getElementById('threadsFollowers').value = affiliate.threads_followers || '';
             document.getElementById('threadsDomain').value = affiliate.threads_domain || '';

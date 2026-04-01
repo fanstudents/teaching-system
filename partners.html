@@ -827,9 +827,13 @@
             const tSec = document.getElementById('threadsInfoSection');
             if (a.threads_enabled) {
                 tSec.style.display = '';
+                const cats = [];
+                if (a.threads_cat_course) cats.push('📚 課程・知識產品');
+                if (a.threads_cat_food) cats.push('🍽️ 餐飲・食品');
+                if (a.threads_cat_beauty) cats.push('💄 美妝・醫美・保養');
                 document.getElementById('threadsInfoContent').innerHTML = `
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                        <span style="background:#6366f1;color:#fff;padding:1px 8px;border-radius:10px;font-size:0.68rem;font-weight:700;">已啟用</span>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
+                        ${cats.map(c => `<span style="background:#eef2ff;color:#4338ca;padding:2px 10px;border-radius:10px;font-size:0.68rem;font-weight:600;">${c}</span>`).join('')}
                     </div>
                     <div><strong>帳號：</strong>@${a.threads_handle || '—'}</div>
                     <div><strong>追蹤數：</strong>${a.threads_followers ? a.threads_followers.toLocaleString() : '—'}</div>
