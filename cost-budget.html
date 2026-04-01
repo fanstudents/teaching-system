@@ -1217,6 +1217,7 @@ async function saveAll() {
     try {
         // 先查詢是否已有此月資料
         const existing = await db.select('cost_budgets', { filter: { month: `eq.${month}` }, limit: 1 });
+        console.log('[save] existing:', existing);
         let result;
         if (existing.data && existing.data.length > 0) {
             // UPDATE
@@ -1232,6 +1233,7 @@ async function saveAll() {
                 updated_at: new Date().toISOString()
             });
         }
+        console.log('[save] result:', result);
 
         if (result.error) {
             console.error('[save] DB error:', result.error);
@@ -1246,12 +1248,13 @@ async function saveAll() {
         showToast('已儲存至雲端 ✓');
         document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--positive);">cloud_done</span> ${new Date().toLocaleTimeString('zh-TW')} 已儲存`;
     } catch (err) {
-        console.error('[save]', err);
+        console.error('[save] FAILED:', err);
         // Supabase 失敗時 fallback 到 localStorage
         const all = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
         all[month] = payload;
         localStorage.setItem(STORE_KEY, JSON.stringify(all));
-        showToast('雲端儲存失敗，已存到本地 ⚠️');
+        showToast('雲端失敗(' + (err.message||'').substring(0,30) + ')，已存本地');
+        document.getElementById('autoSaved').innerHTML = `<span class="material-symbols-outlined" style="font-size:14px;color:var(--negative);">cloud_off</span> 本地已存，雲端失敗`;
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">save</span> 儲存';
