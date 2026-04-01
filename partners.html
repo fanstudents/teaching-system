@@ -291,11 +291,31 @@
                 </div>
                 <div class="form-group">
                     <label>狀態</label>
-                    <select id="affDetailStatus">
+                    <select id="affDetailStatus" onchange="toggleEmailEditor()">
                         <option value="pending">待審核</option>
                         <option value="approved">已通過</option>
                         <option value="rejected">已拒絕</option>
                     </select>
+                </div>
+
+                <!-- 核准信件編輯區 -->
+                <div id="emailEditorSection" style="display:none;margin-top:4px;">
+                    <div class="form-group">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <label style="margin:0;font-weight:600;color:#1a1a2e;">
+                                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">mail</span>
+                                核准通知信
+                            </label>
+                            <div style="display:flex;gap:6px;">
+                                <button type="button" onclick="resetEmailTemplate()" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;font-size:0.68rem;color:#64748b;cursor:pointer;font-family:inherit;">重設範本</button>
+                            </div>
+                        </div>
+                        <input type="text" id="affEmailSubject" value="推廣夥伴申請已通過 — 數位簡報室" style="margin-bottom:6px;font-size:0.82rem;font-weight:600;">
+                        <textarea id="affEmailBody" style="min-height:280px;font-size:0.78rem;line-height:1.7;font-family:'SF Mono','Menlo',monospace;white-space:pre-wrap;"></textarea>
+                        <div style="font-size:0.68rem;color:#94a3b8;margin-top:4px;">
+                            可自由編輯信件內容。支援：── 標題 ──、1. 編號列表、https:// 連結
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer" style="justify-content:space-between;">
@@ -607,6 +627,71 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         }
 
+        // ── Email Editor ──
+        function generateEmailTemplate() {
+            const name = document.getElementById('affDetailName').value || '夥伴';
+            const coupon = document.getElementById('affDetailCoupon').value || 'YOUR_CODE';
+            const rateVal = document.getElementById('affDetailRate').value || '20';
+            const dashUrl = `${location.origin}/affiliate-dashboard.html`;
+
+            return `Hi ${name}，
+
+感謝您申請成為數位簡報室的推廣夥伴！
+我們非常高興在此通知您——您的申請已經正式通過審核。
+
+從現在開始，您將能透過專屬折扣碼與推廣連結，幫助更多人認識優質的 AI 課程，同時獲得每筆成交的佣金回饋。
+
+── 您的推廣資訊 ──
+
+1. 專屬折扣碼：${coupon}
+2. 佣金比例：每筆課程銷售 ${rateVal}%
+3. 推廣者後台：${dashUrl}
+
+── 如何開始推廣 ──
+
+1. 使用 Google 帳號登入推廣後台
+2. 在「可推廣課程」頁面查看所有課程
+3. 點擊課程旁的推廣管道按鈕，一鍵複製帶有您專屬折扣碼的推廣連結
+4. 將連結分享到您的社群媒體、部落格或電子報
+
+── 佣金結算方式 ──
+
+1. 每月 10 日統計上月業績
+2. 每月 25 日撥款至您的帳戶
+3. 請在後台「帳戶管理」填寫銀行帳戶資訊
+
+── 需要協助？ ──
+
+如果您在推廣過程中遇到任何問題，或需要宣傳素材、文案建議，歡迎隨時回覆此信件，我們會盡快為您提供協助。
+
+期待與您攜手合作，一起讓更多人接觸到優質的 AI 學習資源！
+
+祝推廣順利，
+數位簡報室團隊`;
+        }
+
+        window.toggleEmailEditor = function () {
+            const status = document.getElementById('affDetailStatus').value;
+            const section = document.getElementById('emailEditorSection');
+            const id = document.getElementById('affDetailId').value;
+            const a = affiliates.find(x => x.id === id);
+            const isNewApproval = status === 'approved' && a && a.status !== 'approved';
+
+            if (isNewApproval) {
+                section.style.display = 'block';
+                if (!document.getElementById('affEmailBody').value.trim()) {
+                    document.getElementById('affEmailBody').value = generateEmailTemplate();
+                }
+            } else {
+                section.style.display = 'none';
+            }
+        };
+
+        window.resetEmailTemplate = function () {
+            document.getElementById('affEmailBody').value = generateEmailTemplate();
+            document.getElementById('affEmailSubject').value = '推廣夥伴申請已通過 — 數位簡報室';
+        };
+
         window.closeModal = function (id) {
             document.getElementById(id).classList.remove('active');
         };
@@ -759,6 +844,10 @@
             if (a.coupon_code) validateCouponOnTeachify(a.coupon_code);
             else document.getElementById('couponStatus').innerHTML = '';
             document.getElementById('teachifyCouponList').style.display = 'none';
+            // Reset email editor
+            document.getElementById('affEmailBody').value = '';
+            document.getElementById('emailEditorSection').style.display = 'none';
+            toggleEmailEditor();
         };
 
         setupTeachifyCouponUI();
@@ -814,35 +903,8 @@
 
                 // Send approval email automatically
                 if (isNewApproval && a) {
-                    const dashUrl = `${location.origin}/affiliate-dashboard.html`;
-                    const coupon = a.coupon_code || '';
-                    const rate = `${((a.commission_rate || 0.2) * 100).toFixed(0)}%`;
-
-                    const emailBody = `Hi ${a.name}，
-
-恭喜！您的推廣夥伴申請已經通過審核。
-
-── 您的推廣資訊 ──
-
-1. 專屬折扣碼：${coupon}
-2. 佣金比例：課程銷售 ${rate}
-3. 後台登入：${dashUrl}
-
-── 如何開始推廣 ──
-
-1. 使用 Google 帳號登入推廣後台：${dashUrl}
-2. 在後台查看可推廣的課程與專屬連結
-3. 分享課程連結給您的受眾，搭配折扣碼 ${coupon}
-4. 每月 10 日結算佣金，25 日撥款至您的帳戶
-
-── 重要提醒 ──
-
-1. 請在後台「帳戶管理」填寫銀行帳戶資訊
-2. 推廣教學頁面有各平台的文案範本可參考
-3. 如有任何問題，歡迎隨時聯繫我們
-
-祝推廣順利！
-數位簡報室團隊`;
+                    const emailBody = document.getElementById('affEmailBody').value;
+                    const emailSubject = document.getElementById('affEmailSubject').value || '推廣夥伴申請已通過 — 數位簡報室';
 
                     try {
                         const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
@@ -856,7 +918,7 @@
                             },
                             body: JSON.stringify({
                                 to: a.email,
-                                subject: '推廣夥伴申請已通過 — 數位簡報室',
+                                subject: emailSubject,
                                 body: emailBody,
                                 footerText: '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件'
                             })
