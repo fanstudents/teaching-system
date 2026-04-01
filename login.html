@@ -467,28 +467,49 @@
 
         // ── Google Login ──
         window.googleLogin = function() {
+            console.log('[Login] Google login clicked, role:', _currentRole);
             localStorage.setItem('_login_role', _currentRole);
             const redirectUrl = `${location.origin}/login.html?callback=1&role=${_currentRole}`;
             auth.signInWithGoogle(redirectUrl);
         };
 
         // ── Handle OAuth callback ──
-        if (location.hash.includes('access_token') || new URLSearchParams(location.search).get('callback')) {
-            const user = await auth.handleOAuthCallback();
-            if (user) {
-                const role = localStorage.getItem('_login_role') || 'student';
-                localStorage.removeItem('_login_role');
-                await routeUser(role, user.email);
+        try {
+            const isCallback = location.hash.includes('access_token') || new URLSearchParams(location.search).get('callback');
+            if (isCallback) {
+                let user = null;
+                const oauthResult = await auth.handleOAuthCallback();
+                if (oauthResult) {
+                    user = oauthResult.user;
+                } else {
+                    // PKCE flow or session already established — fallback to getSession
+                    const session = await auth.getSession();
+                    if (session?.user) user = session.user;
+                }
+                if (user) {
+                    const role = localStorage.getItem('_login_role') || _currentRole || 'student';
+                    localStorage.removeItem('_login_role');
+                    await routeUser(role, user.email);
+                    return; // stop further execution
+                }
             }
+        } catch (e) {
+            console.warn('[Login] OAuth callback error (safe to ignore on fresh visit):', e);
         }
 
-        // ── Check existing session ──
-        const session = await auth.getSession();
-        if (session && !location.hash && !new URLSearchParams(location.search).get('callback')) {
-            const profile = await getUserProfile();
-            const defaultRedirect = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
-            const redirect = new URLSearchParams(location.search).get('redirect') || defaultRedirect;
-            location.replace(redirect);
+        // ── Check existing session (non-callback visits) ──
+        try {
+            if (!new URLSearchParams(location.search).get('callback')) {
+                const session = await auth.getSession();
+                if (session && !location.hash) {
+                    const profile = await getUserProfile();
+                    const defaultRedirect = profile?.role === 'super_admin' ? 'admin-dashboard.html' : 'manage.html';
+                    const redirect = new URLSearchParams(location.search).get('redirect') || defaultRedirect;
+                    location.replace(redirect);
+                }
+            }
+        } catch (e) {
+            console.warn('[Login] Session check error:', e);
         }
 
         // ── Password toggle ──
@@ -525,14 +546,8 @@
         // ── Route user based on role ──
         async function routeUser(role, email) {
             if (role === 'affiliate') {
-                const { data: aff } = await db.from('affiliates')
-                    .select('*').eq('email', email).eq('status', 'approved').single();
-                if (aff) {
-                    location.replace('affiliate-dashboard.html');
-                } else {
-                    showError('此帳號尚未加入推廣計畫，請先完成申請。');
-                    await auth.signOut();
-                }
+                // affiliate-dashboard.html handles all states: register / pending / approved
+                location.replace('affiliate-dashboard.html');
             } else if (role === 'student') {
                 location.replace('student.html');
             } else {

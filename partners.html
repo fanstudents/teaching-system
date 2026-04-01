@@ -177,26 +177,57 @@
 
     <!-- Affiliate Detail Modal -->
     <div class="modal-overlay" id="affDetailOverlay">
-        <div class="modal">
+        <div class="modal" style="max-width:580px;">
             <div class="modal-header">
                 <h3>聯盟行銷申請詳情</h3>
                 <button class="modal-close" onclick="closeModal('affDetailOverlay')">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="affDetailId">
-                <div class="form-group">
-                    <label>姓名</label>
-                    <input type="text" id="affDetailName" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="affDetailEmail" readonly>
-                </div>
-                <div class="form-group">
-                    <label>折扣碼</label>
-                    <input type="text" id="affDetailCoupon" readonly>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" id="affDetailName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="affDetailEmail" readonly>
+                    </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>折扣碼</label>
+                        <input type="text" id="affDetailCoupon" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>佣金比例</label>
+                        <input type="text" id="affDetailRate" readonly>
+                    </div>
+                </div>
+
+                <!-- 推廣管道 -->
+                <div class="form-group">
+                    <label>推廣管道</label>
+                    <div id="affDetailChannels" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;"></div>
+                </div>
+                <div class="form-group">
+                    <label>管道說明</label>
+                    <div id="affDetailChannelDetail" style="font-size:0.82rem;color:#555;padding:8px 12px;background:#f9fafb;border-radius:8px;min-height:28px;white-space:pre-wrap;"></div>
+                </div>
+
+                <!-- 選擇的課程 -->
+                <div class="form-group">
+                    <label>申請推廣課程</label>
+                    <div id="affDetailCourses" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;"></div>
+                </div>
+
+                <!-- 引薦服務 -->
+                <div class="form-group">
+                    <label>引薦服務</label>
+                    <div id="affDetailReferrals" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;"></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
                     <div class="form-group">
                         <label>銀行名稱</label>
                         <input type="text" id="affDetailBank" readonly>
@@ -205,10 +236,14 @@
                         <label>戶名</label>
                         <input type="text" id="affDetailHolder" readonly>
                     </div>
+                    <div class="form-group">
+                        <label>銀行帳號</label>
+                        <input type="text" id="affDetailAccount" readonly>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>銀行帳號</label>
-                    <input type="text" id="affDetailAccount" readonly>
+                    <label>申請時間</label>
+                    <input type="text" id="affDetailAppliedAt" readonly style="color:#999;font-size:0.82rem;">
                 </div>
                 <div class="form-group">
                     <label>備註</label>
@@ -508,11 +543,37 @@
             document.getElementById('affDetailName').value = a.name || '';
             document.getElementById('affDetailEmail').value = a.email || '';
             document.getElementById('affDetailCoupon').value = a.coupon_code || '';
+            document.getElementById('affDetailRate').value = `${((a.commission_rate || 0.1) * 100).toFixed(0)}%`;
             document.getElementById('affDetailBank').value = a.bank_name || '';
             document.getElementById('affDetailHolder').value = a.account_holder || '';
             document.getElementById('affDetailAccount').value = a.bank_account || '';
             document.getElementById('affDetailNotes').value = a.notes || '';
             document.getElementById('affDetailStatus').value = a.status || 'pending';
+            document.getElementById('affDetailAppliedAt').value = a.created_at
+                ? new Date(a.created_at).toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+                : '';
+
+            // Channels as tag chips
+            const channels = (a.channels || '').split(',').map(s => s.trim()).filter(Boolean);
+            document.getElementById('affDetailChannels').innerHTML = channels.length
+                ? channels.map(c => `<span style="display:inline-block;padding:3px 10px;background:#eef2ff;color:#4f46e5;border-radius:12px;font-size:0.75rem;font-weight:500;">${c}</span>`).join('')
+                : '<span style="color:#ccc;font-size:0.82rem;">—</span>';
+
+            // Channel detail
+            document.getElementById('affDetailChannelDetail').textContent = a.channel_detail || '—';
+
+            // Selected courses
+            const courses = a.selected_courses || [];
+            document.getElementById('affDetailCourses').innerHTML = courses.length
+                ? courses.map(c => `<span style="display:inline-block;padding:3px 10px;background:#f0fdf4;color:#16a34a;border-radius:12px;font-size:0.75rem;font-weight:500;">${c}</span>`).join('')
+                : '<span style="color:#ccc;font-size:0.82rem;">全部課程</span>';
+
+            // Referral services
+            const refs = a.referral_services || [];
+            document.getElementById('affDetailReferrals').innerHTML = refs.length
+                ? refs.map(r => `<span style="display:inline-block;padding:3px 10px;background:#fffbeb;color:#d97706;border-radius:12px;font-size:0.75rem;font-weight:500;">${r}</span>`).join('')
+                : '<span style="color:#ccc;font-size:0.82rem;">未選擇</span>';
+
             document.getElementById('affDetailOverlay').classList.add('active');
         };
 
@@ -520,12 +581,17 @@
             const id = document.getElementById('affDetailId').value;
             const status = document.getElementById('affDetailStatus').value;
             const notes = document.getElementById('affDetailNotes').value.trim();
+            const btn = document.getElementById('affDetailSave');
+            btn.disabled = true;
+            btn.textContent = '儲存中…';
+
             try {
                 const updateData = { status, notes };
 
                 // Generate login token when approving
                 const a = affiliates.find(x => x.id === id);
-                if (status === 'approved' && a && a.status !== 'approved') {
+                const isNewApproval = status === 'approved' && a && a.status !== 'approved';
+                if (isNewApproval) {
                     updateData.login_token = crypto.randomUUID();
                     updateData.approved_at = new Date().toISOString();
                 }
@@ -538,20 +604,74 @@
                 renderAffiliates();
                 closeModal('affDetailOverlay');
 
-                // Show dashboard link after approval
-                if (updateData.login_token) {
-                    const dashUrl = `${location.origin}/affiliate-dashboard.html?token=${updateData.login_token}`;
-                    const copyLink = confirm(
-                        `已通過！夥伴後台連結：\n\n${dashUrl}\n\n是否複製連結？（請透過 Email 傳送給夥伴）`
-                    );
-                    if (copyLink) {
-                        await navigator.clipboard.writeText(dashUrl);
-                        showToast('連結已複製');
+                // Send approval email automatically
+                if (isNewApproval && a) {
+                    const dashUrl = `${location.origin}/affiliate-dashboard.html`;
+                    const coupon = a.coupon_code || '';
+                    const rate = `${((a.commission_rate || 0.1) * 100).toFixed(0)}%`;
+
+                    const emailBody = `Hi ${a.name}，
+
+恭喜！🎉 您的推廣夥伴申請已經通過審核。
+
+── 您的推廣資訊 ──
+
+1. 專屬折扣碼：${coupon}
+2. 佣金比例：課程銷售 ${rate}
+3. 後台登入：${dashUrl}
+
+── 如何開始推廣 ──
+
+1. 使用 Google 帳號登入推廣後台：${dashUrl}
+2. 在後台查看可推廣的課程與專屬連結
+3. 分享課程連結給您的受眾，搭配折扣碼 ${coupon}
+4. 每月 10 日結算佣金，25 日撥款至您的帳戶
+
+── 重要提醒 ──
+
+1. 請在後台「帳戶管理」填寫銀行帳戶資訊
+2. 推廣教學頁面有各平台的文案範本可參考
+3. 如有任何問題，歡迎隨時聯繫我們
+
+祝推廣順利！
+數位簡報室團隊`;
+
+                    try {
+                        const SUPABASE_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+                        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+                        const emailRes = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                to: a.email,
+                                subject: '🎉 推廣夥伴申請已通過 — 數位簡報室',
+                                body: emailBody,
+                                footerText: '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件'
+                            })
+                        });
+                        const emailResult = await emailRes.json();
+                        if (emailResult.success) {
+                            showToast(`已通過！審核通知已發送至 ${a.email}`);
+                        } else {
+                            showToast(`已通過！但 Email 發送失敗：${emailResult.error || '未知錯誤'}`);
+                            console.error('[Approval Email] Error:', emailResult);
+                        }
+                    } catch (emailErr) {
+                        showToast('已通過！但 Email 發送失敗');
+                        console.error('[Approval Email] Error:', emailErr);
                     }
                 } else {
                     showToast('已更新');
                 }
-            } catch (e) { showToast('更新失敗'); }
+            } catch (e) {
+                showToast('更新失敗');
+            }
+            btn.disabled = false;
+            btn.textContent = '儲存';
         });
 
         document.getElementById('affDetailDelete').addEventListener('click', async () => {
