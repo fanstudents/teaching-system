@@ -1359,7 +1359,6 @@
                     <div style="font-size:0.72rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
                         <span class="material-symbols-outlined" style="font-size:14px;">schedule</span>
                         <span id="lastUpdated"></span>
-                    </div>
                 </div>
                 <p class="page-subtitle">你的推廣數據總覽</p>
 
@@ -1386,31 +1385,11 @@
                     </div>
                 </div>
 
-                <!-- Charts Row -->
+                <!-- 銷售 × 流量趨勢 + 佣金 -->
                 <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;">
                     <div class="section-card">
-                        <div class="section-header">
-                            <span class="material-symbols-outlined">show_chart</span> 月度銷售趨勢
-                        </div>
-                        <div class="section-body" style="padding:16px 20px;">
-                            <canvas id="chartSalesTrend" height="220"></canvas>
-                        </div>
-                    </div>
-<div class="section-card">
-                        <div class="section-header">
-                            <span class="material-symbols-outlined">donut_large</span> 佣金收入概覽
-                        </div>
-                        <div class="section-body" style="padding:16px 20px;display:flex;align-items:center;justify-content:center;">
-                            <canvas id="chartCommission" height="220"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 推廣流量分析 (inline in overview) -->
-                <div style="margin-top:8px;">
-                    <div class="section-card" style="margin-bottom:12px;">
                         <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;">
-                            <div><span class="material-symbols-outlined">monitoring</span> 推廣流量分析</div>
+                            <div><span class="material-symbols-outlined">monitoring</span> 銷售 × 流量趨勢</div>
                             <div style="display:flex;gap:6px;align-items:center;">
                                 <select id="trafficDateRange" style="padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:0.7rem;font-family:inherit;">
                                     <option value="7">7 天</option>
@@ -1424,12 +1403,6 @@
                             </div>
                         </div>
                         <div class="section-body" style="padding:12px 16px;">
-                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;padding:8px 12px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border-radius:8px;font-size:0.68rem;color:#92400e;line-height:1.5;">
-                                <span class="material-symbols-outlined" style="font-size:14px;">info</span>
-                                <div>
-                                    <strong>提醒：</strong>必須使用「可推廣課程」頁面的專用 UTM 連結，才能追蹤到你的流量。資料來源為 Google Analytics，更新延遲約 <strong>12～18 小時</strong>。
-                                </div>
-                            </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
                                 <div style="text-align:center;padding:10px;background:#f8fafc;border-radius:8px;">
                                     <div style="font-size:0.62rem;color:#94a3b8;font-weight:600;">訪客數</div>
@@ -1448,34 +1421,52 @@
                                     <div id="trafficBounce" style="font-size:1.2rem;font-weight:800;color:#f59e0b;margin-top:2px;">—</div>
                                 </div>
                             </div>
-                            <canvas id="trafficChart" height="180" style="width:100%;"></canvas>
-                            <div id="trafficChartEmpty" style="display:none;text-align:center;padding:30px;color:#94a3b8;font-size:0.78rem;">
-                                <span class="material-symbols-outlined" style="font-size:28px;display:block;margin-bottom:6px;">analytics</span>
-                                尚無流量資料，至「可推廣課程」頁面複製專用連結開始分享！
+                            <div style="position:relative;height:220px;">
+                                <canvas id="chartSalesTrend" height="220"></canvas>
+                                <canvas id="trafficChart" height="220" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></canvas>
+                            </div>
+                            <div id="trafficChartEmpty" style="display:none;text-align:center;padding:16px;color:#94a3b8;font-size:0.72rem;">
+                                <span class="material-symbols-outlined" style="font-size:22px;display:block;margin-bottom:4px;">analytics</span>
+                                使用「可推廣課程」的專用 UTM 連結開始追蹤流量
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:6px 10px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border-radius:6px;font-size:0.64rem;color:#92400e;line-height:1.4;">
+                                <span class="material-symbols-outlined" style="font-size:13px;">info</span>
+                                GA4 資料更新延遲約 12～18 小時
                             </div>
                         </div>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <div class="section-card" style="margin:0;">
-                            <div class="section-header" style="font-size:0.78rem;">
-                                <span class="material-symbols-outlined">share</span> 流量來源
-                            </div>
-                            <div id="trafficSources" class="section-body" style="padding:8px 16px;font-size:0.76rem;">
-                                <div style="color:#94a3b8;text-align:center;padding:16px;">點擊上方重新載入</div>
-                            </div>
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span class="material-symbols-outlined">donut_large</span> 佣金收入概覽
                         </div>
-                        <div class="section-card" style="margin:0;">
-                            <div class="section-header" style="font-size:0.78rem;">
-                                <span class="material-symbols-outlined">web</span> 熱門頁面
-                            </div>
-                            <div id="trafficPages" class="section-body" style="padding:8px 16px;font-size:0.76rem;">
-                                <div style="color:#94a3b8;text-align:center;padding:16px;">點擊上方重新載入</div>
-                            </div>
+                        <div class="section-body" style="padding:16px 20px;display:flex;align-items:center;justify-content:center;">
+                            <canvas id="chartCommission" height="220"></canvas>
                         </div>
                     </div>
-                    <div id="trafficLastUpdated" style="text-align:right;font-size:0.62rem;color:#94a3b8;margin-top:6px;"></div>
                 </div>
+
+                <!-- 流量來源 + 熱門頁面 -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                    <div class="section-card" style="margin:0;">
+                        <div class="section-header" style="font-size:0.78rem;">
+                            <span class="material-symbols-outlined">share</span> 流量來源
+                        </div>
+                        <div id="trafficSources" class="section-body" style="padding:8px 16px;font-size:0.76rem;">
+                            <div style="color:#94a3b8;text-align:center;padding:16px;">點擊上方重新載入</div>
+                        </div>
+                    </div>
+                    <div class="section-card" style="margin:0;">
+                        <div class="section-header" style="font-size:0.78rem;">
+                            <span class="material-symbols-outlined">web</span> 熱門頁面
+                        </div>
+                        <div id="trafficPages" class="section-body" style="padding:8px 16px;font-size:0.76rem;">
+                            <div style="color:#94a3b8;text-align:center;padding:16px;">點擊上方重新載入</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="trafficLastUpdated" style="text-align:right;font-size:0.62rem;color:#94a3b8;"></div>
             </div>
+
 
             <!-- View: Courses -->
             <div class="view-page" id="view-courses">
@@ -3147,7 +3138,7 @@ Day 4: 真的很棒拜託快去上！</span>
                 return html + '</tbody></table>';
             };
 
-            document.getElementById('recentOrders').innerHTML = buildTable(purchases.slice(0, 5));
+            // recentOrders removed — only allOrders tab remains
             document.getElementById('allOrders').innerHTML = buildTable(purchases);
         }
 
@@ -3157,19 +3148,78 @@ Day 4: 真的很棒拜託快去上！</span>
             for (let i = 5; i >= 0; i--) {
                 monthLabels.push((now.getMonth() - i + 13) % 12 + 1 + '月');
             }
-            const zeros = [0, 0, 0, 0, 0, 0];
+            // Grey placeholder bars with random low heights to look like a "possible" trend
+            const placeholderData = [15, 28, 22, 35, 18, 30];
+
+            const emptyOverlay = {
+                id: 'emptyOverlay',
+                afterDraw(chart) {
+                    const { width, height, ctx: c } = chart;
+                    c.save();
+                    // Semi-transparent overlay
+                    c.fillStyle = 'rgba(255,255,255,0.75)';
+                    c.fillRect(0, 0, width, height);
+                    // Icon
+                    c.font = '600 1.4rem Material Symbols Outlined';
+                    c.fillStyle = '#cbd5e1';
+                    c.textAlign = 'center';
+                    c.textBaseline = 'middle';
+                    c.fillText('📊', width / 2, height / 2 - 14);
+                    // Text
+                    c.font = '600 0.78rem Noto Sans TC';
+                    c.fillStyle = '#94a3b8';
+                    c.fillText('尚無銷售紀錄', width / 2, height / 2 + 10);
+                    c.font = '400 0.68rem Noto Sans TC';
+                    c.fillStyle = '#b0b8c4';
+                    c.fillText('開始分享推廣連結，讓數據動起來！', width / 2, height / 2 + 30);
+                    c.restore();
+                }
+            };
 
             new Chart(document.getElementById('chartSalesTrend').getContext('2d'), {
                 type: 'bar',
-                data: { labels: monthLabels, datasets: [{ label: '銷售額', data: zeros, backgroundColor: 'rgba(26,115,232,0.08)', borderColor: '#e8ecf1', borderWidth: 1, borderRadius: 6 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Noto Sans TC' }, color: '#cbd5e1' } }, y: { grid: { color: '#f5f5f5' }, ticks: { display: false }, beginAtZero: true, max: 100 } } }
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: '銷售額',
+                        data: placeholderData,
+                        backgroundColor: 'rgba(226,232,240,0.5)',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Noto Sans TC' }, color: '#cbd5e1' } },
+                        y: { grid: { color: '#f5f5f5' }, ticks: { display: false }, beginAtZero: true, max: 50 }
+                    }
+                },
+                plugins: [emptyOverlay]
             });
 
             new Chart(document.getElementById('chartCommission').getContext('2d'), {
                 type: 'doughnut',
                 data: { labels: ['尚無資料'], datasets: [{ data: [1], backgroundColor: ['#f0f0f5'], borderWidth: 0, cutout: '72%' }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } },
-                plugins: [{ id: 'emptyCenter', afterDraw(chart) { const { width, height, ctx: c } = chart; c.save(); c.font = '600 0.82rem Noto Sans TC'; c.fillStyle = '#cbd5e1'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('尚無資料', width / 2, height / 2); c.restore(); } }]
+                plugins: [{
+                    id: 'emptyCenter',
+                    afterDraw(chart) {
+                        const { width, height, ctx: c } = chart;
+                        c.save();
+                        c.font = '600 0.82rem Noto Sans TC';
+                        c.fillStyle = '#cbd5e1';
+                        c.textAlign = 'center';
+                        c.textBaseline = 'middle';
+                        c.fillText('💰', width / 2, height / 2 - 10);
+                        c.font = '500 0.72rem Noto Sans TC';
+                        c.fillStyle = '#94a3b8';
+                        c.fillText('尚無佣金', width / 2, height / 2 + 12);
+                        c.restore();
+                    }
+                }]
             });
         }
 
@@ -3204,9 +3254,6 @@ Day 4: 真的很棒拜託快去上！</span>
                     </button>`;
                 }).join('');
 
-                const imgHtml = (c.image_url && c.image_url.startsWith('http'))
-                    ? `<img src="${c.image_url}" alt="${c.name}" style="width:100%;height:160px;object-fit:cover;border-radius:10px 10px 0 0;">`
-                    : '';
                 const descHtml = (c.description && c.description.trim())
                     ? `<div style="font-size:0.78rem;color:#64748b;line-height:1.6;margin-bottom:10px;">${c.description}</div>`
                     : '';
@@ -3216,10 +3263,12 @@ Day 4: 真的很棒拜託快去上！</span>
 
                 return `
                 <div class="section-card" style="margin-bottom:0;overflow:hidden;">
-                    ${imgHtml}
                     <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
-                        <span class="material-symbols-outlined" style="font-size:20px;color:#64748b;">${c.icon || 'school'}</span>
+                        <span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">${c.icon || 'school'}</span>
                         <span style="flex:1;font-size:0.88rem;font-weight:600;color:#1e293b;">${c.name}</span>
+                        <button class="utm-btn" style="font-size:0.68rem;padding:4px 10px;border-color:#c7d2fe;color:#6366f1;background:#eef2ff;" onclick="event.stopPropagation();document.querySelector('[data-view=free-courses]').click()">
+                            <span class="material-symbols-outlined" style="font-size:13px;">visibility</span> 免費觀看
+                        </button>
                         <span class="platform-tag">${plNames[c.platform] || ''}</span>
                         <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
                     </div>
