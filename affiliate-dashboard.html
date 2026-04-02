@@ -3362,7 +3362,7 @@ Day 4: 真的很棒拜託快去上！</span>
             const ratePercent = Math.round((commissionRate || 0.20) * 100);
             const container = document.getElementById('coursesList');
             const { data: courses } = await db.select('affiliate_courses', {
-                filter: { is_active: 'eq.true' }, order: 'total_sales.desc.nullslast,sort_order.asc'
+                filter: { is_active: 'eq.true' }, order: 'sort_order.asc' // TODO: change to total_sales.desc.nullslast,sort_order.asc after migration
             });
 
             if (!courses || courses.length === 0) {
