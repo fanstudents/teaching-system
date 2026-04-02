@@ -2502,6 +2502,9 @@ Day 4: 真的很棒拜託快去上！</span>
                                 <button class="tut-tab" data-channel="line" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;">
                                     LINE
                                 </button>
+                                <button class="tut-tab" data-channel="threads" style="display:flex;align-items:center;gap:6px;padding:12px 20px;border:none;background:none;font-size:0.82rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;">
+                                    🧵 Threads
+                                </button>
                             </div>
 
                             <div style="padding:20px;" id="tutorialContent">
@@ -2657,6 +2660,51 @@ Day 4: 真的很棒拜託快去上！</span>
                                                     <strong>核心原則</strong><br>
                                                     LINE 是高信任度管道<br>
                                                     關係 > 推銷，品質 > 數量
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Threads -->
+                                <div class="tut-channel" id="tut-threads" style="display:none;">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#000;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 貼文範本 A（故事型）</div>
+                                            <div id="tplThreadsA" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:140px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            <div style="margin-top:10px;">
+                                                <div style="font-size:0.75rem;font-weight:600;color:#000;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📋 貼文範本 B（痛點型）</div>
+                                                <div id="tplThreadsB" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.82rem;line-height:1.8;color:#1e293b;white-space:pre-wrap;cursor:pointer;transition:border-color 0.15s;min-height:140px;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);"></div>
+                                            </div>
+                                            <div style="margin-top:6px;font-size:0.68rem;color:#94a3b8;">💡 點擊範本即可複製（請務必用自己的語氣改寫）</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📐 Threads 高轉換策略</div>
+                                            <div style="font-size:0.78rem;color:#475569;line-height:1.9;">
+                                                <div style="padding:10px 12px;background:#f5f3ff;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>✅ 演算法友善寫法</strong><br>
+                                                    用「真實經歷」作為開頭，不要用「推薦」<br>
+                                                    每篇只講一個重點，不要貳<br>
+                                                    連結放留言區，正文不放連結<br>
+                                                    不加任何 #標籤（降權風險）
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fef2f2;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>❌ 絕對避免</strong><br>
+                                                    複製貼上同一段文字洗版<br>
+                                                    用「限時優惠」「不買就虧」等硬推文案<br>
+                                                    假裝不是廣告但明顯在推銷<br>
+                                                    一天發多篇推廣文
+                                                </div>
+                                                <div style="padding:10px 12px;background:#fefce8;border-radius:8px;margin-bottom:8px;">
+                                                    <strong>💡 高手技巧</strong><br>
+                                                    每週 1–2 篇推廣文＋ 3–5 篇日常內容<br>
+                                                    推廣文之間至少隔 2 篇日常貼<br>
+                                                    主動去互動別人的貼文建立存在感
+                                                </div>
+                                                <div style="padding:10px 12px;background:#ecfdf5;border-radius:8px;">
+                                                    <strong>🎯 核心原則</strong><br>
+                                                    Threads 感度傳撒 > 廣告曝光<br>
+                                                    你的貼文要讓人「想分享」而不是「想跳過」
                                                 </div>
                                             </div>
                                         </div>
@@ -3940,10 +3988,43 @@ Day 4: 真的很棒拜託快去上！</span>
 ${link}
 
 我有一組折扣碼 ${coupon}，結帳的時候輸入可以折抵一些，有需要的話可以用 🙂`;
+
+                document.getElementById('tplThreadsA').textContent =
+`上個月我做了一個實驗。
+
+把一個原本要花三天做的專案，全部交給 AI 來協作。
+
+結果：17 小時就做完了。
+
+不是 AI 替代我，是我提的問題變得更精準，AI 產出的結果就更可用。
+
+這個能力是在「${name}」裡練出來的。
+
+課程不會只教你按按鈕，而是教你怎麼「思考」跟 AI 合作。
+
+有興趣的人，我把連結放留言區。`;
+
+                document.getElementById('tplThreadsB').textContent =
+`以前最怕的就是週一早上開電腦。
+
+信箱 47 封未讀、三個報告到期、主管問你上週的數據整理好了沒。
+
+後來我用了一個方法：
+把 AI 當成我的「副駕」。
+
+每天一上班，先花 10 分鐘讓 AI 幫我整理待辦事項、拆解任務、草擬回信。
+
+現在我大概只用以前 60% 的時間就能做完一樣的事。
+
+這套工作流程是在「${name}」裡學的。
+
+不是空語，是每一堂都可以直接用在隨天工作上的實戰內容。
+
+連結我放留言區，有折扣碼可以用。`;
             });
 
             // Tutorial channel tabs (underline style)
-            const channelColors = { facebook:'#1877f2', instagram:'#e1306c', youtube:'#ff0000', blog:'#059669', line:'#06c755' };
+            const channelColors = { facebook:'#1877f2', instagram:'#e1306c', youtube:'#ff0000', blog:'#059669', line:'#06c755', threads:'#000000' };
             document.querySelectorAll('#tutorialTabs .tut-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const ch = tab.dataset.channel;
