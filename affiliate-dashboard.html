@@ -1826,140 +1826,229 @@
                 </div>
 
                 <!-- 範例展示 -->
-                <div class="section-card" style="padding:20px;">
-                    <div class="section-header" style="margin-bottom:16px;">
-                        <span class="material-symbols-outlined">lightbulb</span> 口碑分享範例
-                    </div>
+                <div class="section-card" style="padding:0;overflow:hidden;">
                     <style>
-                        .tp{background:#fff;border:1px solid #e4e4e4;border-radius:16px;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
-                        .ta{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.65rem;color:#fff;flex-shrink:0;}
-                        .tn{font-weight:700;font-size:0.8rem;color:#000;}
-                        .tt{font-size:0.68rem;color:#999;margin-left:6px;}
-                        .tb{font-size:0.8rem;color:#1a1a1a;line-height:1.65;margin:8px 0 0;}
-                        .tact{display:flex;gap:16px;margin-top:8px;}
-                        .tact span{display:flex;align-items:center;gap:2px;font-size:0.68rem;color:#999;}
-                        .tact .material-symbols-outlined{font-size:18px;}
-                        .ttag{color:#1a73e8;font-weight:500;}
+                        .threads-feed{background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,sans-serif;}
+                        .threads-item{padding:14px 16px;border-bottom:0.5px solid #e0e0e0;}
+                        .threads-item:last-child{border-bottom:none;}
+                        .ti-row{display:flex;gap:10px;}
+                        .ti-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+                        .ti-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.6rem;color:#fff;}
+                        .ti-line{width:2px;flex:1;background:#e0e0e0;margin:4px 0;min-height:10px;}
+                        .ti-right{flex:1;min-width:0;}
+                        .ti-header{display:flex;justify-content:space-between;align-items:center;}
+                        .ti-name{font-weight:700;font-size:13px;color:#000;}
+                        .ti-verify{color:#1a73e8;font-size:11px;margin-left:2px;}
+                        .ti-time{color:#999;font-size:12px;margin-left:6px;}
+                        .ti-more{color:#bbb;font-size:16px;letter-spacing:2px;line-height:1;}
+                        .ti-body{font-size:13px;color:#000;line-height:1.6;margin-top:4px;white-space:pre-line;}
+                        .ti-tag{color:#1a73e8;font-weight:500;}
+                        .ti-actions{display:flex;gap:14px;margin-top:8px;}
+                        .ti-act{display:flex;align-items:center;gap:2px;color:#999;font-size:12px;cursor:default;}
+                        .ti-act .material-symbols-outlined{font-size:18px;}
+                        .ti-reply{padding:10px 16px 14px;margin-left:46px;}
+                        .ti-reply .ti-avatar{width:24px;height:24px;font-size:0.45rem;}
+                        .ti-reply .ti-name{font-size:12px;}
+                        .ti-reply .ti-body{font-size:12.5px;margin-top:2px;}
+                        .example-tab-bar{display:flex;border-bottom:1px solid #e0e0e0;}
+                        .example-tab{flex:1;text-align:center;padding:12px;font-size:0.78rem;font-weight:600;color:#999;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+                        .example-tab.active{color:#000;border-bottom-color:#000;}
                     </style>
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                        <!-- 範例 1：原創推薦文 -->
-                        <div>
-                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                                <span style="font-size:0.68rem;font-weight:700;color:#fff;background:#6366f1;padding:3px 10px;border-radius:20px;">寫文分享</span>
-                                <span style="font-size:0.68rem;color:#64748b;">撰寫原創貼文推薦</span>
-                            </div>
-                            <div class="tp">
-                                <div style="display:flex;gap:10px;">
-                                    <div style="display:flex;flex-direction:column;align-items:center;">
-                                        <div class="ta" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);">你</div>
-                                        <div style="width:2px;background:#e4e4e4;flex:1;margin:6px 0;min-height:16px;"></div>
-                                    </div>
-                                    <div style="flex:1;min-width:0;">
-                                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                                            <div><span class="tn">your_handle</span><span class="tt">2小時</span></div>
-                                            <span style="color:#bbb;font-size:13px;letter-spacing:1px;">···</span>
-                                        </div>
-                                        <div class="tb">
-                                            最近上了這堂 AI 課程，真的超實用 🔥<br><br>
-                                            以前 AI 對我來說就是 ChatGPT 聊天而已<br>
-                                            上完才知道原來可以拿來做簡報、自動化工作流程<br>
-                                            甚至用 AI 寫行銷文案，省了超多時間<br><br>
-                                            推薦給一樣想提升工作效率的朋友<br>
-                                            📌 連結＋折扣碼放留言<br><br>
-                                            <span class="ttag">#AI課程</span> <span class="ttag">#ChatGPT</span> <span class="ttag">#工作效率</span>
-                                        </div>
-                                        <div class="tact">
-                                            <span><span class="material-symbols-outlined">favorite</span> 42</span>
-                                            <span><span class="material-symbols-outlined">mode_comment</span> 8</span>
-                                            <span><span class="material-symbols-outlined">repeat</span> 5</span>
-                                            <span><span class="material-symbols-outlined">send</span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f5;">
-                                    <div class="ta" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);width:24px;height:24px;font-size:0.5rem;">你</div>
-                                    <div style="font-size:0.75rem;color:#666;line-height:1.5;">
-                                        <span style="font-weight:700;color:#000;font-size:0.72rem;">your_handle</span><br>
-                                        🔗 <span style="color:#1a73e8;text-decoration:underline;">tbr.digital/courses/ai-course?coupon=JRTING</span><br>
-                                        折扣碼 <span style="font-weight:700;background:#fff3cd;padding:1px 6px;border-radius:4px;">JRTING</span> 享優惠價！
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="margin-top:8px;padding:8px 12px;background:#eef2ff;border-radius:8px;font-size:0.66rem;color:#4338ca;font-weight:600;text-align:center;">
-                                ✨ 自然分享個人體驗 → 留言區放推廣連結 + 折扣碼
-                            </div>
-                        </div>
-
-                        <!-- 範例 2：留言分享心得 -->
-                        <div>
-                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                                <span style="font-size:0.68rem;font-weight:700;color:#fff;background:#10b981;padding:3px 10px;border-radius:20px;">留言互動</span>
-                                <span style="font-size:0.68rem;color:#64748b;">在品牌貼文下留言</span>
-                            </div>
-                            <div class="tp">
-                                <div style="display:flex;gap:10px;">
-                                    <div style="display:flex;flex-direction:column;align-items:center;">
-                                        <div class="ta" style="background:#1e293b;"><span style="font-size:0.5rem;">TBR</span></div>
-                                        <div style="width:2px;background:#e4e4e4;flex:1;margin:6px 0;min-height:16px;"></div>
-                                    </div>
-                                    <div style="flex:1;">
-                                        <div style="display:flex;justify-content:space-between;align-items:center;">
-                                            <div>
-                                                <span class="tn">數位簡報室</span>
-                                                <span style="color:#1a73e8;font-size:11px;margin-left:1px;">✓</span>
-                                                <span class="tt">5小時</span>
-                                            </div>
-                                            <span style="color:#bbb;font-size:13px;letter-spacing:1px;">···</span>
-                                        </div>
-                                        <div class="tb" style="color:#666;">
-                                            全新 2026 AI 入門課程正式上線 🚀<br>
-                                            從零開始學 AI，掌握職場必備技能<br>
-                                            👉 課程連結在個人檔案
-                                        </div>
-                                        <div class="tact" style="margin-top:6px;">
-                                            <span><span class="material-symbols-outlined">favorite</span> 128</span>
-                                            <span><span class="material-symbols-outlined">mode_comment</span> 23</span>
-                                            <span><span class="material-symbols-outlined">repeat</span> 15</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #f0f0f5;">
-                                    <div class="ta" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);width:30px;height:30px;font-size:0.55rem;">你</div>
-                                    <div style="flex:1;">
-                                        <div>
-                                            <span class="tn" style="font-size:0.76rem;">your_handle</span>
-                                            <span class="tt">3小時</span>
-                                        </div>
-                                        <div class="tb" style="margin-top:4px;">
-                                            推推！我自己也上過，特別推薦裡面 AI 自動化的單元 🙌<br>
-                                            學完工作流程效率直接起飛，每天至少省 1 小時<br>
-                                            真心推薦給想入門 AI 但不知道從哪開始的朋友！<br>
-                                            用折扣碼 <span style="font-weight:700;background:#dcfce7;padding:1px 6px;border-radius:4px;color:#16a34a;">JRTING</span> 有優惠 👀
-                                        </div>
-                                        <div class="tact" style="margin-top:6px;">
-                                            <span><span class="material-symbols-outlined">favorite</span> 12</span>
-                                            <span><span class="material-symbols-outlined">mode_comment</span> 3</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="margin-top:8px;padding:8px 12px;background:#ecfdf5;border-radius:8px;font-size:0.66rem;color:#065f46;font-weight:600;text-align:center;">
-                                💬 在品牌貼文下真實留言互動 → 社群信任加乘
-                            </div>
+                    <div style="padding:14px 20px 10px;border-bottom:1px solid #f0f0f0;">
+                        <div class="section-header" style="margin:0;">
+                            <span class="material-symbols-outlined">lightbulb</span> 口碑分享範例
                         </div>
                     </div>
 
-                    <div style="margin-top:16px;padding:14px 18px;background:linear-gradient(135deg,#eef2ff,#faf5ff);border-radius:12px;font-size:0.72rem;color:#4338ca;line-height:1.7;">
+                    <div class="example-tab-bar">
+                        <div class="example-tab active" onclick="switchExampleTab(0)">🔗 不帶連結・純口碑</div>
+                        <div class="example-tab" onclick="switchExampleTab(1)">📎 帶連結・自然植入</div>
+                    </div>
+
+                    <div class="example-panel" id="exPanel0">
+                        <div class="threads-feed">
+                            <div class="threads-item">
+                                <div class="ti-row">
+                                    <div class="ti-left">
+                                        <div class="ti-avatar" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);">你</div>
+                                        <div class="ti-line"></div>
+                                    </div>
+                                    <div class="ti-right">
+                                        <div class="ti-header">
+                                            <div><span class="ti-name">your_handle</span><span class="ti-time">2小時</span></div>
+                                            <span class="ti-more">···</span>
+                                        </div>
+                                        <div class="ti-body">最近花了一個月把 AI 工具融入工作流程
+真心覺得應該更早開始 😭
+
+以前做一份提案至少要 3 天
+現在用 AI 輔助整理資料 → 產出大綱 → 生成初稿
+大概半天就搞定，剩下的時間拿來打磨細節
+
+學習過程中最大的心得是
+不要想一次學完所有工具
+先從「你最常做的事」開始替換就好
+
+<span class="ti-tag">#AI工作術</span> <span class="ti-tag">#效率提升</span> <span class="ti-tag">#ChatGPT</span></div>
+                                        <div class="ti-actions">
+                                            <span class="ti-act"><span class="material-symbols-outlined">favorite</span> 89</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">mode_comment</span> 12</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">repeat</span> 7</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">send</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="threads-item">
+                                <div class="ti-row">
+                                    <div class="ti-left">
+                                        <div class="ti-avatar" style="background:#1e293b;"><span style="font-size:0.5rem;">TBR</span></div>
+                                        <div class="ti-line"></div>
+                                    </div>
+                                    <div class="ti-right">
+                                        <div class="ti-header">
+                                            <div><span class="ti-name">數位簡報室</span><span class="ti-verify">✓</span><span class="ti-time">5小時</span></div>
+                                            <span class="ti-more">···</span>
+                                        </div>
+                                        <div class="ti-body" style="color:#666;">AI 不是要取代你，而是讓你的工作更有餘裕
+2026 年最值得投資自己的一件事 👇</div>
+                                        <div class="ti-actions">
+                                            <span class="ti-act"><span class="material-symbols-outlined">favorite</span> 156</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">mode_comment</span> 31</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">repeat</span> 18</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ti-reply">
+                                    <div class="ti-row" style="gap:8px;">
+                                        <div class="ti-avatar" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);">你</div>
+                                        <div class="ti-right">
+                                            <div><span class="ti-name" style="font-size:12px;">your_handle</span><span class="ti-time">4小時</span></div>
+                                            <div class="ti-body">我之前也覺得 AI 離我很遠
+結果學了之後才發現，光是會用 prompt 跟 AI 溝通這件事
+就讓我的報告品質提升超多
+現在同事都問我怎麼做到的 😂</div>
+                                            <div class="ti-actions">
+                                                <span class="ti-act"><span class="material-symbols-outlined">favorite</span> 24</span>
+                                                <span class="ti-act"><span class="material-symbols-outlined">mode_comment</span> 5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:12px 16px;background:#f0fdf4;text-align:center;font-size:0.68rem;color:#166534;font-weight:600;">
+                            ✅ 純口碑分享 — 不放連結，用真實體驗建立信任，提升帳號權重
+                        </div>
+                    </div>
+
+                    <div class="example-panel" id="exPanel1" style="display:none;">
+                        <div style="padding:12px 16px;background:linear-gradient(135deg,#fef2f2,#fff1f2);border-bottom:1px solid #fecaca;">
+                            <div style="display:flex;gap:8px;align-items:flex-start;">
+                                <span class="material-symbols-outlined" style="color:#dc2626;font-size:18px;margin-top:1px;">warning</span>
+                                <div style="font-size:0.72rem;color:#991b1b;line-height:1.6;">
+                                    <strong>⚠️ 重要：不要直接在正文貼連結</strong><br>
+                                    Threads 演算法會降低含外部連結貼文的觸及率。<br>
+                                    正確做法 → <strong>正文寫真實體驗，留言區回覆自己放連結</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="threads-feed">
+                            <div class="threads-item">
+                                <div class="ti-row">
+                                    <div class="ti-left">
+                                        <div class="ti-avatar" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);">你</div>
+                                        <div class="ti-line"></div>
+                                    </div>
+                                    <div class="ti-right">
+                                        <div class="ti-header">
+                                            <div><span class="ti-name">your_handle</span><span class="ti-time">1小時</span></div>
+                                            <span class="ti-more">···</span>
+                                        </div>
+                                        <div class="ti-body">分享一個最近讓我很驚豔的學習體驗
+
+因為工作需要，我一直在找 AI 相關課程
+試了好幾個平台，但大部分都講得很理論
+直到最近上了一堂真的是「做中學」的課
+
+不是只叫你看影片
+而是每個單元都有實作，跟著做完之後
+馬上就能用在自己的工作上
+
+特別推薦給跟我一樣
+「學了很多但用不出來」的人 🙋‍♀️
+
+詳細心得跟連結我放留言 👇
+
+<span class="ti-tag">#AI課程</span> <span class="ti-tag">#學習推薦</span> <span class="ti-tag">#自我投資</span></div>
+                                        <div class="ti-actions">
+                                            <span class="ti-act"><span class="material-symbols-outlined">favorite</span> 67</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">mode_comment</span> 15</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">repeat</span> 9</span>
+                                            <span class="ti-act"><span class="material-symbols-outlined">send</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ti-reply">
+                                    <div class="ti-row" style="gap:8px;">
+                                        <div class="ti-avatar" style="background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);">你</div>
+                                        <div class="ti-right">
+                                            <div><span class="ti-name" style="font-size:12px;">your_handle</span><span class="ti-time">1小時</span></div>
+                                            <div class="ti-body">補充剛剛說的那堂課 ⬇️
+就是這個 → <span style="color:#1a73e8;text-decoration:underline;">tbr.digital/courses/ai-beginner</span>
+
+我自己是用折扣碼 <span style="font-weight:700;background:#fff3cd;padding:0 4px;border-radius:3px;">JRTING</span> 入手的
+好像還有優惠，有興趣可以看看 🤓</div>
+                                            <div class="ti-actions">
+                                                <span class="ti-act"><span class="material-symbols-outlined">favorite</span> 8</span>
+                                                <span class="ti-act"><span class="material-symbols-outlined">mode_comment</span> 3</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:14px 16px;background:#fafafa;border-top:1px solid #e0e0e0;">
+                            <div style="font-size:0.75rem;font-weight:700;color:#dc2626;margin-bottom:8px;">❌ 不要這樣做</div>
+                            <div style="background:#fff;border:1px solid #fecaca;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#666;line-height:1.6;position:relative;">
+                                <div style="position:absolute;top:8px;right:10px;background:#fecaca;color:#991b1b;font-size:0.58rem;padding:1px 6px;border-radius:4px;font-weight:700;">NG</div>
+                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                                    <div style="width:24px;height:24px;border-radius:50%;background:#ccc;"></div>
+                                    <span style="font-weight:700;font-size:12px;color:#999;">某帳號</span>
+                                </div>
+                                <span style="text-decoration:line-through;color:#999;">🔥 限時優惠！AI 課程現在打 85 折！
+趕快用我的折扣碼 XXX 報名 👇👇
+https://xxx.com/course?coupon=XXX
+#廣告 #課程推薦 #優惠</span>
+                            </div>
+                            <div style="margin-top:8px;font-size:0.65rem;color:#991b1b;line-height:1.5;">
+                                → 正文直接放連結 + 促銷語言 = 觸及率暴跌<br>
+                                → 觀眾一看就知道是廣告，不會產生真實互動
+                            </div>
+                        </div>
+                        <div style="padding:12px 16px;background:#eff6ff;text-align:center;font-size:0.68rem;color:#1e40af;font-weight:600;">
+                            ✅ 正確方式：正文寫真實心得 → 回覆自己放連結＋折扣碼
+                        </div>
+                    </div>
+
+                    <div style="padding:14px 18px;background:linear-gradient(135deg,#eef2ff,#faf5ff);font-size:0.72rem;color:#4338ca;line-height:1.7;border-top:1px solid #e8e8f0;">
                         <strong>💡 口碑行銷小提醒</strong><br>
-                        • 以「自己的語言」分享<strong>真實體驗</strong>，避免過度廣告化<br>
-                        • 標注課程主題相關的 <span class="ttag" style="font-size:0.72rem;">#hashtag</span> 增加觸及<br>
-                        • 搭配<strong>個人故事</strong>（學習心得、效率提升）效果最佳<br>
-                        • 推廣連結和折扣碼放在<strong>留言區</strong>，保持貼文自然<br>
+                        • 以「自己的語言」分享<strong>真實體驗</strong>，像在跟朋友聊天<br>
+                        • 正文不放連結，留言區再補，<strong>避免被降觸及</strong><br>
+                        • 搭配 <span class="ti-tag" style="font-size:0.72rem;">#hashtag</span> 增加曝光<br>
+                        • 先累積純口碑帖再穿插帶連結分享，<strong>比例建議 3:1</strong><br>
                         • 品牌方將根據你的追蹤數和領域匹配合適的合作機會
                     </div>
                 </div>
             </div>
+
+            <script>
+            function switchExampleTab(idx) {
+                document.querySelectorAll('.example-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+                document.querySelectorAll('.example-panel').forEach((p,i) => p.style.display = i===idx ? '' : 'none');
+            }
+            </script>
 
 
             <div class="view-page" id="view-tutorial">
