@@ -2457,9 +2457,21 @@ ${moduleSummary || '  （尚未設定課程模組）'}
 📌 課程須知
 ━━━━━━━━━━━━━━━━━━━━
 
-  1. 本課程屬於數位課程，不提供實體講義。
-  2. 本次課程簡報採用特別開發的互動式簡報，上課當天可透過「課前準備頁」進入簡報連結，進行課堂互動。
-  3. 講師將進行螢幕錄影（原檔交付不剪輯）。若需實體拍攝請自行安排。若錄影因設備意外中斷，將提供課程逐字稿摘要供後續參考。
+${(() => {
+    const notes = od.courseNotes || [];
+    const isInteractive = projectData?.slide_mode !== 'external';
+    if (notes.length > 0) {
+        return notes.map((n, i) => `  ${i + 1}. ${n.title}${n.desc ? `\n     ${n.desc}` : ''}`).join('\n');
+    }
+    const defaultNotes = [
+        '本課程屬於數位課程，不提供實體講義。',
+        isInteractive
+            ? '本次課程簡報採用特別開發的互動式簡報，上課當天可透過「課前準備頁」進入簡報連結，進行課堂互動。'
+            : null,
+        '講師將進行螢幕錄影（原檔交付不剪輯）。若需實體拍攝請自行安排。若錄影因設備意外中斷，將提供課程逐字稿摘要供後續參考。'
+    ].filter(Boolean);
+    return defaultNotes.map((n, i) => `  ${i + 1}. ${n}`).join('\n');
+})()}
 
 
 ━━━━━━━━━━━━━━━━━━━━

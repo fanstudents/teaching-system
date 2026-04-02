@@ -1079,10 +1079,43 @@
                 grid-template-columns: 1fr !important;
             }
 
-            /* Course cards - header */
-            .section-card > div[style*="display:flex"][style*="cursor:pointer"] {
-                flex-wrap: wrap;
-                gap: 8px;
+            /* Course cards - mobile layout */
+            .course-header {
+                flex-wrap: wrap !important;
+                padding: 14px 16px !important;
+                gap: 0 !important;
+            }
+            .course-header .ch-icon {
+                width: 32px !important;
+                height: 32px !important;
+                margin-right: 10px;
+            }
+            .course-header .ch-title {
+                flex: 1 !important;
+                min-width: 0 !important;
+                font-size: 0.84rem !important;
+            }
+            .course-header .ch-expand {
+                margin-left: auto;
+            }
+            .course-header .ch-actions {
+                width: 100%;
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid #f0f0f5;
+            }
+
+            /* Coupon page - prevent mobile overflow */
+            #view-coupon { overflow-x: hidden; }
+            #view-coupon .section-body { overflow-x: hidden; }
+            #promoLinksContainer { word-break: break-all; }
+            #promoLinksContainer div[style*="display:flex"] {
+                flex-direction: column !important;
+            }
+            #promoLinksContainer input,
+            #promoLinksContainer span[style*="monospace"] {
+                font-size: 0.68rem !important;
+                word-break: break-all;
             }
 
             /* Tutorial tabs - scrollable */
@@ -3511,18 +3544,20 @@ Day 4: 真的很棒拜託快去上！</span>
 
                 return `
                 <div class="section-card" style="margin-bottom:0;overflow:hidden;">
-                    <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
-                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <div class="course-header" style="display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
+                        <div class="ch-icon" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                             <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">${c.icon || 'school'}</span>
                         </div>
-                        <div style="flex:1;min-width:0;">
+                        <div class="ch-title" style="flex:1;min-width:0;">
                             <div style="font-size:0.9rem;font-weight:700;color:#1e293b;line-height:1.4;">${c.name}</div>
                         </div>
-                        <button class="utm-btn" style="font-size:0.7rem;padding:5px 12px;border-color:#c7d2fe;color:#6366f1;background:#eef2ff;white-space:nowrap;flex-shrink:0;" onclick="event.stopPropagation();document.querySelector('[data-view=free-courses]').click()">
-                            <span class="material-symbols-outlined" style="font-size:13px;">visibility</span> 免費體驗觀看30天
-                        </button>
-                        <span class="platform-tag" style="flex-shrink:0;">${plNames[c.platform] || ''}</span>
-                        <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;flex-shrink:0;">expand_more</span>
+                        <span class="ch-expand material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;flex-shrink:0;">expand_more</span>
+                        <div class="ch-actions">
+                            <button class="utm-btn" style="font-size:0.7rem;padding:5px 12px;border-color:#c7d2fe;color:#6366f1;background:#eef2ff;white-space:nowrap;flex-shrink:0;" onclick="event.stopPropagation();document.querySelector('[data-view=free-courses]').click()">
+                                <span class="material-symbols-outlined" style="font-size:13px;">visibility</span> 免費體驗觀看30天
+                            </button>
+                            <span class="platform-tag" style="flex-shrink:0;">${plNames[c.platform] || ''}</span>
+                        </div>
                     </div>
                     <div class="c-detail" style="display:none;padding:0 20px 16px;border-top:1px solid #f0f0f5;">
                         <div style="padding-top:14px;">

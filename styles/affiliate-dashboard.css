@@ -588,6 +588,13 @@ select {
     color: var(--success);
 }
 
+/* ── Course Card Actions ── */
+.ch-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* ── Course links ── */
 .course-links {
     display: flex;
