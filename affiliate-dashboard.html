@@ -1042,6 +1042,106 @@
         @media (max-width: 480px) {
             .login-form-panel { padding: 40px 24px; }
         }
+
+        /* ── Mobile Responsive for Affiliate Dashboard ── */
+        @media (max-width: 768px) {
+            .dashboard-layout { flex-direction: column; }
+            .sidebar { 
+                width: 100%; height: auto; position: relative; 
+                flex-direction: row; padding: 8px; gap: 2px;
+                overflow-x: auto; border-right: none; border-bottom: 1px solid #e8ecf1;
+            }
+            .sidebar .brand { display: none; }
+            .nav-divider { display: none; }
+            .nav-item { 
+                padding: 8px 12px; font-size: 0.7rem; white-space: nowrap; 
+                flex-direction: row; gap: 4px; border-radius: 8px;
+            }
+            .nav-item .material-symbols-outlined { font-size: 16px; }
+            .main-content { padding: 16px; }
+            .page-title { font-size: 1.1rem; }
+            .page-subtitle { font-size: 0.78rem; }
+
+            /* Stat Grid */
+            .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 14px; }
+            .stat-value { font-size: 1.1rem; }
+            .stat-label { font-size: 0.68rem; }
+
+            /* Charts */
+            .section-card { border-radius: 10px; }
+            div[style*="grid-template-columns:2fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Referral cards */
+            div[style*="grid-template-columns:1fr 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Course cards - header */
+            .section-card > div[style*="display:flex"][style*="cursor:pointer"] {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            /* Tutorial tabs - scrollable */
+            #tutorialTabs, #refCopyTabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            #tutorialTabs button, #refCopyTabs button {
+                white-space: nowrap;
+                min-width: max-content;
+            }
+
+            /* Tutorial content grid */
+            .tut-channel > div[style*="grid-template-columns:1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Referral form */
+            #refTypeCards {
+                grid-template-columns: 1fr !important;
+            }
+            div[style*="grid-template-columns:1fr 1fr;gap:12px"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Coupon display */
+            .coupon-display { flex-direction: column; text-align: center; }
+            .coupon-code-box { font-size: 1.6rem; }
+
+            /* Promo links */
+            #promoLinksContainer div[style*="display:flex"] {
+                flex-direction: column;
+            }
+
+            /* Free courses conditions */
+            .fc-cond-grid { grid-template-columns: 1fr !important; }
+
+            /* Threads toggle categories */
+            .tw-row { grid-template-columns: 1fr !important; }
+
+            /* Push notice */
+            div[style*="grid-template-columns:1fr 1fr 1fr;gap:10px"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Coupon example image */
+            div[style*="max-width:480px"] {
+                max-width: 100% !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-grid { grid-template-columns: 1fr; }
+            .sidebar { padding: 6px; }
+            .nav-item { padding: 6px 10px; font-size: 0.65rem; }
+            .main-content { padding: 12px; }
+            .section-header { font-size: 0.8rem; padding: 10px 14px; }
+            .section-body { padding: 12px 14px; }
+        }
     </style>
 </head>
 
@@ -3398,31 +3498,41 @@ Day 4: 真的很棒拜託快去上！</span>
 
                 return `
                 <div class="section-card" style="margin-bottom:0;overflow:hidden;">
-                    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
-                        <span class="material-symbols-outlined" style="font-size:20px;color:#6366f1;">${c.icon || 'school'}</span>
-                        <span style="flex:1;font-size:0.88rem;font-weight:600;color:#1e293b;">${c.name}</span>
-                        <button class="utm-btn" style="font-size:0.68rem;padding:4px 10px;border-color:#c7d2fe;color:#6366f1;background:#eef2ff;" onclick="event.stopPropagation();document.querySelector('[data-view=free-courses]').click()">
+                    <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;" onclick="this.parentElement.querySelector('.c-detail').classList.toggle('show')">
+                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">${c.icon || 'school'}</span>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.9rem;font-weight:700;color:#1e293b;line-height:1.4;">${c.name}</div>
+                        </div>
+                        <button class="utm-btn" style="font-size:0.7rem;padding:5px 12px;border-color:#c7d2fe;color:#6366f1;background:#eef2ff;white-space:nowrap;flex-shrink:0;" onclick="event.stopPropagation();document.querySelector('[data-view=free-courses]').click()">
                             <span class="material-symbols-outlined" style="font-size:13px;">visibility</span> 免費體驗觀看30天
                         </button>
-                        <span class="platform-tag">${plNames[c.platform] || ''}</span>
-                        <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;">expand_more</span>
+                        <span class="platform-tag" style="flex-shrink:0;">${plNames[c.platform] || ''}</span>
+                        <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;transition:transform 0.2s;flex-shrink:0;">expand_more</span>
                     </div>
-                    <div class="c-detail" style="display:none;padding:0 18px 14px;border-top:1px solid #f0f0f5;">
-                        ${descHtml}
-                        ${instrHtml}
-                        <div style="display:flex;align-items:center;gap:10px;padding-top:8px;margin-bottom:12px;">
-                            <div style="flex:1;">
-                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px;">折扣碼</div>
-                                <span style="font-family:'SF Mono',monospace;font-size:0.88rem;font-weight:700;color:#1e293b;background:#f1f5f9;padding:3px 10px;border-radius:6px;cursor:pointer;" onclick="event.stopPropagation();navigator.clipboard.writeText('${couponCode||''}');this.textContent='✅ 已複製';setTimeout(()=>this.textContent='${couponCode||''}',1500)">${couponCode || '-'}</span>
+                    <div class="c-detail" style="display:none;padding:0 20px 16px;border-top:1px solid #f0f0f5;">
+                        <div style="padding-top:14px;">
+                            ${descHtml ? `<div style="font-size:0.82rem;color:#475569;line-height:1.7;margin-bottom:12px;padding:12px 14px;background:#f8fafc;border-radius:8px;border-left:3px solid #6366f1;">${c.description}</div>` : ''}
+                            ${instrHtml ? `<div style="font-size:0.76rem;color:#64748b;margin-bottom:12px;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:15px;color:#94a3b8;">person</span> 講師：<strong style="color:#1e293b;">${c.instructor}</strong></div>` : ''}
+                            <div style="display:flex;align-items:center;gap:16px;padding:12px 14px;background:#fafbfc;border-radius:8px;margin-bottom:14px;">
+                                <div>
+                                    <div style="font-size:0.68rem;color:#94a3b8;margin-bottom:4px;font-weight:500;">折扣碼</div>
+                                    <span style="font-family:'SF Mono',monospace;font-size:0.92rem;font-weight:700;color:#1e293b;background:#e2e8f0;padding:4px 14px;border-radius:6px;cursor:pointer;display:inline-block;" onclick="event.stopPropagation();navigator.clipboard.writeText('${couponCode||''}');this.textContent='✅ 已複製';setTimeout(()=>this.textContent='${couponCode||''}',1500)">${couponCode || '-'}</span>
+                                </div>
+                                <div style="width:1px;height:28px;background:#e2e8f0;"></div>
+                                <div>
+                                    <div style="font-size:0.68rem;color:#94a3b8;margin-bottom:4px;font-weight:500;">分潤比例</div>
+                                    <span style="font-size:0.92rem;font-weight:700;color:#10b981;">${ratePercent}%</span>
+                                </div>
                             </div>
-                            <div>
-                                <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px;">分潤</div>
-                                <span style="font-size:0.88rem;font-weight:700;color:#10b981;">${ratePercent}%</span>
+                            <div style="font-size:0.74rem;color:#475569;margin-bottom:10px;font-weight:600;display:flex;align-items:center;gap:6px;">
+                                <span class="material-symbols-outlined" style="font-size:15px;color:#6366f1;">link</span>
+                                推廣連結（點擊複製，已含折扣碼 + UTM）
                             </div>
-                        </div>
-                        <div style="font-size:0.72rem;color:#64748b;margin-bottom:8px;font-weight:600;">推廣連結（點擊複製，已含折扣碼 + UTM）</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                            ${utmBtns}
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                                ${utmBtns}
+                            </div>
                         </div>
                     </div>
                 </div>`;
