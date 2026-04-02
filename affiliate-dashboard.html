@@ -1721,108 +1721,107 @@
                 <h2 class="page-title">Threads 口碑行銷</h2>
                 <p class="page-subtitle">加入口碑行銷計畫，透過你的 Threads 影響力為品牌創造真實推薦</p>
 
-                <!-- 類別開關 -->
-                <div class="section-card" style="margin-bottom:16px;padding:20px;">
-                    <div style="font-size:0.88rem;font-weight:700;color:#1e293b;margin-bottom:4px;">
-                        <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;color:#6366f1;">campaign</span>
-                        選擇你想接的口碑行銷類別
-                    </div>
-                    <div style="font-size:0.72rem;color:#64748b;margin-bottom:14px;">開啟後，該類別的品牌方將可以看到你的 Threads 資料並邀請合作</div>
+                <!-- 設定區 -->
+                <div class="section-card" style="padding:0;overflow:hidden;margin-bottom:16px;">
+                    <style>
+                        .tw-section{padding:16px 20px;border-bottom:1px solid #f0f0f0;}
+                        .tw-section:last-child{border-bottom:none;}
+                        .tw-label{font-size:0.72rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;}
+                        .tw-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+                        .tw-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1.5px solid #e2e8f0;border-radius:20px;cursor:pointer;transition:all .2s;background:#fafbfc;font-size:0.74rem;font-weight:600;color:#64748b;}
+                        .tw-chip:hover{border-color:#c7d2fe;background:#f5f3ff;}
+                        .tw-chip input{display:none;}
+                        .tw-chip:has(input:checked){border-color:#6366f1;background:linear-gradient(135deg,#eef2ff,#f5f3ff);color:#4338ca;box-shadow:0 0 0 2px rgba(99,102,241,0.12);}
+                        .tw-chip:has(input:checked) .tw-check{display:inline;}
+                        .tw-check{display:none;font-size:12px;color:#6366f1;}
+                        .tw-chip .material-symbols-outlined{font-size:16px;}
+                        .tw-price-box{display:flex;align-items:center;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;background:#fff;}
+                        .tw-price-box span{padding:7px 10px;background:#f8fafc;font-size:0.78rem;color:#64748b;font-weight:600;border-right:1px solid #e2e8f0;}
+                        .tw-price-box input{border:none!important;border-radius:0!important;padding:7px 10px;flex:1;font-size:0.82rem;outline:none;box-shadow:none!important;}
+                    </style>
 
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-                        <label class="threads-cat-card" id="catCardCourse">
-                            <input type="checkbox" id="threadsCatCourse" onchange="saveThreadsProfile()" style="display:none;">
-                            <div class="tcc-inner">
-                                <span class="material-symbols-outlined tcc-icon" style="color:#6366f1;">school</span>
-                                <div class="tcc-title">課程・知識產品</div>
-                                <div class="tcc-desc">線上課程、講座、電子書、工作坊</div>
+                    <!-- 類別選擇 -->
+                    <div class="tw-section">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#1e293b;">
+                                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;color:#6366f1;">campaign</span>
+                                想接的口碑行銷類別
                             </div>
-                        </label>
-                        <label class="threads-cat-card" id="catCardFood">
-                            <input type="checkbox" id="threadsCatFood" onchange="saveThreadsProfile()" style="display:none;">
-                            <div class="tcc-inner">
-                                <span class="material-symbols-outlined tcc-icon" style="color:#f59e0b;">restaurant</span>
-                                <div class="tcc-title">餐飲・食品</div>
-                                <div class="tcc-desc">餐廳、飲品、零食、保健食品</div>
-                            </div>
-                        </label>
-                        <label class="threads-cat-card" id="catCardBeauty">
-                            <input type="checkbox" id="threadsCatBeauty" onchange="saveThreadsProfile()" style="display:none;">
-                            <div class="tcc-inner">
-                                <span class="material-symbols-outlined tcc-icon" style="color:#ec4899;">spa</span>
-                                <div class="tcc-title">美妝・醫美・保養</div>
-                                <div class="tcc-desc">保養品、彩妝、醫美療程</div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <style>
-                    .threads-cat-card{cursor:pointer;display:block;}
-                    .tcc-inner{border:1.5px solid #e2e8f0;border-radius:12px;padding:16px 14px;text-align:center;transition:all .2s;background:#fafbfc;}
-                    .tcc-inner:hover{border-color:#c7d2fe;background:#f5f3ff;}
-                    .threads-cat-card input:checked ~ .tcc-inner{border-color:#6366f1;background:linear-gradient(135deg,#eef2ff,#f5f3ff);box-shadow:0 0 0 2px rgba(99,102,241,0.15);}
-                    .tcc-icon{font-size:28px;display:block;margin:0 auto 6px;}
-                    .tcc-title{font-size:0.78rem;font-weight:700;color:#1e293b;margin-bottom:2px;}
-                    .tcc-desc{font-size:0.62rem;color:#94a3b8;line-height:1.4;}
-                    .threads-cat-card input:checked ~ .tcc-inner .tcc-title{color:#4338ca;}
-                    .threads-cat-card input:checked ~ .tcc-inner::after{content:'✓ 已開啟';display:block;margin-top:6px;font-size:0.62rem;font-weight:700;color:#6366f1;}
-                </style>
-
-                <!-- 帳號資訊 -->
-                <div class="section-card" style="margin-bottom:16px;padding:20px;">
-                    <div class="section-header" style="margin-bottom:16px;">
-                        <span class="material-symbols-outlined">account_circle</span> 你的 Threads 資訊
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div>
-                            <label style="font-size:0.72rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">Threads 帳號</label>
-                            <div style="display:flex;align-items:center;gap:0;">
-                                <span style="padding:8px 10px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-right:0;border-radius:8px 0 0 8px;font-size:0.82rem;color:#94a3b8;font-weight:600;">@</span>
-                                <input type="text" id="threadsHandle" placeholder="your_handle" style="flex:1;border-radius:0 8px 8px 0;border-left:0;" onblur="saveThreadsProfile()">
-                            </div>
+                            <span style="font-size:0.62rem;color:#94a3b8;">可複選</span>
                         </div>
-                        <div>
-                            <label style="font-size:0.72rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">追蹤數</label>
-                            <input type="number" id="threadsFollowers" placeholder="例：5000" min="0" onblur="saveThreadsProfile()">
-                        </div>
-                    </div>
-                    <div style="margin-top:12px;">
-                        <label style="font-size:0.72rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">主要經營領域</label>
-                        <input type="text" id="threadsDomain" placeholder="例：AI 科技、行銷、商業、生活風格" onblur="saveThreadsProfile()">
-                    </div>
-                </div>
-
-                <!-- 報價設定 -->
-                <div class="section-card" style="margin-bottom:16px;padding:20px;">
-                    <div class="section-header" style="margin-bottom:16px;">
-                        <span class="material-symbols-outlined">payments</span> 你的報價
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div>
-                            <label style="font-size:0.72rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
-                                分享一篇文章
-                                <span style="color:#94a3b8;font-weight:400;">（每篇）</span>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <label class="tw-chip">
+                                <input type="checkbox" id="threadsCatCourse" onchange="saveThreadsProfile()">
+                                <span class="material-symbols-outlined" style="color:#6366f1;">school</span>
+                                課程・知識產品
+                                <span class="tw-check">✓</span>
                             </label>
-                            <div style="display:flex;align-items:center;gap:0;">
-                                <span style="padding:8px 10px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-right:0;border-radius:8px 0 0 8px;font-size:0.82rem;color:#64748b;font-weight:600;">NT$</span>
-                                <input type="number" id="threadsPostPrice" placeholder="500" min="0" step="50" style="flex:1;border-radius:0 8px 8px 0;border-left:0;" onblur="saveThreadsProfile()">
-                            </div>
-                            <div style="font-size:0.65rem;color:#94a3b8;margin-top:4px;">撰寫原創貼文推薦課程或品牌</div>
-                        </div>
-                        <div>
-                            <label style="font-size:0.72rem;font-weight:600;color:#64748b;display:block;margin-bottom:4px;">
-                                留言分享
-                                <span style="color:#94a3b8;font-weight:400;">（每則）</span>
+                            <label class="tw-chip">
+                                <input type="checkbox" id="threadsCatFood" onchange="saveThreadsProfile()">
+                                <span class="material-symbols-outlined" style="color:#f59e0b;">restaurant</span>
+                                餐飲・食品
+                                <span class="tw-check">✓</span>
                             </label>
-                            <div style="display:flex;align-items:center;gap:0;">
-                                <span style="padding:8px 10px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-right:0;border-radius:8px 0 0 8px;font-size:0.82rem;color:#64748b;font-weight:600;">NT$</span>
-                                <input type="number" id="threadsCommentPrice" placeholder="200" min="0" step="50" style="flex:1;border-radius:0 8px 8px 0;border-left:0;" onblur="saveThreadsProfile()">
-                            </div>
-                            <div style="font-size:0.65rem;color:#94a3b8;margin-top:4px;">在指定貼文下留言分享心得</div>
+                            <label class="tw-chip">
+                                <input type="checkbox" id="threadsCatBeauty" onchange="saveThreadsProfile()">
+                                <span class="material-symbols-outlined" style="color:#ec4899;">spa</span>
+                                美妝・醫美・保養
+                                <span class="tw-check">✓</span>
+                            </label>
                         </div>
                     </div>
-                    <div id="threadsSaveStatus" style="font-size:0.7rem;color:#10b981;margin-top:8px;min-height:18px;"></div>
+
+                    <!-- 帳號資訊 -->
+                    <div class="tw-section">
+                        <div style="font-size:0.82rem;font-weight:700;color:#1e293b;margin-bottom:10px;">
+                            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;color:#6366f1;">account_circle</span>
+                            Threads 資訊
+                        </div>
+                        <div style="display:grid;grid-template-columns:2fr 1fr 2fr;gap:10px;">
+                            <div>
+                                <label class="tw-label">帳號</label>
+                                <div style="display:flex;align-items:center;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+                                    <span style="padding:7px 8px;background:#f8fafc;font-size:0.78rem;color:#94a3b8;font-weight:600;border-right:1px solid #e2e8f0;">@</span>
+                                    <input type="text" id="threadsHandle" placeholder="your_handle" style="border:none!important;border-radius:0!important;padding:7px 8px;flex:1;box-shadow:none!important;" onblur="saveThreadsProfile()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="tw-label">追蹤數</label>
+                                <input type="number" id="threadsFollowers" placeholder="5000" min="0" style="font-size:0.82rem;" onblur="saveThreadsProfile()">
+                            </div>
+                            <div>
+                                <label class="tw-label">主要領域</label>
+                                <input type="text" id="threadsDomain" placeholder="AI、行銷、生活風格" style="font-size:0.82rem;" onblur="saveThreadsProfile()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 報價 -->
+                    <div class="tw-section">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#1e293b;">
+                                <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;color:#6366f1;">payments</span>
+                                報價設定
+                            </div>
+                            <div id="threadsSaveStatus" style="font-size:0.68rem;color:#10b981;min-height:16px;"></div>
+                        </div>
+                        <div class="tw-row">
+                            <div>
+                                <label class="tw-label">寫文分享 <span style="color:#94a3b8;font-weight:400;">每篇</span></label>
+                                <div class="tw-price-box">
+                                    <span>NT$</span>
+                                    <input type="number" id="threadsPostPrice" placeholder="500" min="0" step="50" onblur="saveThreadsProfile()">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="tw-label">留言互動 <span style="color:#94a3b8;font-weight:400;">每則</span></label>
+                                <div class="tw-price-box">
+                                    <span>NT$</span>
+                                    <input type="number" id="threadsCommentPrice" placeholder="200" min="0" step="50" onblur="saveThreadsProfile()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 範例展示 -->
