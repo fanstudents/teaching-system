@@ -1562,16 +1562,20 @@
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                             <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
-                                <div style="font-size:0.78rem;font-weight:600;">帳號代操</div>
-                                <div style="font-size:0.65rem;opacity:0.6;">Content Management</div>
+                                <div style="font-size:0.78rem;font-weight:600;">獨家脆文管理系統</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Content Dashboard</div>
                             </div>
                             <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
-                                <div style="font-size:0.78rem;font-weight:600;">口碑行銷</div>
-                                <div style="font-size:0.65rem;opacity:0.6;">WOM Marketing</div>
+                                <div style="font-size:0.78rem;font-weight:600;">定期海巡 × 脆友互動</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Community Engagement</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);grid-column:span 2;">
-                                <div style="font-size:0.78rem;font-weight:600;">企業品牌經營</div>
-                                <div style="font-size:0.65rem;opacity:0.6;">Brand Strategy & Growth</div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <div style="font-size:0.78rem;font-weight:600;">客製化訪談</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Branded Interviews</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:12px;backdrop-filter:blur(4px);">
+                                <div style="font-size:0.78rem;font-weight:600;">商業轉換流程梳理</div>
+                                <div style="font-size:0.65rem;opacity:0.6;">Conversion Funnel</div>
                             </div>
                         </div>
                         <div style="margin-top:14px;padding:8px 12px;background:rgba(255,255,255,0.15);border-radius:8px;font-size:0.72rem;text-align:center;font-weight:600;">
@@ -1580,24 +1584,75 @@
                     </div>
                 </div>
 
-                <!-- 推薦文案 -->
+                <!-- 推薦文案（分類 Tab） -->
                 <div class="section-card" style="margin-bottom:20px;">
                     <div class="section-header">
                         <span class="material-symbols-outlined">content_copy</span> 推薦文案（點擊複製）
                     </div>
-                    <div class="section-body" style="padding:16px 20px;">
-                        <div id="referralCopy" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:0.82rem;line-height:1.8;cursor:pointer;transition:all 0.15s;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);">我想推薦「數位簡報室」的企業服務給你。
+                    <div class="section-body" style="padding:0;">
+                        <!-- Tab Bar -->
+                        <div style="display:flex;border-bottom:1px solid #e8ecf1;" id="refCopyTabs">
+                            <button class="ref-copy-tab active" data-ref="ai" style="flex:1;padding:10px;border:none;background:none;font-size:0.78rem;font-weight:600;color:#1e40af;cursor:pointer;font-family:inherit;border-bottom:2px solid #1e40af;transition:all 0.15s;">🎯 AI 培訓</button>
+                            <button class="ref-copy-tab" data-ref="system" style="flex:1;padding:10px;border:none;background:none;font-size:0.78rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;">💻 企業導入</button>
+                            <button class="ref-copy-tab" data-ref="threads" style="flex:1;padding:10px;border:none;background:none;font-size:0.78rem;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:all 0.15s;">🧵 Threads 代操</button>
+                        </div>
+                        <!-- Tab Contents -->
+                        <div style="padding:16px 20px;">
+                            <div class="ref-copy-panel active" id="refCopy-ai" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:0.82rem;line-height:1.8;cursor:pointer;transition:all 0.15s;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);">Hi，最近有聽到你們公司在討論 AI 轉型的事情嗎？
 
-🎯 AI 培訓：Vibe Coding 工作坊、辦公室 AI 應用、Claude 全方位教學
-💻 企業導入：儀表板數據整合、老系統改造、企業官網建置、內部系統打造
-🧵 Threads 代操：帳號代操、口碑行銷、企業品牌經營
+我認識一個團隊「數位簡報室」，專門做企業 AI 培訓。
 
-所有課程與系統都可以依企業需求客製化。
+他們的培訓不是那種聽完就忘的講座，而是：
+✅ Vibe Coding 實戰工作坊 — 讓員工直接用 AI 做出內部工具
+✅ 辦公室 AI 應用訓練 — 報告、簡報、數據分析一次搞定
+✅ Claude 全方位企業教學 — 從入門到進階的完整規劃
 
-有興趣的話，可以直接跟他們聯繫：
+已經有超過 20 家企業合作過，包含上市公司和政府單位。
+
+可以依你們的需求客製化課程內容和時數。
+
+如果有興趣，我幫你轉介紹：
 📧 service@tbr.digital
 📲 LINE 官方客服：https://lin.ee/77HaRyW</div>
-                        <div style="margin-top:8px;font-size:0.72rem;color:#94a3b8;">點擊上方文案即可複製</div>
+
+                            <div class="ref-copy-panel" id="refCopy-system" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:0.82rem;line-height:1.8;cursor:pointer;transition:all 0.15s;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);">你們公司有沒有遇過這些問題？
+
+❌ 數據散在 Excel、Google Sheet、各種系統，沒有統一儀表板
+❌ 老系統很難用但不敢動，怕改了會壞
+❌ 想做官網或內部工具，但 IT 人力不夠
+
+我認識「數位簡報室」的技術團隊，他們專門做這些：
+💻 企業儀表板整合 — 把散落的數據統一到一個 Dashboard
+🔧 老系統改造 — 不砍掉重練，用 AI 輔助逐步升級
+🌐 企業官網建置 — 從設計到上線一條龍服務
+⚙️ 內部系統打造 — CRM、進銷存、報表自動化
+
+他們用 Vibe Coding 開發，速度快、成本比傳統軟體公司低。
+
+有興趣的話我幫你們牽線：
+📧 service@tbr.digital
+📲 LINE 官方客服：https://lin.ee/77HaRyW</div>
+
+                            <div class="ref-copy-panel" id="refCopy-threads" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 16px;font-size:0.82rem;line-height:1.8;cursor:pointer;transition:all 0.15s;" onclick="navigator.clipboard.writeText(this.innerText);this.style.borderColor='#10b981';setTimeout(()=>this.style.borderColor='#e2e8f0',1500);">你們品牌有在經營 Threads 嗎？
+
+現在 Threads 是觸及率最高的文字社群平台，但很多企業不知道怎麼操作。
+
+我認識「數位簡報室」的 Threads 代操團隊，他們跟一般代操不一樣的地方：
+
+🔥 獨家脆文管理系統 — 排程、數據追蹤、績效一目瞭然
+🔍 定期海巡機制 — 主動出擊互動，不是發完就放著
+💬 真實脆友互動 — 建立品牌在 Threads 上的真實社群關係
+🎙 客製化訪談企劃 — 把品牌故事轉化為有傳播力的內容
+📊 商業轉換流程梳理 — 從曝光到轉單，打通完整漏斗
+
+不是只幫你發文，而是幫你建立一套可以持續獲客的系統。
+
+有興趣的話我幫你們牽線：
+📧 service@tbr.digital
+📲 LINE 官方客服：https://lin.ee/77HaRyW</div>
+
+                            <div style="margin-top:8px;font-size:0.72rem;color:#94a3b8;">💡 點擊上方文案即可複製</div>
+                        </div>
                     </div>
                 </div>
 
@@ -1620,6 +1675,7 @@
                                         <div>
                                             <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">AI 培訓</div>
                                             <div style="font-size:0.68rem;color:#94a3b8;">Vibe Coding · 辦公應用 · Claude</div>
+                                            <div style="font-size:0.65rem;color:#10b981;font-weight:600;margin-top:2px;">💰 分潤：另議</div>
                                         </div>
                                     </label>
                                     <label style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s;background:#fff;">
@@ -1630,6 +1686,7 @@
                                         <div>
                                             <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">企業導入</div>
                                             <div style="font-size:0.68rem;color:#94a3b8;">儀表板 · 官網 · 系統改造</div>
+                                            <div style="font-size:0.65rem;color:#10b981;font-weight:600;margin-top:2px;">💰 分潤：成交金額 12%</div>
                                         </div>
                                     </label>
                                     <label style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all 0.15s;background:#fff;">
@@ -1640,6 +1697,7 @@
                                         <div>
                                             <div style="font-size:0.84rem;font-weight:600;color:#1e293b;">Threads 代操</div>
                                             <div style="font-size:0.68rem;color:#94a3b8;">社群經營·內容策劃</div>
+                                            <div style="font-size:0.65rem;color:#10b981;font-weight:600;margin-top:2px;">💰 分潤：每月 10%</div>
                                         </div>
                                     </label>
                                 </div>
@@ -3901,6 +3959,28 @@ Day 4: 真的很棒拜託快去上！</span>
                     label.style.background = '#eff6ff';
                     const radio = label.querySelector('input[type="radio"]');
                     document.getElementById('refType').value = radio.value;
+                });
+            });
+
+            // Referral copy tab switching
+            const refTabColors = { ai: '#1e40af', system: '#7c3aed', threads: '#0d9488' };
+            document.querySelectorAll('#refCopyTabs .ref-copy-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const ref = tab.dataset.ref;
+                    document.querySelectorAll('#refCopyTabs .ref-copy-tab').forEach(t => {
+                        t.style.color = '#94a3b8';
+                        t.style.borderBottomColor = 'transparent';
+                        t.classList.remove('active');
+                    });
+                    tab.style.color = refTabColors[ref] || '#1e40af';
+                    tab.style.borderBottomColor = refTabColors[ref] || '#1e40af';
+                    tab.classList.add('active');
+                    document.querySelectorAll('.ref-copy-panel').forEach(p => {
+                        p.style.display = 'none';
+                        p.classList.remove('active');
+                    });
+                    const panel = document.getElementById('refCopy-' + ref);
+                    if (panel) { panel.style.display = 'block'; panel.classList.add('active'); }
                 });
             });
 
