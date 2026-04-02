@@ -1326,6 +1326,9 @@
                 </button>
 
                 <div class="nav-divider"></div>
+                <button class="nav-item" data-view="free-courses">
+                    <span class="material-symbols-outlined">card_giftcard</span> 免費觀看
+                </button>
                 <button class="nav-item" data-view="tutorial">
                     <span class="material-symbols-outlined">auto_stories</span> 推廣教學
                 </button>
@@ -2182,6 +2185,127 @@ https://xxx.com/course?coupon=XXX
             </script>
 
 
+            <!-- View: 免費觀看 -->
+            <div class="view-page" id="view-free-courses">
+                <h2 class="page-title">免費觀看課程</h2>
+                <p class="page-subtitle">符合條件的推廣者，每月可免費觀看 2 堂課程</p>
+
+                <style>
+                    .fc-cond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+                    .fc-cond{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:all .2s;}
+                    .fc-cond.pass{border-color:#10b981;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);}
+                    .fc-cond.fail{opacity:.7;}
+                    .fc-badge{position:absolute;top:10px;right:10px;font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+                    .fc-cond.pass .fc-badge{background:#dcfce7;color:#166534;}
+                    .fc-cond.fail .fc-badge{background:#f1f5f9;color:#94a3b8;}
+                    .fc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+                    .fc-title{font-size:0.78rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+                    .fc-value{font-size:1.15rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;}
+                    .fc-desc{font-size:0.65rem;color:var(--text-muted);margin-top:4px;line-height:1.4;}
+                    .fc-select-card{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
+                    .fc-select-card:hover{border-color:#c7d2fe;background:#fafafe;}
+                    .fc-select-card.selected{border-color:#6366f1;background:linear-gradient(135deg,#eef2ff,#f5f3ff);box-shadow:0 0 0 2px rgba(99,102,241,0.12);}
+                    .fc-select-card.disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
+                    .fc-select-check{width:20px;height:20px;border-radius:50%;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+                    .fc-select-card.selected .fc-select-check{background:#6366f1;border-color:#6366f1;color:#fff;}
+                </style>
+
+                <!-- 資格狀態 -->
+                <div class="fc-cond-grid" id="fcCondGrid">
+                    <div class="fc-cond" id="fcCond1">
+                        <span class="fc-badge">檢查中...</span>
+                        <div class="fc-icon" style="background:var(--accent-bg);color:var(--accent);">
+                            <span class="material-symbols-outlined" style="font-size:18px;">trending_up</span>
+                        </div>
+                        <div class="fc-title">專用連結流量</div>
+                        <div class="fc-value" id="fcTraffic">—</div>
+                        <div class="fc-desc">最近 30 天需超過 100 次點擊</div>
+                    </div>
+                    <div class="fc-cond" id="fcCond2">
+                        <span class="fc-badge">檢查中...</span>
+                        <div class="fc-icon" style="background:var(--pink-bg);color:var(--pink);">
+                            <span class="material-symbols-outlined" style="font-size:18px;">groups</span>
+                        </div>
+                        <div class="fc-title">社群追蹤數</div>
+                        <div class="fc-value" id="fcFollowers">—</div>
+                        <div class="fc-desc">主要社群帳號需超過 3,000</div>
+                    </div>
+                    <div class="fc-cond" id="fcCond3">
+                        <span class="fc-badge">檢查中...</span>
+                        <div class="fc-icon" style="background:var(--success-bg);color:var(--success);">
+                            <span class="material-symbols-outlined" style="font-size:18px;">confirmation_number</span>
+                        </div>
+                        <div class="fc-title">折扣碼使用</div>
+                        <div class="fc-value" id="fcCouponUse">—</div>
+                        <div class="fc-desc">最近 90 天需有訂單使用你的折扣碼</div>
+                    </div>
+                </div>
+
+                <!-- 結果 -->
+                <div id="fcResultBar" style="padding:12px 16px;border-radius:10px;font-size:0.78rem;font-weight:600;margin-bottom:18px;display:none;"></div>
+
+                <!-- 社群帳號 -->
+                <div class="section-card" style="margin-bottom:16px;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">person_pin</span> 社群帳號（條件 2）
+                    </div>
+                    <div class="section-body" style="padding:14px 20px;">
+                        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">
+                            填寫你最主要的社群帳號連結，我們會查核追蹤數。<br>
+                            <span style="color:#94a3b8;">支援 Threads / Instagram / YouTube / Facebook 等</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                            <div>
+                                <label style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">平台</label>
+                                <select id="fcSocialPlatform" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:0.82rem;font-family:inherit;background:#fff;" onchange="saveSocialInfo()">
+                                    <option value="">選擇平台</option>
+                                    <option value="threads">Threads</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">帳號連結</label>
+                                <input type="url" id="fcSocialUrl" placeholder="https://www.threads.net/@your_handle" style="font-size:0.82rem;" onblur="saveSocialInfo()">
+                            </div>
+                            <div>
+                                <label style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">追蹤數</label>
+                                <input type="number" id="fcSocialFollowers" placeholder="例：5000" min="0" style="font-size:0.82rem;" onblur="saveSocialInfo()">
+                            </div>
+                        </div>
+                        <div id="fcSocialStatus" style="font-size:0.68rem;color:var(--success);margin-top:6px;min-height:16px;"></div>
+                    </div>
+                </div>
+
+                <!-- 課程選擇 -->
+                <div class="section-card" id="fcCourseSection" style="display:none;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">school</span> 選擇課程（本月最多 2 堂）
+                    </div>
+                    <div class="section-body" style="padding:14px 20px;">
+                        <div id="fcMonthlyInfo" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:12px;"></div>
+                        <div id="fcCourseList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                        <div style="margin-top:14px;display:flex;justify-content:flex-end;gap:10px;align-items:center;">
+                            <span id="fcSelectedCount" style="font-size:0.72rem;color:var(--text-muted);">已選 0/2</span>
+                            <button id="fcSubmitBtn" class="btn-save" onclick="submitCourseGrant()" disabled>
+                                <span class="material-symbols-outlined" style="font-size:18px;">send</span> 提交申請
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 已申請紀錄 -->
+                <div class="section-card" id="fcHistorySection" style="margin-top:16px;display:none;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">history</span> 申請紀錄
+                    </div>
+                    <div id="fcHistoryBody" class="section-body" style="padding:0;"></div>
+                </div>
+            </div>
+
             <div class="view-page" id="view-tutorial">
                 <h2 class="page-title">推廣教學</h2>
                 <p class="page-subtitle">選擇課程，取得各渠道的專業推廣範本</p>
@@ -2722,6 +2846,7 @@ https://xxx.com/course?coupon=XXX
             currentCouponCode = affiliate.coupon_code || '';
             currentAffiliateId = affiliate.id;
             loadThreadsProfile(affiliate);
+            checkFreeCoursesEligibility();
             setupEvents(affiliate);
         }
 
@@ -3031,6 +3156,279 @@ https://xxx.com/course?coupon=XXX
             document.getElementById('threadsDomain').value = affiliate.threads_domain || '';
             document.getElementById('threadsPostPrice').value = affiliate.threads_post_price || '';
             document.getElementById('threadsCommentPrice').value = affiliate.threads_comment_price || '';
+        }
+
+        // ── Free Course Access ──
+        let fcSelected = new Set();
+        let fcEligible = false;
+
+        async function checkFreeCoursesEligibility() {
+            const a = currentAffiliate;
+            if (!a) return;
+
+            let passCount = 0;
+
+            // Condition 1: GA4 traffic last 30 days > 100
+            let traffic = 0;
+            try {
+                const resp = await fetch('https://qfunccclqaeifrfmkmsc.supabase.co/functions/v1/analytics-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'affiliate', couponCode: a.coupon_code })
+                });
+                const data = await resp.json();
+                if (data.summary) traffic = data.summary.totalSessions || 0;
+            } catch(e) { console.warn('GA4 check failed:', e); }
+            const cond1 = traffic >= 100;
+            updateCondCard('fcCond1', cond1, traffic.toLocaleString());
+            document.getElementById('fcTraffic').textContent = traffic.toLocaleString();
+            if (cond1) passCount++;
+
+            // Condition 2: Social followers > 3000
+            const followers = Math.max(
+                a.threads_followers || 0,
+                a.social_followers || 0
+            );
+            const cond2 = followers >= 3000;
+            updateCondCard('fcCond2', cond2, followers.toLocaleString());
+            document.getElementById('fcFollowers').textContent = followers.toLocaleString();
+            if (cond2) passCount++;
+
+            // Condition 3: Coupon used in last 90 days
+            let couponUsed = false;
+            try {
+                const d90 = new Date();
+                d90.setDate(d90.getDate() - 90);
+                const { data: orders } = await db.select('affiliate_orders', {
+                    filter: {
+                        coupon_code: `eq.${a.coupon_code}`,
+                        payment_time: `gte.${d90.toISOString()}`
+                    },
+                    select: 'id',
+                    limit: 1
+                });
+                couponUsed = orders && orders.length > 0;
+            } catch(e) { console.warn('Order check failed:', e); }
+            const cond3 = couponUsed;
+            updateCondCard('fcCond3', cond3, couponUsed ? '有使用' : '未使用');
+            document.getElementById('fcCouponUse').textContent = couponUsed ? '✓ 有' : '✗ 無';
+            if (cond3) passCount++;
+
+            // Result
+            fcEligible = passCount >= 2;
+            const bar = document.getElementById('fcResultBar');
+            bar.style.display = '';
+            if (fcEligible) {
+                bar.style.background = 'linear-gradient(135deg,#f0fdf4,#ecfdf5)';
+                bar.style.color = '#166534';
+                bar.style.border = '1px solid #86efac';
+                bar.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">check_circle</span> 恭喜！你已符合 ${passCount}/3 個條件，可以申請本月免費觀看課程 🎉`;
+                document.getElementById('fcCourseSection').style.display = '';
+                loadFreeCourses();
+            } else {
+                bar.style.background = 'linear-gradient(135deg,#fff7ed,#fffbeb)';
+                bar.style.color = '#92400e';
+                bar.style.border = '1px solid #fed7aa';
+                bar.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">info</span> 目前符合 ${passCount}/3 個條件（需達 2 個以上），繼續加油！`;
+                document.getElementById('fcCourseSection').style.display = 'none';
+            }
+
+            // Load social info
+            document.getElementById('fcSocialPlatform').value = a.social_platform || '';
+            document.getElementById('fcSocialUrl').value = a.social_url || '';
+            document.getElementById('fcSocialFollowers').value = a.social_followers || '';
+
+            // Load history
+            loadGrantHistory();
+        }
+
+        function updateCondCard(id, pass, value) {
+            const el = document.getElementById(id);
+            el.classList.remove('pass', 'fail');
+            el.classList.add(pass ? 'pass' : 'fail');
+            el.querySelector('.fc-badge').textContent = pass ? '✓ 達標' : '✗ 未達標';
+        }
+
+        async function saveSocialInfo() {
+            if (!currentAffiliateId) return;
+            const platform = document.getElementById('fcSocialPlatform').value;
+            const url = document.getElementById('fcSocialUrl').value.trim();
+            const followers = parseInt(document.getElementById('fcSocialFollowers').value) || 0;
+
+            try {
+                await db.update('affiliates', currentAffiliateId, {
+                    social_platform: platform,
+                    social_url: url,
+                    social_followers: followers
+                });
+                const status = document.getElementById('fcSocialStatus');
+                status.textContent = '✓ 已儲存';
+                setTimeout(() => status.textContent = '', 2000);
+
+                // Re-check condition 2
+                if (currentAffiliate) {
+                    currentAffiliate.social_platform = platform;
+                    currentAffiliate.social_url = url;
+                    currentAffiliate.social_followers = followers;
+                }
+            } catch(e) { console.error('Save social failed:', e); }
+        }
+
+        async function loadFreeCourses() {
+            const now = new Date();
+            const month = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            document.getElementById('fcMonthlyInfo').textContent = `📅 ${month} — 本月可選 2 堂課程`;
+
+            // Get courses
+            const { data: courses } = await db.select('affiliate_courses', {
+                filter: { is_active: 'eq.true', platform: 'eq.tbr' },
+                order: 'sort_order.asc'
+            });
+
+            // Get existing grants this month
+            const { data: grants } = await db.select('affiliate_course_grants', {
+                filter: {
+                    affiliate_id: `eq.${currentAffiliateId}`,
+                    grant_month: `eq.${month}`
+                }
+            });
+            const grantedIds = new Set((grants || []).map(g => g.course_id));
+            const pendingOrApproved = (grants || []).filter(g => g.status === 'pending' || g.status === 'approved');
+            const remaining = 2 - pendingOrApproved.length;
+
+            const list = document.getElementById('fcCourseList');
+            fcSelected.clear();
+
+            if (remaining <= 0) {
+                list.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.82rem;">
+                    <span class="material-symbols-outlined" style="font-size:32px;display:block;margin-bottom:8px;opacity:.4;">task_alt</span>
+                    本月已申請 2 堂課程，下個月再來！
+                </div>`;
+                document.getElementById('fcSubmitBtn').style.display = 'none';
+                document.getElementById('fcSelectedCount').style.display = 'none';
+                return;
+            }
+
+            list.innerHTML = (courses || []).map(c => {
+                const isGranted = grantedIds.has(c.id);
+                const statusLabel = isGranted ?
+                    ((grants||[]).find(g=>g.course_id===c.id)?.status === 'approved' ? '已核准' : '審核中') : '';
+                return `<div class="fc-select-card ${isGranted ? 'disabled' : ''}"
+                    data-course-id="${c.id}"
+                    onclick="${isGranted ? '' : `toggleFcCourse('${c.id}', ${remaining})`}">
+                    <div class="fc-select-check">
+                        <span class="material-symbols-outlined" style="font-size:14px;">check</span>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:0.82rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;color:var(--text-muted);margin-right:4px;">${c.icon||'school'}</span>
+                            ${c.name}
+                        </div>
+                    </div>
+                    ${isGranted ? `<span style="font-size:0.65rem;font-weight:600;padding:2px 8px;border-radius:8px;background:${statusLabel==='已核准'?'#dcfce7':'#fff7ed'};color:${statusLabel==='已核准'?'#166534':'#92400e'};">${statusLabel}</span>` : ''}
+                </div>`;
+            }).join('');
+
+            updateFcCount();
+        }
+
+        function toggleFcCourse(courseId, maxRemaining) {
+            if (fcSelected.has(courseId)) {
+                fcSelected.delete(courseId);
+            } else {
+                if (fcSelected.size >= maxRemaining) return;
+                fcSelected.add(courseId);
+            }
+            // Update UI
+            document.querySelectorAll('.fc-select-card:not(.disabled)').forEach(card => {
+                card.classList.toggle('selected', fcSelected.has(card.dataset.courseId));
+            });
+            updateFcCount();
+        }
+
+        function updateFcCount() {
+            const count = fcSelected.size;
+            document.getElementById('fcSelectedCount').textContent = `已選 ${count}/2`;
+            document.getElementById('fcSubmitBtn').disabled = count === 0;
+        }
+
+        async function submitCourseGrant() {
+            if (fcSelected.size === 0 || !currentAffiliateId) return;
+            const btn = document.getElementById('fcSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_empty</span> 提交中...';
+
+            const now = new Date();
+            const month = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+            try {
+                for (const courseId of fcSelected) {
+                    await db.insert('affiliate_course_grants', {
+                        affiliate_id: currentAffiliateId,
+                        course_id: courseId,
+                        grant_month: month,
+                        status: 'pending'
+                    });
+                }
+                alert('✅ 申請已提交！我們會在審核後通知你。');
+                fcSelected.clear();
+                loadFreeCourses();
+                loadGrantHistory();
+            } catch(e) {
+                console.error('Submit failed:', e);
+                alert('申請失敗，請稍後再試');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">send</span> 提交申請';
+        }
+
+        async function loadGrantHistory() {
+            if (!currentAffiliateId) return;
+            const { data: grants } = await db.select('affiliate_course_grants', {
+                filter: { affiliate_id: `eq.${currentAffiliateId}` },
+                order: 'applied_at.desc',
+                limit: 20
+            });
+            if (!grants || grants.length === 0) {
+                document.getElementById('fcHistorySection').style.display = 'none';
+                return;
+            }
+            document.getElementById('fcHistorySection').style.display = '';
+
+            // Get course names
+            const courseIds = [...new Set(grants.map(g => g.course_id))];
+            const { data: courses } = await db.select('affiliate_courses', {
+                filter: { id: `in.(${courseIds.join(',')})` }
+            });
+            const courseMap = {};
+            (courses || []).forEach(c => courseMap[c.id] = c.name);
+
+            const statusMap = {
+                pending: { label: '審核中', bg: '#fff7ed', color: '#92400e' },
+                approved: { label: '已核准', bg: '#dcfce7', color: '#166534' },
+                rejected: { label: '未通過', bg: '#fef2f2', color: '#991b1b' }
+            };
+
+            document.getElementById('fcHistoryBody').innerHTML = `
+                <table class="s-table">
+                    <thead><tr>
+                        <th>月份</th>
+                        <th>課程</th>
+                        <th>狀態</th>
+                        <th>申請時間</th>
+                    </tr></thead>
+                    <tbody>
+                        ${grants.map(g => {
+                            const s = statusMap[g.status] || statusMap.pending;
+                            return `<tr>
+                                <td style="font-weight:600;">${g.grant_month}</td>
+                                <td>${courseMap[g.course_id] || g.course_id}</td>
+                                <td><span style="font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:8px;background:${s.bg};color:${s.color};">${s.label}</span></td>
+                                <td style="color:var(--text-muted);font-size:0.78rem;">${new Date(g.applied_at).toLocaleDateString('zh-TW')}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
         }
 
         let currentAffiliateId = '';

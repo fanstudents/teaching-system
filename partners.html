@@ -40,6 +40,9 @@
                 <button class="main-tab" data-tab="referrals">
                     <span class="material-symbols-outlined">diversity_3</span> 企業引薦
                 </button>
+                <button class="main-tab" data-tab="grants">
+                    <span class="material-symbols-outlined">card_giftcard</span> 免費觀看
+                </button>
             </div>
 
             <!-- Tab: 聯盟行銷 -->
@@ -211,6 +214,41 @@
                             <tr>
                                 <td colspan="7" style="text-align:center;color:#999;padding:40px;">
                                     <span class="material-symbols-outlined">hourglass_empty</span> 載入中
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: 免費觀看審核 -->
+            <div class="tab-panel" id="tab-grants">
+                <div class="filter-bar">
+                    <select id="grantStatusFilter" onchange="loadGrants()">
+                        <option value="pending">待審核</option>
+                        <option value="">全部</option>
+                        <option value="approved">已核准</option>
+                        <option value="rejected">未通過</option>
+                    </select>
+                </div>
+                <div class="data-table-wrap">
+                    <table class="data-table" id="grantsTable">
+                        <thead>
+                            <tr>
+                                <th>推廣者</th>
+                                <th>課程</th>
+                                <th>月份</th>
+                                <th>社群帳號</th>
+                                <th>追蹤數</th>
+                                <th>狀態</th>
+                                <th>申請時間</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="grantsBody">
+                            <tr>
+                                <td colspan="8" style="text-align:center;color:#999;padding:40px;">
+                                    <span class="material-symbols-outlined">hourglass_empty</span> 切換到此頁籤即載入
                                 </td>
                             </tr>
                         </tbody>
@@ -1440,6 +1478,110 @@
         document.getElementById('refSearch').addEventListener('input', () => renderReferrals());
         document.getElementById('refTypeFilter').addEventListener('change', () => renderReferrals());
         document.getElementById('refStatusFilter').addEventListener('change', () => renderReferrals());
+
+        // ── Grants Management ──
+        let allGrants = [];
+        let grantCourseMap = {};
+        let grantAffiliateMap = {};
+
+        async function loadGrants() {
+            const filter = {};
+            const status = document.getElementById('grantStatusFilter').value;
+            if (status) filter.status = `eq.${status}`;
+
+            const { data: grants } = await db.select('affiliate_course_grants', {
+                filter,
+                order: 'applied_at.desc'
+            });
+            allGrants = grants || [];
+
+            // Fetch course names
+            if (allGrants.length > 0) {
+                const courseIds = [...new Set(allGrants.map(g => g.course_id))];
+                const { data: courses } = await db.select('affiliate_courses', {
+                    filter: { id: `in.(${courseIds.join(',')})` }
+                });
+                grantCourseMap = {};
+                (courses || []).forEach(c => grantCourseMap[c.id] = c.name);
+
+                // Fetch affiliate info
+                const affIds = [...new Set(allGrants.map(g => g.affiliate_id))];
+                const { data: affs } = await db.select('affiliates', {
+                    filter: { id: `in.(${affIds.join(',')})` },
+                    select: 'id,name,email,social_url,social_platform,social_followers,threads_followers,threads_handle'
+                });
+                grantAffiliateMap = {};
+                (affs || []).forEach(a => grantAffiliateMap[a.id] = a);
+            }
+            renderGrants();
+        }
+
+        function renderGrants() {
+            const body = document.getElementById('grantsBody');
+            if (allGrants.length === 0) {
+                body.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#999;padding:40px;">
+                    <span class="material-symbols-outlined">inbox</span> 沒有申請紀錄
+                </td></tr>`;
+                return;
+            }
+
+            const statusMap = {
+                pending: { label: '待審核', bg: '#fff7ed', color: '#92400e' },
+                approved: { label: '已核准', bg: '#dcfce7', color: '#166534' },
+                rejected: { label: '未通過', bg: '#fef2f2', color: '#991b1b' }
+            };
+
+            body.innerHTML = allGrants.map(g => {
+                const aff = grantAffiliateMap[g.affiliate_id] || {};
+                const courseName = grantCourseMap[g.course_id] || '—';
+                const s = statusMap[g.status] || statusMap.pending;
+                const followers = Math.max(aff.threads_followers || 0, aff.social_followers || 0);
+                const socialLink = aff.social_url || (aff.threads_handle ? `https://www.threads.net/@${aff.threads_handle}` : '—');
+                const socialDisplay = aff.social_platform || (aff.threads_handle ? 'Threads' : '—');
+
+                return `<tr>
+                    <td>
+                        <div style="font-weight:600;">${aff.name || '—'}</div>
+                        <div style="font-size:0.72rem;color:#999;">${aff.email || ''}</div>
+                    </td>
+                    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${courseName}</td>
+                    <td style="font-weight:600;">${g.grant_month}</td>
+                    <td>${socialDisplay !== '—' ? `<a href="${socialLink}" target="_blank" style="color:var(--accent-primary);text-decoration:none;">${socialDisplay} ↗</a>` : '—'}</td>
+                    <td style="font-weight:600;">${followers ? followers.toLocaleString() : '—'}</td>
+                    <td><span style="font-size:0.72rem;font-weight:600;padding:2px 10px;border-radius:10px;background:${s.bg};color:${s.color};">${s.label}</span></td>
+                    <td style="font-size:0.78rem;color:#999;">${new Date(g.applied_at).toLocaleDateString('zh-TW')}</td>
+                    <td>
+                        ${g.status === 'pending' ? `
+                            <button onclick="updateGrantStatus('${g.id}','approved')" style="background:#dcfce7;color:#166534;border:none;padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;margin-right:4px;">核准</button>
+                            <button onclick="updateGrantStatus('${g.id}','rejected')" style="background:#fef2f2;color:#991b1b;border:none;padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;">拒絕</button>
+                        ` : '—'}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function updateGrantStatus(grantId, status) {
+            try {
+                await db.update('affiliate_course_grants', grantId, {
+                    status: status,
+                    reviewed_at: new Date().toISOString(),
+                    reviewed_by: 'admin'
+                });
+                showToast(status === 'approved' ? '已核准 ✅' : '已拒絕');
+                loadGrants();
+            } catch (e) {
+                showToast('操作失敗');
+                console.error(e);
+            }
+        }
+
+        // Auto-load grants when tab is switched
+        const origTabHandler = document.querySelectorAll('.main-tab');
+        origTabHandler.forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (tab.dataset.tab === 'grants') setTimeout(loadGrants, 100);
+            });
+        });
     </script>
 </body>
 
