@@ -2219,7 +2219,7 @@ https://xxx.com/course?coupon=XXX
                         </div>
                         <div class="fc-title">專用連結流量</div>
                         <div class="fc-value" id="fcTraffic">—</div>
-                        <div class="fc-desc">最近 30 天需超過 100 次點擊</div>
+                        <div class="fc-desc">上個月需超過 100 次點擊</div>
                     </div>
                     <div class="fc-cond" id="fcCond2">
                         <span class="fc-badge">檢查中...</span>
@@ -2237,7 +2237,7 @@ https://xxx.com/course?coupon=XXX
                         </div>
                         <div class="fc-title">折扣碼使用</div>
                         <div class="fc-value" id="fcCouponUse">—</div>
-                        <div class="fc-desc">最近 90 天需有訂單使用你的折扣碼</div>
+                        <div class="fc-desc">上個月需有訂單使用你的折扣碼</div>
                     </div>
                 </div>
 
@@ -2257,7 +2257,7 @@ https://xxx.com/course?coupon=XXX
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
                             <div>
                                 <label style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">平台</label>
-                                <select id="fcSocialPlatform" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:0.82rem;font-family:inherit;background:#fff;" onchange="saveSocialInfo()">
+                                <select id="fcSocialPlatform" onchange="saveSocialInfo()">
                                     <option value="">選擇平台</option>
                                     <option value="threads">Threads</option>
                                     <option value="instagram">Instagram</option>
@@ -2269,11 +2269,11 @@ https://xxx.com/course?coupon=XXX
                             </div>
                             <div>
                                 <label style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">帳號連結</label>
-                                <input type="url" id="fcSocialUrl" placeholder="https://www.threads.net/@your_handle" style="font-size:0.82rem;" onblur="saveSocialInfo()">
+                                <input type="url" id="fcSocialUrl" placeholder="https://www.threads.net/@your_handle" onblur="saveSocialInfo()">
                             </div>
                             <div>
                                 <label style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">追蹤數</label>
-                                <input type="number" id="fcSocialFollowers" placeholder="例：5000" min="0" style="font-size:0.82rem;" onblur="saveSocialInfo()">
+                                <input type="number" id="fcSocialFollowers" placeholder="例：5000" min="0" onblur="saveSocialInfo()">
                             </div>
                         </div>
                         <div id="fcSocialStatus" style="font-size:0.68rem;color:var(--success);margin-top:6px;min-height:16px;"></div>
@@ -3168,13 +3168,23 @@ https://xxx.com/course?coupon=XXX
 
             let passCount = 0;
 
-            // Condition 1: GA4 traffic last 30 days > 100
+            // Condition 1: Last month's GA4 traffic > 100
+            const now = new Date();
+            const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+            const lastMonthLabel = `${lastMonthStart.getFullYear()}-${String(lastMonthStart.getMonth()+1).padStart(2,'0')}`;
+
             let traffic = 0;
             try {
                 const resp = await fetch('https://qfunccclqaeifrfmkmsc.supabase.co/functions/v1/analytics-data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'affiliate', couponCode: a.coupon_code })
+                    body: JSON.stringify({
+                        type: 'affiliate',
+                        couponCode: a.coupon_code,
+                        startDate: lastMonthStart.toISOString().split('T')[0],
+                        endDate: lastMonthEnd.toISOString().split('T')[0]
+                    })
                 });
                 const data = await resp.json();
                 if (data.summary) traffic = data.summary.totalSessions || 0;
@@ -3194,15 +3204,14 @@ https://xxx.com/course?coupon=XXX
             document.getElementById('fcFollowers').textContent = followers.toLocaleString();
             if (cond2) passCount++;
 
-            // Condition 3: Coupon used in last 90 days
+            // Condition 3: Last month coupon usage
             let couponUsed = false;
             try {
-                const d90 = new Date();
-                d90.setDate(d90.getDate() - 90);
                 const { data: orders } = await db.select('affiliate_orders', {
                     filter: {
                         coupon_code: `eq.${a.coupon_code}`,
-                        payment_time: `gte.${d90.toISOString()}`
+                        payment_time: `gte.${lastMonthStart.toISOString()}`,
+                        payment_time: `lte.${lastMonthEnd.toISOString()}`
                     },
                     select: 'id',
                     limit: 1
