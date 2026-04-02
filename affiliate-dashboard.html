@@ -3928,14 +3928,24 @@ Day 4: 真的很棒拜託快去上！</span>
                     return;
                 }
                 const coupon = affiliate.coupon_code || '';
-                const link = course.url;
+                const baseLink = course.url + (course.url.includes('?') ? '&' : '?') + 'coupon=' + coupon;
                 const name = course.name;
+
+                // Per-channel UTM links
+                const mkLink = (src, med) => `${baseLink}&utm_source=${src}&utm_medium=${med}&utm_campaign=affiliate&utm_content=${coupon}`;
+                const linkFb = mkLink('facebook', 'social');
+                const linkIg = mkLink('instagram', 'social');
+                const linkYt = mkLink('youtube', 'social');
+                const linkBlog = mkLink('blog', 'referral');
+                const linkLine = mkLink('line', 'social');
+                const linkThreads = mkLink('threads', 'social');
+                const link = linkFb; // default display link
 
                 // Show course info
                 const info = document.getElementById('tutCourseInfo');
                 info.style.display = 'block';
-                document.getElementById('tutCourseLink').href = link;
-                document.getElementById('tutCourseLink').textContent = link;
+                document.getElementById('tutCourseLink').href = baseLink;
+                document.getElementById('tutCourseLink').textContent = baseLink;
                 document.getElementById('tutCourseCoupon').textContent = coupon;
 
                 // Show templates area
@@ -3950,7 +3960,7 @@ Day 4: 真的很棒拜託快去上！</span>
 我自己上完之後，最大的收穫是能夠真的把 AI 用在日常工作裡，而不只是玩玩而已。課程裡面有很多實作的部分，跟著做就能直接產出成果。
 
 如果你也想提升 AI 的實戰能力，這門課蠻值得看看的：
-🔗 ${link}
+🔗 ${linkFb}
 🎟 折扣碼 ${coupon}（結帳時輸入可享優惠）`;
 
                 document.getElementById('tplIg').textContent =
@@ -3964,7 +3974,7 @@ Day 4: 真的很棒拜託快去上！</span>
 課程不講空話，每一堂都有實作。
 適合想把 AI 真正用起來的人。
 
-連結放 Bio 👆
+連結放 Bio 👆（連結：${linkIg}）
 折扣碼：${coupon}
 
 #AI實戰 #效率工作 #VibeCoding #自我投資 #數位轉型 #AI學習 #職場技能`;
@@ -3981,7 +3991,7 @@ Day 4: 真的很棒拜託快去上！</span>
 09:00 適合誰 / 不適合誰
 11:00 折扣碼與報名方式
 
-🔗 課程連結：${link}
+🔗 課程連結：${linkYt}
 🎟 折扣碼：${coupon}（結帳時輸入享優惠）
 
 如果你覺得這支影片有幫助，歡迎按讚訂閱，我會持續分享 AI 學習的內容。`;
@@ -4004,7 +4014,7 @@ Day 4: 真的很棒拜託快去上！</span>
 列出 3-4 種適合的對象，幫助讀者快速判斷。
 
 五、報名資訊
-課程連結：${link}
+課程連結：${linkBlog}
 折扣碼：${coupon}
 （輸入折扣碼即可享有優惠價）`;
 
@@ -4014,7 +4024,7 @@ Day 4: 真的很棒拜託快去上！</span>
 我最近開始上「${name}」，覺得內容蠻實用的，尤其是實作的部分，上完就可以直接用在工作上。
 
 如果你對 AI 有興趣，可以參考看看：
-${link}
+${linkLine}
 
 我有一組折扣碼 ${coupon}，結帳的時候輸入可以折抵一些，有需要的話可以用 🙂`;
 
@@ -4031,7 +4041,8 @@ ${link}
 
 課程不會只教你按按鈕，而是教你怎麼「思考」跟 AI 合作。
 
-有興趣的人，我把連結放留言區。`;
+有興趣的人，我把連結放留言區。`
++ `\n\n——————\n👇 留言區貼上這個連結：\n${linkThreads}\n折扣碼：${coupon}`;
 
                 document.getElementById('tplThreadsB').textContent =
 `以前最怕的就是週一早上開電腦。
@@ -4049,7 +4060,8 @@ ${link}
 
 不是空語，是每一堂都可以直接用在隨天工作上的實戰內容。
 
-連結我放留言區，有折扣碼可以用。`;
+連結我放留言區，有折扣碼可以用。`
++ `\n\n——————\n👇 留言區貼上這個連結：\n${linkThreads}\n折扣碼：${coupon}`;
             });
 
             // Tutorial channel tabs (underline style)
