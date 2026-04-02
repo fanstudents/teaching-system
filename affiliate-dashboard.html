@@ -1304,19 +1304,24 @@
                 <button class="nav-item active" data-view="overview">
                     <span class="material-symbols-outlined">dashboard</span> 銷售儀表板
                 </button>
-                <button class="nav-item" data-view="courses">
-                    <span class="material-symbols-outlined">menu_book</span> 可推廣課程
-                </button>
-                <button class="nav-item" data-view="referral">
-                    <span class="material-symbols-outlined">diversity_3</span> 企業引薦
+                <button class="nav-item" data-view="coupon">
+                    <span class="material-symbols-outlined">confirmation_number</span> 折扣碼管理
                 </button>
                 <button class="nav-item" data-view="orders">
                     <span class="material-symbols-outlined">receipt_long</span> 訂單紀錄
                 </button>
-                <button class="nav-item" data-view="coupon">
-                    <span class="material-symbols-outlined">confirmation_number</span> 折扣碼管理
+
+                <div class="nav-group-label">
+                    <span class="material-symbols-outlined" style="font-size:15px;">storefront</span>
+                    可推廣產品
+                </div>
+                <button class="nav-item nav-sub" data-view="courses">
+                    <span class="material-symbols-outlined">menu_book</span> 公開課程
                 </button>
-                <button class="nav-item" data-view="threads-wom">
+                <button class="nav-item nav-sub" data-view="referral">
+                    <span class="material-symbols-outlined">diversity_3</span> 企業引薦
+                </button>
+                <button class="nav-item nav-sub" data-view="threads-wom">
                     <span class="material-symbols-outlined">forum</span> Threads 口碑
                 </button>
 
@@ -1692,16 +1697,32 @@
             <!-- View: Coupon -->
             <div class="view-page" id="view-coupon">
                 <h2 class="page-title">折扣碼管理</h2>
-                <p class="page-subtitle">你的專屬推廣折扣碼</p>
+                <p class="page-subtitle">你的專屬推廣折扣碼與推廣連結</p>
                 <div class="section-card">
                     <div class="coupon-display">
                         <div class="coupon-code-box" id="couponDisplay" title="點擊複製"></div>
                         <div class="coupon-meta">
                             <p>透過此折扣碼購買的訂單將自動計入你的銷售。</p>
                             <p>佣金比例：<strong id="commissionRateText" class="dynamic-rate">20%</strong></p>
+                            <p id="discountInfoLine" style="margin-top:2px;display:none;">折扣形式：<strong id="discountInfoText" style="color:#6366f1;"></strong></p>
                         </div>
                     </div>
                 </div>
+
+                <!-- 各管道推廣連結 -->
+                <div class="section-card" style="margin-top:16px;">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">link</span> 各管道專用推廣連結
+                    </div>
+                    <div class="section-body" style="padding:12px 16px;">
+                        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">
+                            使用以下連結推廣，系統可自動追蹤你在各渠道的流量來源。<br>
+                            <span style="color:#f59e0b;">⚠️ 請使用你專屬的推廣連結，才能追蹤到你的流量數據。</span>
+                        </div>
+                        <div id="promoLinksContainer" style="display:flex;flex-direction:column;gap:6px;"></div>
+                    </div>
+                </div>
+
                 <div class="section-card" style="margin-top:16px;">
                     <div class="section-header">
                         <span class="material-symbols-outlined">info</span> 推廣須知
@@ -2651,6 +2672,45 @@ https://xxx.com/course?coupon=XXX
             document.getElementById('commissionRateText').textContent = rate + '%';
             document.getElementById('loginStatRate').textContent = rate + '%';
             document.querySelectorAll('.dynamic-rate').forEach(el => el.textContent = rate + '%');
+
+            // Discount info
+            if (affiliate.discount_type) {
+                const dt = affiliate.discount_type;
+                const dv = affiliate.discount_value || '';
+                let text = '';
+                if (dt === 'percent') text = `折扣 ${dv}%`;
+                else if (dt === 'fixed') text = `折 NT$ ${Number(dv).toLocaleString()}`;
+                else text = dv || dt;
+                document.getElementById('discountInfoText').textContent = text;
+                document.getElementById('discountInfoLine').style.display = '';
+            }
+
+            // Promo links
+            const coupon = affiliate.coupon_code || '';
+            const channels = [
+                { key: 'threads', label: 'Threads', icon: 'forum', medium: 'social', color: '#000' },
+                { key: 'instagram', label: 'Instagram', icon: 'photo_camera', medium: 'social', color: '#e1306c' },
+                { key: 'facebook', label: 'Facebook', icon: 'group', medium: 'social', color: '#1877f2' },
+                { key: 'blog', label: 'Blog / 部落格', icon: 'edit_note', medium: 'blog', color: '#f59e0b' },
+                { key: 'line', label: 'LINE', icon: 'chat', medium: 'message', color: '#06c755' },
+                { key: 'email', label: 'Email', icon: 'mail', medium: 'email', color: '#6366f1' },
+            ];
+            const promoContainer = document.getElementById('promoLinksContainer');
+            promoContainer.innerHTML = channels.map(ch => {
+                const url = `https://tbr.digital?utm_source=${ch.key}&utm_medium=${ch.medium}&utm_campaign=affiliate&utm_content=${coupon}`;
+                return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:${ch.color};">${ch.icon}</span>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:0.72rem;font-weight:600;color:var(--text);margin-bottom:1px;">${ch.label}</div>
+                        <div style="font-size:0.65rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${url}</div>
+                    </div>
+                    <button onclick="navigator.clipboard.writeText('${url}');this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:16px;color:#10b981;\\'>check</span>';setTimeout(()=>this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:16px;\\'>content_copy</span>',1500)"
+                        style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;display:flex;align-items:center;transition:all .15s;"
+                        title="複製連結">
+                        <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+                    </button>
+                </div>`;
+            }).join('');
 
             // Bank
             document.getElementById('bankName').value = affiliate.bank_name || '';
