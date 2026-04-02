@@ -1406,18 +1406,6 @@
                     </div>
                 </div>
 
-                <div class="section-card">
-                    <div class="section-header">
-                        <span class="material-symbols-outlined">receipt_long</span> 近期訂單
-                    </div>
-                    <div id="recentOrders">
-                        <div class="empty-state">
-                            <span class="material-symbols-outlined">inbox</span>
-                            尚無銷售記錄
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 推廣流量分析 (inline in overview) -->
                 <div style="margin-top:8px;">
                     <div class="section-card" style="margin-bottom:12px;">
@@ -1790,32 +1778,73 @@
 
                     <!-- 類別選擇 -->
                     <div class="tw-section">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <style>
+                            .tw-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f5;}
+                            .tw-toggle-row:last-child{border-bottom:none;}
+                            .tw-toggle-left{display:flex;align-items:center;gap:10px;}
+                            .tw-toggle-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+                            .tw-toggle-icon .material-symbols-outlined{font-size:18px;color:#fff;}
+                            .tw-toggle-name{font-size:0.82rem;font-weight:600;color:#1e293b;}
+                            .tw-toggle-sub{font-size:0.65rem;color:#94a3b8;}
+                            .tw-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+                            .tw-switch input{opacity:0;width:0;height:0;}
+                            .tw-switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#e2e8f0;border-radius:24px;transition:all .25s;}
+                            .tw-switch .slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+                            .tw-switch input:checked + .slider{background:linear-gradient(135deg,#6366f1,#818cf8);}
+                            .tw-switch input:checked + .slider:before{transform:translateX(20px);}
+                        </style>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                             <div style="font-size:0.82rem;font-weight:700;color:#1e293b;">
                                 <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;color:#6366f1;">campaign</span>
                                 想接的口碑行銷類別
                             </div>
-                            <span style="font-size:0.62rem;color:#94a3b8;">可複選</span>
                         </div>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <label class="tw-chip">
-                                <input type="checkbox" id="threadsCatCourse" onchange="saveThreadsProfile()">
-                                <span class="material-symbols-outlined" style="color:#6366f1;">school</span>
-                                課程・知識產品
-                                <span class="tw-check">✓</span>
-                            </label>
-                            <label class="tw-chip">
-                                <input type="checkbox" id="threadsCatFood" onchange="saveThreadsProfile()">
-                                <span class="material-symbols-outlined" style="color:#f59e0b;">restaurant</span>
-                                餐飲・食品
-                                <span class="tw-check">✓</span>
-                            </label>
-                            <label class="tw-chip">
-                                <input type="checkbox" id="threadsCatBeauty" onchange="saveThreadsProfile()">
-                                <span class="material-symbols-outlined" style="color:#ec4899;">spa</span>
-                                美妝・醫美・保養
-                                <span class="tw-check">✓</span>
-                            </label>
+                        <div>
+                            <div class="tw-toggle-row">
+                                <div class="tw-toggle-left">
+                                    <div class="tw-toggle-icon" style="background:linear-gradient(135deg,#6366f1,#818cf8);">
+                                        <span class="material-symbols-outlined">school</span>
+                                    </div>
+                                    <div>
+                                        <div class="tw-toggle-name">課程・知識產品</div>
+                                        <div class="tw-toggle-sub">線上課程、電子書、知識型商品</div>
+                                    </div>
+                                </div>
+                                <label class="tw-switch">
+                                    <input type="checkbox" id="threadsCatCourse" onchange="saveThreadsProfile()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="tw-toggle-row">
+                                <div class="tw-toggle-left">
+                                    <div class="tw-toggle-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">
+                                        <span class="material-symbols-outlined">restaurant</span>
+                                    </div>
+                                    <div>
+                                        <div class="tw-toggle-name">餐飲・食品</div>
+                                        <div class="tw-toggle-sub">餐廳、飲料、零食、健康食品</div>
+                                    </div>
+                                </div>
+                                <label class="tw-switch">
+                                    <input type="checkbox" id="threadsCatFood" onchange="saveThreadsProfile()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="tw-toggle-row">
+                                <div class="tw-toggle-left">
+                                    <div class="tw-toggle-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6);">
+                                        <span class="material-symbols-outlined">spa</span>
+                                    </div>
+                                    <div>
+                                        <div class="tw-toggle-name">美妝・醫美・保養</div>
+                                        <div class="tw-toggle-sub">保養品、彩妝、醫美療程</div>
+                                    </div>
+                                </div>
+                                <label class="tw-switch">
+                                    <input type="checkbox" id="threadsCatBeauty" onchange="saveThreadsProfile()">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
