@@ -152,6 +152,18 @@
                 <div id="topCoursesList">載入中...</div>
             </div>
 
+            <!-- 📬 Student Requests -->
+            <div class="section-title">📬 學員請求 <span id="requestsBadge" style="display:none;background:#ef4444;color:#fff;font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:8px;"></span></div>
+            <div class="top-courses" id="requestsBox">
+                <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+                    <button onclick="filterRequests('all')" class="req-tab active" data-tab="all" style="padding:6px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#6366f1;color:#fff;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:inherit;">全部</button>
+                    <button onclick="filterRequests('question')" class="req-tab" data-tab="question" style="padding:6px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;font-size:0.75rem;font-weight:500;font-family:inherit;">❓ 問題</button>
+                    <button onclick="filterRequests('collaboration')" class="req-tab" data-tab="collaboration" style="padding:6px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;font-size:0.75rem;font-weight:500;font-family:inherit;">🤝 合作</button>
+                    <button onclick="filterRequests('referral')" class="req-tab" data-tab="referral" style="padding:6px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;font-size:0.75rem;font-weight:500;font-family:inherit;">🔗 引薦</button>
+                </div>
+                <div id="requestsList">載入中...</div>
+            </div>
+
             <!-- Quick Links -->
             <div class="section-title">快速操作</div>
             <div class="quick-links">
@@ -182,6 +194,10 @@
                 <a class="quick-link" href="admin-inquiries.html">
                     <div class="ql-icon" style="background:#fef3c7;color:#f59e0b;"><span class="material-symbols-outlined">contact_mail</span></div>
                     <div><div class="ql-title">企業諮詢</div><div class="ql-desc">查看與管理企業諮詢表單</div></div>
+                </a>
+            <a class="quick-link" href="#" onclick="document.getElementById('requestsBox').scrollIntoView({behavior:'smooth'});return false;">
+                    <div class="ql-icon" style="background:#fce7f3;color:#ec4899;"><span class="material-symbols-outlined">inbox</span></div>
+                    <div><div class="ql-title">學員請求</div><div class="ql-desc">問題發問 / 專案合作 / 合作引薦</div></div>
                 </a>
             </div>
         </div>
@@ -287,7 +303,74 @@
                 document.getElementById('pendingCount').textContent = pending;
                 document.getElementById('pendingAlert').classList.add('show');
             }
+            // Student requests
+            try {
+                const { data: requests } = await db.select('student_requests', { order: 'created_at.desc', limit: 50 });
+                window._allRequests = requests || [];
+                const pending = (requests || []).filter(r => r.status === 'pending').length;
+                if (pending > 0) {
+                    const badge = document.getElementById('requestsBadge');
+                    badge.textContent = pending + ' 待處理';
+                    badge.style.display = 'inline';
+                }
+                renderRequests(requests || []);
+            } catch { document.getElementById('requestsList').innerHTML = '<div style="color:#94a3b8;font-size:0.82rem;">無法載入學員請求</div>'; }
         }
+
+        const typeLabels = { question: '❓ 問題', collaboration: '🤝 合作', referral: '🔗 引薦' };
+        const statusColors = { pending: '#f59e0b', replied: '#3b82f6', closed: '#94a3b8' };
+        const statusLabels = { pending: '待處理', replied: '已回覆', closed: '已結案' };
+
+        function renderRequests(requests) {
+            const el = document.getElementById('requestsList');
+            if (!requests || requests.length === 0) {
+                el.innerHTML = '<div style="color:#94a3b8;font-size:0.82rem;padding:12px 0;">目前沒有學員請求</div>';
+                return;
+            }
+            el.innerHTML = requests.map(r => {
+                const date = new Date(r.created_at).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                return `<div style="padding:14px 0;border-bottom:1px solid #f0f1f3;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:0.72rem;padding:2px 8px;border-radius:4px;background:rgba(99,102,241,0.1);color:#6366f1;font-weight:600;">${typeLabels[r.request_type] || r.request_type}</span>
+                            <span style="font-weight:600;font-size:0.88rem;color:#1a1a2e;">${r.subject || '(無主題)'}</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:0.68rem;padding:2px 8px;border-radius:4px;background:${statusColors[r.status] || '#94a3b8'}22;color:${statusColors[r.status] || '#94a3b8'};font-weight:600;">${statusLabels[r.status] || r.status}</span>
+                            <span style="font-size:0.72rem;color:#94a3b8;">${date}</span>
+                        </div>
+                    </div>
+                    <div style="font-size:0.82rem;color:#64748b;margin-bottom:6px;">${r.student_name} (${r.student_email})</div>
+                    <div style="font-size:0.82rem;color:#1a1a2e;line-height:1.5;margin-bottom:8px;">${(r.message || '').substring(0, 200)}${(r.message || '').length > 200 ? '...' : ''}</div>
+                    ${r.project_name ? `<div style="font-size:0.72rem;color:#94a3b8;">課程：${r.project_name}</div>` : ''}
+                    ${r.company ? `<div style="font-size:0.72rem;color:#94a3b8;">公司：${r.company}</div>` : ''}
+                    ${r.referral_target ? `<div style="font-size:0.72rem;color:#94a3b8;">引薦對象：${r.referral_target}</div>` : ''}
+                    ${r.status === 'pending' ? `<div style="margin-top:8px;display:flex;gap:6px;">
+                        <button onclick="updateRequestStatus('${r.id}','replied')" style="padding:4px 12px;border-radius:6px;border:1px solid #3b82f6;background:#eff6ff;color:#3b82f6;cursor:pointer;font-size:0.72rem;font-family:inherit;">標記已回覆</button>
+                        <button onclick="updateRequestStatus('${r.id}','closed')" style="padding:4px 12px;border-radius:6px;border:1px solid #94a3b8;background:#f8fafc;color:#64748b;cursor:pointer;font-size:0.72rem;font-family:inherit;">結案</button>
+                    </div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        window.filterRequests = function (type) {
+            document.querySelectorAll('.req-tab').forEach(b => {
+                b.style.background = b.dataset.tab === type ? '#6366f1' : '#fff';
+                b.style.color = b.dataset.tab === type ? '#fff' : '#64748b';
+            });
+            const filtered = type === 'all' ? window._allRequests : window._allRequests.filter(r => r.request_type === type);
+            renderRequests(filtered);
+        };
+
+        window.updateRequestStatus = async function (id, status) {
+            try {
+                await db.update('student_requests', { status }, { filter: { id: `eq.${id}` } });
+                // 重新載入
+                const { data } = await db.select('student_requests', { order: 'created_at.desc', limit: 50 });
+                window._allRequests = data || [];
+                renderRequests(data || []);
+            } catch (e) { alert('更新失敗：' + e.message); }
+        };
 
         init();
     </script>

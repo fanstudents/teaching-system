@@ -67,7 +67,7 @@ serve(async (req) => {
   <div class="check">✓</div>
   <h1>已取消訂閱</h1>
   <p>你的 Email（${email}）已從數位簡報室的信件通知中移除。</p>
-  <p>如果這是誤按，請聯絡 service@teaching.tbr.digital 恢復。</p>
+  <p>如果這是誤按，請聯絡 service@mail.tbr.digital 恢復。</p>
   <div class="brand">數位簡報室 tbr.digital</div>
 </div>
 </body>

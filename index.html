@@ -17,8 +17,8 @@
     <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <link rel="stylesheet" href="styles/homepage.css">
 
-    <!-- Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -42,372 +42,155 @@
         }
     }
     </script>
-
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', 'Noto Sans TC', -apple-system, system-ui, sans-serif;
-            background: #fff; color: #0f172a; -webkit-font-smoothing: antialiased;
-        }
-
-        /* ═══ Utilities ═══ */
-        .container { max-width: 1140px; margin: 0 auto; padding: 0 32px; }
-        .text-gradient {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-
-        /* ═══ Nav ═══ */
-        .nav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            height: 64px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 32px; background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
-            border-bottom: 1px solid transparent; transition: all .3s;
-        }
-        .nav.scrolled { border-bottom-color: #e2e8f0; box-shadow: 0 1px 8px rgba(0,0,0,.04); }
-        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; font-weight: 700; font-size: .95rem; }
-        .nav-brand img { width: 32px; height: 32px; border-radius: 8px; }
-        .nav-brand small { font-size: .68rem; font-weight: 400; color: #94a3b8; margin-left: 4px; }
-        .nav-links { display: flex; gap: 4px; list-style: none; }
-        .nav-links a { padding: 8px 14px; border-radius: 8px; font-size: .82rem; font-weight: 500; color: #64748b; text-decoration: none; transition: all .2s; }
-        .nav-links a:hover { color: #0f172a; background: #f1f5f9; }
-        .nav-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: 10px; font-size: .82rem; font-weight: 600; background: #0f172a; color: #fff; text-decoration: none; transition: all .2s; }
-        .nav-cta:hover { background: #1e293b; box-shadow: 0 4px 12px rgba(15,23,42,.15); }
-
-        /* ═══ Hero ═══ */
-        .hero {
-            position: relative; text-align: center; padding: 140px 20px 80px; overflow: hidden;
-        }
-        .hero::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,.06) 0%, transparent 60%),
-                        radial-gradient(ellipse at 20% 80%, rgba(139,92,246,.04) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 60%, rgba(6,182,212,.03) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: #f1f5f9; color: #3b82f6; padding: 6px 18px; border-radius: 24px;
-            font-size: .78rem; font-weight: 600; margin-bottom: 24px; border: 1px solid #e2e8f0;
-        }
-        .hero-badge .material-symbols-outlined { font-size: 16px; }
-        .hero h1 { font-size: 3rem; font-weight: 900; line-height: 1.3; letter-spacing: -.03em; margin-bottom: 20px; }
-        .hero h1 em { font-style: normal; }
-        .hero > p { font-size: 1.1rem; color: #64748b; max-width: 600px; margin: 0 auto 36px; line-height: 1.8; }
-        .hero-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 56px; flex-wrap: wrap; }
-        .btn-primary {
-            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 12px;
-            font-size: .92rem; font-weight: 600; background: #0f172a; color: #fff; text-decoration: none; transition: all .25s; border: none; cursor: pointer;
-        }
-        .btn-primary:hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15,23,42,.15); }
-        .btn-ghost {
-            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 12px;
-            font-size: .92rem; font-weight: 600; background: #fff; color: #0f172a; text-decoration: none; border: 1.5px solid #e2e8f0; transition: all .25s; cursor: pointer;
-        }
-        .btn-ghost:hover { border-color: #94a3b8; background: #f8fafc; }
-        .btn-primary .material-symbols-outlined, .btn-ghost .material-symbols-outlined { font-size: 18px; }
-
-        /* Hero Stats */
-        .hero-stats { display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; }
-        .hero-stat { text-align: center; }
-        .hero-stat-num { font-size: 2rem; font-weight: 800; color: #0f172a; letter-spacing: -.03em; }
-        .hero-stat-label { font-size: .78rem; color: #94a3b8; margin-top: 4px; }
-
-        /* ═══ Section Common ═══ */
-        section { padding: 80px 0; }
-        .sec-header { text-align: center; margin-bottom: 48px; }
-        .sec-chip { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
-        .sec-chip .material-symbols-outlined { font-size: 16px; }
-        .sec-header h2 { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: 12px; }
-        .sec-header p { font-size: 1rem; color: #64748b; max-width: 560px; margin: 0 auto; line-height: 1.7; }
-
-        /* ═══ Services ═══ */
-        .services { background: #f8fafc; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
-        .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .svc-card {
-            background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px 24px;
-            transition: all .3s; cursor: default; position: relative; overflow: hidden;
-        }
-        .svc-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: var(--svc-grad); opacity: 0; transition: opacity .3s;
-        }
-        .svc-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); border-color: transparent; }
-        .svc-card:hover::before { opacity: 1; }
-        .svc-icon {
-            width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px; font-size: 24px;
-        }
-        .svc-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
-        .svc-card p { font-size: .85rem; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
-        .svc-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .svc-tag { font-size: .7rem; padding: 3px 10px; border-radius: 6px; background: #f1f5f9; color: #64748b; font-weight: 500; }
-
-        .svc-card:nth-child(1) { --svc-grad: linear-gradient(90deg, #3b82f6, #60a5fa); }
-        .svc-card:nth-child(1) .svc-icon { background: #eff6ff; color: #3b82f6; }
-        .svc-card:nth-child(2) { --svc-grad: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-        .svc-card:nth-child(2) .svc-icon { background: #f5f3ff; color: #8b5cf6; }
-        .svc-card:nth-child(3) { --svc-grad: linear-gradient(90deg, #059669, #34d399); }
-        .svc-card:nth-child(3) .svc-icon { background: #ecfdf5; color: #059669; }
-        .svc-card:nth-child(4) { --svc-grad: linear-gradient(90deg, #d97706, #fbbf24); }
-        .svc-card:nth-child(4) .svc-icon { background: #fffbeb; color: #d97706; }
-
-        /* ═══ Features (USP) ═══ */
-        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-        .feat-card {
-            border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px 28px;
-            position: relative; overflow: hidden; transition: all .3s; cursor: default;
-        }
-        .feat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); border-color: transparent; }
-        .feat-num {
-            position: absolute; top: -12px; right: 16px; font-size: 5rem; font-weight: 900;
-            color: rgba(59,130,246,.05); line-height: 1; pointer-events: none;
-        }
-        .feat-icon {
-            width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 20px; font-size: 26px;
-        }
-        .feat-card:nth-child(1) .feat-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa); color: #fff; }
-        .feat-card:nth-child(2) .feat-icon { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: #fff; }
-        .feat-card:nth-child(3) .feat-icon { background: linear-gradient(135deg, #059669, #34d399); color: #fff; }
-        .feat-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
-        .feat-card p { font-size: .88rem; color: #64748b; line-height: 1.7; }
-
-        /* ═══ Featured Programs ═══ */
-        .programs { background: #0f172a; color: #fff; }
-        .programs .sec-header h2 { color: #fff; }
-        .programs .sec-header p { color: #94a3b8; }
-        .programs .sec-chip { color: #60a5fa; }
-        .prog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .prog-card {
-            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
-            padding: 28px; transition: all .3s; cursor: default; position: relative; overflow: hidden;
-        }
-        .prog-card:hover { background: rgba(255,255,255,.08); transform: translateY(-2px); border-color: rgba(255,255,255,.15); }
-        .prog-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: .68rem; font-weight: 700; padding: 4px 12px; border-radius: 6px;
-            margin-bottom: 14px; text-transform: uppercase; letter-spacing: .05em;
-        }
-        .prog-card:nth-child(1) .prog-badge { background: rgba(59,130,246,.15); color: #60a5fa; }
-        .prog-card:nth-child(2) .prog-badge { background: rgba(16,185,129,.15); color: #34d399; }
-        .prog-card:nth-child(3) .prog-badge { background: rgba(245,158,11,.15); color: #fbbf24; }
-        .prog-card:nth-child(4) .prog-badge { background: rgba(139,92,246,.15); color: #a78bfa; }
-        .prog-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
-        .prog-card > p { font-size: .85rem; color: #94a3b8; line-height: 1.7; margin-bottom: 16px; }
-        .prog-features { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
-        .prog-features li {
-            font-size: .75rem; padding: 4px 12px; border-radius: 8px;
-            background: rgba(255,255,255,.06); color: #cbd5e1; font-weight: 500;
-        }
-
-        /* ═══ Social Proof / Numbers ═══ */
-        .proof { border-top: 1px solid #f1f5f9; }
-        .proof-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
-        .proof-item { padding: 24px; }
-        .proof-num { font-size: 2.4rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: 4px; }
-        .proof-label { font-size: .85rem; color: #64748b; }
-        .proof-item:nth-child(1) .proof-num { color: #3b82f6; }
-        .proof-item:nth-child(2) .proof-num { color: #8b5cf6; }
-        .proof-item:nth-child(3) .proof-num { color: #059669; }
-        .proof-item:nth-child(4) .proof-num { color: #d97706; }
-
-        /* ═══ Clients ═══ */
-        .clients { background: #f8fafc; border-top: 1px solid #f1f5f9; }
-        .clients-label { text-align: center; font-size: .72rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 24px; }
-        .clients-row { display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap; }
-        .client-logo-item {
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-            opacity: .35; transition: all .25s; cursor: default;
-        }
-        .client-logo-item:hover { opacity: 1; transform: translateY(-2px); }
-        .client-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; color: #fff; }
-        .client-name { font-size: .7rem; color: #64748b; font-weight: 500; }
-
-        /* ═══ CTA ═══ */
-        .cta {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-            color: #fff; text-align: center; padding: 80px 20px; position: relative; overflow: hidden;
-        }
-        .cta::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 30% 50%, rgba(59,130,246,.1) 0%, transparent 60%),
-                        radial-gradient(ellipse at 70% 50%, rgba(139,92,246,.08) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .cta-content { position: relative; z-index: 1; }
-        .cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -.03em; }
-        .cta p { font-size: 1rem; color: #94a3b8; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
-        .cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .btn-cta {
-            display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; border-radius: 12px;
-            font-size: .92rem; font-weight: 600; text-decoration: none; transition: all .25s; cursor: pointer; border: none;
-        }
-        .btn-cta-primary { background: #fff; color: #0f172a; }
-        .btn-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(255,255,255,.15); }
-        .btn-cta-ghost { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.2); }
-        .btn-cta-ghost:hover { border-color: rgba(255,255,255,.4); background: rgba(255,255,255,.05); }
-
-        /* ═══ Footer ═══ */
-        .footer { padding: 48px 0 32px; border-top: 1px solid #f1f5f9; }
-        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; margin-bottom: 32px; flex-wrap: wrap; }
-        .footer-brand { max-width: 320px; }
-        .footer-brand-name { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .95rem; margin-bottom: 8px; }
-        .footer-brand-name img { width: 28px; height: 28px; border-radius: 6px; }
-        .footer-brand p { font-size: .82rem; color: #94a3b8; line-height: 1.6; }
-        .footer-links { display: flex; gap: 48px; }
-        .footer-col h4 { font-size: .72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
-        .footer-col a { display: block; font-size: .82rem; color: #64748b; text-decoration: none; padding: 3px 0; transition: color .2s; }
-        .footer-col a:hover { color: #0f172a; }
-        .footer-bottom { text-align: center; font-size: .75rem; color: #cbd5e1; padding-top: 24px; border-top: 1px solid #f1f5f9; }
-
-        /* ═══ Responsive ═══ */
-        @media (max-width: 1024px) {
-            .services-grid { grid-template-columns: repeat(2, 1fr); }
-            .prog-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero h1 { font-size: 2rem; }
-            .hero { padding: 120px 20px 60px; }
-            .services-grid, .features-grid, .proof-grid { grid-template-columns: 1fr; }
-            .hero-stats { gap: 32px; }
-            .footer-top { flex-direction: column; }
-            .footer-links { gap: 24px; }
-            .clients-row { gap: 24px; }
-        }
-        @media (max-width: 480px) {
-            .container { padding: 0 20px; }
-            .hero h1 { font-size: 1.7rem; }
-            .hero-actions { flex-direction: column; align-items: center; }
-        }
-
-        /* ═══ Animations ═══ */
-        .fade-up {
-            opacity: 0; transform: translateY(24px);
-            transition: opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1);
-        }
-        .fade-up.visible { opacity: 1; transform: translateY(0); }
-    </style>
+    <style>html{scroll-behavior:smooth}body{margin:0;padding:0;background:#F8FAFC}</style>
 </head>
 
-<body>
+<body class="hp">
     <!-- ═══ Navigation ═══ -->
-    <nav class="nav" id="mainNav" role="navigation" aria-label="主導覽列">
-        <a href="/" class="nav-brand">
+    <nav class="hp-nav" id="mainNav" role="navigation" aria-label="主導覽列">
+        <a href="/" class="hp-nav-brand">
             <img src="assets/images/tbrlogo.png" alt="數位簡報室 Logo">
             數位簡報室 <small>The Briefing Room</small>
         </a>
-        <ul class="nav-links">
+        <ul class="hp-nav-links">
             <li><a href="#services">服務項目</a></li>
             <li><a href="#features">核心優勢</a></li>
             <li><a href="#programs">主打方案</a></li>
             <li><a href="consulting">企業諮詢</a></li>
             <li><a href="affiliate-dashboard">合作夥伴</a></li>
         </ul>
-        <a href="login" class="nav-cta">
-            <span class="material-symbols-outlined" style="font-size:16px;">login</span>
-            登入
+        <a href="my" class="hp-nav-cta">
+            <span class="material-symbols-outlined">person</span>
+            會員中心
         </a>
     </nav>
 
     <!-- ═══ Hero ═══ -->
-    <header class="hero">
-        <div class="container">
-            <div class="hero-badge">
+    <header class="hp-hero">
+        <div class="hp-hero-aurora"></div>
+        <div class="hp-hero-grid"></div>
+        <div class="hp-hero-content">
+            <div class="hp-hero-badge">
                 <span class="material-symbols-outlined">auto_awesome</span>
                 台灣少數專注 AI 數位人才培訓的新創機構
             </div>
             <h1>
-                用 <em class="text-gradient">AI</em> 賦能組織<br>
+                用 <em class="text-glow">AI</em> 賦能組織<br>
                 從培訓到導入，一站搞定
             </h1>
             <p>
                 數位簡報室結合業界獨家互動簡報教學技術、堅強師資陣容與從公開課到企業導入的完整服務，助力企業與個人在 AI 時代脫穎而出。
             </p>
-            <div class="hero-actions">
-                <a href="consulting" class="btn-primary">
+            <div class="hp-hero-actions">
+                <a href="consulting" class="hp-btn-primary">
                     <span class="material-symbols-outlined">calendar_month</span>
                     免費企業諮詢
                 </a>
-                <a href="#programs" class="btn-ghost">
+                <a href="#programs" class="hp-btn-ghost">
                     <span class="material-symbols-outlined">explore</span>
                     探索課程方案
                 </a>
             </div>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <div class="hero-stat-num">50+</div>
-                    <div class="hero-stat-label">企業客戶</div>
+            <div class="hp-hero-stats">
+                <div class="hp-hero-stat">
+                    <div class="hp-hero-stat-num text-glow" data-count="50">0</div>
+                    <div class="hp-hero-stat-label">企業客戶</div>
                 </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-num">2,000+</div>
-                    <div class="hero-stat-label">培訓學員</div>
+                <div class="hp-hero-stat">
+                    <div class="hp-hero-stat-num text-glow" data-count="2000">0</div>
+                    <div class="hp-hero-stat-label">培訓學員</div>
                 </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-num">98%</div>
-                    <div class="hero-stat-label">滿意度</div>
+                <div class="hp-hero-stat">
+                    <div class="hp-hero-stat-num text-glow" data-count="98">0</div>
+                    <div class="hp-hero-stat-label">滿意度 %</div>
                 </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-num">20+</div>
-                    <div class="hero-stat-label">專業講師</div>
+                <div class="hp-hero-stat">
+                    <div class="hp-hero-stat-num text-glow" data-count="20">0</div>
+                    <div class="hp-hero-stat-label">專業講師</div>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- ═══ Logo Marquee ═══ -->
+    <section class="hp-marquee" aria-label="合作客戶">
+        <div class="hp-marquee-label">受信賴的企業夥伴</div>
+        <div class="hp-marquee-track" id="marqueeTrack">
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#1a73e8">G</div><span class="hp-marquee-name">Google</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#0078d4">M</div><span class="hp-marquee-name">Microsoft</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#ff6600">蝦</div><span class="hp-marquee-name">蝦皮購物</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#e21836">F</div><span class="hp-marquee-name">遠傳電信</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#00b900">L</div><span class="hp-marquee-name">LINE</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#ff5722">台</div><span class="hp-marquee-name">台灣大哥大</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#6366f1">中</div><span class="hp-marquee-name">中華電信</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#0ea5e9">富</div><span class="hp-marquee-name">富邦金控</span></div>
+            <!-- Duplicated for seamless loop -->
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#1a73e8">G</div><span class="hp-marquee-name">Google</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#0078d4">M</div><span class="hp-marquee-name">Microsoft</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#ff6600">蝦</div><span class="hp-marquee-name">蝦皮購物</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#e21836">F</div><span class="hp-marquee-name">遠傳電信</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#00b900">L</div><span class="hp-marquee-name">LINE</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#ff5722">台</div><span class="hp-marquee-name">台灣大哥大</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#6366f1">中</div><span class="hp-marquee-name">中華電信</span></div>
+            <div class="hp-marquee-item"><div class="hp-marquee-icon" style="background:#0ea5e9">富</div><span class="hp-marquee-name">富邦金控</span></div>
+        </div>
+    </section>
+
     <!-- ═══ Services ═══ -->
-    <section class="services" id="services">
-        <div class="container">
-            <div class="sec-header fade-up">
-                <div class="sec-chip"><span class="material-symbols-outlined">category</span> 服務項目</div>
+    <section class="hp-section hp-services" id="services">
+        <div class="hp-container">
+            <div class="hp-sec-header hp-reveal">
+                <div class="hp-sec-chip"><span class="material-symbols-outlined">category</span> 服務項目</div>
                 <h2>四大服務，涵蓋 AI 培訓全需求</h2>
                 <p>從個人學習到企業級導入，數位簡報室提供完整的 AI 人才培訓生態系統</p>
             </div>
-            <div class="services-grid">
-                <article class="svc-card fade-up">
-                    <div class="svc-icon"><span class="material-symbols-outlined">school</span></div>
+            <div class="hp-bento">
+                <article class="hp-bento-card hp-reveal">
+                    <div class="hp-bento-icon"><span class="material-symbols-outlined">school</span></div>
+                    <div class="hp-bento-tag">公開課程</div>
                     <h3>公開課程（數位簡報室）</h3>
                     <p>面向個人的 AI 技能提升公開班，涵蓋 ChatGPT、Claude、Gemini、圖像生成、自動化工作流等實戰主題。定期開班，小班制確保學習品質。</p>
-                    <div class="svc-tags">
-                        <span class="svc-tag">小班制教學</span>
-                        <span class="svc-tag">實作演練</span>
-                        <span class="svc-tag">北中南開班</span>
-                        <span class="svc-tag">線上/實體</span>
+                    <div class="hp-bento-pills">
+                        <span class="hp-bento-pill">小班制教學</span>
+                        <span class="hp-bento-pill">實作演練</span>
+                        <span class="hp-bento-pill">北中南開班</span>
+                        <span class="hp-bento-pill">線上/實體</span>
                     </div>
                 </article>
-                <article class="svc-card fade-up" style="animation-delay:.1s">
-                    <div class="svc-icon"><span class="material-symbols-outlined">forum</span></div>
+                <article class="hp-bento-card hp-reveal">
+                    <div class="hp-bento-icon"><span class="material-symbols-outlined">forum</span></div>
+                    <div class="hp-bento-tag">學習社群</div>
                     <h3>社群（數位茶水間）</h3>
                     <p>專屬學員的 AI 學習社群，提供每週 AI 新知更新、實戰案例分享、業界專家 AMA。建立跨產業人脈網絡，持續學習成長。</p>
-                    <div class="svc-tags">
-                        <span class="svc-tag">每週更新</span>
-                        <span class="svc-tag">專家交流</span>
-                        <span class="svc-tag">案例分享</span>
-                        <span class="svc-tag">跨產業人脈</span>
+                    <div class="hp-bento-pills">
+                        <span class="hp-bento-pill">每週更新</span>
+                        <span class="hp-bento-pill">專家交流</span>
+                        <span class="hp-bento-pill">案例分享</span>
+                        <span class="hp-bento-pill">跨產業人脈</span>
                     </div>
                 </article>
-                <article class="svc-card fade-up" style="animation-delay:.2s">
-                    <div class="svc-icon"><span class="material-symbols-outlined">apartment</span></div>
+                <article class="hp-bento-card hp-reveal">
+                    <div class="hp-bento-icon"><span class="material-symbols-outlined">apartment</span></div>
+                    <div class="hp-bento-tag">企業培訓</div>
                     <h3>AI 企業內訓</h3>
                     <p>為企業量身打造的 AI 培訓方案，根據產業特性與團隊需求客製課程內容。從基礎認知到進階應用，協助企業全面提升 AI 應用能力。</p>
-                    <div class="svc-tags">
-                        <span class="svc-tag">客製化課綱</span>
-                        <span class="svc-tag">產業專屬案例</span>
-                        <span class="svc-tag">到府培訓</span>
-                        <span class="svc-tag">成效追蹤</span>
+                    <div class="hp-bento-pills">
+                        <span class="hp-bento-pill">客製化課綱</span>
+                        <span class="hp-bento-pill">產業專屬案例</span>
+                        <span class="hp-bento-pill">到府培訓</span>
+                        <span class="hp-bento-pill">成效追蹤</span>
                     </div>
                 </article>
-                <article class="svc-card fade-up" style="animation-delay:.3s">
-                    <div class="svc-icon"><span class="material-symbols-outlined">engineering</span></div>
+                <article class="hp-bento-card hp-reveal">
+                    <div class="hp-bento-icon"><span class="material-symbols-outlined">engineering</span></div>
+                    <div class="hp-bento-tag">系統導入</div>
                     <h3>AI 系統導入 · 專家派遣</h3>
                     <p>提供 AI 專家進駐企業，協助評估、規劃、導入 AI 工具與流程。從 POC 概念驗證到全面部署，陪伴企業完成數位轉型。</p>
-                    <div class="svc-tags">
-                        <span class="svc-tag">專家進駐</span>
-                        <span class="svc-tag">POC 驗證</span>
-                        <span class="svc-tag">流程優化</span>
-                        <span class="svc-tag">長期顧問</span>
+                    <div class="hp-bento-pills">
+                        <span class="hp-bento-pill">專家進駐</span>
+                        <span class="hp-bento-pill">POC 驗證</span>
+                        <span class="hp-bento-pill">流程優化</span>
+                        <span class="hp-bento-pill">長期顧問</span>
                     </div>
                 </article>
             </div>
@@ -415,29 +198,29 @@
     </section>
 
     <!-- ═══ Features / USP ═══ -->
-    <section class="usp" id="features">
-        <div class="container">
-            <div class="sec-header fade-up">
-                <div class="sec-chip"><span class="material-symbols-outlined">verified</span> 核心優勢</div>
+    <section class="hp-section hp-usp" id="features">
+        <div class="hp-container">
+            <div class="hp-sec-header hp-reveal">
+                <div class="hp-sec-chip"><span class="material-symbols-outlined">verified</span> 核心優勢</div>
                 <h2>為什麼選擇數位簡報室？</h2>
                 <p>三大業界獨有優勢，讓學習效果最大化</p>
             </div>
-            <div class="features-grid">
-                <article class="feat-card fade-up">
-                    <div class="feat-num">01</div>
-                    <div class="feat-icon"><span class="material-symbols-outlined">touch_app</span></div>
+            <div class="hp-usp-grid">
+                <article class="hp-usp-card hp-reveal">
+                    <div class="hp-usp-num">01</div>
+                    <div class="hp-usp-icon"><span class="material-symbols-outlined">touch_app</span></div>
                     <h3>業界獨家互動式簡報教學</h3>
-                    <p>自主研發的互動教學系統，讓每一堂課都不只是聽講。即時問答、情境模擬、協作白板、AI 助教 — 學員參與度提升 300%，知識留存率大幅提高。告別傳統單向 PPT，擁抱沉浸式學習體驗。</p>
+                    <p>自主研發的互動教學系統，讓每一堂課都不只是聽講。即時問答、情境模擬、協作白板、AI 助教 — 學員參與度提升 300%，知識留存率大幅提高。</p>
                 </article>
-                <article class="feat-card fade-up" style="animation-delay:.1s">
-                    <div class="feat-num">02</div>
-                    <div class="feat-icon"><span class="material-symbols-outlined">rocket_launch</span></div>
+                <article class="hp-usp-card hp-reveal">
+                    <div class="hp-usp-num">02</div>
+                    <div class="hp-usp-icon"><span class="material-symbols-outlined">rocket_launch</span></div>
                     <h3>專注 AI · 數位人才培訓的新創</h3>
                     <p>我們不是傳統教育機構，而是少數專注在 AI 與數位技能的新創團隊。緊跟 AI 最新發展，課程每月更新。從 Claude、GPT-4o 到最新多模態 AI，我們永遠走在技術前沿。</p>
                 </article>
-                <article class="feat-card fade-up" style="animation-delay:.2s">
-                    <div class="feat-num">03</div>
-                    <div class="feat-icon"><span class="material-symbols-outlined">groups</span></div>
+                <article class="hp-usp-card hp-reveal">
+                    <div class="hp-usp-num">03</div>
+                    <div class="hp-usp-icon"><span class="material-symbols-outlined">groups</span></div>
                     <h3>堅強師資，各領域專家</h3>
                     <p>招攬來自科技業、金融業、製造業、行銷傳播等各領域的 AI 實戰專家。每位講師都具備豐富的企業導入經驗，用行業語言教會你在工作中真正用得上的 AI 技能。</p>
                 </article>
@@ -446,56 +229,44 @@
     </section>
 
     <!-- ═══ Featured Programs ═══ -->
-    <section class="programs" id="programs">
-        <div class="container">
-            <div class="sec-header fade-up">
-                <div class="sec-chip"><span class="material-symbols-outlined">star</span> 目前主打</div>
+    <section class="hp-section hp-programs" id="programs">
+        <div class="hp-container">
+            <div class="hp-sec-header hp-reveal">
+                <div class="hp-sec-chip"><span class="material-symbols-outlined">star</span> 目前主打</div>
                 <h2>熱門方案推薦</h2>
                 <p>從入門到深度導入，找到最適合你的 AI 學習路徑</p>
             </div>
-            <div class="prog-grid">
-                <article class="prog-card fade-up">
-                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">smart_toy</span> 熱門</div>
+            <div class="hp-prog-grid">
+                <article class="hp-prog-card hp-reveal">
+                    <div class="hp-prog-badge"><span class="material-symbols-outlined" style="font-size:14px">smart_toy</span> 熱門</div>
                     <h3>Claude 企業導入課程</h3>
                     <p>全方位掌握 Anthropic Claude 的企業級應用。從 Claude for Work 團隊版部署、Prompt Engineering 到 API 整合自動化，協助企業最大化 AI 生產力。</p>
-                    <ul class="prog-features">
-                        <li>Claude Pro 團隊部署</li>
-                        <li>進階 Prompt 技巧</li>
-                        <li>API 自動化</li>
-                        <li>資料安全與合規</li>
+                    <ul class="hp-prog-features">
+                        <li>Claude Pro 團隊部署</li><li>進階 Prompt 技巧</li><li>API 自動化</li><li>資料安全與合規</li>
                     </ul>
                 </article>
-                <article class="prog-card fade-up" style="animation-delay:.1s">
-                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">apartment</span> 企業</div>
+                <article class="hp-prog-card hp-reveal">
+                    <div class="hp-prog-badge"><span class="material-symbols-outlined" style="font-size:14px">apartment</span> 企業</div>
                     <h3>AI 辦公室企業內訓</h3>
                     <p>把 AI 帶進每個人的日常工作。涵蓋文件撰寫、數據分析、會議摘要、客服自動化等實際場景，讓每位員工都能用 AI 提升效率 2-5 倍。</p>
-                    <ul class="prog-features">
-                        <li>文件自動生成</li>
-                        <li>數據分析加速</li>
-                        <li>會議 AI 摘要</li>
-                        <li>客服自動化</li>
+                    <ul class="hp-prog-features">
+                        <li>文件自動生成</li><li>數據分析加速</li><li>會議 AI 摘要</li><li>客服自動化</li>
                     </ul>
                 </article>
-                <article class="prog-card fade-up" style="animation-delay:.2s">
-                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">engineering</span> 顧問</div>
+                <article class="hp-prog-card hp-reveal">
+                    <div class="hp-prog-badge"><span class="material-symbols-outlined" style="font-size:14px">engineering</span> 顧問</div>
                     <h3>AI 專家派遣計畫</h3>
                     <p>不只是培訓，而是真正的 AI 導入。我們派遣資深 AI 專家進駐企業，從痛點分析、POC 驗證到全面部署，陪走企業 AI 轉型的每一步。</p>
-                    <ul class="prog-features">
-                        <li>需求診斷</li>
-                        <li>POC 概念驗證</li>
-                        <li>系統整合</li>
-                        <li>長期技術支援</li>
+                    <ul class="hp-prog-features">
+                        <li>需求診斷</li><li>POC 概念驗證</li><li>系統整合</li><li>長期技術支援</li>
                     </ul>
                 </article>
-                <article class="prog-card fade-up" style="animation-delay:.3s">
-                    <div class="prog-badge"><span class="material-symbols-outlined" style="font-size:14px;">school</span> 公開班</div>
+                <article class="hp-prog-card hp-reveal">
+                    <div class="hp-prog-badge"><span class="material-symbols-outlined" style="font-size:14px">school</span> 公開班</div>
                     <h3>AI 公開課程</h3>
                     <p>固定開班的 AI 實戰課程，適合個人自我提升或企業派遣員工參加。業界獨家互動簡報教學，小班制確保每位學員都學得會、用得上。</p>
-                    <ul class="prog-features">
-                        <li>互動簡報教學</li>
-                        <li>小班制 15-30 人</li>
-                        <li>北中南場次</li>
-                        <li>課後社群支援</li>
+                    <ul class="hp-prog-features">
+                        <li>互動簡報教學</li><li>小班制 15-30 人</li><li>北中南場次</li><li>課後社群支援</li>
                     </ul>
                 </article>
             </div>
@@ -503,57 +274,76 @@
     </section>
 
     <!-- ═══ Social Proof Numbers ═══ -->
-    <section class="proof">
-        <div class="container">
-            <div class="proof-grid fade-up">
-                <div class="proof-item">
-                    <div class="proof-num">50+</div>
-                    <div class="proof-label">合作企業客戶</div>
+    <section class="hp-section hp-proof">
+        <div class="hp-container">
+            <div class="hp-proof-grid hp-reveal">
+                <div class="hp-proof-item">
+                    <div class="hp-proof-num" data-count="50">0+</div>
+                    <div class="hp-proof-label">合作企業客戶</div>
                 </div>
-                <div class="proof-item">
-                    <div class="proof-num">2,000+</div>
-                    <div class="proof-label">累計培訓學員</div>
+                <div class="hp-proof-item">
+                    <div class="hp-proof-num" data-count="2000">0+</div>
+                    <div class="hp-proof-label">累計培訓學員</div>
                 </div>
-                <div class="proof-item">
-                    <div class="proof-num">150+</div>
-                    <div class="proof-label">場次課程完成</div>
+                <div class="hp-proof-item">
+                    <div class="hp-proof-num" data-count="150">0+</div>
+                    <div class="hp-proof-label">場次課程完成</div>
                 </div>
-                <div class="proof-item">
-                    <div class="proof-num">98%</div>
-                    <div class="proof-label">學員推薦意願</div>
+                <div class="hp-proof-item">
+                    <div class="hp-proof-num" data-count="98">0%</div>
+                    <div class="hp-proof-label">學員推薦意願</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ Clients ═══ -->
-    <section class="clients" aria-label="合作客戶">
-        <div class="container">
-            <div class="clients-label">受信賴的企業夥伴</div>
-            <div class="clients-row" id="clientLogos">
-                <div class="client-logo-item"><div class="client-icon" style="background:#1a73e8;">G</div><div class="client-name">Google</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#0078d4;">M</div><div class="client-name">Microsoft</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#ff6600;">蝦</div><div class="client-name">蝦皮購物</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#e21836;">F</div><div class="client-name">遠傳電信</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#00b900;">L</div><div class="client-name">LINE</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#ff5722;">台</div><div class="client-name">台灣大哥大</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#6366f1;">中</div><div class="client-name">中華電信</div></div>
-                <div class="client-logo-item"><div class="client-icon" style="background:#0ea5e9;">富</div><div class="client-name">富邦金控</div></div>
+    <!-- ═══ FAQ ═══ -->
+    <section class="hp-section hp-faq" id="faq">
+        <div class="hp-container">
+            <div class="hp-faq-layout">
+                <div class="hp-reveal">
+                    <div class="hp-faq-title">
+                        <span>常見問題</span>
+                        FAQ
+                    </div>
+                </div>
+                <div class="hp-faq-list hp-reveal">
+                    <div class="hp-faq-item active">
+                        <div class="hp-faq-q">課程形式是怎樣的？線上還是實體？<span class="material-symbols-outlined">add</span></div>
+                        <div class="hp-faq-a"><div class="hp-faq-a-inner">我們提供實體與線上兩種形式。公開課程在台北、台中固定開班，企業內訓則可到府授課或線上進行。所有課程都使用我們獨家的互動式簡報系統，即使線上也能確保高度互動。</div></div>
+                    </div>
+                    <div class="hp-faq-item">
+                        <div class="hp-faq-q">企業內訓可以客製化嗎？<span class="material-symbols-outlined">add</span></div>
+                        <div class="hp-faq-a"><div class="hp-faq-a-inner">完全可以。我們會先進行需求訪談，了解貴公司產業、團隊規模與 AI 應用目標，再量身設計課程大綱、案例與實作練習，確保學員學到的技能可以馬上用在工作中。</div></div>
+                    </div>
+                    <div class="hp-faq-item">
+                        <div class="hp-faq-q">沒有技術背景也可以上課嗎？<span class="material-symbols-outlined">add</span></div>
+                        <div class="hp-faq-a"><div class="hp-faq-a-inner">當然可以！我們的課程設計從零基礎開始，用白話和實際案例帶你掌握 AI 工具。無論你是行銷、人資、業務還是管理層，都能從課程中獲得即戰力。</div></div>
+                    </div>
+                    <div class="hp-faq-item">
+                        <div class="hp-faq-q">AI 專家派遣是什麼服務？<span class="material-symbols-outlined">add</span></div>
+                        <div class="hp-faq-a"><div class="hp-faq-a-inner">AI 專家派遣是我們的深度導入服務。我們會派遣具備豐富企業經驗的 AI 專家進駐您的公司，從需求分析、POC 概念驗證到系統部署，全程陪跑您的 AI 轉型之路。</div></div>
+                    </div>
+                    <div class="hp-faq-item">
+                        <div class="hp-faq-q">如何預約企業諮詢？<span class="material-symbols-outlined">add</span></div>
+                        <div class="hp-faq-a"><div class="hp-faq-a-inner">您可以點擊頁面上的「免費企業諮詢」按鈕，或透過 LINE 官方帳號直接聯繫我們。我們的顧問會在 24 小時內回覆，並安排 30 分鐘的免費線上諮詢。</div></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- ═══ CTA ═══ -->
-    <section class="cta">
-        <div class="cta-content fade-up">
+    <section class="hp-cta">
+        <div class="hp-cta-content hp-reveal">
             <h2>準備好讓 AI 為你的團隊加速了嗎？</h2>
             <p>不論是企業內訓、公開課程還是 AI 專家派遣，我們都有最適合的方案。立即預約免費諮詢，讓我們的專家為您量身規劃。</p>
-            <div class="cta-actions">
-                <a href="consulting" class="btn-cta btn-cta-primary">
-                    <span class="material-symbols-outlined" style="font-size:18px;">calendar_month</span>
+            <div class="hp-cta-actions">
+                <a href="consulting" class="hp-btn-primary">
+                    <span class="material-symbols-outlined">calendar_month</span>
                     預約免費諮詢
                 </a>
-                <a href="https://lin.ee/wAi3y4P" target="_blank" class="btn-cta btn-cta-ghost">
+                <a href="https://lin.ee/wAi3y4P" target="_blank" class="hp-btn-ghost">
                     <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
                     LINE 即時諮詢
                 </a>
@@ -562,38 +352,38 @@
     </section>
 
     <!-- ═══ Footer ═══ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-top">
-                <div class="footer-brand">
-                    <div class="footer-brand-name">
+    <footer class="hp-footer">
+        <div class="hp-container">
+            <div class="hp-footer-top">
+                <div class="hp-footer-brand">
+                    <div class="hp-footer-brand-name">
                         <img src="assets/images/tbrlogo.png" alt="TBR">
                         數位簡報室 The Briefing Room
                     </div>
                     <p>台灣少數專注 AI 與數位人才培訓的新創機構。結合業界獨家互動簡報技術，提供從公開課程到企業導入的完整 AI 培訓服務。</p>
                 </div>
-                <div class="footer-links">
-                    <div class="footer-col">
+                <div class="hp-footer-links">
+                    <div class="hp-footer-col">
                         <h4>服務</h4>
                         <a href="#services">公開課程</a>
                         <a href="#services">企業內訓</a>
                         <a href="#programs">AI 專家派遣</a>
                         <a href="consulting">企業諮詢</a>
                     </div>
-                    <div class="footer-col">
+                    <div class="hp-footer-col">
                         <h4>資源</h4>
                         <a href="affiliate-dashboard">合作夥伴</a>
                         <a href="login">登入系統</a>
                         <a href="https://lin.ee/wAi3y4P" target="_blank">LINE 聯繫</a>
                     </div>
-                    <div class="footer-col">
+                    <div class="hp-footer-col">
                         <h4>法律</h4>
                         <a href="privacy">隱私權政策</a>
                         <a href="terms">服務條款</a>
                     </div>
                 </div>
             </div>
-            <div class="footer-bottom">
+            <div class="hp-footer-bottom">
                 © 2025 數位簡報室 The Briefing Room (TBR Digital). All rights reserved.
             </div>
         </div>
@@ -606,16 +396,50 @@
             nav.classList.toggle('scrolled', window.scrollY > 20);
         });
 
-        // Fade-up on scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+        // Scroll reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+                    setTimeout(() => entry.target.classList.add('visible'), i * 80);
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.hp-reveal').forEach(el => revealObserver.observe(el));
 
-        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+        // Counter animation
+        function animateCounter(el) {
+            const target = parseInt(el.dataset.count);
+            const suffix = el.textContent.replace(/[0-9,]/g, '');
+            const duration = 1800;
+            const start = performance.now();
+            function tick(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(eased * target);
+                el.textContent = current.toLocaleString() + suffix;
+                if (progress < 1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('[data-count]').forEach(animateCounter);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.hp-hero-stats, .hp-proof-grid').forEach(el => counterObserver.observe(el));
+
+        // FAQ accordion
+        document.querySelectorAll('.hp-faq-q').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.parentElement;
+                const wasActive = item.classList.contains('active');
+                document.querySelectorAll('.hp-faq-item').forEach(i => i.classList.remove('active'));
+                if (!wasActive) item.classList.add('active');
+            });
+        });
     </script>
 </body>
 

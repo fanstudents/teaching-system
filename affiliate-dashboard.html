@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>數位簡報室聯盟夥伴計畫</title>
+    <title>會員中心 — 數位簡報室</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -1192,36 +1192,36 @@
             <div class="login-brand-content">
                 <div class="login-brand-badge">
                     <span class="material-symbols-outlined">verified</span>
-                    數位簡報室官方計畫
+                    數位簡報室官方平台
                 </div>
-                <h1>聯盟行銷<br>夥伴計畫</h1>
-                <p>推廣全站課程，賺取高額佣金回饋。<br>即時追蹤你的推廣成效與收益。</p>
+                <h1>會員中心<br>學習 × 推廣</h1>
+                <p>查看你的學習歷程與互動紀錄。<br>推廣者可即時追蹤推廣成效與收益。</p>
                 <div class="login-stats">
                     <div class="login-stat-item">
-                        <div class="login-stat-value" id="loginStatRate">20%</div>
-                        <div class="login-stat-label">銷售分潤比例</div>
+                        <div class="login-stat-value">📊</div>
+                        <div class="login-stat-label">學習數據</div>
                     </div>
                     <div class="login-stat-item">
-                        <div class="login-stat-value">18+</div>
-                        <div class="login-stat-label">可推廣課程</div>
+                        <div class="login-stat-value">📝</div>
+                        <div class="login-stat-label">作業回顧</div>
                     </div>
                     <div class="login-stat-item">
-                        <div class="login-stat-value">即時</div>
-                        <div class="login-stat-label">銷售通知推播</div>
+                        <div class="login-stat-value">🤝</div>
+                        <div class="login-stat-label">推廣銷售</div>
                     </div>
                 </div>
                 <div class="login-features">
                     <div class="login-feature">
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>專屬折扣碼 — 每筆成交自動追蹤</span>
+                        <span>課堂互動紀錄 — 測驗、作業一覽無遺</span>
                     </div>
                     <div class="login-feature">
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>每月 10 日結算，25 日準時撥款</span>
+                        <span>積分排行榜 — 見證你的學習成果</span>
                     </div>
                     <div class="login-feature">
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>即時儀表板 — 隨時查看收益與推廣數據</span>
+                        <span>推廣者方案 — 佣金獎勵自動結算</span>
                     </div>
                 </div>
             </div>
@@ -1235,8 +1235,8 @@
                         <div class="login-form-icon">
                             <img src="assets/images/tbrlogo.png" alt="數位簡報室" style="width:40px;height:40px;border-radius:10px;">
                         </div>
-                        <h2>夥伴專區</h2>
-                        <p>使用 Google 帳號登入或申請加入</p>
+                        <h2>會員中心</h2>
+                        <p>使用 Google 帳號登入</p>
                     </div>
 
                     <div class="login-error-msg" id="loginErrorMsg">
@@ -1430,41 +1430,74 @@
                 </div>
                 <div class="sidebar-brand-text">
                     數位簡報室
-                    <span>聯盟夥伴計畫</span>
+                    <span>會員中心</span>
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <button class="nav-item active" data-view="overview">
-                    <span class="material-symbols-outlined">dashboard</span> 銷售儀表板
+                <!-- 學員區塊 -->
+                <div class="nav-group-label">
+                    <span class="material-symbols-outlined" style="font-size:15px;">school</span>
+                    我的學習
+                </div>
+                <button class="nav-item active" data-view="my-courses">
+                    <span class="material-symbols-outlined">history_edu</span> 課堂紀錄
                 </button>
-                <button class="nav-item" data-view="coupon">
-                    <span class="material-symbols-outlined">confirmation_number</span> 折扣碼管理
+                <button class="nav-item" data-view="my-homework">
+                    <span class="material-symbols-outlined">assignment</span> 作業回顧
                 </button>
-                <button class="nav-item" data-view="orders">
-                    <span class="material-symbols-outlined">receipt_long</span> 訂單紀錄
+                <button class="nav-item" data-view="my-stats">
+                    <span class="material-symbols-outlined">insights</span> 互動數據
                 </button>
 
-                <div class="nav-group-label">
-                    <span class="material-symbols-outlined" style="font-size:15px;">storefront</span>
-                    可推廣產品
+                <!-- 推廣者區塊（動態顯示） -->
+                <div id="affiliateNavSection" style="display:none;">
+                    <div class="nav-divider"></div>
+                    <div class="nav-group-label">
+                        <span class="material-symbols-outlined" style="font-size:15px;">handshake</span>
+                        推廣者專區
+                    </div>
+                    <button class="nav-item" data-view="overview">
+                        <span class="material-symbols-outlined">dashboard</span> 銷售儀表板
+                    </button>
+                    <button class="nav-item" data-view="coupon">
+                        <span class="material-symbols-outlined">confirmation_number</span> 折扣碼管理
+                    </button>
+                    <button class="nav-item" data-view="orders">
+                        <span class="material-symbols-outlined">receipt_long</span> 訂單紀錄
+                    </button>
+
+                    <div class="nav-group-label">
+                        <span class="material-symbols-outlined" style="font-size:15px;">storefront</span>
+                        可推廣產品
+                    </div>
+                    <button class="nav-item nav-sub" data-view="courses">
+                        <span class="material-symbols-outlined">menu_book</span> 公開課程
+                    </button>
+                    <button class="nav-item nav-sub" data-view="referral">
+                        <span class="material-symbols-outlined">diversity_3</span> 企業引薦
+                    </button>
+                    <button class="nav-item nav-sub" data-view="threads-wom">
+                        <span class="material-symbols-outlined">forum</span> Threads 口碑
+                    </button>
+
+                    <div class="nav-divider"></div>
+                    <button class="nav-item" data-view="free-courses">
+                        <span class="material-symbols-outlined">card_giftcard</span> 免費體驗課程
+                    </button>
+                    <button class="nav-item" data-view="tutorial">
+                        <span class="material-symbols-outlined">auto_stories</span> 推廣教學
+                    </button>
                 </div>
-                <button class="nav-item nav-sub" data-view="courses">
-                    <span class="material-symbols-outlined">menu_book</span> 公開課程
-                </button>
-                <button class="nav-item nav-sub" data-view="referral">
-                    <span class="material-symbols-outlined">diversity_3</span> 企業引薦
-                </button>
-                <button class="nav-item nav-sub" data-view="threads-wom">
-                    <span class="material-symbols-outlined">forum</span> Threads 口碑
-                </button>
+
+                <!-- 成為推廣者 CTA（非推廣者時顯示） -->
+                <div id="affiliateCTA" style="display:none;">
+                    <div class="nav-divider"></div>
+                    <button class="nav-item" data-view="become-affiliate" style="color:#6366f1;">
+                        <span class="material-symbols-outlined">diversity_3</span> 成為推廣者
+                    </button>
+                </div>
 
                 <div class="nav-divider"></div>
-                <button class="nav-item" data-view="free-courses">
-                    <span class="material-symbols-outlined">card_giftcard</span> 免費體驗觀看
-                </button>
-                <button class="nav-item" data-view="tutorial">
-                    <span class="material-symbols-outlined">auto_stories</span> 推廣教學
-                </button>
                 <button class="nav-item" data-view="account">
                     <span class="material-symbols-outlined">manage_accounts</span> 帳戶管理
                 </button>
@@ -1485,8 +1518,147 @@
 
         <!-- Main -->
         <main class="saas-main">
-            <!-- View: Overview -->
-            <div class="view-page active" id="view-overview">
+            <!-- View: 課堂紀錄 -->
+            <div class="view-page active" id="view-my-courses">
+                <!-- 課程列表 -->
+                <div id="myCoursesListView">
+                    <h2 class="page-title">我的課堂紀錄</h2>
+                    <p class="page-subtitle">點擊課程查看詳情、講義與互動紀錄</p>
+                    <div id="myCoursesLoading" style="text-align:center;padding:60px 0;color:var(--text-muted);">
+                        <span class="material-symbols-outlined" style="font-size:32px;animation:spin 1s linear infinite;">progress_activity</span>
+                        <p style="margin-top:12px;">載入中…</p>
+                    </div>
+                    <div id="myCoursesEmpty" style="display:none;text-align:center;padding:60px 20px;">
+                        <span class="material-symbols-outlined" style="font-size:48px;color:var(--text-muted);opacity:0.5;">school</span>
+                        <p style="color:var(--text-muted);margin-top:12px;">目前尚無課堂紀錄</p>
+                        <p style="color:var(--text-muted);font-size:0.82rem;margin-top:4px;">參加互動式課程後，您的學習紀錄將自動出現在這裡</p>
+                    </div>
+                    <div id="myCoursesGrid" class="stat-grid" style="display:none;grid-template-columns:1fr;gap:16px;"></div>
+                </div>
+
+                <!-- 課程詳情（單課程檢視） -->
+                <div id="myCourseDetail" style="display:none;">
+                    <button onclick="backToCourseList()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:0.85rem;display:flex;align-items:center;gap:4px;padding:0;margin-bottom:16px;font-family:inherit;">
+                        <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span> 返回課程列表
+                    </button>
+                    <div id="myCourseDetailContent"></div>
+                </div>
+            </div>
+
+            <!-- ═══ 課後行動表單 Modal ═══ -->
+            <div id="actionFormModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:520px;max-height:85vh;overflow-y:auto;background:var(--card-bg);border-radius:16px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                        <h3 id="actionFormTitle" style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin:0;"></h3>
+                        <button onclick="closeActionForm()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:24px;line-height:1;">×</button>
+                    </div>
+                    <form id="actionForm" onsubmit="submitActionForm(event)">
+                        <input type="hidden" id="actionType">
+                        <input type="hidden" id="actionSessionCode">
+                        <input type="hidden" id="actionProjectName">
+                        <div style="display:grid;gap:14px;">
+                            <div>
+                                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">主題</label>
+                                <input type="text" id="actionSubject" required placeholder="請輸入主題" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:var(--bg);color:var(--text-primary);font-family:inherit;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">內容描述</label>
+                                <textarea id="actionMessage" required rows="4" placeholder="請詳細描述..." style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:var(--bg);color:var(--text-primary);resize:vertical;font-family:inherit;"></textarea>
+                            </div>
+                            <!-- 專案合作專用 -->
+                            <div id="actionColabFields" style="display:none;">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                    <div>
+                                        <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">公司名稱</label>
+                                        <input type="text" id="actionCompany" placeholder="公司/組織名稱" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:var(--bg);color:var(--text-primary);font-family:inherit;">
+                                    </div>
+                                    <div>
+                                        <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">聯絡電話</label>
+                                        <input type="tel" id="actionPhone" placeholder="0912-345-678" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:var(--bg);color:var(--text-primary);font-family:inherit;">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 合作引薦專用 -->
+                            <div id="actionReferralFields" style="display:none;">
+                                <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px;">欲引薦的對象/公司</label>
+                                <input type="text" id="actionReferralTarget" placeholder="引薦對象的公司/姓名/聯絡方式" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;background:var(--bg);color:var(--text-primary);font-family:inherit;">
+                            </div>
+                            <button type="submit" id="actionSubmitBtn" style="padding:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:0.92rem;font-weight:600;cursor:pointer;font-family:inherit;">送出</button>
+                        </div>
+                    </form>
+                    <div id="actionFormSuccess" style="display:none;text-align:center;padding:20px 0;">
+                        <span class="material-symbols-outlined" style="font-size:48px;color:#22c55e;">check_circle</span>
+                        <p style="font-size:1rem;font-weight:600;color:var(--text-primary);margin:12px 0 4px;">已成功送出！</p>
+                        <p style="font-size:0.82rem;color:var(--text-muted);">我們會盡快與您聯繫</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: 作業回顧 -->
+            <div class="view-page" id="view-my-homework">
+                <h2 class="page-title">作業回顧</h2>
+                <p class="page-subtitle">您在課堂中提交的所有作業</p>
+                <div id="myHomeworkLoading" style="text-align:center;padding:60px 0;color:var(--text-muted);">
+                    <span class="material-symbols-outlined" style="font-size:32px;animation:spin 1s linear infinite;">progress_activity</span>
+                    <p style="margin-top:12px;">載入中…</p>
+                </div>
+                <div id="myHomeworkEmpty" style="display:none;text-align:center;padding:60px 20px;">
+                    <span class="material-symbols-outlined" style="font-size:48px;color:var(--text-muted);opacity:0.5;">assignment</span>
+                    <p style="color:var(--text-muted);margin-top:12px;">目前尚無作業紀錄</p>
+                </div>
+                <div id="myHomeworkList" style="display:none;"></div>
+            </div>
+
+            <!-- View: 互動數據 -->
+            <div class="view-page" id="view-my-stats">
+                <h2 class="page-title">互動數據</h2>
+                <p class="page-subtitle">您的學習互動統計總覽</p>
+                <div id="myStatsLoading" style="text-align:center;padding:60px 0;color:var(--text-muted);">
+                    <span class="material-symbols-outlined" style="font-size:32px;animation:spin 1s linear infinite;">progress_activity</span>
+                    <p style="margin-top:12px;">載入中…</p>
+                </div>
+                <div id="myStatsContent" style="display:none;">
+                    <div class="stat-grid" id="myStatsGrid" style="margin-bottom:24px;"></div>
+                    <div id="myStatsDetail"></div>
+                </div>
+            </div>
+
+            <!-- View: 成為推廣者 -->
+            <div class="view-page" id="view-become-affiliate">
+                <h2 class="page-title">成為推廣者</h2>
+                <p class="page-subtitle">加入數位簡報室聯盟夥伴計畫，推廣課程賺取佣金</p>
+                <div style="max-width:640px;margin:40px auto;text-align:center;">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
+                        <span class="material-symbols-outlined" style="font-size:36px;color:#fff;">handshake</span>
+                    </div>
+                    <h3 style="font-size:1.4rem;font-weight:700;color:var(--text-primary);margin-bottom:12px;">聯盟夥伴計畫</h3>
+                    <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:8px;">推廣數位簡報室的 AI 課程，每筆成交最高可獲得 <strong style="color:#6366f1;">10% 佣金</strong></p>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:32px 0;">
+                        <div style="padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#6366f1;margin-bottom:8px;">link</span>
+                            <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">專屬連結</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">個人折扣碼追蹤</div>
+                        </div>
+                        <div style="padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#22c55e;margin-bottom:8px;">payments</span>
+                            <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">佣金收入</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">每月結算匯款</div>
+                        </div>
+                        <div style="padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#f59e0b;margin-bottom:8px;">school</span>
+                            <div style="font-size:0.85rem;font-weight:600;color:var(--text-primary);">免費課程</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">達標即可體驗</div>
+                        </div>
+                    </div>
+                    <button onclick="switchView('register')" style="padding:14px 48px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(99,102,241,0.3);transition:all 0.2s ease;">
+                        <span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:6px;">rocket_launch</span>
+                        立即申請
+                    </button>
+                </div>
+            </div>
+
+            <!-- View: Overview (affiliate) -->
+            <div class="view-page" id="view-overview">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
                     <h2 class="page-title">銷售儀表板</h2>
                     <div style="font-size:0.72rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;">
@@ -2003,19 +2175,25 @@
                     <!-- 類別選擇 -->
                     <div class="tw-section">
                         <style>
-                            .tw-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f5;}
+                            .tw-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f5f5f5;transition:all .3s ease;border-radius:10px;margin:0 -8px;padding:10px 8px;}
                             .tw-toggle-row:last-child{border-bottom:none;}
+                            .tw-toggle-row.active{background:linear-gradient(135deg,rgba(99,102,241,.04),rgba(129,140,248,.06));border-color:transparent;}
                             .tw-toggle-left{display:flex;align-items:center;gap:10px;}
-                            .tw-toggle-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+                            .tw-toggle-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:transform .3s ease, box-shadow .3s ease;}
+                            .tw-toggle-row.active .tw-toggle-icon{transform:scale(1.08);box-shadow:0 2px 10px rgba(99,102,241,.25);}
                             .tw-toggle-icon .material-symbols-outlined{font-size:18px;color:#fff;}
-                            .tw-toggle-name{font-size:0.82rem;font-weight:600;color:#1e293b;}
-                            .tw-toggle-sub{font-size:0.65rem;color:#94a3b8;}
+                            .tw-toggle-name{font-size:0.82rem;font-weight:600;color:#1e293b;transition:color .3s;}
+                            .tw-toggle-row.active .tw-toggle-name{color:#4338ca;}
+                            .tw-toggle-sub{font-size:0.65rem;color:#94a3b8;transition:color .3s;}
+                            .tw-toggle-row.active .tw-toggle-sub{color:#6366f1;}
                             .tw-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
                             .tw-switch input{opacity:0;width:0;height:0;}
                             .tw-switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#e2e8f0;border-radius:24px;transition:all .25s;}
                             .tw-switch .slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:all .25s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
                             .tw-switch input:checked + .slider{background:linear-gradient(135deg,#6366f1,#818cf8);}
                             .tw-switch input:checked + .slider:before{transform:translateX(20px);}
+                            @keyframes twToggleOn{0%{transform:scale(1);}40%{transform:scale(1.03);}100%{transform:scale(1);}}
+                            .tw-toggle-row.tw-just-activated{animation:twToggleOn .35s ease;}
                         </style>
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                             <div style="font-size:0.82rem;font-weight:700;color:#1e293b;">
@@ -2035,7 +2213,7 @@
                                     </div>
                                 </div>
                                 <label class="tw-switch">
-                                    <input type="checkbox" id="threadsCatCourse" onchange="saveThreadsProfile()">
+                                    <input type="checkbox" id="threadsCatCourse" onchange="toggleThreadsCat(this);saveThreadsProfile()">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -2050,7 +2228,7 @@
                                     </div>
                                 </div>
                                 <label class="tw-switch">
-                                    <input type="checkbox" id="threadsCatFood" onchange="saveThreadsProfile()">
+                                    <input type="checkbox" id="threadsCatFood" onchange="toggleThreadsCat(this);saveThreadsProfile()">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -2065,7 +2243,7 @@
                                     </div>
                                 </div>
                                 <label class="tw-switch">
-                                    <input type="checkbox" id="threadsCatBeauty" onchange="saveThreadsProfile()">
+                                    <input type="checkbox" id="threadsCatBeauty" onchange="toggleThreadsCat(this);saveThreadsProfile()">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -2559,8 +2737,8 @@ Day 4: 真的很棒拜託快去上！</span>
 
             <!-- View: 免費觀看 -->
             <div class="view-page" id="view-free-courses">
-                <h2 class="page-title">免費體驗觀看課程</h2>
-                <p class="page-subtitle">符合條件的推廣者，每月可免費體驗觀看 2 堂課程（30天）</p>
+                <h2 class="page-title">免費體驗課程</h2>
+                <p class="page-subtitle">符合 2 項以上條件的推廣者，每月可免費參加 1 堂課程（含實體課程體驗）</p>
 
                 <style>
                     .fc-cond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
@@ -2600,7 +2778,7 @@ Day 4: 真的很棒拜託快去上！</span>
                         </div>
                         <div class="fc-title">社群追蹤數</div>
                         <div class="fc-value" id="fcFollowers">—</div>
-                        <div class="fc-desc">主要社群帳號需超過 3,000</div>
+                        <div class="fc-desc">主要社群帳號需超過 5,000</div>
                     </div>
                     <div class="fc-cond" id="fcCond3">
                         <span class="fc-badge">檢查中...</span>
@@ -2973,8 +3151,56 @@ Day 4: 真的很棒拜託快去上！</span>
             <!-- View: Account -->
             <div class="view-page" id="view-account">
                 <h2 class="page-title">帳戶管理</h2>
-                <p class="page-subtitle">管理你的銀行匯款資訊</p>
+                <p class="page-subtitle">管理你的個人資訊與銀行匯款資訊</p>
+
+                <!-- 個人資訊 -->
                 <div class="section-card">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">person</span> 個人資訊
+                    </div>
+                    <div class="section-body">
+                        <div class="bank-form">
+                            <div class="form-group">
+                                <label>真實姓名 <span style="color:#ef4444;font-size:0.7rem;">*</span></label>
+                                <input type="text" id="realName" placeholder="請填寫真實姓名（用於匯款核對）">
+                            </div>
+                            <div class="form-group">
+                                <label>聯絡電話</label>
+                                <input type="tel" id="phoneNumber" placeholder="例：0912-345-678">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 綁定其他 Email -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <span class="material-symbols-outlined">link</span> 綁定其他 Email
+                    </div>
+                    <div class="section-body">
+                        <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 12px;line-height:1.6;">
+                            如果您曾用其他 Email 參加課程（例如公司信箱），綁定後即可在會員中心查看該 Email 的學習紀錄。
+                        </p>
+                        <div class="bank-form">
+                            <div class="form-group full-width">
+                                <label>要綁定的 Email</label>
+                                <input type="email" id="bindEmail" placeholder="例：your-work@company.com">
+                            </div>
+                            <div class="bank-actions">
+                                <div class="bank-saved-msg" id="bindSavedMsg">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> 已綁定
+                                </div>
+                                <button type="button" class="btn-save" id="btnBindEmail">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">add_link</span> 綁定
+                                </button>
+                            </div>
+                        </div>
+                        <div id="boundEmailsList" style="margin-top:12px;"></div>
+                    </div>
+                </div>
+
+                <!-- 銀行匯款資訊（推廣者才顯示） -->
+                <div class="section-card" id="bankInfoSection" style="display:none;">
                     <div class="section-header">
                         <span class="material-symbols-outlined">account_balance</span> 銀行匯款資訊
                     </div>
@@ -3068,10 +3294,6 @@ Day 4: 真的很棒拜託快去上！</span>
 
             const affiliate = data?.[0];
 
-            if (affiliate && affiliate.status === 'approved') {
-                return showDashboard(affiliate, user);
-            }
-
             if (affiliate && affiliate.status === 'pending') {
                 return showPending();
             }
@@ -3080,8 +3302,9 @@ Day 4: 真的很棒拜託快去上！</span>
                 return showRejected();
             }
 
-            // Not registered — show register form
-            return showRegisterForm(user);
+            // Show unified member center
+            const isAffiliate = affiliate && affiliate.status === 'approved';
+            return showDashboard(isAffiliate ? affiliate : null, user);
         }
 
         // ── Screens ──
@@ -3200,73 +3423,94 @@ Day 4: 真的很棒拜託快去上！</span>
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'flex';
 
-            const name = user?.user_metadata?.full_name || user?.user_metadata?.name || affiliate.name || '夥伴';
+            const name = user?.user_metadata?.full_name || user?.user_metadata?.name || (affiliate ? affiliate.name : '') || '會員';
             const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+            const email = user.email;
 
             document.getElementById('sidebarName').textContent = name;
-            document.getElementById('sidebarEmail').textContent = affiliate.email;
+            document.getElementById('sidebarEmail').textContent = email;
             if (avatarUrl) {
                 document.getElementById('userAvatar').innerHTML = `<img src="${avatarUrl}" alt="">`;
             }
 
-            // Coupon
-            document.getElementById('couponDisplay').textContent = affiliate.coupon_code;
-            const rate = Math.round((affiliate.commission_rate || 0.20) * 100);
-            document.getElementById('statRate').textContent = rate + '%';
-            document.getElementById('commissionRateText').textContent = rate + '%';
-            document.getElementById('loginStatRate').textContent = rate + '%';
-            document.querySelectorAll('.dynamic-rate').forEach(el => el.textContent = rate + '%');
+            // ── 動態 sidebar 顯示 ──
+            if (affiliate) {
+                // 顯示推廣者區塊
+                document.getElementById('affiliateNavSection').style.display = '';
+                document.getElementById('affiliateCTA')?.remove();
 
-            // Discount info
-            if (affiliate.discount_type) {
-                const dt = affiliate.discount_type;
-                const dv = affiliate.discount_value || '';
-                let text = '';
-                if (dt === 'percent') text = `折扣 ${dv}%`;
-                else if (dt === 'fixed') text = `折 NT$ ${Number(dv).toLocaleString()}`;
-                else text = dv || dt;
-                document.getElementById('discountInfoText').textContent = text;
-                document.getElementById('discountInfoLine').style.display = '';
+                // Coupon
+                document.getElementById('couponDisplay').textContent = affiliate.coupon_code;
+                const rate = Math.round((affiliate.commission_rate || 0.20) * 100);
+                document.getElementById('statRate').textContent = rate + '%';
+                document.getElementById('commissionRateText').textContent = rate + '%';
+                document.getElementById('loginStatRate')?.textContent = rate + '%';
+                document.querySelectorAll('.dynamic-rate').forEach(el => el.textContent = rate + '%');
+
+                // Discount info
+                if (affiliate.discount_type) {
+                    const dt = affiliate.discount_type;
+                    const dv = affiliate.discount_value || '';
+                    let text = '';
+                    if (dt === 'percent') text = `折扣 ${dv}%`;
+                    else if (dt === 'fixed') text = `折 NT$ ${Number(dv).toLocaleString()}`;
+                    else text = dv || dt;
+                    document.getElementById('discountInfoText').textContent = text;
+                    document.getElementById('discountInfoLine').style.display = '';
+                }
+
+                // Promo links
+                const coupon = affiliate.coupon_code || '';
+                const channels = [
+                    { key: 'threads', label: 'Threads', icon: 'forum', medium: 'social', color: '#000' },
+                    { key: 'instagram', label: 'Instagram', icon: 'photo_camera', medium: 'social', color: '#e1306c' },
+                    { key: 'facebook', label: 'Facebook', icon: 'group', medium: 'social', color: '#1877f2' },
+                    { key: 'blog', label: 'Blog / 部落格', icon: 'edit_note', medium: 'blog', color: '#f59e0b' },
+                    { key: 'line', label: 'LINE', icon: 'chat', medium: 'message', color: '#06c755' },
+                    { key: 'email', label: 'Email', icon: 'mail', medium: 'email', color: '#6366f1' },
+                ];
+                const promoContainer = document.getElementById('promoLinksContainer');
+                promoContainer.innerHTML = channels.map(ch => {
+                    const url = `https://tbr.digital?utm_source=${ch.key}&utm_medium=${ch.medium}&utm_campaign=affiliate&utm_content=${coupon}`;
+                    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:${ch.color};">${ch.icon}</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.72rem;font-weight:600;color:var(--text);margin-bottom:1px;">${ch.label}</div>
+                            <div style="font-size:0.65rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${url}</div>
+                        </div>
+                        <button onclick="navigator.clipboard.writeText('${url}');this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:16px;color:#10b981;\\'>check</span>';setTimeout(()=>this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:16px;\\'>content_copy</span>',1500)"
+                            style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;display:flex;align-items:center;transition:all .15s;"
+                            title="複製連結">
+                            <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+                        </button>
+                    </div>`;
+                }).join('');
+
+                // Personal info
+                document.getElementById('realName').value = affiliate.real_name || '';
+                document.getElementById('phoneNumber').value = affiliate.phone || '';
+
+                // Bank — 推廣者才顯示
+                document.getElementById('bankInfoSection').style.display = '';
+                document.getElementById('bankName').value = affiliate.bank_name || '';
+                document.getElementById('accountHolder').value = affiliate.account_holder || '';
+                document.getElementById('bankAccount').value = affiliate.bank_account || '';
+
+                loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.20);
+                loadCourses(affiliate.coupon_code, affiliate.commission_rate || 0.20);
+                currentCouponCode = affiliate.coupon_code || '';
+                currentAffiliateId = affiliate.id;
+                loadThreadsProfile(affiliate);
+                checkFreeCoursesEligibility();
+            } else {
+                // 非推廣者 — 顯示 CTA
+                document.getElementById('affiliateCTA').style.display = '';
             }
 
-            // Promo links
-            const coupon = affiliate.coupon_code || '';
-            const channels = [
-                { key: 'threads', label: 'Threads', icon: 'forum', medium: 'social', color: '#000' },
-                { key: 'instagram', label: 'Instagram', icon: 'photo_camera', medium: 'social', color: '#e1306c' },
-                { key: 'facebook', label: 'Facebook', icon: 'group', medium: 'social', color: '#1877f2' },
-                { key: 'blog', label: 'Blog / 部落格', icon: 'edit_note', medium: 'blog', color: '#f59e0b' },
-                { key: 'line', label: 'LINE', icon: 'chat', medium: 'message', color: '#06c755' },
-                { key: 'email', label: 'Email', icon: 'mail', medium: 'email', color: '#6366f1' },
-            ];
-            const promoContainer = document.getElementById('promoLinksContainer');
-            promoContainer.innerHTML = channels.map(ch => {
-                const url = `https://tbr.digital?utm_source=${ch.key}&utm_medium=${ch.medium}&utm_campaign=affiliate&utm_content=${coupon}`;
-                return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
-                    <span class="material-symbols-outlined" style="font-size:18px;color:${ch.color};">${ch.icon}</span>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-size:0.72rem;font-weight:600;color:var(--text);margin-bottom:1px;">${ch.label}</div>
-                        <div style="font-size:0.65rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${url}</div>
-                    </div>
-                    <button onclick="navigator.clipboard.writeText('${url}');this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:16px;color:#10b981;\\'>check</span>';setTimeout(()=>this.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:16px;\\'>content_copy</span>',1500)"
-                        style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;display:flex;align-items:center;transition:all .15s;"
-                        title="複製連結">
-                        <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
-                    </button>
-                </div>`;
-            }).join('');
+            // ── 學員資料載入（所有使用者都執行）──
+            loadMyLearning(email);
+            setupBindEmail(email);
 
-            // Bank
-            document.getElementById('bankName').value = affiliate.bank_name || '';
-            document.getElementById('accountHolder').value = affiliate.account_holder || '';
-            document.getElementById('bankAccount').value = affiliate.bank_account || '';
-
-            loadSales(affiliate.coupon_code, affiliate.commission_rate || 0.20);
-            loadCourses(affiliate.coupon_code, affiliate.commission_rate || 0.20);
-            currentCouponCode = affiliate.coupon_code || '';
-            currentAffiliateId = affiliate.id;
-            loadThreadsProfile(affiliate);
-            checkFreeCoursesEligibility();
             setupEvents(affiliate);
         }
 
@@ -3637,10 +3881,28 @@ Day 4: 真的很棒拜託快去上！</span>
             }, 500);
         };
 
+        // Toggle category animation
+        window.toggleThreadsCat = function(checkbox) {
+            const row = checkbox.closest('.tw-toggle-row');
+            if (!row) return;
+            if (checkbox.checked) {
+                row.classList.add('active', 'tw-just-activated');
+                row.addEventListener('animationend', () => row.classList.remove('tw-just-activated'), { once: true });
+            } else {
+                row.classList.remove('active', 'tw-just-activated');
+            }
+        };
+
         function loadThreadsProfile(affiliate) {
             document.getElementById('threadsCatCourse').checked = affiliate.threads_cat_course || false;
             document.getElementById('threadsCatFood').checked = affiliate.threads_cat_food || false;
             document.getElementById('threadsCatBeauty').checked = affiliate.threads_cat_beauty || false;
+            // Sync toggle row active states (without animation)
+            ['threadsCatCourse', 'threadsCatFood', 'threadsCatBeauty'].forEach(id => {
+                const cb = document.getElementById(id);
+                const row = cb?.closest('.tw-toggle-row');
+                if (row) row.classList.toggle('active', cb.checked);
+            });
             document.getElementById('threadsHandle').value = affiliate.threads_handle || '';
             document.getElementById('threadsFollowers').value = affiliate.threads_followers || '';
             document.getElementById('threadsDomain').value = affiliate.threads_domain || '';
@@ -3666,30 +3928,37 @@ Day 4: 真的很棒拜託快去上！</span>
 
             let traffic = 0;
             try {
-                const resp = await fetch('https://qfunccclqaeifrfmkmsc.supabase.co/functions/v1/analytics-data', {
+                const resp = await fetch(ANALYTICS_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': ANON_KEY,
+                        'Authorization': `Bearer ${ANON_KEY}`
+                    },
                     body: JSON.stringify({
                         type: 'affiliate',
                         couponCode: a.coupon_code,
-                        startDate: lastMonthStart.toISOString().split('T')[0],
-                        endDate: lastMonthEnd.toISOString().split('T')[0]
+                        dateRange: {
+                            startDate: lastMonthStart.toISOString().split('T')[0],
+                            endDate: lastMonthEnd.toISOString().split('T')[0]
+                        }
                     })
                 });
                 const data = await resp.json();
-                if (data.summary) traffic = data.summary.totalSessions || 0;
+                if (data.affiliate?.overview) traffic = data.affiliate.overview.sessions || 0;
+                else if (data.summary) traffic = data.summary.totalSessions || 0;
             } catch(e) { console.warn('GA4 check failed:', e); }
             const cond1 = traffic >= 100;
             updateCondCard('fcCond1', cond1, traffic.toLocaleString());
             document.getElementById('fcTraffic').textContent = traffic.toLocaleString();
             if (cond1) passCount++;
 
-            // Condition 2: Social followers > 3000
+            // Condition 2: Social followers > 5000
             const followers = Math.max(
                 a.threads_followers || 0,
                 a.social_followers || 0
             );
-            const cond2 = followers >= 3000;
+            const cond2 = followers >= 5000;
             updateCondCard('fcCond2', cond2, followers.toLocaleString());
             document.getElementById('fcFollowers').textContent = followers.toLocaleString();
             if (cond2) passCount++;
@@ -3700,8 +3969,7 @@ Day 4: 真的很棒拜託快去上！</span>
                 const { data: orders } = await db.select('affiliate_orders', {
                     filter: {
                         coupon_code: `eq.${a.coupon_code}`,
-                        payment_time: `gte.${lastMonthStart.toISOString()}`,
-                        payment_time: `lte.${lastMonthEnd.toISOString()}`
+                        and: `(payment_time.gte.${lastMonthStart.toISOString()},payment_time.lte.${lastMonthEnd.toISOString()})`
                     },
                     select: 'id',
                     limit: 1
@@ -3721,7 +3989,7 @@ Day 4: 真的很棒拜託快去上！</span>
                 bar.style.background = 'linear-gradient(135deg,#f0fdf4,#ecfdf5)';
                 bar.style.color = '#166534';
                 bar.style.border = '1px solid #86efac';
-                bar.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">check_circle</span> 恭喜！你已符合 ${passCount}/3 個條件，可以申請本月免費觀看課程 🎉`;
+                bar.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">check_circle</span> 恭喜！你已符合 ${passCount}/3 個條件，本月可免費參加 1 堂課程（含實體） 🎉`;
                 document.getElementById('fcCourseSection').style.display = '';
                 loadFreeCourses();
             } else {
@@ -3755,11 +4023,11 @@ Day 4: 真的很棒拜託快去上！</span>
             const followers = parseInt(document.getElementById('fcSocialFollowers').value) || 0;
 
             try {
-                await db.update('affiliates', currentAffiliateId, {
+                await db.update('affiliates', {
                     social_platform: platform,
                     social_url: url,
                     social_followers: followers
-                });
+                }, { id: `eq.${currentAffiliateId}` });
                 const status = document.getElementById('fcSocialStatus');
                 status.textContent = '✓ 已儲存';
                 setTimeout(() => status.textContent = '', 2000);
@@ -4083,6 +4351,573 @@ Day 4: 真的很棒拜託快去上！</span>
         }
 
         // ── Events ──
+        // ══════════════════════════════════════
+        // ██ 學員學習資料載入
+        // ══════════════════════════════════════
+        async function loadMyLearning(email) {
+            try {
+                // 蒐集所有要查的 emails（主 email + 綁定的 emails）
+                const linkedEmails = getLinkedEmails(email);
+                const allEmails = [email, ...linkedEmails];
+                const emailFilter = allEmails.length === 1
+                    ? `eq.${email}`
+                    : `in.(${allEmails.join(',')})`;
+
+                // 並行查詢所有學員相關資料
+                const [subsRes, studentsRes, surveysRes] = await Promise.all([
+                    db.select('submissions', {
+                        filter: { student_email: emailFilter },
+                        order: 'created_at.desc',
+                        select: 'id,session_id,element_id,student_name,assignment_title,type,content,file_url,is_correct,score,state,submitted_at,created_at'
+                    }),
+                    db.select('students', {
+                        filter: { email: emailFilter },
+                        select: 'id,email,name,session_code,project_id,group_name,company,session_id,registration_status,attended_at,created_at'
+                    }),
+                    db.select('survey_responses', {
+                        filter: { student_email: emailFilter },
+                        select: 'id,question_id,answer,submitted_at'
+                    })
+                ]);
+
+                const submissions = subsRes.data || [];
+                const studentRecords = studentsRes.data || [];
+                const surveyResponses = surveysRes.data || [];
+
+                // 載入課堂紀錄
+                await renderMyCourses(submissions, studentRecords, email);
+                // 載入作業回顧
+                renderMyHomework(submissions);
+                // 載入互動數據
+                renderMyStats(submissions, surveyResponses, studentRecords);
+
+            } catch (e) {
+                console.warn('[loadMyLearning] error:', e);
+                document.getElementById('myCoursesLoading').innerHTML = '<p style="color:#f87171;">載入失敗</p>';
+            }
+        }
+
+        // 全域學習資料快取
+        let _learningData = { submissions: [], studentRecords: [], surveyResponses: [], projectMap: new Map(), sessionMap: new Map(), userEmail: '' };
+
+        async function renderMyCourses(submissions, studentRecords, email) {
+            const loadingEl = document.getElementById('myCoursesLoading');
+            const emptyEl = document.getElementById('myCoursesEmpty');
+            const gridEl = document.getElementById('myCoursesGrid');
+
+            const sessionIds = new Set();
+            submissions.forEach(s => { if (s.session_id) sessionIds.add(s.session_id); });
+            studentRecords.forEach(s => { if (s.session_code) sessionIds.add(s.session_code); });
+
+            if (sessionIds.size === 0) { loadingEl.style.display = 'none'; emptyEl.style.display = ''; return; }
+
+            const projectMap = new Map();
+            try {
+                const { data: projects } = await db.select('projects', {
+                    filter: { join_code: `in.(${[...sessionIds].join(',')})` },
+                    select: 'id,name,join_code,instructor,organization,course_type,course_link,slide_mode'
+                });
+                (projects || []).forEach(p => projectMap.set(p.join_code, p));
+            } catch { }
+
+            const sessionMap = new Map();
+            submissions.forEach(s => {
+                const sid = s.session_id || 'unknown';
+                if (!sessionMap.has(sid)) sessionMap.set(sid, { submissions: [], date: '' });
+                sessionMap.get(sid).submissions.push(s);
+            });
+            studentRecords.forEach(sr => {
+                const sid = sr.session_code || 'unknown';
+                if (!sessionMap.has(sid)) sessionMap.set(sid, { submissions: [], date: '' });
+                const entry = sessionMap.get(sid);
+                if (sr.attended_at && !entry.date) entry.date = new Date(sr.attended_at).toLocaleDateString('zh-TW');
+            });
+
+            _learningData = { submissions, studentRecords, surveyResponses: [], projectMap, sessionMap, userEmail: email };
+
+            let html = '';
+            for (const [sid, data] of sessionMap) {
+                const project = projectMap.get(sid);
+                const pName = project?.name || sid;
+                const instructor = project?.instructor || '';
+                const subCount = data.submissions.length;
+                const hwCount = data.submissions.filter(s => ['text','image','link','video','audio','homework'].includes(s.type)).length;
+                const quizCount = data.submissions.filter(s => ['quiz','truefalse','matching','fillblank','ordering','hotspot','buzzer'].includes(s.type)).length;
+                let totalPoints = 0;
+                data.submissions.forEach(s => { let st = s.state; if (typeof st === 'string') try { st = JSON.parse(st); } catch { st = {}; } totalPoints += parseInt(st?._awarded) || 0; });
+                const latestDate = data.submissions.length > 0 ? new Date(data.submissions[0].created_at || data.submissions[0].submitted_at).toLocaleDateString('zh-TW') : data.date || '—';
+
+                html += `
+                <div onclick="showCourseDetail('${sid}')" style="padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:14px;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.borderColor='var(--accent)';this.style.transform='translateY(-2px)'" onmouseleave="this.style.borderColor='var(--border)';this.style.transform=''">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                        <div style="flex:1;min-width:0;">
+                            <h3 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin:0 0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pName}</h3>
+                            <div style="font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                ${instructor ? `<span style="display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">person</span>${instructor}</span>` : ''}
+                                <span style="display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:14px;">calendar_today</span>${latestDate}</span>
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div style="padding:6px 14px;background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.1));border-radius:8px;text-align:center;">
+                                <div style="font-size:0.68rem;color:var(--text-muted);">積分</div>
+                                <div style="font-size:1.1rem;font-weight:800;color:#6366f1;">${totalPoints}</div>
+                            </div>
+                            <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-muted);">chevron_right</span>
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px;"><div style="font-size:1rem;font-weight:700;color:var(--text-primary);">${subCount}</div><div style="font-size:0.7rem;color:var(--text-muted);">總互動</div></div>
+                        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px;"><div style="font-size:1rem;font-weight:700;color:#22c55e;">${quizCount}</div><div style="font-size:0.7rem;color:var(--text-muted);">答題</div></div>
+                        <div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px;"><div style="font-size:1rem;font-weight:700;color:#f59e0b;">${hwCount}</div><div style="font-size:0.7rem;color:var(--text-muted);">作業</div></div>
+                    </div>
+                </div>`;
+            }
+            loadingEl.style.display = 'none';
+            gridEl.innerHTML = html;
+            gridEl.style.display = '';
+        }
+
+        // ══════════════════════════
+        // ██ 課程詳情頁
+        // ══════════════════════════
+        window.backToCourseList = function () {
+            document.getElementById('myCoursesListView').style.display = '';
+            document.getElementById('myCourseDetail').style.display = 'none';
+        };
+
+        window.showCourseDetail = async function (sessionId) {
+            document.getElementById('myCoursesListView').style.display = 'none';
+            document.getElementById('myCourseDetail').style.display = '';
+            const container = document.getElementById('myCourseDetailContent');
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><span class="material-symbols-outlined" style="font-size:32px;animation:spin 1s linear infinite;">progress_activity</span></div>';
+
+            const { projectMap, sessionMap, userEmail } = _learningData;
+            const project = projectMap.get(sessionId);
+            const sessionData = sessionMap.get(sessionId) || { submissions: [] };
+            const pName = project?.name || sessionId;
+            const instructor = project?.instructor || '';
+            const subs = sessionData.submissions;
+            const allEmails = [userEmail, ...getLinkedEmails(userEmail)];
+
+            // 查課後信件
+            let emailDrafts = [];
+            try {
+                const ef = allEmails.length === 1 ? `eq.${userEmail}` : `in.(${allEmails.join(',')})`;
+                const { data } = await db.select('email_drafts', { filter: { student_email: ef, status: 'eq.sent' }, select: 'id,subject,body,sent_at' });
+                emailDrafts = data || [];
+            } catch { }
+
+            // 查場次資訊
+            let sessionInfo = null;
+            try {
+                const { data } = await db.select('project_sessions', { filter: { session_code: `eq.${sessionId}` }, select: 'id,date,time,venue', limit: 1 });
+                sessionInfo = data?.[0];
+            } catch { }
+
+            // 分類
+            const quizTypes = ['quiz','truefalse','matching','fillblank','ordering','hotspot','buzzer'];
+            const hwTypes = ['text','image','link','video','audio','homework'];
+            const quizSubs = subs.filter(s => quizTypes.includes(s.type));
+            const hwSubs = subs.filter(s => hwTypes.includes(s.type));
+            const correctCount = quizSubs.filter(s => s.is_correct).length;
+            let totalPoints = 0;
+            subs.forEach(s => { let st = s.state; if (typeof st === 'string') try { st = JSON.parse(st); } catch { st = {}; } totalPoints += parseInt(st?._awarded) || 0; });
+
+            let html = '';
+
+            // Header
+            html += `<div style="margin-bottom:24px;">
+                <h2 style="font-size:1.2rem;font-weight:800;color:var(--text-primary);margin:0 0 6px;">${pName}</h2>
+                <div style="font-size:0.82rem;color:var(--text-muted);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    ${instructor ? `<span style="display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:16px;">person</span>${instructor}</span>` : ''}
+                    ${sessionInfo?.date ? `<span style="display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:16px;">calendar_today</span>${sessionInfo.date}</span>` : ''}
+                    ${sessionInfo?.venue ? `<span style="display:flex;align-items:center;gap:3px;"><span class="material-symbols-outlined" style="font-size:16px;">location_on</span>${sessionInfo.venue}</span>` : ''}
+                </div>
+                <div style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 14px;background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.12));border-radius:8px;">
+                    <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1;">military_tech</span>
+                    <span style="font-size:0.88rem;font-weight:700;color:#6366f1;">累積 ${totalPoints} 積分</span>
+                </div>
+            </div>`;
+
+            // 📚 講義區
+            html += `<div class="section-card" style="margin-bottom:16px;">
+                <div class="section-header"><span class="material-symbols-outlined">menu_book</span> 課程講義</div>
+                <div class="section-body" style="display:grid;gap:10px;">`;
+            if (project?.slide_mode === 'external' && project?.course_link) {
+                html += `<a href="${project.course_link}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border-radius:10px;text-decoration:none;color:var(--text-primary);">
+                    <span class="material-symbols-outlined" style="font-size:22px;color:#3b82f6;">open_in_new</span>
+                    <div><div style="font-weight:600;font-size:0.88rem;">外部課程連結</div><div style="font-size:0.72rem;color:var(--text-muted);">點擊開啟</div></div></a>`;
+            } else {
+                html += `<a href="student?code=${sessionId}&joinCode=${sessionId}&autoJoin=1" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border-radius:10px;text-decoration:none;color:var(--text-primary);">
+                    <span class="material-symbols-outlined" style="font-size:22px;color:#6366f1;">slideshow</span>
+                    <div><div style="font-weight:600;font-size:0.88rem;">互動式簡報</div><div style="font-size:0.72rem;color:var(--text-muted);">重新進入課程簡報</div></div></a>`;
+                if (project?.course_link) {
+                    html += `<a href="${project.course_link}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border-radius:10px;text-decoration:none;color:var(--text-primary);">
+                        <span class="material-symbols-outlined" style="font-size:22px;color:#f59e0b;">link</span>
+                        <div><div style="font-weight:600;font-size:0.88rem;">補充資料</div><div style="font-size:0.72rem;color:var(--text-muted);">點擊開啟</div></div></a>`;
+                }
+            }
+            html += `</div></div>`;
+
+            // 🎯 互動紀錄
+            if (quizSubs.length > 0) {
+                html += `<div class="section-card" style="margin-bottom:16px;">
+                    <div class="section-header"><span class="material-symbols-outlined">quiz</span> 互動紀錄 <span style="font-size:0.78rem;color:var(--text-muted);font-weight:400;margin-left:8px;">${quizSubs.length} 題（答對 ${correctCount}）</span></div>
+                    <div class="section-body" style="max-height:320px;overflow-y:auto;"><div style="display:grid;gap:8px;">`;
+                quizSubs.forEach(q => {
+                    const ok = q.is_correct;
+                    const title = q.assignment_title || q.element_id || '題目';
+                    const ans = typeof q.content === 'string' ? q.content : (q.content?.answer || '');
+                    html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid ${ok?'#22c55e':'#ef4444'};">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:${ok?'#22c55e':'#ef4444'};">${ok?'check_circle':'cancel'}</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.82rem;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${title}</div>
+                            ${ans ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">答案：${String(ans).substring(0,60)}</div>` : ''}
+                        </div></div>`;
+                });
+                html += `</div></div></div>`;
+            }
+
+            // 📝 作業紀錄
+            if (hwSubs.length > 0) {
+                html += `<div class="section-card" style="margin-bottom:16px;">
+                    <div class="section-header"><span class="material-symbols-outlined">assignment</span> 作業紀錄 <span style="font-size:0.78rem;color:var(--text-muted);font-weight:400;margin-left:8px;">${hwSubs.length} 份</span></div>
+                    <div class="section-body"><div style="display:grid;gap:10px;">`;
+                hwSubs.forEach(hw => {
+                    const title = hw.assignment_title || '未命名作業';
+                    const typeLabels = {text:'文字',image:'圖片',link:'連結',video:'影片',audio:'音訊',homework:'作業'};
+                    const date = new Date(hw.submitted_at||hw.created_at).toLocaleDateString('zh-TW',{month:'short',day:'numeric'});
+                    let preview = '';
+                    if (hw.type==='image' && hw.file_url) preview = `<img src="${hw.file_url}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-top:6px;">`;
+                    else if (hw.content) { const t = typeof hw.content==='string'?hw.content:JSON.stringify(hw.content); preview = `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${t.substring(0,100)}</div>`; }
+                    const scoreHtml = hw.score!=null&&hw.score!=='' ? `<span style="padding:2px 8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border-radius:6px;font-size:0.7rem;font-weight:600;">${hw.score} 分</span>` : '';
+                    html += `<div style="padding:14px;background:var(--bg);border-radius:10px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span style="padding:2px 8px;background:rgba(99,102,241,0.1);color:#6366f1;border-radius:4px;font-size:0.7rem;font-weight:600;">${typeLabels[hw.type]||hw.type}</span>
+                                <span style="font-size:0.88rem;font-weight:600;color:var(--text-primary);">${title}</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">${scoreHtml}<span style="font-size:0.72rem;color:var(--text-muted);">${date}</span></div>
+                        </div>${preview}</div>`;
+                });
+                html += `</div></div></div>`;
+            }
+
+            // ✉️ 課後信件
+            if (emailDrafts.length > 0) {
+                html += `<div class="section-card" style="margin-bottom:16px;">
+                    <div class="section-header"><span class="material-symbols-outlined">mail</span> 課後信件 <span style="font-size:0.78rem;color:var(--text-muted);font-weight:400;margin-left:8px;">${emailDrafts.length} 封</span></div>
+                    <div class="section-body"><div style="display:grid;gap:10px;">`;
+                emailDrafts.forEach(draft => {
+                    const date = draft.sent_at ? new Date(draft.sent_at).toLocaleDateString('zh-TW',{month:'short',day:'numeric'}) : '';
+                    html += `<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+                        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size:18px;color:#22c55e;">mark_email_read</span>
+                                <span style="font-size:0.85rem;font-weight:500;color:var(--text-primary);">${draft.subject||'課後學習回饋'}</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span style="font-size:0.72rem;color:var(--text-muted);">${date}</span>
+                                <span class="material-symbols-outlined" style="font-size:16px;color:var(--text-muted);">expand_more</span>
+                            </div>
+                        </div>
+                        <div style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">
+                            <div style="padding:16px 0;font-size:0.82rem;color:var(--text-secondary);line-height:1.8;white-space:pre-wrap;">${(draft.body||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div></div>`;
+            }
+
+            // 💬 課後行動
+            const escapedName = pName.replace(/'/g, "\\'");
+            html += `<div class="section-card">
+                <div class="section-header"><span class="material-symbols-outlined">forum</span> 課後行動</div>
+                <div class="section-body">
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 14px;line-height:1.5;">課程結束後，歡迎透過以下方式與我們進一步互動</p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+                        <button onclick="openActionForm('question','${sessionId}','${escapedName}')" style="padding:14px 12px;background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(59,130,246,0.15));border:1px solid rgba(59,130,246,0.2);border-radius:12px;cursor:pointer;text-align:center;font-family:inherit;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#3b82f6;display:block;margin-bottom:6px;">help_center</span>
+                            <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">問題發問</div>
+                            <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">課後延伸問題</div>
+                        </button>
+                        <button onclick="openActionForm('collaboration','${sessionId}','${escapedName}')" style="padding:14px 12px;background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.15));border:1px solid rgba(34,197,94,0.2);border-radius:12px;cursor:pointer;text-align:center;font-family:inherit;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#22c55e;display:block;margin-bottom:6px;">handshake</span>
+                            <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">專案合作</div>
+                            <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">AI 導入 / 顧問</div>
+                        </button>
+                        <button onclick="openActionForm('referral','${sessionId}','${escapedName}')" style="padding:14px 12px;background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.15));border:1px solid rgba(245,158,11,0.2);border-radius:12px;cursor:pointer;text-align:center;font-family:inherit;">
+                            <span class="material-symbols-outlined" style="font-size:28px;color:#f59e0b;display:block;margin-bottom:6px;">group_add</span>
+                            <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);">合作引薦</div>
+                            <div style="font-size:0.68rem;color:var(--text-muted);margin-top:2px;">推薦夥伴 / 企業</div>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+            container.innerHTML = html;
+        };
+
+        // ══════════════════════════
+        // ██ 課後行動表單
+        // ══════════════════════════
+        const actionLabels = { question: '❓ 問題發問', collaboration: '🤝 專案合作', referral: '🔗 合作引薦' };
+
+        window.openActionForm = function (type, sessionCode, projectName) {
+            document.getElementById('actionFormTitle').textContent = actionLabels[type] || type;
+            document.getElementById('actionType').value = type;
+            document.getElementById('actionSessionCode').value = sessionCode;
+            document.getElementById('actionProjectName').value = projectName;
+            document.getElementById('actionColabFields').style.display = type === 'collaboration' ? '' : 'none';
+            document.getElementById('actionReferralFields').style.display = type === 'referral' ? '' : 'none';
+            document.getElementById('actionForm').style.display = '';
+            document.getElementById('actionFormSuccess').style.display = 'none';
+            document.getElementById('actionFormModal').style.display = '';
+        };
+        window.closeActionForm = function () {
+            document.getElementById('actionFormModal').style.display = 'none';
+            document.getElementById('actionForm').reset();
+        };
+        window.submitActionForm = async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('actionSubmitBtn');
+            btn.disabled = true; btn.textContent = '送出中…';
+            try {
+                await db.insert('student_requests', {
+                    student_email: _learningData.userEmail,
+                    student_name: currentUser?.user_metadata?.full_name || currentUser?.email || '',
+                    session_code: document.getElementById('actionSessionCode').value,
+                    project_name: document.getElementById('actionProjectName').value,
+                    request_type: document.getElementById('actionType').value,
+                    subject: document.getElementById('actionSubject').value.trim(),
+                    message: document.getElementById('actionMessage').value.trim(),
+                    company: document.getElementById('actionCompany')?.value?.trim() || '',
+                    phone: document.getElementById('actionPhone')?.value?.trim() || '',
+                    referral_target: document.getElementById('actionReferralTarget')?.value?.trim() || ''
+                });
+                document.getElementById('actionForm').style.display = 'none';
+                document.getElementById('actionFormSuccess').style.display = '';
+                setTimeout(() => closeActionForm(), 2500);
+            } catch (err) { alert('送出失敗：' + err.message); }
+            finally { btn.disabled = false; btn.textContent = '送出'; }
+        };
+
+        function renderMyHomework(submissions) {
+            const loadingEl = document.getElementById('myHomeworkLoading');
+            const emptyEl = document.getElementById('myHomeworkEmpty');
+            const listEl = document.getElementById('myHomeworkList');
+
+            const homework = submissions.filter(s =>
+                ['text', 'image', 'link', 'video', 'audio', 'homework'].includes(s.type)
+            );
+
+            if (homework.length === 0) {
+                loadingEl.style.display = 'none';
+                emptyEl.style.display = '';
+                return;
+            }
+
+            let html = '<div style="display:grid;gap:12px;">';
+            homework.forEach(hw => {
+                const date = new Date(hw.submitted_at || hw.created_at).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const title = hw.assignment_title || '未命名作業';
+                const typeLabels = { text: '文字', image: '圖片', link: '連結', video: '影片', audio: '音訊', homework: '作業' };
+                const typeLabel = typeLabels[hw.type] || hw.type;
+
+                let scoreHtml = '';
+                if (hw.score != null && hw.score !== '') {
+                    scoreHtml = `<span style="padding:3px 10px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border-radius:6px;font-size:0.72rem;font-weight:600;">${hw.score} 分</span>`;
+                }
+
+                let contentHtml = '';
+                if (hw.type === 'image' && hw.file_url) {
+                    contentHtml = `<img src="${hw.file_url}" alt="" style="width:100%;max-width:300px;border-radius:8px;margin-top:10px;border:1px solid var(--border);">`;
+                } else if (hw.content) {
+                    const preview = hw.content.length > 120 ? hw.content.substring(0, 120) + '…' : hw.content;
+                    contentHtml = `<p style="margin-top:8px;font-size:0.82rem;color:var(--text-secondary);line-height:1.6;background:var(--bg);padding:10px 14px;border-radius:8px;">${preview}</p>`;
+                }
+
+                html += `
+                <div style="padding:16px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="padding:3px 8px;background:rgba(99,102,241,0.1);color:#6366f1;border-radius:4px;font-size:0.68rem;font-weight:600;">${typeLabel}</span>
+                            <h4 style="font-size:0.88rem;font-weight:600;color:var(--text-primary);margin:0;">${title}</h4>
+                        </div>
+                        ${scoreHtml}
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);">${date} · 場次 ${hw.session_id || '—'}</div>
+                    ${contentHtml}
+                </div>`;
+            });
+            html += '</div>';
+
+            loadingEl.style.display = 'none';
+            listEl.innerHTML = html;
+            listEl.style.display = '';
+        }
+
+        function renderMyStats(submissions, surveyResponses, studentRecords) {
+            const loadingEl = document.getElementById('myStatsLoading');
+            const contentEl = document.getElementById('myStatsContent');
+            const gridEl = document.getElementById('myStatsGrid');
+            const detailEl = document.getElementById('myStatsDetail');
+
+            // 總場次
+            const sessionSet = new Set();
+            submissions.forEach(s => { if (s.session_id) sessionSet.add(s.session_id); });
+            const totalSessions = sessionSet.size;
+
+            // 總互動
+            const totalInteractions = submissions.length;
+
+            // 答對率
+            const quizSubs = submissions.filter(s => s.is_correct !== null);
+            const correctCount = quizSubs.filter(s => s.is_correct === true).length;
+            const accuracy = quizSubs.length > 0 ? Math.round((correctCount / quizSubs.length) * 100) : 0;
+
+            // 總積分
+            let totalPoints = 0;
+            submissions.forEach(s => {
+                let st = s.state;
+                if (typeof st === 'string') try { st = JSON.parse(st); } catch { st = {}; }
+                totalPoints += parseInt(st?._awarded) || 0;
+            });
+
+            // 作業數
+            const hwCount = submissions.filter(s => ['text', 'image', 'link', 'video', 'audio', 'homework'].includes(s.type)).length;
+
+            // 問卷數
+            const surveyCount = surveyResponses.length;
+
+            gridEl.innerHTML = `
+                <div class="stat-card blue">
+                    <div class="stat-icon"><span class="material-symbols-outlined">school</span></div>
+                    <div class="stat-label">參與場次</div>
+                    <div class="stat-value">${totalSessions}</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon"><span class="material-symbols-outlined">emoji_events</span></div>
+                    <div class="stat-label">累積積分</div>
+                    <div class="stat-value">${totalPoints.toLocaleString()}</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-icon"><span class="material-symbols-outlined">target</span></div>
+                    <div class="stat-label">答對率</div>
+                    <div class="stat-value">${accuracy}%</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-icon"><span class="material-symbols-outlined">touch_app</span></div>
+                    <div class="stat-label">總互動</div>
+                    <div class="stat-value">${totalInteractions}</div>
+                </div>
+            `;
+
+            // 明細
+            detailEl.innerHTML = `
+                <div style="padding:20px;background:var(--card-bg);border:1px solid var(--border);border-radius:14px;">
+                    <h3 style="font-size:0.92rem;font-weight:700;color:var(--text-primary);margin:0 0 16px;display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:18px;">analytics</span>
+                        互動明細
+                    </h3>
+                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+                        <div style="padding:14px;background:var(--bg);border-radius:10px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;">測驗答題</div>
+                            <div style="font-size:1.2rem;font-weight:700;color:var(--text-primary);">${quizSubs.length} <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">題</span></div>
+                            <div style="font-size:0.72rem;color:#22c55e;margin-top:2px;">答對 ${correctCount} 題</div>
+                        </div>
+                        <div style="padding:14px;background:var(--bg);border-radius:10px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;">作業提交</div>
+                            <div style="font-size:1.2rem;font-weight:700;color:var(--text-primary);">${hwCount} <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">份</span></div>
+                        </div>
+                        <div style="padding:14px;background:var(--bg);border-radius:10px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;">問卷填答</div>
+                            <div style="font-size:1.2rem;font-weight:700;color:var(--text-primary);">${surveyCount} <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">題</span></div>
+                        </div>
+                        <div style="padding:14px;background:var(--bg);border-radius:10px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;">課程參與</div>
+                            <div style="font-size:1.2rem;font-weight:700;color:var(--text-primary);">${studentRecords.length} <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">筆報名</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            loadingEl.style.display = 'none';
+            contentEl.style.display = '';
+        }
+
+        // ══════════════════════════════════════
+        // ██ Email 綁定功能
+        // ══════════════════════════════════════
+        function getLinkedEmails(primaryEmail) {
+            try {
+                return JSON.parse(localStorage.getItem(`linked_emails_${primaryEmail}`) || '[]');
+            } catch { return []; }
+        }
+
+        function saveLinkedEmails(primaryEmail, list) {
+            localStorage.setItem(`linked_emails_${primaryEmail}`, JSON.stringify(list));
+        }
+
+        function setupBindEmail(primaryEmail) {
+            renderBoundEmails(primaryEmail);
+
+            document.getElementById('btnBindEmail')?.addEventListener('click', () => {
+                const emailInput = document.getElementById('bindEmail');
+                const email = emailInput.value.trim().toLowerCase();
+                const msgEl = document.getElementById('bindSavedMsg');
+
+                if (!email || !email.includes('@')) return;
+                if (email === primaryEmail.toLowerCase()) {
+                    alert('不需要綁定自己目前登入的 Email');
+                    return;
+                }
+
+                const list = getLinkedEmails(primaryEmail);
+                if (list.includes(email)) {
+                    alert('此 Email 已經綁定過了');
+                    return;
+                }
+
+                list.push(email);
+                saveLinkedEmails(primaryEmail, list);
+
+                // 顯示成功
+                msgEl.style.display = 'flex';
+                emailInput.value = '';
+                setTimeout(() => { msgEl.style.display = 'none'; }, 2000);
+
+                // 重新渲染列表 + 重新載入學習紀錄
+                renderBoundEmails(primaryEmail);
+                loadMyLearning(primaryEmail);
+            });
+        }
+
+        function renderBoundEmails(primaryEmail) {
+            const container = document.getElementById('boundEmailsList');
+            if (!container) return;
+            const list = getLinkedEmails(primaryEmail);
+            if (list.length === 0) { container.innerHTML = ''; return; }
+
+            container.innerHTML = `
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">已綁定的 Email：</div>
+                ${list.map((e, i) => `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;">
+                        <span style="font-size:0.82rem;color:var(--text-primary);">${e}</span>
+                        <button onclick="unbindEmail('${primaryEmail}',${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.72rem;padding:2px 6px;">移除</button>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        window.unbindEmail = function (primaryEmail, index) {
+            const list = getLinkedEmails(primaryEmail);
+            list.splice(index, 1);
+            saveLinkedEmails(primaryEmail, list);
+            renderBoundEmails(primaryEmail);
+            loadMyLearning(primaryEmail);
+        };
+
         function setupEvents(affiliate) {
             // Nav switching
             document.querySelectorAll('[data-view]').forEach(btn => {
@@ -4099,12 +4934,14 @@ Day 4: 真的很棒拜託快去上！</span>
             });
 
             // Coupon copy
-            document.getElementById('couponDisplay').addEventListener('click', async () => {
-                await navigator.clipboard.writeText(affiliate.coupon_code);
-                const el = document.getElementById('couponDisplay');
-                el.textContent = '已複製！';
-                setTimeout(() => { el.textContent = affiliate.coupon_code; }, 1500);
-            });
+            if (affiliate) {
+                document.getElementById('couponDisplay').addEventListener('click', async () => {
+                    await navigator.clipboard.writeText(affiliate.coupon_code);
+                    const el = document.getElementById('couponDisplay');
+                    el.textContent = '已複製！';
+                    setTimeout(() => { el.textContent = affiliate.coupon_code; }, 1500);
+                });
+            }
 
             // Radio card selector for referral type
             document.querySelectorAll('#refTypeCards label').forEach(label => {
@@ -4333,6 +5170,8 @@ ${linkLine}
                 const btn = document.getElementById('btnSaveBank');
                 btn.disabled = true;
                 const { error } = await db.update('affiliates', {
+                    real_name: document.getElementById('realName').value.trim(),
+                    phone: document.getElementById('phoneNumber').value.trim(),
                     bank_name: document.getElementById('bankName').value.trim(),
                     bank_account: document.getElementById('bankAccount').value.trim(),
                     account_holder: document.getElementById('accountHolder').value.trim()
@@ -4406,7 +5245,27 @@ ${linkLine}
             let selectedCourses;
             const channels = [...document.querySelectorAll('#phaseRegister input[name="channel"]:checked')].map(c => c.value);
             const coupon = document.getElementById('regCoupon').value.trim().toUpperCase();
+            const regName = document.getElementById('regName').value.trim();
             const resetBtn = () => { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined">send</span> 送出申請'; };
+
+            // Required field validation
+            if (!regName) { alert('請填寫姓名'); resetBtn(); return; }
+            if (!coupon) { alert('請填寫折扣碼'); resetBtn(); return; }
+            if (coupon.length < 3) { alert('折扣碼至少需要 3 個字元'); resetBtn(); return; }
+
+            // Check coupon uniqueness
+            try {
+                const { data: existing } = await db.select('affiliates', {
+                    filter: { coupon_code: `eq.${coupon}` },
+                    select: 'id',
+                    limit: 1
+                });
+                if (existing && existing.length > 0) {
+                    alert('此折扣碼已被使用，請換一個');
+                    resetBtn();
+                    return;
+                }
+            } catch(e) { console.warn('Coupon check failed:', e); }
 
             if (window._courseMode === 'all') {
                 selectedCourses = (window._regCourses || []).map(c => c.name);
@@ -4427,7 +5286,7 @@ ${linkLine}
             const referrals = [...document.querySelectorAll('#phaseRegister input[name="referral"]:checked')].map(c => c.value);
 
             const { error } = await db.insert('affiliates', {
-                name: document.getElementById('regName').value.trim(),
+                name: regName,
                 email: document.getElementById('regEmail').value.trim(),
                 coupon_code: coupon,
                 platforms,

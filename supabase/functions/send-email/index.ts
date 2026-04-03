@@ -5,7 +5,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || 're_ZaV22t8T_8qh2TiAfCA3cXDYfZNZjB7xn';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://wsaknnhjgiqmkendeyrj.supabase.co';
-const FROM_EMAIL = 'service@teaching.tbr.digital';
+const FROM_EMAIL = 'service@mail.tbr.digital';
 const FROM_NAME = '數位簡報室';
 
 // Token 產生（跟 unsubscribe function 共用邏輯）

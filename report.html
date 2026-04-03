@@ -1309,7 +1309,7 @@ ${d.satisfactionResult ? `滿意度：${d.satisfactionResult.avg_rating}/5` : ''
                                 .replace('${courseName}', _proj?.name || 'AI 工作坊')
                                 .replace('${studentName}', student.name),
                             body: d.emailDraft.body,
-                            replyTo: 'service@teaching.tbr.digital',
+                            replyTo: 'service@mail.tbr.digital',
                             draftId: d.emailDraft.id,
                             homeworkImages,  // ★ 作業圖片嵌入 Email
                             footerText: _sessionEmailConfig.footer_text || '此信件由 數位簡報室 系統自動發送\n如有任何問題，歡迎直接回覆此信件'
