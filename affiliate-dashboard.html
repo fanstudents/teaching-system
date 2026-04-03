@@ -1434,20 +1434,22 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <!-- 學員區塊 -->
-                <div class="nav-group-label">
-                    <span class="material-symbols-outlined" style="font-size:15px;">school</span>
-                    我的學習
+                <!-- 學員區塊（有學習紀錄才顯示） -->
+                <div id="learningNavSection">
+                    <div class="nav-group-label">
+                        <span class="material-symbols-outlined" style="font-size:15px;">school</span>
+                        我的學習
+                    </div>
+                    <button class="nav-item active" data-view="my-courses">
+                        <span class="material-symbols-outlined">history_edu</span> 課堂紀錄
+                    </button>
+                    <button class="nav-item" data-view="my-homework">
+                        <span class="material-symbols-outlined">assignment</span> 作業回顧
+                    </button>
+                    <button class="nav-item" data-view="my-stats">
+                        <span class="material-symbols-outlined">insights</span> 互動數據
+                    </button>
                 </div>
-                <button class="nav-item active" data-view="my-courses">
-                    <span class="material-symbols-outlined">history_edu</span> 課堂紀錄
-                </button>
-                <button class="nav-item" data-view="my-homework">
-                    <span class="material-symbols-outlined">assignment</span> 作業回顧
-                </button>
-                <button class="nav-item" data-view="my-stats">
-                    <span class="material-symbols-outlined">insights</span> 互動數據
-                </button>
 
                 <!-- 推廣者區塊（動態顯示） -->
                 <div id="affiliateNavSection" style="display:none;">
@@ -1489,7 +1491,7 @@
                     </button>
                 </div>
 
-                <!-- 成為推廣者 CTA（非推廣者時顯示） -->
+                <!-- 成為推廣者 CTA（非推廣者時顯示，需有學習紀錄） -->
                 <div id="affiliateCTA" style="display:none;">
                     <div class="nav-divider"></div>
                     <button class="nav-item" data-view="become-affiliate" style="color:#6366f1;">
@@ -4391,11 +4393,21 @@ Day 4: 真的很棒拜託快去上！</span>
                 const studentRecords = studentsRes.data || [];
                 const surveyResponses = surveysRes.data || [];
 
-                // 載入課堂紀錄
+                const hasLearningData = submissions.length > 0 || studentRecords.length > 0;
+
+                // 沒有學習紀錄 → 隱藏學習區塊 sidebar
+                if (!hasLearningData) {
+                    document.getElementById('learningNavSection').style.display = 'none';
+                    // 純推廣者 → 預設跳到銷售儀表板
+                    if (currentAffiliate && !location.hash.slice(1)) {
+                        navigateToView?.('overview');
+                    }
+                } else {
+                    document.getElementById('learningNavSection').style.display = '';
+                }
+
                 await renderMyCourses(submissions, studentRecords, email);
-                // 載入作業回顧
                 renderMyHomework(submissions);
-                // 載入互動數據
                 renderMyStats(submissions, surveyResponses, studentRecords);
 
             } catch (e) {
