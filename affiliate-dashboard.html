@@ -3450,7 +3450,8 @@ Day 4: 真的很棒拜託快去上！</span>
                 const rate = Math.round((affiliate.commission_rate || 0.20) * 100);
                 document.getElementById('statRate').textContent = rate + '%';
                 document.getElementById('commissionRateText').textContent = rate + '%';
-                document.getElementById('loginStatRate')?.textContent = rate + '%';
+                const loginStatRateEl = document.getElementById('loginStatRate');
+                if (loginStatRateEl) loginStatRateEl.textContent = rate + '%';
                 document.querySelectorAll('.dynamic-rate').forEach(el => el.textContent = rate + '%');
 
                 // Discount info
