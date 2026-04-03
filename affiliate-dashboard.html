@@ -3249,6 +3249,12 @@ Day 4: 真的很棒拜託快去上！</span>
         </div>
     </div>
 
+    <script>
+        window.addEventListener('error', function(e) {
+            var ls = document.getElementById('loadingScreen');
+            if (ls) ls.innerHTML = '<div style="color:red;padding:20px;font-size:13px;max-width:90vw;word-break:break-all;">[JS Error] ' + (e.message || '') + '<br>' + (e.filename || '') + ':' + (e.lineno || '') + '</div>';
+        });
+    </script>
     <script type="module">
         import { auth, db } from './scripts/supabase.js';
 
@@ -5308,7 +5314,10 @@ ${linkLine}
             document.getElementById('phasePending').style.display = 'block';
         });
 
-        init();
+        init().catch(err => {
+            console.error('[INIT ERROR]', err);
+            document.getElementById('loadingScreen').innerHTML = '<div style="color:red;padding:20px;font-size:14px;">初始化錯誤: ' + err.message + '</div>';
+        });
     </script>
 </body>
 
