@@ -49,9 +49,18 @@ export class WordCloudGame {
         if (!cloudEl) {
             cloudEl = document.createElement('div');
             cloudEl.className = 'wordcloud-cloud';
-            container.appendChild(cloudEl);
         }
-        container.insertBefore(inputArea, cloudEl);
+
+        // 建立水平佈局包裝：左側輸入 + 右側文字雲
+        let bodyEl = container.querySelector('.wordcloud-body');
+        if (!bodyEl) {
+            bodyEl = document.createElement('div');
+            bodyEl.className = 'wordcloud-body';
+            container.appendChild(bodyEl);
+        }
+        bodyEl.innerHTML = '';
+        bodyEl.appendChild(inputArea);
+        bodyEl.appendChild(cloudEl);
 
         const inputsWrap = inputArea.querySelector('.wc-inputs');
         const countEl = inputArea.querySelector('.wc-count');
