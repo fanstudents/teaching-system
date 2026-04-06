@@ -10,6 +10,12 @@ export class SlideManager {
         this.sections = []; // [{ name, startIndex }]
         this.currentIndex = 0;
         this.currentSessionId = null; // 場次級簡報：非 null 時 save/load 指向 session
+
+        // ★ 場次級 localStorage key（避免跨場次覆蓋）
+        this._localStorageKey = () => {
+            const base = `project_${this.currentProjectId}`;
+            return this.currentSessionId ? `${base}_session_${this.currentSessionId}` : base;
+        };
         this.slideListEl = document.getElementById('slideList');
 
         // Undo / Redo（最多 15 步）
@@ -3310,7 +3316,7 @@ export class SlideManager {
 
         // localStorage 快取（即時）— quota 超過時 silently skip
         try {
-            localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+            localStorage.setItem(this._localStorageKey(), JSON.stringify(data));
         } catch (_) { /* quota exceeded, rely on DB */ }
 
         // 更新快取的 updatedAt
@@ -3342,7 +3348,7 @@ export class SlideManager {
         };
 
         try {
-            localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data));
+            localStorage.setItem(this._localStorageKey(), JSON.stringify(data));
         } catch (_) { /* quota exceeded */ }
 
         const p = this._projectsCache.find(p => p.id === this.currentProjectId);
@@ -3464,25 +3470,27 @@ export class SlideManager {
                 console.log(`[SaveDB] 壓縮後 ${(payloadSize / 1024).toFixed(1)}KB`);
             }
 
-            // ★ 場次級簡報：寫入 session 或 project
+            // ★ 場次級簡報：寫入 session 或 project（絕不 fallback，避免覆蓋其他場次）
             let result;
             if (this.currentSessionId) {
+                console.log('[SaveDB] saving to SESSION', this.currentSessionId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
                 try {
-                    console.log('[SaveDB] saving to SESSION', this.currentSessionId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
                     result = await this._db.update('project_sessions', {
                         slides_data: data,
                     }, { id: `eq.${this.currentSessionId}` });
-                    // 如果 slides_data 欄位不存在，result.error 會有值
                     if (result.error) {
-                        console.warn('[SaveDB] session save failed, falling back to project:', result.error);
-                        this.currentSessionId = null; // 暫時清除，避免重複失敗
+                        // ★ 不再清除 currentSessionId，避免後續存檔全寫到 project 並覆蓋其他場次
+                        console.error('[SaveDB] session save failed (will retry next time):', result.error);
+                        this._showSaveError('場次儲存失敗，請檢查網路連線');
+                        return; // 直接返回，不 fallback
                     }
                 } catch (sessErr) {
-                    console.warn('[SaveDB] session save exception, falling back to project:', sessErr.message);
-                    this.currentSessionId = null;
+                    // ★ 不再清除 currentSessionId
+                    console.error('[SaveDB] session save exception (will retry next time):', sessErr.message);
+                    this._showSaveError('場次儲存失敗：' + sessErr.message);
+                    return; // 直接返回，不 fallback
                 }
-            }
-            if (!this.currentSessionId) {
+            } else {
                 console.log('[SaveDB] saving to PROJECT', this.currentProjectId, `(${(payloadSize / 1024).toFixed(1)}KB, ${data.slides?.length || 0} slides)`);
                 result = await this._db.update('projects', {
                     slides_data: data,
@@ -3649,8 +3657,8 @@ export class SlideManager {
             }
         }
 
-        // 2. 從 localStorage 載入
-        const localRaw = localStorage.getItem(`project_${this.currentProjectId}`);
+        // 2. 從 localStorage 載入（使用場次級 key）
+        const localRaw = localStorage.getItem(this._localStorageKey());
         if (localRaw) {
             try { localData = JSON.parse(localRaw); } catch { /* ignore */ }
         }
@@ -3664,8 +3672,8 @@ export class SlideManager {
             chosen = dbData;
             // ★ 記錄 DB 版本號
             this._dbVersion = dbData._version || 0;
-            // 同步 DB → localStorage（作為離線備援）
-            try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(dbData)); } catch (_) { }
+            // 同步 DB → localStorage（作為離線備援，使用場次級 key）
+            try { localStorage.setItem(this._localStorageKey(), JSON.stringify(dbData)); } catch (_) { }
         } else if (localData) {
             // DB 無資料時才使用 localStorage（離線模式）
             console.warn('[Load] ⚠️ DB 無資料，使用 localStorage 離線備援');
@@ -3734,8 +3742,8 @@ export class SlideManager {
                     currentIndex: this.currentIndex,
                     savedAt: new Date().toISOString()
                 };
-                // 用 localStorage 即時寫入（同步，不會被頁面關閉中斷）
-                try { localStorage.setItem(`project_${this.currentProjectId}`, JSON.stringify(data)); } catch (_) { }
+                // 用 localStorage 即時寫入（同步，不會被頁面關閉中斷，使用場次級 key）
+                try { localStorage.setItem(this._localStorageKey(), JSON.stringify(data)); } catch (_) { }
                 // 嘗試用 sendBeacon 通知 DB（best effort）
                 if (this._db && navigator.sendBeacon) {
                     try {
