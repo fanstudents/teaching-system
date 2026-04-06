@@ -3629,17 +3629,23 @@ export class SlideManager {
                 // ★ 場次級：先讀 session.slides_data（欄位可能尚不存在）
                 if (this.currentSessionId) {
                     try {
-                        const { data: sRows } = await this._db.select('project_sessions', {
+                        console.log('[Load] 🔍 Querying session:', this.currentSessionId);
+                        const { data: sRows, error: sErr } = await this._db.select('project_sessions', {
                             filter: { id: `eq.${this.currentSessionId}` },
                             select: 'slides_data'
                         });
+                        console.log('[Load] 📦 Session query result:', { rowCount: sRows?.length, hasData: !!sRows?.[0]?.slides_data, hasSlides: !!sRows?.[0]?.slides_data?.slides, error: sErr });
                         if (sRows?.[0]?.slides_data && sRows[0].slides_data.slides) {
                             dbData = sRows[0].slides_data;
-                            console.log('[Load] ✅ Using SESSION slides', this.currentSessionId);
+                            console.log('[Load] ✅ Using SESSION slides', this.currentSessionId, `(${dbData.slides.length} slides, savedAt: ${dbData.savedAt})`);
+                        } else {
+                            console.warn('[Load] ⚠️ Session found but no slides_data:', sRows?.[0]);
                         }
                     } catch (sessionErr) {
                         console.warn('[Load] session slides_data read failed (column may not exist):', sessionErr.message);
                     }
+                } else {
+                    console.log('[Load] ⚡ No currentSessionId set, skipping session query. URL:', location.href);
                 }
                 // ★ fallback 到 project
                 if (!dbData) {
