@@ -3657,8 +3657,19 @@ export class SlideManager {
             }
         }
 
-        // 2. 從 localStorage 載入（使用場次級 key）
-        const localRaw = localStorage.getItem(this._localStorageKey());
+        // 2. 從 localStorage 載入（使用場次級 key，含舊 key 遷移）
+        let localRaw = localStorage.getItem(this._localStorageKey());
+        if (!localRaw && this.currentSessionId) {
+            // ★ 遷移：舊版程式碼使用 project_{pid} 作為 key，新版改為 project_{pid}_session_{sid}
+            const legacyKey = `project_${this.currentProjectId}`;
+            const legacyRaw = localStorage.getItem(legacyKey);
+            if (legacyRaw) {
+                console.log('[Load] 🔄 Migrating localStorage from legacy key:', legacyKey, '→', this._localStorageKey());
+                localRaw = legacyRaw;
+                // 寫入新 key，保留舊 key（其他場次可能還需要）
+                try { localStorage.setItem(this._localStorageKey(), legacyRaw); } catch (_) { }
+            }
+        }
         if (localRaw) {
             try { localData = JSON.parse(localRaw); } catch { /* ignore */ }
         }
