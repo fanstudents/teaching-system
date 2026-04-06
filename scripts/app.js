@@ -984,7 +984,8 @@ ${slideContents}
 
             // ── 右側大 QR Code：學員掃碼進入互動頁 ──
             const joinCode = this.slideManager.getCurrentJoinCode() || '';
-            const audienceUrl = `${location.origin}/student.html?code=${joinCode}`;
+            const _sidParam = this.slideManager.currentSessionId ? `&sid=${this.slideManager.currentSessionId}` : '';
+            const audienceUrl = `${location.origin}/student.html?code=${joinCode}${_sidParam}`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(audienceUrl)}&bgcolor=ffffff&color=312e81`;
 
             // QR 區域背景卡片
