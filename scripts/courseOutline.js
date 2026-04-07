@@ -2370,8 +2370,11 @@ function _generateEmailText() {
     const hero = od.hero || {};
     const courseName = projectData?.name || '課程名稱';
     const clientName = orgData?.name || '貴公司';
-    const joinCode = projectData?.join_code || sessionData?.session_code || '';
-    const loginUrl = joinCode ? `${location.origin}/portal.html?code=${joinCode}` : `${location.origin}/portal.html`;
+    const joinCode = projectData?.join_code || '';
+    const sessionCode = sessionData?.session_code || '';
+    const loginUrl = joinCode
+        ? `${location.origin}/portal.html?code=${joinCode}${sessionCode ? '&session=' + sessionCode : ''}`
+        : `${location.origin}/portal.html`;
 
     // Schedule — auto-detect days from timeline (same logic as render)
     const timeline = od.timeline || [];
