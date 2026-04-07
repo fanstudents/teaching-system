@@ -2324,14 +2324,15 @@
             document.getElementById(id).classList.remove('active');
         };
 
-        function showToast(msg) {
+        window.showToast = function(msg) {
             const t = document.getElementById('toast');
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2000);
-        }
+        };
+        const showToast = window.showToast;
 
-        function copySessionLink(btn, joinCode, sessionCode) {
+        window.copySessionLink = function(btn, joinCode, sessionCode) {
             const url = location.origin + '/portal.html?code=' + joinCode + '&session=' + sessionCode;
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => {
@@ -2345,7 +2346,7 @@
             } else {
                 prompt('請複製以下課前登入連結：', url);
             }
-        }
+        };
 
         // ══════════════════════════════════════
         // CREATE PROJECT — INSTRUCTOR PICKER
