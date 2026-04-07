@@ -1120,6 +1120,9 @@
                         : 'pre-class';
                 const pType = p.type || 'course';
                 const date = p.created_at ? new Date(p.created_at).toLocaleDateString('zh-TW') : '';
+                // ★ 自動取最近場次 sid
+                const latestSess = projectSessions.length > 0 ? projectSessions[0] : null;
+                const editorSid = latestSess ? `&sid=${latestSess.id}` : '';
 
                 return `
                 <div class="project-card" data-id="${p.id}">
@@ -1139,7 +1142,7 @@
                     <div class="pcard-actions">
                         ${p.slide_mode === 'external' && p.course_link
                         ? `<a class="btn btn-sm" href="${p.course_link}" target="_blank" title="簡報" onclick="event.stopPropagation()"><span class="material-symbols-outlined">open_in_new</span></a>`
-                        : `<a class="btn btn-sm" href="editor.html?id=${p.id}#id=${p.id}" onclick="event.stopPropagation();localStorage.setItem('current_project_id','${p.id}')" title="簡報"><span class="material-symbols-outlined">slideshow</span></a>`}
+                        : `<a class="btn btn-sm" href="editor.html?id=${p.id}${editorSid}#id=${p.id}" onclick="event.stopPropagation();localStorage.setItem('current_project_id','${p.id}')" title="簡報"><span class="material-symbols-outlined">slideshow</span></a>`}
                         ${pType === 'corporate' ? `<a class="btn btn-sm" href="course-outline.html?admin=1&project=${p.id}" title="課程大綱" onclick="event.stopPropagation()"><span class="material-symbols-outlined">description</span></a>` : ''}
                         <button class="btn btn-sm" data-edit="${p.id}" title="設定" onclick="event.stopPropagation()"><span class="material-symbols-outlined">edit</span></button>
                         <button class="btn btn-sm" data-copy="${p.id}" title="複製專案" onclick="event.stopPropagation()"><span class="material-symbols-outlined">content_copy</span></button>
@@ -1233,9 +1236,12 @@
             const pType = p.type || 'course';
 
             const clientName = pType === 'corporate' && p.organization_id && clientMap[p.organization_id] ? clientMap[p.organization_id] : '';
+            // ★ 自動取最近場次 sid
+            const detailLatestSess = projectSessions.length > 0 ? projectSessions[0] : null;
+            const detailSid = detailLatestSess ? `&sid=${detailLatestSess.id}` : '';
             const slideLink = p.slide_mode === 'external' && p.course_link
                 ? { href: p.course_link, target: '_blank', icon: 'open_in_new' }
-                : { href: `editor.html?id=${p.id}#id=${p.id}`, onclick: `localStorage.setItem('current_project_id','${p.id}')`, icon: 'slideshow' };
+                : { href: `editor.html?id=${p.id}${detailSid}#id=${p.id}`, onclick: `localStorage.setItem('current_project_id','${p.id}')`, icon: 'slideshow' };
 
             document.getElementById('projectDetailHeader').innerHTML = `
                 <!-- Title Row -->
