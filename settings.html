@@ -418,6 +418,10 @@
                 <span class="material-symbols-outlined">webhook</span>
                 Webhook 設定
             </div>
+            <div class="settings-tab" data-tab="email-templates">
+                <span class="material-symbols-outlined">mail</span>
+                Email 範本
+            </div>
             <div class="settings-tab" data-tab="finance">
                 <span class="material-symbols-outlined">account_balance</span>
                 帳務設定
@@ -551,6 +555,71 @@
             </div>
         </div>
 
+        <!-- Tab: Email Templates -->
+        <div class="tab-pane settings-container" id="tab-email-templates">
+            <div class="prompt-list">
+                <div class="prompt-list-header">
+                    <span class="material-symbols-outlined" style="font-size:18px;">mail</span>
+                    Email 範本管理
+                </div>
+                <div id="emailTplListItems"><div style="padding:40px 20px;text-align:center;color:#80868b;font-size:13px;">載入中…</div></div>
+            </div>
+
+            <div class="prompt-editor" id="emailTplEditor" style="display:flex;flex-direction:column;">
+                <div class="empty-state" id="emailTplEmptyState">
+                    <div style="text-align:center;">
+                        <span class="material-symbols-outlined" style="font-size:48px;color:#cbd5e1;">drafts</span>
+                        <p>選擇左側的信件範本來編輯</p>
+                    </div>
+                </div>
+                <div id="emailTplContent" style="display:none;flex-direction:column;flex:1;overflow-y:auto;">
+                    <div class="prompt-editor-header">
+                        <div>
+                            <div class="prompt-editor-title" id="emailTplTitle"></div>
+                            <div class="prompt-editor-desc" id="emailTplDesc"></div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="wh-copy-btn" onclick="window._previewEmailTpl()">
+                                <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> 預覽
+                            </button>
+                        </div>
+                    </div>
+                    <div class="prompt-editor-body" style="gap:12px;">
+                        <div>
+                            <label style="font-size:13px;font-weight:500;color:#444746;margin-bottom:6px;display:block;">📧 信件主旨</label>
+                            <input type="text" id="emailTplSubject" style="width:100%;padding:10px 14px;border:1px solid #dadce0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border-color .2s;box-sizing:border-box;" placeholder="主旨範本，可使用 {{變數}}">
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;">
+                            <label style="font-size:13px;font-weight:500;color:#444746;margin-bottom:6px;display:block;">📝 信件本文（HTML）</label>
+                            <textarea class="prompt-textarea" id="emailTplBody" style="flex:1;min-height:300px;"></textarea>
+                        </div>
+                        <div class="variable-hint" id="emailTplVarsHint">
+                            <b>可用變數：</b>使用 <code>{{variableName}}</code> 格式插入動態變數。系統會在發信時自動替換。
+                        </div>
+                    </div>
+                    <div class="prompt-editor-footer">
+                        <span class="save-status" id="emailTplSaveStatus"></span>
+                        <button class="btn-save" id="btnSaveEmailTpl" onclick="window._saveEmailTpl()">儲存範本</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Preview Modal -->
+        <div class="wh-modal-overlay" id="emailPreviewModal" onclick="if(event.target===this)this.classList.remove('active')">
+            <div class="wh-modal" style="width:720px;max-width:95vw;">
+                <div class="wh-modal-header">
+                    <h3>📧 信件預覽</h3>
+                    <button class="wh-copy-btn" onclick="document.getElementById('emailPreviewModal').classList.remove('active')">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="wh-modal-body" style="padding:0;">
+                    <iframe id="emailPreviewFrame" style="width:100%;height:65vh;border:none;"></iframe>
+                </div>
+            </div>
+        </div>
+
         <!-- Tab: Finance Settings -->
         <div class="tab-pane webhook-container" id="tab-finance">
             <div class="wh-card">
@@ -596,6 +665,7 @@
                 document.getElementById(`tab-${target}`).classList.add('active');
                 if (target === 'webhook') loadWebhookLogs();
                 if (target === 'tools') renderToolsGrid();
+                if (target === 'email-templates') loadEmailTemplates();
             });
         });
 
@@ -833,6 +903,131 @@
             setTimeout(() => { st.textContent = ''; }, 2000);
         };
 
+        // ── Email Templates ──
+        let emailTemplates = [];
+        let currentTplId = null;
+
+        async function loadEmailTemplates() {
+            try {
+                const { data, error } = await db.select('email_templates', { order: 'created_at.asc' });
+                if (error) throw new Error(error.message || 'Load failed');
+                emailTemplates = data || [];
+                renderEmailTplList();
+            } catch (e) {
+                document.getElementById('emailTplListItems').innerHTML =
+                    `<div style="padding:20px;text-align:center;color:#c5221f;font-size:12px;">載入失敗：${e.message}</div>`;
+            }
+        }
+
+        function renderEmailTplList() {
+            const container = document.getElementById('emailTplListItems');
+            if (emailTemplates.length === 0) {
+                container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#80868b;font-size:13px;">尚無範本</div>';
+                return;
+            }
+            container.innerHTML = emailTemplates.map(t => `
+                <div class="prompt-item ${t.id === currentTplId ? 'active' : ''}" data-id="${t.id}" onclick="window._selectEmailTpl('${t.id}')">
+                    <div class="prompt-item-name">${t.name}</div>
+                    <div class="prompt-item-desc">${t.description || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        window._selectEmailTpl = function(id) {
+            currentTplId = id;
+            const t = emailTemplates.find(x => x.id === id);
+            if (!t) return;
+
+            document.getElementById('emailTplEmptyState').style.display = 'none';
+            document.getElementById('emailTplContent').style.display = 'flex';
+            document.getElementById('emailTplTitle').textContent = t.name;
+            document.getElementById('emailTplDesc').textContent = t.description || '';
+            document.getElementById('emailTplSubject').value = t.subject_template || '';
+            document.getElementById('emailTplBody').value = t.body_template || '';
+            document.getElementById('emailTplSaveStatus').textContent = '';
+
+            // 渲染可用變數提示
+            const vars = (t.available_vars || '').split(',').filter(v => v.trim());
+            const hint = document.getElementById('emailTplVarsHint');
+            if (vars.length > 0) {
+                hint.innerHTML = '<b>可用變數：</b>' + vars.map(v => `<code>{{${v.trim()}}}</code>`).join(' ');
+            }
+
+            renderEmailTplList();
+        };
+
+        window._saveEmailTpl = async function() {
+            if (!currentTplId) return;
+            const subject = document.getElementById('emailTplSubject').value;
+            const body = document.getElementById('emailTplBody').value;
+            const status = document.getElementById('emailTplSaveStatus');
+            const btn = document.getElementById('btnSaveEmailTpl');
+
+            btn.disabled = true;
+            status.textContent = '⏳ 儲存中...';
+            status.className = 'save-status saving';
+
+            try {
+                await db.update('email_templates',
+                    { subject_template: subject, body_template: body, updated_at: new Date().toISOString() },
+                    { id: `eq.${currentTplId}` }
+                );
+                status.textContent = '✅ 已儲存';
+                status.className = 'save-status saved';
+
+                const t = emailTemplates.find(x => x.id === currentTplId);
+                if (t) { t.subject_template = subject; t.body_template = body; }
+            } catch (e) {
+                status.textContent = '❌ 儲存失敗：' + e.message;
+                status.className = 'save-status';
+            }
+            btn.disabled = false;
+        };
+
+        window._previewEmailTpl = function() {
+            const body = document.getElementById('emailTplBody').value;
+            if (!body) return;
+            const t = emailTemplates.find(x => x.id === currentTplId);
+
+            // 用假資料替換變數做預覽
+            const previewVars = {
+                affiliate_name: '王小明',
+                transaction_id: 'TXN-20260404-001',
+                course_name: 'AI 簡報實戰課',
+                amount: '3,980',
+                currency_symbol: 'NT$',
+                rate_percent: '15',
+                commission_amount: '597',
+                dashboard_url: 'https://tbr.digital/affiliate-dashboard',
+            };
+
+            let rendered = body.replace(/\{\{(\w+)\}\}/g, (_, key) => previewVars[key] || `{{${key}}}`);
+
+            // 包裝成完整 HTML（如果範本不含 DOCTYPE）
+            if (!rendered.includes('<!DOCTYPE')) {
+                rendered = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:32px;background:#f4f4f8;font-family:-apple-system,'Noto Sans TC',sans-serif;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:28px 36px;">
+<div style="font-size:18px;font-weight:700;color:#fff;">🎉 數位簡報室・推廣夥伴</div>
+<div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;">信件預覽</div>
+</div>
+<div style="padding:36px;font-size:14px;color:#333;line-height:1.75;">
+${rendered}
+</div>
+<div style="background:#fafafe;padding:20px 36px;border-top:1px solid #e8e8f0;font-size:11px;color:#999;">
+此信件由 數位簡報室 系統自動發送
+</div>
+</div>
+</body></html>`;
+            }
+
+            const frame = document.getElementById('emailPreviewFrame');
+            frame.srcdoc = rendered;
+            document.getElementById('emailPreviewModal').classList.add('active');
+        };
+
         // ── Init ──
         loadPrompts();
         loadFinanceSettings();
@@ -844,6 +1039,8 @@
             document.querySelector('.settings-tab[data-tab="tools"]').click();
         } else if (location.hash === '#finance') {
             document.querySelector('.settings-tab[data-tab="finance"]').click();
+        } else if (location.hash === '#email-templates') {
+            document.querySelector('.settings-tab[data-tab="email-templates"]').click();
         }
     </script>
     <script src="components/nav.js"></script>

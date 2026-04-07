@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知推送紀錄 — 教學系統</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/s79-theme.css">
+    <style>
+        body { margin: 0; background: #f6f7f9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 32px 48px; }
+        .page-header { padding: 28px 0 16px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .page-header h1 { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; margin: 0; letter-spacing: -0.03em; }
+        .page-header .meta { font-size: 0.75rem; color: #9ca3af; margin-top: 4px; }
+
+        /* Stats Cards */
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: #fff; border: 1.5px solid rgba(0,0,0,0.05); border-radius: 14px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); transition: all 0.25s; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+        .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .stat-icon .material-symbols-outlined { font-size: 18px; }
+        .stat-label { font-size: 0.68rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; letter-spacing: -0.03em; }
+        .stat-sub { font-size: 0.7rem; color: #9ca3af; margin-top: 4px; }
+
+        /* Filters */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+        .filter-btn { padding: 7px 16px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; cursor: pointer; font-size: 0.78rem; font-weight: 500; font-family: inherit; transition: all 0.2s; }
+        .filter-btn:hover { border-color: #6366f1; color: #6366f1; }
+        .filter-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; font-weight: 600; }
+        .search-input { padding: 7px 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.78rem; font-family: inherit; min-width: 200px; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: #6366f1; }
+
+        /* Table */
+        .table-wrap { background: #fff; border: 1.5px solid rgba(0,0,0,0.05); border-radius: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); overflow: hidden; }
+        .ntable { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .ntable thead { background: #f8f9fc; }
+        .ntable th { padding: 12px 16px; text-align: left; font-weight: 600; color: #64748b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+        .ntable td { padding: 14px 16px; border-bottom: 1px solid #f0f1f3; color: #1a1a2e; vertical-align: middle; }
+        .ntable tr:last-child td { border-bottom: none; }
+        .ntable tr:hover { background: #fafafe; }
+
+        /* Status badges */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
+        .badge.sent { background: #d1fae5; color: #059669; }
+        .badge.failed { background: #fee2e2; color: #dc2626; }
+        .badge.sending { background: #fef3c7; color: #d97706; }
+        .badge.bounced { background: #fce7f3; color: #db2777; }
+
+        /* Progress bars for rates */
+        .rate-bar { display: flex; align-items: center; gap: 8px; }
+        .rate-track { width: 60px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; flex-shrink: 0; }
+        .rate-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+        .rate-fill.open { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+        .rate-fill.click { background: linear-gradient(90deg, #10b981, #34d399); }
+        .rate-text { font-size: 0.72rem; font-weight: 600; color: #6366f1; min-width: 28px; }
+        .rate-text.click { color: #10b981; }
+
+        /* Detail modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: #fff; border-radius: 20px; max-width: 680px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .modal-header { padding: 24px 28px 16px; border-bottom: 1px solid #f0f1f3; display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: none; background: #f0f1f3; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .modal-close:hover { background: #e2e8f0; }
+        .modal-body { padding: 20px 28px 28px; }
+        .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f8f9fc; gap: 12px; }
+        .detail-label { font-size: 0.75rem; color: #9ca3af; font-weight: 600; min-width: 90px; flex-shrink: 0; }
+        .detail-value { font-size: 0.82rem; color: #1a1a2e; word-break: break-all; }
+        .events-timeline { margin-top: 16px; }
+        .event-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 0.78rem; }
+        .event-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .event-dot.open { background: #6366f1; }
+        .event-dot.click { background: #10b981; }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+        .page-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; cursor: pointer; font-size: 0.75rem; font-family: inherit; transition: all 0.2s; }
+        .page-btn:hover { border-color: #6366f1; color: #6366f1; }
+        .page-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+
+        /* Empty state */
+        .empty-state { padding: 60px 0; text-align: center; color: #9ca3af; font-size: 0.88rem; }
+        .empty-state .material-symbols-outlined { font-size: 48px; color: #d1d5db; display: block; margin-bottom: 12px; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-card { animation: fadeUp 0.4s ease both; }
+        .stat-card:nth-child(2) { animation-delay: 0.05s; }
+        .stat-card:nth-child(3) { animation-delay: 0.1s; }
+        .stat-card:nth-child(4) { animation-delay: 0.15s; }
+        .stat-card:nth-child(5) { animation-delay: 0.2s; }
+
+        @media (max-width: 1024px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .container { padding: 0 16px 40px; } .stats-row { grid-template-columns: repeat(2, 1fr); } .ntable { font-size: 0.75rem; } .ntable th, .ntable td { padding: 10px 12px; } }
+    </style>
+</head>
+
+<body>
+    <div class="admin-main">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1>📬 通知推送紀錄</h1>
+                    <div class="meta" id="headerMeta"></div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#ede9fe;color:#6366f1;"><span class="material-symbols-outlined">mail</span></div>
+                    <div class="stat-label">總通知數</div>
+                    <div class="stat-value" id="statTotal">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#d1fae5;color:#10b981;"><span class="material-symbols-outlined">check_circle</span></div>
+                    <div class="stat-label">成功發送</div>
+                    <div class="stat-value" id="statSent">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#fee2e2;color:#ef4444;"><span class="material-symbols-outlined">error</span></div>
+                    <div class="stat-label">發送失敗</div>
+                    <div class="stat-value" id="statFailed">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#e0e7ff;color:#4f46e5;"><span class="material-symbols-outlined">visibility</span></div>
+                    <div class="stat-label">平均開信率</div>
+                    <div class="stat-value" id="statOpenRate">-</div>
+                    <div class="stat-sub" id="statOpenSub"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:#d1fae5;color:#059669;"><span class="material-symbols-outlined">ads_click</span></div>
+                    <div class="stat-label">平均點擊率</div>
+                    <div class="stat-value" id="statClickRate">-</div>
+                    <div class="stat-sub" id="statClickSub"></div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">全部</button>
+                <button class="filter-btn" data-filter="affiliate_commission" onclick="setFilter('affiliate_commission')">💰 推廣佣金</button>
+                <button class="filter-btn" data-filter="sent" onclick="setFilter('sent')">✅ 成功</button>
+                <button class="filter-btn" data-filter="failed" onclick="setFilter('failed')">❌ 失敗</button>
+                <div style="flex:1;"></div>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜尋收件者 Email 或主旨..." oninput="handleSearch()">
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrap">
+                <table class="ntable">
+                    <thead>
+                        <tr>
+                            <th>時間</th>
+                            <th>類型</th>
+                            <th>收件者</th>
+                            <th>主旨</th>
+                            <th>狀態</th>
+                            <th>開信</th>
+                            <th>點擊</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notifTableBody">
+                        <tr><td colspan="8" class="empty-state"><span class="material-symbols-outlined">hourglass_top</span>載入中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div><!-- /admin-main -->
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">通知詳情</h2>
+                <button class="modal-close" onclick="closeModal()"><span class="material-symbols-outlined" style="font-size:16px;">close</span></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, requireAuth } from './scripts/supabase.js';
+
+        // ── Auth Guard ──
+        const authResult = await requireAuth(['super_admin']);
+        if (!authResult) throw new Error('not authorized');
+
+        document.getElementById('headerMeta').textContent =
+            authResult.session.user.email + ' · ' +
+            new Date().toLocaleString('zh-TW', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        // ── State ──
+        let allNotifs = [];
+        let filteredNotifs = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentPage = 1;
+        const PAGE_SIZE = 20;
+
+        // ── Type labels ──
+        const typeLabels = {
+            affiliate_commission: '💰 推廣佣金',
+            system: '⚙️ 系統',
+            marketing: '📢 行銷',
+        };
+
+        // ── Init ──
+        async function init() {
+            try {
+                const { data, error } = await db.select('notification_logs', {
+                    select: '*',
+                    order: 'sent_at.desc',
+                    limit: 1000,
+                });
+                if (error) throw error;
+                allNotifs = data || [];
+                applyFilters();
+                updateStats();
+            } catch (err) {
+                document.getElementById('notifTableBody').innerHTML =
+                    `<tr><td colspan="8" class="empty-state"><span class="material-symbols-outlined">error</span>載入失敗：${err.message}</td></tr>`;
+            }
+        }
+
+        // ── Stats ──
+        function updateStats() {
+            const total = allNotifs.length;
+            const sent = allNotifs.filter(n => n.send_status === 'sent').length;
+            const failed = allNotifs.filter(n => n.send_status === 'failed').length;
+            const opened = allNotifs.filter(n => n.open_count > 0).length;
+            const clicked = allNotifs.filter(n => n.click_count > 0).length;
+
+            document.getElementById('statTotal').textContent = total.toLocaleString();
+            document.getElementById('statSent').textContent = sent.toLocaleString();
+            document.getElementById('statFailed').textContent = failed.toLocaleString();
+
+            if (sent > 0) {
+                const openRate = Math.round(opened / sent * 100);
+                const clickRate = Math.round(clicked / sent * 100);
+                document.getElementById('statOpenRate').textContent = openRate + '%';
+                document.getElementById('statOpenSub').textContent = `${opened} / ${sent} 封`;
+                document.getElementById('statClickRate').textContent = clickRate + '%';
+                document.getElementById('statClickSub').textContent = `${clicked} / ${sent} 封`;
+            } else {
+                document.getElementById('statOpenRate').textContent = '-';
+                document.getElementById('statClickRate').textContent = '-';
+            }
+        }
+
+        // ── Filters ──
+        function applyFilters() {
+            filteredNotifs = allNotifs.filter(n => {
+                if (currentFilter === 'sent' && n.send_status !== 'sent') return false;
+                if (currentFilter === 'failed' && n.send_status !== 'failed') return false;
+                if (currentFilter === 'affiliate_commission' && n.notification_type !== 'affiliate_commission') return false;
+                if (currentSearch) {
+                    const q = currentSearch.toLowerCase();
+                    return (n.recipient_email || '').toLowerCase().includes(q)
+                        || (n.recipient_name || '').toLowerCase().includes(q)
+                        || (n.subject || '').toLowerCase().includes(q);
+                }
+                return true;
+            });
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+        }
+
+        window.setFilter = function (filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.filter === filter);
+            });
+            applyFilters();
+        };
+
+        window.handleSearch = function () {
+            currentSearch = document.getElementById('searchInput').value.trim();
+            applyFilters();
+        };
+
+        // ── Render Table ──
+        function renderTable() {
+            const tbody = document.getElementById('notifTableBody');
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageData = filteredNotifs.slice(start, start + PAGE_SIZE);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><span class="material-symbols-outlined">mail</span>尚無通知紀錄</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = pageData.map(n => {
+                const time = new Date(n.sent_at || n.created_at).toLocaleString('zh-TW', {
+                    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                const type = typeLabels[n.notification_type] || n.notification_type;
+                const statusClass = n.send_status || 'sent';
+                const statusLabel = { sent: '已發送', failed: '失敗', sending: '發送中', bounced: '退信' }[statusClass] || statusClass;
+
+                // 開信率
+                const openHtml = n.open_count > 0
+                    ? `<div class="rate-bar"><div class="rate-track"><div class="rate-fill open" style="width:100%"></div></div><span class="rate-text">${n.open_count}</span></div>`
+                    : `<span style="color:#d1d5db;font-size:0.75rem;">—</span>`;
+
+                // 點擊率
+                const clickHtml = n.click_count > 0
+                    ? `<div class="rate-bar"><div class="rate-track"><div class="rate-fill click" style="width:100%"></div></div><span class="rate-text click">${n.click_count}</span></div>`
+                    : `<span style="color:#d1d5db;font-size:0.75rem;">—</span>`;
+
+                // 主旨截短
+                const subjectShort = (n.subject || '').length > 40 ? n.subject.substring(0, 40) + '...' : (n.subject || '');
+
+                return `<tr>
+                    <td style="white-space:nowrap;color:#64748b;font-size:0.78rem;">${time}</td>
+                    <td style="white-space:nowrap;">${type}</td>
+                    <td>
+                        <div style="font-weight:500;">${n.recipient_name || '-'}</div>
+                        <div style="font-size:0.72rem;color:#9ca3af;">${n.recipient_email}</div>
+                    </td>
+                    <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(n.subject || '').replace(/"/g, '&quot;')}">${subjectShort}</td>
+                    <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+                    <td>${openHtml}</td>
+                    <td>${clickHtml}</td>
+                    <td><button onclick="showDetail('${n.id}')" style="padding:4px 10px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#6366f1;cursor:pointer;font-size:0.72rem;font-family:inherit;font-weight:500;transition:all 0.2s;" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='#e2e8f0'">詳情</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Pagination ──
+        function renderPagination() {
+            const total = Math.ceil(filteredNotifs.length / PAGE_SIZE);
+            const el = document.getElementById('pagination');
+            if (total <= 1) { el.innerHTML = ''; return; }
+
+            let html = '';
+            for (let i = 1; i <= total; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            }
+            el.innerHTML = html;
+        }
+
+        window.goPage = function (p) {
+            currentPage = p;
+            renderTable();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // ── Detail Modal ──
+        window.showDetail = async function (id) {
+            const n = allNotifs.find(x => x.id === id);
+            if (!n) return;
+
+            const modal = document.getElementById('detailModal');
+            const body = document.getElementById('modalBody');
+
+            const time = new Date(n.sent_at || n.created_at).toLocaleString('zh-TW');
+            const meta = n.metadata || {};
+            const statusClass = n.send_status || 'sent';
+            const statusLabel = { sent: '已發送', failed: '失敗', sending: '發送中', bounced: '退信' }[statusClass] || statusClass;
+
+            let detailHtml = `
+                <div class="detail-row"><div class="detail-label">通知 ID</div><div class="detail-value" style="font-family:monospace;font-size:0.75rem;">${n.id}</div></div>
+                <div class="detail-row"><div class="detail-label">發送時間</div><div class="detail-value">${time}</div></div>
+                <div class="detail-row"><div class="detail-label">狀態</div><div class="detail-value"><span class="badge ${statusClass}">${statusLabel}</span></div></div>
+                <div class="detail-row"><div class="detail-label">類型</div><div class="detail-value">${typeLabels[n.notification_type] || n.notification_type}</div></div>
+                <div class="detail-row"><div class="detail-label">收件者</div><div class="detail-value">${n.recipient_name || ''} &lt;${n.recipient_email}&gt;</div></div>
+                <div class="detail-row"><div class="detail-label">主旨</div><div class="detail-value">${n.subject}</div></div>
+                ${n.resend_message_id ? `<div class="detail-row"><div class="detail-label">Resend ID</div><div class="detail-value" style="font-family:monospace;font-size:0.75rem;">${n.resend_message_id}</div></div>` : ''}
+                ${n.error_message ? `<div class="detail-row"><div class="detail-label">錯誤訊息</div><div class="detail-value" style="color:#dc2626;">${n.error_message}</div></div>` : ''}
+                <div class="detail-row"><div class="detail-label">開信次數</div><div class="detail-value">${n.open_count || 0}${n.first_opened_at ? ` · 首次 ${new Date(n.first_opened_at).toLocaleString('zh-TW')}` : ''}</div></div>
+                <div class="detail-row"><div class="detail-label">點擊次數</div><div class="detail-value">${n.click_count || 0}${n.first_clicked_at ? ` · 首次 ${new Date(n.first_clicked_at).toLocaleString('zh-TW')}` : ''}</div></div>
+            `;
+
+            // 顯示 metadata（佣金明細等）
+            if (meta.course_name || meta.amount) {
+                const curr = meta.currency === 'TWD' ? 'NT$' : '$';
+                detailHtml += `
+                    <div style="margin-top:16px;background:#f8f9ff;border:1px solid #e8e8f0;border-radius:12px;padding:16px 20px;">
+                        <div style="font-weight:600;font-size:0.82rem;color:#1a1a2e;margin-bottom:10px;">📋 訂單明細</div>
+                        ${n.reference_id ? `<div class="detail-row" style="border:none;padding:4px 0;"><div class="detail-label">訂單編號</div><div class="detail-value">${n.reference_id}</div></div>` : ''}
+                        ${meta.course_name ? `<div class="detail-row" style="border:none;padding:4px 0;"><div class="detail-label">商品名稱</div><div class="detail-value">${meta.course_name}</div></div>` : ''}
+                        ${meta.amount ? `<div class="detail-row" style="border:none;padding:4px 0;"><div class="detail-label">訂單金額</div><div class="detail-value">${curr} ${Number(meta.amount).toLocaleString()}</div></div>` : ''}
+                        ${meta.commission_rate ? `<div class="detail-row" style="border:none;padding:4px 0;"><div class="detail-label">分潤比例</div><div class="detail-value">${Math.round(meta.commission_rate * 100)}%</div></div>` : ''}
+                        ${meta.commission_amount ? `<div class="detail-row" style="border:none;padding:4px 0;"><div class="detail-label">佣金金額</div><div class="detail-value" style="color:#10b981;font-weight:600;">${curr} ${Number(meta.commission_amount).toLocaleString()}</div></div>` : ''}
+                    </div>
+                `;
+            }
+
+            // 載入事件時間軸
+            try {
+                const { data: events } = await db.select('notification_events', {
+                    select: '*',
+                    filter: { notification_id: `eq.${id}` },
+                    order: 'created_at.desc',
+                    limit: 50,
+                });
+
+                if (events && events.length > 0) {
+                    detailHtml += `<div class="events-timeline"><div style="font-weight:600;font-size:0.82rem;color:#1a1a2e;margin-bottom:10px;margin-top:16px;">📊 事件時間軸</div>`;
+                    events.forEach(e => {
+                        const t = new Date(e.created_at).toLocaleString('zh-TW');
+                        const isClick = e.event_type === 'click';
+                        const label = isClick ? '🖱️ 點擊' : '👁️ 開信';
+                        detailHtml += `<div class="event-item">
+                            <div class="event-dot ${e.event_type}"></div>
+                            <div>
+                                <span style="font-weight:500;">${label}</span>
+                                <span style="color:#9ca3af;margin-left:8px;">${t}</span>
+                                ${isClick && e.url ? `<div style="font-size:0.7rem;color:#6366f1;margin-top:2px;word-break:break-all;">${e.url}</div>` : ''}
+                                ${e.ip_address ? `<div style="font-size:0.68rem;color:#cbd5e1;">IP: ${e.ip_address}</div>` : ''}
+                            </div>
+                        </div>`;
+                    });
+                    detailHtml += '</div>';
+                }
+            } catch { /* 不影響 */ }
+
+            body.innerHTML = detailHtml;
+            modal.classList.add('show');
+        };
+
+        window.closeModal = function () {
+            document.getElementById('detailModal').classList.remove('show');
+        };
+
+        // ESC 關閉 modal
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+        document.getElementById('detailModal').addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        init();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+
+</html>
