@@ -966,7 +966,9 @@
         // ── Google OAuth callback 處理 ──
         if (location.hash && location.hash.includes('access_token')) {
             try {
-                const user = await auth.getUser();
+                // ★ 必須先呼叫 handleOAuthCallback() 把 token 從 hash 存到 localStorage
+                const result = await auth.handleOAuthCallback();
+                const user = result?.user || await auth.getUser();
                 if (user) {
                     const email = user.email;
                     const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
@@ -974,12 +976,16 @@
                     document.getElementById('loginName').value = name;
                     // 清除 hash 但保留 query params
                     history.replaceState(null, '', location.pathname + location.search);
-                    // 提示填場次代碼
-                    if (!document.getElementById('loginSessionCode').value) {
+                    // ★ 如果場次代碼已填好（從 URL 帶入），自動登入
+                    const sessionCodeEl = document.getElementById('loginSessionCode');
+                    if (sessionCodeEl.value) {
+                        // 自動觸發登入
+                        document.getElementById('loginBtn').click();
+                    } else {
                         document.getElementById('loginError').textContent = 'Google 登入成功！請輸入場次代碼後按「進入課程」';
                         document.getElementById('loginError').style.display = 'block';
                         document.getElementById('loginError').style.color = '#22c55e';
-                        document.getElementById('loginSessionCode').focus();
+                        sessionCodeEl.focus();
                     }
                 }
             } catch (e) { console.warn('[portal] Google callback error:', e); }
