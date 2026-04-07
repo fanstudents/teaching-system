@@ -966,9 +966,13 @@
         // ── Google OAuth callback 處理 ──
         if (location.hash && location.hash.includes('access_token')) {
             try {
-                // ★ 必須先呼叫 handleOAuthCallback() 把 token 從 hash 存到 localStorage
+                // ★ 呼叫 handleOAuthCallback() 取得 Google user info
                 const result = await auth.handleOAuthCallback();
                 const user = result?.user || await auth.getUser();
+                // ★ Portal 只需要 email/name，不需要保留 auth token
+                // 清掉以免 RLS 用 student JWT 查 projects 失敗
+                localStorage.removeItem('_at');
+                sessionStorage.removeItem('_at');
                 if (user) {
                     const email = user.email;
                     const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
@@ -979,7 +983,6 @@
                     // ★ 如果場次代碼已填好（從 URL 帶入），自動登入
                     const sessionCodeEl = document.getElementById('loginSessionCode');
                     if (sessionCodeEl.value) {
-                        // 自動觸發登入
                         document.getElementById('loginBtn').click();
                     } else {
                         document.getElementById('loginError').textContent = 'Google 登入成功！請輸入場次代碼後按「進入課程」';
