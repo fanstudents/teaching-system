@@ -1216,6 +1216,55 @@ ${slideContents}
             this.showToast('已儲存');
         });
 
+        // 版本歷史
+        document.getElementById('versionHistoryBtn')?.addEventListener('click', async () => {
+            const modal = document.getElementById('versionHistoryModal');
+            const listEl = document.getElementById('versionHistoryList');
+            if (!modal || !listEl) return;
+            modal.style.display = '';
+            listEl.innerHTML = '<div style="text-align:center;color:#80868b;padding:40px 0;">載入中...</div>';
+
+            const snapshots = await this.slideManager.loadSnapshots();
+            if (!snapshots.length) {
+                listEl.innerHTML = '<div style="text-align:center;color:#80868b;padding:40px 0;">尚無版本快照</div>';
+                return;
+            }
+
+            listEl.innerHTML = snapshots.map((s, i) => {
+                const t = new Date(s.created_at);
+                const date = `${t.getMonth()+1}/${t.getDate()}`;
+                const time = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+                const srcLabel = { auto: '自動', manual: '手動', beforeunload: '關閉前' }[s.source] || s.source;
+                const srcColor = s.source === 'manual' ? '#34a853' : s.source === 'beforeunload' ? '#ea8600' : '#80868b';
+                const isCurrent = i === 0;
+                return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:${isCurrent ? '#1a3a5c' : '#2a2a2a'};border-radius:10px;border:1px solid ${isCurrent ? '#1a73e8' : '#333'};">
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                        <div style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;">
+                            <span style="color:#8ab4f8;">v${s.version}</span>
+                            <span style="font-size:11px;padding:1px 6px;border-radius:4px;background:${srcColor}22;color:${srcColor};">${srcLabel}</span>
+                            ${isCurrent ? '<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:#1a73e833;color:#8ab4f8;">目前</span>' : ''}
+                        </div>
+                        <div style="font-size:11px;color:#80868b;">
+                            ${date} ${time} · ${s.slide_count} 頁 · ${s.element_count} 元素 · seq:${s.save_seq}
+                        </div>
+                    </div>
+                    ${!isCurrent ? `<button onclick="window._restoreSnapshot('${s.id}')" style="padding:4px 12px;background:#1a73e8;border:none;border-radius:6px;color:#fff;font-size:12px;cursor:pointer;white-space:nowrap;">還原</button>` : ''}
+                </div>`;
+            }).join('');
+        });
+
+        // 版本還原全域 handler
+        window._restoreSnapshot = async (id) => {
+            if (!confirm('確定要還原到這個版本嗎？目前的編輯內容會被覆蓋。')) return;
+            const ok = await this.slideManager.restoreSnapshot(id);
+            if (ok) {
+                this.showToast('✅ 已還原到指定版本');
+                document.getElementById('versionHistoryModal').style.display = 'none';
+            } else {
+                this.showToast('❌ 還原失敗', 'error');
+            }
+        };
+
         // === 設計 Tab ===
 
         // 背景色板

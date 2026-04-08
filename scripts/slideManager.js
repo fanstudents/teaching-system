@@ -3537,7 +3537,7 @@ export class SlideManager {
                 const statusEl = document.getElementById('autoSaveStatus');
                 if (statusEl) statusEl.textContent = '⚠ 儲存失敗';
             } else {
-                console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, version: data._version });
+                console.log('[SaveDB] ✅ saved OK', { savedAt: data.savedAt, version: data._version, seq: data._saveSeq });
                 this._lastSaveOk = true;
                 // ★ 更新自動存檔狀態指示器
                 const statusEl = document.getElementById('autoSaveStatus');
@@ -3552,6 +3552,8 @@ export class SlideManager {
                         statusEl.style.color = 'var(--text-muted)';
                     }, 3000);
                 }
+                // ★ 版本快照（手動存 always、自動存每 5 次）
+                this._saveSnapshot(data);
             }
         } catch (e) {
             console.error('[SaveDB] ❌ exception:', e);
@@ -3568,6 +3570,124 @@ export class SlideManager {
             this._showSaveError('資料庫連線失敗：' + e.message);
         } finally {
             this._isSaving = false;
+        }
+    }
+
+    /**
+     * ★ 版本快照：手動存每次都寫快照、自動存每 5 次寫一次
+     * 每場次最多保留 30 筆，超過自動刪除最舊的
+     */
+    async _saveSnapshot(data) {
+        if (!this._db) return;
+        const seq = data._saveSeq || 0;
+        const source = data._source || 'auto';
+
+        // 節流：自動存檔每 5 次才寫快照
+        if (source === 'auto') {
+            if (!this._lastSnapshotSeq) this._lastSnapshotSeq = 0;
+            if (seq - this._lastSnapshotSeq < 5) return;
+        }
+        this._lastSnapshotSeq = seq;
+
+        const slideCount = data.slides?.length || 0;
+        const elementCount = (data.slides || []).reduce((sum, s) => sum + (s.elements?.length || 0), 0);
+
+        try {
+            await this._db.insert('slide_snapshots', {
+                session_id: this.currentSessionId || null,
+                project_id: this.currentProjectId,
+                save_seq: seq,
+                version: data._version || 0,
+                slide_count: slideCount,
+                element_count: elementCount,
+                source: source,
+                slides_data: data
+            });
+            console.log(`[Snapshot] ✅ saved (seq:${seq}, v${data._version}, ${slideCount} slides, source:${source})`);
+
+            // ★ 清理：每場次最多 30 筆，刪除最舊的
+            this._cleanupSnapshots();
+        } catch (e) {
+            console.warn('[Snapshot] ⚠️ failed to save snapshot:', e.message);
+        }
+    }
+
+    async _cleanupSnapshots() {
+        if (!this._db) return;
+        const MAX_SNAPSHOTS = 30;
+        try {
+            const filterKey = this.currentSessionId ? 'session_id' : 'project_id';
+            const filterId = this.currentSessionId || this.currentProjectId;
+            const { data: all } = await this._db.select('slide_snapshots', {
+                filter: { [filterKey]: `eq.${filterId}` },
+                select: 'id',
+                order: 'created_at.desc',
+                limit: 1000
+            });
+            if (all && all.length > MAX_SNAPSHOTS) {
+                const toDelete = all.slice(MAX_SNAPSHOTS).map(r => r.id);
+                for (const id of toDelete) {
+                    await this._db.delete('slide_snapshots', { id: `eq.${id}` });
+                }
+                console.log(`[Snapshot] 🗑 cleaned ${toDelete.length} old snapshots`);
+            }
+        } catch (e) {
+            console.warn('[Snapshot] cleanup error:', e.message);
+        }
+    }
+
+    /**
+     * ★ 載入版本歷史快照列表（不含完整 slides_data，用 select 只拉 metadata）
+     */
+    async loadSnapshots() {
+        if (!this._db) return [];
+        const filterKey = this.currentSessionId ? 'session_id' : 'project_id';
+        const filterId = this.currentSessionId || this.currentProjectId;
+        try {
+            const { data } = await this._db.select('slide_snapshots', {
+                filter: { [filterKey]: `eq.${filterId}` },
+                select: 'id,save_seq,version,slide_count,element_count,source,created_at',
+                order: 'created_at.desc',
+                limit: 30
+            });
+            return data || [];
+        } catch (e) {
+            console.error('[Snapshot] load list error:', e.message);
+            return [];
+        }
+    }
+
+    /**
+     * ★ 還原到指定快照
+     */
+    async restoreSnapshot(snapshotId) {
+        if (!this._db) return false;
+        try {
+            const { data } = await this._db.select('slide_snapshots', {
+                filter: { id: `eq.${snapshotId}` },
+                select: 'slides_data,save_seq,version'
+            });
+            const snapshot = data?.[0];
+            if (!snapshot?.slides_data?.slides) {
+                console.error('[Snapshot] ❌ no valid data in snapshot', snapshotId);
+                return false;
+            }
+            const sd = snapshot.slides_data;
+            this.slides = sd.slides;
+            this.sections = sd.sections || [];
+            this.currentIndex = Math.min(sd.currentIndex || 0, this.slides.length - 1);
+            this.thankYouConfig = sd.thankYouConfig || null;
+            this.surveyConfig = sd.surveyConfig || null;
+            this.renderThumbnails();
+            this.renderCurrentSlide();
+            this.updateCounter();
+            // 立即存到 DB
+            this.saveNow();
+            console.log(`[Snapshot] ✅ restored to seq:${snapshot.save_seq} v${snapshot.version}`);
+            return true;
+        } catch (e) {
+            console.error('[Snapshot] restore error:', e.message);
+            return false;
         }
     }
 

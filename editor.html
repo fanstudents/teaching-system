@@ -83,6 +83,9 @@
                 <button class="btn btn-ghost btn-sm" id="saveBtn" title="儲存專案" style="padding:4px 8px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">save</span> 儲存
                 </button>
+                <button class="btn btn-ghost btn-sm" id="versionHistoryBtn" title="版本歷史" style="padding:4px 8px;gap:3px;">
+                    <span class="material-symbols-outlined icon-sm">history</span>
+                </button>
                 <button class="btn btn-ghost btn-sm" id="shareEntryLinkBtn" title="生成入口連結" style="padding:4px 8px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">link</span> 分享
                 </button>
@@ -2185,6 +2188,25 @@
                 用 AI 生成個人化信件
             </button>
             <div id="emailResults" style="margin-top:16px;display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+    </div>
+
+    <!-- 版本歷史 Modal -->
+    <div id="versionHistoryModal"
+        style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);overflow-y:auto;">
+        <div style="max-width:600px;margin:60px auto;background:#1f1f1f;border-radius:16px;color:#fff;padding:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h2 style="margin:0;font-size:18px;display:flex;align-items:center;gap:8px;">
+                    <span class="material-symbols-outlined">history</span> 版本歷史
+                </h2>
+                <button onclick="document.getElementById('versionHistoryModal').style.display='none'"
+                    style="background:none;border:none;color:#80868b;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+            <p style="font-size:12px;color:#80868b;margin:0 0 12px;">點擊「還原」可回復到該版本。每場次保留最近 30 筆快照。</p>
+            <div id="versionHistoryList"
+                style="display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow-y:auto;">
+                <div style="text-align:center;color:#80868b;padding:40px 0;">載入中...</div>
+            </div>
         </div>
     </div>
 
