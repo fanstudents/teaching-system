@@ -2016,10 +2016,14 @@
                 <button onclick="document.getElementById('importSlidesModal').style.display='none'"
                     style="background:none;border:none;color:#80868b;cursor:pointer;font-size:1.2rem;">✕</button>
             </div>
-            <div style="padding:16px 20px;">
-                <select id="importProjectSelect" onchange="window.__loadImportSlides()"
-                    style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#0f0f17;color:#dadce0;font-size:0.9rem;font-family:inherit;">
+            <div style="padding:16px 20px;display:flex;gap:10px;">
+                <select id="importProjectSelect" onchange="window.__onImportProjectChange()"
+                    style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#0f0f17;color:#dadce0;font-size:0.9rem;font-family:inherit;">
                     <option value="">選擇來源專案…</option>
+                </select>
+                <select id="importSessionSelect" onchange="window.__loadImportSlides()"
+                    style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#0f0f17;color:#dadce0;font-size:0.9rem;font-family:inherit;display:none;">
+                    <option value="__project__">📁 專案原始版本</option>
                 </select>
             </div>
             <div id="importSlidesGrid"
@@ -2067,15 +2071,64 @@
             importSlides = [];
         };
 
+        window.__onImportProjectChange = async function () {
+            const pid = document.getElementById('importProjectSelect').value;
+            const sessionSelect = document.getElementById('importSessionSelect');
+            const grid = document.getElementById('importSlidesGrid');
+
+            if (!pid) {
+                sessionSelect.style.display = 'none';
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#444746;padding:40px 0;">請先選擇來源專案</div>';
+                importSlides = [];
+                return;
+            }
+
+            // 載入該專案的場次列表
+            sessionSelect.innerHTML = '<option value="__project__">📁 專案原始版本</option>';
+            try {
+                const { data: sessions } = await db.select('project_sessions', {
+                    filter: { project_id: `eq.${pid}` },
+                    select: 'id,date,time,venue,session_code',
+                    order: 'date.desc'
+                });
+                if (sessions && sessions.length > 0) {
+                    sessions.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id;
+                        const label = [s.date, s.time, s.venue].filter(Boolean).join(' ') || s.session_code || s.id.slice(0, 8);
+                        opt.textContent = `📅 ${label}`;
+                        sessionSelect.appendChild(opt);
+                    });
+                    sessionSelect.style.display = '';
+                } else {
+                    sessionSelect.style.display = 'none';
+                }
+            } catch (_) {
+                sessionSelect.style.display = 'none';
+            }
+
+            // 預設載入專案原始版本
+            window.__loadImportSlides();
+        };
+
         window.__loadImportSlides = async function () {
             const pid = document.getElementById('importProjectSelect').value;
+            const sid = document.getElementById('importSessionSelect').value;
             const grid = document.getElementById('importSlidesGrid');
             if (!pid) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#444746;padding:40px 0;">請先選擇來源專案</div>'; importSlides = []; return; }
 
             grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#444746;padding:40px 0;">載入中…</div>';
 
-            const { data } = await db.select('projects', { filter: { id: `eq.${pid}` }, select: 'slides_data' });
-            const slidesData = data?.[0]?.slides_data;
+            let slidesData = null;
+            if (sid && sid !== '__project__') {
+                // 從場次載入
+                const { data } = await db.select('project_sessions', { filter: { id: `eq.${sid}` }, select: 'slides_data' });
+                slidesData = data?.[0]?.slides_data;
+            } else {
+                // 從專案載入
+                const { data } = await db.select('projects', { filter: { id: `eq.${pid}` }, select: 'slides_data' });
+                slidesData = data?.[0]?.slides_data;
+            }
             importSlides = slidesData?.slides || [];
 
             if (importSlides.length === 0) {
