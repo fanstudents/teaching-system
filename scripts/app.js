@@ -1212,7 +1212,7 @@ ${slideContents}
 
         // 儲存
         document.getElementById('saveBtn').addEventListener('click', () => {
-            this.slideManager.save();
+            this.slideManager.saveNow();
             this.showToast('已儲存');
         });
 

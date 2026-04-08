@@ -39,6 +39,9 @@ function getHeaders() {
 // ── Database (PostgREST — Supabase 底層相同) ──
 
 export const db = {
+    // ★ 暴露給 slideManager beforeunload keepalive fetch 使用
+    _baseUrl: SUPABASE_URL,
+    _anonKey: SUPABASE_ANON_KEY,
     /**
  * INSERT — body 必須是 array
  * @param {string} table

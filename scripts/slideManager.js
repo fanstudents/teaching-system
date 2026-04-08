@@ -3311,7 +3311,10 @@ export class SlideManager {
             currentIndex: this.currentIndex,
             thankYouConfig: this.thankYouConfig || null,
             surveyConfig: this.surveyConfig || null,
-            savedAt: new Date().toISOString()
+            savedAt: new Date().toISOString(),
+            _version: this._dbVersion || 0,
+            _saveSeq: this._saveSeq || 0,
+            _sessionId: this.currentSessionId || null
         };
 
         // localStorage 快取（即時）— quota 超過時 silently skip
@@ -3344,7 +3347,10 @@ export class SlideManager {
             slides: this.slides,
             sections: this.sections,
             currentIndex: this.currentIndex,
-            savedAt: new Date().toISOString()
+            savedAt: new Date().toISOString(),
+            _version: this._dbVersion || 0,
+            _saveSeq: this._saveSeq || 0,
+            _sessionId: this.currentSessionId || null
         };
 
         try {
@@ -3438,13 +3444,28 @@ export class SlideManager {
             console.warn('[SaveDB] skip — no db or no project ID', { db: !!this._db, pid: this.currentProjectId });
             return;
         }
-        // ★ 正在存檔中就跳過（避免併發）
-        if (this._isSaving) return;
+        // ★ 正在存檔中就跳過（避免併發）— 但卡超過 30 秒就強制重置
+        if (this._isSaving) {
+            if (this._saveStartedAt && Date.now() - this._saveStartedAt > 30000) {
+                console.warn('[SaveDB] ⚠️ _isSaving stuck >30s, forcing reset');
+                this._isSaving = false;
+            } else {
+                return;
+            }
+        }
         this._isSaving = true;
+        this._saveStartedAt = Date.now();
         try {
             // ★ 樂觀鎖：遞增版本號
             this._dbVersion = (this._dbVersion || 0) + 1;
             data._version = this._dbVersion;
+
+            // ★ 場次流水號 + sessionId（方便反查存檔紀錄）
+            if (this.currentSessionId) {
+                this._saveSeq = (this._saveSeq || 0) + 1;
+                data._saveSeq = this._saveSeq;
+                data._sessionId = this.currentSessionId;
+            }
 
             let payload = JSON.stringify(data);
             let payloadSize = payload.length;
@@ -3680,22 +3701,40 @@ export class SlideManager {
             try { localData = JSON.parse(localRaw); } catch { /* ignore */ }
         }
 
-        // 3. ★ DB-First 策略：DB 永遠優先，localStorage 只作離線備援
+        // 3. ★ 比對時間戳策略：取 DB 與 localStorage 中較新的資料
         let chosen = null;
-        if (dbData) {
+        if (dbData && localData) {
+            const dbTime = new Date(dbData.savedAt || 0).getTime();
+            const localTime = new Date(localData.savedAt || 0).getTime();
+            const dbVer = dbData._version || 0;
+            const localVer = localData._version || 0;
+            if (localTime > dbTime && localVer >= dbVer) {
+                // localStorage 比 DB 新（可能頁面關閉時 DB 寫入失敗）
+                console.warn(`[Load] ⚠️ localStorage 比 DB 新！local: ${localData.savedAt} v${localVer} (seq:${localData._saveSeq||'?'}), db: ${dbData.savedAt} v${dbVer} → 使用 localStorage 並回寫 DB`);
+                chosen = localData;
+                this._dbVersion = localVer;
+                this._saveSeq = localData._saveSeq || 0;
+                // 回寫 DB
+                if (this._db) this._saveToDB(localData);
+            } else {
+                const dbSlideCount = dbData.slides?.length || 0;
+                console.log(`[Load] ✅ Using DB data (${dbSlideCount} slides, savedAt: ${dbData.savedAt}, v${dbVer}, seq:${dbData._saveSeq||'?'})`);
+                chosen = dbData;
+                this._dbVersion = dbVer;
+                this._saveSeq = dbData._saveSeq || 0;
+                try { localStorage.setItem(this._localStorageKey(), JSON.stringify(dbData)); } catch (_) { }
+            }
+        } else if (dbData) {
             const dbSlideCount = dbData.slides?.length || 0;
-            const dbElementCount = (dbData.slides || []).reduce((sum, s) => sum + (s.elements?.length || 0), 0);
-            console.log(`[Load] ✅ Using DB data (${dbSlideCount} slides, ${dbElementCount} elements, savedAt: ${dbData.savedAt}, v${dbData._version || 0})`);
+            console.log(`[Load] ✅ Using DB data (${dbSlideCount} slides, savedAt: ${dbData.savedAt}, v${dbData._version || 0})`);
             chosen = dbData;
-            // ★ 記錄 DB 版本號
             this._dbVersion = dbData._version || 0;
-            // 同步 DB → localStorage（作為離線備援，使用場次級 key）
+            this._saveSeq = dbData._saveSeq || 0;
             try { localStorage.setItem(this._localStorageKey(), JSON.stringify(dbData)); } catch (_) { }
         } else if (localData) {
-            // DB 無資料時才使用 localStorage（離線模式）
             console.warn('[Load] ⚠️ DB 無資料，使用 localStorage 離線備援');
             chosen = localData;
-            // 嘗試回寫 DB
+            this._saveSeq = localData._saveSeq || 0;
             if (this._db) this._saveToDB(localData);
         }
 
@@ -3734,7 +3773,10 @@ export class SlideManager {
                     slides: this.slides,
                     sections: this.sections,
                     currentIndex: this.currentIndex,
-                    savedAt: new Date().toISOString()
+                    savedAt: new Date().toISOString(),
+                    _version: this._dbVersion || 0,
+                    _saveSeq: this._saveSeq || 0,
+                    _sessionId: this.currentSessionId || null
                 };
                 this._saveToDB(data);
             }
@@ -3753,20 +3795,45 @@ export class SlideManager {
                 if (!inPresentation) {
                     this.saveCurrentSlide();
                 }
+                this._saveSeq = (this._saveSeq || 0) + 1;
+                this._dbVersion = (this._dbVersion || 0) + 1;
                 const data = {
                     slides: this.slides,
                     sections: this.sections,
                     currentIndex: this.currentIndex,
-                    savedAt: new Date().toISOString()
+                    savedAt: new Date().toISOString(),
+                    _version: this._dbVersion,
+                    _saveSeq: this._saveSeq,
+                    _sessionId: this.currentSessionId || null,
+                    _source: 'beforeunload'
                 };
                 // 用 localStorage 即時寫入（同步，不會被頁面關閉中斷，使用場次級 key）
                 try { localStorage.setItem(this._localStorageKey(), JSON.stringify(data)); } catch (_) { }
-                // 嘗試用 sendBeacon 通知 DB（best effort）
-                if (this._db && navigator.sendBeacon) {
-                    try {
-                        this._saveToDB(data);
-                    } catch (e) { /* best effort */ }
-                }
+                // ★ 用 fetch keepalive 寫 DB（比 sendBeacon 可帶自訂 headers，且不會被頁面關閉取消）
+                try {
+                    const table = this.currentSessionId ? 'project_sessions' : 'projects';
+                    const filterId = this.currentSessionId || this.currentProjectId;
+                    const qs = `id=eq.${filterId}`;
+                    const payload = this.currentSessionId
+                        ? { slides_data: data }
+                        : { slides_data: data, updated_at: data.savedAt };
+                    // 取得 headers（supabase.js 的 getHeaders 不是 export，直接組）
+                    const anonKey = this._db?._anonKey;
+                    const token = localStorage.getItem('_at') || sessionStorage.getItem('_at') || anonKey;
+                    if (anonKey) {
+                        fetch(`${this._db._baseUrl}/rest/v1/${table}?${qs}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': anonKey,
+                                'Authorization': `Bearer ${token || anonKey}`,
+                                'Content-Type': 'application/json',
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(payload),
+                            keepalive: true
+                        }).catch(() => {});
+                    }
+                } catch (e) { /* best effort */ }
             }
         });
     }
