@@ -3496,17 +3496,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             realtime.on('student_join', (msg) => {
                 const p = msg.payload || msg;
                 this.onlineStudents.set(p.studentId, {
+                    id: p.studentId,
                     name: p.studentName,
                     joinedAt: Date.now()
                 });
                 this.updateViewerCount();
                 console.log('[Broadcast] student joined:', p.studentName);
-
-                // 新學員加入時，重新廣播當前投影片讓他們看到畫面
-                if (this.broadcasting) {
-                    const idx = this.presentationIndex ?? this.slideManager.currentIndex;
-                    this.broadcastSlideData(idx);
-                }
+                // ★ 不再重新 broadcastSlideData — 新學生自行從 DB 拉當前投影片
+                // 這樣不會打斷其他學生正在操作的互動元件（連連看、拖曳等）
             });
 
             realtime.on('student_leave', (msg) => {
@@ -3521,6 +3518,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 const p = msg.payload || msg;
                 if (p.studentId) {
                     this.onlineStudents.set(p.studentId, {
+                        id: p.studentId,
                         name: p.studentName,
                         joinedAt: Date.now()
                     });
@@ -3584,6 +3582,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     const num = badge.querySelector('.hw-counter-num');
                     if (num) num.textContent = p.totalSubmitted || (parseInt(num.textContent) + 1);
                 });
+            });
+
+            // ★ 收到學生作答 → 立即刷新排行榜（不等 5 秒輪詢）
+            realtime.on('submission_saved', () => {
+                // debounce：500ms 內多次提交只刷一次
+                clearTimeout(this._lbImmediateTimer);
+                this._lbImmediateTimer = setTimeout(() => this.updateLeaderboard(), 500);
             });
 
             // ★ 綁定場次級簡報：找今天的 project_session

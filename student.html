@@ -772,6 +772,17 @@
                     slidesCache[idx] = slide;
 
                     if (mode === 'follow') {
+                        // ★ 同頁面且有互動元件正在操作 → 跳過重新渲染
+                        if (idx === currentIndex) {
+                            const hasActiveInteraction = slideEl.querySelector(
+                                '.match-game, .drag-order-game, .poll-widget, .quiz-widget, ' +
+                                '.flashcard-widget, .homework-widget, .assessment-widget'
+                            );
+                            if (hasActiveInteraction) {
+                                console.log('[Student] skip re-render: same page with active interaction');
+                                return;
+                            }
+                        }
                         currentIndex = idx;
                         renderSlide(slide, idx, total);
                         updateNavButtons();
