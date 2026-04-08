@@ -28,8 +28,11 @@
             } catch (_) { }
         });
         window.addEventListener('unhandledrejection', function (e) {
+            const msg = e.reason?.message || String(e.reason || '');
             console.error('[UnhandledRejection]', e.reason);
-            _showErrorToast('Promise 錯誤: ' + (e.reason?.message || e.reason));
+            // ★ 非關鍵的網路瞬斷不彈紅色 toast（自動存檔會重試）
+            if (/failed to fetch|networkerror|load failed|abort/i.test(msg)) return;
+            _showErrorToast('Promise 錯誤: ' + msg);
         });
         function _showErrorToast(msg) {
             let t = document.getElementById('_errToast');
