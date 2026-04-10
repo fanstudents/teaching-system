@@ -359,7 +359,6 @@ async function loadOutline(projectId) {
             // Check for multi-day format
             const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
             if (hasDays) {
-                // Group by day
                 const days = {};
                 outline.timeline.forEach(b => {
                     const d = b.day || 1;
@@ -367,15 +366,24 @@ async function loadOutline(projectId) {
                     days[d].blocks.push(b);
                 });
                 const dayKeys = Object.keys(days);
-                const cols = dayKeys.length;
-                const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : cols === 2 ? 'timeline-grid-2' : '';
-                container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
-                    const d = days[k];
-                    return `<div class="timeline-day-col">
-                        <div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>
-                        ${d.blocks.map(block => renderTimelineBlock(block, true)).join('')}
-                    </div>`;
-                }).join('')}</div>`;
+
+                if (dayKeys.length === 1) {
+                    // Single day → normal timeline with day header
+                    const d = days[dayKeys[0]];
+                    container.innerHTML = `<div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>`
+                        + d.blocks.map(block => renderTimelineBlock(block, false)).join('');
+                } else {
+                    // Multi-day grid
+                    const cols = dayKeys.length;
+                    const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : 'timeline-grid-2';
+                    container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
+                        const d = days[k];
+                        return `<div class="timeline-day-col">
+                            <div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>
+                            ${d.blocks.map(block => renderTimelineBlock(block, true)).join('')}
+                        </div>`;
+                    }).join('')}</div>`;
+                }
             } else {
                 container.innerHTML = outline.timeline.map(block => renderTimelineBlock(block, false)).join('');
             }
