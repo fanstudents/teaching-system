@@ -321,6 +321,9 @@ async function init() {
         document.getElementById('loadingScreen').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
         document.title = `${q.title || '課程報價'} — 數位簡報室`;
+
+        // Apply section visibility
+        applySectionVisibility(q.section_visibility);
     } catch (err) {
         console.error(err);
         showError('載入失敗：' + err.message);
@@ -385,6 +388,22 @@ function showError(msg) {
 }
 
 function fmt(n) { return 'NT$ ' + (n || 0).toLocaleString('zh-TW'); }
+
+function applySectionVisibility(sv) {
+    if (!sv) return; // default: show all
+    // Pricing section (table + total)
+    const pricingSection = document.getElementById('quoteTable')?.closest('.q-section');
+    if (pricingSection && sv.pricing === false) pricingSection.style.display = 'none';
+    // Payment/Invoice section
+    const paymentSection = document.getElementById('bankInfoCard')?.closest('.q-section');
+    if (paymentSection && sv.payment === false) paymentSection.style.display = 'none';
+    // Instructor section
+    if (sv.instructor === false) {
+        document.getElementById('instructorSection').style.display = 'none';
+        // Also hide in outline block by flagging
+        window._hideInstructor = true;
+    }
+}
 
 // Calculate business days before a date (skip weekends)
 function businessDaysBefore(dateStr, days) {
@@ -748,11 +767,12 @@ function renderOutlineData(outline) {
         `).join('');
     }
 
-    if (outline.instructors && outline.instructors.length > 0) {
-        document.getElementById('instructorSection').style.display = 'block';
+
+    if (window._hideInstructor) {
+        // Admin toggled instructor off
+    } else if (outline.instructors && outline.instructors.length > 0) {
         renderInstructorCards(outline.instructors);
     } else if (outline.instructorIds && outline.instructorIds.length > 0) {
-        // Resolve instructor IDs from DB
         resolveInstructorIds(outline.instructorIds);
     } else {
         document.getElementById('instructorSection').style.display = 'none';

@@ -130,6 +130,28 @@
 
         .variant-delete-area { display: flex; justify-content: flex-end; margin-top: 12px; }
 
+        /* Section visibility toggles */
+        .visibility-section { margin-top: 24px; padding-top: 20px; border-top: 2px solid #f0f1f3; }
+        .toggle-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-label { font-size: .88rem; font-weight: 500; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+        .toggle-label .material-symbols-outlined { font-size: 18px; color: #9ca3af; }
+        .toggle-switch {
+            position: relative; width: 44px; height: 24px; border-radius: 12px;
+            background: #e2e8f0; cursor: pointer; transition: background .2s;
+        }
+        .toggle-switch.on { background: #6366f1; }
+        .toggle-switch::after {
+            content: ''; position: absolute; top: 2px; left: 2px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15);
+            transition: transform .2s;
+        }
+        .toggle-switch.on::after { transform: translateX(20px); }
+
         @media (max-width: 768px) {
             .container { padding: 0 16px 40px; }
             .item-row, .items-header { grid-template-columns: 1fr 1fr; }
@@ -208,6 +230,23 @@
                 <div class="form-group">
                     <label class="form-label">備註</label>
                     <textarea class="form-input form-textarea" id="fNotes" placeholder="補充說明..."></textarea>
+                </div>
+
+                <!-- Section Visibility -->
+                <div class="visibility-section">
+                    <div class="form-label" style="margin-bottom:12px">區塊顯示控制</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label"><span class="material-symbols-outlined">receipt_long</span> 費用明細</span>
+                        <div class="toggle-switch on" id="togPricing" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label"><span class="material-symbols-outlined">mail</span> 發票/付款資訊</span>
+                        <div class="toggle-switch on" id="togPayment" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label"><span class="material-symbols-outlined">school</span> 講師介紹</span>
+                        <div class="toggle-switch on" id="togInstructor" onclick="toggleSwitch(this)"></div>
+                    </div>
                 </div>
 
                 <!-- Variants -->
@@ -304,6 +343,10 @@
             activeVariantIdx = 0;
             renderVariantTabs();
             renderVariantEditor();
+            // Default all visible
+            setToggle('togPricing', true);
+            setToggle('togPayment', true);
+            setToggle('togInstructor', true);
             document.getElementById('editorOverlay').classList.add('open');
         };
 
@@ -337,6 +380,11 @@
             activeVariantIdx = 0;
             renderVariantTabs();
             renderVariantEditor();
+            // Load visibility toggles
+            const sv = q.section_visibility || {};
+            setToggle('togPricing', sv.pricing !== false);
+            setToggle('togPayment', sv.payment !== false);
+            setToggle('togInstructor', sv.instructor !== false);
             document.getElementById('editorOverlay').classList.add('open');
         };
 
@@ -533,6 +581,11 @@
                 project_id: document.getElementById('fProjectId').value.trim() || null,
                 valid_until: document.getElementById('fValidUntil').value || null,
                 notes: document.getElementById('fNotes').value.trim(),
+                section_visibility: {
+                    pricing: isToggleOn('togPricing'),
+                    payment: isToggleOn('togPayment'),
+                    instructor: isToggleOn('togInstructor'),
+                },
             };
 
             if (editingVariants.length === 1) {
@@ -578,6 +631,19 @@
             t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // ── Toggle helpers ──
+        window.toggleSwitch = function(el) {
+            el.classList.toggle('on');
+        };
+        function setToggle(id, on) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle('on', on);
+        }
+        function isToggleOn(id) {
+            return document.getElementById(id)?.classList.contains('on') ?? true;
         }
 
         loadQuotes();
