@@ -421,16 +421,13 @@
             <details class="outline-edit-group" open>
                 <summary><span class="material-symbols-outlined" style="font-size:16px">info</span> 課程基本資訊</summary>
                 <div class="oe-fields">
-                    <div class="oe-field"><label>課程副標題</label><input type="text" id="oeHeroSubtitle" placeholder="從 ChatGPT 到 Notion，掌握五大 AI 工具..."></div>
-                    <!-- 天數排程 -->
-                    <div style="margin-top:8px">
-                        <label style="font-size:0.78rem;font-weight:600;color:var(--text-2);margin-bottom:6px;display:block">授課天數排程</label>
-                        <div id="oeScheduleList" style="display:flex;flex-direction:column;gap:6px"></div>
-                        <button class="btn btn-outline oe-add-btn" onclick="addScheduleDay()" style="margin-top:6px">
-                            <span class="material-symbols-outlined">add</span> 新增天數
-                        </button>
+                    <!-- ① 課程資訊 -->
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                        <span class="material-symbols-outlined" style="font-size:15px;color:var(--accent)">description</span>
+                        <span style="font-size:0.78rem;font-weight:700;color:var(--text-2);letter-spacing:.02em">課程資訊</span>
                     </div>
-                    <div class="oe-row">
+                    <div class="oe-field"><label>課程副標題</label><input type="text" id="oeHeroSubtitle" placeholder="從 ChatGPT 到 Notion，掌握五大 AI 工具..."></div>
+                    <div class="oe-row" style="margin-top:4px">
                         <div class="oe-field"><label>人數</label>
                             <select id="oeHeroGroupSize">
                                 <option value="10–20 人">10–20 人</option>
@@ -450,21 +447,40 @@
                             </select>
                         </div>
                     </div>
-                    <!-- 報價明細 (inline in basic info) -->
-                    <div style="margin-top:16px;padding-top:16px;border-top:2px solid var(--border)">
-                        <label style="font-size:0.78rem;font-weight:600;color:var(--text-2);margin-bottom:8px;display:flex;align-items:center;gap:6px">
-                            <span class="material-symbols-outlined" style="font-size:16px">receipt_long</span> 報價明細
-                        </label>
-                        <div style="display:grid;grid-template-columns:1fr 100px 80px 90px 32px;gap:6px;font-size:0.7rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;padding:0 0 6px;margin-bottom:4px">
+
+                    <!-- ② 授課排程 -->
+                    <div style="margin-top:20px;padding-top:18px;border-top:1.5px solid var(--border)">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                            <span class="material-symbols-outlined" style="font-size:15px;color:#f59e0b">calendar_month</span>
+                            <span style="font-size:0.78rem;font-weight:700;color:var(--text-2);letter-spacing:.02em">授課天數排程</span>
+                        </div>
+                        <div id="oeScheduleList" style="display:flex;flex-direction:column;gap:8px"></div>
+                        <button class="btn btn-outline oe-add-btn" onclick="addScheduleDay()" style="margin-top:8px">
+                            <span class="material-symbols-outlined">add</span> 新增天數
+                        </button>
+                    </div>
+
+                    <!-- ③ 報價明細 -->
+                    <div style="margin-top:20px;padding-top:18px;border-top:1.5px solid var(--border)">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <span class="material-symbols-outlined" style="font-size:15px;color:#10b981">receipt_long</span>
+                                <span style="font-size:0.78rem;font-weight:700;color:var(--text-2);letter-spacing:.02em">報價明細</span>
+                            </div>
+                            <span id="oePricingTotal" style="font-size:0.95rem;font-weight:800;color:var(--accent);font-family:'Inter',sans-serif">NT$ 0</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 90px 70px 85px 28px;gap:4px 6px;font-size:0.68rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;padding:0 4px 6px">
                             <span>項目</span><span>類型</span><span>數量</span><span>單價</span><span></span>
                         </div>
-                        <div id="oePricingList" style="display:flex;flex-direction:column;gap:6px"></div>
-                        <button class="btn btn-outline" onclick="addPricingItem()" style="margin-top:10px;font-size:0.78rem;padding:6px 14px">
-                            <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增項目
-                        </button>
-                        <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:12px 0 0;margin-top:8px;border-top:2px solid var(--border)">
-                            <span style="font-size:0.85rem;font-weight:600;color:var(--text-2)">合計（未稅）</span>
-                            <span id="oePricingTotal" style="font-size:1.1rem;font-weight:800;color:var(--accent)">NT$ 0</span>
+                        <div id="oePricingList" style="display:flex;flex-direction:column;gap:5px"></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+                            <button class="btn btn-outline" onclick="addPricingItem()" style="font-size:0.78rem;padding:5px 12px">
+                                <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增項目
+                            </button>
+                            <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:linear-gradient(135deg,#f0f9ff,#e8f5e9);border-radius:8px">
+                                <span style="font-size:0.82rem;font-weight:600;color:var(--text-2)">合計（未稅）</span>
+                                <span id="oePricingTotalLarge" style="font-size:1.15rem;font-weight:800;color:var(--accent);font-family:'Inter',sans-serif">NT$ 0</span>
+                            </div>
                         </div>
                     </div>
                 </div>

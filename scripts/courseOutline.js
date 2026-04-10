@@ -1649,7 +1649,7 @@ window.addPricingItem = function(data) {
     const div = document.createElement('div');
     div.className = 'oe-pricing-row';
     div.dataset.idx = idx;
-    div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 80px 90px 32px;gap:6px;align-items:center';
+    div.style.cssText = 'display:grid;grid-template-columns:1fr 90px 70px 85px 28px;gap:4px 6px;align-items:center';
     const typeOpts = `<option value="hourly" ${item.type==='hourly'?'selected':''}>小時計</option>
         <option value="fixed" ${item.type==='fixed'?'selected':''}>固定</option>
         <option value="perhead" ${item.type==='perhead'?'selected':''}>人數計</option>`;
@@ -1693,8 +1693,11 @@ window.recalcPricingTotal = function() {
         else if (item.type === 'perhead') total += (item.count||0) * (item.rate||0);
         else total += (item.amount||0);
     });
+    const str = 'NT$ ' + total.toLocaleString();
     const el = document.getElementById('oePricingTotal');
-    if (el) el.textContent = 'NT$ ' + total.toLocaleString();
+    const el2 = document.getElementById('oePricingTotalLarge');
+    if (el) el.textContent = str;
+    if (el2) el2.textContent = str;
 };
 
 function collectPricingItems() {
