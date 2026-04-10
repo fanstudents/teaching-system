@@ -27,10 +27,12 @@
 .hp-nav-links a:hover { color: #0F172A; background: rgba(0,0,0,.04); }
 .hp-nav-cta {
     display: inline-flex; align-items: center; gap: 6px; padding: 9px 24px; border-radius: 50px;
-    font-size: .84rem; font-weight: 600; background: #0F172A; color: #fff; transition: all .3s; border: none; cursor: pointer;
+    font-size: .84rem; font-weight: 600; background: linear-gradient(135deg, #3B82F6, #2563EB); color: #fff; transition: all .3s; border: none; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(59,130,246,.3);
 }
-.hp-nav-cta:hover { box-shadow: 0 4px 20px rgba(15,23,42,.2); transform: translateY(-1px); }
+.hp-nav-cta:hover { box-shadow: 0 4px 20px rgba(59,130,246,.4); transform: translateY(-1px); }
 .hp-nav-cta .material-symbols-outlined { font-size: 16px; }
+
 
 /* ── Hero ── */
 .hp-hero {
