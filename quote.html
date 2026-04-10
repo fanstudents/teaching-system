@@ -366,6 +366,38 @@ async function init() {
         currentQuotation = q;
         renderQuote(q);
 
+        // Build variants from live outline_versions (always fresh)
+        if (q.project_id) {
+            try {
+                const { data: projArr } = await db.select('projects', {
+                    select: 'outline_versions',
+                    filter: { id: `eq.${q.project_id}` },
+                    limit: 1
+                });
+                const versions = projArr?.[0]?.outline_versions || [];
+                if (versions.length > 0) {
+                    q.variants = versions.map(v => {
+                        const od = v.data || {};
+                        const pricing = od.pricing || [];
+                        let vTotal = 0;
+                        const items = pricing.map(p => {
+                            let item = { label: p.label, type: p.type };
+                            if (p.type === 'hourly') { item.hours = p.hours||0; item.rate = p.rate||0; vTotal += item.hours * item.rate; }
+                            else if (p.type === 'perhead') { item.count = p.count||0; item.rate = p.rate||0; vTotal += item.count * item.rate; }
+                            else { item.amount = p.amount||0; vTotal += item.amount; }
+                            return item;
+                        });
+                        return {
+                            name: v.name || '版本',
+                            items: items.length > 0 ? items : (q.items || []),
+                            total: items.length > 0 ? vTotal : (q.total_amount || 0),
+                            outline_data: od
+                        };
+                    });
+                }
+            } catch(e) { console.warn('Failed to load live outline_versions:', e); }
+        }
+
         if (q.variants && q.variants.length > 0) {
             // Multi-variant mode
             renderVariantTabs(q.variants);
