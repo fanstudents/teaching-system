@@ -741,20 +741,47 @@ function renderOutlineData(outline) {
 
     if (outline.instructors && outline.instructors.length > 0) {
         document.getElementById('instructorSection').style.display = 'block';
-        document.getElementById('instructorContent').innerHTML = outline.instructors.map(ins => `
-            <div class="q-instructor-card">
-                <div class="q-instructor-main">
-                    ${ins.photoUrl ? `<img src="${ins.photoUrl}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
-                    <div>
-                        <div class="q-instructor-name">${ins.name || ''}</div>
-                        <div class="q-instructor-title">${ins.title || ''}</div>
-                        <div class="q-instructor-bio">${ins.bio || ''}</div>
-                        ${ins.tags && ins.tags.length > 0 ? `<div class="q-instructor-tags">${ins.tags.map(t => `<span class="q-tag">${t}</span>`).join('')}</div>` : ''}
-                    </div>
+        renderInstructorCards(outline.instructors);
+    } else if (outline.instructorIds && outline.instructorIds.length > 0) {
+        // Resolve instructor IDs from DB
+        resolveInstructorIds(outline.instructorIds);
+    } else {
+        document.getElementById('instructorSection').style.display = 'none';
+    }
+}
+
+function renderInstructorCards(instructors) {
+    document.getElementById('instructorSection').style.display = 'block';
+    document.getElementById('instructorContent').innerHTML = instructors.map(ins => `
+        <div class="q-instructor-card">
+            <div class="q-instructor-main">
+                ${ins.photoUrl || ins.photo_url ? `<img src="${ins.photoUrl || ins.photo_url}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
+                <div>
+                    <div class="q-instructor-name">${ins.name || ''}</div>
+                    <div class="q-instructor-title">${ins.title || ''}</div>
+                    <div class="q-instructor-bio">${ins.bio || ''}</div>
+                    ${(ins.tags || ins.specialties || []).length > 0 ? `<div class="q-instructor-tags">${(ins.tags || ins.specialties || []).map(t => `<span class="q-tag">${t}</span>`).join('')}</div>` : ''}
                 </div>
             </div>
-        `).join('');
-    }
+        </div>
+    `).join('');
+}
+
+async function resolveInstructorIds(ids) {
+    try {
+        const { data } = await db.select('instructors');
+        if (!data) return;
+        const matched = ids.map(id => data.find(i => i.id === id)).filter(Boolean);
+        if (matched.length > 0) {
+            renderInstructorCards(matched.map(i => ({
+                name: i.name,
+                photoUrl: i.photo_url,
+                title: i.title,
+                bio: i.bio,
+                tags: i.specialties || []
+            })));
+        }
+    } catch (e) { console.warn('resolveInstructorIds:', e); }
 }
 
 async function loadOutline(projectId) {
