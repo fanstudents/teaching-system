@@ -1725,9 +1725,10 @@ function applyPricingItems(pricing) {
         // Smart defaults based on current outline data
         addPricingItem({ label: '講師鐘點費', type: 'hourly', hours: 0, rate: 8000 });
         addPricingItem({ label: '車馬費', type: 'fixed', amount: 0 });
-        // Auto-add TA fee based on taConfig
         const taCount = parseInt(document.getElementById('oeTaCount')?.value) || 0;
         addPricingItem({ label: '助教費', type: 'perhead', count: taCount, rate: 3000 });
+        addPricingItem({ label: '教材費', type: 'fixed', amount: 0 });
+        addPricingItem({ label: '專業攝影費（出機錄製）', type: 'fixed', amount: 0 });
     }
 }
 
