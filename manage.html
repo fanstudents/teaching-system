@@ -3476,7 +3476,7 @@ ${gscQueriesStr || '無搜尋資料'}
                 }
             }
             renderQuoteItems();
-            openModal('quotationModal');
+            document.getElementById('quotationModal').classList.add('active');
         };
 
         function renderQuoteItems() {
