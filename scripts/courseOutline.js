@@ -1655,14 +1655,33 @@ window.addPricingItem = function(data) {
         <option value="perhead" ${item.type==='perhead'?'selected':''}>人數計</option>`;
     const qty = item.type === 'hourly' ? (item.hours||0) : item.type === 'perhead' ? (item.count||0) : (item.amount||0);
     const rate = item.type === 'fixed' ? '' : (item.rate||0);
+    const qtyLabel = item.type === 'hourly' ? '時數' : item.type === 'perhead' ? '人數' : '金額';
     div.innerHTML = `
-        <input type="text" data-f="label" value="${_esc(item.label||'')}" placeholder="講師費" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit">
-        <select data-f="type" onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit">${typeOpts}</select>
-        <input type="number" data-f="qty" value="${qty}" onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;text-align:center;font-family:inherit">
+        <input type="text" data-f="label" value="${_esc(item.label||'')}" placeholder="講師鐘點費" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit">
+        <select data-f="type" onchange="onPricingTypeChange(this)" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit">${typeOpts}</select>
+        <input type="number" data-f="qty" value="${qty}" placeholder="${qtyLabel}" onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;text-align:center;font-family:inherit">
         <input type="number" data-f="rate" value="${rate}" placeholder="${item.type==='fixed'?'—':'單價'}" ${item.type==='fixed'?'disabled':''} onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;text-align:right;font-family:inherit">
         <button onclick="this.closest('.oe-pricing-row').remove();recalcPricingTotal()" style="width:26px;height:26px;border-radius:6px;border:none;background:#fee2e2;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
     `;
     list.appendChild(div);
+    recalcPricingTotal();
+};
+
+window.onPricingTypeChange = function(selectEl) {
+    const row = selectEl.closest('.oe-pricing-row');
+    const type = selectEl.value;
+    const rateEl = row.querySelector('[data-f="rate"]');
+    const qtyEl = row.querySelector('[data-f="qty"]');
+    if (type === 'fixed') {
+        rateEl.disabled = true;
+        rateEl.value = '';
+        rateEl.placeholder = '—';
+        qtyEl.placeholder = '金額';
+    } else {
+        rateEl.disabled = false;
+        rateEl.placeholder = '單價';
+        qtyEl.placeholder = type === 'hourly' ? '時數' : '人數';
+    }
     recalcPricingTotal();
 };
 
@@ -1703,9 +1722,12 @@ function applyPricingItems(pricing) {
     if (pricing && pricing.length > 0) {
         pricing.forEach(item => addPricingItem(item));
     } else {
-        // Defaults
-        addPricingItem({ label: '講師費', type: 'hourly', hours: 0, rate: 8000 });
+        // Smart defaults based on current outline data
+        addPricingItem({ label: '講師鐘點費', type: 'hourly', hours: 0, rate: 8000 });
         addPricingItem({ label: '車馬費', type: 'fixed', amount: 0 });
+        // Auto-add TA fee based on taConfig
+        const taCount = parseInt(document.getElementById('oeTaCount')?.value) || 0;
+        addPricingItem({ label: '助教費', type: 'perhead', count: taCount, rate: 3000 });
     }
 }
 
