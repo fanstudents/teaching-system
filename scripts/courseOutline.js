@@ -898,6 +898,9 @@ function initOutlineEditor() {
         _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
     }
 
+    // Populate pricing items
+    applyPricingItems(od?.pricing);
+
     // Populate Course Notes
     const notesData = od?.courseNotes?.length ? od.courseNotes : DEFAULT_COURSE_NOTES;
     notesData.forEach(n => addCourseNote(n));
@@ -1634,6 +1637,79 @@ window._updateTimelineTimeRanges = function() {
 };
 
 // ═══════════════════════════════════════
+// PRICING ITEMS (per outline version)
+// ═══════════════════════════════════════
+let _pricingCounter = 0;
+
+window.addPricingItem = function(data) {
+    const list = document.getElementById('oePricingList');
+    if (!list) return;
+    const idx = _pricingCounter++;
+    const item = data || { label: '', type: 'hourly', hours: 0, rate: 0 };
+    const div = document.createElement('div');
+    div.className = 'oe-pricing-row';
+    div.dataset.idx = idx;
+    div.style.cssText = 'display:grid;grid-template-columns:1fr 100px 80px 90px 32px;gap:6px;align-items:center';
+    const typeOpts = `<option value="hourly" ${item.type==='hourly'?'selected':''}>小時計</option>
+        <option value="fixed" ${item.type==='fixed'?'selected':''}>固定</option>
+        <option value="perhead" ${item.type==='perhead'?'selected':''}>人數計</option>`;
+    const qty = item.type === 'hourly' ? (item.hours||0) : item.type === 'perhead' ? (item.count||0) : (item.amount||0);
+    const rate = item.type === 'fixed' ? '' : (item.rate||0);
+    div.innerHTML = `
+        <input type="text" data-f="label" value="${_esc(item.label||'')}" placeholder="講師費" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit">
+        <select data-f="type" onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit">${typeOpts}</select>
+        <input type="number" data-f="qty" value="${qty}" onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;text-align:center;font-family:inherit">
+        <input type="number" data-f="rate" value="${rate}" placeholder="${item.type==='fixed'?'—':'單價'}" ${item.type==='fixed'?'disabled':''} onchange="recalcPricingTotal()" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;text-align:right;font-family:inherit">
+        <button onclick="this.closest('.oe-pricing-row').remove();recalcPricingTotal()" style="width:26px;height:26px;border-radius:6px;border:none;background:#fee2e2;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>
+    `;
+    list.appendChild(div);
+    recalcPricingTotal();
+};
+
+window.recalcPricingTotal = function() {
+    const items = collectPricingItems();
+    let total = 0;
+    items.forEach(item => {
+        if (item.type === 'hourly') total += (item.hours||0) * (item.rate||0);
+        else if (item.type === 'perhead') total += (item.count||0) * (item.rate||0);
+        else total += (item.amount||0);
+    });
+    const el = document.getElementById('oePricingTotal');
+    if (el) el.textContent = 'NT$ ' + total.toLocaleString();
+};
+
+function collectPricingItems() {
+    const rows = document.querySelectorAll('#oePricingList .oe-pricing-row');
+    const items = [];
+    rows.forEach(row => {
+        const label = row.querySelector('[data-f="label"]').value.trim();
+        const type = row.querySelector('[data-f="type"]').value;
+        const qty = parseFloat(row.querySelector('[data-f="qty"]').value) || 0;
+        const rate = parseFloat(row.querySelector('[data-f="rate"]').value) || 0;
+        let item = { label, type };
+        if (type === 'hourly') { item.hours = qty; item.rate = rate; }
+        else if (type === 'perhead') { item.count = qty; item.rate = rate; }
+        else { item.amount = qty; }
+        items.push(item);
+    });
+    return items;
+}
+
+function applyPricingItems(pricing) {
+    const list = document.getElementById('oePricingList');
+    if (!list) return;
+    list.innerHTML = '';
+    _pricingCounter = 0;
+    if (pricing && pricing.length > 0) {
+        pricing.forEach(item => addPricingItem(item));
+    } else {
+        // Defaults
+        addPricingItem({ label: '講師費', type: 'hourly', hours: 0, rate: 8000 });
+        addPricingItem({ label: '車馬費', type: 'fixed', amount: 0 });
+    }
+}
+
+// ═══════════════════════════════════════
 // OUTLINE VERSION MANAGEMENT
 // ═══════════════════════════════════════
 
@@ -1842,6 +1918,9 @@ function collectOutlineData() {
     if (emailEl) {
         od.email_template = emailEl.innerText.trim();
     }
+
+    // Pricing items
+    od.pricing = collectPricingItems();
 
     return od;
 }
@@ -2122,6 +2201,9 @@ function _applyOutlineData(od) {
         _v('oeTaCount', od.taConfig.count);
         _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
     }
+
+    // Pricing
+    applyPricingItems(od.pricing);
 
     initDragAndDrop();
     if (typeof _updateTimelineTimeRanges === 'function') _updateTimelineTimeRanges();

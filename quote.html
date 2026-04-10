@@ -77,7 +77,14 @@
                     <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
                 </div>
                 <div class="q-timeline timeline" id="outlineTimeline"></div>
-                <div class="suggest-topic-area" style="padding:36px 12px;border-top:1px dashed #ddd;margin-top:8px">
+                <div class="suggest-topic-area" style="padding:28px 12px;border-top:1px dashed #ddd;margin-top:8px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                        <span class="material-symbols-outlined" style="font-size:20px;color:var(--q-accent)">lightbulb</span>
+                        <div>
+                            <div style="font-size:1rem;font-weight:700;color:var(--q-text)">課綱建議</div>
+                            <div style="font-size:.82rem;color:var(--q-text-3)">歡迎提出您希望加入的主題或調整方向</div>
+                        </div>
+                    </div>
                     <div class="suggested-list" id="suggestedList"></div>
                     <button style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:var(--q-radius);background:none;border:1.5px dashed #ccc;color:var(--q-text-2);font-size:.95rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s" onclick="openSuggestSheet()" type="button" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)';this.style.background='var(--q-accent-light)'" onmouseout="this.style.borderColor='#ccc';this.style.color='var(--q-text-2)';this.style.background='none'">
                         <span class="material-symbols-outlined" style="font-size:22px">add_circle_outline</span>
@@ -285,6 +292,26 @@
         <div class="suggest-topic-form-actions">
             <button class="suggest-submit" onclick="submitSuggestion()" type="button">送出建議</button>
             <button class="suggest-cancel" onclick="closeSuggestSheet()" type="button">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Sheet: Comment -->
+<div class="bottom-sheet-overlay" id="commentOverlay" onclick="closeCommentSheet()"></div>
+<div class="bottom-sheet" id="commentSheet">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">
+        <span>💬 <span id="commentSheetTitle">課綱建議</span></span>
+        <button class="bottom-sheet-close" onclick="closeCommentSheet()">
+            <span class="material-symbols-outlined" style="font-size:18px">close</span>
+        </button>
+    </div>
+    <div id="commentSheetList" style="max-height:40vh;overflow-y:auto;margin-bottom:16px"></div>
+    <div class="suggest-topic-form" style="display:block">
+        <textarea id="commentSheetInput" placeholder="對此單元有任何建議或問題…" rows="3" style="font-size:1rem"></textarea>
+        <div class="suggest-topic-form-actions">
+            <button class="suggest-submit" id="commentSheetSubmit" type="button">送出</button>
+            <button class="suggest-cancel" onclick="closeCommentSheet()" type="button">取消</button>
         </div>
     </div>
 </div>
@@ -542,16 +569,70 @@ function renderTimelineBlock(block, isGrid) {
     </div>`;
 }
 
+let _activeCommentIdx = null;
+
 window.openComment = function(idx) {
-    document.querySelectorAll('.q-comment-popover.open').forEach(el => {
-        if (el.id !== `commentPopover${idx}`) el.classList.remove('open');
-    });
-    const pop = document.getElementById(`commentPopover${idx}`);
-    pop.classList.toggle('open');
-    if (pop.classList.contains('open')) {
-        document.getElementById(`commentInput${idx}`)?.focus();
+    const isMobile = window.innerWidth <= 640;
+
+    if (isMobile) {
+        // Use bottom sheet on mobile
+        _activeCommentIdx = idx;
+        const blockTitle = document.querySelector(`#commentBtn${idx}`)?.closest('.timeline-row')?.querySelector('.timeline-title')?.textContent || '此單元';
+        document.getElementById('commentSheetTitle').textContent = blockTitle;
+        // Copy existing comments to sheet
+        const existingList = document.getElementById(`commentList${idx}`)?.innerHTML || '';
+        document.getElementById('commentSheetList').innerHTML = existingList;
+        document.getElementById('commentSheetInput').value = '';
+        document.getElementById('commentSheetSubmit').onclick = () => submitCommentFromSheet(idx, blockTitle);
+        document.getElementById('commentOverlay').classList.add('open');
+        requestAnimationFrame(() => document.getElementById('commentSheet').classList.add('open'));
+        setTimeout(() => document.getElementById('commentSheetInput')?.focus(), 300);
+    } else {
+        // Desktop: toggle popover
+        document.querySelectorAll('.q-comment-popover.open').forEach(el => {
+            if (el.id !== `commentPopover${idx}`) el.classList.remove('open');
+        });
+        const pop = document.getElementById(`commentPopover${idx}`);
+        pop.classList.toggle('open');
+        if (pop.classList.contains('open')) {
+            document.getElementById(`commentInput${idx}`)?.focus();
+        }
     }
 };
+
+window.closeCommentSheet = function() {
+    document.getElementById('commentSheet').classList.remove('open');
+    setTimeout(() => document.getElementById('commentOverlay').classList.remove('open'), 300);
+    _activeCommentIdx = null;
+};
+
+async function submitCommentFromSheet(idx, blockTitle) {
+    const inputEl = document.getElementById('commentSheetInput');
+    const text = inputEl.value.trim();
+    if (!text) return;
+    try {
+        await db.insert('quote_comments', {
+            quotation_id: currentQuotationId,
+            block_index: idx,
+            block_title: blockTitle,
+            comment_text: text,
+            commenter_name: '客戶'
+        });
+        inputEl.value = '';
+        const { data } = await db.select('quote_comments', {
+            select: '*',
+            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${idx}` },
+            order: 'created_at.asc'
+        });
+        renderComments(idx, data || []);
+        // Update sheet list too
+        const existingList = document.getElementById(`commentList${idx}`)?.innerHTML || '';
+        document.getElementById('commentSheetList').innerHTML = existingList;
+    } catch (e) {
+        console.error('submitComment:', e);
+        alert('送出失敗，請稍後再試');
+    }
+}
 
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.q-comment-popover') && !e.target.closest('.timeline-comment-btn')) {

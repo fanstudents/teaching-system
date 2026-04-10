@@ -487,6 +487,24 @@
                 <div class="oe-field" style="margin-top:8px"><label>設備備註</label><input type="text" id="oeEquipNote" placeholder="請學員於課前完成帳號註冊..."></div>
             </details>
 
+            <!-- 報價明細 -->
+            <details class="outline-edit-group" open>
+                <summary><span class="material-symbols-outlined" style="font-size:16px">receipt_long</span> 報價明細</summary>
+                <div style="padding:16px 20px">
+                    <div style="display:grid;grid-template-columns:1fr 100px 80px 90px 32px;gap:6px;font-size:0.7rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;padding:0 0 6px;margin-bottom:4px">
+                        <span>項目</span><span>類型</span><span>數量</span><span>單價</span><span></span>
+                    </div>
+                    <div id="oePricingList" style="display:flex;flex-direction:column;gap:6px"></div>
+                    <button class="btn btn-outline" onclick="addPricingItem()" style="margin-top:10px;font-size:0.78rem;padding:6px 14px">
+                        <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增項目
+                    </button>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:12px 0 0;margin-top:8px;border-top:2px solid var(--border)">
+                        <span style="font-size:0.85rem;font-weight:600;color:var(--text-2)">合計（未稅）</span>
+                        <span id="oePricingTotal" style="font-size:1.1rem;font-weight:800;color:var(--accent)">NT$ 0</span>
+                    </div>
+                </div>
+            </details>
+
             <!-- 助教 -->
             <details class="outline-edit-group">
                 <summary><span class="material-symbols-outlined" style="font-size:16px">support_agent</span> 助教配置</summary>
