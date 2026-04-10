@@ -74,8 +74,9 @@ body {
     margin-bottom: 20px; padding: 6px;
     background: #fff; border: 1px solid var(--q-border);
     border-radius: var(--q-radius); display: flex;
+    align-items: center; gap: 4px;
 }
-.q-variant-tabs-inner { display: flex; gap: 4px; width: 100%; }
+.q-variant-tabs-inner { display: flex; gap: 4px; flex: 1; }
 .q-variant-tab {
     flex: 1; padding: 14px 20px;
     background: none; border: none; border-radius: 8px;
@@ -88,6 +89,42 @@ body {
     background: var(--q-accent); color: #fff;
     box-shadow: 0 2px 8px rgba(74,92,138,.25);
 }
+.q-compare-btn {
+    padding: 10px 16px; border: 1.5px solid var(--q-border);
+    border-radius: 8px; background: #fff; cursor: pointer;
+    font-size: .78rem; font-weight: 600; color: var(--q-text-2);
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit; transition: all .15s; white-space: nowrap;
+}
+.q-compare-btn:hover { border-color: var(--q-accent); color: var(--q-accent); background: #f8f9ff; }
+
+/* Multi-pricing cards */
+.q-pricing-cards { display: flex; flex-direction: column; gap: 12px; }
+.q-pricing-card {
+    border: 1.5px solid var(--q-border); border-radius: var(--q-radius);
+    padding: 22px 24px; transition: all .25s; position: relative; overflow: hidden;
+}
+.q-pricing-card.dimmed { opacity: .45; filter: grayscale(.3); transform: scale(.98); }
+.q-pricing-card.active-card {
+    border-color: var(--q-accent); opacity: 1;
+    box-shadow: 0 4px 16px rgba(74,92,138,.12);
+}
+.q-pricing-card-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .82rem; font-weight: 700; padding: 5px 14px;
+    border-radius: 6px; margin-bottom: 14px;
+}
+.q-pricing-card.active-card .q-pricing-card-label {
+    background: var(--q-accent); color: #fff;
+}
+.q-pricing-card.dimmed .q-pricing-card-label {
+    background: #f2f2f2; color: var(--q-text-3);
+}
+.q-pricing-card-total {
+    font-size: 1.1rem; font-weight: 800; color: var(--q-accent);
+    text-align: right; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--q-border);
+}
+.q-pricing-card.dimmed .q-pricing-card-total { color: var(--q-text-3); }
 
 /* ── Section ── */
 .q-section {
@@ -515,10 +552,17 @@ body {
     .q-badge { font-size: .68rem; padding: 5px 12px; }
     .q-header-client-logo { max-height: 32px; }
 
-    /* Variant Tabs — horizontal scroll, pill style */
-    .q-variant-tabs { margin-bottom: 14px; padding: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    /* Variant Tabs — sticky top, horizontal scroll */
+    .q-variant-tabs {
+        position: sticky; top: 0; z-index: 100;
+        margin: 0 -16px 14px; padding: 6px 16px;
+        border-radius: 0; border-left: none; border-right: none;
+        overflow-x: auto; -webkit-overflow-scrolling: touch;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
     .q-variant-tabs-inner { flex-wrap: nowrap; gap: 4px; }
-    .q-variant-tab { flex: 0 0 auto; padding: 12px 20px; font-size: .88rem; white-space: nowrap; min-width: 0; }
+    .q-variant-tab { flex: 0 0 auto; padding: 11px 18px; font-size: .85rem; white-space: nowrap; min-width: 0; }
+    .q-compare-btn { padding: 8px 12px; font-size: .72rem; flex-shrink: 0; }
 
     /* Section compact */
     .q-section { padding: 22px 18px; margin-bottom: 14px; border-radius: 12px; }

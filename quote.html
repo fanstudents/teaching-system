@@ -67,6 +67,10 @@
         <!-- Variant Tabs (only shown when variants exist) -->
         <div class="q-variant-tabs" id="variantTabs" style="display:none">
             <div class="q-variant-tabs-inner" id="variantTabsInner"></div>
+            <button class="q-compare-btn" id="compareBtn" onclick="compareVersions()" style="display:none">
+                <span class="material-symbols-outlined" style="font-size:16px">compare_arrows</span>
+                比較版本
+            </button>
         </div>
 
         <!-- Course Outline (loaded from project) -->
@@ -122,12 +126,15 @@
         </div>
 
         <!-- Quote Table -->
-        <section class="q-section">
+        <section class="q-section" id="pricingSectionWrap">
             <div class="q-section-header">
                 <div class="q-section-icon"><span class="material-symbols-outlined">receipt_long</span></div>
                 <div><div class="q-section-title">費用明細</div><div class="q-section-desc">以下費用皆為未稅價格</div></div>
             </div>
-            <div class="q-table-wrap">
+            <!-- Multi-variant pricing cards (populated by JS) -->
+            <div class="q-pricing-cards" id="pricingCards" style="display:none"></div>
+            <!-- Fallback: single table -->
+            <div class="q-table-wrap" id="singlePricingWrap">
                 <table class="q-table" id="quoteTable">
                     <thead>
                         <tr>
@@ -316,6 +323,24 @@
     </div>
 </div>
 
+<!-- Bottom Sheet: Compare Versions -->
+<div class="bottom-sheet-overlay" id="compareOverlay" onclick="closeCompareSheet()"></div>
+<div class="bottom-sheet" id="compareSheet" style="max-height:90vh">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">
+        <span>🔍 版本差異比較</span>
+        <button class="bottom-sheet-close" onclick="closeCompareSheet()">
+            <span class="material-symbols-outlined" style="font-size:18px">close</span>
+        </button>
+    </div>
+    <div id="compareContent" style="font-size:.92rem;line-height:1.8;color:var(--q-text);overflow-y:auto;max-height:70vh">
+        <div style="text-align:center;padding:40px;color:var(--q-text-3)">
+            <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:8px">hourglass_top</span>
+            AI 分析中…
+        </div>
+    </div>
+</div>
+
 <script type="module">
 import { db } from './scripts/supabase.js';
 
@@ -370,12 +395,56 @@ async function init() {
 }
 
 // ── Variant Tabs ──
+let _allVariants = [];
+
 function renderVariantTabs(variants) {
+    _allVariants = variants;
     const container = document.getElementById('variantTabsInner');
     container.innerHTML = variants.map((v, i) =>
         `<button class="q-variant-tab${i === 0 ? ' active' : ''}" data-idx="${i}" onclick="switchVariant(${i})" type="button">${v.name || '方案 ' + (i+1)}</button>`
     ).join('');
-    document.getElementById('variantTabs').style.display = 'block';
+    document.getElementById('variantTabs').style.display = 'flex';
+
+    // Show compare button if 2+ variants
+    if (variants.length >= 2) {
+        document.getElementById('compareBtn').style.display = 'flex';
+    }
+
+    // Render multi-pricing cards
+    renderPricingCards(variants);
+}
+
+function renderPricingCards(variants) {
+    if (variants.length < 2) return; // single variant uses fallback table
+    const cards = document.getElementById('pricingCards');
+    const singleWrap = document.getElementById('singlePricingWrap');
+    singleWrap.style.display = 'none';
+    cards.style.display = 'flex';
+
+    cards.innerHTML = variants.map((v, i) => {
+        const isActive = i === 0;
+        const items = v.items || [];
+        let total = 0;
+        const rowsHtml = items.map(item => {
+            let detail = '', amount = 0;
+            if (item.type === 'hourly') { detail = `${item.hours||0}h × ${fmt(item.rate)}/時`; amount = (item.hours||0) * (item.rate||0); }
+            else if (item.type === 'perhead') { detail = `${item.count||0}人 × ${fmt(item.rate)}/人`; amount = (item.count||0) * (item.rate||0); }
+            else { detail = '固定'; amount = item.amount || 0; }
+            total += amount;
+            if (amount === 0) return '';
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.88rem">
+                <span>${item.label}</span>
+                <span style="color:var(--q-text-2);font-size:.82rem">${detail}</span>
+                <span style="font-weight:600;min-width:90px;text-align:right">${fmt(amount)}</span>
+            </div>`;
+        }).filter(Boolean).join('');
+
+        return `<div class="q-pricing-card ${isActive ? 'active-card' : 'dimmed'}" data-vidx="${i}" onclick="switchVariant(${i})">
+            <div class="q-pricing-card-label"><span class="material-symbols-outlined" style="font-size:16px">${isActive ? 'check_circle' : 'radio_button_unchecked'}</span> ${v.name || '方案 ' + (i+1)}</div>
+            ${rowsHtml}
+            <div class="q-pricing-card-total">${fmt(v.total || total)}</div>
+        </div>`;
+    }).join('');
 }
 
 window.switchVariant = function(idx) {
@@ -387,7 +456,21 @@ window.switchVariant = function(idx) {
     document.querySelectorAll('.q-variant-tab').forEach(t => t.classList.remove('active'));
     document.querySelector(`.q-variant-tab[data-idx="${idx}"]`)?.classList.add('active');
 
-    // Render items
+    // Update pricing cards highlighting
+    document.querySelectorAll('.q-pricing-card').forEach(card => {
+        const cardIdx = parseInt(card.dataset.vidx);
+        if (cardIdx === idx) {
+            card.classList.remove('dimmed');
+            card.classList.add('active-card');
+            card.querySelector('.q-pricing-card-label .material-symbols-outlined').textContent = 'check_circle';
+        } else {
+            card.classList.remove('active-card');
+            card.classList.add('dimmed');
+            card.querySelector('.q-pricing-card-label .material-symbols-outlined').textContent = 'radio_button_unchecked';
+        }
+    });
+
+    // Render single table as well (for fallback / visibility toggle)
     if (variant.items) {
         const tbody = document.getElementById('quoteTableBody');
         tbody.innerHTML = '';
@@ -420,6 +503,79 @@ window.switchVariant = function(idx) {
     }
 };
 
+// ── Compare Versions (AI) ──
+window.compareVersions = function() {
+    const overlay = document.getElementById('compareOverlay');
+    const sheet = document.getElementById('compareSheet');
+    const content = document.getElementById('compareContent');
+
+    content.innerHTML = `<div style="text-align:center;padding:40px;color:var(--q-text-3)">
+        <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:8px;animation:spin 1s linear infinite">hourglass_top</span>
+        AI 分析中，請稍候…
+    </div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>`;
+
+    overlay.classList.add('open');
+    requestAnimationFrame(() => sheet.classList.add('open'));
+
+    // Build comparison data
+    const summaries = _allVariants.map((v, i) => {
+        const od = v.outline_data || {};
+        const timeline = (od.timeline || []).map(b => b.title).join(', ');
+        const tools = (od.tools || []).map(t => t.name).join(', ');
+        const pricing = (v.items || []).map(p => {
+            if (p.type === 'hourly') return `${p.label}: ${p.hours}h × NT$${p.rate}`;
+            if (p.type === 'perhead') return `${p.label}: ${p.count}人 × NT$${p.rate}`;
+            return `${p.label}: NT$${p.amount || 0}`;
+        }).join('; ');
+        return `【${v.name || '方案'+(i+1)}】\n課程主題: ${timeline || '無'}\n工具: ${tools || '無'}\n費用: ${pricing || '無'}\n合計: NT$${(v.total||0).toLocaleString()}`;
+    });
+
+    // Render local comparison (no API needed)
+    setTimeout(() => {
+        let html = '<div style="padding:4px 0">';
+        // Compare each pair
+        for (let i = 0; i < _allVariants.length; i++) {
+            for (let j = i+1; j < _allVariants.length; j++) {
+                const a = _allVariants[i], b = _allVariants[j];
+                html += `<div style="background:#f8f9ff;border-radius:10px;padding:16px;margin-bottom:12px">
+                    <div style="font-weight:700;margin-bottom:10px">${a.name || '方案'+(i+1)} vs ${b.name || '方案'+(j+1)}</div>`;
+
+                // Price diff
+                const diff = (b.total||0) - (a.total||0);
+                const diffStr = diff > 0 ? `+${fmt(diff)}` : diff < 0 ? fmt(diff) : '相同';
+                html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eef">
+                    <span>💰 費用差異</span><span style="font-weight:700;color:${diff>0?'#ef4444':'#10b981'}">${diffStr}</span></div>`;
+
+                // Topic diff
+                const aTopics = ((a.outline_data||{}).timeline||[]).map(t=>t.title);
+                const bTopics = ((b.outline_data||{}).timeline||[]).map(t=>t.title);
+                const added = bTopics.filter(t => !aTopics.includes(t));
+                const removed = aTopics.filter(t => !bTopics.includes(t));
+                if (added.length) html += `<div style="padding:4px 0;font-size:.85rem">➕ 新增主題：${added.join('、')}</div>`;
+                if (removed.length) html += `<div style="padding:4px 0;font-size:.85rem">➖ 移除主題：${removed.join('、')}</div>`;
+                if (!added.length && !removed.length) html += `<div style="padding:4px 0;font-size:.85rem;color:var(--q-text-3)">📋 課程主題相同</div>`;
+
+                // Tool diff
+                const aTools = ((a.outline_data||{}).tools||[]).map(t=>t.name);
+                const bTools = ((b.outline_data||{}).tools||[]).map(t=>t.name);
+                const addedT = bTools.filter(t => !aTools.includes(t));
+                const removedT = aTools.filter(t => !bTools.includes(t));
+                if (addedT.length) html += `<div style="padding:4px 0;font-size:.85rem">🔧 新增工具：${addedT.join('、')}</div>`;
+                if (removedT.length) html += `<div style="padding:4px 0;font-size:.85rem">🔧 移除工具：${removedT.join('、')}</div>`;
+
+                html += `</div>`;
+            }
+        }
+        html += '</div>';
+        content.innerHTML = html;
+    }, 500);
+};
+
+window.closeCompareSheet = function() {
+    document.getElementById('compareSheet').classList.remove('open');
+    setTimeout(() => document.getElementById('compareOverlay').classList.remove('open'), 300);
+};
+
 function showError(msg) {
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('errorMsg').textContent = msg;
@@ -430,8 +586,8 @@ function fmt(n) { return 'NT$ ' + (n || 0).toLocaleString('zh-TW'); }
 
 function applySectionVisibility(sv) {
     if (!sv) return; // default: show all
-    // Pricing section (table + total)
-    const pricingSection = document.getElementById('quoteTable')?.closest('.q-section');
+    // Pricing section
+    const pricingSection = document.getElementById('pricingSectionWrap');
     if (pricingSection && sv.pricing === false) pricingSection.style.display = 'none';
     // Payment/Invoice section
     const paymentSection = document.getElementById('bankInfoCard')?.closest('.q-section');
