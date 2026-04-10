@@ -116,7 +116,7 @@
                 </div>
                 <div class="q-payment-card">
                     <div class="q-payment-label">收款時間</div>
-                    <div class="q-payment-value" id="paymentTerms">開課前全額付款</div>
+                    <div class="q-payment-value" id="paymentTerms">為保留老師的時間，請於開課前五天前支付款項</div>
                 </div>
                 <div class="q-payment-card q-payment-bank" id="bankInfoCard">
                     <div class="q-payment-label">匯款帳號</div>
@@ -165,34 +165,20 @@
             <div id="instructorContent"></div>
         </section>
 
-        <!-- About TBR Digital -->
+        <!-- About -->
         <section class="q-section" id="aboutSection">
             <div class="q-section-header">
                 <div class="q-section-icon" style="background:#0f172a"><span class="material-symbols-outlined">apartment</span></div>
-                <div><div class="q-section-title">關於數位簡報室 TBR.Digital</div><div class="q-section-desc">市面上少數的 AI 專業培訓團隊</div></div>
+                <div><div class="q-section-title">關於數位簡報室</div><div class="q-section-desc">市面上少數的 AI 專業培訓團隊</div></div>
             </div>
             <div class="q-about-content">
-                <!-- Stats -->
                 <div class="q-about-stats">
-                    <div class="q-about-stat">
-                        <div class="q-about-stat-num" id="statProjects">14+</div>
-                        <div class="q-about-stat-label">企業合作專案</div>
-                    </div>
-                    <div class="q-about-stat">
-                        <div class="q-about-stat-num">10+</div>
-                        <div class="q-about-stat-label">年培訓經驗</div>
-                    </div>
-                    <div class="q-about-stat">
-                        <div class="q-about-stat-num">7+</div>
-                        <div class="q-about-stat-label">橫跨產業</div>
-                    </div>
-                    <div class="q-about-stat">
-                        <div class="q-about-stat-num">500+</div>
-                        <div class="q-about-stat-label">培訓學員</div>
-                    </div>
+                    <div class="q-about-stat"><div class="q-about-stat-num" id="statProjects">14+</div><div class="q-about-stat-label">企業合作專案</div></div>
+                    <div class="q-about-stat"><div class="q-about-stat-num">10+</div><div class="q-about-stat-label">年培訓經驗</div></div>
+                    <div class="q-about-stat"><div class="q-about-stat-num">7+</div><div class="q-about-stat-label">橫跨產業</div></div>
+                    <div class="q-about-stat"><div class="q-about-stat-num">500+</div><div class="q-about-stat-label">培訓學員</div></div>
                 </div>
 
-                <!-- Founder -->
                 <div class="q-about-founder">
                     <img src="assets/images/fan-songpu.jpg" alt="樊松蒲" class="q-about-founder-photo" onerror="this.style.display='none'">
                     <div class="q-about-founder-info">
@@ -213,7 +199,6 @@
                     </div>
                 </div>
 
-                <!-- Team -->
                 <div class="q-about-team-desc">
                     <div class="q-about-team-item">
                         <span class="material-symbols-outlined">edit_note</span>
@@ -225,13 +210,9 @@
                     </div>
                 </div>
 
-                <!-- Training Gallery -->
-                <div class="q-about-gallery">
-                    <img src="assets/images/training/training-1.png" alt="企業培訓實況">
-                    <img src="assets/images/training/training-2.png" alt="團隊研討">
-                    <img src="assets/images/training/training-3.png" alt="課程現場">
-                    <img src="assets/images/training/training-4.png" alt="實作指導">
-                </div>
+                <a href="https://tbr.digital" target="_blank" class="q-about-link">
+                    <span class="material-symbols-outlined">open_in_new</span> 瞭解更多數位簡報室
+                </a>
             </div>
         </section>
 
@@ -328,7 +309,7 @@ async function loadPaymentDate(projectId) {
             const firstDate = sessions[0].date;
             const payDate = businessDaysBefore(firstDate, 5);
             const formatted = payDate.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('paymentTerms').innerHTML = `開課前五天匯款<br><strong style="color:var(--q-accent);font-size:.95rem">${formatted}（含）前</strong>`;
+            document.getElementById('paymentTerms').innerHTML = `為保留老師的時間，請於開課前五天前支付款項<br><strong style="color:var(--q-accent);font-size:.95rem">請於 ${formatted}（含）前完成匯款</strong>`;
         }
     } catch (e) { console.warn('loadPaymentDate:', e); }
 }
@@ -375,7 +356,7 @@ function renderQuote(q) {
     if (q.notes) { document.getElementById('notesSection').style.display = 'block'; document.getElementById('notesContent').textContent = q.notes; }
 
     document.getElementById('paymentMethod').textContent = q.payment_method || '銀行匯款';
-    document.getElementById('paymentTerms').textContent = q.payment_terms || '開課前五天匯款';
+    document.getElementById('paymentTerms').textContent = q.payment_terms || '為保留老師的時間，請於開課前五天前支付款項';
 
     const bank = q.bank_info || {};
     const bankEl = document.getElementById('bankDetails');
@@ -397,37 +378,42 @@ function renderTimelineBlock(block, isGrid) {
     const topicsHtml = (block.topics && block.topics.length > 0)
         ? `<div class="timeline-topics">${block.topics.map(t => `<span class="topic-tag${(t.highlight ? ' highlight' : '')}">${t.name || t}</span>`).join('')}</div>`
         : '';
-    return `<div class="timeline-block ${breakClass}" data-block-idx="${idx}">
-        <div class="timeline-header">
-            ${block.time ? `<span class="timeline-time">${block.time}</span>` : ''}
-            <span class="timeline-title">${block.title || ''}</span>
+    const escapedTitle = (block.title||'').replace(/'/g,"\\'");
+    return `<div class="timeline-row ${breakClass}" data-block-idx="${idx}">
+        <div class="timeline-content">
+            <div class="timeline-header">
+                ${block.time ? `<span class="timeline-time">${block.time}</span>` : ''}
+                <span class="timeline-title">${block.title || ''}</span>
+            </div>
+            ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
+            ${topicsHtml}
         </div>
-        ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
-        ${topicsHtml}
-        <button class="block-comment-toggle" onclick="toggleComment(${idx})" title="提出建議或問題">
-            <span class="material-symbols-outlined">chat_bubble_outline</span>
-            <span>提出建議</span>
-            <span class="comment-count" id="commentCount${idx}" style="display:none">0</span>
-        </button>
-        <div class="block-comment-area" id="commentArea${idx}">
-            <div class="block-comment-list" id="commentList${idx}"></div>
-            <div class="block-comment-form">
-                <input class="block-comment-name" id="commentName${idx}" placeholder="姓名" value="">
-                <textarea class="block-comment-input" id="commentInput${idx}" placeholder="對此區塊有任何建議或問題…" rows="1"></textarea>
-                <button class="block-comment-submit" onclick="submitComment(${idx}, '${(block.title||'').replace(/'/g,"\\'")}')">送出</button>
+        <div class="timeline-annotation" id="annotationPanel${idx}">
+            <div class="annotation-list" id="annotationList${idx}"></div>
+            <button class="annotation-add" onclick="toggleAnnotation(${idx})">
+                <span class="material-symbols-outlined">add_comment</span> 加入註解
+                <span class="annotation-count" id="annotationCount${idx}" style="display:none">0</span>
+            </button>
+            <div class="annotation-form" id="annotationForm${idx}">
+                <input id="annotationName${idx}" placeholder="姓名（選填）">
+                <textarea id="annotationInput${idx}" placeholder="對此單元的問題或建議…" rows="2"></textarea>
+                <button onclick="submitAnnotation(${idx}, '${escapedTitle}')">送出</button>
             </div>
         </div>
     </div>`;
 }
 
-window.toggleComment = function(idx) {
-    const area = document.getElementById(`commentArea${idx}`);
-    area.classList.toggle('open');
+window.toggleAnnotation = function(idx) {
+    const form = document.getElementById(`annotationForm${idx}`);
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+        document.getElementById(`annotationInput${idx}`)?.focus();
+    }
 };
 
-window.submitComment = async function(idx, blockTitle) {
-    const nameEl = document.getElementById(`commentName${idx}`);
-    const inputEl = document.getElementById(`commentInput${idx}`);
+window.submitAnnotation = async function(idx, blockTitle) {
+    const nameEl = document.getElementById(`annotationName${idx}`);
+    const inputEl = document.getElementById(`annotationInput${idx}`);
     const text = inputEl.value.trim();
     if (!text) return;
 
@@ -441,16 +427,16 @@ window.submitComment = async function(idx, blockTitle) {
             commenter_name: name
         });
         inputEl.value = '';
+        document.getElementById(`annotationForm${idx}`).classList.remove('open');
 
-        // Reload comments for this block
         const { data } = await db.select('quote_comments', {
             select: '*',
             filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${idx}` },
             order: 'created_at.asc'
         });
-        renderBlockComments(idx, data || []);
+        renderAnnotations(idx, data || []);
     } catch (e) {
-        console.error('submitComment:', e);
+        console.error('submitAnnotation:', e);
         alert('送出失敗，請稍後再試');
     }
 };
@@ -464,33 +450,30 @@ async function loadComments() {
             order: 'created_at.asc'
         });
         if (!data) return;
-        // Group by block_index
         const grouped = {};
         data.forEach(c => {
             if (!grouped[c.block_index]) grouped[c.block_index] = [];
             grouped[c.block_index].push(c);
         });
         Object.entries(grouped).forEach(([idx, comments]) => {
-            renderBlockComments(parseInt(idx), comments);
+            renderAnnotations(parseInt(idx), comments);
         });
     } catch (e) { console.warn('loadComments:', e); }
 }
 
-function renderBlockComments(idx, comments) {
-    const list = document.getElementById(`commentList${idx}`);
-    const count = document.getElementById(`commentCount${idx}`);
+function renderAnnotations(idx, comments) {
+    const list = document.getElementById(`annotationList${idx}`);
+    const count = document.getElementById(`annotationCount${idx}`);
     if (!list) return;
 
     if (comments.length > 0) {
         list.innerHTML = comments.map(c => {
             const t = new Date(c.created_at);
-            const timeStr = t.toLocaleDateString('zh-TW') + ' ' + t.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
-            return `<div class="block-comment-item"><strong>${c.commenter_name}</strong><span>${c.comment_text}</span><time>${timeStr}</time></div>`;
+            const timeStr = t.toLocaleDateString('zh-TW');
+            return `<div class="annotation-item"><strong>${c.commenter_name}</strong> ${c.comment_text}<time>${timeStr}</time></div>`;
         }).join('');
         count.textContent = comments.length;
         count.style.display = 'inline';
-        // Auto-open if has comments
-        document.getElementById(`commentArea${idx}`)?.classList.add('open');
     }
 }
 
