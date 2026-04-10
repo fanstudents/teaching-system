@@ -48,6 +48,12 @@
         </div>
     </header>
 
+    <!-- Expiry Banner -->
+    <div class="q-expiry-banner" id="expiryBanner" style="display:none">
+        <span class="material-symbols-outlined" style="font-size:18px">timer</span>
+        <span id="expiryBannerText"></span>
+    </div>
+
     <div class="q-container">
         <!-- Quote Header -->
         <section class="q-header">
@@ -261,6 +267,29 @@
                 </a>
             </div>
         </section>
+
+        <!-- Confirm Quote -->
+        <div class="q-confirm-section" id="confirmSection" style="display:none">
+            <div class="q-confirm-card" id="confirmCard">
+                <div class="q-confirm-icon"><span class="material-symbols-outlined">verified</span></div>
+                <h3>確認此報價方案</h3>
+                <p>點擊下方按鈕即表示您同意以上報價內容與合作條款</p>
+                <div class="q-confirm-form">
+                    <input type="text" id="confirmName" placeholder="請輸入確認人姓名" class="q-confirm-input">
+                    <button class="q-confirm-btn" onclick="confirmQuote()">
+                        <span class="material-symbols-outlined" style="font-size:18px">check_circle</span>
+                        確認報價
+                    </button>
+                </div>
+                <div class="q-confirm-note">確認後我們將主動與您聯繫後續事宜</div>
+            </div>
+            <!-- Already confirmed state -->
+            <div class="q-confirmed-card" id="confirmedCard" style="display:none">
+                <div class="q-confirmed-icon">✅</div>
+                <h3>此報價已確認</h3>
+                <p id="confirmedDetail"></p>
+            </div>
+        </div>
 
         <!-- CTA -->
         <div class="q-cta">
@@ -766,7 +795,46 @@ function renderQuote(q) {
     const created = new Date(q.created_at);
     document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
     if (q.valid_until) {
-        document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${new Date(q.valid_until).toLocaleDateString('zh-TW')}`;
+        const validDate = new Date(q.valid_until);
+        document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${validDate.toLocaleDateString('zh-TW')}`;
+
+        // Expiry banner logic
+        const now = new Date();
+        const diffMs = validDate.getTime() - now.getTime();
+        const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        const banner = document.getElementById('expiryBanner');
+        const bannerText = document.getElementById('expiryBannerText');
+
+        if (daysLeft < 0) {
+            banner.style.display = 'flex';
+            banner.className = 'q-expiry-banner expired';
+            bannerText.textContent = '此報價已過期，如需重新報價請聯繫我們';
+        } else if (daysLeft <= 3) {
+            banner.style.display = 'flex';
+            banner.className = 'q-expiry-banner urgent';
+            bannerText.textContent = `此報價將在 ${daysLeft === 0 ? '今天' : daysLeft + ' 天內'}到期`;
+        } else if (daysLeft <= 7) {
+            banner.style.display = 'flex';
+            banner.className = 'q-expiry-banner';
+            bannerText.textContent = `此報價有效期限剩餘 ${daysLeft} 天（至 ${validDate.toLocaleDateString('zh-TW')}）`;
+        }
+    }
+
+    // Confirm section
+    const confirmSection = document.getElementById('confirmSection');
+    if (q.status !== 'draft') {
+        confirmSection.style.display = 'block';
+        if (q.confirmed_at) {
+            // Already confirmed
+            document.getElementById('confirmCard').style.display = 'none';
+            document.getElementById('confirmedCard').style.display = 'block';
+            const cDate = new Date(q.confirmed_at).toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+            document.getElementById('confirmedDetail').textContent = `由 ${q.confirmed_by || '客戶'} 於 ${cDate} 確認`;
+        }
+        // If expired, hide confirm form
+        if (q.valid_until && new Date(q.valid_until) < new Date() && !q.confirmed_at) {
+            document.getElementById('confirmCard').style.display = 'none';
+        }
     }
 
     const badge = document.getElementById('statusBadge');
@@ -1220,6 +1288,45 @@ async function loadOutline(projectId) {
         renderOutlineData(outline);
     } catch (err) { console.warn('Failed to load outline:', err); }
 }
+
+// ── Confirm Quote ──
+window.confirmQuote = async function() {
+    const nameInput = document.getElementById('confirmName');
+    const name = nameInput.value.trim();
+    if (!name) {
+        nameInput.style.borderColor = '#ef4444';
+        nameInput.placeholder = '請輸入姓名';
+        nameInput.focus();
+        return;
+    }
+    const btn = document.querySelector('.q-confirm-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">hourglass_top</span> 確認中...';
+
+    try {
+        await db.update('quotations', {
+            confirmed_at: new Date().toISOString(),
+            confirmed_by: name,
+            status: 'accepted'
+        }, { id: `eq.${currentQuotationId}` });
+
+        // Switch UI
+        document.getElementById('confirmCard').style.display = 'none';
+        document.getElementById('confirmedCard').style.display = 'block';
+        const cDate = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+        document.getElementById('confirmedDetail').textContent = `由 ${name} 於 ${cDate} 確認`;
+
+        // Update badge
+        const badge = document.getElementById('statusBadge');
+        badge.textContent = '已接受';
+        badge.style.background = '#dcfce7';
+        badge.style.color = '#166534';
+    } catch (e) {
+        alert('確認失敗，請稍後再試');
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">check_circle</span> 確認報價';
+    }
+};
 
 init();
 </script>

@@ -2,11 +2,56 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url=affiliate-dashboard">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>會員中心 — 數位簡報室</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
+    <style>
+        body { margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; background:#f8f9fa; font-family:system-ui,sans-serif; }
+        .loading { text-align:center; color:#64748b; }
+        .spinner { width:32px; height:32px; border:3px solid #e2e8f0; border-top-color:#3b82f6; border-radius:50%; animation:spin .6s linear infinite; margin:0 auto 12px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
 </head>
 <body>
-    <script>location.replace('affiliate-dashboard' + location.search + location.hash);</script>
+    <div class="loading">
+        <div class="spinner"></div>
+        <div>正在載入會員中心...</div>
+    </div>
+    <script type="module">
+        import { auth, getUserProfile } from './scripts/supabase.js';
+
+        try {
+            const session = await auth.getSession();
+            if (!session) {
+                // 未登入 → 登入頁
+                location.replace('login.html?redirect=my.html');
+            } else {
+                const profile = await getUserProfile();
+                const role = profile?.role || '';
+
+                if (role === 'super_admin') {
+                    location.replace('admin-dashboard.html');
+                } else if (role === 'instructor' || role === 'admin') {
+                    location.replace('manage.html');
+                } else {
+                    // 學員或其他 → 先檢查是否為推廣者
+                    const { db } = await import('./scripts/supabase.js');
+                    const { data: aff } = await db.select('affiliates', {
+                        filter: { email: `eq.${session.user.email}` },
+                        limit: 1
+                    });
+                    if (aff && aff.length > 0) {
+                        location.replace('affiliate-dashboard.html');
+                    } else {
+                        location.replace('portal.html');
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('my.html routing error:', e);
+            location.replace('login.html?redirect=my.html');
+        }
+    </script>
 </body>
 </html>
