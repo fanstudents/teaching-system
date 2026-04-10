@@ -503,122 +503,147 @@ window.switchVariant = function(idx) {
     }
 };
 
-// ── Compare Versions (AI) ──
+// ── Compare Versions (Apple-style) ──
 window.compareVersions = function() {
     const overlay = document.getElementById('compareOverlay');
     const sheet = document.getElementById('compareSheet');
     const content = document.getElementById('compareContent');
 
     content.innerHTML = `<div style="text-align:center;padding:40px;color:var(--q-text-3)">
-        <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:8px;animation:spin 1s linear infinite">hourglass_top</span>
-        AI 分析中，請稍候…
+        <div style="width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:var(--q-accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
+        分析版本差異中…
     </div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>`;
 
     overlay.classList.add('open');
     requestAnimationFrame(() => sheet.classList.add('open'));
 
-    // Build comparison data
-    const summaries = _allVariants.map((v, i) => {
-        const od = v.outline_data || {};
-        const timeline = (od.timeline || []).map(b => b.title).join(', ');
-        const tools = (od.tools || []).map(t => t.name).join(', ');
-        const pricing = (v.items || []).map(p => {
-            if (p.type === 'hourly') return `${p.label}: ${p.hours}h × NT$${p.rate}`;
-            if (p.type === 'perhead') return `${p.label}: ${p.count}人 × NT$${p.rate}`;
-            return `${p.label}: NT$${p.amount || 0}`;
-        }).join('; ');
-        return `【${v.name || '方案'+(i+1)}】\n課程主題: ${timeline || '無'}\n工具: ${tools || '無'}\n費用: ${pricing || '無'}\n合計: NT$${(v.total||0).toLocaleString()}`;
-    });
-
-    // Render comparison
     setTimeout(() => {
-        let html = '<div style="padding:4px 0">';
-        for (let i = 0; i < _allVariants.length; i++) {
-            for (let j = i+1; j < _allVariants.length; j++) {
-                const a = _allVariants[i], b = _allVariants[j];
-                const ad = a.outline_data || {}, bd = b.outline_data || {};
-                html += `<div style="background:#f8f9ff;border-radius:12px;padding:18px;margin-bottom:14px">
-                    <div style="font-weight:700;font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-                        <span class="material-symbols-outlined" style="font-size:18px;color:var(--q-accent)">compare_arrows</span>
-                        ${a.name || '方案'+(i+1)} vs ${b.name || '方案'+(j+1)}
-                    </div>`;
+        const n = _allVariants.length;
+        const cols = n + 1; // label col + version cols
+        const colW = n <= 2 ? '1fr' : 'minmax(100px,1fr)';
+        const gridCols = `minmax(110px,140px) repeat(${n}, ${colW})`;
 
-                const rows = [];
+        // Helper: calc item amount
+        const calcAmt = (item) => {
+            if (!item) return 0;
+            if (item.type === 'hourly') return (item.hours||0) * (item.rate||0);
+            if (item.type === 'perhead') return (item.count||0) * (item.rate||0);
+            return item.amount || 0;
+        };
 
-                // ① 費用差異
-                const diff = (b.total||0) - (a.total||0);
-                const diffStr = diff > 0 ? `+${fmt(diff)}` : diff < 0 ? `${fmt(diff)}` : '相同';
-                rows.push(`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:${diff!==0?'#fef3c7':'#f0fdf4'};border-radius:8px;margin-bottom:6px">
-                    <span style="font-weight:600">💰 總費用</span>
-                    <div style="text-align:right">
-                        <div style="font-weight:700;color:${diff>0?'#ef4444':diff<0?'#10b981':'#6b7280'}">${diffStr}</div>
-                        <div style="font-size:.75rem;color:#9ca3af">${fmt(a.total||0)} → ${fmt(b.total||0)}</div>
-                    </div>
-                </div>`);
+        // Gather data for each version
+        const vData = _allVariants.map(v => {
+            const od = v.outline_data || {};
+            const sched = od.schedule || [];
+            return {
+                name: v.name,
+                total: v.total || 0,
+                days: sched.length,
+                hours: sched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0),
+                topics: (od.timeline||[]).map(t => t.title),
+                topicCount: (od.timeline||[]).length,
+                tools: (od.tools||[]).map(t => t.name),
+                equipment: (od.equipment||[]).map(e => e.name),
+                items: v.items || [],
+                subtitle: od.heroSubtitle || '',
+                groupSize: od.heroGroupSize || '',
+                location: od.heroLocation || ''
+            };
+        });
 
-                // ② 費用項目明細對比
-                const aItems = a.items || [], bItems = b.items || [];
-                const allLabels = [...new Set([...aItems.map(x=>x.label), ...bItems.map(x=>x.label)])];
-                const itemDiffs = [];
-                allLabels.forEach(label => {
-                    const ai = aItems.find(x=>x.label===label), bi = bItems.find(x=>x.label===label);
-                    const aAmt = ai ? (ai.type==='hourly'?(ai.hours||0)*(ai.rate||0):ai.type==='perhead'?(ai.count||0)*(ai.rate||0):(ai.amount||0)) : 0;
-                    const bAmt = bi ? (bi.type==='hourly'?(bi.hours||0)*(bi.rate||0):bi.type==='perhead'?(bi.count||0)*(bi.rate||0):(bi.amount||0)) : 0;
-                    if (aAmt !== bAmt) {
-                        itemDiffs.push(`${label}：${fmt(aAmt)} → ${fmt(bAmt)}`);
-                    } else if (!ai) { itemDiffs.push(`${label}：新增 ${fmt(bAmt)}`); }
-                    else if (!bi) { itemDiffs.push(`${label}：移除`); }
-                });
-                if (itemDiffs.length) {
-                    rows.push(`<div style="padding:6px 0;font-size:.85rem"><span style="font-weight:600">📋 費用項目差異</span><ul style="margin:4px 0 0 18px;padding:0;list-style:disc">${itemDiffs.map(d=>`<li style="padding:2px 0">${d}</li>`).join('')}</ul></div>`);
-                }
+        let html = '';
 
-                // ③ 授課天數
-                const aSched = ad.schedule || [], bSched = bd.schedule || [];
-                if (aSched.length !== bSched.length) {
-                    rows.push(`<div style="padding:6px 0;font-size:.85rem">📅 授課天數：${aSched.length} 天 → ${bSched.length} 天</div>`);
-                }
-                // 總時數
-                const aHrs = aSched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
-                const bHrs = bSched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
-                if (aHrs !== bHrs) {
-                    rows.push(`<div style="padding:6px 0;font-size:.85rem">⏱ 總時數：${aHrs}h → ${bHrs}h</div>`);
-                }
+        // ── Header Row ──
+        html += `<div style="display:grid;grid-template-columns:${gridCols};gap:0;position:sticky;top:0;background:#fff;z-index:2;padding-bottom:12px;border-bottom:2px solid var(--q-border)">`;
+        html += `<div></div>`;
+        vData.forEach((v, i) => {
+            const isFirst = i === 0;
+            html += `<div style="text-align:center;padding:16px 8px">
+                <div style="font-size:1.05rem;font-weight:800;color:var(--q-text);letter-spacing:-.02em">${v.name || '方案'+(i+1)}</div>
+                <div style="font-size:1.4rem;font-weight:800;color:var(--q-accent);margin-top:4px;font-family:'Inter',sans-serif">${fmt(v.total)}</div>
+            </div>`;
+        });
+        html += `</div>`;
 
-                // ④ 課程主題差異
-                const aTopics = (ad.timeline||[]).map(t=>t.title);
-                const bTopics = (bd.timeline||[]).map(t=>t.title);
-                const addedTopics = bTopics.filter(t => !aTopics.includes(t));
-                const removedTopics = aTopics.filter(t => !bTopics.includes(t));
-                if (addedTopics.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">➕ 新增主題：${addedTopics.join('、')}</div>`);
-                if (removedTopics.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">➖ 移除主題：${removedTopics.join('、')}</div>`);
-
-                // ⑤ 工具差異
-                const aTools = (ad.tools||[]).map(t=>t.name);
-                const bTools = (bd.tools||[]).map(t=>t.name);
-                const addedT = bTools.filter(t => !aTools.includes(t));
-                const removedT = aTools.filter(t => !bTools.includes(t));
-                if (addedT.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🔧 新增工具：${addedT.join('、')}</div>`);
-                if (removedT.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🔧 移除工具：${removedT.join('、')}</div>`);
-
-                // ⑥ 設備差異
-                const aEquip = (ad.equipment||[]).map(e=>e.name);
-                const bEquip = (bd.equipment||[]).map(e=>e.name);
-                const addedE = bEquip.filter(e => !aEquip.includes(e));
-                const removedE = aEquip.filter(e => !bEquip.includes(e));
-                if (addedE.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🖥️ 新增設備：${addedE.join('、')}</div>`);
-                if (removedE.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🖥️ 移除設備：${removedE.join('、')}</div>`);
-
-                // If nothing different at all
-                if (rows.length === 1 && diff === 0) {
-                    rows.push(`<div style="padding:10px 0;font-size:.88rem;color:var(--q-text-3);text-align:center">✅ 這兩個版本的內容完全相同</div>`);
-                }
-
-                html += rows.join('') + '</div>';
-            }
+        // ── Row builder ──
+        let rowIdx = 0;
+        function addRow(label, values, opts = {}) {
+            const bg = rowIdx % 2 === 0 ? '#fafbfc' : '#fff';
+            const allSame = values.every(v => v === values[0]);
+            html += `<div style="display:grid;grid-template-columns:${gridCols};gap:0;background:${bg};border-bottom:1px solid #f0f1f3;${opts.highlight?'background:#fffbeb;':''}">`;
+            html += `<div style="padding:12px 14px;font-size:.82rem;font-weight:600;color:var(--q-text-2);display:flex;align-items:center;gap:6px">${label}</div>`;
+            values.forEach(val => {
+                const changed = !allSame;
+                html += `<div style="padding:12px 10px;text-align:center;font-size:.88rem;${changed?'font-weight:700;color:var(--q-text)':'color:var(--q-text-2)'}">${val}</div>`;
+            });
+            html += `</div>`;
+            rowIdx++;
         }
-        html += '</div>';
-        content.innerHTML = html;
+
+        function addCheckRow(label, arraysPerVersion) {
+            const allItems = [...new Set(arraysPerVersion.flat())];
+            if (allItems.length === 0) return;
+            allItems.forEach(item => {
+                const values = arraysPerVersion.map(arr =>
+                    arr.includes(item)
+                        ? '<span class="material-symbols-outlined" style="font-size:18px;color:#10b981">check_circle</span>'
+                        : '<span class="material-symbols-outlined" style="font-size:18px;color:#e5e7eb">cancel</span>'
+                );
+                addRow(`<span style="font-size:.78rem;font-weight:500">${item}</span>`, values);
+            });
+        }
+
+        // ── Section: 基本資訊 ──
+        html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">基本資訊</div>`;
+        addRow('授課天數', vData.map(v => `${v.days} 天`));
+        addRow('總時數', vData.map(v => `${v.hours} 小時`));
+        if (vData.some(v => v.groupSize)) addRow('人數', vData.map(v => v.groupSize || '—'));
+        if (vData.some(v => v.location)) addRow('授課方式', vData.map(v => v.location || '—'));
+
+        // ── Section: 費用明細 ──
+        const allPricingLabels = [...new Set(vData.flatMap(v => v.items.map(i => i.label)))];
+        if (allPricingLabels.length) {
+            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">費用明細</div>`;
+            allPricingLabels.forEach(label => {
+                const values = vData.map(v => {
+                    const item = v.items.find(i => i.label === label);
+                    const amt = calcAmt(item);
+                    if (!item) return '<span style="color:#d1d5db">—</span>';
+                    let detail = '';
+                    if (item.type === 'hourly') detail = `<div style="font-size:.7rem;color:#9ca3af">${item.hours||0}h × ${(item.rate||0).toLocaleString()}</div>`;
+                    else if (item.type === 'perhead') detail = `<div style="font-size:.7rem;color:#9ca3af">${item.count||0}人 × ${(item.rate||0).toLocaleString()}</div>`;
+                    return `<div style="font-weight:700">${amt > 0 ? fmt(amt) : '—'}</div>${detail}`;
+                });
+                addRow(label, values);
+            });
+            addRow('<span style="font-weight:800">合計</span>', vData.map(v =>
+                `<span style="font-size:1.05rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}</span>`
+            ), { highlight: true });
+        }
+
+        // ── Section: 課程主題 ──
+        const allTopics = [...new Set(vData.flatMap(v => v.topics))];
+        if (allTopics.length) {
+            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">課程主題</div>`;
+            addRow('主題數', vData.map(v => `${v.topicCount} 個`));
+            addCheckRow('主題', vData.map(v => v.topics));
+        }
+
+        // ── Section: 工具 ──
+        const allTools = [...new Set(vData.flatMap(v => v.tools))];
+        if (allTools.length) {
+            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">教學工具</div>`;
+            addCheckRow('工具', vData.map(v => v.tools));
+        }
+
+        // ── Section: 設備 ──
+        const allEquip = [...new Set(vData.flatMap(v => v.equipment))];
+        if (allEquip.length) {
+            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">設備需求</div>`;
+            addCheckRow('設備', vData.map(v => v.equipment));
+        }
+
+        content.innerHTML = `<div style="border:1px solid var(--q-border);border-radius:12px;overflow:hidden">${html}</div>`;
     }, 300);
 };
 
