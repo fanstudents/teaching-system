@@ -64,6 +64,10 @@
                 </div>
             </div>
         </section>
+        <!-- Variant Tabs (only shown when variants exist) -->
+        <div class="q-variant-tabs" id="variantTabs" style="display:none">
+            <div class="q-variant-tabs-inner" id="variantTabsInner"></div>
+        </div>
 
         <!-- Course Outline (loaded from project) -->
         <div id="outlineSection" style="display:none">
@@ -277,7 +281,8 @@ import { db } from './scripts/supabase.js';
 const params = new URLSearchParams(location.search);
 const slug = params.get('slug') || location.pathname.split('/').pop()?.replace('.html','');
 let currentQuotationId = null;
-let commentsCache = {};  // { blockIndex: [comments] }
+let currentQuotation = null;
+let commentsCache = {};
 
 async function init() {
     if (!slug || slug === 'quote') { showError('請提供報價單代碼'); return; }
@@ -292,17 +297,24 @@ async function init() {
 
         const q = quotes[0];
         currentQuotationId = q.id;
+        currentQuotation = q;
         renderQuote(q);
 
-        if (q.include_outline && q.project_id) {
-            await loadOutline(q.project_id);
-            // Load payment date from sessions
-            await loadPaymentDate(q.project_id);
-            // Load comments
-            await loadComments();
-            await loadSuggestions();
-            await loadInvoiceEmail();
+        if (q.variants && q.variants.length > 0) {
+            // Multi-variant mode
+            renderVariantTabs(q.variants);
+            switchVariant(0);
+        } else {
+            // Single mode (backward compatible)
+            if (q.include_outline && q.project_id) {
+                await loadOutline(q.project_id);
+            }
         }
+
+        if (q.project_id) await loadPaymentDate(q.project_id);
+        await loadComments();
+        await loadSuggestions();
+        await loadInvoiceEmail();
 
         document.getElementById('loadingScreen').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
@@ -312,6 +324,50 @@ async function init() {
         showError('載入失敗：' + err.message);
     }
 }
+
+// ── Variant Tabs ──
+function renderVariantTabs(variants) {
+    const container = document.getElementById('variantTabsInner');
+    container.innerHTML = variants.map((v, i) =>
+        `<button class="q-variant-tab${i === 0 ? ' active' : ''}" data-idx="${i}" onclick="switchVariant(${i})" type="button">${v.name || '方案 ' + (i+1)}</button>`
+    ).join('');
+    document.getElementById('variantTabs').style.display = 'block';
+}
+
+window.switchVariant = function(idx) {
+    const q = currentQuotation;
+    if (!q || !q.variants || !q.variants[idx]) return;
+    const variant = q.variants[idx];
+
+    // Update tab active
+    document.querySelectorAll('.q-variant-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.q-variant-tab[data-idx="${idx}"]`)?.classList.add('active');
+
+    // Render items
+    if (variant.items) {
+        const tbody = document.getElementById('quoteTableBody');
+        tbody.innerHTML = '';
+        variant.items.forEach(item => {
+            const tr = document.createElement('tr');
+            let detail = '', amount = 0;
+            if (item.type === 'hourly') { detail = `${item.hours || 0} 小時 × ${fmt(item.rate)}/時`; amount = (item.hours || 0) * (item.rate || 0); }
+            else if (item.type === 'perhead') { detail = `${item.count || 0} 人 × ${fmt(item.rate)}/人`; amount = (item.count || 0) * (item.rate || 0); }
+            else { detail = item.detail || '—'; amount = item.amount || 0; }
+            if (amount === 0 && item.type === 'fixed') detail = '本次不適用';
+            tr.innerHTML = `<td class="q-td-item">${item.label || ''}</td><td class="q-td-detail">${detail}</td><td class="q-td-amount">${amount > 0 ? fmt(amount) : '—'}</td>`;
+            if (amount === 0) tr.classList.add('q-row-zero');
+            tbody.appendChild(tr);
+        });
+        document.getElementById('totalAmount').textContent = fmt(variant.total || 0);
+    }
+
+    // Render outline
+    if (variant.outline_data) {
+        blockCounter = 0;
+        renderOutlineData(variant.outline_data);
+        document.getElementById('outlineSection').style.display = 'block';
+    }
+};
 
 function showError(msg) {
     document.getElementById('loadingScreen').style.display = 'none';
@@ -626,6 +682,81 @@ async function loadInvoiceEmail() {
     } catch (e) { console.warn('loadInvoiceEmail:', e); }
 }
 
+// Render outline data (reusable for variants and project outlines)
+function renderOutlineData(outline) {
+    if (!outline) return;
+    document.getElementById('outlineSection').style.display = 'block';
+
+    if (outline.timeline && outline.timeline.length > 0) {
+        const container = document.getElementById('outlineTimeline');
+        const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
+        if (hasDays) {
+            const days = {};
+            outline.timeline.forEach(b => {
+                const d = b.day || 1;
+                if (!days[d]) days[d] = { label: b.dayLabel || `Day ${d}`, info: b.dayInfo || '', blocks: [] };
+                days[d].blocks.push(b);
+            });
+            const dayKeys = Object.keys(days);
+            if (dayKeys.length === 1) {
+                const d = days[dayKeys[0]];
+                container.innerHTML = `<div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>`
+                    + d.blocks.map(block => renderTimelineBlock(block, false)).join('');
+            } else {
+                const cols = dayKeys.length;
+                const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : 'timeline-grid-2';
+                container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
+                    const d = days[k];
+                    return `<div class="timeline-day-col">
+                        <div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>
+                        ${d.blocks.map(block => renderTimelineBlock(block, true)).join('')}
+                    </div>`;
+                }).join('')}</div>`;
+            }
+        } else {
+            container.innerHTML = outline.timeline.map(block => renderTimelineBlock(block, false)).join('');
+        }
+    }
+
+    if (outline.tools && outline.tools.length > 0) {
+        document.getElementById('toolsSection').style.display = 'block';
+        document.getElementById('toolGrid').innerHTML = outline.tools.map(t => `
+            <div class="q-tool-card">
+                ${t.logo ? `<img src="${t.logo}" alt="${t.name}" class="q-tool-logo" onerror="this.style.display='none'">` : ''}
+                <div class="q-tool-name">${t.name || ''}</div>
+                <div class="q-tool-purpose">${t.purpose || ''}</div>
+            </div>
+        `).join('');
+    }
+
+    if (outline.equipment && outline.equipment.length > 0) {
+        document.getElementById('equipSection').style.display = 'block';
+        document.getElementById('equipGrid').innerHTML = outline.equipment.map(e => `
+            <div class="q-equip-item">
+                <div class="q-equip-icon"><span class="material-symbols-outlined">${e.icon || 'check_circle'}</span></div>
+                <div><div class="q-equip-label">${e.label || ''}</div><div class="q-equip-detail">${e.detail || ''}</div></div>
+            </div>
+        `).join('');
+    }
+
+    if (outline.instructors && outline.instructors.length > 0) {
+        document.getElementById('instructorSection').style.display = 'block';
+        document.getElementById('instructorContent').innerHTML = outline.instructors.map(ins => `
+            <div class="q-instructor-card">
+                <div class="q-instructor-main">
+                    ${ins.photoUrl ? `<img src="${ins.photoUrl}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
+                    <div>
+                        <div class="q-instructor-name">${ins.name || ''}</div>
+                        <div class="q-instructor-title">${ins.title || ''}</div>
+                        <div class="q-instructor-bio">${ins.bio || ''}</div>
+                        ${ins.tags && ins.tags.length > 0 ? `<div class="q-instructor-tags">${ins.tags.map(t => `<span class="q-tag">${t}</span>`).join('')}</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
 async function loadOutline(projectId) {
     try {
         const { data: projects } = await db.select('projects', {
@@ -636,77 +767,7 @@ async function loadOutline(projectId) {
         if (!projects || projects.length === 0) return;
         const outline = projects[0].outline_data;
         if (!outline) return;
-
-        document.getElementById('outlineSection').style.display = 'block';
-
-        if (outline.timeline && outline.timeline.length > 0) {
-            const container = document.getElementById('outlineTimeline');
-            const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
-            if (hasDays) {
-                const days = {};
-                outline.timeline.forEach(b => {
-                    const d = b.day || 1;
-                    if (!days[d]) days[d] = { label: b.dayLabel || `Day ${d}`, info: b.dayInfo || '', blocks: [] };
-                    days[d].blocks.push(b);
-                });
-                const dayKeys = Object.keys(days);
-                if (dayKeys.length === 1) {
-                    const d = days[dayKeys[0]];
-                    container.innerHTML = `<div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>`
-                        + d.blocks.map(block => renderTimelineBlock(block, false)).join('');
-                } else {
-                    const cols = dayKeys.length;
-                    const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : 'timeline-grid-2';
-                    container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
-                        const d = days[k];
-                        return `<div class="timeline-day-col">
-                            <div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>
-                            ${d.blocks.map(block => renderTimelineBlock(block, true)).join('')}
-                        </div>`;
-                    }).join('')}</div>`;
-                }
-            } else {
-                container.innerHTML = outline.timeline.map(block => renderTimelineBlock(block, false)).join('');
-            }
-        }
-
-        if (outline.tools && outline.tools.length > 0) {
-            document.getElementById('toolsSection').style.display = 'block';
-            document.getElementById('toolGrid').innerHTML = outline.tools.map(t => `
-                <div class="q-tool-card">
-                    ${t.logo ? `<img src="${t.logo}" alt="${t.name}" class="q-tool-logo" onerror="this.style.display='none'">` : ''}
-                    <div class="q-tool-name">${t.name || ''}</div>
-                    <div class="q-tool-purpose">${t.purpose || ''}</div>
-                </div>
-            `).join('');
-        }
-
-        if (outline.equipment && outline.equipment.length > 0) {
-            document.getElementById('equipSection').style.display = 'block';
-            document.getElementById('equipGrid').innerHTML = outline.equipment.map(e => `
-                <div class="q-equip-item">
-                    <div class="q-equip-icon"><span class="material-symbols-outlined">${e.icon || 'check_circle'}</span></div>
-                    <div><div class="q-equip-label">${e.label || ''}</div><div class="q-equip-detail">${e.detail || ''}</div></div>
-                </div>
-            `).join('');
-        }
-
-        if (outline.instructors && outline.instructors.length > 0) {
-            document.getElementById('instructorSection').style.display = 'block';
-            document.getElementById('instructorContent').innerHTML = outline.instructors.map(ins => `
-                <div class="q-instructor-card">
-                    <div class="q-instructor-main">
-                        ${ins.photoUrl ? `<img src="${ins.photoUrl}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
-                        <div>
-                            <div class="q-instructor-name">${ins.name || ''}</div>
-                            <div class="q-instructor-title">${ins.title || ''}</div>
-                            <div class="q-instructor-bio">${ins.bio || ''}</div>
-                            ${ins.tags && ins.tags.length > 0 ? `<div class="q-instructor-tags">${ins.tags.map(t => `<span class="q-tag">${t}</span>`).join('')}</div>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
+        renderOutlineData(outline);
     } catch (err) { console.warn('Failed to load outline:', err); }
 }
 

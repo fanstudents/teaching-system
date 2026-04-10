@@ -69,6 +69,26 @@ body {
 .q-header-meta span { display: flex; align-items: center; gap: 6px; }
 .q-header-meta .material-symbols-outlined { color: rgba(255,255,255,.6); }
 
+/* ── Variant Tabs ── */
+.q-variant-tabs {
+    margin-bottom: 20px; padding: 6px;
+    background: #fff; border: 1px solid var(--q-border);
+    border-radius: var(--q-radius); display: flex;
+}
+.q-variant-tabs-inner { display: flex; gap: 4px; width: 100%; }
+.q-variant-tab {
+    flex: 1; padding: 14px 20px;
+    background: none; border: none; border-radius: 8px;
+    font-size: .95rem; font-weight: 600; font-family: inherit;
+    color: var(--q-text-2); cursor: pointer;
+    transition: all .15s; text-align: center;
+}
+.q-variant-tab:hover { background: var(--q-hover); color: var(--q-text); }
+.q-variant-tab.active {
+    background: var(--q-accent); color: #fff;
+    box-shadow: 0 2px 8px rgba(74,92,138,.25);
+}
+
 /* ── Section ── */
 .q-section {
     margin-bottom: 20px;
