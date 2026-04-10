@@ -1,41 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI PM 養成計劃 — 三個月實戰歷練，從 AI 使用者蛻變為 AI 專案經理｜數位簡報室</title>
-    <meta name="description" content="數位簡報室 AI PM 養成計劃：兩個月真實企業專案歷練、一個月實戰上場。每週一對一指導、解決真實客戶場景。每期限額 8 名，審核制入選。">
-    <meta name="keywords" content="AI PM,AI 專案經理,AI 養成計劃,AI 實戰培訓,AI 人才培育,AI 顧問,數位簡報室">
-    <meta property="og:title" content="AI PM 養成計劃 — 數位簡報室">
-    <meta property="og:description" content="三個月高強度實戰歷練，帶你從 AI 使用者蛻變為能獨當一面的 AI 專案經理。審核制，每期限額 8 名。">
-    <meta property="og:type" content="website">
-    <link rel="canonical" href="https://teaching.tbr.digital/ai-pm">
+    <title>AI PM 養成計劃 — 實戰歷練，從 AI 使用者蛻變為 AI 專案經理｜數位簡報室</title>
+    <meta name="description" content="數位簡報室 AI PM 養成計劃：4 週一對一密集訓練、2 個真實客戶實戰演練、後續合作講課或企業導入機會。審核制入選。">
     <link rel="icon" href="assets/images/tbrlogo.png">
     <link rel="stylesheet" href="styles/ai-pm-page.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Course",
-        "name": "AI PM 養成計劃",
-        "provider": {
-            "@type": "Organization",
-            "name": "數位簡報室"
-        },
-        "description": "三個月實戰歷練，從 AI 使用者蛻變為能獨當一面的 AI 專案經理",
-        "coursePrerequisites": ["AI 基礎能力", "付費使用 3 種以上 AI 工具", "能獨立面對客戶"],
-        "totalHistoricalEnrollment": 8,
-        "offers": {
-            "@type": "Offer",
-            "price": "60000",
-            "priceCurrency": "TWD"
-        }
-    }
-    </script>
 </head>
-
 <body class="pm-page">
 
     <!-- Navigation -->
@@ -47,13 +20,13 @@
             </a>
             <div class="pm-nav-links">
                 <a href="#program" class="pm-nav-link">計劃內容</a>
-                <a href="#requirements" class="pm-nav-link">申請條件</a>
-                <a href="#process" class="pm-nav-link">申請流程</a>
+                <a href="#cases" class="pm-nav-link">企業實戰</a>
+                <a href="#mentor" class="pm-nav-link">計劃主持人</a>
                 <a href="#faq" class="pm-nav-link">常見問題</a>
             </div>
             <button class="pm-nav-cta" onclick="openBooking()">
                 <span class="material-symbols-outlined" style="font-size:1.1rem">edit_document</span>
-                申請諮詢
+                預約諮詢
             </button>
         </div>
     </nav>
@@ -62,21 +35,17 @@
     <section class="pm-hero">
         <div class="pm-hero-inner">
             <div class="pm-fade-up">
-                <div class="pm-hero-badge">
-                    <span class="dot"></span>
-                    審核制 · 限額招募中
-                </div>
-                <h1>
-                    三個月，從 AI 使用者<br>
-                    蛻變為<span class="accent"> AI 專案經理</span>
-                </h1>
+                <div class="pm-hero-eyebrow">審核制 · 每期限額招募</div>
+                <p class="pm-hero-tagline">只上公開課，是不可能變強者的。</p>
+                <h1>從 AI 使用者<br>蛻變為<span class="accent"> AI 專案經理</span></h1>
                 <p class="pm-hero-desc">
-                    不是上課，是<strong>真正的實戰</strong>。兩個月跟著真實企業主歷練，一個月真槍實彈上戰場。每週一對一指導，解決真實客戶場景——出來就是即戰力。
+                    每個人要解決的問題不同，公開課給不了你答案。<br>
+                    4 週一對一密集訓練、2 個真實客戶實戰——出來就是<strong>即戰力</strong>，後續還有合作講課與企業導入的機會。
                 </p>
                 <div class="pm-hero-actions">
                     <button class="pm-btn-primary" onclick="openBooking()">
                         <span class="material-symbols-outlined" style="font-size:1.1rem">edit_document</span>
-                        填寫申請表單
+                        預約免費諮詢
                     </button>
                     <a href="#program" class="pm-btn-ghost">
                         <span class="material-symbols-outlined" style="font-size:1.1rem">arrow_downward</span>
@@ -88,16 +57,16 @@
                 <div class="pm-hero-card">
                     <div class="pm-hero-stats-grid">
                         <div class="pm-hero-stat-item">
-                            <div class="pm-hero-stat-num">3 個月</div>
-                            <div class="pm-hero-stat-label">完整培訓週期</div>
+                            <div class="pm-hero-stat-num">4 週</div>
+                            <div class="pm-hero-stat-label">一對一密集訓練</div>
                         </div>
                         <div class="pm-hero-stat-item">
-                            <div class="pm-hero-stat-num">1 對 1</div>
-                            <div class="pm-hero-stat-label">每週實戰指導</div>
+                            <div class="pm-hero-stat-num">2 個客戶</div>
+                            <div class="pm-hero-stat-label">真實實戰演練</div>
                         </div>
                         <div class="pm-hero-stat-item">
-                            <div class="pm-hero-stat-num">真實案例</div>
-                            <div class="pm-hero-stat-label">企業主實際歷練</div>
+                            <div class="pm-hero-stat-num">後續合作</div>
+                            <div class="pm-hero-stat-label">講課 / 顧問機會</div>
                         </div>
                         <div class="pm-hero-stat-item">
                             <div class="pm-hero-stat-num">審核制</div>
@@ -108,7 +77,7 @@
                         <div class="pm-hero-card-info-icon">🎯</div>
                         <div class="pm-hero-card-info-text">
                             <strong>計劃主持人：樊松蒲</strong><br>
-                            AI 實戰家 ／ 數位簡報室創辦人
+                            數位簡報室創辦人・橫跨 7+ 產業 AI 導入經驗
                         </div>
                     </div>
                 </div>
@@ -122,24 +91,12 @@
             <div class="pm-fade-up">
                 <div class="pm-section-label">這個計劃為誰設計</div>
                 <h2 class="pm-section-title">你已經會用 AI，但缺一個舞台證明自己</h2>
-                <p class="pm-section-desc">你不需要再上課了。你需要的是一個真正的戰場，讓你把 AI 能力轉化為可以幫企業解決問題的專案管理能力。</p>
+                <p class="pm-section-desc">你不需要再上課了。你需要的是實戰——4 週密集訓練打底，然後直接上場面對真實客戶。</p>
             </div>
             <div class="pm-audience-cards pm-fade-up">
-                <article class="pm-audience-card">
-                    <div class="pm-audience-icon">🚀</div>
-                    <h3>AI 重度用戶，想轉職成為 AI 顧問</h3>
-                    <p>你已經付費使用 Claude Max、ChatGPT Plus、Gemini 等工具，但不知道如何把這些能力商業化。這個計劃幫你把 AI 技能包裝成可以賣的專業服務。</p>
-                </article>
-                <article class="pm-audience-card">
-                    <div class="pm-audience-icon">💼</div>
-                    <h3>有客戶服務經驗，想加上 AI 武器</h3>
-                    <p>你已經能獨立面對客戶、拿得住場面，但缺少 AI 系統化導入的方法論。這個計劃教你如何把 AI 落地到客戶的真實場景裡。</p>
-                </article>
-                <article class="pm-audience-card">
-                    <div class="pm-audience-icon">🎯</div>
-                    <h3>想成為 AI PM，不知道從哪裡開始</h3>
-                    <p>你看到 AI PM 是趨勢，但不確定自己的程度是否足夠。填寫申請表後，我們會一對一評估你的基礎——夠的話就直接上陣練。</p>
-                </article>
+                <article class="pm-audience-card"><div class="pm-audience-icon">🚀</div><h3>AI 重度用戶，想轉職成為 AI 顧問</h3><p>你已經付費使用 Claude Max、ChatGPT Plus、Gemini 等工具，但不知道如何把這些能力商業化。這個計劃幫你把 AI 技能包裝成可以賣的專業服務。</p></article>
+                <article class="pm-audience-card"><div class="pm-audience-icon">💼</div><h3>有客戶經驗，想加上 AI 武器</h3><p>你已經能獨立面對客戶、拿得住場面，但缺少 AI 系統化導入的方法論。這個計劃教你如何把 AI 落地到客戶的真實場景裡。</p></article>
+                <article class="pm-audience-card"><div class="pm-audience-icon">🎯</div><h3>想成為 AI PM，不知道從哪裡開始</h3><p>你看到 AI PM 是趨勢，但不確定自己的程度是否足夠。填寫申請表後，我們會一對一評估你的基礎——夠的話就直接上陣練。</p></article>
             </div>
         </div>
     </section>
@@ -150,30 +107,12 @@
             <div class="pm-fade-up">
                 <div class="pm-section-label">申請條件</div>
                 <h2 class="pm-section-title">我們要找的人，不是什麼都不會的人</h2>
-                <p class="pm-section-desc">這不是入門課。你必須已經具備 AI 基礎能力，我們才能在三個月內把你提升到能獨當一面的 AI PM 水準。</p>
+                <p class="pm-section-desc">這不是入門課。你必須已經具備 AI 基礎能力，我們才能在最短時間內把你提升到能獨當一面的 AI PM 水準。</p>
             </div>
             <div class="pm-prereq-grid pm-fade-up">
-                <div class="pm-prereq-item">
-                    <div class="pm-prereq-check">✓</div>
-                    <div class="pm-prereq-content">
-                        <h4>已具備 AI 基礎能力</h4>
-                        <p>你不需要是工程師，但你必須已經知道怎麼用 Prompt 解決問題、理解主流 AI 工具的特性與限制。</p>
-                    </div>
-                </div>
-                <div class="pm-prereq-item">
-                    <div class="pm-prereq-check">✓</div>
-                    <div class="pm-prereq-content">
-                        <h4>有付費使用 3 種以上 AI 工具</h4>
-                        <p>例如 Claude Max/Pro、ChatGPT Plus、Gemini Advanced、Midjourney、Cursor 等——或擁有 Claude Max $100 方案。代表你已經夠深入、不是淺嚐即止。</p>
-                    </div>
-                </div>
-                <div class="pm-prereq-item">
-                    <div class="pm-prereq-check">✓</div>
-                    <div class="pm-prereq-content">
-                        <h4>能獨立面對客戶</h4>
-                        <p>你必須能自己跑會議、做簡報、處理客戶需求。我們不教溝通技巧——你進來就要上場面對企業主。</p>
-                    </div>
-                </div>
+                <div class="pm-prereq-item"><div class="pm-prereq-check">✓</div><div class="pm-prereq-content"><h4>已具備 AI 基礎能力</h4><p>你必須已經知道怎麼用 Prompt 解決問題、理解主流 AI 工具的特性與限制。</p></div></div>
+                <div class="pm-prereq-item"><div class="pm-prereq-check">✓</div><div class="pm-prereq-content"><h4>有付費使用 3 種以上 AI 工具</h4><p>例如 Claude Max/Pro、ChatGPT Plus、Gemini Advanced、Cursor 等——或擁有 Claude Max $100 方案。</p></div></div>
+                <div class="pm-prereq-item"><div class="pm-prereq-check">✓</div><div class="pm-prereq-content"><h4>能獨立面對客戶</h4><p>你必須能自己跑會議、做簡報、處理客戶需求。我們不教溝通技巧——進來就要上場。</p></div></div>
             </div>
         </div>
     </section>
@@ -183,80 +122,204 @@
         <div class="pm-section-inner">
             <div class="pm-fade-up">
                 <div class="pm-section-label">計劃內容</div>
-                <h2 class="pm-section-title">三個月，三個階段，一個目標：能獨當一面</h2>
-                <p class="pm-section-desc">整個計劃設計圍繞「真實場景」。不模擬、不假設——你面對的每一個問題，都是真的企業主的真實需求。</p>
+                <h2 class="pm-section-title">三個階段，一個目標：能獨當一面</h2>
+                <p class="pm-section-desc">從密集訓練到真實上場，再到長期合作——每一步都是為了讓你成為真正的即戰力。</p>
             </div>
             <div class="pm-program-timeline pm-fade-up">
                 <div class="pm-timeline-item">
                     <div class="pm-timeline-dot">🔥</div>
                     <div class="pm-timeline-content">
-                        <div class="pm-timeline-phase">第一階段 · 第 1-4 週</div>
-                        <h3>跟著企業主，觀摩真實歷練</h3>
-                        <p>你會被指派到真實的企業客戶專案中，跟著資深 AI 顧問一起出席客戶會議、參與需求分析、觀摩如何把客戶的痛點轉化為 AI 解決方案。在旁學習如何洞察需求、拆解問題、規劃導入路徑。</p>
-                        <div class="pm-timeline-features">
-                            <span>跟隨資深顧問</span>
-                            <span>真實客戶會議</span>
-                            <span>需求分析實戰</span>
-                            <span>方案設計觀摩</span>
-                        </div>
+                        <div class="pm-timeline-phase">第一階段 · 4 週密集訓練</div>
+                        <h3>一對一密集特訓，打造你的 AI PM 底子</h3>
+                        <p>每週與資深顧問一對一訓練。從需求訪談技巧、AI 方案設計、客戶簡報製作到專案管理方法論——不是看影片自學，是有人手把手帶你走過每一個環節。</p>
+                        <div class="pm-timeline-features"><span>每週 1v1 訓練</span><span>需求訪談實作</span><span>AI 方案設計</span><span>客戶簡報製作</span></div>
                     </div>
                 </div>
                 <div class="pm-timeline-item">
                     <div class="pm-timeline-dot">⚡</div>
                     <div class="pm-timeline-content">
-                        <div class="pm-timeline-phase">第二階段 · 第 5-8 週</div>
-                        <h3>獨力操刀，每週一對一實戰模擬</h3>
-                        <p>你開始獨立接手專案的某些環節：做客戶簡報、設計 AI 導入流程、處理客戶問題。每週有一次一對一的實戰模擬與覆盤指導，讓你在犯錯的安全環境中快速成長。</p>
-                        <div class="pm-timeline-features">
-                            <span>獨力操刀實戰</span>
-                            <span>每週 1v1 指導</span>
-                            <span>實戰模擬覆盤</span>
-                            <span>問題場景訓練</span>
-                        </div>
+                        <div class="pm-timeline-phase">第二階段 · 2 個客戶實戰</div>
+                        <h3>真槍實彈，面對真實客戶</h3>
+                        <p>安排 2 個真實的企業客戶專案讓你實戰演練。從第一次客戶會議到交付成果，你全程參與——資深顧問在幕後 backup，但場面由你主導。</p>
+                        <div class="pm-timeline-features"><span>2 個真實客戶</span><span>全程參與專案</span><span>實戰覆盤指導</span><span>建立作品集</span></div>
                     </div>
                 </div>
                 <div class="pm-timeline-item">
                     <div class="pm-timeline-dot">🎯</div>
                     <div class="pm-timeline-content">
-                        <div class="pm-timeline-phase">第三階段 · 第 9-12 週</div>
-                        <h3>真槍實彈，獨立上戰場</h3>
-                        <p>最後一個月，你就是 AI PM。獨立面對客戶、主導專案規劃、管理導入進度。資深顧問在幕後提供支援，但場面由你全權負責——這不是畢業專題，是真正的商業專案。</p>
-                        <div class="pm-timeline-features">
-                            <span>獨立面對客戶</span>
-                            <span>主導專案全程</span>
-                            <span>幕後顧問支援</span>
-                            <span>真實商業成果</span>
-                        </div>
+                        <div class="pm-timeline-phase">第三階段 · 後續合作機會</div>
+                        <h3>結業不是結束，是合作的開始</h3>
+                        <p>表現出色的學員，我們會直接邀請加入合作體系——成為數位簡報室的合作講師，或參與企業導入顧問專案。你的 AI PM 職涯，從這裡正式展開。</p>
+                        <div class="pm-timeline-features"><span>合作講課機會</span><span>企業導入顧問</span><span>長期合作體系</span><span>持續成長</span></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Core Highlights -->
-    <section class="pm-section">
+    <!-- Enterprise Case Studies -->
+    <section class="pm-section" id="cases">
         <div class="pm-section-inner">
             <div class="pm-fade-up">
-                <div class="pm-section-label">核心亮點</div>
-                <h2 class="pm-section-title">為什麼這個計劃值 6 萬？</h2>
-                <p class="pm-section-desc">因為你買的不是課程，是三個月的實戰經驗值。出來之後，你能直接接案、直接上工。</p>
+                <div class="pm-section-label">企業實戰演練</div>
+                <h2 class="pm-section-title">你在這裡做的，是真正會上線的東西</h2>
+                <p class="pm-section-desc">不是假案例、不是期末報告——這些是我們實際幫企業做的東西。在第二階段的 2 個客戶實戰中，你會參與類似的專案。</p>
             </div>
-            <div class="pm-highlights pm-fade-up">
-                <article class="pm-highlight-card">
-                    <span class="pm-highlight-emoji">🏢</span>
-                    <h3>真實企業主<br>實際歷練</h3>
-                    <p>不是模擬案例、不是紙上談兵。你面對的每一個客戶、每一個問題，都是真實的商業場景。</p>
+            <div class="pm-cases-grid pm-fade-up">
+                <div class="pm-case-card">
+                    <div class="pm-case-svg-wrap">
+                        <svg viewBox="0 0 560 280" fill="none" xmlns="http://www.w3.org/2000/svg" class="pm-case-svg">
+                            <rect width="560" height="280" rx="12" fill="#f8f7f4"/>
+                            <rect x="16" y="16" width="528" height="36" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <circle cx="36" cy="34" r="6" fill="#c8956c" opacity=".6"/>
+                            <text x="52" y="38" font-size="12" font-weight="700" fill="#2c2c2c" font-family="system-ui">企業營運儀表板</text>
+                            <rect x="420" y="24" width="60" height="20" rx="10" fill="#eef5f0" stroke="#5a8a6a" stroke-width=".5"/>
+                            <text x="434" y="37" font-size="9" fill="#5a8a6a" font-weight="600" font-family="system-ui">已上線</text>
+                            <!-- KPI Cards -->
+                            <rect x="16" y="64" width="125" height="56" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="28" y="82" font-size="9" fill="#999" font-family="system-ui">月營業額</text>
+                            <text x="28" y="104" font-size="18" font-weight="800" fill="#2c2c2c" font-family="system-ui">$2.4M</text>
+                            <rect x="150" y="64" width="125" height="56" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="162" y="82" font-size="9" fill="#999" font-family="system-ui">轉換率</text>
+                            <text x="162" y="104" font-size="18" font-weight="800" fill="#5a8a6a" font-family="system-ui">18.2%</text>
+                            <rect x="284" y="64" width="125" height="56" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="296" y="82" font-size="9" fill="#999" font-family="system-ui">新客戶數</text>
+                            <text x="296" y="104" font-size="18" font-weight="800" fill="#5a7a9a" font-family="system-ui">1,247</text>
+                            <rect x="418" y="64" width="126" height="56" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="430" y="82" font-size="9" fill="#999" font-family="system-ui">滿意度</text>
+                            <text x="430" y="104" font-size="18" font-weight="800" fill="#c8956c" font-family="system-ui">94.5%</text>
+                            <!-- Chart Area -->
+                            <rect x="16" y="132" width="340" height="132" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="28" y="152" font-size="10" font-weight="700" fill="#2c2c2c" font-family="system-ui">營收趨勢（近 12 個月）</text>
+                            <polyline points="36,240 72,225 108,230 144,210 180,205 216,195 252,200 288,180 324,170 340,168" stroke="#c8956c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                            <polyline points="36,240 72,225 108,230 144,210 180,205 216,195 252,200 288,180 324,170 340,168 340,252 36,252" fill="url(#chartGrad)" opacity=".15"/>
+                            <defs><linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8956c"/><stop offset="100%" stop-color="#c8956c" stop-opacity="0"/></linearGradient></defs>
+                            <!-- Side Panel -->
+                            <rect x="368" y="132" width="176" height="132" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="380" y="152" font-size="10" font-weight="700" fill="#2c2c2c" font-family="system-ui">產品佔比</text>
+                            <circle cx="456" cy="210" r="36" fill="none" stroke="#c8956c" stroke-width="8" stroke-dasharray="90 140"/>
+                            <circle cx="456" cy="210" r="36" fill="none" stroke="#5a7a9a" stroke-width="8" stroke-dasharray="55 175" stroke-dashoffset="-90"/>
+                            <circle cx="456" cy="210" r="36" fill="none" stroke="#5a8a6a" stroke-width="8" stroke-dasharray="40 190" stroke-dashoffset="-145"/>
+                            <circle cx="456" cy="210" r="36" fill="none" stroke="#e8e4de" stroke-width="8" stroke-dasharray="35 195" stroke-dashoffset="-185"/>
+                        </svg>
+                    </div>
+                    <div class="pm-case-body">
+                        <div class="pm-case-tag">製造業客戶</div>
+                        <h3>企業營運儀表板</h3>
+                        <p>為製造業客戶打造即時營運數據看板，整合 ERP、CRM 與行銷數據，讓老闆一開手機就能掌握全局。從需求訪談到資料串接，全程參與。</p>
+                    </div>
+                </div>
+                <div class="pm-case-card">
+                    <div class="pm-case-svg-wrap">
+                        <svg viewBox="0 0 560 280" fill="none" xmlns="http://www.w3.org/2000/svg" class="pm-case-svg">
+                            <rect width="560" height="280" rx="12" fill="#f8f7f4"/>
+                            <rect x="16" y="16" width="528" height="36" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <circle cx="36" cy="34" r="6" fill="#5a7a9a" opacity=".6"/>
+                            <text x="52" y="38" font-size="12" font-weight="700" fill="#2c2c2c" font-family="system-ui">客戶關係管理系統</text>
+                            <rect x="420" y="24" width="60" height="20" rx="10" fill="#eef5f0" stroke="#5a8a6a" stroke-width=".5"/>
+                            <text x="434" y="37" font-size="9" fill="#5a8a6a" font-weight="600" font-family="system-ui">已上線</text>
+                            <!-- Kanban Header -->
+                            <text x="28" y="76" font-size="10" font-weight="700" fill="#2c2c2c" font-family="system-ui">銷售管道</text>
+                            <!-- Kanban Columns -->
+                            <rect x="16" y="84" width="128" height="180" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="28" y="102" font-size="9" font-weight="600" fill="#999" font-family="system-ui">待跟進 (5)</text>
+                            <rect x="24" y="110" width="112" height="44" rx="6" fill="#f8f7f4" stroke="#e8e4de"/>
+                            <circle cx="38" cy="126" r="8" fill="#c8956c" opacity=".3"/>
+                            <text x="38" y="130" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">王</text>
+                            <text x="52" y="128" font-size="9" font-weight="600" fill="#2c2c2c" font-family="system-ui">王先生</text>
+                            <text x="52" y="142" font-size="8" fill="#999" font-family="system-ui">$45,000</text>
+                            <rect x="24" y="160" width="112" height="44" rx="6" fill="#f8f7f4" stroke="#e8e4de"/>
+                            <circle cx="38" cy="176" r="8" fill="#5a7a9a" opacity=".3"/>
+                            <text x="38" y="180" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">李</text>
+                            <text x="52" y="178" font-size="9" font-weight="600" fill="#2c2c2c" font-family="system-ui">李小姐</text>
+                            <text x="52" y="192" font-size="8" fill="#999" font-family="system-ui">$120,000</text>
+                            <!-- Col 2 -->
+                            <rect x="152" y="84" width="128" height="180" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="164" y="102" font-size="9" font-weight="600" fill="#999" font-family="system-ui">洽談中 (3)</text>
+                            <rect x="160" y="110" width="112" height="44" rx="6" fill="#f5ebe0" stroke="rgba(200,149,108,.2)"/>
+                            <circle cx="174" cy="126" r="8" fill="#5a8a6a" opacity=".3"/>
+                            <text x="174" y="130" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">陳</text>
+                            <text x="188" y="128" font-size="9" font-weight="600" fill="#2c2c2c" font-family="system-ui">陳總監</text>
+                            <text x="188" y="142" font-size="8" fill="#c8956c" font-family="system-ui">$280,000</text>
+                            <!-- Col 3 -->
+                            <rect x="288" y="84" width="128" height="180" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="300" y="102" font-size="9" font-weight="600" fill="#999" font-family="system-ui">提案中 (2)</text>
+                            <rect x="296" y="110" width="112" height="44" rx="6" fill="#f8f7f4" stroke="#e8e4de"/>
+                            <circle cx="310" cy="126" r="8" fill="#c8956c" opacity=".3"/>
+                            <text x="310" y="130" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">張</text>
+                            <text x="324" y="128" font-size="9" font-weight="600" fill="#2c2c2c" font-family="system-ui">張經理</text>
+                            <text x="324" y="142" font-size="8" fill="#999" font-family="system-ui">$95,000</text>
+                            <!-- Col 4 -->
+                            <rect x="424" y="84" width="120" height="180" rx="8" fill="#fff" stroke="#e8e4de"/>
+                            <text x="436" y="102" font-size="9" font-weight="600" fill="#5a8a6a" font-family="system-ui">已成交 ✓ (8)</text>
+                            <rect x="432" y="110" width="104" height="44" rx="6" fill="#eef5f0" stroke="rgba(90,138,106,.2)"/>
+                            <circle cx="446" cy="126" r="8" fill="#5a8a6a" opacity=".3"/>
+                            <text x="446" y="130" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" font-family="system-ui">林</text>
+                            <text x="460" y="128" font-size="9" font-weight="600" fill="#2c2c2c" font-family="system-ui">林董事長</text>
+                            <text x="460" y="142" font-size="8" fill="#5a8a6a" font-weight="600" font-family="system-ui">$540,000</text>
+                        </svg>
+                    </div>
+                    <div class="pm-case-body">
+                        <div class="pm-case-tag">SaaS 軟體業客戶</div>
+                        <h3>客戶關係管理系統（CRM）</h3>
+                        <p>為軟體公司量身打造 AI 驅動的 CRM 系統，從銷售管道追蹤到客戶行為分析，幫助業務團隊精準掌握每一筆交易狀態。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future Identity -->
+    <section class="pm-section alt">
+        <div class="pm-section-inner">
+            <div class="pm-fade-up">
+                <div class="pm-section-label">投資你的下一個身份</div>
+                <h2 class="pm-section-title">培訓完後，你會成為什麼？</h2>
+                <p class="pm-section-desc">結業之後，你不再只是「會用 AI 的人」。你會有一個全新的職業身份——而且是市場上最搶手的那種。</p>
+            </div>
+            <div class="pm-identity-grid pm-fade-up">
+                <article class="pm-identity-card">
+                    <span class="pm-identity-emoji">🏢</span>
+                    <h3>公司內的 AI PM</h3>
+                    <p>在企業內部主導 AI 專案，從需求發掘、方案設計到系統上線，你就是那個讓 AI 真正落地的人。不再只是寫 Prompt，而是帶領團隊把 AI 變成生產力。</p>
                 </article>
-                <article class="pm-highlight-card">
-                    <span class="pm-highlight-emoji">🎙️</span>
-                    <h3>每週一對一<br>實戰模擬</h3>
-                    <p>每週跟資深顧問進行一對一的覆盤與進階指導，不是大班制教學——每一分鐘都在打磨你的能力。</p>
+                <article class="pm-identity-card">
+                    <span class="pm-identity-emoji">🧩</span>
+                    <h3>AI 解決問題顧問</h3>
+                    <p>獨立接案，幫不同產業的企業診斷痛點、設計 AI 解法。你是客戶遇到問題時第一個想到的人——因為你有真實的實戰經驗背書。</p>
                 </article>
-                <article class="pm-highlight-card">
-                    <span class="pm-highlight-emoji">🧩</span>
-                    <h3>解決問題場景<br>百戰百勝</h3>
-                    <p>從需求分析、方案設計到客戶溝通，你會經歷各種真實場景的洗禮。三個月打完一般人三年的仗。</p>
+                <article class="pm-identity-card">
+                    <span class="pm-identity-emoji">🎓</span>
+                    <h3>AI 講師</h3>
+                    <p>站上講台，教別人怎麼用 AI。因為你不是只會講理論的人——你有實際操刀過儀表板、CRM、自動化流程的經驗，說服力完全不同。</p>
                 </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mentor -->
+    <section class="pm-section" id="mentor">
+        <div class="pm-section-inner">
+            <div class="pm-fade-up">
+                <div class="pm-section-label">計劃主持人</div>
+                <h2 class="pm-section-title">由樊松蒲親自帶隊</h2>
+            </div>
+            <div class="pm-mentor-layout pm-fade-up">
+                <div class="pm-mentor-photo-wrap">
+                    <img src="assets/images/fan-songpu.jpg" alt="樊松蒲" class="pm-mentor-photo">
+                </div>
+                <div class="pm-mentor-info">
+                    <div class="pm-mentor-badge">計劃主持人 · 核心指導顧問</div>
+                    <h3>樊松蒲</h3>
+                    <p class="pm-mentor-role">數位簡報室創辦人 ／ AI 企業導入策略顧問</p>
+                    <p class="pm-mentor-desc">帶領 14 名專家團隊，已協助數十家企業完成 AI 落地。專精 AI 企業導入策略規劃、工作流程自動化、AI 工具整合應用。4 週訓練期間由他親自一對一帶你，客戶實戰階段全程在幕後提供支援。</p>
+                    <div class="pm-mentor-industries">
+                        <div class="pm-mentor-industries-title">企業實戰導入經驗</div>
+                        <div class="pm-mentor-tags">
+                            <span>製造業</span><span>旅遊業</span><span>管顧業</span><span>非營利組織</span><span>物流業</span><span>SaaS 軟體業</span><span>汽車業</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -264,17 +327,13 @@
     <!-- Key Message -->
     <div class="pm-key-message pm-fade-up">
         <div class="pm-key-message-inner">
-            <h2>這不是一堂課<br><span class="accent">這是你的 AI PM 起跑線</span></h2>
-            <p>我們不在乎你學歷背景，只在乎你是否已經準備好。填寫申請表，跟我們聊聊——如果你夠格，我們三個月後讓你帶著作品集和實戰經驗出場。</p>
+            <h2>這不是一堂課<br><span class="accent">這是你的下一個身份</span></h2>
+            <p>只上公開課，你永遠只是學員。在這裡做完 2 個真實客戶專案，你帶走的是作品集、實戰經驗、和一個全新的職業可能。</p>
             <div class="pm-key-message-actions">
                 <button class="pm-btn-primary" onclick="openBooking()">
                     <span class="material-symbols-outlined" style="font-size:1.1rem">edit_document</span>
-                    立即申請
+                    預約免費諮詢
                 </button>
-                <a href="https://lin.ee/wAi3y4P" target="_blank" rel="noopener" class="pm-btn-line">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-                    LINE 即時聯繫
-                </a>
             </div>
         </div>
     </div>
@@ -288,26 +347,10 @@
                 <p class="pm-section-desc">我們採審核制入選。不是付錢就能上——我們要確保每一位學員都準備好了。</p>
             </div>
             <div class="pm-process-steps pm-fade-up">
-                <div class="pm-process-step">
-                    <div class="pm-process-icon">📝</div>
-                    <h3>填寫申請表單</h3>
-                    <p>填寫你的基本資料、AI 使用經驗、申請動機，並選擇諮詢時段。</p>
-                </div>
-                <div class="pm-process-step">
-                    <div class="pm-process-icon">📞</div>
-                    <h3>線上一對一面談</h3>
-                    <p>約 30 分鐘的視訊面談，我們會評估你的 AI 基礎與實際準備度。</p>
-                </div>
-                <div class="pm-process-step">
-                    <div class="pm-process-icon">✅</div>
-                    <h3>審核結果通知</h3>
-                    <p>3 個工作天內通知結果。通過審核後完成繳費，即確認入選名額。</p>
-                </div>
-                <div class="pm-process-step">
-                    <div class="pm-process-icon">🚀</div>
-                    <h3>正式啟動計劃</h3>
-                    <p>依期別統一開訓，配對指導顧問與企業專案，正式進入實戰歷練。</p>
-                </div>
+                <div class="pm-process-step"><div class="pm-process-icon">📝</div><h3>填寫申請表單</h3><p>填寫基本資料、AI 使用經驗、申請動機，並選擇諮詢時段。</p></div>
+                <div class="pm-process-step"><div class="pm-process-icon">📞</div><h3>線上一對一面談</h3><p>約 30 分鐘的視訊面談，我們會評估你的 AI 基礎與準備度。</p></div>
+                <div class="pm-process-step"><div class="pm-process-icon">✅</div><h3>審核結果通知</h3><p>3 個工作天內通知。通過審核後完成繳費，即確認名額。</p></div>
+                <div class="pm-process-step"><div class="pm-process-icon">🚀</div><h3>正式啟動計劃</h3><p>依期別開訓，配對指導顧問與企業專案，正式進入實戰。</p></div>
             </div>
         </div>
     </section>
@@ -320,98 +363,36 @@
                 <h2 class="pm-section-title">關於 AI PM 養成計劃，你可能想問</h2>
             </div>
             <div class="pm-faq-list pm-fade-up">
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>我沒有 PM 經驗，可以申請嗎？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>可以。我們看的不是你的 PM 經驗，而是你的 AI 基礎能力和面對客戶的溝通能力。只要你符合三項申請條件，歡迎申請——面談時我們會進一步評估你的潛力。</p></div>
-                </div>
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>三個月之後我能做什麼？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>你可以獨立做為 AI 專案經理接案。你會有實戰經驗、有作品集、有能力面對真實客戶。表現優異的學員也有機會直接加入數位簡報室的顧問團。</p></div>
-                </div>
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>上課時間怎麼安排？需要全職嗎？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>不需要全職。每週需要投入約 10-15 小時，包含客戶會議、一對一指導課、專案準備時間。時段會根據客戶和指導顧問的時間靈活安排。</p></div>
-                </div>
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>為什麼要審核制？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>因為你會直接面對我們的真實客戶。我們必須確保每一位學員的基礎能力和態度都到位，才不會影響客戶體驗。這也是對你負責——如果基礎不夠，三個月只會挫折感很重。</p></div>
-                </div>
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>可以分期付款嗎？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>可以討論。通過審核後，我們會根據你的需求安排付款方式。原則上支持兩期繳納。</p></div>
-                </div>
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>是線上還是實體？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>以線上為主，客戶會議會根據客戶需求安排線上或實體到府。一對一指導課為線上 Google Meet 進行。</p></div>
-                </div>
-                <div class="pm-faq-item">
-                    <button class="pm-faq-q" onclick="toggleFaq(this)">
-                        <h3>每一期有多少名額？</h3><span class="arrow">▼</span>
-                    </button>
-                    <div class="pm-faq-a"><p>每期原則上限額 8 名學員。嚴格控管人數是為了確保每位學員都能獲得足夠的資深顧問指導時間與真實專案歷練機會。</p></div>
-                </div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>我沒有 PM 經驗，可以申請嗎？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>可以。我們看的不是 PM 經驗，而是你的 AI 基礎能力和面對客戶的溝通能力。只要你符合三項申請條件，歡迎申請。</p></div></div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>三個月之後我能做什麼？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>你可以獨立做為 AI 專案經理接案、在企業內主導 AI 專案、或成為 AI 講師。表現優異的學員也有機會直接加入數位簡報室的顧問團。</p></div></div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>上課時間怎麼安排？需要全職嗎？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>不需要全職。每週約 10-15 小時，包含客戶會議、一對一指導課、專案準備時間。時段靈活安排。</p></div></div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>為什麼要審核制？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>因為你會直接面對我們的真實客戶。我們必須確保每一位學員的基礎能力和態度都到位，這也是對你負責。</p></div></div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>可以分期付款嗎？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>可以討論。通過審核後，我們會根據你的需求安排付款方式。原則上支持兩期繳納。</p></div></div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>是線上還是實體？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>以線上為主，客戶會議會根據客戶需求安排線上或實體。一對一指導課為線上 Google Meet 進行。</p></div></div>
+                <div class="pm-faq-item"><button class="pm-faq-q" onclick="toggleFaq(this)"><h3>每一期有多少名額？</h3><span class="arrow">▼</span></button><div class="pm-faq-a"><p>每期限額 8 名。嚴格控管人數是為了確保每位學員都能獲得足夠的指導時間與歷練機會。</p></div></div>
             </div>
         </div>
     </section>
 
-    <!-- Mentor Section -->
-    <section class="pm-section">
-        <div class="pm-section-inner">
-            <div class="pm-fade-up">
-                <div class="pm-section-label">計劃主持人</div>
-                <h2 class="pm-section-title">由 AI 實戰家樊松蒲親自帶隊</h2>
-            </div>
-            <div class="pm-mentor-card pm-fade-up">
-                <div class="pm-mentor-avatar">
-                    <span>樊</span>
-                </div>
-                <div class="pm-mentor-info">
-                    <div class="pm-mentor-badge">計劃主持人 · 核心指導顧問</div>
-                    <h3>樊松蒲</h3>
-                    <p class="pm-mentor-role">AI 實戰家 ／ 數位簡報室創辦人</p>
-                    <p class="pm-mentor-desc">專精 AI 企業導入策略規劃、工作流程自動化、AI 工具整合應用。帶領 14 名專家團隊，已協助數十家企業完成 AI 落地。親自參與每位學員的實戰指導與階段評估。</p>
-                    <div class="pm-mentor-tags">
-                        <span>AI 策略規劃</span>
-                        <span>企業導入實戰</span>
-                        <span>流程改造</span>
-                        <span>一對一指導</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing + Final CTA -->
+    <!-- Pricing + CTA -->
     <section class="pm-pricing-section">
         <div class="pm-pricing-inner pm-fade-up">
-            <div class="pm-section-label" style="color:var(--pm-accent);text-align:center;">方案費用</div>
+            <div class="pm-section-label" style="color:var(--pm-accent-dark);text-align:center;">方案費用</div>
             <h2>先約線上諮詢，再決定要不要加入</h2>
             <div class="pm-pricing-card">
                 <div class="pm-pricing-amount">NT$60,000<small>/人</small></div>
-                <div class="pm-pricing-note">含三個月完整實戰歷練 · 每週一對一指導 · 真實企業專案經驗</div>
+                <div class="pm-pricing-note">含 4 週一對一密集訓練 · 2 個真實客戶實戰演練 · 後續合作講課/顧問機會</div>
                 <ul class="pm-pricing-includes">
                     <li>✓ 需先填寫申請表，線上一對一面談後審核</li>
                     <li>✓ 通過審核才能報名繳費，確保每位學員質量</li>
                     <li>✓ 表現優異者有機會直接加入顧問團</li>
                 </ul>
             </div>
-            <p class="pm-pricing-desc">對計劃有興趣？先預約一對一線上諮詢，讓我們了解你的背景——<br>聊完之後，你再決定要不要加入。沒有壓力。</p>
+            <p class="pm-pricing-desc">對計劃有興趣？先預約一對一線上諮詢，讓我們了解你的背景。<br>聊完之後，你再決定要不要加入。沒有壓力。</p>
             <div class="pm-cta-buttons">
-                <button class="pm-btn-primary-light" onclick="openBooking()">
+                <button class="pm-btn-primary" onclick="openBooking()">
                     <span class="material-symbols-outlined" style="font-size:1.1rem">edit_document</span>
-                    填寫申請表單
+                    預約免費諮詢
                 </button>
                 <a href="https://lin.ee/wAi3y4P" target="_blank" rel="noopener" class="pm-btn-line">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
@@ -421,401 +402,64 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="pm-footer">
-        <p>© 2025 數位簡報室 The Briefing Room — AI 培訓 / 導入機構｜<a href="privacy">隱私政策</a>｜<a href="terms">服務條款</a></p>
-    </footer>
+    <footer class="pm-footer"><p>© 2025 數位簡報室 The Briefing Room — AI 培訓 / 導入機構｜<a href="privacy">隱私政策</a>｜<a href="terms">服務條款</a></p></footer>
 
-    <!-- ═══ Booking Modal ═══ -->
+    <!-- Booking Modal -->
     <div class="pm-modal-overlay" id="bookingModal">
         <div class="pm-modal" style="max-width:580px;">
-            <div class="pm-modal-header">
-                <div>
-                    <h2 id="modalTitle">申請 AI PM 養成計劃</h2>
-                    <p id="modalSubtitle">選擇一對一面談時段</p>
-                </div>
-                <button class="pm-modal-close" onclick="closeBooking()">✕</button>
-            </div>
-
-            <!-- Step indicator -->
-            <div class="pm-booking-steps" id="bookingSteps">
-                <div class="pm-bk-step active" data-step="1"><span>1</span>選日期</div>
-                <div class="pm-bk-step" data-step="2"><span>2</span>選時段</div>
-                <div class="pm-bk-step" data-step="3"><span>3</span>填寫資料</div>
-            </div>
-
+            <div class="pm-modal-header"><div><h2 id="modalTitle">申請 AI PM 養成計劃</h2><p id="modalSubtitle">選擇一對一面談時段</p></div><button class="pm-modal-close" onclick="closeBooking()">✕</button></div>
+            <div class="pm-booking-steps" id="bookingSteps"><div class="pm-bk-step active" data-step="1"><span>1</span>選日期</div><div class="pm-bk-step" data-step="2"><span>2</span>選時段</div><div class="pm-bk-step" data-step="3"><span>3</span>填寫資料</div></div>
             <div class="pm-modal-body">
-                <!-- Step 1: Calendar -->
                 <div class="pm-booking-step active" id="step1">
-                    <div class="pm-calendar-nav">
-                        <button onclick="calendarNav(-1)" id="calPrev" class="pm-cal-nav-btn">
-                            <span class="material-symbols-outlined">chevron_left</span>
-                        </button>
-                        <div class="pm-cal-month" id="calMonthLabel"></div>
-                        <button onclick="calendarNav(1)" id="calNext" class="pm-cal-nav-btn">
-                            <span class="material-symbols-outlined">chevron_right</span>
-                        </button>
-                    </div>
-                    <div class="pm-calendar-grid" id="calendarGrid">
-                        <div class="pm-cal-loading">
-                            <div class="pm-spinner"></div>
-                            <p>正在載入可用時段...</p>
-                        </div>
-                    </div>
+                    <div class="pm-calendar-nav"><button onclick="calendarNav(-1)" id="calPrev" class="pm-cal-nav-btn"><span class="material-symbols-outlined">chevron_left</span></button><div class="pm-cal-month" id="calMonthLabel"></div><button onclick="calendarNav(1)" id="calNext" class="pm-cal-nav-btn"><span class="material-symbols-outlined">chevron_right</span></button></div>
+                    <div class="pm-calendar-grid" id="calendarGrid"><div class="pm-cal-loading"><div class="pm-spinner"></div><p>正在載入可用時段...</p></div></div>
                 </div>
-
-                <!-- Step 2: Time slots -->
-                <div class="pm-booking-step" id="step2">
-                    <div class="pm-selected-date" id="selectedDateLabel"></div>
-                    <div class="pm-time-grid" id="timeGrid"></div>
-                    <button class="pm-back-btn" onclick="goToStep(1)">
-                        <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> 重選日期
-                    </button>
-                </div>
-
-                <!-- Step 3: Form -->
+                <div class="pm-booking-step" id="step2"><div class="pm-selected-date" id="selectedDateLabel"></div><div class="pm-time-grid" id="timeGrid"></div><button class="pm-back-btn" onclick="goToStep(1)"><span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> 重選日期</button></div>
                 <div class="pm-booking-step" id="step3">
                     <div class="pm-booking-summary" id="bookingSummary"></div>
                     <form id="bookingForm" onsubmit="submitBooking(event)">
-                        <div class="pm-form-row">
-                            <div class="pm-form-group">
-                                <label>姓名 <span class="req">*</span></label>
-                                <input type="text" class="pm-form-input" name="name" required placeholder="例：王大明">
-                            </div>
-                            <div class="pm-form-group">
-                                <label>Email <span class="req">*</span></label>
-                                <input type="email" class="pm-form-input" name="email" required placeholder="your@email.com">
-                            </div>
-                        </div>
-                        <div class="pm-form-row">
-                            <div class="pm-form-group">
-                                <label>電話</label>
-                                <input type="tel" class="pm-form-input" name="phone" placeholder="09xx-xxx-xxx">
-                            </div>
-                            <div class="pm-form-group">
-                                <label>LINE ID</label>
-                                <input type="text" class="pm-form-input" name="lineId" placeholder="方便後續聯繫">
-                            </div>
-                        </div>
-                        <div class="pm-form-group">
-                            <label>你目前在使用哪些付費 AI 工具？ <span class="req">*</span></label>
-                            <input type="text" class="pm-form-input" name="aiTools" required placeholder="例：Claude Max、ChatGPT Plus、Cursor...">
-                        </div>
-                        <div class="pm-form-group">
-                            <label>你為什麼想成為 AI PM？ <span class="req">*</span></label>
-                            <textarea class="pm-form-textarea" name="motivation" rows="3" required placeholder="簡述你的動機與目前的 AI 使用經驗…"></textarea>
-                        </div>
-                        <div class="pm-form-group">
-                            <label>過去有面對客戶的經驗嗎？請簡述</label>
-                            <textarea class="pm-form-textarea" name="clientExp" rows="2" placeholder="例：擔任過業務、客服、專案管理、自由接案..."></textarea>
-                        </div>
-                        <div class="pm-form-actions">
-                            <button type="button" class="pm-back-btn" onclick="goToStep(2)">
-                                <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> 重選時段
-                            </button>
-                            <button type="submit" class="pm-form-submit" id="submitBtn">
-                                <span class="material-symbols-outlined" style="font-size:18px">send</span>
-                                送出申請
-                            </button>
-                        </div>
+                        <div class="pm-form-row"><div class="pm-form-group"><label>姓名 <span class="req">*</span></label><input type="text" class="pm-form-input" name="name" required placeholder="例：王大明"></div><div class="pm-form-group"><label>Email <span class="req">*</span></label><input type="email" class="pm-form-input" name="email" required placeholder="your@email.com"></div></div>
+                        <div class="pm-form-row"><div class="pm-form-group"><label>電話</label><input type="tel" class="pm-form-input" name="phone" placeholder="09xx-xxx-xxx"></div><div class="pm-form-group"><label>LINE ID</label><input type="text" class="pm-form-input" name="lineId" placeholder="方便後續聯繫"></div></div>
+                        <div class="pm-form-group"><label>你目前在使用哪些付費 AI 工具？ <span class="req">*</span></label><input type="text" class="pm-form-input" name="aiTools" required placeholder="例：Claude Max、ChatGPT Plus、Cursor..."></div>
+                        <div class="pm-form-group"><label>你為什麼想成為 AI PM？ <span class="req">*</span></label><textarea class="pm-form-textarea" name="motivation" rows="3" required placeholder="簡述你的動機與目前的 AI 使用經驗…"></textarea></div>
+                        <div class="pm-form-group"><label>過去有面對客戶的經驗嗎？請簡述</label><textarea class="pm-form-textarea" name="clientExp" rows="2" placeholder="例：擔任過業務、客服、專案管理、自由接案..."></textarea></div>
+                        <div class="pm-form-actions"><button type="button" class="pm-back-btn" onclick="goToStep(2)"><span class="material-symbols-outlined" style="font-size:18px">arrow_back</span> 重選時段</button><button type="submit" class="pm-form-submit" id="submitBtn"><span class="material-symbols-outlined" style="font-size:18px">send</span> 送出申請</button></div>
                     </form>
                 </div>
-
-                <!-- Success -->
                 <div class="pm-booking-step" id="stepSuccess" style="text-align:center;padding:40px 0;">
                     <div style="font-size:3.5rem;margin-bottom:16px;">🎉</div>
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:10px;color:#1a1a2e;">申請已送出！</h3>
-                    <p id="successDetail" style="color:#64748b;font-size:.92rem;line-height:1.7;margin-bottom:20px;"></p>
-                    <p style="color:#64748b;font-size:.85rem;">我們已發送行事曆邀請到您的信箱。<br>面談當天請準備分享你的 AI 使用經驗。</p>
-                    <a href="https://lin.ee/wAi3y4P" target="_blank" rel="noopener" class="pm-btn-line" style="display:inline-flex;margin-top:20px;">
-                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-                        LINE 加好友追蹤進度
-                    </a>
+                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:10px;">申請已送出！</h3>
+                    <p id="successDetail" style="color:#5a5a5a;font-size:.92rem;line-height:1.7;margin-bottom:20px;"></p>
+                    <p style="color:#999;font-size:.85rem;">我們已發送行事曆邀請到您的信箱。<br>面談當天請準備分享你的 AI 使用經驗。</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Nav scroll
-        window.addEventListener('scroll', () => {
-            document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 10);
-        });
+    window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>10)});
+    const observer=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('visible');observer.unobserve(el.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.pm-fade-up').forEach(el=>observer.observe(el));
+    function openBooking(){document.getElementById('bookingModal').classList.add('active');document.body.style.overflow='hidden';if(!window._calData)loadCalendar()}
+    function closeBooking(){document.getElementById('bookingModal').classList.remove('active');document.body.style.overflow=''}
+    document.getElementById('bookingModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeBooking()});
+    function toggleFaq(btn){btn.closest('.pm-faq-item').classList.toggle('open')}
+    document.querySelectorAll('.pm-nav-link').forEach(l=>{l.addEventListener('click',e=>{e.preventDefault();document.querySelector(l.getAttribute('href'))?.scrollIntoView({behavior:'smooth',block:'start'})})});
 
-        // Fade-up observer
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.pm-fade-up').forEach(el => observer.observe(el));
-
-        // Booking modal
-        function openBooking() {
-            document.getElementById('bookingModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            if (!window._calData) loadCalendar();
-        }
-        function closeBooking() {
-            document.getElementById('bookingModal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        document.getElementById('bookingModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeBooking();
-        });
-
-        // FAQ toggle
-        function toggleFaq(btn) {
-            btn.closest('.pm-faq-item').classList.toggle('open');
-        }
-
-        // Supabase config (same as consulting)
-        const SB_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
-
-        // ── Calendar State ──
-        let _selectedDate = null;
-        let _selectedTime = null;
-        let _calViewMonth = null;
-
-        const DOW = ['日', '一', '二', '三', '四', '五', '六'];
-        const MONTH_NAMES = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-
-        function getTimeLabel(slot) {
-            const h = parseInt(slot);
-            if (h >= 9 && h <= 12) return '上午';
-            if (h >= 13 && h <= 17) return '下午';
-            return '晚間';
-        }
-
-        // ── Step Navigation ──
-        function goToStep(n) {
-            document.querySelectorAll('.pm-booking-step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`step${n}`)?.classList.add('active');
-            document.querySelectorAll('.pm-bk-step').forEach(s => {
-                const sn = parseInt(s.dataset.step);
-                s.classList.toggle('active', sn === n);
-                s.classList.toggle('done', sn < n);
-            });
-
-            if (n === 1) {
-                document.getElementById('modalTitle').textContent = '申請 AI PM 養成計劃';
-                document.getElementById('modalSubtitle').textContent = '選擇一對一面談日期';
-            } else if (n === 2) {
-                document.getElementById('modalTitle').textContent = '選擇面談時段';
-                document.getElementById('modalSubtitle').textContent = formatDateFull(_selectedDate);
-            } else if (n === 3) {
-                document.getElementById('modalTitle').textContent = '填寫申請資料';
-                document.getElementById('modalSubtitle').textContent = `${formatDateFull(_selectedDate)} ${_selectedTime}`;
-                document.getElementById('bookingSummary').innerHTML = `
-                    <span class="icon">📅</span>
-                    <span><strong>${formatDateFull(_selectedDate)}</strong>・${_selectedTime} 線上一對一面談（約 30 分鐘）</span>
-                `;
-            }
-        }
-
-        function formatDateFull(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr + 'T00:00:00');
-            return `${d.getMonth() + 1}月${d.getDate()}日 (${DOW[d.getDay()]})`;
-        }
-
-        // ── Load Calendar Data ──
-        async function loadCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = '<div class="pm-cal-loading"><div class="pm-spinner"></div><p>正在載入可用時段...</p></div>';
-
-            try {
-                const res = await fetch(`${SB_URL}/functions/v1/calendar-availability`, {
-                    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
-                });
-                const data = await res.json();
-
-                if (!data.calendarConnected || !data.dates?.length) {
-                    window._calData = generateFallbackDates();
-                } else {
-                    window._calData = data.dates;
-                }
-            } catch (err) {
-                console.warn('Calendar API error, using fallback:', err);
-                window._calData = generateFallbackDates();
-            }
-
-            const first = window._calData[0]?.date;
-            const d = new Date(first + 'T00:00:00');
-            _calViewMonth = { year: d.getFullYear(), month: d.getMonth() };
-            renderCalendar();
-        }
-
-        function generateFallbackDates() {
-            const dates = [];
-            const now = new Date();
-            let d = new Date(now);
-            d.setDate(d.getDate() + 1);
-            const defaultSlots = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','21:00','22:00','23:00'];
-            while (dates.length < 30) {
-                const day = d.getDay();
-                if (day !== 0 && day !== 6) {
-                    dates.push({
-                        date: d.toISOString().slice(0, 10),
-                        dow: day,
-                        slots: defaultSlots,
-                        availableCount: 11,
-                        allBusy: false
-                    });
-                }
-                d.setDate(d.getDate() + 1);
-            }
-            return dates;
-        }
-
-        // ── Render Calendar ──
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            const { year, month } = _calViewMonth;
-            document.getElementById('calMonthLabel').textContent = `${year}年 ${MONTH_NAMES[month]}`;
-
-            const allDates = (window._calData || []).map(d => d.date);
-            const firstDate = allDates[0];
-            const lastDate = allDates[allDates.length - 1];
-            const fd = new Date(firstDate + 'T00:00:00');
-            const ld = new Date(lastDate + 'T00:00:00');
-
-            document.getElementById('calPrev').disabled = (year <= fd.getFullYear() && month <= fd.getMonth());
-            document.getElementById('calNext').disabled = (year >= ld.getFullYear() && month >= ld.getMonth());
-
-            const dateMap = {};
-            for (const dd of (window._calData || [])) { dateMap[dd.date] = dd; }
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            let html = DOW.map(d => `<div class="pm-cal-head">${d}</div>`).join('');
-            for (let i = 0; i < firstDay; i++) html += '<div class="pm-cal-day empty"></div>';
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const info = dateMap[dateStr];
-                const isSelected = dateStr === _selectedDate;
-                if (!info || info.allBusy) {
-                    html += `<div class="pm-cal-day disabled">${day}</div>`;
-                } else {
-                    html += `<div class="pm-cal-day${isSelected ? ' selected' : ''}" onclick="selectDate('${dateStr}')" data-date="${dateStr}">
-                        ${day}<div class="pm-cal-dot"></div>
-                    </div>`;
-                }
-            }
-            grid.innerHTML = html;
-        }
-
-        function calendarNav(dir) {
-            _calViewMonth.month += dir;
-            if (_calViewMonth.month > 11) { _calViewMonth.month = 0; _calViewMonth.year++; }
-            if (_calViewMonth.month < 0) { _calViewMonth.month = 11; _calViewMonth.year--; }
-            renderCalendar();
-        }
-
-        // ── Select Date → Show Time Slots ──
-        function selectDate(dateStr) {
-            _selectedDate = dateStr;
-            renderCalendar();
-
-            const info = (window._calData || []).find(d => d.date === dateStr);
-            const slots = info?.slots || [];
-
-            document.getElementById('selectedDateLabel').innerHTML = `
-                <span class="material-symbols-outlined" style="font-size:20px;color:var(--pm-accent);">calendar_today</span>
-                ${formatDateFull(dateStr)} — 可用時段
-            `;
-
-            const timeGrid = document.getElementById('timeGrid');
-            if (slots.length === 0) {
-                timeGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#94a3b8;">此日無可用時段</div>';
-            } else {
-                timeGrid.innerHTML = slots.map(s => `
-                    <div class="pm-time-slot" onclick="selectTime(this, '${s}')">
-                        ${s}
-                        <div class="pm-time-label">${getTimeLabel(s)}</div>
-                    </div>
-                `).join('');
-            }
-            goToStep(2);
-        }
-
-        function selectTime(el, time) {
-            _selectedTime = time;
-            document.querySelectorAll('.pm-time-slot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-            setTimeout(() => goToStep(3), 300);
-        }
-
-        // ── Submit Booking ──
-        async function submitBooking(e) {
-            e.preventDefault();
-            const form = e.target;
-            const btn = document.getElementById('submitBtn');
-            const fd = new FormData(form);
-
-            btn.disabled = true;
-            btn.innerHTML = '<div class="pm-spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px;"></div>送出中...';
-
-            const payload = {
-                name: fd.get('name'),
-                email: fd.get('email'),
-                phone: fd.get('phone') || '',
-                company: 'AI PM 養成計劃申請',
-                headcount: '',
-                lineId: fd.get('lineId') || '',
-                message: [
-                    '【AI PM 養成計劃申請】',
-                    `付費 AI 工具：${fd.get('aiTools')}`,
-                    `申請動機：${fd.get('motivation')}`,
-                    fd.get('clientExp') ? `客戶經驗：${fd.get('clientExp')}` : ''
-                ].filter(Boolean).join('\n'),
-                date: _selectedDate,
-                time: _selectedTime
-            };
-
-            try {
-                const res = await fetch(`${SB_URL}/functions/v1/create-booking`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SB_KEY,
-                        'Authorization': `Bearer ${SB_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await res.json();
-                if (!res.ok) throw new Error(result.error || '申請失敗');
-
-                document.getElementById('successDetail').innerHTML = `
-                    您已成功預約 <strong>${formatDateFull(_selectedDate)} ${_selectedTime}</strong> 的線上面談。
-                `;
-
-                document.querySelectorAll('.pm-booking-step').forEach(s => s.classList.remove('active'));
-                document.getElementById('stepSuccess').classList.add('active');
-                document.querySelectorAll('.pm-bk-step').forEach(s => s.classList.add('done'));
-                document.getElementById('modalTitle').textContent = '申請已送出！';
-                document.getElementById('modalSubtitle').textContent = '';
-                document.getElementById('bookingSteps').style.display = 'none';
-
-            } catch (err) {
-                console.error('Booking error:', err);
-                alert('申請失敗：' + (err.message || '請稍後再試'));
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">send</span> 送出申請';
-            }
-        }
-
-        // Smooth scroll for nav links
-        document.querySelectorAll('.pm-nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.querySelector(link.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            });
-        });
+    const SB_URL='https://wsaknnhjgiqmkendeyrj.supabase.co';
+    const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+    let _selectedDate=null,_selectedTime=null,_calViewMonth=null;
+    const DOW=['日','一','二','三','四','五','六'],MONTH_NAMES=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    function getTimeLabel(s){const h=parseInt(s);if(h>=9&&h<=12)return'上午';if(h>=13&&h<=17)return'下午';return'晚間'}
+    function goToStep(n){document.querySelectorAll('.pm-booking-step').forEach(s=>s.classList.remove('active'));document.getElementById(`step${n}`)?.classList.add('active');document.querySelectorAll('.pm-bk-step').forEach(s=>{const sn=parseInt(s.dataset.step);s.classList.toggle('active',sn===n);s.classList.toggle('done',sn<n)});if(n===1){document.getElementById('modalTitle').textContent='申請 AI PM 養成計劃';document.getElementById('modalSubtitle').textContent='選擇一對一面談日期'}else if(n===2){document.getElementById('modalTitle').textContent='選擇面談時段';document.getElementById('modalSubtitle').textContent=formatDateFull(_selectedDate)}else if(n===3){document.getElementById('modalTitle').textContent='填寫申請資料';document.getElementById('modalSubtitle').textContent=`${formatDateFull(_selectedDate)} ${_selectedTime}`;document.getElementById('bookingSummary').innerHTML=`<span class="icon">📅</span><span><strong>${formatDateFull(_selectedDate)}</strong>・${_selectedTime} 線上一對一面談（約 30 分鐘）</span>`}}
+    function formatDateFull(d){if(!d)return'';const dt=new Date(d+'T00:00:00');return`${dt.getMonth()+1}月${dt.getDate()}日 (${DOW[dt.getDay()]})`}
+    async function loadCalendar(){const g=document.getElementById('calendarGrid');g.innerHTML='<div class="pm-cal-loading"><div class="pm-spinner"></div><p>正在載入...</p></div>';try{const r=await fetch(`${SB_URL}/functions/v1/calendar-availability`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});const d=await r.json();window._calData=(!d.calendarConnected||!d.dates?.length)?generateFallbackDates():d.dates}catch(e){window._calData=generateFallbackDates()}const f=window._calData[0]?.date;const dt=new Date(f+'T00:00:00');_calViewMonth={year:dt.getFullYear(),month:dt.getMonth()};renderCalendar()}
+    function generateFallbackDates(){const dates=[];let d=new Date();d.setDate(d.getDate()+1);const slots=['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','21:00','22:00','23:00'];while(dates.length<30){const day=d.getDay();if(day!==0&&day!==6)dates.push({date:d.toISOString().slice(0,10),dow:day,slots,availableCount:11,allBusy:false});d.setDate(d.getDate()+1)}return dates}
+    function renderCalendar(){const g=document.getElementById('calendarGrid');const{year,month}=_calViewMonth;document.getElementById('calMonthLabel').textContent=`${year}年 ${MONTH_NAMES[month]}`;const all=(window._calData||[]).map(d=>d.date);const fd=new Date(all[0]+'T00:00:00'),ld=new Date(all[all.length-1]+'T00:00:00');document.getElementById('calPrev').disabled=(year<=fd.getFullYear()&&month<=fd.getMonth());document.getElementById('calNext').disabled=(year>=ld.getFullYear()&&month>=ld.getMonth());const map={};for(const d of(window._calData||[]))map[d.date]=d;const firstDay=new Date(year,month,1).getDay(),dim=new Date(year,month+1,0).getDate();let h=DOW.map(d=>`<div class="pm-cal-head">${d}</div>`).join('');for(let i=0;i<firstDay;i++)h+='<div class="pm-cal-day empty"></div>';for(let day=1;day<=dim;day++){const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;const info=map[ds];if(!info||info.allBusy)h+=`<div class="pm-cal-day disabled">${day}</div>`;else h+=`<div class="pm-cal-day${ds===_selectedDate?' selected':''}" onclick="selectDate('${ds}')">${day}<div class="pm-cal-dot"></div></div>`}g.innerHTML=h}
+    function calendarNav(dir){_calViewMonth.month+=dir;if(_calViewMonth.month>11){_calViewMonth.month=0;_calViewMonth.year++}if(_calViewMonth.month<0){_calViewMonth.month=11;_calViewMonth.year--}renderCalendar()}
+    function selectDate(ds){_selectedDate=ds;renderCalendar();const info=(window._calData||[]).find(d=>d.date===ds);const slots=info?.slots||[];document.getElementById('selectedDateLabel').innerHTML=`<span class="material-symbols-outlined" style="font-size:20px;color:var(--pm-accent-dark)">calendar_today</span> ${formatDateFull(ds)} — 可用時段`;const tg=document.getElementById('timeGrid');tg.innerHTML=slots.length?slots.map(s=>`<div class="pm-time-slot" onclick="selectTime(this,'${s}')">${s}<div class="pm-time-label">${getTimeLabel(s)}</div></div>`).join(''):'<div style="grid-column:1/-1;text-align:center;padding:24px;color:#999">此日無可用時段</div>';goToStep(2)}
+    function selectTime(el,t){_selectedTime=t;document.querySelectorAll('.pm-time-slot').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');setTimeout(()=>goToStep(3),300)}
+    async function submitBooking(e){e.preventDefault();const form=e.target,btn=document.getElementById('submitBtn'),fd=new FormData(form);btn.disabled=true;btn.innerHTML='<div class="pm-spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:8px"></div>送出中...';const payload={name:fd.get('name'),email:fd.get('email'),phone:fd.get('phone')||'',company:'AI PM 養成計劃申請',headcount:'',lineId:fd.get('lineId')||'',message:['【AI PM 養成計劃申請】',`付費 AI 工具：${fd.get('aiTools')}`,`申請動機：${fd.get('motivation')}`,fd.get('clientExp')?`客戶經驗：${fd.get('clientExp')}`:''].filter(Boolean).join('\n'),date:_selectedDate,time:_selectedTime};try{const r=await fetch(`${SB_URL}/functions/v1/create-booking`,{method:'POST',headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(payload)});const res=await r.json();if(!r.ok)throw new Error(res.error||'申請失敗');document.getElementById('successDetail').innerHTML=`您已成功預約 <strong>${formatDateFull(_selectedDate)} ${_selectedTime}</strong> 的線上面談。`;document.querySelectorAll('.pm-booking-step').forEach(s=>s.classList.remove('active'));document.getElementById('stepSuccess').classList.add('active');document.querySelectorAll('.pm-bk-step').forEach(s=>s.classList.add('done'));document.getElementById('modalTitle').textContent='申請已送出！';document.getElementById('modalSubtitle').textContent='';document.getElementById('bookingSteps').style.display='none'}catch(err){alert('申請失敗：'+(err.message||'請稍後再試'));btn.disabled=false;btn.innerHTML='<span class="material-symbols-outlined" style="font-size:18px">send</span> 送出申請'}}
     </script>
 </body>
-
 </html>
