@@ -551,11 +551,8 @@ window.compareVersions = function() {
 
     setTimeout(() => {
         const n = _allVariants.length;
-        const cols = n + 1; // label col + version cols
-        const colW = n <= 2 ? '1fr' : 'minmax(100px,1fr)';
-        const gridCols = `minmax(110px,140px) repeat(${n}, ${colW})`;
+        const gridCols = `minmax(100px,130px) repeat(${n}, minmax(90px,1fr))`;
 
-        // Helper: calc item amount
         const calcAmt = (item) => {
             if (!item) return 0;
             if (item.type === 'hourly') return (item.hours||0) * (item.rate||0);
@@ -563,81 +560,81 @@ window.compareVersions = function() {
             return item.amount || 0;
         };
 
-        // Gather data for each version
         const vData = _allVariants.map(v => {
             const od = v.outline_data || {};
             const sched = od.schedule || [];
-            return {
-                name: v.name,
-                total: v.total || 0,
-                days: sched.length,
-                hours: sched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0),
-                topics: (od.timeline||[]).map(t => t.title),
-                topicCount: (od.timeline||[]).length,
-                tools: (od.tools||[]).map(t => t.name),
-                equipment: (od.equipment||[]).map(e => e.name),
-                items: v.items || [],
-                subtitle: od.heroSubtitle || '',
-                groupSize: od.heroGroupSize || '',
-                location: od.heroLocation || ''
-            };
+            const topics = (od.timeline||[]).map(t => t.title);
+            const tools = (od.tools||[]).map(t => t.name);
+            const equip = (od.equipment||[]).map(e => e.name);
+            const days = sched.length;
+            const hours = sched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
+            // Auto-generate feature tags
+            const tags = [];
+            if (days > 0) tags.push(`${days} 天 ${hours}h`);
+            if (topics.length) tags.push(`${topics.length} 個主題`);
+            if (tools.length) tags.push(`${tools.length} 種工具`);
+            if (equip.length) tags.push(`需 ${equip.length} 項設備`);
+            return { name: v.name, total: v.total||0, days, hours, topics, tools, equip, items: v.items||[], tags,
+                groupSize: od.heroGroupSize||'', location: od.heroLocation||'', subtitle: od.heroSubtitle||'' };
         });
 
         let html = '';
 
-        // ── Header Row ──
-        html += `<div style="display:grid;grid-template-columns:${gridCols};gap:0;position:sticky;top:0;background:#fff;z-index:2;padding-bottom:12px;border-bottom:2px solid var(--q-border)">`;
-        html += `<div></div>`;
+        // ── Hero Cards (version overview) ──
+        html += `<div class="cmp-hero">`;
         vData.forEach((v, i) => {
-            const isFirst = i === 0;
-            html += `<div style="text-align:center;padding:16px 8px">
-                <div style="font-size:1.05rem;font-weight:800;color:var(--q-text);letter-spacing:-.02em">${v.name || '方案'+(i+1)}</div>
-                <div style="font-size:1.4rem;font-weight:800;color:var(--q-accent);margin-top:4px;font-family:'Inter',sans-serif">${fmt(v.total)}</div>
+            html += `<div class="cmp-card">
+                <div class="cmp-card-name">${v.name || '方案'+(i+1)}</div>
+                <div class="cmp-card-price">${fmt(v.total)}</div>
+                ${v.subtitle ? `<div class="cmp-card-sub">${v.subtitle}</div>` : ''}
+                <div class="cmp-tags">${v.tags.map(t => `<span class="cmp-tag">${t}</span>`).join('')}</div>
             </div>`;
         });
         html += `</div>`;
 
-        // ── Row builder ──
+        // ── Grid comparison ──
         let rowIdx = 0;
-        function addRow(label, values, opts = {}) {
-            const bg = rowIdx % 2 === 0 ? '#fafbfc' : '#fff';
+        function row(label, values, opts = {}) {
             const allSame = values.every(v => v === values[0]);
-            html += `<div style="display:grid;grid-template-columns:${gridCols};gap:0;background:${bg};border-bottom:1px solid #f0f1f3;${opts.highlight?'background:#fffbeb;':''}">`;
-            html += `<div style="padding:12px 14px;font-size:.82rem;font-weight:600;color:var(--q-text-2);display:flex;align-items:center;gap:6px">${label}</div>`;
+            const cls = opts.highlight ? 'cmp-row highlight' : 'cmp-row';
+            let h = `<div class="${cls}" style="grid-template-columns:${gridCols};${rowIdx%2===0?'':'background:#fafbfc'}">`;
+            h += `<div class="cmp-row-label">${label}</div>`;
             values.forEach(val => {
-                const changed = !allSame;
-                html += `<div style="padding:12px 10px;text-align:center;font-size:.88rem;${changed?'font-weight:700;color:var(--q-text)':'color:var(--q-text-2)'}">${val}</div>`;
+                h += `<div class="cmp-row-val${!allSame?' diff':''}">${val}</div>`;
             });
-            html += `</div>`;
+            h += `</div>`;
             rowIdx++;
+            return h;
         }
 
-        function addCheckRow(label, arraysPerVersion) {
+        function checkRows(arraysPerVersion) {
             const allItems = [...new Set(arraysPerVersion.flat())];
-            if (allItems.length === 0) return;
-            allItems.forEach(item => {
-                const values = arraysPerVersion.map(arr =>
+            if (!allItems.length) return '';
+            return allItems.map(item => {
+                const vals = arraysPerVersion.map(arr =>
                     arr.includes(item)
                         ? '<span class="material-symbols-outlined" style="font-size:18px;color:#10b981">check_circle</span>'
                         : '<span class="material-symbols-outlined" style="font-size:18px;color:#e5e7eb">cancel</span>'
                 );
-                addRow(`<span style="font-size:.78rem;font-weight:500">${item}</span>`, values);
-            });
+                return row(`<span style="font-size:.78rem;font-weight:500">${item}</span>`, vals);
+            }).join('');
         }
 
-        // ── Section: 基本資訊 ──
-        html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">基本資訊</div>`;
-        addRow('授課天數', vData.map(v => `${v.days} 天`));
-        addRow('總時數', vData.map(v => `${v.hours} 小時`));
-        if (vData.some(v => v.groupSize)) addRow('人數', vData.map(v => v.groupSize || '—'));
-        if (vData.some(v => v.location)) addRow('授課方式', vData.map(v => v.location || '—'));
+        let grid = '';
 
-        // ── Section: 費用明細 ──
-        const allPricingLabels = [...new Set(vData.flatMap(v => v.items.map(i => i.label)))];
-        if (allPricingLabels.length) {
-            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">費用明細</div>`;
-            allPricingLabels.forEach(label => {
-                const values = vData.map(v => {
+        // Section: 基本資訊
+        grid += `<div class="cmp-section-label">基本資訊</div>`;
+        grid += row('授課天數', vData.map(v => `${v.days} 天`));
+        grid += row('總時數', vData.map(v => `${v.hours} 小時`));
+        if (vData.some(v => v.groupSize)) grid += row('人數', vData.map(v => v.groupSize || '—'));
+        if (vData.some(v => v.location)) grid += row('授課方式', vData.map(v => v.location || '—'));
+
+        // Section: 費用明細
+        const allLabels = [...new Set(vData.flatMap(v => v.items.map(i => i.label)))];
+        if (allLabels.length) {
+            grid += `<div class="cmp-section-label">費用明細</div>`;
+            allLabels.forEach(label => {
+                const vals = vData.map(v => {
                     const item = v.items.find(i => i.label === label);
                     const amt = calcAmt(item);
                     if (!item) return '<span style="color:#d1d5db">—</span>';
@@ -646,42 +643,58 @@ window.compareVersions = function() {
                     else if (item.type === 'perhead') detail = `<div style="font-size:.7rem;color:#9ca3af">${item.count||0}人 × ${(item.rate||0).toLocaleString()}</div>`;
                     return `<div style="font-weight:700">${amt > 0 ? fmt(amt) : '—'}</div>${detail}`;
                 });
-                addRow(label, values);
+                grid += row(label, vals);
             });
-            addRow('<span style="font-weight:800">合計</span>', vData.map(v =>
+            grid += row('<span style="font-weight:800">合計</span>', vData.map(v =>
                 `<span style="font-size:1.05rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}</span>`
             ), { highlight: true });
         }
 
-        // ── Section: 課程主題 ──
+        // Section: 課程主題
         const allTopics = [...new Set(vData.flatMap(v => v.topics))];
         if (allTopics.length) {
-            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">課程主題</div>`;
-            addRow('主題數', vData.map(v => `${v.topicCount} 個`));
-            addCheckRow('主題', vData.map(v => v.topics));
+            grid += `<div class="cmp-section-label">課程主題</div>`;
+            grid += row('主題數', vData.map(v => `${v.topics.length} 個`));
+            grid += checkRows(vData.map(v => v.topics));
         }
 
-        // ── Section: 工具 ──
+        // Section: 工具
         const allTools = [...new Set(vData.flatMap(v => v.tools))];
         if (allTools.length) {
-            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">教學工具</div>`;
-            addCheckRow('工具', vData.map(v => v.tools));
+            grid += `<div class="cmp-section-label">教學工具</div>`;
+            grid += checkRows(vData.map(v => v.tools));
         }
 
-        // ── Section: 設備 ──
-        const allEquip = [...new Set(vData.flatMap(v => v.equipment))];
+        // Section: 設備
+        const allEquip = [...new Set(vData.flatMap(v => v.equip))];
         if (allEquip.length) {
-            html += `<div style="padding:14px;font-size:.78rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--q-border);background:#f8f9ff">設備需求</div>`;
-            addCheckRow('設備', vData.map(v => v.equipment));
+            grid += `<div class="cmp-section-label">設備需求</div>`;
+            grid += checkRows(vData.map(v => v.equip));
         }
 
-        content.innerHTML = `<div style="border:1px solid var(--q-border);border-radius:12px;overflow:hidden">${html}</div>`;
+        html += `<div class="cmp-grid">${grid}</div>`;
+        content.innerHTML = html;
     }, 300);
 };
 
 window.closeCompareSheet = function() {
     document.getElementById('compareSheet').classList.remove('open');
     setTimeout(() => document.getElementById('compareOverlay').classList.remove('open'), 300);
+};
+
+window.copyBankAccount = function(account) {
+    navigator.clipboard.writeText(account).then(() => {
+        const btn = event.currentTarget;
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:#10b981">check</span>已複製';
+        btn.style.borderColor = '#10b981';
+        btn.style.color = '#10b981';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
+    }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = account; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    });
 };
 
 function showError(msg) {
@@ -786,7 +799,7 @@ function renderQuote(q) {
     if (bank.bank || bank.account) {
         bankEl.innerHTML = `
             ${bank.bank ? `<div class="q-bank-row"><span class="q-bank-label">銀行</span><span>${bank.bank}${bank.branch ? ' ' + bank.branch : ''}</span></div>` : ''}
-            ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span class="q-bank-account">${bank.account}</span></div>` : ''}
+            ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span style="display:flex;align-items:center;gap:8px"><span class="q-bank-account">${bank.account}</span><button onclick="copyBankAccount('${bank.account}')" style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border:1px solid var(--q-border);border-radius:6px;background:#f8fafc;color:var(--q-text-2);font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)'" onmouseout="this.style.borderColor='var(--q-border)';this.style.color='var(--q-text-2)'"><span class="material-symbols-outlined" style="font-size:14px">content_copy</span>複製</button></span></div>` : ''}
             ${bank.name ? `<div class="q-bank-row"><span class="q-bank-label">戶名</span><span>${bank.name}</span></div>` : ''}
         `;
     } else { document.getElementById('bankInfoCard').style.display = 'none'; }

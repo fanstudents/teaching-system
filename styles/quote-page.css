@@ -128,6 +128,40 @@ body {
 }
 .q-pricing-card.dimmed .q-pricing-card-total { color: var(--q-text-3); }
 
+/* ── Compare Panel ── */
+.cmp-hero { display: flex; gap: 12px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cmp-card {
+    flex: 1; min-width: 160px; padding: 20px 16px; text-align: center;
+    border-radius: 14px; border: 1.5px solid var(--q-border); background: #fff;
+}
+.cmp-card:nth-child(1) { border-color: #6366f1; background: linear-gradient(135deg,#f8f7ff,#eef2ff); }
+.cmp-card:nth-child(2) { border-color: #10b981; background: linear-gradient(135deg,#f0fdf4,#ecfdf5); }
+.cmp-card:nth-child(3) { border-color: #f59e0b; background: linear-gradient(135deg,#fffbeb,#fef3c7); }
+.cmp-card-name { font-size: 1rem; font-weight: 800; color: var(--q-text); margin-bottom: 4px; }
+.cmp-card-price { font-size: 1.5rem; font-weight: 800; font-family: 'Inter',sans-serif; margin: 6px 0; }
+.cmp-card:nth-child(1) .cmp-card-price { color: #6366f1; }
+.cmp-card:nth-child(2) .cmp-card-price { color: #10b981; }
+.cmp-card:nth-child(3) .cmp-card-price { color: #f59e0b; }
+.cmp-card-sub { font-size: .78rem; color: var(--q-text-3); line-height: 1.4; }
+.cmp-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+.cmp-tag { font-size: .68rem; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+.cmp-card:nth-child(1) .cmp-tag { background: rgba(99,102,241,.1); color: #6366f1; }
+.cmp-card:nth-child(2) .cmp-tag { background: rgba(16,185,129,.1); color: #10b981; }
+.cmp-card:nth-child(3) .cmp-tag { background: rgba(245,158,11,.1); color: #f59e0b; }
+.cmp-grid { border: 1px solid var(--q-border); border-radius: 12px; overflow: hidden; }
+.cmp-section-label {
+    padding: 12px 16px; font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--q-accent); background: #f8f9ff; border-bottom: 1px solid var(--q-border);
+}
+.cmp-row { display: grid; align-items: center; border-bottom: 1px solid #f0f1f3; }
+.cmp-row:hover { background: #f8faff; }
+.cmp-row-label { padding: 11px 14px; font-size: .82rem; font-weight: 600; color: var(--q-text-2); }
+.cmp-row-val { padding: 11px 10px; text-align: center; font-size: .88rem; color: var(--q-text-2); }
+.cmp-row-val.diff { font-weight: 700; color: var(--q-text); }
+.cmp-row.highlight { background: #fffbeb; }
+.cmp-row.highlight .cmp-row-val { font-weight: 800; color: var(--q-accent); }
+
 /* ── Section ── */
 .q-section {
     margin-bottom: 20px;
