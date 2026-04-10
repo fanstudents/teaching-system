@@ -173,10 +173,10 @@
             </div>
             <div class="q-about-content">
                 <div class="q-about-stats">
-                    <div class="q-about-stat"><div class="q-about-stat-num" id="statProjects">14+</div><div class="q-about-stat-label">企業合作專案</div></div>
+                    <div class="q-about-stat"><div class="q-about-stat-num">30+</div><div class="q-about-stat-label">企業培訓實績</div></div>
                     <div class="q-about-stat"><div class="q-about-stat-num">10+</div><div class="q-about-stat-label">年培訓經驗</div></div>
                     <div class="q-about-stat"><div class="q-about-stat-num">7+</div><div class="q-about-stat-label">橫跨產業</div></div>
-                    <div class="q-about-stat"><div class="q-about-stat-num">500+</div><div class="q-about-stat-label">培訓學員</div></div>
+                    <div class="q-about-stat"><div class="q-about-stat-num">5,000+</div><div class="q-about-stat-label">培訓學員</div></div>
                 </div>
 
                 <div class="q-about-founder">
@@ -211,7 +211,8 @@
                 </div>
 
                 <a href="https://tbr.digital" target="_blank" class="q-about-link">
-                    <span class="material-symbols-outlined">open_in_new</span> 瞭解更多數位簡報室
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                    前往數位簡報室官方網站，瞭解更多服務內容
                 </a>
             </div>
         </section>
@@ -395,8 +396,7 @@ function renderTimelineBlock(block, isGrid) {
                 <span class="annotation-count" id="annotationCount${idx}" style="display:none">0</span>
             </button>
             <div class="annotation-form" id="annotationForm${idx}">
-                <input id="annotationName${idx}" placeholder="姓名（選填）">
-                <textarea id="annotationInput${idx}" placeholder="對此單元的問題或建議…" rows="2"></textarea>
+                <textarea id="annotationInput${idx}" placeholder="對此單元有任何問題或調整建議…" rows="2"></textarea>
                 <button onclick="submitAnnotation(${idx}, '${escapedTitle}')">送出</button>
             </div>
         </div>
@@ -412,19 +412,17 @@ window.toggleAnnotation = function(idx) {
 };
 
 window.submitAnnotation = async function(idx, blockTitle) {
-    const nameEl = document.getElementById(`annotationName${idx}`);
     const inputEl = document.getElementById(`annotationInput${idx}`);
     const text = inputEl.value.trim();
     if (!text) return;
 
-    const name = nameEl.value.trim() || '客戶';
     try {
         await db.insert('quote_comments', {
             quotation_id: currentQuotationId,
             block_index: idx,
             block_title: blockTitle,
             comment_text: text,
-            commenter_name: name
+            commenter_name: '客戶'
         });
         inputEl.value = '';
         document.getElementById(`annotationForm${idx}`).classList.remove('open');
