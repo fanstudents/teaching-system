@@ -758,14 +758,19 @@
                 </div>
 
                 <div style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:8px;">
-                    <label style="font-weight:600;font-size:.88rem;display:flex;align-items:center;gap:6px;margin-bottom:12px">
+                    <label style="font-weight:600;font-size:.88rem;display:flex;align-items:center;gap:6px;margin-bottom:8px">
                         <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1">receipt_long</span> 費用明細
                     </label>
-                    <div id="quoteItemsEditor" style="display:flex;flex-direction:column;gap:10px;"></div>
-                    <button class="btn" onclick="addQuoteItem()" style="margin-top:8px;font-size:.78rem;padding:5px 14px;">
-                        <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增項目
-                    </button>
-                    <div style="text-align:right;margin-top:12px;font-size:.92rem;font-weight:700;color:#6366f1;" id="quoteTotalPreview">合計：NT$ 0</div>
+                    <div id="quoteVersionPricingSummary" style="display:flex;flex-direction:column;gap:8px">
+                        <div style="padding:16px;background:#f8fafc;border:1.5px dashed #d1d5db;border-radius:10px;color:#9ca3af;text-align:center;font-size:.85rem">
+                            <span class="material-symbols-outlined" style="font-size:24px;display:block;margin-bottom:4px">sync</span>
+                            儲存時將自動從課綱版本同步報價明細
+                        </div>
+                    </div>
+                    <div style="display:none">
+                        <div id="quoteItemsEditor"></div>
+                        <div id="quoteTotalPreview"></div>
+                    </div>
                 </div>
 
                 <div style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:16px;">
@@ -3457,13 +3462,7 @@ ${gscQueriesStr || '無搜尋資料'}
                 document.getElementById('quoteValidUntil').value = '';
                 document.getElementById('quoteStatus').value = 'draft';
                 document.getElementById('quoteIncludeOutline').checked = true;
-                _quoteItems = [
-                    { label: '講師費', type: 'hourly', hours: 4, rate: 8000, subtotal: 32000 },
-                    { label: '車馬費', type: 'fixed', amount: 0 },
-                    { label: '住宿費', type: 'fixed', amount: 0 },
-                    { label: '助理費', type: 'perhead', count: 0, rate: 3000, subtotal: 0 },
-                    { label: '影片錄製授權費', type: 'fixed', amount: 0 }
-                ];
+                _quoteItems = [];
                 // 自動帶入專案名稱
                 const proj = projects.find(p => p.id === currentProjectId);
                 if (proj) {
@@ -3476,8 +3475,57 @@ ${gscQueriesStr || '無搜尋資料'}
                 }
             }
             renderQuoteItems();
+            // Load outline version pricing summary
+            loadVersionPricingSummary();
             document.getElementById('quotationModal').classList.add('active');
         };
+
+        async function loadVersionPricingSummary() {
+            const container = document.getElementById('quoteVersionPricingSummary');
+            if (!container) return;
+            try {
+                const { data: projArr } = await db.select('projects', {
+                    select: 'outline_versions',
+                    filter: { id: `eq.${currentProjectId}` },
+                    limit: 1
+                });
+                const versions = projArr?.[0]?.outline_versions || [];
+                if (versions.length === 0) {
+                    container.innerHTML = `<div style="padding:16px;background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;color:#92400e;font-size:.85rem;text-align:center">
+                        <span class="material-symbols-outlined" style="font-size:20px;vertical-align:middle;margin-right:4px">warning</span>
+                        尚未建立課綱版本，請先到「課綱編輯」建立版本並設定報價明細
+                    </div>`;
+                    return;
+                }
+                container.innerHTML = versions.map((v, i) => {
+                    const od = v.data || {};
+                    const pricing = od.pricing || [];
+                    let total = 0;
+                    const rows = pricing.map(p => {
+                        let amt = 0;
+                        if (p.type === 'hourly') amt = (p.hours||0) * (p.rate||0);
+                        else if (p.type === 'perhead') amt = (p.count||0) * (p.rate||0);
+                        else amt = p.amount || 0;
+                        total += amt;
+                        if (amt === 0) return '';
+                        return `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:2px 0">
+                            <span style="color:#64748b">${p.label}</span>
+                            <span style="font-weight:600">NT$ ${amt.toLocaleString()}</span>
+                        </div>`;
+                    }).filter(Boolean).join('');
+
+                    return `<div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${rows?'8px':'0'}">
+                            <span style="font-weight:700;font-size:.88rem;color:#334155">${v.name || '版本 ' + (i+1)}</span>
+                            <span style="font-weight:800;color:#6366f1;font-size:.92rem">NT$ ${total.toLocaleString()}</span>
+                        </div>
+                        ${rows}
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                console.warn('Failed to load version pricing summary:', e);
+            }
+        }
 
         function renderQuoteItems() {
             const container = document.getElementById('quoteItemsEditor');
