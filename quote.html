@@ -530,45 +530,96 @@ window.compareVersions = function() {
         return `【${v.name || '方案'+(i+1)}】\n課程主題: ${timeline || '無'}\n工具: ${tools || '無'}\n費用: ${pricing || '無'}\n合計: NT$${(v.total||0).toLocaleString()}`;
     });
 
-    // Render local comparison (no API needed)
+    // Render comparison
     setTimeout(() => {
         let html = '<div style="padding:4px 0">';
-        // Compare each pair
         for (let i = 0; i < _allVariants.length; i++) {
             for (let j = i+1; j < _allVariants.length; j++) {
                 const a = _allVariants[i], b = _allVariants[j];
-                html += `<div style="background:#f8f9ff;border-radius:10px;padding:16px;margin-bottom:12px">
-                    <div style="font-weight:700;margin-bottom:10px">${a.name || '方案'+(i+1)} vs ${b.name || '方案'+(j+1)}</div>`;
+                const ad = a.outline_data || {}, bd = b.outline_data || {};
+                html += `<div style="background:#f8f9ff;border-radius:12px;padding:18px;margin-bottom:14px">
+                    <div style="font-weight:700;font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:var(--q-accent)">compare_arrows</span>
+                        ${a.name || '方案'+(i+1)} vs ${b.name || '方案'+(j+1)}
+                    </div>`;
 
-                // Price diff
+                const rows = [];
+
+                // ① 費用差異
                 const diff = (b.total||0) - (a.total||0);
-                const diffStr = diff > 0 ? `+${fmt(diff)}` : diff < 0 ? fmt(diff) : '相同';
-                html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eef">
-                    <span>💰 費用差異</span><span style="font-weight:700;color:${diff>0?'#ef4444':'#10b981'}">${diffStr}</span></div>`;
+                const diffStr = diff > 0 ? `+${fmt(diff)}` : diff < 0 ? `${fmt(diff)}` : '相同';
+                rows.push(`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:${diff!==0?'#fef3c7':'#f0fdf4'};border-radius:8px;margin-bottom:6px">
+                    <span style="font-weight:600">💰 總費用</span>
+                    <div style="text-align:right">
+                        <div style="font-weight:700;color:${diff>0?'#ef4444':diff<0?'#10b981':'#6b7280'}">${diffStr}</div>
+                        <div style="font-size:.75rem;color:#9ca3af">${fmt(a.total||0)} → ${fmt(b.total||0)}</div>
+                    </div>
+                </div>`);
 
-                // Topic diff
-                const aTopics = ((a.outline_data||{}).timeline||[]).map(t=>t.title);
-                const bTopics = ((b.outline_data||{}).timeline||[]).map(t=>t.title);
-                const added = bTopics.filter(t => !aTopics.includes(t));
-                const removed = aTopics.filter(t => !bTopics.includes(t));
-                if (added.length) html += `<div style="padding:4px 0;font-size:.85rem">➕ 新增主題：${added.join('、')}</div>`;
-                if (removed.length) html += `<div style="padding:4px 0;font-size:.85rem">➖ 移除主題：${removed.join('、')}</div>`;
-                if (!added.length && !removed.length) html += `<div style="padding:4px 0;font-size:.85rem;color:var(--q-text-3)">📋 課程主題相同</div>`;
+                // ② 費用項目明細對比
+                const aItems = a.items || [], bItems = b.items || [];
+                const allLabels = [...new Set([...aItems.map(x=>x.label), ...bItems.map(x=>x.label)])];
+                const itemDiffs = [];
+                allLabels.forEach(label => {
+                    const ai = aItems.find(x=>x.label===label), bi = bItems.find(x=>x.label===label);
+                    const aAmt = ai ? (ai.type==='hourly'?(ai.hours||0)*(ai.rate||0):ai.type==='perhead'?(ai.count||0)*(ai.rate||0):(ai.amount||0)) : 0;
+                    const bAmt = bi ? (bi.type==='hourly'?(bi.hours||0)*(bi.rate||0):bi.type==='perhead'?(bi.count||0)*(bi.rate||0):(bi.amount||0)) : 0;
+                    if (aAmt !== bAmt) {
+                        itemDiffs.push(`${label}：${fmt(aAmt)} → ${fmt(bAmt)}`);
+                    } else if (!ai) { itemDiffs.push(`${label}：新增 ${fmt(bAmt)}`); }
+                    else if (!bi) { itemDiffs.push(`${label}：移除`); }
+                });
+                if (itemDiffs.length) {
+                    rows.push(`<div style="padding:6px 0;font-size:.85rem"><span style="font-weight:600">📋 費用項目差異</span><ul style="margin:4px 0 0 18px;padding:0;list-style:disc">${itemDiffs.map(d=>`<li style="padding:2px 0">${d}</li>`).join('')}</ul></div>`);
+                }
 
-                // Tool diff
-                const aTools = ((a.outline_data||{}).tools||[]).map(t=>t.name);
-                const bTools = ((b.outline_data||{}).tools||[]).map(t=>t.name);
+                // ③ 授課天數
+                const aSched = ad.schedule || [], bSched = bd.schedule || [];
+                if (aSched.length !== bSched.length) {
+                    rows.push(`<div style="padding:6px 0;font-size:.85rem">📅 授課天數：${aSched.length} 天 → ${bSched.length} 天</div>`);
+                }
+                // 總時數
+                const aHrs = aSched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
+                const bHrs = bSched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
+                if (aHrs !== bHrs) {
+                    rows.push(`<div style="padding:6px 0;font-size:.85rem">⏱ 總時數：${aHrs}h → ${bHrs}h</div>`);
+                }
+
+                // ④ 課程主題差異
+                const aTopics = (ad.timeline||[]).map(t=>t.title);
+                const bTopics = (bd.timeline||[]).map(t=>t.title);
+                const addedTopics = bTopics.filter(t => !aTopics.includes(t));
+                const removedTopics = aTopics.filter(t => !bTopics.includes(t));
+                if (addedTopics.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">➕ 新增主題：${addedTopics.join('、')}</div>`);
+                if (removedTopics.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">➖ 移除主題：${removedTopics.join('、')}</div>`);
+
+                // ⑤ 工具差異
+                const aTools = (ad.tools||[]).map(t=>t.name);
+                const bTools = (bd.tools||[]).map(t=>t.name);
                 const addedT = bTools.filter(t => !aTools.includes(t));
                 const removedT = aTools.filter(t => !bTools.includes(t));
-                if (addedT.length) html += `<div style="padding:4px 0;font-size:.85rem">🔧 新增工具：${addedT.join('、')}</div>`;
-                if (removedT.length) html += `<div style="padding:4px 0;font-size:.85rem">🔧 移除工具：${removedT.join('、')}</div>`;
+                if (addedT.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🔧 新增工具：${addedT.join('、')}</div>`);
+                if (removedT.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🔧 移除工具：${removedT.join('、')}</div>`);
 
-                html += `</div>`;
+                // ⑥ 設備差異
+                const aEquip = (ad.equipment||[]).map(e=>e.name);
+                const bEquip = (bd.equipment||[]).map(e=>e.name);
+                const addedE = bEquip.filter(e => !aEquip.includes(e));
+                const removedE = aEquip.filter(e => !bEquip.includes(e));
+                if (addedE.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🖥️ 新增設備：${addedE.join('、')}</div>`);
+                if (removedE.length) rows.push(`<div style="padding:4px 0;font-size:.85rem">🖥️ 移除設備：${removedE.join('、')}</div>`);
+
+                // If nothing different at all
+                if (rows.length === 1 && diff === 0) {
+                    rows.push(`<div style="padding:10px 0;font-size:.88rem;color:var(--q-text-3);text-align:center">✅ 這兩個版本的內容完全相同</div>`);
+                }
+
+                html += rows.join('') + '</div>';
             }
         }
         html += '</div>';
         content.innerHTML = html;
-    }, 500);
+    }, 300);
 };
 
 window.closeCompareSheet = function() {
