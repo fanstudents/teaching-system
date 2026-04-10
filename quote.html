@@ -111,6 +111,15 @@
                 </div>
                 <div class="q-equip-grid" id="equipGrid"></div>
             </section>
+
+            <!-- Instructor (inside outline block so it toggles per variant) -->
+            <section class="q-section" id="instructorSection" style="display:none">
+                <div class="q-section-header">
+                    <div class="q-section-icon"><span class="material-symbols-outlined">school</span></div>
+                    <div><div class="q-section-title">講師介紹</div><div class="q-section-desc">本課程授課講師團隊</div></div>
+                </div>
+                <div id="instructorContent"></div>
+            </section>
         </div>
 
         <!-- Quote Table -->
@@ -193,14 +202,7 @@
             </div>
         </section>
 
-        <!-- Instructor -->
-        <section class="q-section" id="instructorSection" style="display:none">
-            <div class="q-section-header">
-                <div class="q-section-icon"><span class="material-symbols-outlined">school</span></div>
-                <div><div class="q-section-title">講師介紹</div></div>
-            </div>
-            <div id="instructorContent"></div>
-        </section>
+
 
         <!-- About -->
         <section class="q-section" id="aboutSection">
@@ -361,11 +363,18 @@ window.switchVariant = function(idx) {
         document.getElementById('totalAmount').textContent = fmt(variant.total || 0);
     }
 
-    // Render outline
+    // Reset all optional sections first
+    document.getElementById('toolsSection').style.display = 'none';
+    document.getElementById('equipSection').style.display = 'none';
+    document.getElementById('instructorSection').style.display = 'none';
+
+    // Render outline (includes tools, equipment, instructor)
     if (variant.outline_data) {
         blockCounter = 0;
         renderOutlineData(variant.outline_data);
         document.getElementById('outlineSection').style.display = 'block';
+    } else {
+        document.getElementById('outlineSection').style.display = 'none';
     }
 };
 
