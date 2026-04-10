@@ -1765,12 +1765,20 @@ function renderVersionTabs() {
         sectionTitle.parentElement.insertBefore(container, sectionTitle.nextSibling);
     }
     container.innerHTML = outlineVersions.map((v, i) =>
-        `<button class="oe-version-tab${i === activeVersionIdx ? ' active' : ''}" onclick="switchVersion(${i})" style="
-            padding:8px 16px;border-radius:8px;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
-            background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
-            color:${i === activeVersionIdx ? '#fff' : '#64748b'};
-            font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;
-        " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>`
+        `<div style="display:inline-flex;align-items:center;gap:0;position:relative">
+            <button class="oe-version-tab${i === activeVersionIdx ? ' active' : ''}" onclick="switchVersion(${i})" style="
+                padding:8px 16px;border-radius:8px 0 0 8px;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
+                background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
+                color:${i === activeVersionIdx ? '#fff' : '#64748b'};
+                font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border-right:none;
+            " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>
+            <button onclick="renameVersion(${i})" title="重新命名" style="
+                padding:6px 8px;border-radius:0 8px 8px 0;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
+                background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
+                color:${i === activeVersionIdx ? 'rgba(255,255,255,.7)' : '#9ca3af'};
+                cursor:pointer;display:flex;align-items:center;transition:all .15s;
+            "><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
+        </div>`
     ).join('') +
     `<button onclick="addVersion()" style="
         padding:8px 14px;border-radius:8px;border:1.5px dashed #d1d5db;
