@@ -99,7 +99,8 @@
 
     <script type="module">
         import { showToast, showConfirm } from './scripts/ui.js';
-        import { db } from './scripts/supabase.js';
+        import { db, requireAuth } from './scripts/supabase.js';
+        const _authCheck = await requireAuth(['super_admin']); if (!_authCheck) throw new Error('unauthorized');
 
         // ── State ──
         let allSessions = [];

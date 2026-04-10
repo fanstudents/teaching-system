@@ -140,7 +140,8 @@
 </div><!-- /admin-main -->
 
     <script type="module">
-        import { db } from './scripts/supabase.js';
+        import { db, requireAuth } from './scripts/supabase.js';
+        const _authCheck = await requireAuth(['super_admin']); if (!_authCheck) throw new Error('unauthorized');
 
         let currentTab = 'affiliate';
         let allData = [];

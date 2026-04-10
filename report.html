@@ -262,7 +262,8 @@
         </div>
 
         <script type="module">
-            import { db, ai } from './scripts/supabase.js';
+            import { db, ai, requireAuth } from './scripts/supabase.js';
+            const _authCheck = await requireAuth(); if (!_authCheck) throw new Error('unauthorized');
             import { showToast, showConfirm } from './scripts/ui.js';
 
             // ── 取得當前專案 (DB-first) ──

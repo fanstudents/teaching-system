@@ -425,7 +425,8 @@
     </div>
 
     <script type="module">
-        import { db } from './scripts/supabase.js';
+        import { db, requireAuth } from './scripts/supabase.js';
+        const _authCheck = await requireAuth(); if (!_authCheck) throw new Error('unauthorized');
         import { HomeworkSubmission } from './scripts/homework.js';
 
         const homework = new HomeworkSubmission();

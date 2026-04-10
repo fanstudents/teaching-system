@@ -349,6 +349,7 @@ const slug = params.get('slug') || location.pathname.split('/').pop()?.replace('
 let currentQuotationId = null;
 let currentQuotation = null;
 let commentsCache = {};
+let _commentTimestamps = []; // rate limiter
 
 async function init() {
     if (!slug || slug === 'quote') { showError('請提供報價單代碼'); return; }
@@ -887,6 +888,16 @@ async function submitCommentFromSheet(idx, blockTitle) {
     const inputEl = document.getElementById('commentSheetInput');
     const text = inputEl.value.trim();
     if (!text) return;
+
+    // Rate limit: max 3 comments per 30 seconds
+    const now = Date.now();
+    _commentTimestamps = _commentTimestamps.filter(t => now - t < 30000);
+    if (_commentTimestamps.length >= 3) {
+        alert('操作過於頻繁，請稍後再試');
+        return;
+    }
+    _commentTimestamps.push(now);
+
     try {
         await db.insert('quote_comments', {
             quotation_id: currentQuotationId,
@@ -921,6 +932,11 @@ window.submitComment = async function(idx, blockTitle) {
     const inputEl = document.getElementById(`commentInput${idx}`);
     const text = inputEl.value.trim();
     if (!text) return;
+
+    const now = Date.now();
+    _commentTimestamps = _commentTimestamps.filter(t => now - t < 30000);
+    if (_commentTimestamps.length >= 3) { alert('操作過於頻繁，請稍後再試'); return; }
+    _commentTimestamps.push(now);
 
     try {
         await db.insert('quote_comments', {

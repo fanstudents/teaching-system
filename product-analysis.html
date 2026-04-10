@@ -244,7 +244,8 @@
 </div>
 
 <script type="module">
-    import { db, functions, ai } from './scripts/supabase.js';
+    import { db, functions, ai, requireAuth } from './scripts/supabase.js';
+    const _authCheck = await requireAuth(); if (!_authCheck) throw new Error('unauthorized');
 
     let cachedData = null;
 

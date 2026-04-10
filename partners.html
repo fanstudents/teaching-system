@@ -576,7 +576,8 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { db } from './scripts/supabase.js';
+        import { db, requireAuth } from './scripts/supabase.js';
+        const _authCheck = await requireAuth(); if (!_authCheck) throw new Error('unauthorized');
 
         let affiliates = [];
         let instructors = [];
