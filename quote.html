@@ -325,18 +325,18 @@
 
 <!-- Bottom Sheet: Compare Versions -->
 <div class="bottom-sheet-overlay" id="compareOverlay" onclick="closeCompareSheet()"></div>
-<div class="bottom-sheet" id="compareSheet" style="max-height:90vh">
+<div class="bottom-sheet" id="compareSheet" style="max-height:92vh">
     <div class="bottom-sheet-handle"></div>
     <div class="bottom-sheet-title">
-        <span>🔍 版本差異比較</span>
+        <span style="display:flex;align-items:center;gap:8px"><span class="material-symbols-outlined" style="font-size:20px;color:var(--q-accent)">compare_arrows</span>版本差異比較</span>
         <button class="bottom-sheet-close" onclick="closeCompareSheet()">
             <span class="material-symbols-outlined" style="font-size:18px">close</span>
         </button>
     </div>
-    <div id="compareContent" style="font-size:.92rem;line-height:1.8;color:var(--q-text);overflow-y:auto;max-height:70vh">
+    <div id="compareContent" style="font-size:.92rem;line-height:1.6;color:var(--q-text);overflow-y:auto;max-height:78vh;padding-bottom:20px">
         <div style="text-align:center;padding:40px;color:var(--q-text-3)">
             <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:8px">hourglass_top</span>
-            AI 分析中…
+            載入中…
         </div>
     </div>
 </div>

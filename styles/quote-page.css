@@ -685,6 +685,18 @@ body {
     .q-cta p { font-size: .85rem; }
     .q-cta-buttons { flex-direction: column; gap: 10px; }
     .q-cta-btn { width: 100%; justify-content: center; padding: 14px 24px; font-size: .9rem; }
+
+    /* Compare panel mobile */
+    .cmp-hero { flex-direction: column; gap: 10px; }
+    .cmp-card { min-width: unset; padding: 16px 14px; display: flex; align-items: center; gap: 14px; text-align: left; }
+    .cmp-card-name { font-size: .92rem; margin-bottom: 0; }
+    .cmp-card-price { font-size: 1.2rem; margin: 0; white-space: nowrap; }
+    .cmp-card-sub { display: none; }
+    .cmp-tags { justify-content: flex-start; margin-top: 6px; }
+    .cmp-grid { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .cmp-row { min-width: 480px; }
+    .cmp-section-label { min-width: 480px; position: sticky; left: 0; }
+    .cmp-row-label { position: sticky; left: 0; background: inherit; z-index: 1; min-width: 100px; }
 }
 
 /* ── Extra small (< 375px) ── */
