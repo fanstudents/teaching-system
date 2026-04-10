@@ -21,6 +21,10 @@ let students = [];
 let uploadedFiles = [];
 const ADMIN_PASSWORD = 'admin2026';
 
+// ── Outline Versions ──
+let outlineVersions = [];    // [{name, data, created_at}]
+let activeVersionIdx = 0;
+
 // ── DOM Ready ──
 document.addEventListener('DOMContentLoaded', init);
 
@@ -835,6 +839,9 @@ function updateTopbar() {
 // ══════════════════════════════════════
 
 function initOutlineEditor() {
+    // Init version management tabs
+    initVersions();
+
     const od = getOutlineData();
 
     // Suppress column rebuild during initial population
@@ -1626,6 +1633,113 @@ window._updateTimelineTimeRanges = function() {
     }
 };
 
+// ═══════════════════════════════════════
+// OUTLINE VERSION MANAGEMENT
+// ═══════════════════════════════════════
+
+function initVersions() {
+    const versions = projectData?.outline_versions;
+    if (versions && versions.length > 0) {
+        outlineVersions = JSON.parse(JSON.stringify(versions));
+    } else {
+        // Bootstrap: current outline_data becomes "版本一"
+        const od = getOutlineData();
+        outlineVersions = [{
+            name: '版本一',
+            data: od ? JSON.parse(JSON.stringify(od)) : null,
+            created_at: new Date().toISOString()
+        }];
+    }
+    activeVersionIdx = 0;
+    renderVersionTabs();
+}
+
+function renderVersionTabs() {
+    let container = document.getElementById('outlineVersionTabs');
+    if (!container) {
+        // Create tab bar after admin-section-title
+        const sectionTitle = document.querySelector('#adminPanel .admin-section-title');
+        if (!sectionTitle) return;
+        container = document.createElement('div');
+        container.id = 'outlineVersionTabs';
+        container.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding:10px 20px;background:#f8fafc;border-bottom:1px solid var(--border,#e2e8f0)';
+        sectionTitle.parentElement.insertBefore(container, sectionTitle.nextSibling);
+    }
+    container.innerHTML = outlineVersions.map((v, i) =>
+        `<button class="oe-version-tab${i === activeVersionIdx ? ' active' : ''}" onclick="switchVersion(${i})" style="
+            padding:8px 16px;border-radius:8px;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
+            background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
+            color:${i === activeVersionIdx ? '#fff' : '#64748b'};
+            font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;
+        " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>`
+    ).join('') +
+    `<button onclick="addVersion()" style="
+        padding:8px 14px;border-radius:8px;border:1.5px dashed #d1d5db;
+        background:none;color:#9ca3af;font-size:0.82rem;cursor:pointer;font-family:inherit;
+    " onmouseover="this.style.borderColor='var(--accent,#6366f1)';this.style.color='var(--accent,#6366f1)'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#9ca3af'">+ 新增版本</button>`;
+}
+
+window.switchVersion = function(idx) {
+    if (idx === activeVersionIdx) return;
+    // Save current form data to active version
+    outlineVersions[activeVersionIdx].data = collectOutlineData();
+    // Switch
+    activeVersionIdx = idx;
+    renderVersionTabs();
+    // Apply new version's data to editor
+    const vData = outlineVersions[idx]?.data;
+    if (vData) {
+        _applyOutlineData(vData);
+    } else {
+        _clearEditorFields();
+    }
+};
+
+window.addVersion = function() {
+    // Save current version first
+    outlineVersions[activeVersionIdx].data = collectOutlineData();
+    // Create new version (copy from current)
+    const newVersion = {
+        name: '版本' + _zhNum(outlineVersions.length + 1),
+        data: JSON.parse(JSON.stringify(outlineVersions[activeVersionIdx].data)),
+        created_at: new Date().toISOString()
+    };
+    outlineVersions.push(newVersion);
+    activeVersionIdx = outlineVersions.length - 1;
+    renderVersionTabs();
+    // Apply (already same data, but re-render to be safe)
+    _applyOutlineData(newVersion.data);
+};
+
+window.renameVersion = function(idx) {
+    const current = outlineVersions[idx].name;
+    const newName = prompt('版本名稱：', current);
+    if (newName && newName.trim()) {
+        outlineVersions[idx].name = newName.trim();
+        renderVersionTabs();
+    }
+};
+
+function _zhNum(n) {
+    const zh = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    return n <= 10 ? zh[n] : String(n);
+}
+
+function _clearEditorFields() {
+    // Reset all editor fields to empty
+    _v('oeHeroSubtitle', '');
+    document.getElementById('oeScheduleList').innerHTML = '';
+    const oldCols = document.querySelector('.oe-timeline-columns');
+    if (oldCols) oldCols.remove();
+    document.getElementById('oeTimelineList').innerHTML = '';
+    document.getElementById('oeTimelineList').style.display = '';
+    document.getElementById('oeToolsList').innerHTML = '';
+    document.getElementById('oeEquipList').innerHTML = '';
+    _tlCounter = 0; _toolCounter = 0; _eqCounter = 0; _schCounter = 0;
+    _isColumnMode = false;
+    addScheduleDay({ day: 1, hours: '', topic: '' });
+}
+
 // ── Collect Form Data ──
 function collectOutlineData() {
     const od = {};
@@ -1741,11 +1855,22 @@ async function saveOutlineData() {
     btn.textContent = '儲存中...';
     try {
         const outline_data = collectOutlineData();
-        const { error } = await db.update('projects', { outline_data }, { id: `eq.${projectData.id}` });
+        // Update active version
+        if (outlineVersions.length > 0) {
+            outlineVersions[activeVersionIdx].data = outline_data;
+        }
+        // Save both outline_data (active) and outline_versions (all)
+        const payload = { outline_data };
+        if (outlineVersions.length > 0) {
+            payload.outline_versions = outlineVersions;
+        }
+        const { error } = await db.update('projects', payload, { id: `eq.${projectData.id}` });
         if (error) throw new Error(JSON.stringify(error));
         projectData.outline_data = outline_data;
+        projectData.outline_versions = outlineVersions;
         renderOutlineFromDB();
-        statusEl.textContent = `✓ 已儲存（${new Date().toLocaleTimeString('zh-TW')})`;
+        const vName = outlineVersions[activeVersionIdx]?.name || '';
+        statusEl.textContent = `✓ 已儲存${vName ? '「' + vName + '」' : ''}（${new Date().toLocaleTimeString('zh-TW')}）`;
         statusEl.style.display = 'block';
         statusEl.style.color = '#059669';
         setTimeout(() => statusEl.style.display = 'none', 3000);

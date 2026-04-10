@@ -307,7 +307,7 @@
             document.getElementById('editorOverlay').classList.add('open');
         };
 
-        window.openEditor = function(id) {
+        window.openEditor = async function(id) {
             const q = allQuotes.find(x => x.id === id);
             if (!q) return;
             editingQuote = q;
@@ -320,6 +320,9 @@
             document.getElementById('fValidUntil').value = q.valid_until || '';
             document.getElementById('fNotes').value = q.notes || '';
             document.getElementById('fLink').value = baseUrl + q.slug;
+
+            // Load outline versions from project
+            await loadProjectOutlineVersions(q.project_id);
 
             if (q.variants && q.variants.length > 0) {
                 editingVariants = JSON.parse(JSON.stringify(q.variants));
@@ -370,14 +373,31 @@
             renderVariantEditor();
         };
 
+        let projectOutlineVersions = []; // loaded from project
+
         function renderVariantEditor() {
             const v = editingVariants[activeVariantIdx];
             if (!v) return;
             const el = document.getElementById('variantEditor');
+
+            // Build outline version options
+            let outlineOptions = '<option value="">— 不指定課綱 —</option>';
+            projectOutlineVersions.forEach((ver, i) => {
+                const selected = v._outlineVersionIdx === i ? 'selected' : '';
+                outlineOptions += `<option value="${i}" ${selected}>${ver.name || '版本 ' + (i+1)}</option>`;
+            });
+
             el.innerHTML = `
                 <div class="form-group">
                     <label class="form-label">方案名稱</label>
                     <input class="form-input" id="vName" value="${v.name || ''}" placeholder="方案 A：基礎培訓">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">綁定課綱版本</label>
+                    <select class="form-input form-select" id="vOutlineVersion" onchange="onOutlineVersionChange(this.value)">
+                        ${outlineOptions}
+                    </select>
+                    <div style="font-size:.72rem;color:#9ca3af;margin-top:4px">選擇後，此方案會使用該版本的課綱與講師資訊。於課綱編輯器（course-outline.html）管理版本。</div>
                 </div>
                 <div class="form-label" style="margin-bottom:8px">報價項目</div>
                 <div class="items-header">
@@ -393,6 +413,43 @@
                 </div>
                 ${editingVariants.length > 1 ? `<div class="variant-delete-area"><button class="btn-danger" onclick="deleteVariant(${activeVariantIdx})">刪除此方案</button></div>` : ''}
             `;
+        }
+
+        window.onOutlineVersionChange = function(val) {
+            const v = editingVariants[activeVariantIdx];
+            if (val === '') {
+                v.outline_data = null;
+                v._outlineVersionIdx = null;
+            } else {
+                const idx = parseInt(val);
+                const ver = projectOutlineVersions[idx];
+                if (ver) {
+                    v.outline_data = JSON.parse(JSON.stringify(ver.data));
+                    v._outlineVersionIdx = idx;
+                }
+            }
+        };
+
+        async function loadProjectOutlineVersions(projectId) {
+            if (!projectId) { projectOutlineVersions = []; return; }
+            try {
+                const { data } = await db.select('projects', {
+                    select: 'outline_versions,outline_data',
+                    filter: { id: `eq.${projectId}` },
+                    limit: 1
+                });
+                if (data && data[0]) {
+                    const versions = data[0].outline_versions;
+                    if (versions && versions.length > 0) {
+                        projectOutlineVersions = versions;
+                    } else if (data[0].outline_data) {
+                        // Fallback: single version from outline_data
+                        projectOutlineVersions = [{ name: '版本一', data: data[0].outline_data }];
+                    } else {
+                        projectOutlineVersions = [];
+                    }
+                }
+            } catch (e) { console.warn('loadProjectOutlineVersions:', e); }
         }
 
         function renderItemRow(item, idx) {
