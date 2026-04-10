@@ -1822,12 +1822,40 @@ window.addVersion = function() {
 };
 
 window.renameVersion = function(idx) {
-    const current = outlineVersions[idx].name;
-    const newName = prompt('版本名稱：', current);
-    if (newName && newName.trim()) {
-        outlineVersions[idx].name = newName.trim();
+    // Find the tab button for this version
+    const tabContainer = document.getElementById('outlineVersionTabs');
+    if (!tabContainer) return;
+    const tabBtn = tabContainer.querySelectorAll('.oe-version-tab')[idx];
+    if (!tabBtn) return;
+
+    const current = outlineVersions[idx].name || '版本 ' + (idx+1);
+    const parentDiv = tabBtn.closest('div[style*="inline-flex"]');
+    if (!parentDiv) return;
+
+    // Replace the tab group with an inline input
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = current;
+    input.style.cssText = 'padding:7px 12px;border:2px solid var(--accent,#6366f1);border-radius:8px;font-size:0.82rem;font-weight:600;font-family:inherit;outline:none;width:120px;background:#fff;color:var(--text,#1e293b)';
+    input.setAttribute('autofocus', 'true');
+
+    // Hide the original buttons, show input
+    const origHTML = parentDiv.innerHTML;
+    parentDiv.innerHTML = '';
+    parentDiv.appendChild(input);
+    input.focus();
+    input.select();
+
+    const commit = () => {
+        const val = input.value.trim();
+        if (val) outlineVersions[idx].name = val;
         renderVersionTabs();
-    }
+    };
+    input.addEventListener('blur', commit);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        if (e.key === 'Escape') { renderVersionTabs(); }
+    });
 };
 
 function _zhNum(n) {
