@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報價單管理 — 教學系統</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/admin-layout.css">
+    <link rel="stylesheet" href="styles/s79-theme.css">
+    <style>
+        body { margin: 0; background: #f6f7f9; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 32px 48px; }
+        .page-header { padding: 28px 0 16px; display: flex; align-items: flex-end; justify-content: space-between; }
+        .page-header h1 { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-header .meta { font-size: .75rem; color: #9ca3af; margin-top: 4px; }
+
+        /* Quote list */
+        .quote-list { display: flex; flex-direction: column; gap: 10px; }
+        .quote-card {
+            background: #fff; border: 1.5px solid rgba(0,0,0,.05); border-radius: 14px;
+            padding: 20px 24px; display: flex; align-items: center; gap: 16px;
+            cursor: pointer; transition: all .2s; text-decoration: none; color: inherit;
+        }
+        .quote-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-2px); }
+        .quote-card-icon { width: 42px; height: 42px; border-radius: 12px; background: #ede9fe; color: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .quote-card-icon .material-symbols-outlined { font-size: 20px; }
+        .quote-card-info { flex: 1; min-width: 0; }
+        .quote-card-title { font-weight: 700; font-size: .92rem; color: #1a1a2e; }
+        .quote-card-sub { font-size: .75rem; color: #9ca3af; margin-top: 3px; }
+        .quote-card-right { display: flex; align-items: center; gap: 12px; }
+        .quote-status { font-size: .68rem; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
+        .quote-status.draft { background: #f5f5f5; color: #9ca3af; }
+        .quote-status.sent { background: #eff6ff; color: #3b82f6; }
+        .quote-status.accepted { background: #ecfdf5; color: #10b981; }
+        .quote-amount { font-weight: 700; font-size: .92rem; color: #1a1a2e; white-space: nowrap; }
+
+        /* Editor panel */
+        .editor-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; backdrop-filter: blur(2px); }
+        .editor-overlay.open { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
+        .editor-panel {
+            background: #fff; border-radius: 16px; width: 100%; max-width: 880px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.15); animation: slideUp .2s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .editor-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; border-bottom: 1px solid #f0f1f3; }
+        .editor-header h2 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .editor-close { width: 32px; height: 32px; border: none; border-radius: 8px; background: #f5f5f5; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
+        .editor-close:hover { background: #eee; color: #1a1a2e; }
+        .editor-body { padding: 24px 28px; max-height: 70vh; overflow-y: auto; }
+        .editor-footer { padding: 16px 28px; border-top: 1px solid #f0f1f3; display: flex; justify-content: flex-end; gap: 10px; }
+
+        /* Form */
+        .form-group { margin-bottom: 18px; }
+        .form-label { font-size: .78rem; font-weight: 600; color: #64748b; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .04em; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: .88rem; font-family: inherit; transition: border-color .15s;
+        }
+        .form-input:focus, .form-textarea:focus { border-color: #6366f1; outline: none; }
+        .form-textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        /* Variant section */
+        .variant-section { margin-top: 24px; padding-top: 20px; border-top: 2px solid #f0f1f3; }
+        .variant-tabs-editor { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+        .variant-tab-btn {
+            padding: 8px 16px; border-radius: 8px; border: 1.5px solid #e2e8f0;
+            background: #fff; font-size: .82rem; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: all .15s; color: #64748b;
+        }
+        .variant-tab-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+        .variant-tab-btn:hover:not(.active) { border-color: #6366f1; color: #6366f1; }
+        .variant-add-btn {
+            padding: 8px 14px; border-radius: 8px; border: 1.5px dashed #d1d5db;
+            background: none; font-size: .82rem; cursor: pointer; color: #9ca3af;
+            font-family: inherit;
+        }
+        .variant-add-btn:hover { border-color: #6366f1; color: #6366f1; }
+
+        /* Items editor */
+        .items-list { margin-top: 12px; }
+        .item-row {
+            display: grid; grid-template-columns: 1fr 120px 100px 100px 32px; gap: 8px;
+            align-items: center; margin-bottom: 8px;
+        }
+        .item-input {
+            padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+            font-size: .82rem; font-family: inherit;
+        }
+        .item-input:focus { border-color: #6366f1; outline: none; }
+        .item-del {
+            width: 28px; height: 28px; border: none; border-radius: 6px;
+            background: #fee2e2; color: #ef4444; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .item-del:hover { background: #fecaca; }
+        .item-del .material-symbols-outlined { font-size: 16px; }
+        .item-add-row {
+            padding: 8px 14px; border: 1.5px dashed #d1d5db; border-radius: 6px;
+            background: none; font-size: .78rem; cursor: pointer; color: #9ca3af;
+            font-family: inherit; width: 100%; text-align: left; margin-top: 4px;
+        }
+        .item-add-row:hover { border-color: #6366f1; color: #6366f1; }
+        .items-header {
+            display: grid; grid-template-columns: 1fr 120px 100px 100px 32px; gap: 8px;
+            font-size: .68rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;
+            letter-spacing: .04em; padding: 0 0 6px; margin-bottom: 4px;
+        }
+        .variant-total { display: flex; justify-content: flex-end; gap: 12px; align-items: center; padding: 12px 0; }
+        .variant-total-label { font-size: .82rem; font-weight: 600; color: #64748b; }
+        .variant-total-amount { font-size: 1.1rem; font-weight: 800; color: #6366f1; }
+
+        /* Buttons */
+        .btn-primary { padding: 10px 24px; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; font-size: .82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-primary:hover { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+        .btn-secondary { padding: 10px 20px; background: #f5f5f5; color: #64748b; border: none; border-radius: 8px; font-size: .82rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+        .btn-secondary:hover { background: #eee; }
+        .btn-danger { padding: 6px 14px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; font-size: .75rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-danger:hover { background: #fecaca; }
+
+        /* Copy link */
+        .copy-link { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+        .copy-link input { flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: .78rem; font-family: monospace; color: #6366f1; background: #f8fafc; }
+        .copy-link button { padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; font-size: .72rem; font-weight: 600; font-family: inherit; color: #64748b; }
+        .copy-link button:hover { background: #f5f5f5; }
+
+        .variant-delete-area { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 16px 40px; }
+            .item-row, .items-header { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-main">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1>📄 報價單管理</h1>
+                    <div class="meta" id="headerMeta"></div>
+                </div>
+                <button class="btn-primary" onclick="openNewQuote()">
+                    <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px">add</span>
+                    新增報價單
+                </button>
+            </div>
+
+            <div class="quote-list" id="quoteList">載入中...</div>
+        </div>
+    </div>
+
+    <!-- Editor Overlay -->
+    <div class="editor-overlay" id="editorOverlay" onclick="if(event.target===this)closeEditor()">
+        <div class="editor-panel">
+            <div class="editor-header">
+                <h2 id="editorTitle">編輯報價單</h2>
+                <button class="editor-close" onclick="closeEditor()"><span class="material-symbols-outlined" style="font-size:18px">close</span></button>
+            </div>
+            <div class="editor-body" id="editorBody">
+                <!-- Basic info -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">報價單標題</label>
+                        <input class="form-input" id="fTitle" placeholder="例：Dynapack AI 培訓報價">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">SLUG（網址代碼）</label>
+                        <input class="form-input" id="fSlug" placeholder="英文小寫，如 dynapack">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">客戶名稱</label>
+                        <input class="form-input" id="fClientName" placeholder="Dynapack">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">狀態</label>
+                        <select class="form-input form-select" id="fStatus">
+                            <option value="draft">草稿</option>
+                            <option value="sent">已送出</option>
+                            <option value="accepted">已接受</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">客戶報價連結</label>
+                    <div class="copy-link">
+                        <input id="fLink" readonly>
+                        <button onclick="copyLink()">複製</button>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">關聯專案 ID（選填）</label>
+                        <input class="form-input" id="fProjectId" placeholder="UUID">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">有效期限</label>
+                        <input class="form-input" type="date" id="fValidUntil">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">備註</label>
+                    <textarea class="form-input form-textarea" id="fNotes" placeholder="補充說明..."></textarea>
+                </div>
+
+                <!-- Variants -->
+                <div class="variant-section">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                        <div class="form-label" style="margin:0">方案管理</div>
+                    </div>
+                    <div class="variant-tabs-editor" id="variantTabsEditor">
+                        <!-- tabs rendered here -->
+                    </div>
+                    <div id="variantEditor">
+                        <!-- current variant fields -->
+                    </div>
+                </div>
+            </div>
+            <div class="editor-footer">
+                <button class="btn-secondary" onclick="closeEditor()">取消</button>
+                <button class="btn-primary" id="saveBtn" onclick="saveQuote()">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+        import { db, requireAuth } from './scripts/supabase.js';
+
+        const authResult = await requireAuth(['super_admin']);
+        if (!authResult) throw new Error('not authorized');
+        document.getElementById('headerMeta').textContent = authResult.session.user.email;
+
+        let allQuotes = [];
+        let editingQuote = null;
+        let editingVariants = [];
+        let activeVariantIdx = 0;
+
+        const baseUrl = location.origin + '/quote.html?slug=';
+
+        // ── Load quotes ──
+        async function loadQuotes() {
+            const { data } = await db.select('quotations', { select: '*', order: 'created_at.desc' });
+            allQuotes = data || [];
+            renderQuoteList();
+        }
+
+        function renderQuoteList() {
+            const el = document.getElementById('quoteList');
+            if (allQuotes.length === 0) {
+                el.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">尚無報價單，點擊右上角新增</div>';
+                return;
+            }
+            el.innerHTML = allQuotes.map(q => {
+                const date = new Date(q.created_at).toLocaleDateString('zh-TW');
+                const variantCount = q.variants ? q.variants.length : 0;
+                const total = q.total_amount || 0;
+                return `<div class="quote-card" onclick="openEditor('${q.id}')">
+                    <div class="quote-card-icon"><span class="material-symbols-outlined">description</span></div>
+                    <div class="quote-card-info">
+                        <div class="quote-card-title">${q.title || '(無標題)'}</div>
+                        <div class="quote-card-sub">${q.client_name || ''} · ${q.slug} · ${date}${variantCount > 0 ? ` · ${variantCount} 方案` : ''}</div>
+                    </div>
+                    <div class="quote-card-right">
+                        <span class="quote-status ${q.status}">${({draft:'草稿',sent:'已送出',accepted:'已接受'})[q.status] || q.status}</span>
+                        <span class="quote-amount">${variantCount > 0 ? '多方案' : 'NT$ ' + total.toLocaleString()}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Editor ──
+        window.openNewQuote = function() {
+            editingQuote = null;
+            document.getElementById('editorTitle').textContent = '新增報價單';
+            document.getElementById('fTitle').value = '';
+            document.getElementById('fSlug').value = '';
+            document.getElementById('fClientName').value = '';
+            document.getElementById('fStatus').value = 'draft';
+            document.getElementById('fProjectId').value = '';
+            document.getElementById('fValidUntil').value = '';
+            document.getElementById('fNotes').value = '';
+            document.getElementById('fLink').value = '';
+
+            // Default single variant
+            editingVariants = [{
+                name: '標準方案',
+                items: [
+                    { label: '講師費', type: 'hourly', hours: 4, rate: 8000 },
+                    { label: '車馬費', type: 'fixed', amount: 0 },
+                    { label: '助理費', type: 'perhead', count: 0, rate: 3000 }
+                ],
+                total: 32000,
+                outline_data: null
+            }];
+            activeVariantIdx = 0;
+            renderVariantTabs();
+            renderVariantEditor();
+            document.getElementById('editorOverlay').classList.add('open');
+        };
+
+        window.openEditor = function(id) {
+            const q = allQuotes.find(x => x.id === id);
+            if (!q) return;
+            editingQuote = q;
+            document.getElementById('editorTitle').textContent = '編輯報價單';
+            document.getElementById('fTitle').value = q.title || '';
+            document.getElementById('fSlug').value = q.slug || '';
+            document.getElementById('fClientName').value = q.client_name || '';
+            document.getElementById('fStatus').value = q.status || 'draft';
+            document.getElementById('fProjectId').value = q.project_id || '';
+            document.getElementById('fValidUntil').value = q.valid_until || '';
+            document.getElementById('fNotes').value = q.notes || '';
+            document.getElementById('fLink').value = baseUrl + q.slug;
+
+            if (q.variants && q.variants.length > 0) {
+                editingVariants = JSON.parse(JSON.stringify(q.variants));
+            } else {
+                editingVariants = [{
+                    name: '標準方案',
+                    items: q.items || [],
+                    total: q.total_amount || 0,
+                    outline_data: null
+                }];
+            }
+            activeVariantIdx = 0;
+            renderVariantTabs();
+            renderVariantEditor();
+            document.getElementById('editorOverlay').classList.add('open');
+        };
+
+        window.closeEditor = function() {
+            document.getElementById('editorOverlay').classList.remove('open');
+        };
+
+        // ── Variant Tabs ──
+        function renderVariantTabs() {
+            const el = document.getElementById('variantTabsEditor');
+            el.innerHTML = editingVariants.map((v, i) =>
+                `<button class="variant-tab-btn${i === activeVariantIdx ? ' active' : ''}" onclick="switchEditorVariant(${i})">${v.name || '方案 ' + (i+1)}</button>`
+            ).join('') + `<button class="variant-add-btn" onclick="addVariant()">+ 新增方案</button>`;
+        }
+
+        window.switchEditorVariant = function(idx) {
+            // Save current variant items from DOM first
+            saveCurrentVariantFromDOM();
+            activeVariantIdx = idx;
+            renderVariantTabs();
+            renderVariantEditor();
+        };
+
+        window.addVariant = function() {
+            saveCurrentVariantFromDOM();
+            editingVariants.push({
+                name: '方案 ' + (editingVariants.length + 1),
+                items: [{ label: '講師費', type: 'hourly', hours: 4, rate: 8000 }],
+                total: 32000,
+                outline_data: null
+            });
+            activeVariantIdx = editingVariants.length - 1;
+            renderVariantTabs();
+            renderVariantEditor();
+        };
+
+        function renderVariantEditor() {
+            const v = editingVariants[activeVariantIdx];
+            if (!v) return;
+            const el = document.getElementById('variantEditor');
+            el.innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">方案名稱</label>
+                    <input class="form-input" id="vName" value="${v.name || ''}" placeholder="方案 A：基礎培訓">
+                </div>
+                <div class="form-label" style="margin-bottom:8px">報價項目</div>
+                <div class="items-header">
+                    <span>項目名稱</span><span>類型</span><span>數量/小時</span><span>單價</span><span></span>
+                </div>
+                <div class="items-list" id="itemsList">
+                    ${(v.items || []).map((item, i) => renderItemRow(item, i)).join('')}
+                </div>
+                <button class="item-add-row" onclick="addItem()">+ 新增項目</button>
+                <div class="variant-total">
+                    <span class="variant-total-label">合計（未稅）</span>
+                    <span class="variant-total-amount" id="variantTotal">NT$ ${(v.total || 0).toLocaleString()}</span>
+                </div>
+                ${editingVariants.length > 1 ? `<div class="variant-delete-area"><button class="btn-danger" onclick="deleteVariant(${activeVariantIdx})">刪除此方案</button></div>` : ''}
+            `;
+        }
+
+        function renderItemRow(item, idx) {
+            const typeOptions = `<option value="hourly" ${item.type==='hourly'?'selected':''}>小時計</option>
+                <option value="fixed" ${item.type==='fixed'?'selected':''}>固定</option>
+                <option value="perhead" ${item.type==='perhead'?'selected':''}>人數計</option>`;
+            const qty = item.type === 'hourly' ? (item.hours||0) : item.type === 'perhead' ? (item.count||0) : (item.amount||0);
+            const rate = item.type === 'fixed' ? '' : (item.rate||0);
+            return `<div class="item-row" data-idx="${idx}">
+                <input class="item-input" data-field="label" value="${item.label || ''}">
+                <select class="item-input" data-field="type" onchange="recalcTotal()">${typeOptions}</select>
+                <input class="item-input" data-field="qty" type="number" value="${qty}" onchange="recalcTotal()">
+                <input class="item-input" data-field="rate" type="number" value="${rate}" placeholder="${item.type==='fixed'?'—':'單價'}" ${item.type==='fixed'?'disabled':''} onchange="recalcTotal()">
+                <button class="item-del" onclick="deleteItem(${idx})"><span class="material-symbols-outlined">close</span></button>
+            </div>`;
+        }
+
+        window.addItem = function() {
+            saveCurrentVariantFromDOM();
+            editingVariants[activeVariantIdx].items.push({ label: '', type: 'fixed', amount: 0 });
+            renderVariantEditor();
+        };
+
+        window.deleteItem = function(idx) {
+            saveCurrentVariantFromDOM();
+            editingVariants[activeVariantIdx].items.splice(idx, 1);
+            renderVariantEditor();
+        };
+
+        window.deleteVariant = function(idx) {
+            if (editingVariants.length <= 1) return;
+            if (!confirm('確定刪除此方案？')) return;
+            editingVariants.splice(idx, 1);
+            activeVariantIdx = Math.min(activeVariantIdx, editingVariants.length - 1);
+            renderVariantTabs();
+            renderVariantEditor();
+        };
+
+        window.recalcTotal = function() {
+            saveCurrentVariantFromDOM();
+            const v = editingVariants[activeVariantIdx];
+            document.getElementById('variantTotal').textContent = 'NT$ ' + (v.total || 0).toLocaleString();
+        };
+
+        function saveCurrentVariantFromDOM() {
+            const v = editingVariants[activeVariantIdx];
+            if (!v) return;
+            const nameEl = document.getElementById('vName');
+            if (nameEl) v.name = nameEl.value.trim();
+
+            const rows = document.querySelectorAll('#itemsList .item-row');
+            const items = [];
+            let total = 0;
+            rows.forEach(row => {
+                const label = row.querySelector('[data-field="label"]').value.trim();
+                const type = row.querySelector('[data-field="type"]').value;
+                const qty = parseFloat(row.querySelector('[data-field="qty"]').value) || 0;
+                const rate = parseFloat(row.querySelector('[data-field="rate"]').value) || 0;
+                let item = { label, type };
+                if (type === 'hourly') { item.hours = qty; item.rate = rate; total += qty * rate; }
+                else if (type === 'perhead') { item.count = qty; item.rate = rate; total += qty * rate; }
+                else { item.amount = qty; total += qty; }
+                items.push(item);
+            });
+            v.items = items;
+            v.total = total;
+        }
+
+        // ── Save ──
+        window.saveQuote = async function() {
+            saveCurrentVariantFromDOM();
+            const title = document.getElementById('fTitle').value.trim();
+            const slug = document.getElementById('fSlug').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            if (!title || !slug) { alert('請填寫標題和 SLUG'); return; }
+
+            const payload = {
+                title,
+                slug,
+                client_name: document.getElementById('fClientName').value.trim(),
+                status: document.getElementById('fStatus').value,
+                project_id: document.getElementById('fProjectId').value.trim() || null,
+                valid_until: document.getElementById('fValidUntil').value || null,
+                notes: document.getElementById('fNotes').value.trim(),
+            };
+
+            if (editingVariants.length === 1) {
+                // Single variant: store in items + total_amount, variants = null
+                payload.items = editingVariants[0].items;
+                payload.total_amount = editingVariants[0].total;
+                payload.variants = null;
+            } else {
+                // Multi variant
+                payload.variants = editingVariants;
+                payload.items = editingVariants[0].items;
+                payload.total_amount = editingVariants[0].total;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true; btn.textContent = '儲存中...';
+
+            try {
+                if (editingQuote) {
+                    await db.update('quotations', payload, { filter: { id: `eq.${editingQuote.id}` } });
+                } else {
+                    await db.insert('quotations', payload);
+                }
+                closeEditor();
+                showToast('報價單已儲存');
+                await loadQuotes();
+            } catch (e) {
+                alert('儲存失敗：' + e.message);
+            } finally {
+                btn.disabled = false; btn.textContent = '儲存';
+            }
+        };
+
+        window.copyLink = function() {
+            const input = document.getElementById('fLink');
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            showToast('已複製連結');
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        loadQuotes();
+    </script>
+    <script src="components/nav.js"></script>
+</body>
+</html>
