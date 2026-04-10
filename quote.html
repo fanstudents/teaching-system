@@ -381,6 +381,10 @@ function renderTimelineBlock(block, isGrid) {
         : '';
     const escapedTitle = (block.title||'').replace(/'/g,"\\'");
     return `<div class="timeline-row ${breakClass}" data-block-idx="${idx}">
+        <div class="timeline-dot-col">
+            <div class="timeline-dot"></div>
+            <div class="timeline-dot-line"></div>
+        </div>
         <div class="timeline-content">
             <div class="timeline-header">
                 ${block.time ? `<span class="timeline-time">${block.time}</span>` : ''}
@@ -389,29 +393,26 @@ function renderTimelineBlock(block, isGrid) {
             ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
             ${topicsHtml}
         </div>
-        <div class="comment-trigger" id="commentTrigger${idx}">
-            <button class="comment-trigger-btn" onclick="togglePopover(${idx})">
-                <span class="material-symbols-outlined">chat_bubble</span>
-                <span id="commentBadge${idx}" class="comment-badge" style="display:none">0</span>
-            </button>
-        </div>
-        <div class="comment-popover" id="commentPopover${idx}">
-            <div class="comment-popover-header">
-                課綱建議
-                <button class="comment-popover-close" onclick="togglePopover(${idx})"><span class="material-symbols-outlined">close</span></button>
+        <button class="timeline-comment-btn" id="commentBtn${idx}" onclick="event.stopPropagation(); togglePopover(${idx})" type="button">
+            <span class="material-symbols-outlined">mode_comment</span>
+            <span class="cb-count" id="commentBadge${idx}">0</span>
+        </button>
+        <div class="q-comment-popover" id="commentPopover${idx}">
+            <div class="pop-header">
+                <span>課綱建議</span>
+                <button class="pop-close" onclick="event.stopPropagation(); togglePopover(${idx})" type="button"><span class="material-symbols-outlined">close</span></button>
             </div>
-            <div class="comment-popover-list" id="commentList${idx}"></div>
-            <div class="comment-popover-form">
-                <textarea class="comment-popover-input" id="commentInput${idx}" placeholder="有任何問題或調整建議…" rows="1"></textarea>
-                <button class="comment-popover-submit" onclick="submitComment(${idx}, '${escapedTitle}')">送出</button>
+            <div class="pop-list" id="commentList${idx}"></div>
+            <div class="pop-form">
+                <textarea class="pop-input" id="commentInput${idx}" placeholder="對此單元有任何建議或問題…" rows="1"></textarea>
+                <button class="pop-submit" onclick="event.stopPropagation(); submitComment(${idx}, '${escapedTitle}')" type="button">送出</button>
             </div>
         </div>
     </div>`;
 }
 
 window.togglePopover = function(idx) {
-    // Close all other popovers first
-    document.querySelectorAll('.comment-popover.open').forEach(el => {
+    document.querySelectorAll('.q-comment-popover.open').forEach(el => {
         if (el.id !== `commentPopover${idx}`) el.classList.remove('open');
     });
     const pop = document.getElementById(`commentPopover${idx}`);
@@ -421,10 +422,9 @@ window.togglePopover = function(idx) {
     }
 };
 
-// Close popovers when clicking outside
 document.addEventListener('click', (e) => {
-    if (!e.target.closest('.comment-popover') && !e.target.closest('.comment-trigger-btn')) {
-        document.querySelectorAll('.comment-popover.open').forEach(el => el.classList.remove('open'));
+    if (!e.target.closest('.q-comment-popover') && !e.target.closest('.timeline-comment-btn')) {
+        document.querySelectorAll('.q-comment-popover.open').forEach(el => el.classList.remove('open'));
     }
 });
 
@@ -478,18 +478,17 @@ async function loadComments() {
 function renderComments(idx, comments) {
     const list = document.getElementById(`commentList${idx}`);
     const badge = document.getElementById(`commentBadge${idx}`);
-    const trigger = document.getElementById(`commentTrigger${idx}`);
+    const btn = document.getElementById(`commentBtn${idx}`);
     if (!list) return;
 
     if (comments.length > 0) {
         list.innerHTML = comments.map(c => {
             const t = new Date(c.created_at);
             const timeStr = t.toLocaleDateString('zh-TW');
-            return `<div class="comment-popover-item">${c.comment_text}<time>${timeStr}</time></div>`;
+            return `<div class="pop-item">${c.comment_text}<time>${timeStr}</time></div>`;
         }).join('');
         badge.textContent = comments.length;
-        badge.style.display = 'inline-flex';
-        trigger.classList.add('has-comments');
+        btn.classList.add('has-count');
     }
 }
 
