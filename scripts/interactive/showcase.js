@@ -528,8 +528,21 @@ export class Showcase {
 
     /* ───── 聚焦放大 ───── */
 
-    openFocus(submissions, index, container) {
+    /**
+     * 清除目前的 focus overlay + keyboard handler
+     */
+    _cleanupFocusOverlay() {
+        if (this._focusKeyHandler) {
+            document.removeEventListener('keydown', this._focusKeyHandler);
+            this._focusKeyHandler = null;
+        }
         document.querySelector('.showcase-focus-overlay')?.remove();
+    }
+
+    openFocus(submissions, index, container) {
+        // ★ 先清除舊的 overlay 和 keyboard handler
+        this._cleanupFocusOverlay();
+
         const s = submissions[index];
         if (!s) return;
         const total = submissions.length;
@@ -567,14 +580,18 @@ export class Showcase {
         presMode.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('active'));
 
-        overlay.querySelector('.showcase-focus-btn.close').onclick = () => {
+        // ★ 關閉用的共用函式（同時清除 keydown handler）
+        const closeFocus = () => {
+            if (this._focusKeyHandler) {
+                document.removeEventListener('keydown', this._focusKeyHandler);
+                this._focusKeyHandler = null;
+            }
             overlay.classList.remove('active');
             setTimeout(() => overlay.remove(), 200);
         };
-        overlay.querySelector('.showcase-focus-backdrop').onclick = () => {
-            overlay.classList.remove('active');
-            setTimeout(() => overlay.remove(), 200);
-        };
+
+        overlay.querySelector('.showcase-focus-btn.close').onclick = closeFocus;
+        overlay.querySelector('.showcase-focus-backdrop').onclick = closeFocus;
         overlay.querySelector('.showcase-focus-btn.prev').onclick = () => {
             overlay.remove();
             this.openFocus(submissions, index - 1, container);
@@ -584,21 +601,28 @@ export class Showcase {
             this.openFocus(submissions, index + 1, container);
         };
 
+        // ★ 將 keyHandler 存到 instance 上，外部可清除
         const keyHandler = (e) => {
+            // ★ 如果 overlay 已被外部移除（例如切頁），清除 handler 並退出
+            if (!overlay.isConnected) {
+                document.removeEventListener('keydown', keyHandler);
+                this._focusKeyHandler = null;
+                return;
+            }
             if (e.key === 'Escape') {
-                overlay.classList.remove('active');
-                setTimeout(() => overlay.remove(), 200);
-                document.removeEventListener('keydown', keyHandler);
+                e.stopPropagation(); // 避免觸發退出簡報
+                closeFocus();
             } else if (e.key === 'ArrowLeft' && index > 0) {
+                e.stopPropagation(); // 避免同時切投影片
                 overlay.remove();
-                document.removeEventListener('keydown', keyHandler);
                 this.openFocus(submissions, index - 1, container);
             } else if (e.key === 'ArrowRight' && index < total - 1) {
+                e.stopPropagation(); // 避免同時切投影片
                 overlay.remove();
-                document.removeEventListener('keydown', keyHandler);
                 this.openFocus(submissions, index + 1, container);
             }
         };
+        this._focusKeyHandler = keyHandler;
         document.addEventListener('keydown', keyHandler);
     }
 

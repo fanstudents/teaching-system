@@ -325,6 +325,9 @@
                     <button class="sub-tab" data-subtab="corporate" id="subTabCorporate" style="display:none">
                         <span class="material-symbols-outlined">business</span> 客戶
                     </button>
+                    <button class="sub-tab" data-subtab="quotation">
+                        <span class="material-symbols-outlined">request_quote</span> 報價
+                    </button>
                 </div>
 
                 <!-- Sub: 場次 -->
@@ -345,6 +348,21 @@
                 <!-- Sub: 客戶 (corporate only) -->
                 <div class="sub-panel" id="sub-corporate">
                     <div id="corporateQuickActions"></div>
+                </div>
+
+                <!-- Sub: 報價 -->
+                <div class="sub-panel" id="sub-quotation">
+                    <div class="filter-bar">
+                        <button class="btn btn-dark" id="btnCreateQuote">
+                            <span class="material-symbols-outlined">add</span> 建立報價單
+                        </button>
+                        <button class="btn" id="btnRefreshQuotes">
+                            <span class="material-symbols-outlined">refresh</span> 重新整理
+                        </button>
+                    </div>
+                    <div id="quotationList">
+                        <div class="empty-state">尚無報價單</div>
+                    </div>
                 </div>
 
                 <!-- Sub: 學員 -->
@@ -704,6 +722,103 @@
                 <div class="modal-footer-right">
                     <button class="btn" onclick="closeModal('assignmentModal')">取消</button>
                     <button class="btn btn-dark" id="assignmentSave">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quotation Modal -->
+    <div class="modal-overlay" id="quotationModal">
+        <div class="modal" style="max-width:640px">
+            <div class="modal-header">
+                <h3 id="quotationModalTitle">建立報價單</h3>
+                <button class="modal-close" onclick="closeModal('quotationModal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height:70vh;overflow-y:auto;">
+                <input type="hidden" id="quoteEditId">
+                <div class="form-group">
+                    <label>報價標題 <span style="color:#c5221f">*</span></label>
+                    <input type="text" id="quoteTitle" placeholder="例：AI 職場應用工作坊 — 時代基金會">
+                </div>
+                <div class="form-group">
+                    <label>報價代碼 (URL slug) <span style="color:#c5221f">*</span></label>
+                    <input type="text" id="quoteSlug" placeholder="例：epoch-ai-2026q2（英文小寫+數字+連字號）">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>客戶名稱</label>
+                        <input type="text" id="quoteClientName" placeholder="選填">
+                    </div>
+                    <div class="form-group">
+                        <label>客戶 Logo URL</label>
+                        <input type="text" id="quoteClientLogo" placeholder="選填">
+                    </div>
+                </div>
+
+                <div style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:8px;">
+                    <label style="font-weight:600;font-size:.88rem;display:flex;align-items:center;gap:6px;margin-bottom:12px">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:#6366f1">receipt_long</span> 費用明細
+                    </label>
+                    <div id="quoteItemsEditor" style="display:flex;flex-direction:column;gap:10px;"></div>
+                    <button class="btn" onclick="addQuoteItem()" style="margin-top:8px;font-size:.78rem;padding:5px 14px;">
+                        <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增項目
+                    </button>
+                    <div style="text-align:right;margin-top:12px;font-size:.92rem;font-weight:700;color:#6366f1;" id="quoteTotalPreview">合計：NT$ 0</div>
+                </div>
+
+                <div style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:16px;">
+                    <label style="font-weight:600;font-size:.88rem;display:flex;align-items:center;gap:6px;margin-bottom:12px">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:#10b981">account_balance</span> 付款資訊
+                    </label>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group"><label>付款方式</label><input type="text" id="quotePaymentMethod" value="銀行匯款"></div>
+                        <div class="form-group"><label>收款時間</label><input type="text" id="quotePaymentTerms" value="開課前全額付款"></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group"><label>銀行名稱</label><input type="text" id="quoteBankName" placeholder="例：中國信託"></div>
+                        <div class="form-group"><label>分行</label><input type="text" id="quoteBankBranch" placeholder="例：民生分行"></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group"><label>帳號</label><input type="text" id="quoteBankAccount" placeholder="例：822-xxx-xxxxx"></div>
+                        <div class="form-group"><label>戶名</label><input type="text" id="quoteBankHolder" value="數位簡報室"></div>
+                    </div>
+                </div>
+
+                <div style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:16px;">
+                    <div class="form-group">
+                        <label>備註說明</label>
+                        <textarea id="quoteNotes" placeholder="選填" rows="3"></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="form-group">
+                            <label>有效期限</label>
+                            <input type="date" id="quoteValidUntil">
+                        </div>
+                        <div class="form-group">
+                            <label>狀態</label>
+                            <select id="quoteStatus">
+                                <option value="draft">草稿</option>
+                                <option value="sent">已送出</option>
+                                <option value="accepted">已接受</option>
+                                <option value="expired">已過期</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:6px;">
+                            <input type="checkbox" id="quoteIncludeOutline" checked>
+                            包含課綱內容
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="quoteDelete" style="display:none">刪除</button>
+                <div class="modal-footer-right">
+                    <button class="btn" onclick="closeModal('quotationModal')">取消</button>
+                    <button class="btn btn-dark" id="quoteSave">儲存</button>
                 </div>
             </div>
         </div>
@@ -3253,6 +3368,250 @@ ${gscQueriesStr || '無搜尋資料'}
             `;
             document.head.appendChild(style);
         }
+
+        // ═══════════════════════════════════════
+        // ★ 報價單 CRUD
+        // ═══════════════════════════════════════
+        let quotations = [];
+        let _quoteItems = [];
+
+        // 載入報價列表
+        async function loadQuotations(projectId) {
+            const list = document.getElementById('quotationList');
+            if (!list) return;
+            list.innerHTML = '<div class="empty-state"><span class="material-symbols-outlined">hourglass_empty</span> 載入中</div>';
+            const { data, error } = await db.select('quotations', {
+                select: '*', filter: { project_id: `eq.${projectId}` }, order: 'created_at.desc'
+            });
+            quotations = data || [];
+            if (quotations.length === 0) {
+                list.innerHTML = '<div class="empty-state">尚無報價單</div>';
+                return;
+            }
+            const statusMap = { draft: '草稿', sent: '已送出', accepted: '已接受', expired: '已過期' };
+            const statusColor = { draft: '#94a3b8', sent: '#6366f1', accepted: '#10b981', expired: '#ef4444' };
+            list.innerHTML = quotations.map(q => {
+                const total = (q.total_amount || 0).toLocaleString('zh-TW');
+                return `<div class="data-table-wrap" style="margin-bottom:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openQuoteEditor('${q.id}')">
+                    <span class="material-symbols-outlined" style="font-size:22px;color:#6366f1">request_quote</span>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;font-size:.88rem">${q.title || '未命名報價'}</div>
+                        <div style="font-size:.75rem;color:#80868b;margin-top:2px">${q.slug} · ${q.client_name || '—'}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-weight:700;font-size:.92rem;font-family:Inter,monospace">NT$ ${total}</div>
+                        <div style="font-size:.68rem;color:${statusColor[q.status] || '#94a3b8'};font-weight:600;margin-top:2px">${statusMap[q.status] || q.status}</div>
+                    </div>
+                    <div style="display:flex;gap:4px">
+                        <button class="btn" style="padding:4px 8px;font-size:.72rem" onclick="event.stopPropagation();copyQuoteLink('${q.slug}')" title="複製連結"><span class="material-symbols-outlined" style="font-size:14px">link</span></button>
+                        <a href="quote.html?slug=${q.slug}" target="_blank" class="btn" style="padding:4px 8px;font-size:.72rem;text-decoration:none" onclick="event.stopPropagation()" title="預覽"><span class="material-symbols-outlined" style="font-size:14px">visibility</span></a>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        window.copyQuoteLink = function(slug) {
+            const url = `${location.origin}/quote.html?slug=${slug}`;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('已複製報價連結');
+            });
+        };
+
+        // 開啟報價編輯器
+        window.openQuoteEditor = function(quoteId) {
+            const isEdit = !!quoteId;
+            document.getElementById('quotationModalTitle').textContent = isEdit ? '編輯報價單' : '建立報價單';
+            document.getElementById('quoteDelete').style.display = isEdit ? '' : 'none';
+            document.getElementById('quoteEditId').value = quoteId || '';
+
+            if (isEdit) {
+                const q = quotations.find(x => x.id === quoteId);
+                if (!q) return;
+                document.getElementById('quoteTitle').value = q.title || '';
+                document.getElementById('quoteSlug').value = q.slug || '';
+                document.getElementById('quoteClientName').value = q.client_name || '';
+                document.getElementById('quoteClientLogo').value = q.client_logo || '';
+                document.getElementById('quotePaymentMethod').value = q.payment_method || '銀行匯款';
+                document.getElementById('quotePaymentTerms').value = q.payment_terms || '開課前全額付款';
+                const bank = q.bank_info || {};
+                document.getElementById('quoteBankName').value = bank.bank || '';
+                document.getElementById('quoteBankBranch').value = bank.branch || '';
+                document.getElementById('quoteBankAccount').value = bank.account || '';
+                document.getElementById('quoteBankHolder').value = bank.name || '數位簡報室';
+                document.getElementById('quoteNotes').value = q.notes || '';
+                document.getElementById('quoteValidUntil').value = q.valid_until || '';
+                document.getElementById('quoteStatus').value = q.status || 'draft';
+                document.getElementById('quoteIncludeOutline').checked = q.include_outline !== false;
+                _quoteItems = JSON.parse(JSON.stringify(q.items || []));
+            } else {
+                document.getElementById('quoteTitle').value = '';
+                document.getElementById('quoteSlug').value = '';
+                document.getElementById('quoteClientName').value = '';
+                document.getElementById('quoteClientLogo').value = '';
+                document.getElementById('quotePaymentMethod').value = '銀行匯款';
+                document.getElementById('quotePaymentTerms').value = '開課前全額付款';
+                document.getElementById('quoteBankName').value = '';
+                document.getElementById('quoteBankBranch').value = '';
+                document.getElementById('quoteBankAccount').value = '';
+                document.getElementById('quoteBankHolder').value = '數位簡報室';
+                document.getElementById('quoteNotes').value = '';
+                document.getElementById('quoteValidUntil').value = '';
+                document.getElementById('quoteStatus').value = 'draft';
+                document.getElementById('quoteIncludeOutline').checked = true;
+                _quoteItems = [
+                    { label: '講師費', type: 'hourly', hours: 4, rate: 8000, subtotal: 32000 },
+                    { label: '車馬費', type: 'fixed', amount: 0 },
+                    { label: '住宿費', type: 'fixed', amount: 0 },
+                    { label: '助理費', type: 'perhead', count: 0, rate: 3000, subtotal: 0 },
+                    { label: '影片錄製授權費', type: 'fixed', amount: 0 }
+                ];
+                // 自動帶入專案名稱
+                const proj = projects.find(p => p.id === currentProjectId);
+                if (proj) {
+                    document.getElementById('quoteTitle').value = proj.name || '';
+                    document.getElementById('quoteSlug').value = (proj.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || '';
+                    // 帶入客戶
+                    if (proj.organization_id && clientMap[proj.organization_id]) {
+                        document.getElementById('quoteClientName').value = clientMap[proj.organization_id];
+                    }
+                }
+            }
+            renderQuoteItems();
+            openModal('quotationModal');
+        };
+
+        function renderQuoteItems() {
+            const container = document.getElementById('quoteItemsEditor');
+            container.innerHTML = _quoteItems.map((item, i) => {
+                let fields = '';
+                if (item.type === 'hourly') {
+                    fields = `<div style="display:flex;gap:6px;align-items:center;flex:1">
+                        <input type="number" value="${item.hours || 0}" min="0" step="0.5" style="width:60px;padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.82rem;text-align:right" onchange="updateQuoteItem(${i},'hours',this.value)"> <span style="font-size:.75rem;color:#80868b">時</span>
+                        <span style="font-size:.75rem;color:#80868b">×</span>
+                        <input type="number" value="${item.rate || 0}" min="0" style="width:80px;padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.82rem;text-align:right" onchange="updateQuoteItem(${i},'rate',this.value)"> <span style="font-size:.75rem;color:#80868b">/時</span>
+                    </div>`;
+                } else if (item.type === 'perhead') {
+                    fields = `<div style="display:flex;gap:6px;align-items:center;flex:1">
+                        <input type="number" value="${item.count || 0}" min="0" style="width:50px;padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.82rem;text-align:right" onchange="updateQuoteItem(${i},'count',this.value)"> <span style="font-size:.75rem;color:#80868b">人</span>
+                        <span style="font-size:.75rem;color:#80868b">×</span>
+                        <input type="number" value="${item.rate || 0}" min="0" style="width:80px;padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.82rem;text-align:right" onchange="updateQuoteItem(${i},'rate',this.value)"> <span style="font-size:.75rem;color:#80868b">/人</span>
+                    </div>`;
+                } else {
+                    fields = `<div style="flex:1"><input type="number" value="${item.amount || 0}" min="0" style="width:100px;padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.82rem;text-align:right" onchange="updateQuoteItem(${i},'amount',this.value)"></div>`;
+                }
+                const sub = item.type === 'hourly' ? (item.hours || 0) * (item.rate || 0) : item.type === 'perhead' ? (item.count || 0) * (item.rate || 0) : (item.amount || 0);
+                return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fafbfc;border:1px solid #eef0f4;border-radius:10px">
+                    <input type="text" value="${item.label || ''}" style="width:120px;padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.82rem;font-weight:600" onchange="updateQuoteItem(${i},'label',this.value)">
+                    <select style="padding:5px 8px;border:1.5px solid #dadce0;border-radius:6px;font-size:.78rem" onchange="updateQuoteItem(${i},'type',this.value)">
+                        <option value="hourly" ${item.type==='hourly'?'selected':''}>時薪</option>
+                        <option value="perhead" ${item.type==='perhead'?'selected':''}>人頭</option>
+                        <option value="fixed" ${item.type==='fixed'?'selected':''}>固定</option>
+                    </select>
+                    ${fields}
+                    <span style="font-size:.82rem;font-weight:700;min-width:80px;text-align:right;font-family:Inter,monospace">${sub > 0 ? 'NT$ ' + sub.toLocaleString() : '—'}</span>
+                    <button class="btn" style="padding:2px 4px;min-height:unset" onclick="removeQuoteItem(${i})"><span class="material-symbols-outlined" style="font-size:16px;color:#ef4444">close</span></button>
+                </div>`;
+            }).join('');
+            // Total
+            const total = _quoteItems.reduce((sum, item) => {
+                if (item.type === 'hourly') return sum + (item.hours || 0) * (item.rate || 0);
+                if (item.type === 'perhead') return sum + (item.count || 0) * (item.rate || 0);
+                return sum + (item.amount || 0);
+            }, 0);
+            document.getElementById('quoteTotalPreview').textContent = `合計：NT$ ${total.toLocaleString('zh-TW')}`;
+        }
+
+        window.updateQuoteItem = function(i, field, value) {
+            if (!_quoteItems[i]) return;
+            if (field === 'type') {
+                _quoteItems[i].type = value;
+                if (value === 'hourly') { _quoteItems[i].hours = _quoteItems[i].hours || 0; _quoteItems[i].rate = _quoteItems[i].rate || 0; }
+                else if (value === 'perhead') { _quoteItems[i].count = _quoteItems[i].count || 0; _quoteItems[i].rate = _quoteItems[i].rate || 0; }
+                else { _quoteItems[i].amount = _quoteItems[i].amount || 0; }
+            } else if (field === 'label') {
+                _quoteItems[i].label = value;
+            } else {
+                _quoteItems[i][field] = parseFloat(value) || 0;
+            }
+            renderQuoteItems();
+        };
+        window.removeQuoteItem = function(i) { _quoteItems.splice(i, 1); renderQuoteItems(); };
+        window.addQuoteItem = function() { _quoteItems.push({ label: '自訂項目', type: 'fixed', amount: 0 }); renderQuoteItems(); };
+
+        // 儲存報價
+        document.getElementById('quoteSave')?.addEventListener('click', async () => {
+            const title = document.getElementById('quoteTitle').value.trim();
+            const slug = document.getElementById('quoteSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+            if (!title || !slug) { showToast('請填寫標題和代碼'); return; }
+
+            const total = _quoteItems.reduce((sum, item) => {
+                if (item.type === 'hourly') return sum + (item.hours || 0) * (item.rate || 0);
+                if (item.type === 'perhead') return sum + (item.count || 0) * (item.rate || 0);
+                return sum + (item.amount || 0);
+            }, 0);
+
+            const record = {
+                project_id: currentProjectId,
+                title, slug,
+                client_name: document.getElementById('quoteClientName').value.trim(),
+                client_logo: document.getElementById('quoteClientLogo').value.trim(),
+                items: _quoteItems,
+                total_amount: total,
+                notes: document.getElementById('quoteNotes').value.trim(),
+                payment_method: document.getElementById('quotePaymentMethod').value.trim(),
+                payment_terms: document.getElementById('quotePaymentTerms').value.trim(),
+                bank_info: {
+                    bank: document.getElementById('quoteBankName').value.trim(),
+                    branch: document.getElementById('quoteBankBranch').value.trim(),
+                    account: document.getElementById('quoteBankAccount').value.trim(),
+                    name: document.getElementById('quoteBankHolder').value.trim()
+                },
+                include_outline: document.getElementById('quoteIncludeOutline').checked,
+                status: document.getElementById('quoteStatus').value,
+                valid_until: document.getElementById('quoteValidUntil').value || null
+            };
+
+            const editId = document.getElementById('quoteEditId').value;
+            let result;
+            if (editId) {
+                result = await db.update('quotations', record, { id: `eq.${editId}` });
+            } else {
+                result = await db.insert('quotations', record);
+            }
+
+            if (result.error) {
+                showToast('儲存失敗：' + (result.error.message || JSON.stringify(result.error)));
+                return;
+            }
+            showToast('報價單已儲存');
+            closeModal('quotationModal');
+            await loadQuotations(currentProjectId);
+        });
+
+        // 刪除報價
+        document.getElementById('quoteDelete')?.addEventListener('click', async () => {
+            const id = document.getElementById('quoteEditId').value;
+            if (!id) return;
+            if (!confirm('確定要刪除此報價單？')) return;
+            await db.delete('quotations', { id: `eq.${id}` });
+            showToast('報價單已刪除');
+            closeModal('quotationModal');
+            await loadQuotations(currentProjectId);
+        });
+
+        // 建立報價按鈕
+        document.getElementById('btnCreateQuote')?.addEventListener('click', () => openQuoteEditor(null));
+        document.getElementById('btnRefreshQuotes')?.addEventListener('click', () => {
+            if (currentProjectId) loadQuotations(currentProjectId);
+        });
+
+        // Hook: 切換到報價 tab 時自動載入
+        document.querySelectorAll('.sub-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (tab.dataset.subtab === 'quotation' && currentProjectId) {
+                    loadQuotations(currentProjectId);
+                }
+            });
+        });
 
         init();
     </script>

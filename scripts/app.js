@@ -3591,6 +3591,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this._lbImmediateTimer = setTimeout(() => this.updateLeaderboard(), 500);
             });
 
+            // ★ 記住目前的投影片位置（load 會覆蓋 currentIndex）
+            const savedIndex = this.slideManager.currentIndex;
+
             // ★ 綁定場次級簡報：找今天的 project_session
             const proj = this.slideManager._projectsCache?.find(p => p.id === this.slideManager.currentProjectId);
             const today = new Date().toISOString().slice(0, 10);
@@ -3612,9 +3615,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 }
             }
 
+            // ★ 恢復投影片位置：使用 load 前的位置（確保不超出範圍）
+            const restoredIndex = Math.min(savedIndex, this.slideManager.slides.length - 1);
+            this.slideManager.currentIndex = restoredIndex;
+
             // 發送初始投影片資料
             this.slideManager.saveCurrentSlide();
-            this.broadcastSlideData(0);
+            this.broadcastSlideData(restoredIndex);
 
             this.broadcasting = true;
 
@@ -5100,8 +5107,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             this._magMouseHandler = null;
         }
 
-        // 清除 showcase polling timers
-        if (this.showcase) this.showcase.destroy();
+        // 清除 showcase focus overlay + polling timers
+        if (this.showcase) {
+            this.showcase._cleanupFocusOverlay?.();
+            this.showcase.destroy();
+        }
 
         // 退出全螢幕
         if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -5191,8 +5201,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             document.head.appendChild(s);
         }
 
-        // 切頁時關閉作業牆展開的卡片
-        document.querySelector('.showcase-focus-overlay')?.remove();
+        // 切頁時關閉作業牆展開的卡片（含 keyboard handler 清除）
+        if (this.showcase?._cleanupFocusOverlay) {
+            this.showcase._cleanupFocusOverlay();
+        } else {
+            document.querySelector('.showcase-focus-overlay')?.remove();
+        }
 
         presentationSlide.innerHTML = '';
         // 第一頁不套用過場動畫（避免進入簡報時從小窗閃爍）

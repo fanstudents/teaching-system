@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報價與課程規劃 — 數位簡報室</title>
+    <meta name="description" content="數位簡報室課程報價與教學規劃">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <link rel="stylesheet" href="styles/quote-page.css">
+</head>
+<body>
+
+<!-- Loading -->
+<div class="q-loading" id="loadingScreen">
+    <div class="q-loading-inner">
+        <img src="favicon.png" alt="Logo" style="width:48px;height:48px;margin-bottom:16px">
+        <div class="q-loading-spinner"></div>
+        <p>載入報價資料中…</p>
+    </div>
+</div>
+
+<!-- Error -->
+<div class="q-error" id="errorScreen" style="display:none">
+    <div class="q-error-inner">
+        <span class="material-symbols-outlined" style="font-size:48px;color:#ef4444;margin-bottom:16px">error</span>
+        <h2>無法載入報價單</h2>
+        <p id="errorMsg">找不到此報價單，請確認連結是否正確。</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="q-page" id="mainContent" style="display:none">
+    <!-- Print Header -->
+    <header class="q-topbar" id="topbar">
+        <div class="q-topbar-left">
+            <img src="favicon.png" alt="TBR" class="q-topbar-logo">
+            <span class="q-topbar-brand">數位簡報室 TBR.Digital</span>
+        </div>
+        <div class="q-topbar-right">
+            <button class="q-btn q-btn-outline" onclick="window.print()" id="btnPrint">
+                <span class="material-symbols-outlined" style="font-size:16px">print</span> 列印 / PDF
+            </button>
+        </div>
+    </header>
+
+    <div class="q-container">
+        <!-- Quote Header -->
+        <section class="q-header">
+            <div class="q-header-logos">
+                <img src="favicon.png" alt="TBR" class="q-header-logo">
+                <img id="clientLogo" src="" alt="" class="q-header-client-logo" style="display:none">
+            </div>
+            <div class="q-header-info">
+                <div class="q-badge" id="statusBadge">報價單</div>
+                <h1 id="quoteTitle">課程報價</h1>
+                <div class="q-header-meta">
+                    <span id="clientNameDisplay"></span>
+                    <span id="quoteDateDisplay"></span>
+                    <span id="validUntilDisplay"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quote Table -->
+        <section class="q-section">
+            <div class="q-section-header">
+                <div class="q-section-icon"><span class="material-symbols-outlined">receipt_long</span></div>
+                <div><div class="q-section-title">費用明細</div><div class="q-section-desc">以下為本次課程之費用項目</div></div>
+            </div>
+            <div class="q-table-wrap">
+                <table class="q-table" id="quoteTable">
+                    <thead>
+                        <tr>
+                            <th class="q-th-item">項目</th>
+                            <th class="q-th-detail">說明</th>
+                            <th class="q-th-amount">金額</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quoteTableBody">
+                    </tbody>
+                    <tfoot>
+                        <tr class="q-total-row">
+                            <td colspan="2" class="q-total-label">合計</td>
+                            <td class="q-total-amount" id="totalAmount">NT$ 0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- Notes -->
+        <div id="notesSection" style="display:none">
+            <section class="q-section">
+                <div class="q-section-header">
+                    <div class="q-section-icon" style="background:#f59e0b"><span class="material-symbols-outlined">sticky_note_2</span></div>
+                    <div><div class="q-section-title">備註說明</div></div>
+                </div>
+                <div class="q-notes" id="notesContent"></div>
+            </section>
+        </div>
+
+        <!-- Payment Info -->
+        <section class="q-section">
+            <div class="q-section-header">
+                <div class="q-section-icon" style="background:#10b981"><span class="material-symbols-outlined">account_balance</span></div>
+                <div><div class="q-section-title">付款資訊</div><div class="q-section-desc">匯款方式與收款帳號</div></div>
+            </div>
+            <div class="q-payment-grid">
+                <div class="q-payment-card">
+                    <div class="q-payment-label">付款方式</div>
+                    <div class="q-payment-value" id="paymentMethod">銀行匯款</div>
+                </div>
+                <div class="q-payment-card">
+                    <div class="q-payment-label">收款時間</div>
+                    <div class="q-payment-value" id="paymentTerms">開課前全額付款</div>
+                </div>
+                <div class="q-payment-card q-payment-bank" id="bankInfoCard">
+                    <div class="q-payment-label">匯款帳號</div>
+                    <div class="q-bank-details" id="bankDetails">
+                        <!-- 動態填入 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Course Outline (loaded from project) -->
+        <div id="outlineSection" style="display:none">
+            <section class="q-section">
+                <div class="q-section-header">
+                    <div class="q-section-icon" style="background:#6366f1"><span class="material-symbols-outlined">view_timeline</span></div>
+                    <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
+                </div>
+                <div class="q-timeline" id="outlineTimeline"></div>
+            </section>
+
+            <!-- Tools -->
+            <section class="q-section" id="toolsSection" style="display:none">
+                <div class="q-section-header">
+                    <div class="q-section-icon" style="background:#0ea5e9"><span class="material-symbols-outlined">build</span></div>
+                    <div><div class="q-section-title">使用工具清單</div><div class="q-section-desc">課程中會使用到的 AI 應用工具</div></div>
+                </div>
+                <div class="q-tool-grid" id="toolGrid"></div>
+            </section>
+
+            <!-- Equipment -->
+            <section class="q-section" id="equipSection" style="display:none">
+                <div class="q-section-header">
+                    <div class="q-section-icon" style="background:#d93025"><span class="material-symbols-outlined">devices</span></div>
+                    <div><div class="q-section-title">設備需求</div><div class="q-section-desc">場地與設備準備清單</div></div>
+                </div>
+                <div class="q-equip-grid" id="equipGrid"></div>
+            </section>
+        </div>
+
+        <!-- Instructor -->
+        <section class="q-section" id="instructorSection" style="display:none">
+            <div class="q-section-header">
+                <div class="q-section-icon" style="background:#f9ab00"><span class="material-symbols-outlined">school</span></div>
+                <div><div class="q-section-title">講師介紹</div></div>
+            </div>
+            <div id="instructorContent"></div>
+        </section>
+
+        <!-- CTA -->
+        <div class="q-cta">
+            <h2>對課程有任何問題？</h2>
+            <p>歡迎來信討論課程客製化需求或其他合作洽談</p>
+            <a href="mailto:service@tbr.digital" class="q-cta-btn">
+                <span class="material-symbols-outlined" style="font-size:18px">mail</span> service@tbr.digital
+            </a>
+        </div>
+
+        <footer class="q-footer">
+            由 <a href="https://tbr.digital" target="_blank">數位簡報室 TBR.Digital</a> 製作 · 本報價單僅供授權對象閱覽
+        </footer>
+    </div>
+</div>
+
+<script type="module">
+import { db } from './scripts/supabase.js';
+
+const SB_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+
+// Get slug from URL
+const params = new URLSearchParams(location.search);
+const slug = params.get('slug') || location.pathname.split('/').pop()?.replace('.html','');
+
+async function init() {
+    if (!slug || slug === 'quote') {
+        showError('請提供報價單代碼');
+        return;
+    }
+
+    try {
+        // Load quotation
+        const { data: quotes, error } = await db.select('quotations', {
+            select: '*',
+            filter: { slug: `eq.${slug}` },
+            limit: 1
+        });
+
+        if (error || !quotes || quotes.length === 0) {
+            showError('找不到此報價單，請確認連結是否正確。');
+            return;
+        }
+
+        const q = quotes[0];
+        renderQuote(q);
+
+        // Load outline if enabled
+        if (q.include_outline && q.project_id) {
+            await loadOutline(q.project_id);
+        }
+
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        document.title = `${q.title || '課程報價'} — 數位簡報室`;
+
+    } catch (err) {
+        console.error(err);
+        showError('載入失敗：' + err.message);
+    }
+}
+
+function showError(msg) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('errorMsg').textContent = msg;
+    document.getElementById('errorScreen').style.display = 'flex';
+}
+
+function fmt(n) {
+    return 'NT$ ' + (n || 0).toLocaleString('zh-TW');
+}
+
+function renderQuote(q) {
+    // Title
+    document.getElementById('quoteTitle').textContent = q.title || '課程報價';
+
+    // Client
+    if (q.client_name) {
+        document.getElementById('clientNameDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">business</span> ${q.client_name}`;
+    }
+    if (q.client_logo) {
+        const logo = document.getElementById('clientLogo');
+        logo.src = q.client_logo;
+        logo.style.display = 'block';
+    }
+
+    // Date
+    const created = new Date(q.created_at);
+    document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
+
+    if (q.valid_until) {
+        document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${new Date(q.valid_until).toLocaleDateString('zh-TW')}`;
+    }
+
+    // Status badge
+    const badge = document.getElementById('statusBadge');
+    const statusMap = { draft: '草稿', sent: '已送出', accepted: '已接受', expired: '已過期' };
+    badge.textContent = statusMap[q.status] || '報價單';
+
+    // Items table
+    const items = q.items || [];
+    const tbody = document.getElementById('quoteTableBody');
+    tbody.innerHTML = '';
+    items.forEach(item => {
+        const tr = document.createElement('tr');
+        let detail = '', amount = 0;
+        if (item.type === 'hourly') {
+            detail = `${item.hours || 0} 小時 × ${fmt(item.rate)}/時`;
+            amount = (item.hours || 0) * (item.rate || 0);
+        } else if (item.type === 'perhead') {
+            detail = `${item.count || 0} 人 × ${fmt(item.rate)}/人`;
+            amount = (item.count || 0) * (item.rate || 0);
+        } else {
+            detail = item.detail || '—';
+            amount = item.amount || 0;
+        }
+        if (amount === 0 && item.type === 'fixed') detail = '本次不適用';
+
+        tr.innerHTML = `
+            <td class="q-td-item">${item.label || ''}</td>
+            <td class="q-td-detail">${detail}</td>
+            <td class="q-td-amount">${amount > 0 ? fmt(amount) : '—'}</td>
+        `;
+        if (amount === 0) tr.classList.add('q-row-zero');
+        tbody.appendChild(tr);
+    });
+
+    // Total
+    document.getElementById('totalAmount').textContent = fmt(q.total_amount || 0);
+
+    // Notes
+    if (q.notes) {
+        document.getElementById('notesSection').style.display = 'block';
+        document.getElementById('notesContent').textContent = q.notes;
+    }
+
+    // Payment
+    document.getElementById('paymentMethod').textContent = q.payment_method || '銀行匯款';
+    document.getElementById('paymentTerms').textContent = q.payment_terms || '開課前全額付款';
+
+    const bank = q.bank_info || {};
+    const bankEl = document.getElementById('bankDetails');
+    if (bank.bank || bank.account) {
+        bankEl.innerHTML = `
+            ${bank.bank ? `<div class="q-bank-row"><span class="q-bank-label">銀行</span><span>${bank.bank}${bank.branch ? ' ' + bank.branch : ''}</span></div>` : ''}
+            ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span class="q-bank-account">${bank.account}</span></div>` : ''}
+            ${bank.name ? `<div class="q-bank-row"><span class="q-bank-label">戶名</span><span>${bank.name}</span></div>` : ''}
+        `;
+    } else {
+        document.getElementById('bankInfoCard').style.display = 'none';
+    }
+}
+
+async function loadOutline(projectId) {
+    try {
+        // Load outline_data from project
+        const { data: projects } = await db.select('projects', {
+            select: 'id,name,outline_data',
+            filter: { id: `eq.${projectId}` },
+            limit: 1
+        });
+        if (!projects || projects.length === 0) return;
+        const outline = projects[0].outline_data;
+        if (!outline) return;
+
+        document.getElementById('outlineSection').style.display = 'block';
+
+        // Timeline
+        if (outline.timeline && outline.timeline.length > 0) {
+            const container = document.getElementById('outlineTimeline');
+            container.innerHTML = outline.timeline.map(block => `
+                <div class="q-timeline-block ${block.isBreak ? 'q-break' : ''}">
+                    <div class="q-timeline-time">${block.time || ''}</div>
+                    <div class="q-timeline-title">${block.title || ''}</div>
+                    ${block.desc ? `<div class="q-timeline-desc">${block.desc}</div>` : ''}
+                    ${block.topics && block.topics.length > 0 ? `<div class="q-timeline-tags">${block.topics.map(t => `<span class="q-tag${t.highlight ? ' q-tag-hl' : ''}">${t.name || t}</span>`).join('')}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Tools
+        if (outline.tools && outline.tools.length > 0) {
+            document.getElementById('toolsSection').style.display = 'block';
+            document.getElementById('toolGrid').innerHTML = outline.tools.map(t => `
+                <div class="q-tool-card">
+                    ${t.logo ? `<img src="${t.logo}" alt="${t.name}" class="q-tool-logo" onerror="this.style.display='none'">` : ''}
+                    <div class="q-tool-name">${t.name || ''}</div>
+                    <div class="q-tool-purpose">${t.purpose || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        // Equipment
+        if (outline.equipment && outline.equipment.length > 0) {
+            document.getElementById('equipSection').style.display = 'block';
+            document.getElementById('equipGrid').innerHTML = outline.equipment.map(e => `
+                <div class="q-equip-item">
+                    <div class="q-equip-icon"><span class="material-symbols-outlined">${e.icon || 'check_circle'}</span></div>
+                    <div><div class="q-equip-label">${e.label || ''}</div><div class="q-equip-detail">${e.detail || ''}</div></div>
+                </div>
+            `).join('');
+        }
+
+        // Instructors
+        if (outline.instructors && outline.instructors.length > 0) {
+            document.getElementById('instructorSection').style.display = 'block';
+            document.getElementById('instructorContent').innerHTML = outline.instructors.map(ins => `
+                <div class="q-instructor-card">
+                    <div class="q-instructor-main">
+                        ${ins.photoUrl ? `<img src="${ins.photoUrl}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
+                        <div>
+                            <div class="q-instructor-name">${ins.name || ''}</div>
+                            <div class="q-instructor-title">${ins.title || ''}</div>
+                            <div class="q-instructor-bio">${ins.bio || ''}</div>
+                            ${ins.tags && ins.tags.length > 0 ? `<div class="q-instructor-tags">${ins.tags.map(t => `<span class="q-tag">${t}</span>`).join('')}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+    } catch (err) {
+        console.warn('Failed to load outline:', err);
+    }
+}
+
+init();
+</script>
+</body>
+</html>

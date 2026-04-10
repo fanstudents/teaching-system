@@ -2127,7 +2127,8 @@
 
                     // ── 狀態恢復 ──
                     const hwStateKey = `hw_submitted_${element.id}`;
-                    const prevState = (() => { try { return JSON.parse(sessionStorage.getItem(hwStateKey)); } catch { return null; } })();
+                    let currentHwState = (() => { try { return JSON.parse(sessionStorage.getItem(hwStateKey)); } catch { return null; } })();
+                    let lastSubmittedElementId = null; // ★ 追蹤上次提交的 element_id，供編輯時刪除舊 row
 
                     const hwStartBtn = el.querySelector('.hw-start-btn');
                     const hwInlineForm = el.querySelector('.hw-inline-form');
@@ -2182,12 +2183,17 @@
                                     if (zone) zone.style.display = 'none';
                                 }
                             }
+                            // ★ 全功能模式：切到對應 tab
+                            if (!hwMode && state.type) {
+                                const targetTab = el.querySelector(`.hw-tab[data-type="${state.type}"]`);
+                                if (targetTab) targetTab.click();
+                            }
                         }
                         el.querySelector('.hw-submit-btn').innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">sync</span> 更新作業';
                     }
 
-                    if (prevState) {
-                        showSubmittedState(prevState);
+                    if (currentHwState) {
+                        showSubmittedState(currentHwState);
                     }
 
                     // 開始繳交
@@ -2199,10 +2205,10 @@
                         });
                     }
 
-                    // 編輯按鈕
+                    // 編輯按鈕 — ★ 使用動態 currentHwState（而非 stale prevState）
                     el.querySelector('.hw-edit-btn')?.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        openEditMode(prevState);
+                        openEditMode(currentHwState);
                     });
 
                     // tab 切換
@@ -2309,7 +2315,18 @@
                             hwSubmitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;animation:spin 1s linear infinite;">progress_activity</span> 上傳中…';
 
                             try {
-                                await homework.submit(element.title || '課堂作業', type, content, userObj, matchedAssignment?.id || element.id);
+                                // ★ 如果是編輯模式（有舊提交），先刪除舊的 DB row
+                                if (lastSubmittedElementId) {
+                                    try {
+                                        await db.delete('submissions', { element_id: `eq.${lastSubmittedElementId}` });
+                                        console.log('[HW] 舊提交已刪除:', lastSubmittedElementId);
+                                    } catch (e) { console.warn('[HW] 刪除舊提交失敗:', e); }
+                                }
+
+                                const result = await homework.submit(element.title || '課堂作業', type, content, userObj, matchedAssignment?.id || element.id);
+
+                                // ★ 追蹤新提交的 elementId，供下次編輯時刪除
+                                lastSubmittedElementId = result?.elementId || null;
 
                                 // 繳交作業也計分
                                 if (stateManager) {
@@ -2325,10 +2342,14 @@
                                     } catch (e) { console.warn('[HW] score save err:', e); }
                                 }
 
-                                // 記住繳交狀態
-                                const savedState = { type, content: typeof content === 'string' && content.startsWith('data:') ? '(image)' : content };
+                                // ★ 記住繳交狀態 + 更新 currentHwState（修復 stale state bug）
+                                const stateContent = typeof content === 'string' && content.startsWith('data:')
+                                    ? (result?.fileUrl || '(image)')
+                                    : content;
+                                const savedState = { type, content: stateContent };
+                                currentHwState = savedState;
                                 sessionStorage.setItem(hwStateKey, JSON.stringify(savedState));
-                                showSubmittedState({ type, content });
+                                showSubmittedState({ type, content: stateContent });
                                 homework.showSuccessToast();
 
                                 // ★ 顯示第幾個提交
