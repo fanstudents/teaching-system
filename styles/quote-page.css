@@ -255,40 +255,67 @@ body {
 .timeline-comment-btn.has-count { color: var(--q-accent); }
 .timeline-comment-btn.has-count .cb-count { display: flex; }
 
-/* ── Suggest new topic ── */
-.suggest-topic-area {
-    padding: 36px 12px; border-top: 1px dashed #ddd;
-    margin-top: 8px;
+/* ── Bottom Sheet (suggest form) ── */
+.bottom-sheet-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.4); z-index: 300;
+    backdrop-filter: blur(2px);
+    animation: bsOverlayIn .2s ease;
 }
-.suggest-topic-btn {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 28px; border-radius: var(--q-radius);
-    background: none; border: 1.5px dashed #ccc;
-    color: var(--q-text-2); font-size: .95rem; font-weight: 500;
-    cursor: pointer; font-family: inherit; transition: all .15s;
-}
-.suggest-topic-btn:hover { border-color: var(--q-accent); color: var(--q-accent); background: var(--q-accent-light); }
-.suggest-topic-btn .material-symbols-outlined { font-size: 22px; }
+.bottom-sheet-overlay.open { display: block; }
+@keyframes bsOverlayIn { from { opacity: 0; } to { opacity: 1; } }
 
-.suggest-topic-form { display: none; margin-top: 24px; }
-.suggest-topic-form.open { display: block; }
+.bottom-sheet {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; z-index: 301;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 40px rgba(0,0,0,.12);
+    max-height: 85vh; overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.32,.72,0,1);
+    padding: 0 24px 32px;
+    -webkit-overflow-scrolling: touch;
+}
+.bottom-sheet.open { transform: translateY(0); }
+
+.bottom-sheet-handle {
+    display: flex; justify-content: center; padding: 12px 0 8px; cursor: grab;
+    position: sticky; top: 0; background: #fff; z-index: 1;
+}
+.bottom-sheet-handle::after {
+    content: ''; width: 40px; height: 4px; border-radius: 2px; background: #d1d5db;
+}
+
+.bottom-sheet-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--q-text);
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--q-border);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.bottom-sheet-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: #f5f5f5; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: #9ca3af;
+}
+.bottom-sheet-close:hover { background: #eee; color: var(--q-text); }
+
 .suggest-topic-form input, .suggest-topic-form textarea {
     width: 100%; padding: 16px 20px; border: 1px solid var(--q-border); border-radius: var(--q-radius);
     font-size: 1rem; font-family: inherit; margin-bottom: 12px;
     transition: border-color .15s;
 }
 .suggest-topic-form input:focus, .suggest-topic-form textarea:focus { border-color: var(--q-accent); outline: none; }
-.suggest-topic-form textarea { min-height: 90px; resize: vertical; line-height: 1.7; }
-.suggest-topic-form-actions { display: flex; gap: 12px; margin-top: 6px; }
+.suggest-topic-form textarea { min-height: 120px; resize: vertical; line-height: 1.7; }
+.suggest-topic-form-actions { display: flex; gap: 12px; margin-top: 8px; }
 .suggest-submit {
-    padding: 14px 32px; background: var(--q-accent); color: #fff; border: none; border-radius: var(--q-radius);
-    font-size: .95rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    flex: 1; padding: 16px 32px; background: var(--q-accent); color: #fff; border: none; border-radius: var(--q-radius);
+    font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit;
     transition: background .15s;
 }
 .suggest-submit:hover { background: var(--q-accent-hover); }
 .suggest-cancel {
-    padding: 14px 28px; background: #f2f2f2; color: var(--q-text-2); border: none; border-radius: var(--q-radius);
-    font-size: .95rem; font-weight: 500; cursor: pointer; font-family: inherit;
+    padding: 16px 28px; background: #f2f2f2; color: var(--q-text-2); border: none; border-radius: var(--q-radius);
+    font-size: 1rem; font-weight: 500; cursor: pointer; font-family: inherit;
 }
 .suggest-cancel:hover { background: #e8e8e8; }
 
@@ -475,7 +502,7 @@ body {
 
     /* Topbar compact */
     .q-topbar { padding: 10px 16px; }
-    .q-topbar-brand { display: none; }
+    .q-topbar-brand { font-size: .78rem; }
     .q-topbar-logo { width: 24px; height: 24px; }
     .q-btn { padding: 8px 14px; font-size: .8rem; }
 

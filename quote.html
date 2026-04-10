@@ -77,20 +77,12 @@
                     <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
                 </div>
                 <div class="q-timeline timeline" id="outlineTimeline"></div>
-                <div class="suggest-topic-area">
+                <div class="suggest-topic-area" style="padding:36px 12px;border-top:1px dashed #ddd;margin-top:8px">
                     <div class="suggested-list" id="suggestedList"></div>
-                    <button class="suggest-topic-btn" onclick="toggleSuggestForm()" type="button">
-                        <span class="material-symbols-outlined">add_circle_outline</span>
+                    <button style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:var(--q-radius);background:none;border:1.5px dashed #ccc;color:var(--q-text-2);font-size:.95rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s" onclick="openSuggestSheet()" type="button" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)';this.style.background='var(--q-accent-light)'" onmouseout="this.style.borderColor='#ccc';this.style.color='var(--q-text-2)';this.style.background='none'">
+                        <span class="material-symbols-outlined" style="font-size:22px">add_circle_outline</span>
                         建議新增主題
                     </button>
-                    <div class="suggest-topic-form" id="suggestForm">
-                        <input id="suggestTitle" placeholder="建議主題名稱">
-                        <textarea id="suggestDesc" placeholder="簡短說明為什麼需要這個主題（選填）" rows="2"></textarea>
-                        <div class="suggest-topic-form-actions">
-                            <button class="suggest-submit" onclick="submitSuggestion()" type="button">送出建議</button>
-                            <button class="suggest-cancel" onclick="toggleSuggestForm()" type="button">取消</button>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -274,6 +266,26 @@
         <footer class="q-footer">
             由 <a href="https://tbr.digital" target="_blank">數位簡報室 TBR.Digital</a> 製作 · 本報價單僅供授權對象閱覽
         </footer>
+    </div>
+</div>
+
+<!-- Bottom Sheet: Suggest Topic -->
+<div class="bottom-sheet-overlay" id="suggestOverlay" onclick="closeSuggestSheet()"></div>
+<div class="bottom-sheet" id="suggestSheet">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">
+        <span>💡 建議新增主題</span>
+        <button class="bottom-sheet-close" onclick="closeSuggestSheet()">
+            <span class="material-symbols-outlined" style="font-size:18px">close</span>
+        </button>
+    </div>
+    <div class="suggest-topic-form" style="display:block">
+        <input id="suggestTitle" placeholder="建議主題名稱" style="font-size:1rem">
+        <textarea id="suggestDesc" placeholder="簡短說明為什麼需要這個主題（選填）" rows="4" style="font-size:1rem"></textarea>
+        <div class="suggest-topic-form-actions">
+            <button class="suggest-submit" onclick="submitSuggestion()" type="button">送出建議</button>
+            <button class="suggest-cancel" onclick="closeSuggestSheet()" type="button">取消</button>
+        </div>
     </div>
 </div>
 
@@ -611,13 +623,21 @@ function renderComments(idx, comments) {
     }
 }
 
-// ── Suggest new topic ──
-window.toggleSuggestForm = function() {
-    const form = document.getElementById('suggestForm');
-    form.classList.toggle('open');
-    if (form.classList.contains('open')) {
-        document.getElementById('suggestTitle')?.focus();
-    }
+// ── Suggest new topic (Bottom Sheet) ──
+window.openSuggestSheet = function() {
+    document.getElementById('suggestOverlay').classList.add('open');
+    // Slight delay for CSS transition
+    requestAnimationFrame(() => {
+        document.getElementById('suggestSheet').classList.add('open');
+    });
+    setTimeout(() => document.getElementById('suggestTitle')?.focus(), 300);
+};
+
+window.closeSuggestSheet = function() {
+    document.getElementById('suggestSheet').classList.remove('open');
+    setTimeout(() => {
+        document.getElementById('suggestOverlay').classList.remove('open');
+    }, 300);
 };
 
 window.submitSuggestion = async function() {
@@ -635,7 +655,7 @@ window.submitSuggestion = async function() {
         });
         document.getElementById('suggestTitle').value = '';
         document.getElementById('suggestDesc').value = '';
-        document.getElementById('suggestForm').classList.remove('open');
+        closeSuggestSheet();
         loadSuggestions();
     } catch (e) {
         console.error('submitSuggestion:', e);
