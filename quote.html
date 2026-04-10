@@ -389,30 +389,47 @@ function renderTimelineBlock(block, isGrid) {
             ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
             ${topicsHtml}
         </div>
-        <div class="timeline-annotation" id="annotationPanel${idx}">
-            <div class="annotation-list" id="annotationList${idx}"></div>
-            <button class="annotation-add" onclick="toggleAnnotation(${idx})">
-                <span class="material-symbols-outlined">add_comment</span> 加入註解
-                <span class="annotation-count" id="annotationCount${idx}" style="display:none">0</span>
+        <div class="comment-trigger" id="commentTrigger${idx}">
+            <button class="comment-trigger-btn" onclick="togglePopover(${idx})">
+                <span class="material-symbols-outlined">chat_bubble</span>
+                <span id="commentBadge${idx}" class="comment-badge" style="display:none">0</span>
             </button>
-            <div class="annotation-form" id="annotationForm${idx}">
-                <textarea id="annotationInput${idx}" placeholder="對此單元有任何問題或調整建議…" rows="2"></textarea>
-                <button onclick="submitAnnotation(${idx}, '${escapedTitle}')">送出</button>
+        </div>
+        <div class="comment-popover" id="commentPopover${idx}">
+            <div class="comment-popover-header">
+                課綱建議
+                <button class="comment-popover-close" onclick="togglePopover(${idx})"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="comment-popover-list" id="commentList${idx}"></div>
+            <div class="comment-popover-form">
+                <textarea class="comment-popover-input" id="commentInput${idx}" placeholder="有任何問題或調整建議…" rows="1"></textarea>
+                <button class="comment-popover-submit" onclick="submitComment(${idx}, '${escapedTitle}')">送出</button>
             </div>
         </div>
     </div>`;
 }
 
-window.toggleAnnotation = function(idx) {
-    const form = document.getElementById(`annotationForm${idx}`);
-    form.classList.toggle('open');
-    if (form.classList.contains('open')) {
-        document.getElementById(`annotationInput${idx}`)?.focus();
+window.togglePopover = function(idx) {
+    // Close all other popovers first
+    document.querySelectorAll('.comment-popover.open').forEach(el => {
+        if (el.id !== `commentPopover${idx}`) el.classList.remove('open');
+    });
+    const pop = document.getElementById(`commentPopover${idx}`);
+    pop.classList.toggle('open');
+    if (pop.classList.contains('open')) {
+        document.getElementById(`commentInput${idx}`)?.focus();
     }
 };
 
-window.submitAnnotation = async function(idx, blockTitle) {
-    const inputEl = document.getElementById(`annotationInput${idx}`);
+// Close popovers when clicking outside
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.comment-popover') && !e.target.closest('.comment-trigger-btn')) {
+        document.querySelectorAll('.comment-popover.open').forEach(el => el.classList.remove('open'));
+    }
+});
+
+window.submitComment = async function(idx, blockTitle) {
+    const inputEl = document.getElementById(`commentInput${idx}`);
     const text = inputEl.value.trim();
     if (!text) return;
 
@@ -425,16 +442,15 @@ window.submitAnnotation = async function(idx, blockTitle) {
             commenter_name: '客戶'
         });
         inputEl.value = '';
-        document.getElementById(`annotationForm${idx}`).classList.remove('open');
 
         const { data } = await db.select('quote_comments', {
             select: '*',
             filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${idx}` },
             order: 'created_at.asc'
         });
-        renderAnnotations(idx, data || []);
+        renderComments(idx, data || []);
     } catch (e) {
-        console.error('submitAnnotation:', e);
+        console.error('submitComment:', e);
         alert('送出失敗，請稍後再試');
     }
 };
@@ -454,24 +470,26 @@ async function loadComments() {
             grouped[c.block_index].push(c);
         });
         Object.entries(grouped).forEach(([idx, comments]) => {
-            renderAnnotations(parseInt(idx), comments);
+            renderComments(parseInt(idx), comments);
         });
     } catch (e) { console.warn('loadComments:', e); }
 }
 
-function renderAnnotations(idx, comments) {
-    const list = document.getElementById(`annotationList${idx}`);
-    const count = document.getElementById(`annotationCount${idx}`);
+function renderComments(idx, comments) {
+    const list = document.getElementById(`commentList${idx}`);
+    const badge = document.getElementById(`commentBadge${idx}`);
+    const trigger = document.getElementById(`commentTrigger${idx}`);
     if (!list) return;
 
     if (comments.length > 0) {
         list.innerHTML = comments.map(c => {
             const t = new Date(c.created_at);
             const timeStr = t.toLocaleDateString('zh-TW');
-            return `<div class="annotation-item"><strong>${c.commenter_name}</strong> ${c.comment_text}<time>${timeStr}</time></div>`;
+            return `<div class="comment-popover-item">${c.comment_text}<time>${timeStr}</time></div>`;
         }).join('');
-        count.textContent = comments.length;
-        count.style.display = 'inline';
+        badge.textContent = comments.length;
+        badge.style.display = 'inline-flex';
+        trigger.classList.add('has-comments');
     }
 }
 
