@@ -121,6 +121,46 @@ body {
 .q-bank-label { font-size: .82rem; color: var(--q-text-3); min-width: 50px; }
 .q-bank-account { font-family: -apple-system, monospace; font-weight: 700; font-size: 1.05rem; letter-spacing: .05em; }
 
+/* Payment note */
+.q-payment-note {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px; margin-bottom: 20px;
+    background: var(--q-accent-light); border-radius: 8px;
+    font-size: .92rem; color: var(--q-accent); font-weight: 500; line-height: 1.5;
+}
+.q-payment-note .material-symbols-outlined { font-size: 20px; flex-shrink: 0; }
+
+/* Invoice email */
+.q-invoice-section {
+    margin-top: 24px; padding-top: 24px;
+    border-top: 1px solid var(--q-border);
+}
+.q-invoice-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: .92rem; font-weight: 700; margin-bottom: 12px;
+}
+.q-invoice-label .material-symbols-outlined { font-size: 20px; color: var(--q-accent); }
+.q-invoice-form { display: flex; gap: 10px; }
+.q-invoice-input {
+    flex: 1; padding: 14px 18px; border: 1px solid var(--q-border); border-radius: var(--q-radius);
+    font-size: .95rem; font-family: inherit; transition: border-color .15s;
+}
+.q-invoice-input:focus { border-color: var(--q-accent); outline: none; }
+.q-invoice-submit {
+    padding: 14px 28px; background: var(--q-accent); color: #fff; border: none; border-radius: var(--q-radius);
+    font-size: .92rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: background .15s; white-space: nowrap;
+}
+.q-invoice-submit:hover { background: var(--q-accent-hover); }
+.q-invoice-submit:disabled { background: #ccc; cursor: not-allowed; }
+.q-invoice-saved {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px; margin-top: 12px;
+    background: #f0faf0; border-radius: 8px;
+    font-size: .9rem; color: #2e7d32; font-weight: 500;
+}
+.q-invoice-saved .material-symbols-outlined { font-size: 20px; }
+
 /* ═══════════════════════════════════
    TIMELINE
    ═══════════════════════════════════ */

@@ -153,6 +153,10 @@
                 <div class="q-section-icon"><span class="material-symbols-outlined">account_balance</span></div>
                 <div><div class="q-section-title">付款資訊</div><div class="q-section-desc">匯款方式與收款帳號</div></div>
             </div>
+            <div class="q-payment-note">
+                <span class="material-symbols-outlined">info</span>
+                我們會先開立發票，請您們再按時間付款。
+            </div>
             <div class="q-payment-grid">
                 <div class="q-payment-card">
                     <div class="q-payment-label">付款方式</div>
@@ -167,6 +171,20 @@
                     <div class="q-bank-details" id="bankDetails">
                         <!-- 動態填入 -->
                     </div>
+                </div>
+            </div>
+            <div class="q-invoice-section">
+                <div class="q-invoice-label">
+                    <span class="material-symbols-outlined">mail</span>
+                    發票收件 Email
+                </div>
+                <div class="q-invoice-form">
+                    <input type="email" id="invoiceEmail" class="q-invoice-input" placeholder="請輸入收取發票的 Email 地址">
+                    <button class="q-invoice-submit" id="invoiceSubmitBtn" onclick="submitInvoiceEmail()" type="button">確認</button>
+                </div>
+                <div class="q-invoice-saved" id="invoiceSaved" style="display:none">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span id="invoiceSavedText"></span>
                 </div>
             </div>
         </section>
@@ -283,6 +301,7 @@ async function init() {
             // Load comments
             await loadComments();
             await loadSuggestions();
+            await loadInvoiceEmail();
         }
 
         document.getElementById('loadingScreen').style.display = 'none';
@@ -557,6 +576,54 @@ async function loadSuggestions() {
             return `<div class="suggested-item"><div><strong>${title}</strong><span>${s.comment_text !== title ? s.comment_text : ''}</span></div><time>${timeStr}</time></div>`;
         }).join('');
     } catch (e) { console.warn('loadSuggestions:', e); }
+}
+
+// ── Invoice Email ──
+window.submitInvoiceEmail = async function() {
+    const input = document.getElementById('invoiceEmail');
+    const email = input.value.trim();
+    if (!email || !email.includes('@')) { input.focus(); return; }
+
+    const btn = document.getElementById('invoiceSubmitBtn');
+    btn.disabled = true; btn.textContent = '送出中…';
+
+    try {
+        // Store as a special comment with block_index = -2
+        await db.insert('quote_comments', {
+            quotation_id: currentQuotationId,
+            block_index: -2,
+            block_title: '【發票Email】',
+            comment_text: email,
+            commenter_name: '客戶'
+        });
+        // Show saved state
+        document.querySelector('.q-invoice-form').style.display = 'none';
+        const saved = document.getElementById('invoiceSaved');
+        document.getElementById('invoiceSavedText').textContent = '已送出：' + email;
+        saved.style.display = 'flex';
+    } catch (e) {
+        console.error('submitInvoiceEmail:', e);
+        alert('送出失敗，請稍後再試');
+        btn.disabled = false; btn.textContent = '確認';
+    }
+};
+
+async function loadInvoiceEmail() {
+    if (!currentQuotationId) return;
+    try {
+        const { data } = await db.select('quote_comments', {
+            select: '*',
+            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: 'eq.-2' },
+            order: 'created_at.desc',
+            limit: 1
+        });
+        if (data && data.length > 0) {
+            document.querySelector('.q-invoice-form').style.display = 'none';
+            const saved = document.getElementById('invoiceSaved');
+            document.getElementById('invoiceSavedText').textContent = '已送出：' + data[0].comment_text;
+            saved.style.display = 'flex';
+        }
+    } catch (e) { console.warn('loadInvoiceEmail:', e); }
 }
 
 async function loadOutline(projectId) {
