@@ -65,11 +65,40 @@
             </div>
         </section>
 
+        <!-- Course Outline (loaded from project) -->
+        <div id="outlineSection" style="display:none">
+            <section class="q-section">
+                <div class="q-section-header">
+                    <div class="q-section-icon"><span class="material-symbols-outlined">view_timeline</span></div>
+                    <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
+                </div>
+                <div class="q-timeline timeline" id="outlineTimeline"></div>
+            </section>
+
+            <!-- Tools -->
+            <section class="q-section" id="toolsSection" style="display:none">
+                <div class="q-section-header">
+                    <div class="q-section-icon"><span class="material-symbols-outlined">build</span></div>
+                    <div><div class="q-section-title">使用工具清單</div><div class="q-section-desc">課程中會使用到的 AI 應用工具</div></div>
+                </div>
+                <div class="q-tool-grid" id="toolGrid"></div>
+            </section>
+
+            <!-- Equipment -->
+            <section class="q-section" id="equipSection" style="display:none">
+                <div class="q-section-header">
+                    <div class="q-section-icon"><span class="material-symbols-outlined">devices</span></div>
+                    <div><div class="q-section-title">設備需求</div><div class="q-section-desc">場地與設備準備清單</div></div>
+                </div>
+                <div class="q-equip-grid" id="equipGrid"></div>
+            </section>
+        </div>
+
         <!-- Quote Table -->
         <section class="q-section">
             <div class="q-section-header">
                 <div class="q-section-icon"><span class="material-symbols-outlined">receipt_long</span></div>
-                <div><div class="q-section-title">費用明細</div><div class="q-section-desc">以下為本次課程之費用項目</div></div>
+                <div><div class="q-section-title">費用明細</div><div class="q-section-desc">以下費用皆為未稅價格</div></div>
             </div>
             <div class="q-table-wrap">
                 <table class="q-table" id="quoteTable">
@@ -84,7 +113,7 @@
                     </tbody>
                     <tfoot>
                         <tr class="q-total-row">
-                            <td colspan="2" class="q-total-label">合計</td>
+                            <td colspan="2" class="q-total-label">合計（未稅）</td>
                             <td class="q-total-amount" id="totalAmount">NT$ 0</td>
                         </tr>
                     </tfoot>
@@ -96,7 +125,7 @@
         <div id="notesSection" style="display:none">
             <section class="q-section">
                 <div class="q-section-header">
-                    <div class="q-section-icon" style="background:#f59e0b"><span class="material-symbols-outlined">sticky_note_2</span></div>
+                    <div class="q-section-icon"><span class="material-symbols-outlined">sticky_note_2</span></div>
                     <div><div class="q-section-title">備註說明</div></div>
                 </div>
                 <div class="q-notes" id="notesContent"></div>
@@ -106,7 +135,7 @@
         <!-- Payment Info -->
         <section class="q-section">
             <div class="q-section-header">
-                <div class="q-section-icon" style="background:#10b981"><span class="material-symbols-outlined">account_balance</span></div>
+                <div class="q-section-icon"><span class="material-symbols-outlined">account_balance</span></div>
                 <div><div class="q-section-title">付款資訊</div><div class="q-section-desc">匯款方式與收款帳號</div></div>
             </div>
             <div class="q-payment-grid">
@@ -127,39 +156,10 @@
             </div>
         </section>
 
-        <!-- Course Outline (loaded from project) -->
-        <div id="outlineSection" style="display:none">
-            <section class="q-section">
-                <div class="q-section-header">
-                    <div class="q-section-icon" style="background:#6366f1"><span class="material-symbols-outlined">view_timeline</span></div>
-                    <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
-                </div>
-                <div class="q-timeline timeline" id="outlineTimeline"></div>
-            </section>
-
-            <!-- Tools -->
-            <section class="q-section" id="toolsSection" style="display:none">
-                <div class="q-section-header">
-                    <div class="q-section-icon" style="background:#0ea5e9"><span class="material-symbols-outlined">build</span></div>
-                    <div><div class="q-section-title">使用工具清單</div><div class="q-section-desc">課程中會使用到的 AI 應用工具</div></div>
-                </div>
-                <div class="q-tool-grid" id="toolGrid"></div>
-            </section>
-
-            <!-- Equipment -->
-            <section class="q-section" id="equipSection" style="display:none">
-                <div class="q-section-header">
-                    <div class="q-section-icon" style="background:#d93025"><span class="material-symbols-outlined">devices</span></div>
-                    <div><div class="q-section-title">設備需求</div><div class="q-section-desc">場地與設備準備清單</div></div>
-                </div>
-                <div class="q-equip-grid" id="equipGrid"></div>
-            </section>
-        </div>
-
         <!-- Instructor -->
         <section class="q-section" id="instructorSection" style="display:none">
             <div class="q-section-header">
-                <div class="q-section-icon" style="background:#f9ab00"><span class="material-symbols-outlined">school</span></div>
+                <div class="q-section-icon"><span class="material-symbols-outlined">school</span></div>
                 <div><div class="q-section-title">講師介紹</div></div>
             </div>
             <div id="instructorContent"></div>
@@ -168,7 +168,7 @@
         <!-- About -->
         <section class="q-section" id="aboutSection">
             <div class="q-section-header">
-                <div class="q-section-icon" style="background:#0f172a"><span class="material-symbols-outlined">apartment</span></div>
+                <div class="q-section-icon"><span class="material-symbols-outlined">apartment</span></div>
                 <div><div class="q-section-title">關於數位簡報室</div><div class="q-section-desc">市面上少數的 AI 專業培訓團隊</div></div>
             </div>
             <div class="q-about-content">
