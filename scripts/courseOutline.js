@@ -1775,7 +1775,7 @@ function renderVersionTabs() {
                 color:${i === activeVersionIdx ? '#fff' : '#64748b'};
                 font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border-right:none;
             " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>
-            <button onclick="renameVersion(${i})" title="重新命名" style="
+            <button onclick="event.stopPropagation();renameVersion(${i})" title="重新命名" style="
                 padding:6px 8px;border-radius:0 8px 8px 0;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
                 background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
                 color:${i === activeVersionIdx ? 'rgba(255,255,255,.7)' : '#9ca3af'};
