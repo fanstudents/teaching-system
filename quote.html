@@ -6,7 +6,7 @@
     <title>報價與課程規劃 — 數位簡報室</title>
     <meta name="description" content="數位簡報室課程報價與教學規劃">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 <!-- Loading -->
 <div class="q-loading" id="loadingScreen">
     <div class="q-loading-inner">
-        <img src="favicon.png" alt="Logo" style="width:48px;height:48px;margin-bottom:16px">
+        <img src="assets/images/tbrlogo.png" alt="Logo" style="width:48px;height:48px;margin-bottom:16px;border-radius:8px">
         <div class="q-loading-spinner"></div>
         <p>載入報價資料中…</p>
     </div>
@@ -38,7 +38,7 @@
     <!-- Print Header -->
     <header class="q-topbar" id="topbar">
         <div class="q-topbar-left">
-            <img src="favicon.png" alt="TBR" class="q-topbar-logo">
+            <img src="assets/images/tbrlogo.png" alt="TBR" class="q-topbar-logo">
             <span class="q-topbar-brand">數位簡報室 TBR.Digital</span>
         </div>
         <div class="q-topbar-right">
@@ -52,7 +52,6 @@
         <!-- Quote Header -->
         <section class="q-header">
             <div class="q-header-logos">
-                <img src="favicon.png" alt="TBR" class="q-header-logo">
                 <img id="clientLogo" src="" alt="" class="q-header-client-logo" style="display:none">
             </div>
             <div class="q-header-info">
@@ -135,7 +134,7 @@
                     <div class="q-section-icon" style="background:#6366f1"><span class="material-symbols-outlined">view_timeline</span></div>
                     <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
                 </div>
-                <div class="q-timeline" id="outlineTimeline"></div>
+                <div class="q-timeline timeline" id="outlineTimeline"></div>
             </section>
 
             <!-- Tools -->
@@ -169,10 +168,16 @@
         <!-- CTA -->
         <div class="q-cta">
             <h2>對課程有任何問題？</h2>
-            <p>歡迎來信討論課程客製化需求或其他合作洽談</p>
-            <a href="mailto:service@tbr.digital" class="q-cta-btn">
-                <span class="material-symbols-outlined" style="font-size:18px">mail</span> service@tbr.digital
-            </a>
+            <p>歡迎來信或透過 LINE 官方帳號討論課程客製化需求</p>
+            <div class="q-cta-buttons">
+                <a href="https://lin.ee/wAi3y4P" target="_blank" class="q-cta-btn q-cta-line">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                    LINE 即時諮詢
+                </a>
+                <a href="mailto:service@tbr.digital" class="q-cta-btn q-cta-email">
+                    <span class="material-symbols-outlined" style="font-size:18px">mail</span> service@tbr.digital
+                </a>
+            </div>
         </div>
 
         <footer class="q-footer">
@@ -319,6 +324,21 @@ function renderQuote(q) {
     }
 }
 
+function renderTimelineBlock(block, isGrid) {
+    const breakClass = block.isBreak ? 'break-block' : '';
+    const topicsHtml = (block.topics && block.topics.length > 0)
+        ? `<div class="timeline-topics">${block.topics.map(t => `<span class="topic-tag${(t.highlight ? ' highlight' : '')}">${t.name || t}</span>`).join('')}</div>`
+        : '';
+    return `<div class="timeline-block ${breakClass}">
+        <div class="timeline-header">
+            ${block.time ? `<span class="timeline-time">${block.time}</span>` : ''}
+            <span class="timeline-title">${block.title || ''}</span>
+        </div>
+        ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
+        ${topicsHtml}
+    </div>`;
+}
+
 async function loadOutline(projectId) {
     try {
         // Load outline_data from project
@@ -336,14 +356,29 @@ async function loadOutline(projectId) {
         // Timeline
         if (outline.timeline && outline.timeline.length > 0) {
             const container = document.getElementById('outlineTimeline');
-            container.innerHTML = outline.timeline.map(block => `
-                <div class="q-timeline-block ${block.isBreak ? 'q-break' : ''}">
-                    <div class="q-timeline-time">${block.time || ''}</div>
-                    <div class="q-timeline-title">${block.title || ''}</div>
-                    ${block.desc ? `<div class="q-timeline-desc">${block.desc}</div>` : ''}
-                    ${block.topics && block.topics.length > 0 ? `<div class="q-timeline-tags">${block.topics.map(t => `<span class="q-tag${t.highlight ? ' q-tag-hl' : ''}">${t.name || t}</span>`).join('')}</div>` : ''}
-                </div>
-            `).join('');
+            // Check for multi-day format
+            const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
+            if (hasDays) {
+                // Group by day
+                const days = {};
+                outline.timeline.forEach(b => {
+                    const d = b.day || 1;
+                    if (!days[d]) days[d] = { label: b.dayLabel || `Day ${d}`, info: b.dayInfo || '', blocks: [] };
+                    days[d].blocks.push(b);
+                });
+                const dayKeys = Object.keys(days);
+                const cols = dayKeys.length;
+                const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : cols === 2 ? 'timeline-grid-2' : '';
+                container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
+                    const d = days[k];
+                    return `<div class="timeline-day-col">
+                        <div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>
+                        ${d.blocks.map(block => renderTimelineBlock(block, true)).join('')}
+                    </div>`;
+                }).join('')}</div>`;
+            } else {
+                container.innerHTML = outline.timeline.map(block => renderTimelineBlock(block, false)).join('');
+            }
         }
 
         // Tools
