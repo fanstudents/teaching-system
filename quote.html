@@ -259,44 +259,37 @@
 <script type="module">
 import { db } from './scripts/supabase.js';
 
-const SB_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
-
-// Get slug from URL
 const params = new URLSearchParams(location.search);
 const slug = params.get('slug') || location.pathname.split('/').pop()?.replace('.html','');
+let currentQuotationId = null;
+let commentsCache = {};  // { blockIndex: [comments] }
 
 async function init() {
-    if (!slug || slug === 'quote') {
-        showError('請提供報價單代碼');
-        return;
-    }
+    if (!slug || slug === 'quote') { showError('請提供報價單代碼'); return; }
 
     try {
-        // Load quotation
         const { data: quotes, error } = await db.select('quotations', {
             select: '*',
             filter: { slug: `eq.${slug}` },
             limit: 1
         });
-
-        if (error || !quotes || quotes.length === 0) {
-            showError('找不到此報價單，請確認連結是否正確。');
-            return;
-        }
+        if (error || !quotes || quotes.length === 0) { showError('找不到此報價單，請確認連結是否正確。'); return; }
 
         const q = quotes[0];
+        currentQuotationId = q.id;
         renderQuote(q);
 
-        // Load outline if enabled
         if (q.include_outline && q.project_id) {
             await loadOutline(q.project_id);
+            // Load payment date from sessions
+            await loadPaymentDate(q.project_id);
+            // Load comments
+            await loadComments();
         }
 
         document.getElementById('loadingScreen').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
         document.title = `${q.title || '課程報價'} — 數位簡報室`;
-
     } catch (err) {
         console.error(err);
         showError('載入失敗：' + err.message);
@@ -309,15 +302,40 @@ function showError(msg) {
     document.getElementById('errorScreen').style.display = 'flex';
 }
 
-function fmt(n) {
-    return 'NT$ ' + (n || 0).toLocaleString('zh-TW');
+function fmt(n) { return 'NT$ ' + (n || 0).toLocaleString('zh-TW'); }
+
+// Calculate business days before a date (skip weekends)
+function businessDaysBefore(dateStr, days) {
+    const d = new Date(dateStr + 'T00:00:00');
+    let count = 0;
+    while (count < days) {
+        d.setDate(d.getDate() - 1);
+        const dow = d.getDay();
+        if (dow !== 0 && dow !== 6) count++;
+    }
+    return d;
+}
+
+async function loadPaymentDate(projectId) {
+    try {
+        const { data: sessions } = await db.select('project_sessions', {
+            select: 'date',
+            filter: { project_id: `eq.${projectId}` },
+            order: 'date.asc',
+            limit: 1
+        });
+        if (sessions && sessions.length > 0 && sessions[0].date) {
+            const firstDate = sessions[0].date;
+            const payDate = businessDaysBefore(firstDate, 5);
+            const formatted = payDate.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('paymentTerms').innerHTML = `開課前五天匯款<br><strong style="color:var(--q-accent);font-size:.95rem">${formatted}（含）前</strong>`;
+        }
+    } catch (e) { console.warn('loadPaymentDate:', e); }
 }
 
 function renderQuote(q) {
-    // Title
     document.getElementById('quoteTitle').textContent = q.title || '課程報價';
 
-    // Client
     if (q.client_name) {
         document.getElementById('clientNameDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">business</span> ${q.client_name}`;
     }
@@ -327,59 +345,37 @@ function renderQuote(q) {
         logo.style.display = 'block';
     }
 
-    // Date
     const created = new Date(q.created_at);
     document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
-
     if (q.valid_until) {
         document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${new Date(q.valid_until).toLocaleDateString('zh-TW')}`;
     }
 
-    // Status badge
     const badge = document.getElementById('statusBadge');
     const statusMap = { draft: '草稿', sent: '已送出', accepted: '已接受', expired: '已過期' };
     badge.textContent = statusMap[q.status] || '報價單';
 
-    // Items table
     const items = q.items || [];
     const tbody = document.getElementById('quoteTableBody');
     tbody.innerHTML = '';
     items.forEach(item => {
         const tr = document.createElement('tr');
         let detail = '', amount = 0;
-        if (item.type === 'hourly') {
-            detail = `${item.hours || 0} 小時 × ${fmt(item.rate)}/時`;
-            amount = (item.hours || 0) * (item.rate || 0);
-        } else if (item.type === 'perhead') {
-            detail = `${item.count || 0} 人 × ${fmt(item.rate)}/人`;
-            amount = (item.count || 0) * (item.rate || 0);
-        } else {
-            detail = item.detail || '—';
-            amount = item.amount || 0;
-        }
+        if (item.type === 'hourly') { detail = `${item.hours || 0} 小時 × ${fmt(item.rate)}/時`; amount = (item.hours || 0) * (item.rate || 0); }
+        else if (item.type === 'perhead') { detail = `${item.count || 0} 人 × ${fmt(item.rate)}/人`; amount = (item.count || 0) * (item.rate || 0); }
+        else { detail = item.detail || '—'; amount = item.amount || 0; }
         if (amount === 0 && item.type === 'fixed') detail = '本次不適用';
-
-        tr.innerHTML = `
-            <td class="q-td-item">${item.label || ''}</td>
-            <td class="q-td-detail">${detail}</td>
-            <td class="q-td-amount">${amount > 0 ? fmt(amount) : '—'}</td>
-        `;
+        tr.innerHTML = `<td class="q-td-item">${item.label || ''}</td><td class="q-td-detail">${detail}</td><td class="q-td-amount">${amount > 0 ? fmt(amount) : '—'}</td>`;
         if (amount === 0) tr.classList.add('q-row-zero');
         tbody.appendChild(tr);
     });
 
-    // Total
     document.getElementById('totalAmount').textContent = fmt(q.total_amount || 0);
 
-    // Notes
-    if (q.notes) {
-        document.getElementById('notesSection').style.display = 'block';
-        document.getElementById('notesContent').textContent = q.notes;
-    }
+    if (q.notes) { document.getElementById('notesSection').style.display = 'block'; document.getElementById('notesContent').textContent = q.notes; }
 
-    // Payment
     document.getElementById('paymentMethod').textContent = q.payment_method || '銀行匯款';
-    document.getElementById('paymentTerms').textContent = q.payment_terms || '開課前全額付款';
+    document.getElementById('paymentTerms').textContent = q.payment_terms || '開課前五天匯款';
 
     const bank = q.bank_info || {};
     const bankEl = document.getElementById('bankDetails');
@@ -389,29 +385,117 @@ function renderQuote(q) {
             ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span class="q-bank-account">${bank.account}</span></div>` : ''}
             ${bank.name ? `<div class="q-bank-row"><span class="q-bank-label">戶名</span><span>${bank.name}</span></div>` : ''}
         `;
-    } else {
-        document.getElementById('bankInfoCard').style.display = 'none';
-    }
+    } else { document.getElementById('bankInfoCard').style.display = 'none'; }
 }
 
+// --- Timeline ---
+let blockCounter = 0;
+
 function renderTimelineBlock(block, isGrid) {
+    const idx = blockCounter++;
     const breakClass = block.isBreak ? 'break-block' : '';
     const topicsHtml = (block.topics && block.topics.length > 0)
         ? `<div class="timeline-topics">${block.topics.map(t => `<span class="topic-tag${(t.highlight ? ' highlight' : '')}">${t.name || t}</span>`).join('')}</div>`
         : '';
-    return `<div class="timeline-block ${breakClass}">
+    return `<div class="timeline-block ${breakClass}" data-block-idx="${idx}">
         <div class="timeline-header">
             ${block.time ? `<span class="timeline-time">${block.time}</span>` : ''}
             <span class="timeline-title">${block.title || ''}</span>
         </div>
         ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
         ${topicsHtml}
+        <button class="block-comment-toggle" onclick="toggleComment(${idx})" title="提出建議或問題">
+            <span class="material-symbols-outlined">chat_bubble_outline</span>
+            <span>提出建議</span>
+            <span class="comment-count" id="commentCount${idx}" style="display:none">0</span>
+        </button>
+        <div class="block-comment-area" id="commentArea${idx}">
+            <div class="block-comment-list" id="commentList${idx}"></div>
+            <div class="block-comment-form">
+                <input class="block-comment-name" id="commentName${idx}" placeholder="姓名" value="">
+                <textarea class="block-comment-input" id="commentInput${idx}" placeholder="對此區塊有任何建議或問題…" rows="1"></textarea>
+                <button class="block-comment-submit" onclick="submitComment(${idx}, '${(block.title||'').replace(/'/g,"\\'")}')">送出</button>
+            </div>
+        </div>
     </div>`;
+}
+
+window.toggleComment = function(idx) {
+    const area = document.getElementById(`commentArea${idx}`);
+    area.classList.toggle('open');
+};
+
+window.submitComment = async function(idx, blockTitle) {
+    const nameEl = document.getElementById(`commentName${idx}`);
+    const inputEl = document.getElementById(`commentInput${idx}`);
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    const name = nameEl.value.trim() || '客戶';
+    try {
+        await db.insert('quote_comments', {
+            quotation_id: currentQuotationId,
+            block_index: idx,
+            block_title: blockTitle,
+            comment_text: text,
+            commenter_name: name
+        });
+        inputEl.value = '';
+
+        // Reload comments for this block
+        const { data } = await db.select('quote_comments', {
+            select: '*',
+            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${idx}` },
+            order: 'created_at.asc'
+        });
+        renderBlockComments(idx, data || []);
+    } catch (e) {
+        console.error('submitComment:', e);
+        alert('送出失敗，請稍後再試');
+    }
+};
+
+async function loadComments() {
+    if (!currentQuotationId) return;
+    try {
+        const { data } = await db.select('quote_comments', {
+            select: '*',
+            filter: { quotation_id: `eq.${currentQuotationId}` },
+            order: 'created_at.asc'
+        });
+        if (!data) return;
+        // Group by block_index
+        const grouped = {};
+        data.forEach(c => {
+            if (!grouped[c.block_index]) grouped[c.block_index] = [];
+            grouped[c.block_index].push(c);
+        });
+        Object.entries(grouped).forEach(([idx, comments]) => {
+            renderBlockComments(parseInt(idx), comments);
+        });
+    } catch (e) { console.warn('loadComments:', e); }
+}
+
+function renderBlockComments(idx, comments) {
+    const list = document.getElementById(`commentList${idx}`);
+    const count = document.getElementById(`commentCount${idx}`);
+    if (!list) return;
+
+    if (comments.length > 0) {
+        list.innerHTML = comments.map(c => {
+            const t = new Date(c.created_at);
+            const timeStr = t.toLocaleDateString('zh-TW') + ' ' + t.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+            return `<div class="block-comment-item"><strong>${c.commenter_name}</strong><span>${c.comment_text}</span><time>${timeStr}</time></div>`;
+        }).join('');
+        count.textContent = comments.length;
+        count.style.display = 'inline';
+        // Auto-open if has comments
+        document.getElementById(`commentArea${idx}`)?.classList.add('open');
+    }
 }
 
 async function loadOutline(projectId) {
     try {
-        // Load outline_data from project
         const { data: projects } = await db.select('projects', {
             select: 'id,name,outline_data',
             filter: { id: `eq.${projectId}` },
@@ -423,10 +507,8 @@ async function loadOutline(projectId) {
 
         document.getElementById('outlineSection').style.display = 'block';
 
-        // Timeline
         if (outline.timeline && outline.timeline.length > 0) {
             const container = document.getElementById('outlineTimeline');
-            // Check for multi-day format
             const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
             if (hasDays) {
                 const days = {};
@@ -436,14 +518,11 @@ async function loadOutline(projectId) {
                     days[d].blocks.push(b);
                 });
                 const dayKeys = Object.keys(days);
-
                 if (dayKeys.length === 1) {
-                    // Single day → normal timeline with day header
                     const d = days[dayKeys[0]];
                     container.innerHTML = `<div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>`
                         + d.blocks.map(block => renderTimelineBlock(block, false)).join('');
                 } else {
-                    // Multi-day grid
                     const cols = dayKeys.length;
                     const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : 'timeline-grid-2';
                     container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
@@ -459,7 +538,6 @@ async function loadOutline(projectId) {
             }
         }
 
-        // Tools
         if (outline.tools && outline.tools.length > 0) {
             document.getElementById('toolsSection').style.display = 'block';
             document.getElementById('toolGrid').innerHTML = outline.tools.map(t => `
@@ -471,7 +549,6 @@ async function loadOutline(projectId) {
             `).join('');
         }
 
-        // Equipment
         if (outline.equipment && outline.equipment.length > 0) {
             document.getElementById('equipSection').style.display = 'block';
             document.getElementById('equipGrid').innerHTML = outline.equipment.map(e => `
@@ -482,7 +559,6 @@ async function loadOutline(projectId) {
             `).join('');
         }
 
-        // Instructors
         if (outline.instructors && outline.instructors.length > 0) {
             document.getElementById('instructorSection').style.display = 'block';
             document.getElementById('instructorContent').innerHTML = outline.instructors.map(ins => `
@@ -499,13 +575,11 @@ async function loadOutline(projectId) {
                 </div>
             `).join('');
         }
-
-    } catch (err) {
-        console.warn('Failed to load outline:', err);
-    }
+    } catch (err) { console.warn('Failed to load outline:', err); }
 }
 
 init();
 </script>
 </body>
 </html>
+
