@@ -793,4 +793,571 @@ SLIDE_TEMPLATES.push(
             background: '#ffffff'
         })
     },
+    // SWOT 分析
+    {
+        id: 'swot',
+        name: 'SWOT 分析',
+        icon: 'grid_4x4',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 15, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;text-align:center;display:block;">SWOT 分析</b>', fontSize: 24 },
+                // S
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 65, width: 425, height: 215, background: '#eff6ff', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 60, y: 75, width: 385, height: 195, content: '<b style="font-size:17px;color:#1e40af;">S — 優勢</b><br><span style="font-size:13px;color:#475569;line-height:2;">• 優勢一<br>• 優勢二</span>', fontSize: 13 },
+                // W
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 65, width: 425, height: 215, background: '#fef2f2', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 515, y: 75, width: 385, height: 195, content: '<b style="font-size:17px;color:#991b1b;">W — 劣勢</b><br><span style="font-size:13px;color:#475569;line-height:2;">• 劣勢一<br>• 劣勢二</span>', fontSize: 13 },
+                // O
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 300, width: 425, height: 215, background: '#ecfdf5', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 60, y: 310, width: 385, height: 195, content: '<b style="font-size:17px;color:#065f46;">O — 機會</b><br><span style="font-size:13px;color:#475569;line-height:2;">• 機會一<br>• 機會二</span>', fontSize: 13 },
+                // T
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 300, width: 425, height: 215, background: '#fefce8', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 515, y: 310, width: 385, height: 195, content: '<b style="font-size:17px;color:#92400e;">T — 威脅</b><br><span style="font-size:13px;color:#475569;line-height:2;">• 威脅一<br>• 威脅二</span>', fontSize: 13 },
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 四格卡片
+    {
+        id: 'grid-4',
+        name: '四格卡片',
+        icon: 'grid_view',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 15, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;">四格重點</b>', fontSize: 24 },
+                ...[0,1,2,3].flatMap(i => {
+                    const col = i % 2, row = Math.floor(i / 2);
+                    const x = 40 + col * 455, y = 65 + row * 235;
+                    const colors = ['#eff6ff','#ecfdf5','#fefce8','#fce7f3'];
+                    const icons = ['lightbulb','build','target','rocket_launch'];
+                    const iconColors = ['#2563eb','#059669','#d97706','#be185d'];
+                    return [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x, y, width: 425, height: 215, background: colors[i], borderRadius: 14 },
+                        { id: gen(), type: 'text', x: x+20, y: y+15, width: 385, height: 185, content: `<span class="material-symbols-outlined" style="font-size:24px;color:${iconColors[i]};">${icons[i]}</span><br><b style="font-size:15px;color:#1e293b;">標題 ${i+1}</b><br><span style="font-size:13px;color:#64748b;line-height:1.8;">說明文字</span>`, fontSize: 13 },
+                    ];
+                }),
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 六格卡片
+    {
+        id: 'grid-6',
+        name: '六格卡片',
+        icon: 'apps',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 10, width: 840, height: 35, content: '<b style="font-size:22px;color:#1e293b;">六大面向</b>', fontSize: 22 },
+                ...[0,1,2,3,4,5].flatMap(i => {
+                    const col = i % 3, row = Math.floor(i / 3);
+                    const x = 30 + col * 310, y = 55 + row * 245;
+                    const colors = ['#eff6ff','#ecfdf5','#fefce8','#fce7f3','#f5f3ff','#fff7ed'];
+                    return [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x, y, width: 290, height: 225, background: colors[i], borderRadius: 12 },
+                        { id: gen(), type: 'text', x: x+15, y: y+12, width: 260, height: 200, content: `<b style="font-size:14px;color:#1e293b;">項目 ${i+1}</b><br><span style="font-size:12px;color:#64748b;line-height:1.8;">說明文字</span>`, fontSize: 12 },
+                    ];
+                }),
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 大數字
+    {
+        id: 'big-number',
+        name: '大數字突出',
+        icon: 'pin',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 40, content: '<b style="font-size:22px;color:#1e293b;">核心數據</b>', fontSize: 22 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 120, y: 100, width: 720, height: 260, background: '#eff6ff', borderRadius: 20 },
+                { id: gen(), type: 'text', x: 140, y: 120, width: 680, height: 120, content: '<b style="font-size:80px;color:#1e40af;text-align:center;display:block;">87%</b>', fontSize: 80 },
+                { id: gen(), type: 'text', x: 140, y: 240, width: 680, height: 40, content: '<span style="font-size:20px;color:#475569;text-align:center;display:block;">關鍵指標說明</span>', fontSize: 20 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 360, y: 290, width: 240, height: 3, background: '#93c5fd', borderRadius: 2 },
+                { id: gen(), type: 'text', x: 120, y: 400, width: 720, height: 80, content: '<span style="font-size:15px;color:#64748b;text-align:center;display:block;line-height:1.8;">補充說明：數據來源與分析解讀。</span>', fontSize: 15 },
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 圖示列表
+    {
+        id: 'icon-list',
+        name: '圖示條列',
+        icon: 'format_list_bulleted',
+        category: '結構',
+        create: (gen) => {
+            const items = [
+                { icon: 'check_circle', color: '#059669', title: '第一點', desc: '說明文字' },
+                { icon: 'star', color: '#d97706', title: '第二點', desc: '說明文字' },
+                { icon: 'bolt', color: '#2563eb', title: '第三點', desc: '說明文字' },
+                { icon: 'favorite', color: '#dc2626', title: '第四點', desc: '說明文字' },
+            ];
+            return {
+                id: gen(),
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;">重點項目</b>', fontSize: 24 },
+                    ...items.flatMap((it, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 80 + i * 110, width: 880, height: 95, background: i % 2 === 0 ? '#f8fafc' : '#ffffff', borderRadius: 12 },
+                        { id: gen(), type: 'text', x: 60, y: 90 + i * 110, width: 840, height: 75, content: `<span class="material-symbols-outlined" style="font-size:26px;color:${it.color};vertical-align:middle;">${it.icon}</span> <b style="font-size:16px;color:#1e293b;vertical-align:middle;">${it.title}</b><br><span style="font-size:13px;color:#64748b;margin-left:36px;">${it.desc}</span>`, fontSize: 16 },
+                    ]),
+                ],
+                background: '#ffffff'
+            };
+        }
+    },
+    // 金字塔
+    {
+        id: 'pyramid',
+        name: '金字塔層次',
+        icon: 'signal_cellular_alt',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 15, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;text-align:center;display:block;">層次架構</b>', fontSize: 24 },
+                // Level 1 (top)
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 330, y: 70, width: 300, height: 80, background: '#1e40af', borderRadius: 10 },
+                { id: gen(), type: 'text', x: 340, y: 80, width: 280, height: 60, content: '<b style="font-size:15px;color:#fff;text-align:center;display:block;">策略層</b>', fontSize: 15 },
+                // Level 2
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 230, y: 165, width: 500, height: 80, background: '#3b82f6', borderRadius: 10 },
+                { id: gen(), type: 'text', x: 240, y: 175, width: 480, height: 60, content: '<b style="font-size:15px;color:#fff;text-align:center;display:block;">管理層</b>', fontSize: 15 },
+                // Level 3
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 130, y: 260, width: 700, height: 80, background: '#60a5fa', borderRadius: 10 },
+                { id: gen(), type: 'text', x: 140, y: 270, width: 680, height: 60, content: '<b style="font-size:15px;color:#fff;text-align:center;display:block;">執行層</b>', fontSize: 15 },
+                // Level 4 (base)
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 355, width: 880, height: 80, background: '#93c5fd', borderRadius: 10 },
+                { id: gen(), type: 'text', x: 50, y: 365, width: 860, height: 60, content: '<b style="font-size:15px;color:#1e40af;text-align:center;display:block;">基礎層</b>', fontSize: 15 },
+                { id: gen(), type: 'text', x: 60, y: 460, width: 840, height: 50, content: '<span style="font-size:13px;color:#94a3b8;text-align:center;display:block;">由上而下：高層策略 → 基層執行</span>', fontSize: 13 },
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 核查表
+    {
+        id: 'checklist',
+        name: '核查清單',
+        icon: 'checklist',
+        category: '結構',
+        create: (gen) => {
+            const items = ['任務項目一', '任務項目二', '任務項目三', '任務項目四', '任務項目五'];
+            return {
+                id: gen(),
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;">待辦清單</b>', fontSize: 24 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 70, width: 50, height: 3, background: '#059669', borderRadius: 2 },
+                    ...items.flatMap((txt, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 90 + i * 82, width: 840, height: 68, background: '#f0fdf4', borderRadius: 10 },
+                        { id: gen(), type: 'text', x: 80, y: 100 + i * 82, width: 800, height: 48, content: `<span class="material-symbols-outlined" style="font-size:22px;color:#059669;vertical-align:middle;">check_box_outline_blank</span> <span style="font-size:15px;color:#1e293b;vertical-align:middle;">${txt}</span>`, fontSize: 15 },
+                    ]),
+                ],
+                background: '#ffffff'
+            };
+        }
+    },
+    // 優缺點對比
+    {
+        id: 'pros-cons',
+        name: '優缺點',
+        icon: 'thumbs_up_down',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 15, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;text-align:center;display:block;">優缺點分析</b>', fontSize: 24 },
+                // Pros
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 70, width: 425, height: 440, background: '#ecfdf5', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 60, y: 80, width: 385, height: 420, content: '<span class="material-symbols-outlined" style="font-size:28px;color:#059669;">thumb_up</span><br><b style="font-size:18px;color:#065f46;">優點</b><br><span style="font-size:14px;color:#475569;line-height:2.2;">✓ 優點一<br>✓ 優點二<br>✓ 優點三</span>', fontSize: 14 },
+                // Cons
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 70, width: 425, height: 440, background: '#fef2f2', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 515, y: 80, width: 385, height: 420, content: '<span class="material-symbols-outlined" style="font-size:28px;color:#dc2626;">thumb_down</span><br><b style="font-size:18px;color:#7f1d1d;">缺點</b><br><span style="font-size:14px;color:#475569;line-height:2.2;">✗ 缺點一<br>✗ 缺點二<br>✗ 缺點三</span>', fontSize: 14 },
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 三行橫條
+    {
+        id: 'three-row',
+        name: '三行橫條',
+        icon: 'view_agenda',
+        category: '結構',
+        create: (gen) => {
+            const colors = ['#eff6ff', '#ecfdf5', '#fefce8'];
+            const accents = ['#2563eb', '#059669', '#d97706'];
+            const titles = ['第一點', '第二點', '第三點'];
+            return {
+                id: gen(),
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 15, width: 840, height: 40, content: '<b style="font-size:24px;color:#1e293b;">三大要點</b>', fontSize: 24 },
+                    ...colors.flatMap((bg, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 70 + i * 155, width: 880, height: 135, background: bg, borderRadius: 14 },
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 70 + i * 155, width: 6, height: 135, background: accents[i], borderRadius: 14 },
+                        { id: gen(), type: 'text', x: 70, y: 85 + i * 155, width: 830, height: 105, content: `<b style="font-size:17px;color:#1e293b;">${titles[i]}</b><br><span style="font-size:14px;color:#64748b;line-height:1.8;">補充說明文字</span>`, fontSize: 17 },
+                    ]),
+                ],
+                background: '#ffffff'
+            };
+        }
+    },
+    // 議程表
+    {
+        id: 'agenda',
+        name: '議程表',
+        icon: 'event_note',
+        category: '結構',
+        create: (gen) => {
+            const items = [
+                { time: '09:00', title: '開場與介紹' },
+                { time: '09:30', title: '主題演講' },
+                { time: '10:30', title: '實作練習' },
+                { time: '11:30', title: '分組討論' },
+                { time: '12:00', title: 'Q&A 與總結' },
+            ];
+            return {
+                id: gen(),
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 20, width: 840, height: 45, content: '<b style="font-size:26px;color:#1e293b;">課程議程</b>', fontSize: 26 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 68, width: 50, height: 3, background: '#2563eb', borderRadius: 2 },
+                    ...items.flatMap((it, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 85 + i * 85, width: 840, height: 70, background: i % 2 === 0 ? '#f8fafc' : '#ffffff', borderRadius: 10 },
+                        { id: gen(), type: 'text', x: 80, y: 95 + i * 85, width: 120, height: 50, content: `<b style="font-size:16px;color:#2563eb;">${it.time}</b>`, fontSize: 16 },
+                        { id: gen(), type: 'text', x: 210, y: 95 + i * 85, width: 670, height: 50, content: `<span style="font-size:16px;color:#1e293b;">${it.title}</span>`, fontSize: 16 },
+                    ]),
+                ],
+                background: '#ffffff'
+            };
+        }
+    },
+    // 重點摘要
+    {
+        id: 'key-takeaway',
+        name: '重點摘要',
+        icon: 'auto_awesome',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 100, background: '#1e293b' },
+                { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 50, content: '<span class="material-symbols-outlined" style="font-size:22px;color:#fbbf24;vertical-align:middle;">auto_awesome</span> <b style="font-size:26px;color:#fff;vertical-align:middle;"> Key Takeaways</b>', fontSize: 26 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 120, width: 840, height: 120, background: '#eff6ff', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 80, y: 132, width: 800, height: 96, content: '<span class="material-symbols-outlined" style="font-size:20px;color:#2563eb;vertical-align:middle;">looks_one</span> <b style="font-size:16px;color:#1e293b;vertical-align:middle;">第一個重點</b><br><span style="font-size:14px;color:#64748b;margin-left:30px;">詳細說明</span>', fontSize: 16 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 255, width: 840, height: 120, background: '#ecfdf5', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 80, y: 267, width: 800, height: 96, content: '<span class="material-symbols-outlined" style="font-size:20px;color:#059669;vertical-align:middle;">looks_two</span> <b style="font-size:16px;color:#1e293b;vertical-align:middle;">第二個重點</b><br><span style="font-size:14px;color:#64748b;margin-left:30px;">詳細說明</span>', fontSize: 16 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 390, width: 840, height: 120, background: '#fefce8', borderRadius: 14 },
+                { id: gen(), type: 'text', x: 80, y: 402, width: 800, height: 96, content: '<span class="material-symbols-outlined" style="font-size:20px;color:#d97706;vertical-align:middle;">looks_3</span> <b style="font-size:16px;color:#1e293b;vertical-align:middle;">第三個重點</b><br><span style="font-size:14px;color:#64748b;margin-left:30px;">詳細說明</span>', fontSize: 16 },
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 圖片左 + 文字右
+    {
+        id: 'image-left',
+        name: '圖文左右',
+        icon: 'image',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 40, width: 420, height: 460, background: '#f1f5f9', borderRadius: 16, border: '2px dashed #cbd5e1' },
+                { id: gen(), type: 'text', x: 160, y: 240, width: 180, height: 40, content: '<span style="font-size:14px;color:#94a3b8;text-align:center;display:block;">📷 放置圖片</span>', fontSize: 14 },
+                { id: gen(), type: 'text', x: 500, y: 60, width: 420, height: 50, content: '<b style="font-size:28px;color:#1e293b;">標題文字</b>', fontSize: 28 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 500, y: 118, width: 50, height: 3, background: '#2563eb', borderRadius: 2 },
+                { id: gen(), type: 'text', x: 500, y: 140, width: 420, height: 340, content: '<div style="font-size:15px;color:#475569;line-height:2.2;">• 重點一<br>• 重點二<br>• 重點三<br>• 重點四</div>', fontSize: 15 },
+            ],
+            background: '#ffffff'
+        })
+    },
+    // 文字左 + 圖片右
+    {
+        id: 'image-right',
+        name: '文圖左右',
+        icon: 'photo_library',
+        category: '結構',
+        create: (gen) => ({
+            id: gen(),
+            elements: [
+                { id: gen(), type: 'text', x: 60, y: 60, width: 400, height: 50, content: '<b style="font-size:28px;color:#1e293b;">標題文字</b>', fontSize: 28 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 118, width: 50, height: 3, background: '#059669', borderRadius: 2 },
+                { id: gen(), type: 'text', x: 60, y: 140, width: 400, height: 340, content: '<div style="font-size:15px;color:#475569;line-height:2.2;">• 重點一<br>• 重點二<br>• 重點三<br>• 重點四</div>', fontSize: 15 },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 500, y: 40, width: 420, height: 460, background: '#f0fdf4', borderRadius: 16, border: '2px dashed #bbf7d0' },
+                { id: gen(), type: 'text', x: 620, y: 240, width: 180, height: 40, content: '<span style="font-size:14px;color:#86efac;text-align:center;display:block;">📷 放置圖片</span>', fontSize: 14 },
+            ],
+            background: '#ffffff'
+        })
+    },
 );
+
+// ═══════════════════════════════════════════════════════
+// 佈局版型工廠 — 供 AI 生成器使用
+// createLayoutSlide(layoutType, data, themeId, gen)
+// ═══════════════════════════════════════════════════════
+
+/**
+ * 根據版型類型 + 內容資料 + 色系產生完整投影片
+ * @param {'cover'|'section'|'content'|'two-column'|'three-card'|'comparison'|'numbered-list'|'quote'|'timeline'|'stats'|'flow'|'swot'|'grid-4'|'big-number'|'icon-list'|'key-takeaway'|'thank-you'|'pros-cons'|'three-row'|'agenda'|'checklist'|'image-left'|'image-right'} layoutType
+ * @param {Object} data - { title, content, items[], day, needsVisual }
+ * @param {string} themeId - MASTER_THEMES id (e.g. 'biz', 'navy')
+ * @param {Function} gen - ID generator
+ * @returns {Object} slide object { id, elements, background }
+ */
+export function createLayoutSlide(layoutType, data = {}, themeId = null, gen) {
+    const t = themeId ? MASTER_THEMES.find(m => m.id === themeId)?.colors : null;
+    // 預設通用配色
+    const c = {
+        bgDark: t?.bgDark || '#1e293b',
+        bgLight: t?.bgLight || '#ffffff',
+        accent: t?.accent || '#2563eb',
+        cardBg: t?.cardBg || '#f1f5f9',
+        textDark: t?.textDark || '#1e293b',
+        textLight: t?.textLight || '#ffffff',
+        subtextDark: t?.subtextDark || '#64748b',
+        subtextLight: t?.subtextLight || '#94a3b8',
+    };
+    const title = data.title || '';
+    const content = data.content || '';
+    const items = data.items || content.split('|||').filter(Boolean);
+
+    switch (layoutType) {
+        case 'cover':
+            return {
+                id: gen(), background: c.bgDark,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 540, background: c.bgDark },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 6, height: 540, background: c.accent },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 460, width: 960, height: 80, background: `${c.accent}10` },
+                    { id: gen(), type: 'text', x: 60, y: 140, width: 700, height: 80, content: `<b style="font-size:46px;color:${c.textLight};letter-spacing:0.5px;">${title}</b>`, fontSize: 46, bold: true },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 240, width: 50, height: 3, background: c.accent },
+                    { id: gen(), type: 'text', x: 60, y: 268, width: 500, height: 35, content: `<span style="font-size:18px;color:${c.subtextLight};">${content}</span>`, fontSize: 18 },
+                    { id: gen(), type: 'text', x: 60, y: 478, width: 400, height: 25, content: `<span style="font-size:13px;color:${c.subtextDark};">${data.speaker || ''}</span>`, fontSize: 13 },
+                ],
+            };
+
+        case 'section':
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 6, background: c.accent },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 100, width: 840, height: 200, background: c.cardBg, borderRadius: 16 },
+                    { id: gen(), type: 'text', x: 80, y: 120, width: 800, height: 30, content: `<span style="font-size:14px;color:${c.accent};letter-spacing:3px;font-weight:600;">${data.day || ''}</span>`, fontSize: 14 },
+                    { id: gen(), type: 'text', x: 80, y: 160, width: 800, height: 80, content: `<b style="font-size:36px;color:${c.textDark};">${title}</b>`, fontSize: 36 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 80, y: 260, width: 80, height: 4, background: c.accent, borderRadius: 2 },
+                ],
+            };
+
+        case 'two-column': {
+            const [left = '', right = ''] = items;
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 22, width: 5, height: 50, background: c.accent, borderRadius: 2 },
+                    { id: gen(), type: 'text', x: 78, y: 25, width: 820, height: 45, content: `<b style="font-size:26px;color:${c.textDark};">${title}</b>`, fontSize: 26 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 85, width: 425, height: 420, background: c.cardBg, borderRadius: 16 },
+                    { id: gen(), type: 'text', x: 60, y: 100, width: 385, height: 390, content: `<div style="font-size:15px;color:${c.subtextDark};line-height:2;">${left}</div>`, fontSize: 15 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 85, width: 425, height: 420, background: c.cardBg, borderRadius: 16 },
+                    { id: gen(), type: 'text', x: 515, y: 100, width: 385, height: 390, content: `<div style="font-size:15px;color:${c.subtextDark};line-height:2;">${right}</div>`, fontSize: 15 },
+                ],
+            };
+        }
+
+        case 'three-card': {
+            const cards = items.slice(0, 3);
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 22, width: 5, height: 50, background: c.accent, borderRadius: 2 },
+                    { id: gen(), type: 'text', x: 78, y: 25, width: 820, height: 45, content: `<b style="font-size:26px;color:${c.textDark};">${title}</b>`, fontSize: 26 },
+                    ...cards.flatMap((cd, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 30 + i * 310, y: 85, width: 290, height: 420, background: c.cardBg, borderRadius: 16 },
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 30 + i * 310, y: 85, width: 290, height: 5, background: c.accent, borderRadius: 16 },
+                        { id: gen(), type: 'text', x: 50 + i * 310, y: 105, width: 250, height: 385, content: `<div style="font-size:14px;color:${c.subtextDark};line-height:2;">${cd}</div>`, fontSize: 14 },
+                    ]),
+                ],
+            };
+        }
+
+        case 'comparison': {
+            const [left = '', right = ''] = items;
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 45, content: `<b style="font-size:26px;color:${c.textDark};text-align:center;display:block;">${title}</b>`, fontSize: 26 },
+                    { id: gen(), type: 'shape', shapeType: 'circle', x: 440, y: 260, width: 50, height: 50, background: c.bgDark },
+                    { id: gen(), type: 'text', x: 440, y: 268, width: 50, height: 30, content: `<b style="font-size:14px;color:${c.textLight};text-align:center;display:block;">VS</b>`, fontSize: 14 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 85, width: 395, height: 420, background: '#fef2f2', borderRadius: 16 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 85, width: 395, height: 5, background: '#ef4444', borderRadius: 16 },
+                    { id: gen(), type: 'text', x: 60, y: 105, width: 355, height: 385, content: `<div style="font-size:14px;color:#475569;line-height:2.2;">${left}</div>`, fontSize: 14 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 85, width: 425, height: 420, background: '#ecfdf5', borderRadius: 16 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 85, width: 425, height: 5, background: '#059669', borderRadius: 16 },
+                    { id: gen(), type: 'text', x: 515, y: 105, width: 385, height: 385, content: `<div style="font-size:14px;color:#475569;line-height:2.2;">${right}</div>`, fontSize: 14 },
+                ],
+            };
+        }
+
+        case 'numbered-list': {
+            const listItems = content.split('<br>').filter(Boolean);
+            const els = [
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 45, height: 540, background: c.cardBg },
+                { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 22, width: 5, height: 50, background: c.accent, borderRadius: 2 },
+                { id: gen(), type: 'text', x: 78, y: 25, width: 820, height: 45, content: `<b style="font-size:26px;color:${c.textDark};">${title}</b>`, fontSize: 26 },
+                ...listItems.slice(0, 5).flatMap((item, i) => [
+                    { id: gen(), type: 'shape', shapeType: 'circle', x: 60, y: 90 + i * 85, width: 40, height: 40, background: c.accent },
+                    { id: gen(), type: 'text', x: 60, y: 94 + i * 85, width: 40, height: 32, content: `<b style="font-size:18px;color:${c.textLight};text-align:center;display:block;">${i + 1}</b>`, fontSize: 18 },
+                    { id: gen(), type: 'text', x: 120, y: 94 + i * 85, width: 780, height: 40, content: `<span style="font-size:16px;color:${c.textDark};">${item.trim()}</span>`, fontSize: 16 },
+                ]),
+            ];
+            return { id: gen(), background: c.bgLight, elements: els };
+        }
+
+        case 'quote':
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 80, width: 840, height: 380, background: c.cardBg, borderRadius: 20 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 70, y: 100, width: 5, height: 200, background: c.accent, borderRadius: 2 },
+                    { id: gen(), type: 'text', x: 110, y: 160, width: 740, height: 180, content: `<span style="font-size:24px;color:${c.textDark};font-style:italic;line-height:1.8;">${content}</span>`, fontSize: 24 },
+                    { id: gen(), type: 'text', x: 110, y: 380, width: 740, height: 30, content: `<span style="font-size:16px;color:${c.subtextLight};">— ${title}</span>`, fontSize: 16 },
+                ],
+            };
+
+        case 'stats': {
+            const statItems = items.slice(0, 3);
+            const statColors = ['#eff6ff', '#ecfdf5', '#fefce8'];
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 40, content: `<b style="font-size:22px;color:${c.textDark};">${title}</b>`, fontSize: 22 },
+                    ...statItems.flatMap((st, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40 + i * 300, y: 80, width: 280, height: 140, background: statColors[i] || c.cardBg, borderRadius: 12 },
+                        { id: gen(), type: 'text', x: 60 + i * 300, y: 95, width: 240, height: 110, content: `<div style="font-size:14px;color:${c.subtextDark};text-align:center;line-height:2;">${st}</div>`, fontSize: 14 },
+                    ]),
+                    { id: gen(), type: 'text', x: 60, y: 250, width: 840, height: 260, content: `<div style="font-size:15px;color:${c.subtextDark};line-height:2;">補充說明</div>`, fontSize: 15 },
+                ],
+            };
+        }
+
+        case 'swot': {
+            const [s = '', w = '', o = '', _t = ''] = items;
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 15, width: 840, height: 40, content: `<b style="font-size:24px;color:${c.textDark};text-align:center;display:block;">${title || 'SWOT 分析'}</b>`, fontSize: 24 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 65, width: 425, height: 215, background: '#eff6ff', borderRadius: 14 },
+                    { id: gen(), type: 'text', x: 60, y: 75, width: 385, height: 195, content: `<b style="font-size:17px;color:#1e40af;">S — 優勢</b><br><span style="font-size:13px;color:#475569;line-height:2;">${s}</span>`, fontSize: 13 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 65, width: 425, height: 215, background: '#fef2f2', borderRadius: 14 },
+                    { id: gen(), type: 'text', x: 515, y: 75, width: 385, height: 195, content: `<b style="font-size:17px;color:#991b1b;">W — 劣勢</b><br><span style="font-size:13px;color:#475569;line-height:2;">${w}</span>`, fontSize: 13 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 300, width: 425, height: 215, background: '#ecfdf5', borderRadius: 14 },
+                    { id: gen(), type: 'text', x: 60, y: 310, width: 385, height: 195, content: `<b style="font-size:17px;color:#065f46;">O — 機會</b><br><span style="font-size:13px;color:#475569;line-height:2;">${o}</span>`, fontSize: 13 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 495, y: 300, width: 425, height: 215, background: '#fefce8', borderRadius: 14 },
+                    { id: gen(), type: 'text', x: 515, y: 310, width: 385, height: 195, content: `<b style="font-size:17px;color:#92400e;">T — 威脅</b><br><span style="font-size:13px;color:#475569;line-height:2;">${_t}</span>`, fontSize: 13 },
+                ],
+            };
+        }
+
+        case 'big-number':
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 40, content: `<b style="font-size:22px;color:${c.textDark};">${title}</b>`, fontSize: 22 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 120, y: 100, width: 720, height: 260, background: c.cardBg, borderRadius: 20 },
+                    { id: gen(), type: 'text', x: 140, y: 120, width: 680, height: 120, content: `<b style="font-size:80px;color:${c.accent};text-align:center;display:block;">${data.number || content}</b>`, fontSize: 80 },
+                    { id: gen(), type: 'text', x: 140, y: 240, width: 680, height: 40, content: `<span style="font-size:20px;color:${c.subtextDark};text-align:center;display:block;">${data.label || title}</span>`, fontSize: 20 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 360, y: 290, width: 240, height: 3, background: c.accent, borderRadius: 2, opacity: 0.3 },
+                    { id: gen(), type: 'text', x: 120, y: 400, width: 720, height: 80, content: `<span style="font-size:15px;color:${c.subtextDark};text-align:center;display:block;line-height:1.8;">${data.description || ''}</span>`, fontSize: 15 },
+                ],
+            };
+
+        case 'key-takeaway': {
+            const keys = items.slice(0, 3);
+            const keyColors = ['#eff6ff', '#ecfdf5', '#fefce8'];
+            const keyIcons = ['looks_one', 'looks_two', 'looks_3'];
+            const keyIconColors = ['#2563eb', '#059669', '#d97706'];
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 100, background: c.bgDark },
+                    { id: gen(), type: 'text', x: 60, y: 25, width: 840, height: 50, content: `<span class="material-symbols-outlined" style="font-size:22px;color:#fbbf24;vertical-align:middle;">auto_awesome</span> <b style="font-size:26px;color:${c.textLight};vertical-align:middle;"> ${title || 'Key Takeaways'}</b>`, fontSize: 26 },
+                    ...keys.flatMap((k, i) => [
+                        { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 120 + i * 135, width: 840, height: 120, background: keyColors[i], borderRadius: 14 },
+                        { id: gen(), type: 'text', x: 80, y: 132 + i * 135, width: 800, height: 96, content: `<span class="material-symbols-outlined" style="font-size:20px;color:${keyIconColors[i]};vertical-align:middle;">${keyIcons[i]}</span> <b style="font-size:16px;color:${c.textDark};vertical-align:middle;">${k}</b>`, fontSize: 16 },
+                    ]),
+                ],
+            };
+        }
+
+        case 'thank-you':
+            return {
+                id: gen(), background: c.bgLight,
+                elements: [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 180, y: 120, width: 600, height: 300, background: c.cardBg, borderRadius: 20 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 330, y: 130, width: 300, height: 4, background: c.accent, borderRadius: 2 },
+                    { id: gen(), type: 'text', x: 200, y: 180, width: 560, height: 70, content: `<b style="font-size:42px;color:${c.textDark};text-align:center;display:block;">Thank You</b>`, fontSize: 42 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 380, y: 265, width: 200, height: 2, background: c.subtextLight },
+                    { id: gen(), type: 'text', x: 200, y: 290, width: 560, height: 50, content: `<span style="font-size:18px;color:${c.subtextDark};text-align:center;display:block;">${content}</span>`, fontSize: 18 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 500, width: 960, height: 40, background: c.cardBg },
+                ],
+            };
+
+        // fallback: content (4 variants)
+        default: {
+            const idx = data._index || 0;
+            const variant = idx % 4;
+            const rawContent = content;
+            const lines = rawContent.split('<br>').filter(Boolean);
+            let styledContent;
+            if (lines.length > 1) {
+                const first = `<b style="font-size:19px;color:${c.textDark};">${lines[0]}</b>`;
+                const rest = lines.slice(1).map(l => `<span style="font-size:16px;color:${c.subtextDark};">${l}</span>`).join('<br>');
+                styledContent = `<div style="line-height:2.4;">${first}<br>${rest}</div>`;
+            } else {
+                styledContent = `<div style="font-size:17px;color:${c.subtextDark};line-height:2.2;">${rawContent}</div>`;
+            }
+            const cw = data.needsVisual ? 420 : 840;
+            const cardW = data.needsVisual ? 450 : 880;
+            let elements;
+
+            if (variant === 0) {
+                elements = [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 90, background: c.accent },
+                    { id: gen(), type: 'text', x: 50, y: 20, width: 860, height: 55, content: `<b style="font-size:30px;color:${c.textLight};">${title}</b>`, fontSize: 30, bold: true },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 40, y: 110, width: cardW, height: 400, background: c.cardBg, borderRadius: 12 },
+                    { id: gen(), type: 'text', x: 60, y: 125, width: cw, height: 370, content: styledContent, fontSize: 17 },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 520, width: 960, height: 20, background: c.cardBg },
+                ];
+            } else if (variant === 1) {
+                elements = [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 60, height: 540, background: c.accent },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 60, y: 0, width: 10, height: 540, background: c.cardBg },
+                    { id: gen(), type: 'text', x: 90, y: 25, width: 820, height: 55, content: `<b style="font-size:30px;color:${c.textDark};">${title}</b>`, fontSize: 30, bold: true },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 90, y: 85, width: 120, height: 4, background: c.accent, borderRadius: 2 },
+                    { id: gen(), type: 'text', x: 90, y: 105, width: cw, height: 400, content: styledContent, fontSize: 17 },
+                ];
+            } else if (variant === 2) {
+                elements = [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 960, height: 140, background: c.cardBg },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 135, width: 960, height: 6, background: c.accent },
+                    { id: gen(), type: 'text', x: 50, y: 40, width: 860, height: 70, content: `<b style="font-size:32px;color:${c.accent};">${title}</b>`, fontSize: 32, bold: true },
+                    { id: gen(), type: 'text', x: 60, y: 165, width: cw, height: 350, content: styledContent, fontSize: 17 },
+                ];
+            } else {
+                elements = [
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 0, y: 0, width: 5, height: 540, background: c.accent },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 25, width: 5, height: 50, background: c.accent, borderRadius: 2 },
+                    { id: gen(), type: 'text', x: 62, y: 28, width: 840, height: 55, content: `<b style="font-size:30px;color:${c.textDark};">${title}</b>`, fontSize: 30, bold: true },
+                    { id: gen(), type: 'shape', shapeType: 'rectangle', x: 45, y: 95, width: cardW, height: 420, background: c.cardBg, borderRadius: 12 },
+                    { id: gen(), type: 'text', x: 62, y: 110, width: cw, height: 390, content: styledContent, fontSize: 17 },
+                ];
+            }
+
+            if (data.needsVisual) {
+                elements.push({ id: gen(), type: 'shape', shapeType: 'rectangle', x: 520, y: variant === 0 ? 110 : 95, width: 400, height: variant === 0 ? 400 : 420, background: '#f8fafc', borderRadius: 12, border: '2px dashed #cbd5e1', _placeholder: 'visual' });
+            }
+            return { id: gen(), background: c.bgLight, elements };
+        }
+    }
+}
