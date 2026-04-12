@@ -691,13 +691,15 @@ body {
 /* 主題色板 */
 .theme-swatches {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     align-items: center;
+    flex-wrap: wrap;
+    max-width: 340px;
 }
 
 .theme-swatch {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     border-radius: var(--radius-sm);
     border: 2px solid var(--border-color);
     cursor: pointer;

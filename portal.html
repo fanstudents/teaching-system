@@ -326,15 +326,16 @@
 
         // ── INIT ──
         async function init() {
-            if (!code) { showError(); return; }
+            if (!code) { console.error('[portal] No code param'); showError(); return; }
 
             try {
                 const { data, error } = await db.select('projects', {
                     filter: { join_code: `eq.${code}` }, limit: 1
                 });
+                console.log('[portal] Project query:', { code, data, error });
                 if (error || !data || data.length === 0) { showError(); return; }
                 project = data[0];
-            } catch { showError(); return; }
+            } catch (err) { console.error('[portal] Project fetch failed:', err); showError(); return; }
 
             // Load session data
             if (sessionParam) {

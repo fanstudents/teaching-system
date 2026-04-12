@@ -11,91 +11,131 @@
  *   例如：'animated:aurora', 'animated:ocean', 'animated:sunset'
  */
 
-// 預設動態漸層主題
 export const ANIMATED_THEMES = {
+    // ── 深色系 ──
     aurora: {
         name: '極光',
         colors: ['#00d2ff', '#7b2ff7', '#ff0080', '#00d2ff'],
-        angle: -45,
-        duration: 8,
-        bgSize: 300,
+        angle: -45, duration: 8, bgSize: 300,
     },
     ocean: {
         name: '深海',
         colors: ['#0f172a', '#1e3a5f', '#0ea5e9', '#0f172a'],
-        angle: -45,
-        duration: 10,
-        bgSize: 300,
-    },
-    sunset: {
-        name: '晚霞',
-        colors: ['#f97316', '#ec4899', '#8b5cf6', '#f97316'],
-        angle: -45,
-        duration: 8,
-        bgSize: 300,
-    },
-    forest: {
-        name: '森林',
-        colors: ['#064e3b', '#059669', '#34d399', '#064e3b'],
-        angle: -45,
-        duration: 10,
-        bgSize: 300,
-    },
-    neon: {
-        name: '霓虹',
-        colors: ['#7c3aed', '#ec4899', '#06b6d4', '#7c3aed'],
-        angle: -45,
-        duration: 6,
-        bgSize: 300,
-    },
-    candy: {
-        name: '糖果',
-        colors: ['#fecdd3', '#c4b5fd', '#a5f3fc', '#fecdd3'],
-        angle: 135,
-        duration: 8,
-        bgSize: 300,
-    },
-    midnight: {
-        name: '午夜',
-        colors: ['#0f0c29', '#302b63', '#24243e', '#0f0c29'],
-        angle: -45,
-        duration: 12,
-        bgSize: 300,
-    },
-    lava: {
-        name: '熔岩',
-        colors: ['#7f1d1d', '#dc2626', '#f97316', '#7f1d1d'],
-        angle: -45,
-        duration: 7,
-        bgSize: 300,
-    },
-    sakura: {
-        name: '櫻花',
-        colors: ['#fdf2f8', '#fbcfe8', '#f9a8d4', '#fdf2f8'],
-        angle: 135,
-        duration: 10,
-        bgSize: 300,
+        angle: -45, duration: 10, bgSize: 300,
     },
     galaxy: {
         name: '銀河',
         colors: ['#0c0a1a', '#1e1b4b', '#4c1d95', '#7c3aed', '#0c0a1a'],
-        angle: -45,
-        duration: 12,
-        bgSize: 400,
+        angle: -45, duration: 12, bgSize: 400,
+    },
+    midnight: {
+        name: '午夜',
+        colors: ['#0f0c29', '#302b63', '#24243e', '#0f0c29'],
+        angle: -45, duration: 12, bgSize: 300,
+    },
+    lava: {
+        name: '熔岩',
+        colors: ['#7f1d1d', '#dc2626', '#f97316', '#7f1d1d'],
+        angle: -45, duration: 7, bgSize: 300,
     },
     emerald: {
         name: '翡翠',
         colors: ['#022c22', '#065f46', '#10b981', '#022c22'],
-        angle: 135,
-        duration: 9,
-        bgSize: 300,
+        angle: 135, duration: 9, bgSize: 300,
+    },
+    neon: {
+        name: '霓虓',
+        colors: ['#7c3aed', '#ec4899', '#06b6d4', '#7c3aed'],
+        angle: -45, duration: 6, bgSize: 300,
+    },
+    obsidian: {
+        name: '黑曜石',
+        colors: ['#0a0a0a', '#1a1a2e', '#16213e', '#0a0a0a'],
+        angle: -45, duration: 14, bgSize: 300,
+    },
+    nebula: {
+        name: '星雲',
+        colors: ['#0d0221', '#261447', '#6b21a8', '#a855f7', '#0d0221'],
+        angle: 135, duration: 10, bgSize: 400,
+    },
+    abyss: {
+        name: '深淵',
+        colors: ['#020617', '#0c4a6e', '#164e63', '#020617'],
+        angle: -45, duration: 12, bgSize: 350,
+    },
+    inferno: {
+        name: '烈焰',
+        colors: ['#1c0800', '#7f1d1d', '#ea580c', '#fbbf24', '#1c0800'],
+        angle: -45, duration: 8, bgSize: 400,
+    },
+    cyber: {
+        name: '賽博',
+        colors: ['#0a0a1a', '#00f5d4', '#7b2ff7', '#f72585', '#0a0a1a'],
+        angle: -45, duration: 7, bgSize: 400,
+    },
+
+    // ── 淺色 / 柔和系 ──
+    sakura: {
+        name: '櫻花',
+        colors: ['#fdf2f8', '#fbcfe8', '#f9a8d4', '#fdf2f8'],
+        angle: 135, duration: 10, bgSize: 300,
     },
     warmth: {
         name: '暖陽',
         colors: ['#fff7ed', '#fed7aa', '#fdba74', '#fff7ed'],
-        angle: 135,
-        duration: 8,
-        bgSize: 300,
+        angle: 135, duration: 8, bgSize: 300,
+    },
+    candy: {
+        name: '糖果',
+        colors: ['#fecdd3', '#c4b5fd', '#a5f3fc', '#fecdd3'],
+        angle: 135, duration: 8, bgSize: 300,
+    },
+    lavender: {
+        name: '薰衣草',
+        colors: ['#f5f3ff', '#ddd6fe', '#c4b5fd', '#f5f3ff'],
+        angle: 135, duration: 10, bgSize: 300,
+    },
+    peach: {
+        name: '蜜桃',
+        colors: ['#fff1f2', '#fecdd3', '#fda4af', '#fdba74', '#fff1f2'],
+        angle: 135, duration: 9, bgSize: 400,
+    },
+    mint: {
+        name: '薄荷',
+        colors: ['#ecfdf5', '#a7f3d0', '#6ee7b7', '#ecfdf5'],
+        angle: 135, duration: 10, bgSize: 300,
+    },
+    cloud: {
+        name: '雲彩',
+        colors: ['#f0f9ff', '#e0f2fe', '#bae6fd', '#f0f9ff'],
+        angle: 135, duration: 12, bgSize: 300,
+    },
+    champagne: {
+        name: '香檳',
+        colors: ['#fefce8', '#fef9c3', '#fde68a', '#fcd34d', '#fefce8'],
+        angle: 135, duration: 9, bgSize: 400,
+    },
+
+    // ── 特殊質感 ──
+    sunset: {
+        name: '晚霞',
+        colors: ['#f97316', '#ec4899', '#8b5cf6', '#f97316'],
+        angle: -45, duration: 8, bgSize: 300,
+    },
+    forest: {
+        name: '森林',
+        colors: ['#064e3b', '#059669', '#34d399', '#064e3b'],
+        angle: -45, duration: 10, bgSize: 300,
+    },
+    copper: {
+        name: '古銅',
+        colors: ['#292524', '#78350f', '#b45309', '#d97706', '#292524'],
+        angle: 135, duration: 10, bgSize: 400,
+    },
+    arctic: {
+        name: '極地',
+        colors: ['#e0f2fe', '#7dd3fc', '#38bdf8', '#0284c7', '#e0f2fe'],
+        angle: -45, duration: 9, bgSize: 400,
     },
 };
 
