@@ -1125,14 +1125,15 @@ export class SlideManager {
                 this._renderLeaderboardContent(el, title, hasSession ? [] : placeholder);
 
                 if (hasSession) {
-                    const sessionCode = window.app.sessionCode;
                     const projectId = this.currentProjectId || null;
                     const self = this;
 
                     // 立即載入 + 5 秒輪詢
                     const fetchAndRender = () => {
                         import('./interactive/stateManager.js').then(({ stateManager }) => {
-                            stateManager.getLeaderboard(sessionCode, projectId).then(data => {
+                            // ★ 使用與側欄相同的 effectiveSessionId（場次 UUID 優先）
+                            const effectiveSessionId = stateManager.getSessionCode() || window.app.sessionCode;
+                            stateManager.getLeaderboard(effectiveSessionId, projectId).then(data => {
                                 if (data.length > 0) self._renderLeaderboardContent(el, title, data);
                             });
                         });
@@ -1191,16 +1192,18 @@ export class SlideManager {
                 el.classList.add('interactive-element', 'icebreaker-element');
                 el.style.overflow = 'hidden';
                 this._applyInteractiveStyles(el, element);
-                const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                if (isLive) {
+                // ★ 延遲判斷：createElement 時 el 尚未插入 DOM，closest() 永遠 null
+                // 改用 rAF 等 appendChild 之後再判斷是否為 live 模式
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
                     import('./interactive/icebreaker.js').then(({ IcebreakerGame }) => {
-                        new IcebreakerGame().render(el, element);
+                        if (isLive) {
+                            new IcebreakerGame().render(el, element);
+                        } else {
+                            new IcebreakerGame().renderPreview(el, element);
+                        }
                     });
-                } else {
-                    import('./interactive/icebreaker.js').then(({ IcebreakerGame }) => {
-                        new IcebreakerGame().renderPreview(el, element);
-                    });
-                }
+                });
                 break;
             }
 

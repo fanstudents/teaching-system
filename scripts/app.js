@@ -219,6 +219,12 @@ class App {
         if (italicBtn) italicBtn.addEventListener('click', () => this.applyTextFormat('italic'));
         if (underlineBtn) underlineBtn.addEventListener('click', () => this.applyTextFormat('underline'));
 
+        // 列點 / 編號
+        const addListBtn = document.getElementById('addListBtn');
+        const addNumberListBtn = document.getElementById('addNumberListBtn');
+        if (addListBtn) addListBtn.addEventListener('click', () => this.applyListFormat('insertUnorderedList'));
+        if (addNumberListBtn) addNumberListBtn.addEventListener('click', () => this.applyListFormat('insertOrderedList'));
+
         // 對齊
         const alignLeftBtn = document.getElementById('alignLeftBtn');
         const alignCenterBtn = document.getElementById('alignCenterBtn');
@@ -1348,6 +1354,24 @@ ${slideContents}
                 break;
         }
         this.slideManager.save();
+    }
+
+    applyListFormat(command) {
+        const el = this.editor.selectedElement;
+        if (!el || el.dataset.type !== 'text') return;
+
+        const id = el.dataset.id;
+        const contentEl = el.querySelector('[contenteditable]') || el;
+        // 確保 focus 在文字元素上
+        contentEl.focus();
+        document.execCommand(command, false, null);
+        // 同步更新 model
+        const slide = this.slideManager.getCurrentSlide();
+        const elementData = slide?.elements.find(e => e.id === id);
+        if (elementData) {
+            elementData.content = contentEl.innerHTML;
+            this.slideManager.save();
+        }
     }
 
     applyTextAlign(align) {
