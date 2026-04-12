@@ -379,11 +379,12 @@
         // ── Google OAuth callback ──
         if (location.hash && location.hash.includes('access_token')) {
             try {
-                const gUser = await auth.getUser();
+                const oauthResult = await auth.handleOAuthCallback();
+                const gUser = oauthResult?.user;
                 if (gUser) {
                     document.getElementById('studentEmail').value = gUser.email;
                     document.getElementById('studentName').value = gUser.user_metadata?.full_name || gUser.user_metadata?.name || gUser.email.split('@')[0];
-                    history.replaceState(null, '', location.pathname + location.search);
+                    // handleOAuthCallback 已清除 hash，不需再 replaceState
 
                     const codeVal = document.getElementById('sessionCode').value.trim();
                     const emailVal = document.getElementById('studentEmail').value.trim();
