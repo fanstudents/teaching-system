@@ -371,7 +371,7 @@
 </div>
 
 <script type="module">
-import { db } from './scripts/supabase.js';
+import { db, ai } from './scripts/supabase.js';
 
 const params = new URLSearchParams(location.search);
 const slug = params.get('slug') || location.pathname.split('/').pop()?.replace('.html','');
@@ -465,11 +465,12 @@ function renderVariantTabs(variants) {
     container.innerHTML = variants.map((v, i) =>
         `<button class="q-variant-tab${i === 0 ? ' active' : ''}" data-idx="${i}" onclick="switchVariant(${i})" type="button">${v.name || '方案 ' + (i+1)}</button>`
     ).join('');
-    document.getElementById('variantTabs').style.display = 'flex';
-
-    // Show compare button if 2+ variants
+    // 只有 2+ 版本才顯示 tabs 和比較按鈕
     if (variants.length >= 2) {
+        document.getElementById('variantTabs').style.display = 'flex';
         document.getElementById('compareBtn').style.display = 'flex';
+    } else {
+        document.getElementById('variantTabs').style.display = 'none';
     }
 
     // Render multi-pricing cards
@@ -703,7 +704,24 @@ window.compareVersions = function() {
         }
 
         html += `<div class="cmp-grid">${grid}</div>`;
+
+        // AI 摘要區塊（先放 loading placeholder）
+        html += `<div id="aiCompareSection" style="margin-top:20px;padding:20px;background:linear-gradient(135deg,#f0f4ff,#faf5ff);border-radius:14px;border:1px solid #e0e7ff">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-weight:700;font-size:.95rem;color:#4f46e5">
+                <span class="material-symbols-outlined" style="font-size:20px">psychology</span> AI 差異分析
+            </div>
+            <div id="aiCompareBody" style="font-size:.88rem;line-height:1.7;color:#374151">
+                <div style="display:flex;align-items:center;gap:8px;color:#9ca3af">
+                    <div style="width:18px;height:18px;border:2px solid #e5e7eb;border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite"></div>
+                    AI 正在分析版本差異…
+                </div>
+            </div>
+        </div>`;
+
         content.innerHTML = html;
+
+        // 呼叫 AI 生成摘要
+        generateAICompare(vData);
     }, 300);
 };
 
@@ -711,6 +729,72 @@ window.closeCompareSheet = function() {
     document.getElementById('compareSheet').classList.remove('open');
     setTimeout(() => document.getElementById('compareOverlay').classList.remove('open'), 300);
 };
+
+// ── AI Compare Summary ──
+async function generateAICompare(vData) {
+    const body = document.getElementById('aiCompareBody');
+    if (!body) return;
+
+    // 構建版本摘要給 AI
+    const summaries = vData.map((v, i) => {
+        const lines = [`## ${v.name || '方案' + (i + 1)}`];
+        lines.push(`- 價格：NT$ ${(v.total || 0).toLocaleString()}`);
+        lines.push(`- 天數：${v.days} 天 / ${v.hours} 小時`);
+        if (v.groupSize) lines.push(`- 人數：${v.groupSize}`);
+        if (v.location) lines.push(`- 授課方式：${v.location}`);
+        if (v.topics.length) lines.push(`- 課程主題（${v.topics.length} 個）：${v.topics.join('、')}`);
+        if (v.tools.length) lines.push(`- 教學工具（${v.tools.length} 種）：${v.tools.join('、')}`);
+        if (v.equip.length) lines.push(`- 設備需求：${v.equip.join('、')}`);
+        // 費用明細
+        const itemLines = v.items.filter(it => {
+            if (it.type === 'hourly') return (it.hours || 0) * (it.rate || 0) > 0;
+            if (it.type === 'perhead') return (it.count || 0) * (it.rate || 0) > 0;
+            return (it.amount || 0) > 0;
+        }).map(it => `  - ${it.label}`);
+        if (itemLines.length) lines.push(`- 費用項目：\n${itemLines.join('\n')}`);
+        return lines.join('\n');
+    }).join('\n\n');
+
+    const prompt = `你是一位企業培訓顧問。以下是同一個課程的 ${vData.length} 個報價版本，請用繁體中文：
+
+${summaries}
+
+請完成以下分析：
+
+1. **核心差異摘要**：用 2-3 句話總結各版本的主要差異（不要逐項列舉，要提煉出核心差別）
+
+2. **適合族群**：每個版本各用 1-2 句話說明最適合什麼類型的企業/團隊/需求。格式：
+   - 【版本名稱】→ 適合…
+
+3. **選擇建議**：一句話給出選擇建議
+
+請直接輸出分析，不要重複版本資料。語氣專業但親切，像是顧問在跟客戶解說。`;
+
+    try {
+        const result = await ai.chat([
+            { role: 'system', content: '你是專業的企業培訓顧問，善於分析課程方案差異並給出客觀建議。回覆請用繁體中文，簡潔有力。' },
+            { role: 'user', content: prompt }
+        ], { model: 'claude-haiku-4-5', temperature: 0.4, maxTokens: 1024 });
+
+        // 簡單 markdown → HTML
+        const html = result
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/【(.+?)】/g, '<strong style="color:#4f46e5">【$1】</strong>')
+            .replace(/^### (.+)$/gm, '<div style="font-weight:700;font-size:.95rem;margin:16px 0 8px;color:#1f2937">$1</div>')
+            .replace(/^## (.+)$/gm, '<div style="font-weight:700;font-size:1rem;margin:16px 0 8px;color:#1f2937">$1</div>')
+            .replace(/^- /gm, '• ')
+            .replace(/\n{2,}/g, '<br><br>')
+            .replace(/\n/g, '<br>');
+
+        body.innerHTML = html;
+    } catch (err) {
+        console.error('[AI Compare]', err);
+        body.innerHTML = `<div style="color:#9ca3af;font-size:.85rem">
+            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">info</span>
+            AI 分析暫時無法使用：${err.message || '請稍後再試'}
+        </div>`;
+    }
+}
 
 window.copyBankAccount = function(account) {
     navigator.clipboard.writeText(account).then(() => {
