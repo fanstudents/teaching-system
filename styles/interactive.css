@@ -3207,6 +3207,81 @@
     stroke-width: 0.25;
 }
 
+/* ── 游標跟隨預覽圈（桌面版） ── */
+.hs-preview-group {
+    transition: opacity 0.2s ease;
+}
+
+.hs-preview-glow {
+    fill: none;
+    stroke: rgba(59, 130, 246, 0.15);
+    stroke-width: 1.5;
+    animation: hsPreviewPulse 1.8s ease-in-out infinite;
+}
+
+.hs-preview-circle {
+    fill: rgba(59, 130, 246, 0.06);
+    stroke: rgba(59, 130, 246, 0.4);
+    stroke-width: 0.4;
+    stroke-dasharray: 2.5 1.5;
+}
+
+.hs-preview-cross {
+    stroke: rgba(59, 130, 246, 0.3);
+    stroke-width: 0.2;
+}
+
+@keyframes hsPreviewPulse {
+    0%, 100% { stroke-width: 1.5; stroke: rgba(59, 130, 246, 0.15); }
+    50% { stroke-width: 2.5; stroke: rgba(59, 130, 246, 0.25); }
+}
+
+/* ── 放置後的呼吸動畫 ── */
+.hs-circle-glow {
+    animation: hsGlowBreathe 2s ease-in-out infinite;
+}
+
+@keyframes hsGlowBreathe {
+    0%, 100% { stroke-width: 1.5; stroke: rgba(59, 130, 246, 0.25); }
+    50% { stroke-width: 2.5; stroke: rgba(59, 130, 246, 0.4); }
+}
+
+/* ── 手機引導提示 ── */
+.hs-tap-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 8;
+    transition: opacity 0.3s;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.hs-tap-hint-icon {
+    font-size: 28px;
+    color: #1a73e8;
+    animation: hsTapHintBounce 2s ease-in-out infinite;
+}
+
+.hs-tap-hint span:last-child {
+    font-size: 14px;
+    font-weight: 600;
+    color: #5f6368;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(4px);
+}
+
+@keyframes hsTapHintBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
 /* ── 半徑調整滑桿 ── */
 .hs-radius-wrap {
     display: flex;

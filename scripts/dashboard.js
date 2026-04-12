@@ -8,8 +8,8 @@
 import { db, realtime } from './supabase.js';
 
 const POLL_INTERVAL = 30000;
-const TYPE_ICONS = { quiz: 'quiz', poll: 'how_to_vote', matching: 'drag_indicator', ordering: 'format_list_numbered', fillblank: 'edit_note', truefalse: 'check_circle', opentext: 'chat', scale: 'linear_scale', buzzer: 'notifications_active', wordcloud: 'cloud', hotspot: 'my_location' };
-const TYPE_LABELS = { quiz: '\u9078\u64C7\u984C', poll: '\u6295\u7968', matching: '\u9023\u9023\u770B', ordering: '\u6392\u5217\u9806\u5E8F', fillblank: '\u586B\u7A7A\u984C', truefalse: '\u662F\u975E\u984C', opentext: '\u958B\u653E\u554F\u7B54', scale: '\u91CF\u8868\u8A55\u5206', buzzer: '\u6436\u7B54', wordcloud: '\u6587\u5B57\u96F2', hotspot: '\u5716\u7247\u6A19\u8A3B' };
+const TYPE_ICONS = { quiz: 'quiz', poll: 'how_to_vote', matching: 'drag_indicator', ordering: 'format_list_numbered', fillblank: 'edit_note', truefalse: 'check_circle', opentext: 'chat', scale: 'linear_scale', buzzer: 'notifications_active', wordcloud: 'cloud', hotspot: 'my_location', livetap: 'touch_app' };
+const TYPE_LABELS = { quiz: '\u9078\u64C7\u984C', poll: '\u6295\u7968', matching: '\u9023\u9023\u770B', ordering: '\u6392\u5217\u9806\u5E8F', fillblank: '\u586B\u7A7A\u984C', truefalse: '\u662F\u975E\u984C', opentext: '\u958B\u653E\u554F\u7B54', scale: '\u91CF\u8868\u8A55\u5206', buzzer: '\u6436\u7B54', wordcloud: '\u6587\u5B57\u96F2', hotspot: '\u5716\u7247\u6A19\u8A3B', livetap: '\u5373\u6642\u9EDE\u64CA' };
 
 // Helper: handle is_correct as both boolean and string
 function isCorrectTrue(v) { return v === true || v === 'true'; }
@@ -716,13 +716,15 @@ function renderTrailView() {
         scale: 'linear_scale', buzzer: 'notifications_active', wordcloud: 'cloud',
         hotspot: 'my_location', matching: 'drag_indicator', ordering: 'format_list_numbered',
         fillblank: 'edit_note', homework: 'assignment', copycard: 'content_copy',
-        qa: 'help_outline', survey: 'rate_review', document: 'description', showcase: 'collections'
+        qa: 'help_outline', survey: 'rate_review', document: 'description', showcase: 'collections',
+        livetap: 'touch_app'
     };
     const typeLabels = {
         quiz: '選擇題', poll: '投票', truefalse: '是非題', opentext: '開放問答',
         scale: '量表', buzzer: '搶答', wordcloud: '文字雲', hotspot: '圖片標註',
         matching: '連連看', ordering: '排列', fillblank: '填空', homework: '作業',
-        copycard: '複製卡', qa: 'Q&A 提問', survey: '問卷', document: '文件', showcase: '展示'
+        copycard: '複製卡', qa: 'Q&A 提問', survey: '問卷', document: '文件', showcase: '展示',
+        livetap: '即時點擊'
     };
 
     const formatTime = (t) => {

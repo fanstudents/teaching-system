@@ -1,7 +1,7 @@
 /**
- * 圖片標註互動模組 — 區域標註 + 熱點圖版
- * 學員在圖片上點選放置圓形區域 → 可調整半徑 → 送出
- * 講師端即時顯示 Canvas 熱點圖（密度越高顏色越暖）
+ * 圖片標註互動模組 — 區域標註 + 熱點圖版 v2
+ * 學員：游標跟隨預覽圓 → 點擊放置 → 滾輪/滑桿調整半徑 → 送出
+ * 講師：Canvas 熱點圖 + hover tooltip（不再顯示峰值數字）
  */
 import { stateManager } from './stateManager.js';
 import { db, realtime } from '../supabase.js';
@@ -26,7 +26,6 @@ export class HotspotGame {
         const isPresenter = !!container.closest('.presentation-slide');
         const isBroadcasting = !!window.app?.broadcasting;
 
-        // 解析正確區域（講師可選設定）
         let correctZone = null;
         try { correctZone = JSON.parse(container.dataset.correctZone || 'null'); } catch { }
 
@@ -38,7 +37,7 @@ export class HotspotGame {
     }
 
     /* ═══════════════════════════════════════════
-       學員端：點擊放置圓 → 調整半徑 → 送出
+       學員端：游標跟隨 → 點擊放置 → 調整 → 送出
        ═══════════════════════════════════════════ */
     async setupStudentView(container, elementId, correctZone) {
         const imageWrap = container.querySelector('.hotspot-image-wrap');
@@ -50,21 +49,20 @@ export class HotspotGame {
         const radiusSlider = container.querySelector('.hs-radius-slider');
         const radiusLabel = container.querySelector('.hs-radius-label');
         let submitted = false;
-        let annotation = null; // { cx, cy, r } 皆為圖片百分比
+        let annotation = null; // { cx, cy, r } percentage
+        let placed = false;    // 已放置
 
-        const MIN_R = 2;
-        const MAX_R = 18;
-        const DEFAULT_R = 7;
-
-        // SVG overlay 用於畫圓
+        const MIN_R = 2, MAX_R = 18, DEFAULT_R = 7;
         const svgNS = 'http://www.w3.org/2000/svg';
+
+        // SVG overlay
         const svg = document.createElementNS(svgNS, 'svg');
         svg.classList.add('hs-marker-svg');
         svg.setAttribute('viewBox', '0 0 100 100');
         svg.setAttribute('preserveAspectRatio', 'none');
         imageWrap.appendChild(svg);
 
-        // 重新作答按鈕
+        // 重新作答
         const resetBtn = document.createElement('button');
         resetBtn.className = 'interactive-reset-btn';
         resetBtn.innerHTML = '<span class="material-symbols-outlined">refresh</span>重新標註';
@@ -79,17 +77,112 @@ export class HotspotGame {
             radiusSlider.step = 0.5;
         }
 
+        // ── 手機引導提示 ──
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const hintEl = document.createElement('div');
+        hintEl.className = 'hs-tap-hint';
+        hintEl.innerHTML = `
+            <span class="material-symbols-outlined hs-tap-hint-icon">touch_app</span>
+            <span>點擊圖片上你要標註的位置</span>
+        `;
+        imageWrap.appendChild(hintEl);
+
+        // ── 游標跟隨預覽圈（桌面版） ──
+        let previewGroup = null;
+        let currentR = DEFAULT_R;
+
+        if (!isMobile) {
+            previewGroup = document.createElementNS(svgNS, 'g');
+            previewGroup.classList.add('hs-preview-group');
+            previewGroup.style.opacity = '0';
+
+            const previewGlow = document.createElementNS(svgNS, 'circle');
+            previewGlow.classList.add('hs-preview-glow');
+            previewGlow.setAttribute('r', currentR);
+            previewGroup.appendChild(previewGlow);
+
+            const previewCircle = document.createElementNS(svgNS, 'circle');
+            previewCircle.classList.add('hs-preview-circle');
+            previewCircle.setAttribute('r', currentR);
+            previewGroup.appendChild(previewCircle);
+
+            // 準心
+            const armLen = Math.max(1, currentR * 0.35);
+            const crossH = document.createElementNS(svgNS, 'line');
+            crossH.classList.add('hs-preview-cross');
+            const crossV = document.createElementNS(svgNS, 'line');
+            crossV.classList.add('hs-preview-cross');
+            previewGroup._crossH = crossH;
+            previewGroup._crossV = crossV;
+            previewGroup.appendChild(crossH);
+            previewGroup.appendChild(crossV);
+            svg.appendChild(previewGroup);
+
+            const updatePreviewPos = (cx, cy) => {
+                previewGlow.setAttribute('cx', cx);
+                previewGlow.setAttribute('cy', cy);
+                previewCircle.setAttribute('cx', cx);
+                previewCircle.setAttribute('cy', cy);
+                const arm = Math.max(1, currentR * 0.35);
+                crossH.setAttribute('x1', cx - arm); crossH.setAttribute('y1', cy);
+                crossH.setAttribute('x2', cx + arm); crossH.setAttribute('y2', cy);
+                crossV.setAttribute('x1', cx); crossV.setAttribute('y1', cy - arm);
+                crossV.setAttribute('x2', cx); crossV.setAttribute('y2', cy + arm);
+            };
+
+            const updatePreviewR = (r) => {
+                currentR = r;
+                previewGlow.setAttribute('r', r);
+                previewCircle.setAttribute('r', r);
+            };
+
+            imageWrap.addEventListener('mousemove', (e) => {
+                if (submitted || placed) return;
+                const rect = imageWrap.getBoundingClientRect();
+                const cx = ((e.clientX - rect.left) / rect.width) * 100;
+                const cy = ((e.clientY - rect.top) / rect.height) * 100;
+                updatePreviewPos(cx, cy);
+                previewGroup.style.opacity = '0.6';
+                hintEl.style.opacity = '0';
+            });
+            imageWrap.addEventListener('mouseleave', () => {
+                if (!placed) {
+                    previewGroup.style.opacity = '0';
+                    hintEl.style.opacity = '1';
+                }
+            });
+
+            // 滾輪調整半徑
+            imageWrap.addEventListener('wheel', (e) => {
+                if (submitted) return;
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.5 : 0.5;
+                currentR = Math.max(MIN_R, Math.min(MAX_R, currentR + delta));
+                updatePreviewR(currentR);
+                if (radiusSlider) radiusSlider.value = currentR;
+                if (radiusLabel) radiusLabel.textContent = `範圍 ${currentR}%`;
+                if (placed && annotation) {
+                    annotation.r = currentR;
+                    drawAnnotation();
+                }
+            }, { passive: false });
+        }
+
+        /* ── 繪製已放置的標註 ── */
         const drawAnnotation = () => {
-            svg.innerHTML = '';
+            // 清除所有子元素但保留 preview group
+            Array.from(svg.children).forEach(c => {
+                if (c !== previewGroup) c.remove();
+            });
             if (!annotation) return;
 
-            // 外圈 glow
+            // 外圈 glow（動畫呼吸效果）
             const glow = document.createElementNS(svgNS, 'circle');
             glow.setAttribute('cx', annotation.cx);
             glow.setAttribute('cy', annotation.cy);
             glow.setAttribute('r', annotation.r);
             glow.classList.add('hs-circle-glow');
-            svg.appendChild(glow);
+            svg.insertBefore(glow, previewGroup);
 
             // 主圓
             const circle = document.createElementNS(svgNS, 'circle');
@@ -98,22 +191,21 @@ export class HotspotGame {
             circle.setAttribute('r', annotation.r);
             circle.classList.add('hs-circle-main');
             if (submitted) circle.classList.add('submitted');
-            svg.appendChild(circle);
+            svg.insertBefore(circle, previewGroup);
 
-            // 中心十字
+            // 準心
             const armLen = Math.max(1, annotation.r * 0.3);
-            const cx = annotation.cx, cy = annotation.cy;
             const cross = document.createElementNS(svgNS, 'g');
             cross.classList.add('hs-crosshair');
             const h = document.createElementNS(svgNS, 'line');
-            h.setAttribute('x1', cx - armLen); h.setAttribute('y1', cy);
-            h.setAttribute('x2', cx + armLen); h.setAttribute('y2', cy);
+            h.setAttribute('x1', annotation.cx - armLen); h.setAttribute('y1', annotation.cy);
+            h.setAttribute('x2', annotation.cx + armLen); h.setAttribute('y2', annotation.cy);
             const v = document.createElementNS(svgNS, 'line');
-            v.setAttribute('x1', cx); v.setAttribute('y1', cy - armLen);
-            v.setAttribute('x2', cx); v.setAttribute('y2', cy + armLen);
+            v.setAttribute('x1', annotation.cx); v.setAttribute('y1', annotation.cy - armLen);
+            v.setAttribute('x2', annotation.cx); v.setAttribute('y2', annotation.cy + armLen);
             cross.appendChild(h);
             cross.appendChild(v);
-            svg.appendChild(cross);
+            svg.insertBefore(cross, previewGroup);
         };
 
         const updateUI = () => {
@@ -121,25 +213,30 @@ export class HotspotGame {
             if (radiusLabel && annotation) radiusLabel.textContent = `範圍 ${annotation.r}%`;
         };
 
-        // 點擊放置
+        // ── 點擊放置 ──
         imageWrap.addEventListener('click', (e) => {
             if (submitted) return;
             if (e.target.closest('.hs-radius-wrap') || e.target.closest('.hs-submit-btn')) return;
             const rect = imageWrap.getBoundingClientRect();
             const cx = ((e.clientX - rect.left) / rect.width) * 100;
             const cy = ((e.clientY - rect.top) / rect.height) * 100;
-            const r = radiusSlider ? parseFloat(radiusSlider.value) : DEFAULT_R;
+            const r = currentR;
             annotation = { cx: Math.round(cx * 10) / 10, cy: Math.round(cy * 10) / 10, r };
+            placed = true;
+            hintEl.style.display = 'none';
+            if (previewGroup) previewGroup.style.opacity = '0';
             drawAnnotation();
             updateUI();
             if (sliderWrap) sliderWrap.style.display = '';
+            if (radiusSlider) radiusSlider.value = r;
         });
 
-        // 半徑調整
+        // 半徑滑桿
         if (radiusSlider) {
             radiusSlider.addEventListener('input', () => {
                 if (!annotation || submitted) return;
                 annotation.r = parseFloat(radiusSlider.value);
+                currentR = annotation.r;
                 drawAnnotation();
                 updateUI();
             });
@@ -151,6 +248,8 @@ export class HotspotGame {
             if (prev?.state?.annotation) {
                 annotation = prev.state.annotation;
                 submitted = true;
+                placed = true;
+                hintEl.style.display = 'none';
                 drawAnnotation();
                 updateUI();
                 if (submitBtn) submitBtn.style.display = 'none';
@@ -197,25 +296,29 @@ export class HotspotGame {
         // 重新作答
         resetBtn.addEventListener('click', async () => {
             submitted = false;
+            placed = false;
             annotation = null;
+            currentR = DEFAULT_R;
             drawAnnotation();
             updateUI();
             if (submitBtn) { submitBtn.style.display = ''; submitBtn.disabled = true; }
             if (sliderWrap) sliderWrap.style.display = 'none';
             if (resultEl) { resultEl.className = 'hotspot-result'; resultEl.innerHTML = ''; }
+            hintEl.style.display = '';
+            hintEl.style.opacity = '1';
             resetBtn.classList.remove('visible');
+            if (radiusSlider) radiusSlider.value = DEFAULT_R;
             if (elementId) await stateManager.clear(elementId);
         });
     }
 
     /* ═══════════════════════════════════════════
-       講師端：Canvas 熱點圖
+       講師端：Canvas 熱點圖 + hover tooltip
        ═══════════════════════════════════════════ */
     async setupPresenterView(container, elementId, correctZone) {
         const imageWrap = container.querySelector('.hotspot-image-wrap');
         if (!imageWrap) return;
 
-        // 隱藏學員 UI
         const submitBtn = container.querySelector('.hs-submit-btn');
         const sliderWrap = container.querySelector('.hs-radius-wrap');
         if (submitBtn) submitBtn.style.display = 'none';
@@ -224,12 +327,25 @@ export class HotspotGame {
         // Canvas 覆蓋層
         const canvas = document.createElement('canvas');
         canvas.className = 'hs-heatmap-canvas';
-        // 解析度：越高越精細但越慢。200x150 對 50+ 人足夠
         canvas.width = 200;
         canvas.height = 150;
+        imageWrap.style.position = 'relative';
         imageWrap.appendChild(canvas);
 
-        // 統計顯示
+        // Hover tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'hs-hover-tooltip';
+        tooltip.style.cssText = `
+            position:absolute;pointer-events:none;z-index:90;
+            background:rgba(15,23,42,0.92);color:#fff;
+            padding:6px 12px;border-radius:8px;font-size:12px;
+            font-weight:600;white-space:nowrap;
+            opacity:0;transition:opacity 0.15s;
+            backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,0.3);
+        `;
+        imageWrap.appendChild(tooltip);
+
+        // 統計
         const countEl = container.querySelector('.hs-count') || (() => {
             const el = document.createElement('div');
             el.className = 'hs-count';
@@ -279,10 +395,35 @@ export class HotspotGame {
             }
         };
 
+        // Hover → 顯示區域人數 + 姓名
+        canvas.style.pointerEvents = 'auto';
+        canvas.style.cursor = 'crosshair';
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const px = (e.clientX - rect.left) / rect.width * 100;
+            const py = (e.clientY - rect.top) / rect.height * 100;
+            const detectR = 8; // 偵測半徑 (百分比)
+            const nearby = submissions.filter(s => {
+                const a = s.annotation;
+                return Math.hypot(a.cx - px, a.cy - py) < detectR + (a.r || 5);
+            });
+            if (nearby.length > 0) {
+                const names = [...new Set(nearby.map(s => s.name))].slice(0, 5);
+                const extra = nearby.length > 5 ? ` +${nearby.length - 5}人` : '';
+                tooltip.textContent = `${nearby.length} 人：${names.join('、')}${extra}`;
+                tooltip.style.opacity = '1';
+                const wrapRect = imageWrap.getBoundingClientRect();
+                tooltip.style.left = (e.clientX - wrapRect.left + 12) + 'px';
+                tooltip.style.top = (e.clientY - wrapRect.top - 32) + 'px';
+            } else {
+                tooltip.style.opacity = '0';
+            }
+        });
+        canvas.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+
         await fetchAndRender();
         const timer = setInterval(fetchAndRender, 4000);
 
-        // 即時推送
         if (sessionCode && realtime?.on) {
             realtime.on('submission_saved', (msg) => {
                 const p = msg.payload || msg;
@@ -290,35 +431,26 @@ export class HotspotGame {
             });
         }
 
-        // 清理
         container._hsCleanup = () => clearInterval(timer);
     }
 
     /* ═══════════════════════════════════════════
-       Canvas 熱點圖繪製
+       Canvas 熱點圖繪製（不再繪製峰值數字）
        ═══════════════════════════════════════════ */
     _renderHeatmap(canvas, submissions) {
         const ctx = canvas.getContext('2d');
-        const w = canvas.width;
-        const h = canvas.height;
+        const w = canvas.width, h = canvas.height;
         ctx.clearRect(0, 0, w, h);
         if (submissions.length === 0) return;
 
-        // 建立密度格點
         const grid = new Float32Array(w * h);
         let maxDensity = 0;
 
         for (const sub of submissions) {
             const a = sub.annotation;
             if (!a) continue;
-
-            // 百分比 → pixel
-            const cx = (a.cx / 100) * w;
-            const cy = (a.cy / 100) * h;
-            const rx = (a.r / 100) * w;
-            const ry = (a.r / 100) * h;
-
-            // 只遍歷 bounding box
+            const cx = (a.cx / 100) * w, cy = (a.cy / 100) * h;
+            const rx = (a.r / 100) * w, ry = (a.r / 100) * h;
             const x0 = Math.max(0, Math.floor(cx - rx));
             const x1 = Math.min(w - 1, Math.ceil(cx + rx));
             const y0 = Math.max(0, Math.floor(cy - ry));
@@ -326,11 +458,9 @@ export class HotspotGame {
 
             for (let py = y0; py <= y1; py++) {
                 for (let px = x0; px <= x1; px++) {
-                    const dx = (px - cx) / rx;
-                    const dy = (py - cy) / ry;
+                    const dx = (px - cx) / rx, dy = (py - cy) / ry;
                     const distSq = dx * dx + dy * dy;
                     if (distSq <= 1) {
-                        // 高斯式權重：中心 1.0，邊緣 0.3
                         const weight = 1 - distSq * 0.7;
                         const idx = py * w + px;
                         grid[idx] += weight;
@@ -342,12 +472,10 @@ export class HotspotGame {
 
         if (maxDensity === 0) return;
 
-        // 繪製熱點圖
         const imageData = ctx.createImageData(w, h);
         for (let i = 0; i < grid.length; i++) {
             const val = grid[i] / maxDensity;
             if (val < 0.01) continue;
-
             const [r, g, b, a] = this._heatColor(val);
             const idx = i * 4;
             imageData.data[idx] = r;
@@ -356,75 +484,14 @@ export class HotspotGame {
             imageData.data[idx + 3] = a;
         }
         ctx.putImageData(imageData, 0, 0);
-
-        // 繪製密度峰值標籤（前 3 名最熱區域）
-        this._drawPeakLabels(ctx, grid, w, h, maxDensity, submissions.length);
-    }
-
-    /**
-     * 在最熱區域顯示人數標籤
-     */
-    _drawPeakLabels(ctx, grid, w, h, maxDensity, totalCount) {
-        // 找峰值（降低解析度避免太密）
-        const blockSize = 12;
-        const peaks = [];
-        for (let by = 0; by < h; by += blockSize) {
-            for (let bx = 0; bx < w; bx += blockSize) {
-                let sum = 0, count = 0;
-                for (let dy = 0; dy < blockSize && by + dy < h; dy++) {
-                    for (let dx = 0; dx < blockSize && bx + dx < w; dx++) {
-                        sum += grid[(by + dy) * w + (bx + dx)];
-                        count++;
-                    }
-                }
-                const avg = sum / count;
-                if (avg > maxDensity * 0.5) {
-                    peaks.push({ x: bx + blockSize / 2, y: by + blockSize / 2, density: avg });
-                }
-            }
-        }
-
-        // 按密度排序取前 3
-        peaks.sort((a, b) => b.density - a.density);
-        const topPeaks = [];
-        for (const p of peaks) {
-            // 確保峰值不太接近已有的
-            const tooClose = topPeaks.some(t => Math.hypot(t.x - p.x, t.y - p.y) < blockSize * 2);
-            if (!tooClose) topPeaks.push(p);
-            if (topPeaks.length >= 3) break;
-        }
-
-        // 繪製標籤
-        ctx.font = 'bold 10px Inter, system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        for (const p of topPeaks) {
-            const approxCount = Math.round((p.density / maxDensity) * totalCount);
-            if (approxCount < 2) continue;
-
-            // 背景圓
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.92)';
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            // 數字
-            ctx.fillStyle = '#1e293b';
-            ctx.fillText(approxCount, p.x, p.y);
-        }
+        // ✅ 不再繪製峰值數字標籤 → 改用 hover tooltip
     }
 
     /* ═══════════════════════════════════════════
        熱點圖色彩映射
        ═══════════════════════════════════════════ */
     _heatColor(val) {
-        // val: 0~1 → 透明藍 → 青 → 綠 → 黃 → 紅
         const alpha = Math.min(220, Math.round(val * 180 + 40));
-
         if (val < 0.2) {
             const t = val / 0.2;
             return [60, 60 + Math.round(t * 160), 255, alpha];
@@ -463,16 +530,12 @@ export class HotspotGame {
         }
     }
 
-    /**
-     * 計算兩圓重疊比 (intersection / union)
-     */
     _calcOverlap(a, b) {
         const d = Math.sqrt((a.cx - b.cx) ** 2 + (a.cy - b.cy) ** 2);
         const r1 = a.r, r2 = b.r;
         if (d >= r1 + r2) return 0;
         if (d + r1 <= r2) return (r1 * r1) / (r2 * r2);
         if (d + r2 <= r1) return (r2 * r2) / (r1 * r1);
-
         const p1 = r1 * r1 * Math.acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1));
         const p2 = r2 * r2 * Math.acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2));
         const p3 = 0.5 * Math.sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));

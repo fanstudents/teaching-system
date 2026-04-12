@@ -969,6 +969,16 @@
                     } catch (e) { console.warn('[hw_scored] popup failed:', e); }
                 });
 
+                // ── 即時點擊模式 ──
+                try {
+                    const { studentInit } = await import('./scripts/interactive/liveTap.js');
+                    const slideElRef = document.getElementById('slideContent');
+                    studentInit(sessionCode, slideElRef, () => ({
+                        name: studentName,
+                        email: document.getElementById('studentEmail')?.value?.trim() || JSON.parse(sessionStorage.getItem('homework_user') || '{}').email || '',
+                    }));
+                } catch (e) { console.warn('[LiveTap] init failed (non-fatal):', e); }
+
                 // 頁面關閉時通知離線
                 window.addEventListener('beforeunload', () => {
                     realtime.publish(`session:${sessionCode}`, 'student_leave', {

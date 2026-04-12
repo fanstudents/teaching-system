@@ -3935,6 +3935,12 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 同步 DB
         db.update('sessions', { current_slide: String(index) },
             { session_code: `eq.${this.sessionCode}` });
+        // Live Tap：如果啟用中，切換來源
+        import('./interactive/liveTap.js').then(m => {
+            if (m.isPresenterActive()) {
+                m.presenterSlideChanged(index, document.getElementById('presentationSlide'));
+            }
+        }).catch(() => {});
     }
 
     /* ── 雷射筆：滑鼠追蹤 ── */
@@ -4350,6 +4356,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     const pcb = document.getElementById('presCaptionBtn');
                     if (pcb) { pcb.style.display = 'none'; pcb.classList.remove('active'); }
                     if (this._liveCaptions) this._liveCaptions.stop();
+                    // Live Tap 清理
+                    const plt = document.getElementById('presLiveTapBtn');
+                    if (plt) { plt.style.display = 'none'; plt.style.background = ''; plt.style.borderColor = ''; plt.style.color = ''; }
+                    import('./interactive/liveTap.js').then(m => m.presenterCleanup()).catch(() => {});
                 };
             }
             // 雷射筆按鈕
@@ -4373,6 +4383,32 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         if (this.broadcasting && this.sessionCode) {
                             realtime.publish(`session:${this.sessionCode}`, 'cursor_move', { visible: false });
                         }
+                    }
+                };
+            }
+
+            // ── 即時點擊按鈕 ──
+            const presLiveTapBtn = document.getElementById('presLiveTapBtn');
+            if (presLiveTapBtn) {
+                presLiveTapBtn.style.display = 'flex';
+                presLiveTapBtn.onclick = async () => {
+                    const { presenterToggle, presenterStop, isPresenterActive } = await import('./interactive/liveTap.js');
+                    const slideEl = document.getElementById('presentationSlide');
+                    const activated = presenterToggle(
+                        this.slideManager.currentSlideIndex,
+                        this.sessionCode,
+                        slideEl
+                    );
+                    if (activated) {
+                        presLiveTapBtn.style.background = 'rgba(59,130,246,0.6)';
+                        presLiveTapBtn.style.borderColor = 'rgba(59,130,246,0.8)';
+                        presLiveTapBtn.style.color = '#fff';
+                        this.showToast('👆 即時點擊已開啟 — 學員可在投影片上標記感興趣的區域');
+                    } else {
+                        presLiveTapBtn.style.background = 'rgba(255,255,255,0.12)';
+                        presLiveTapBtn.style.borderColor = 'rgba(255,255,255,0.2)';
+                        presLiveTapBtn.style.color = 'rgba(255,255,255,0.85)';
+                        this.showToast('即時點擊已關閉');
                     }
                 };
             }
@@ -4412,6 +4448,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             if (presStopBtn) presStopBtn.style.display = 'none';
             const plb2 = document.getElementById('presLaserBtn');
             if (plb2) plb2.style.display = 'none';
+            const plt2 = document.getElementById('presLiveTapBtn');
+            if (plt2) plt2.style.display = 'none';
         }
 
         // 顯示場次資訊
