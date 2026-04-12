@@ -412,9 +412,12 @@ export class HotspotGame {
                 const extra = nearby.length > 5 ? ` +${nearby.length - 5}人` : '';
                 tooltip.textContent = `${nearby.length} 人：${names.join('、')}${extra}`;
                 tooltip.style.opacity = '1';
-                const wrapRect = imageWrap.getBoundingClientRect();
-                tooltip.style.left = (e.clientX - wrapRect.left + 12) + 'px';
-                tooltip.style.top = (e.clientY - wrapRect.top - 32) + 'px';
+                // 用百分比定位，避免 CSS transform scale 造成的偏移
+                const xPct = px; // 已經是百分比 (0-100)
+                const yPct = py;
+                tooltip.style.left = xPct + '%';
+                tooltip.style.top = Math.max(0, yPct - 5) + '%';
+                tooltip.style.transform = 'translate(-50%, -100%)';
             } else {
                 tooltip.style.opacity = '0';
             }
