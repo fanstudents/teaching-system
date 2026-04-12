@@ -51,7 +51,7 @@
     box-shadow: none !important;
 }
 
-/* 調整大小的控制點 */
+/* 調整大小的控制點 — 預設隱藏，選取時才顯示 */
 .resize-handle {
     position: absolute;
     width: 9px;
@@ -61,6 +61,11 @@
     border-radius: 50%;
     z-index: 10;
     box-shadow: var(--shadow-xs);
+    display: none;
+}
+
+.editable-element.selected > .resize-handle {
+    display: block;
 }
 
 .resize-handle.nw {
