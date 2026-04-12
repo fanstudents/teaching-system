@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', 'Inter', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="humanGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="aiGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="g2">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="960" height="540" fill="url(#bg2)" rx="16"/>
+
+  <!-- 標題 -->
+  <text x="480" y="52" fill="rgba(255,255,255,0.4)" font-size="13" text-anchor="middle" letter-spacing="3" opacity="0">
+    HUMAN × AI COLLABORATION
+    <animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="0.2s" fill="freeze"/>
+  </text>
+  <text x="480" y="88" fill="#fff" font-size="26" font-weight="800" text-anchor="middle" letter-spacing="1" opacity="0">
+    與 AI 的協作光譜
+    <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="0.4s" fill="freeze"/>
+  </text>
+
+  <!-- ═══ 4 個協作卡片 ═══ -->
+  <!-- 共用常數：卡片寬 190、起始 x=60、間距 220 -->
+
+  <!-- ─── 1. 簡報 (人 70% / AI 30%) ─── -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.7s" begin="1s" fill="freeze"/>
+    <!-- 卡片背景 -->
+    <rect x="60" y="120" width="190" height="290" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <!-- 圖示 -->
+    <circle cx="155" cy="168" r="28" fill="rgba(249,115,22,0.12)" stroke="rgba(249,115,22,0.25)" stroke-width="1"/>
+    <text x="155" y="177" font-size="24" text-anchor="middle">📊</text>
+    <!-- 名稱 -->
+    <text x="155" y="218" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">簡報</text>
+    <text x="155" y="238" fill="rgba(255,255,255,0.35)" font-size="11" text-anchor="middle">Presentation</text>
+    <!-- 比例條 -->
+    <rect x="82" y="258" width="146" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+    <!-- 人類部分 70% -->
+    <rect x="82" y="258" width="0" height="10" rx="5" fill="url(#humanGrad)">
+      <animate attributeName="width" from="0" to="102" dur="0.8s" begin="1.5s" fill="freeze"/>
+    </rect>
+    <!-- AI 部分 30% -->
+    <rect x="184" y="258" width="0" height="10" rx="5" fill="url(#aiGrad)">
+      <animate attributeName="width" from="0" to="44" dur="0.8s" begin="1.5s" fill="freeze"/>
+    </rect>
+    <!-- 百分比 -->
+    <text x="110" y="286" fill="#f59e0b" font-size="11" font-weight="700" text-anchor="middle">人 70%</text>
+    <text x="200" y="286" fill="#60a5fa" font-size="11" font-weight="700" text-anchor="middle">AI 30%</text>
+    <!-- 協作模式標籤 -->
+    <rect x="100" y="300" width="110" height="22" rx="11" fill="rgba(249,115,22,0.15)" stroke="rgba(249,115,22,0.3)" stroke-width="0.5"/>
+    <text x="155" y="315" fill="#fbbf24" font-size="10" font-weight="600" text-anchor="middle">🎨 人類主導創意</text>
+    <!-- 描述 -->
+    <text x="155" y="345" fill="rgba(255,255,255,0.45)" font-size="10" text-anchor="middle">
+      <tspan x="155" dy="0">AI 生成初稿</tspan>
+      <tspan x="155" dy="15">人類打磨設計與故事線</tspan>
+    </text>
+  </g>
+
+  <!-- ─── 2. Email 信件 (人 30% / AI 70%) ─── -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.7s" begin="1.4s" fill="freeze"/>
+    <rect x="280" y="120" width="190" height="290" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="375" cy="168" r="28" fill="rgba(59,130,246,0.12)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
+    <text x="375" y="177" font-size="24" text-anchor="middle">✉️</text>
+    <text x="375" y="218" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">Email 信件</text>
+    <text x="375" y="238" fill="rgba(255,255,255,0.35)" font-size="11" text-anchor="middle">Email Writing</text>
+    <rect x="302" y="258" width="146" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+    <rect x="302" y="258" width="0" height="10" rx="5" fill="url(#humanGrad)">
+      <animate attributeName="width" from="0" to="44" dur="0.8s" begin="1.9s" fill="freeze"/>
+    </rect>
+    <rect x="346" y="258" width="0" height="10" rx="5" fill="url(#aiGrad)">
+      <animate attributeName="width" from="0" to="102" dur="0.8s" begin="1.9s" fill="freeze"/>
+    </rect>
+    <text x="322" y="286" fill="#f59e0b" font-size="11" font-weight="700" text-anchor="middle">人 30%</text>
+    <text x="420" y="286" fill="#60a5fa" font-size="11" font-weight="700" text-anchor="middle">AI 70%</text>
+    <rect x="320" y="300" width="110" height="22" rx="11" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
+    <text x="375" y="315" fill="#60a5fa" font-size="10" font-weight="600" text-anchor="middle">🤖 AI 主導生成</text>
+    <text x="375" y="345" fill="rgba(255,255,255,0.45)" font-size="10" text-anchor="middle">
+      <tspan x="375" dy="0">AI 撰寫全文</tspan>
+      <tspan x="375" dy="15">人類審核語氣與判斷</tspan>
+    </text>
+  </g>
+
+  <!-- ─── 3. 開發系統 (人 40% / AI 60%) ─── -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.7s" begin="1.8s" fill="freeze"/>
+    <rect x="500" y="120" width="190" height="290" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="595" cy="168" r="28" fill="rgba(139,92,246,0.12)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+    <text x="595" y="177" font-size="24" text-anchor="middle">💻</text>
+    <text x="595" y="218" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">開發系統</text>
+    <text x="595" y="238" fill="rgba(255,255,255,0.35)" font-size="11" text-anchor="middle">Development</text>
+    <rect x="522" y="258" width="146" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+    <rect x="522" y="258" width="0" height="10" rx="5" fill="url(#humanGrad)">
+      <animate attributeName="width" from="0" to="58" dur="0.8s" begin="2.3s" fill="freeze"/>
+    </rect>
+    <rect x="580" y="258" width="0" height="10" rx="5" fill="url(#aiGrad)">
+      <animate attributeName="width" from="0" to="88" dur="0.8s" begin="2.3s" fill="freeze"/>
+    </rect>
+    <text x="550" y="286" fill="#f59e0b" font-size="11" font-weight="700" text-anchor="middle">人 40%</text>
+    <text x="640" y="286" fill="#60a5fa" font-size="11" font-weight="700" text-anchor="middle">AI 60%</text>
+    <rect x="535" y="300" width="120" height="22" rx="11" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="0.5"/>
+    <text x="595" y="315" fill="#a78bfa" font-size="10" font-weight="600" text-anchor="middle">🔄 深度共創模式</text>
+    <text x="595" y="345" fill="rgba(255,255,255,0.45)" font-size="10" text-anchor="middle">
+      <tspan x="595" dy="0">AI 寫 Code</tspan>
+      <tspan x="595" dy="15">人類架構設計與除錯</tspan>
+    </text>
+  </g>
+
+  <!-- ─── 4. 數據分析 (人 25% / AI 75%) ─── -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.7s" begin="2.2s" fill="freeze"/>
+    <rect x="720" y="120" width="190" height="290" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <circle cx="815" cy="168" r="28" fill="rgba(34,197,94,0.12)" stroke="rgba(34,197,94,0.25)" stroke-width="1"/>
+    <text x="815" y="177" font-size="24" text-anchor="middle">📈</text>
+    <text x="815" y="218" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">數據分析</text>
+    <text x="815" y="238" fill="rgba(255,255,255,0.35)" font-size="11" text-anchor="middle">Data Analysis</text>
+    <rect x="742" y="258" width="146" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+    <rect x="742" y="258" width="0" height="10" rx="5" fill="url(#humanGrad)">
+      <animate attributeName="width" from="0" to="36" dur="0.8s" begin="2.7s" fill="freeze"/>
+    </rect>
+    <rect x="778" y="258" width="0" height="10" rx="5" fill="url(#aiGrad)">
+      <animate attributeName="width" from="0" to="110" dur="0.8s" begin="2.7s" fill="freeze"/>
+    </rect>
+    <text x="760" y="286" fill="#f59e0b" font-size="11" font-weight="700" text-anchor="middle">人 25%</text>
+    <text x="855" y="286" fill="#60a5fa" font-size="11" font-weight="700" text-anchor="middle">AI 75%</text>
+    <rect x="755" y="300" width="120" height="22" rx="11" fill="rgba(34,197,94,0.15)" stroke="rgba(34,197,94,0.3)" stroke-width="0.5"/>
+    <text x="815" y="315" fill="#4ade80" font-size="10" font-weight="600" text-anchor="middle">⚡ AI 驅動洞察</text>
+    <text x="815" y="345" fill="rgba(255,255,255,0.45)" font-size="10" text-anchor="middle">
+      <tspan x="815" dy="0">AI 處理海量數據</tspan>
+      <tspan x="815" dy="15">人類解讀與決策</tspan>
+    </text>
+  </g>
+
+  <!-- ═══ 底部光譜軸 ═══ -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="3.5s" fill="freeze"/>
+
+    <!-- 漸層條 -->
+    <defs>
+      <linearGradient id="spectrumGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#f59e0b"/>
+        <stop offset="50%" stop-color="#a78bfa"/>
+        <stop offset="100%" stop-color="#3b82f6"/>
+      </linearGradient>
+    </defs>
+    <rect x="120" y="445" width="720" height="4" rx="2" fill="url(#spectrumGrad)" opacity="0.6"/>
+
+    <!-- 光譜兩端標籤 -->
+    <text x="120" y="472" fill="#f59e0b" font-size="11" font-weight="700">👤 人類主導</text>
+    <text x="840" y="472" fill="#60a5fa" font-size="11" font-weight="700" text-anchor="end">🤖 AI 主導</text>
+    <text x="480" y="472" fill="rgba(255,255,255,0.3)" font-size="10" text-anchor="middle">協作光譜</text>
+
+    <!-- 位置指標點 -->
+    <circle cx="193" cy="447" r="5" fill="#f59e0b" filter="url(#g2)"/>
+    <circle cx="413" cy="447" r="5" fill="#60a5fa" filter="url(#g2)"/>
+    <circle cx="533" cy="447" r="5" fill="#a78bfa" filter="url(#g2)"/>
+    <circle cx="660" cy="447" r="5" fill="#4ade80" filter="url(#g2)"/>
+  </g>
+
+  <!-- ═══ 底部洞察 ═══ -->
+  <g opacity="0">
+    <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="4s" fill="freeze"/>
+    <rect x="200" y="490" width="560" height="32" rx="16" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <text x="480" y="511" fill="rgba(255,255,255,0.5)" font-size="12" text-anchor="middle" font-weight="500">
+      💡 核心觀點：不是取代，而是找到每個任務最佳的人機分工比例
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head><meta charset="UTF-8"><title>匯入素材</title></head>
+<body style="font-family:sans-serif;padding:40px;">
+<h2>素材匯入工具</h2>
+<div id="status">準備中…</div>
+<script type="module">
+import { db, requireAuth } from './scripts/supabase.js';
+const _auth = await requireAuth(); if (!_auth) throw new Error('unauthorized');
+const el = document.getElementById('status');
+
+const svgs = [
+    {
+        file: 'assets/ai-average-shift.svg',
+        name: 'AI 時代平均水準提升圖',
+        description: '鐘型曲線動畫：人類平均從 50 分上移到 70 分，展示 AI 對全民能力基線的影響',
+        tags: ['AI', '圖表', '動畫', '鐘型曲線', '趨勢']
+    },
+    {
+        file: 'assets/ai-human-collaboration.svg',
+        name: '人類與 AI 協作光譜',
+        description: '四種任務的人機協作比例：簡報、Email、開發系統、數據分析，展示不同任務的最佳分工',
+        tags: ['AI', '圖表', '動畫', '協作', '光譜']
+    }
+];
+
+let ok = 0;
+for (const s of svgs) {
+    try {
+        el.innerHTML += `<br>⏳ 正在匯入「${s.name}」…`;
+        const content = await fetch(s.file).then(r => r.text());
+        await db.insert('assets', {
+            name: s.name,
+            description: s.description,
+            type: 'svg',
+            tags: s.tags,
+            source_url: '',
+            content
+        });
+        el.innerHTML += ` ✅`;
+        ok++;
+    } catch (e) {
+        el.innerHTML += ` ❌ ${e.message}`;
+    }
+}
+el.innerHTML += `<br><br><strong>${ok}/${svgs.length} 個素材已匯入！</strong><br><a href="assets.html">→ 前往素材庫查看</a>`;
+</script>
+</body>
+</html>
