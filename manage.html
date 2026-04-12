@@ -2611,6 +2611,7 @@
                             </div>
                         </div>
                         <div class="form-group"><label class="form-label">簡介</label><textarea class="form-textarea" id="instBio" rows="3" placeholder="講師經歷、背景介紹..."></textarea></div>
+                        <div class="form-group"><label class="form-label">經歷（每行一項）</label><textarea class="form-textarea" id="instExperience" rows="4" placeholder="例：&#10;前 Google 資深工程師&#10;台大資工系兼任講師&#10;累計培訓超過 500 間企業"></textarea></div>
                         <div class="form-group"><label class="form-label">專長標籤（逗號分隔）</label><input class="form-input" id="instSpecialties" placeholder="例：AI 教學, 簡報設計, 數位轉型"></div>
                         <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
                         <details style="margin-bottom:12px">
@@ -2653,6 +2654,7 @@
                 }
             };
             document.getElementById('instBio').value = '';
+            document.getElementById('instExperience').value = '';
             document.getElementById('instSpecialties').value = '';
             document.getElementById('instBankName').value = '';
             document.getElementById('instAccountHolder').value = '';
@@ -2673,6 +2675,7 @@
                         document.getElementById('instPhotoPreview').innerHTML = `<img src="${inst.photo_url}" style="width:100%;height:100%;object-fit:cover">`;
                     }
                     document.getElementById('instBio').value = inst.bio || '';
+                    document.getElementById('instExperience').value = (inst.experience || []).join('\n');
                     document.getElementById('instSpecialties').value = (inst.specialties || []).join(', ');
                     document.getElementById('instBankName').value = inst.bank_name || '';
                     document.getElementById('instAccountHolder').value = inst.account_holder || '';
@@ -2714,6 +2717,7 @@
                 title: document.getElementById('instTitle').value.trim(),
                 photo_url: photoUrl,
                 bio: document.getElementById('instBio').value.trim(),
+                experience: document.getElementById('instExperience').value.split('\n').map(s => s.trim()).filter(Boolean),
                 specialties: document.getElementById('instSpecialties').value.split(',').map(s => s.trim()).filter(Boolean),
                 bank_name: document.getElementById('instBankName').value.trim(),
                 account_holder: document.getElementById('instAccountHolder').value.trim(),

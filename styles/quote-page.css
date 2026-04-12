@@ -92,13 +92,26 @@ body {
     box-shadow: 0 2px 8px rgba(74,92,138,.25);
 }
 .q-compare-btn {
-    padding: 10px 16px; border: 1.5px solid var(--q-border);
-    border-radius: 8px; background: #fff; cursor: pointer;
-    font-size: .78rem; font-weight: 600; color: var(--q-text-2);
-    display: flex; align-items: center; gap: 6px;
-    font-family: inherit; transition: all .15s; white-space: nowrap;
+    padding: 10px 18px; border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+    cursor: pointer;
+    font-size: .82rem; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 7px;
+    font-family: inherit; transition: all .2s; white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(99,102,241,.3);
+    position: relative; overflow: hidden;
 }
-.q-compare-btn:hover { border-color: var(--q-accent); color: var(--q-accent); background: #f8f9ff; }
+.q-compare-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
+    pointer-events: none;
+}
+.q-compare-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(99,102,241,.4);
+    filter: brightness(1.08);
+}
 
 /* Multi-pricing cards */
 .q-pricing-cards { display: flex; flex-direction: column; gap: 12px; }
@@ -598,7 +611,7 @@ body {
     }
     .q-variant-tabs-inner { flex-wrap: nowrap; gap: 4px; }
     .q-variant-tab { flex: 0 0 auto; padding: 11px 18px; font-size: .85rem; white-space: nowrap; min-width: 0; }
-    .q-compare-btn { padding: 8px 12px; font-size: .72rem; flex-shrink: 0; }
+    .q-compare-btn { padding: 8px 14px; font-size: .75rem; flex-shrink: 0; }
 
     /* Section compact */
     .q-section { padding: 22px 18px; margin-bottom: 14px; border-radius: 12px; }
