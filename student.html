@@ -384,7 +384,15 @@
                     document.getElementById('studentEmail').value = gUser.email;
                     document.getElementById('studentName').value = gUser.user_metadata?.full_name || gUser.user_metadata?.name || gUser.email.split('@')[0];
                     history.replaceState(null, '', location.pathname + location.search);
-                    if (!document.getElementById('sessionCode').value) {
+
+                    const codeVal = document.getElementById('sessionCode').value.trim();
+                    const emailVal = document.getElementById('studentEmail').value.trim();
+                    const nameVal = document.getElementById('studentName').value.trim();
+
+                    if (codeVal && emailVal && nameVal) {
+                        // 所有欄位齊全 → 自動加入
+                        setTimeout(() => joinSession(), 300);
+                    } else if (!codeVal) {
                         const errEl = document.getElementById('joinError');
                         errEl.textContent = 'Google 登入成功！請輸入課堂代碼';
                         errEl.style.display = 'block';
