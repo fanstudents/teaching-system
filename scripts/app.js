@@ -3639,6 +3639,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
             this.broadcasting = true;
 
+            // ★ 場次隔離：用 project_sessions.id 作為 stateManager 的 session_id
+            if (this.slideManager.currentSessionId) {
+                import('./interactive/stateManager.js').then(({ stateManager }) => {
+                    stateManager.setSessionOverride(this.slideManager.currentSessionId);
+                    console.log('[Broadcast] stateManager session override:', this.slideManager.currentSessionId);
+                }).catch(() => {});
+            }
+
             // UI 更新 — 按鈕
             btn.classList.remove('broadcast-loading');
             btn.classList.add('broadcasting');
@@ -3739,6 +3747,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // ★ 解除場次級簡報綁定，回到專案模式
         this.slideManager.currentSessionId = null;
+        import('./interactive/stateManager.js').then(({ stateManager }) => {
+            stateManager.setSessionOverride(null);
+        }).catch(() => {});
         await this.slideManager.load();
     }
 
@@ -3758,7 +3769,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!this._lbScoreCache) this._lbScoreCache = new Map(); // email → { pts, rank }
         try {
             const { stateManager } = await import('./interactive/stateManager.js');
-            const board = await stateManager.getLeaderboard(this.sessionCode, this.slideManager.currentProjectId);
+            // 使用 stateManager 的 session override（場次 UUID）優先
+            const effectiveSessionId = stateManager.getSessionCode() || this.sessionCode;
+            const board = await stateManager.getLeaderboard(effectiveSessionId, this.slideManager.currentProjectId);
             const list = document.getElementById('lbList');
             if (!list) return;
 

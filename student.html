@@ -1062,6 +1062,16 @@
                             if (_projectSession.time) parts.push(_projectSession.time);
                             sessionInfoEl.textContent = parts.join(' · ');
                         }
+
+                        // ★ 場次隔離：用 project_sessions 的 id (UUID) 作為唯一識別
+                        // 避免跨場次共用 join_code 導致排行榜、submissions 混在一起
+                        if (_projectSession?.id) {
+                            try {
+                                const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                                stateManager.setSessionOverride(_projectSession.id);
+                                console.log('[Student] session override set to:', _projectSession.id);
+                            } catch (e) { console.warn('[Student] setSessionOverride failed:', e); }
+                        }
                     } catch { /* non-critical */ }
                 }
 
@@ -1248,7 +1258,8 @@
                 async function updateStudentLeaderboard() {
                     if (!sessionCode) return;
                     try {
-                        const board = await stateManager.getLeaderboard(sessionCode, project?.id || '');
+                        const effectiveSession = stateManager.getSessionCode() || sessionCode;
+                        const board = await stateManager.getLeaderboard(effectiveSession, project?.id || '');
                         const list = document.getElementById('studentLbList');
                         if (!list) return;
                         if (!board.length) {

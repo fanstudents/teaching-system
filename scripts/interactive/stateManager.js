@@ -8,6 +8,8 @@ class InteractionState {
     constructor() {
         /** @type {Map<string, object>} key → submission record */
         this._cache = new Map();
+        /** 場次專屬 session_id 覆蓋（優先於 URL 的 code） */
+        this._sessionOverride = null;
     }
 
     /** 組合快取 key */
@@ -20,8 +22,17 @@ class InteractionState {
         return JSON.parse(sessionStorage.getItem('homework_user') || 'null');
     }
 
-    /** 取得 session code */
+    /**
+     * 設定場次專屬 session_id（覆蓋 URL 的 code）
+     * 讓 submissions 和排行榜查詢都侷限於此場次
+     */
+    setSessionOverride(sessionCode) {
+        this._sessionOverride = sessionCode || null;
+    }
+
+    /** 取得 session code（優先使用場次覆蓋值） */
     getSessionCode() {
+        if (this._sessionOverride) return this._sessionOverride;
         return new URLSearchParams(location.search).get('code')
             || new URLSearchParams(location.search).get('session')
             || '';
