@@ -714,6 +714,36 @@ body {
     box-shadow: 0 0 0 2px rgba(74, 122, 232, 0.25);
 }
 
+/* 動態漸層色板 */
+.theme-swatch.animated-swatch {
+    position: relative;
+}
+
+.theme-swatch.animated-swatch::after {
+    content: '✦';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    font-size: 8px;
+    color: #fff;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+@keyframes animSwatchShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 /* ========================================
    主要內容區
    ======================================== */

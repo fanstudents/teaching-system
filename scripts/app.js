@@ -1395,7 +1395,9 @@ ${slideContents}
 
         slide.background = bg;
         const canvas = document.getElementById('slideCanvas');
-        if (bg.startsWith('linear-gradient')) {
+        if (typeof window._applyBackground === 'function') {
+            window._applyBackground(canvas, bg);
+        } else if (bg.startsWith('linear-gradient') || bg.startsWith('animated:')) {
             canvas.style.background = bg;
         } else {
             canvas.style.background = bg;
@@ -5291,8 +5293,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             presentationSlide.style.animation = animMap[transition] || animMap.fade;
         }
 
-        // 套用背景
-        if (slide.background && slide.background !== '#ffffff') {
+        // 套用背景（支援動態漸層）
+        if (typeof window._applyBackground === 'function') {
+            window._applyBackground(presentationSlide, slide.background);
+        } else if (slide.background && slide.background !== '#ffffff') {
             presentationSlide.style.background = slide.background;
         } else {
             presentationSlide.style.background = 'white';

@@ -304,6 +304,8 @@
 
     <script type="module">
         import { db, realtime, auth } from './scripts/supabase.js';
+        import { applyBackground } from './scripts/animatedBg.js';
+        window._applyBackground = applyBackground;
         import { MatchingGame } from './scripts/interactive/matching.js';
         import { FillBlank } from './scripts/interactive/fillBlank.js';
         import { OrderingGame } from './scripts/interactive/ordering.js';
@@ -1430,8 +1432,10 @@
                 // 切頁時關閉作業牆展開的卡片
                 document.querySelector('.showcase-focus-overlay')?.remove();
 
-                // 背景
-                if (slide.background && slide.background !== '#ffffff') {
+                // 背景（支援動態漸層）
+                if (typeof window._applyBackground === 'function') {
+                    window._applyBackground(slideEl, slide.background);
+                } else if (slide.background && slide.background !== '#ffffff') {
                     slideEl.style.background = slide.background;
                 } else {
                     slideEl.style.background = 'white';

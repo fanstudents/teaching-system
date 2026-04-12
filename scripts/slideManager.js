@@ -882,9 +882,11 @@ export class SlideManager {
             const slide = this.getCurrentSlide();
             if (!slide) return;
 
-            // 套用背景
+            // 套用背景（支援動態漸層 animated:* ）
             const canvas = document.getElementById('slideCanvas');
-            if (slide.background && slide.background !== '#ffffff') {
+            if (typeof window._applyBackground === 'function') {
+                window._applyBackground(canvas, slide.background);
+            } else if (slide.background && slide.background !== '#ffffff') {
                 canvas.style.background = slide.background;
             } else {
                 canvas.style.background = 'white';
@@ -2846,8 +2848,10 @@ export class SlideManager {
             const previewContainer = document.createElement('div');
             previewContainer.className = 'slide-thumbnail-preview';
 
-            // 同步投影片背景
-            if (slide.background && slide.background !== '#ffffff') {
+            // 同步投影片背景（支援動態漸層）
+            if (typeof window._applyBackground === 'function') {
+                window._applyBackground(previewContainer, slide.background);
+            } else if (slide.background && slide.background !== '#ffffff') {
                 previewContainer.style.background = slide.background;
             }
 

@@ -556,6 +556,25 @@
                                 <button class="theme-swatch" data-bg="linear-gradient(135deg, #0ea5e9, #1a73e8)"
                                     title="科技藍" style="background:linear-gradient(135deg, #0ea5e9, #1a73e8);"></button>
                             </div>
+                            <!-- 動態漸層 -->
+                            <div class="theme-swatches">
+                                <button class="theme-swatch animated-swatch" data-bg="animated:aurora" title="極光 ✦"
+                                    style="background:linear-gradient(-45deg, #00d2ff, #7b2ff7, #ff0080, #00d2ff);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:ocean" title="深海 ✦"
+                                    style="background:linear-gradient(-45deg, #0f172a, #1e3a5f, #0ea5e9, #0f172a);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:sunset" title="晚霞 ✦"
+                                    style="background:linear-gradient(-45deg, #f97316, #ec4899, #8b5cf6, #f97316);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:neon" title="霓虹 ✦"
+                                    style="background:linear-gradient(-45deg, #7c3aed, #ec4899, #06b6d4, #7c3aed);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:galaxy" title="銀河 ✦"
+                                    style="background:linear-gradient(-45deg, #0c0a1a, #1e1b4b, #4c1d95, #7c3aed, #0c0a1a);background-size:400% 400%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:lava" title="熔岩 ✦"
+                                    style="background:linear-gradient(-45deg, #7f1d1d, #dc2626, #f97316, #7f1d1d);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:sakura" title="櫻花 ✦"
+                                    style="background:linear-gradient(135deg, #fdf2f8, #fbcfe8, #f9a8d4, #fdf2f8);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                                <button class="theme-swatch animated-swatch" data-bg="animated:emerald" title="翡翠 ✦"
+                                    style="background:linear-gradient(135deg, #022c22, #065f46, #10b981, #022c22);background-size:300% 300%;animation:animSwatchShift 3s ease infinite;"></button>
+                            </div>
                         </div>
                         <div class="ribbon-group-title">投影片背景</div>
                     </div>
@@ -2006,6 +2025,10 @@
     <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
+    <script type="module">
+        import { applyBackground } from './scripts/animatedBg.js';
+        window._applyBackground = applyBackground;
+    </script>
     <script src="scripts/app.js?v=20260308e" type="module"></script>
     <script src="components/nav.js"></script>
 
