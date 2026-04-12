@@ -366,7 +366,7 @@ export class HotspotGame {
         container.appendChild(legend);
 
         let submissions = [];
-        const sessionCode = window.app?.sessionCode;
+        const sessionCode = window._activeSessionUUID || window.app?.sessionCode;
 
         const fetchAndRender = async () => {
             try {

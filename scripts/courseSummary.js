@@ -34,6 +34,7 @@ class CourseSummary {
     async init() {
         const params = new URLSearchParams(location.search);
         this.sessionCode = params.get('code') || '';
+        this.sessionUUID = params.get('psid') || ''; // 場次 UUID
         this.email = params.get('email') || '';
 
         if (!this.sessionCode || !this.email) {
@@ -101,8 +102,9 @@ class CourseSummary {
 
     async _loadSubmissions() {
         try {
+            const qid = this.sessionUUID || this.sessionCode;
             const res = await db.select('submissions', {
-                filter: { session_id: `eq.${this.sessionCode}`, student_email: `eq.${this.email}` },
+                filter: { session_id: `eq.${qid}`, student_email: `eq.${this.email}` },
             });
             return this._unwrap(res);
         } catch (e) { return []; }
@@ -110,8 +112,9 @@ class CourseSummary {
 
     async _loadPollVotes() {
         try {
+            const qid = this.sessionUUID || this.sessionCode;
             const res = await db.select('poll_votes', {
-                filter: { session_code: `eq.${this.sessionCode}`, student_email: `eq.${this.email}` },
+                filter: { session_code: `eq.${qid}`, student_email: `eq.${this.email}` },
             });
             return this._unwrap(res);
         } catch (e) { return []; }

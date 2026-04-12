@@ -3388,7 +3388,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         });
         document.getElementById('broadcastBarDashboard')?.addEventListener('click', () => {
             if (this.sessionCode) {
-                window.open(`dashboard.html?code=${this.sessionCode}`, '_blank');
+                const psid = this.slideManager.currentSessionId ? `&psid=${this.slideManager.currentSessionId}` : '';
+                window.open(`dashboard.html?code=${this.sessionCode}${psid}`, '_blank');
             }
         });
         document.getElementById('broadcastBarAudience')?.addEventListener('click', () => {
@@ -3639,11 +3640,14 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
             this.broadcasting = true;
 
-            // ★ 場次隔離：用 project_sessions.id 作為 stateManager 的 session_id
-            if (this.slideManager.currentSessionId) {
+            // ★ 場次隔離：用 project_sessions.id 作為全局 session UUID
+            // Realtime 頻道仍用 join_code，但資料查詢全部改用此 UUID
+            const sessionUUID = this.slideManager.currentSessionId || null;
+            window._activeSessionUUID = sessionUUID;
+            if (sessionUUID) {
                 import('./interactive/stateManager.js').then(({ stateManager }) => {
-                    stateManager.setSessionOverride(this.slideManager.currentSessionId);
-                    console.log('[Broadcast] stateManager session override:', this.slideManager.currentSessionId);
+                    stateManager.setSessionOverride(sessionUUID);
+                    console.log('[Broadcast] session UUID:', sessionUUID);
                 }).catch(() => {});
             }
 
@@ -3747,6 +3751,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // ★ 解除場次級簡報綁定，回到專案模式
         this.slideManager.currentSessionId = null;
+        window._activeSessionUUID = null;
         import('./interactive/stateManager.js').then(({ stateManager }) => {
             stateManager.setSessionOverride(null);
         }).catch(() => {});
@@ -3903,8 +3908,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         try {
             const { db } = await import('./supabase.js');
+            const sid = window._activeSessionUUID || this.sessionCode;
             const { error } = await db.delete('submissions', {
-                session_id: `eq.${this.sessionCode}`,
+                session_id: `eq.${sid}`,
                 student_email: `eq.${email}`,
             });
             if (error) throw new Error(error.message);
@@ -4334,7 +4340,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (dashBtn) {
             dashBtn.style.display = this.broadcasting ? 'flex' : 'none';
             dashBtn.onclick = () => {
-                if (this.sessionCode) window.open(`dashboard.html?code=${this.sessionCode}`, '_blank');
+                const psid = this.slideManager.currentSessionId ? `&psid=${this.slideManager.currentSessionId}` : '';
+                if (this.sessionCode) window.open(`dashboard.html?code=${this.sessionCode}${psid}`, '_blank');
             };
         }
 
@@ -4884,7 +4891,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         try {
             const rows = await db.select('submissions', {
                 filter: {
-                    session_id: `eq.${this.sessionCode}`,
+                    session_id: `eq.${window._activeSessionUUID || this.sessionCode}`,
                     type: 'eq.qa',
                 },
                 order: 'submitted_at.asc',
@@ -6147,7 +6154,7 @@ window.__markQAAnswered = function (qid) {
         window.app.updateQABadge();
         // 持久化到 DB
         db.update('submissions', { state: { image: q.image || null, answered: q.answered, private: q.private } },
-            { element_id: `eq.${qid}`, session_id: `eq.${window.app.sessionCode}`, type: 'eq.qa' }).catch(() => { });
+            { element_id: `eq.${qid}`, session_id: `eq.${window._activeSessionUUID || window.app.sessionCode}`, type: 'eq.qa' }).catch(() => { });
     }
 };
 window.__markQAPrivate = function (qid) {
@@ -6160,7 +6167,7 @@ window.__markQAPrivate = function (qid) {
         window.app.updateQABadge();
         // 持久化到 DB
         db.update('submissions', { state: { image: q.image || null, answered: q.answered, private: q.private } },
-            { element_id: `eq.${qid}`, session_id: `eq.${window.app.sessionCode}`, type: 'eq.qa' }).catch(() => { });
+            { element_id: `eq.${qid}`, session_id: `eq.${window._activeSessionUUID || window.app.sessionCode}`, type: 'eq.qa' }).catch(() => { });
     }
 };
 

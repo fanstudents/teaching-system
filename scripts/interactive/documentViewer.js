@@ -446,7 +446,7 @@ export class DocumentViewer {
 
         try {
             const { db } = await import('../supabase.js');
-            const sessionCode = window.app?.sessionCode || '';
+            const sessionCode = window._activeSessionUUID || window.app?.sessionCode || '';
             const { data: rows } = await db.select('submissions', {
                 filter: {
                     element_id: `eq.${elementId}`,
@@ -519,7 +519,7 @@ export class DocumentViewer {
 
         try {
             const { db } = await import('../supabase.js');
-            const sessionCode = window._app?.sessionCode || '';
+            const sessionCode = window._activeSessionUUID || window._app?.sessionCode || '';
             const { data: rows } = await db.select('submissions', {
                 filter: {
                     element_id: `eq.${elementId}`,

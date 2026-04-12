@@ -29,12 +29,14 @@ let pollVotesMap = {};
 let rawSubmissions = [];  // 原始提交列表（軌跡檢視用）
 let lastFetchTime = null;
 let currentView = 'cards';
+let sessionUUID = ''; // 場次 UUID（新系統），優先於 join_code 查詢
 
 // ══════════════════════
 //  初始化
 // ══════════════════════
 export async function init() {
     currentSessionCode = new URLSearchParams(location.search).get('code') || '';
+    sessionUUID = new URLSearchParams(location.search).get('psid') || '';
 
     // 載入所有場次
     await loadSessions();
@@ -56,6 +58,8 @@ export async function init() {
     if (!currentSessionCode && allSessions.length > 0) {
         currentSessionCode = allSessions[0].session_code || allSessions[0].join_code || '';
     }
+    // 有效查詢 ID：優先使用場次 UUID
+    const effectiveId = () => sessionUUID || currentSessionCode;
     sel.value = currentSessionCode;
 
     if (!currentSessionCode) {
@@ -214,9 +218,10 @@ async function fetchSubmissions() {
     try {
         const subColumns = 'id,element_id,student_email,student_name,content,is_correct,score,type,assignment_title,submitted_at,created_at,session_id';
         const pollColumns = 'id,element_id,student_email,student_name,option_index,option_text,created_at,session_code';
+        const qid = sessionUUID || currentSessionCode;
         const [subRes, pollRes] = await Promise.all([
-            db.select('submissions', { select: subColumns, filter: { session_id: 'eq.' + currentSessionCode }, order: 'submitted_at.asc' }),
-            db.select('poll_votes', { select: pollColumns, filter: { session_code: 'eq.' + currentSessionCode }, order: 'created_at.asc' }),
+            db.select('submissions', { select: subColumns, filter: { session_id: 'eq.' + qid }, order: 'submitted_at.asc' }),
+            db.select('poll_votes', { select: pollColumns, filter: { session_code: 'eq.' + qid }, order: 'created_at.asc' }),
         ]);
 
         submissionsMap = {};

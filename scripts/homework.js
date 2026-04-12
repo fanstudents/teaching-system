@@ -627,6 +627,12 @@ export class HomeworkSubmission {
         const joinCode = new URLSearchParams(location.search).get('code')
             || new URLSearchParams(location.search).get('session')
             || '';
+        // 場次隔離：優先使用 stateManager 的 session override
+        let effectiveSessionId = joinCode;
+        try {
+            const { stateManager } = await import('./interactive/stateManager.js');
+            effectiveSessionId = stateManager.getSessionCode() || joinCode;
+        } catch { /* fallback to joinCode */ }
         const row = {
             student_name: user.name,
             student_email: user.email || '',
@@ -636,7 +642,7 @@ export class HomeworkSubmission {
             file_url: fileUrl || '',
             file_key: fileKey || '',
             submitted_at: submission.submittedAt,
-            session_id: joinCode || null,
+            session_id: effectiveSessionId || null,
             element_id: elementId,
             state: { version: Date.now(), base_element_id: assignmentId || '' }
         };
@@ -664,7 +670,7 @@ export class HomeworkSubmission {
                 const baseId = assignmentId || '';
                 const countResult = await db.select('submissions', {
                     filter: {
-                        session_id: `eq.${sessionCode}`,
+                        session_id: `eq.${effectiveSessionId}`,
                         'state->>base_element_id': `eq.${baseId}`
                     },
                     columns: 'student_name'

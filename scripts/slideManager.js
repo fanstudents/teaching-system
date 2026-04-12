@@ -1480,7 +1480,9 @@ export class SlideManager {
                         (async () => {
                             try {
                                 const { db } = await import('./supabase.js');
-                                const sessionCode = new URLSearchParams(location.search).get('code')
+                                const { stateManager } = await import('./interactive/stateManager.js');
+                                const sessionCode = stateManager.getSessionCode()
+                                    || new URLSearchParams(location.search).get('code')
                                     || new URLSearchParams(location.search).get('session') || '';
                                 if (sessionCode) {
                                     const result = await db.select('submissions', {

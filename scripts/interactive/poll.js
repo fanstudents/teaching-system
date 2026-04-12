@@ -100,7 +100,7 @@ export class PollGame {
         // 持久化到 DB（poll_votes 獨立表，用於即時統計）
         try {
             await db.insert('poll_votes', {
-                session_code: sessionCode || 'free',
+                session_code: stateManager.getSessionCode() || sessionCode || 'free',
                 element_id: elementId,
                 student_email: user?.email || '',
                 student_name: user?.name || '匿名',
@@ -131,7 +131,7 @@ export class PollGame {
         const optionEls = container.querySelectorAll('.poll-option');
         const counts = new Array(optionEls.length).fill(0);
         try {
-            const code = sessionCode || 'free';
+            const code = stateManager.getSessionCode() || sessionCode || 'free';
             const rows = await db.select('poll_votes', {
                 filter: {
                     session_code: `eq.${code}`,
@@ -248,9 +248,10 @@ export class PollGame {
             const counts = new Array(optionEls.length).fill(0);
             const names = Array.from({ length: optionEls.length }, () => []);
             try {
+                const sid = window._activeSessionUUID || sessionCode || 'free';
                 const rows = await db.select('poll_votes', {
                     filter: {
-                        session_code: `eq.${sessionCode || 'free'}`,
+                        session_code: `eq.${sid}`,
                         element_id: `eq.${elementId}`,
                     },
                 });
@@ -357,6 +358,9 @@ export class PollGame {
 
     // ─ Helpers ─
     _getSessionCode() {
+        // 優先用 stateManager 的 session override
+        const override = stateManager.getSessionCode();
+        if (override) return override;
         return new URLSearchParams(location.search).get('code')
             || new URLSearchParams(location.search).get('session')
             || sessionStorage.getItem('poll_session_code')

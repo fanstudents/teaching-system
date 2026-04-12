@@ -176,12 +176,11 @@ function _createPresenterOverlay(slideEl) {
             const extra = nearby.length > 5 ? ` +${nearby.length - 5}人` : '';
             tip.textContent = `${nearby.length} 人點擊：${names.join('、')}${extra}`;
             tip.style.opacity = '1';
-            tip.style.left = (e.clientX - rect.left + wrap.getBoundingClientRect().left - rect.left + 12) + 'px';
-            tip.style.top = (e.clientY - rect.top + wrap.getBoundingClientRect().top - rect.top - 30) + 'px';
-            // Reposition relative to wrap
-            const wrapRect = wrap.getBoundingClientRect();
-            tip.style.left = (e.clientX - wrapRect.left + 12) + 'px';
-            tip.style.top = (e.clientY - wrapRect.top - 30) + 'px';
+            const xPct = px * 100;
+            const yPct = py * 100;
+            tip.style.left = xPct + '%';
+            tip.style.top = Math.max(0, yPct - 3) + '%';
+            tip.style.transform = 'translate(-50%, -100%)';
         } else {
             tip.style.opacity = '0';
         }
@@ -194,9 +193,10 @@ async function _fetchTaps() {
     if (!_presState.active || !_presState.sessionCode) return;
     try {
         const eid = `livetap_slide_${_presState.slideIndex}`;
+        const sid = window._activeSessionUUID || _presState.sessionCode;
         const { data } = await db.select('submissions', {
             filter: {
-                session_id: `eq.${_presState.sessionCode}`,
+                session_id: `eq.${sid}`,
                 element_id: `eq.${eid}`,
                 type: `eq.livetap`,
             },
@@ -369,6 +369,8 @@ function _showStudentOverlay(slideEl, getStudentInfo) {
 
         // 存 DB
         try {
+            const { stateManager } = await import('./stateManager.js');
+            const sid = stateManager.getSessionCode() || _studentState.sessionCode;
             await db.insert('submissions', {
                 student_name: name || '匿名',
                 student_email: email || '',
@@ -376,7 +378,7 @@ function _showStudentOverlay(slideEl, getStudentInfo) {
                 type: 'livetap',
                 content: `(${(cx * 100).toFixed(1)}%, ${(cy * 100).toFixed(1)}%)`,
                 element_id: eid,
-                session_id: _studentState.sessionCode,
+                session_id: sid,
                 submitted_at: new Date().toISOString(),
                 state: { cx, cy, slideIndex: _studentState.slideIndex },
             });

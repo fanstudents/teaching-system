@@ -115,11 +115,12 @@ export class Showcase {
 
             // 第一輪：帶 session_id 嚴格查詢
             if (this.sessionCode) {
+                const qid = window._activeSessionUUID || this.sessionCode;
                 try {
                     const r = await fetchWithTimeout('submissions', {
                         filter: {
                             assignment_title: `eq.${assignmentTitle}`,
-                            session_id: `eq.${this.sessionCode}`
+                            session_id: `eq.${qid}`
                         },
                         order: 'submitted_at.asc'
                     });
@@ -357,7 +358,7 @@ export class Showcase {
                                 {
                                     p_submission_id: subId,
                                     p_score: score,
-                                    p_session_id: this.sessionCode || null,
+                                    p_session_id: window._activeSessionUUID || this.sessionCode || null,
                                     p_student_email: studentEmail || null
                                 }
                             );
