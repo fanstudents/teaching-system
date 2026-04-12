@@ -518,10 +518,10 @@ export class Editor {
         const element = {
             type: 'hotspot',
             x: 50, y: 50,
-            width: 600, height: 400,
-            question: '圈出你認為有問題的地方',
+            width: 600, height: 420,
+            question: '請在圖片上標註你認為的位置',
             image: '',
-            nodes: [],
+            correctZone: null, // null = 開放式標註（無對錯）
         };
         this.slideManager.addElement(element);
         this.selectElementById(element.id);
@@ -1386,17 +1386,8 @@ export class Editor {
                 </div>
             `;
         } else if (type === 'hotspot') {
-            const nodes = elementData.nodes || [];
-            const nodesListHtml = nodes.map((n, i) => `
-                <div class="hs-node-row" data-idx="${i}">
-                    <span class="hs-node-label">${n.label}</span>
-                    <label class="hs-node-correct-label">
-                        <input type="checkbox" class="hs-node-correct" ${n.isCorrect ? 'checked' : ''}>
-                        有問題
-                    </label>
-                    <button class="hs-node-delete" title="刪除">✕</button>
-                </div>
-            `).join('');
+            const cz = elementData.correctZone;
+            const hasCorrectZone = !!cz;
             html += `
                 <div class="property-section">
                     <div class="property-section-title">圖片標註設定</div>
@@ -1405,18 +1396,29 @@ export class Editor {
                         <input type="text" class="form-input" id="hsQuestion" value="${elementData.question || ''}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">圖片 URL</label>
-                        <input type="text" class="form-input" id="hsImage" value="${elementData.image || ''}" placeholder="https://...">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">節點（點擊預覽圖新增）</label>
-                        <div class="hs-preview-wrap" id="hsPreviewWrap" style="position:relative;width:100%;aspect-ratio:3/2;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;cursor:crosshair;">
-                            ${elementData.image ? '<img src="' + elementData.image + '" style="width:100%;height:100%;object-fit:contain;">' : '<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#94a3b8;font-size:13px;">請先輸入圖片 URL</span>'}
-                            ${nodes.map(n => '<div class="hs-preview-node" style="position:absolute;left:' + n.x + '%;top:' + n.y + '%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;background:' + (n.isCorrect ? '#10b981' : '#1a73e8') + ';color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">' + n.label + '</div>').join('')}
+                        <label class="form-label">圖片</label>
+                        <div style="display:flex;gap:6px;">
+                            <input type="text" class="form-input" id="hsImage" value="${elementData.image || ''}" placeholder="輸入 URL 或上傳圖片" style="flex:1;">
+                            <label class="style-btn" style="cursor:pointer;position:relative;width:auto;padding:0 8px;" title="上傳圖片">
+                                <span class="material-symbols-outlined" style="font-size:16px;">upload</span>
+                                <input type="file" id="hsImageUpload" accept="image/*" style="display:none;">
+                            </label>
                         </div>
                     </div>
-                    <div class="hs-nodes-list" id="hsNodesList">${nodesListHtml}</div>
-                    ${nodes.length > 0 ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">綠色 = 正確答案（有問題的地方）</div>' : ''}
+                    <div class="form-group">
+                        <label class="form-label">預覽（${hasCorrectZone ? '點擊設定正確區域' : '可設定正確區域'}）</label>
+                        <div class="hs-preview-wrap" id="hsPreviewWrap" style="position:relative;width:100%;aspect-ratio:3/2;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;cursor:crosshair;">
+                            ${elementData.image ? '<img src="' + elementData.image + '" style="width:100%;height:100%;object-fit:contain;">' : '<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#94a3b8;font-size:13px;">請先設定圖片</span>'}
+                            ${cz ? '<div class="hs-preview-zone" style="position:absolute;left:' + cz.cx + '%;top:' + cz.cy + '%;transform:translate(-50%,-50%);width:' + (cz.r * 2) + '%;height:0;padding-bottom:' + (cz.r * 2) + '%;border-radius:50%;border:2px dashed #10b981;background:rgba(16,185,129,0.15);"></div>' : ''}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="hs-node-correct-label" style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                            <input type="checkbox" id="hsHasCorrect" ${hasCorrectZone ? 'checked' : ''}>
+                            <span style="font-size:12px;">設定正確標註區域</span>
+                        </label>
+                        ${hasCorrectZone ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">綠色虛線圈 = 正確區域。點擊預覽圖可移動位置。</div>' : '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">未設定時為開放式標註，不判斷對錯。</div>'}
+                    </div>
                 </div>
             `;
         }
@@ -2643,7 +2645,8 @@ ${truncated}
             bindSimple('wcMaxWords', 'maxWords', v => parseInt(v) || 3);
         } else if (elementData.type === 'hotspot') {
             bindSimple('hsQuestion', 'question');
-            // 圖片 URL 改變時重新渲染
+
+            // 圖片 URL 改變
             const hsImageInput = document.getElementById('hsImage');
             if (hsImageInput) {
                 hsImageInput.addEventListener('change', () => {
@@ -2652,42 +2655,78 @@ ${truncated}
                     this.selectElementById(elementId);
                 });
             }
-            // 點擊預覽圖新增節點
-            const previewWrap = document.getElementById('hsPreviewWrap');
-            if (previewWrap) {
-                previewWrap.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('hs-preview-node')) return;
-                    const rect = previewWrap.getBoundingClientRect();
-                    const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-                    const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-                    const nodes = [...(elementData.nodes || [])];
-                    const label = String.fromCharCode(65 + nodes.length); // A, B, C...
-                    nodes.push({ id: label, x, y, label, isCorrect: false });
-                    this.slideManager.updateElement(elementId, { nodes });
+
+            // 圖片上傳
+            const hsUpload = document.getElementById('hsImageUpload');
+            if (hsUpload) {
+                hsUpload.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // 壓縮 + 上傳（複用 handleImageUpload 的邏輯）
+                    const dataUrl = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = ev => r(ev.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                    const img = await new Promise(r => {
+                        const i = new Image();
+                        i.onload = () => r(i);
+                        i.src = dataUrl;
+                    });
+
+                    const MAX_DIM = 1920;
+                    let cw = img.width, ch = img.height;
+                    if (cw > MAX_DIM || ch > MAX_DIM) {
+                        if (cw > ch) { ch = Math.round(ch * MAX_DIM / cw); cw = MAX_DIM; }
+                        else { cw = Math.round(cw * MAX_DIM / ch); ch = MAX_DIM; }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cw; canvas.height = ch;
+                    canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+                    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.90));
+
+                    let src = canvas.toDataURL('image/jpeg', 0.90);
+                    try {
+                        const { storage } = await import('./supabase.js');
+                        const key = `images/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+                        const result = await storage.upload('homework', key, blob);
+                        if (result.data?.url) src = result.data.url;
+                    } catch { /* fallback to base64 */ }
+
+                    this.slideManager.updateElement(elementId, { image: src });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                    hsUpload.value = '';
+                });
+            }
+
+            // 正確區域 toggle
+            const hsHasCorrect = document.getElementById('hsHasCorrect');
+            if (hsHasCorrect) {
+                hsHasCorrect.addEventListener('change', () => {
+                    if (hsHasCorrect.checked) {
+                        // 預設正確區域在中心
+                        this.slideManager.updateElement(elementId, { correctZone: { cx: 50, cy: 50, r: 10 } });
+                    } else {
+                        this.slideManager.updateElement(elementId, { correctZone: null });
+                    }
                     this.slideManager.renderCurrentSlide();
                     this.selectElementById(elementId);
                 });
             }
-            // 節點正確/刪除
-            const nodesList = document.getElementById('hsNodesList');
-            if (nodesList) {
-                nodesList.addEventListener('change', (e) => {
-                    if (!e.target.classList.contains('hs-node-correct')) return;
-                    const idx = parseInt(e.target.closest('.hs-node-row').dataset.idx);
-                    const nodes = [...(elementData.nodes || [])];
-                    if (nodes[idx]) nodes[idx].isCorrect = e.target.checked;
-                    this.slideManager.updateElement(elementId, { nodes });
-                    this.slideManager.renderCurrentSlide();
-                    this.selectElementById(elementId);
-                });
-                nodesList.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('hs-node-delete')) return;
-                    const idx = parseInt(e.target.closest('.hs-node-row').dataset.idx);
-                    const nodes = [...(elementData.nodes || [])];
-                    nodes.splice(idx, 1);
-                    // 重新編號
-                    nodes.forEach((n, i) => { n.label = String.fromCharCode(65 + i); n.id = n.label; });
-                    this.slideManager.updateElement(elementId, { nodes });
+
+            // 點擊預覽圖設定正確區域位置
+            const previewWrap = document.getElementById('hsPreviewWrap');
+            if (previewWrap) {
+                previewWrap.addEventListener('click', (e) => {
+                    if (!document.getElementById('hsHasCorrect')?.checked) return;
+                    if (e.target.closest('.hs-preview-zone')) return;
+                    const rect = previewWrap.getBoundingClientRect();
+                    const cx = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+                    const cy = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+                    const oldR = elementData.correctZone?.r || 10;
+                    this.slideManager.updateElement(elementId, { correctZone: { cx, cy, r: oldR } });
                     this.slideManager.renderCurrentSlide();
                     this.selectElementById(elementId);
                 });

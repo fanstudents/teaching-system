@@ -2669,18 +2669,19 @@ export class SlideManager {
 
     renderHotspotElement(el, element) {
         const src = element.image || element.src || '';
-        const nodes = element.nodes || [];
-        const nodesJson = JSON.stringify(nodes).replace(/"/g, '&quot;');
-        const nodesHtml = nodes.map(n =>
-            `<div class="hs-node" data-id="${n.id}" style="left:${n.x}%;top:${n.y}%;">${n.label}</div>`
-        ).join('');
+        const correctZone = element.correctZone ? JSON.stringify(element.correctZone).replace(/"/g, '&quot;') : 'null';
         el.innerHTML = `
             <div class="interactive-label">圖片標註</div>
-            <div class="hotspot-container" data-nodes="${nodesJson}">
-                <div class="hotspot-question">${element.question || '圈出你認為有問題的地方'}</div>
+            <div class="hotspot-container" data-correct-zone="${correctZone}">
+                <div class="hotspot-question">${element.question || '請在圖片上標註你認為的位置'}</div>
                 <div class="hotspot-image-wrap" style="position:relative;">
-                    ${src ? '<img src="' + src + '" class="hotspot-image" draggable="false" />' : '<div class="hotspot-placeholder">（請設定圖片）</div>'}
-                    ${nodesHtml}
+                    ${src ? '<img src="' + src + '" class="hotspot-image" draggable="false" />' : '<div class="hotspot-placeholder"><span class="material-symbols-outlined" style="font-size:36px;margin-bottom:8px;">image</span><span>請在右側設定圖片</span></div>'}
+                </div>
+                <div class="hs-radius-wrap" style="display:none;">
+                    <span class="material-symbols-outlined" style="font-size:16px;color:#64748b;">radio_button_unchecked</span>
+                    <input type="range" class="hs-radius-slider" min="2" max="18" value="7" step="0.5">
+                    <span class="material-symbols-outlined" style="font-size:22px;color:#64748b;">radio_button_unchecked</span>
+                    <span class="hs-radius-label" style="font-size:12px;color:#64748b;min-width:50px;">範圍 7%</span>
                 </div>
                 <div class="hotspot-actions">
                     <button class="hs-submit-btn" disabled>確認送出</button>

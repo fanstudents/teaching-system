@@ -3118,7 +3118,7 @@
 }
 
 /* ========================================
-   圖片標註 - Hotspot
+   圖片標註 - Hotspot (區域標註 + 熱點圖)
    ======================================== */
 .hotspot-container {
     position: absolute;
@@ -3146,6 +3146,7 @@
     border: 1px solid #dadce0;
     position: relative;
     cursor: crosshair;
+    min-height: 180px;
 }
 
 .hotspot-image {
@@ -3159,65 +3160,169 @@
 
 .hotspot-placeholder {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
+    min-height: 180px;
     color: #80868b;
     font-size: 14px;
     background: #f1f3f4;
+    gap: 4px;
 }
 
-.hotspot-marker {
+/* ── SVG 標註覆蓋層 ── */
+.hs-marker-svg {
     position: absolute;
-    transform: translate(-50%, -50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.hs-circle-glow {
+    fill: none;
+    stroke: rgba(59, 130, 246, 0.25);
+    stroke-width: 1.5;
+}
+
+.hs-circle-main {
+    fill: rgba(59, 130, 246, 0.1);
+    stroke: rgba(59, 130, 246, 0.7);
+    stroke-width: 0.5;
+    stroke-dasharray: 2 1;
+    transition: fill 0.25s, stroke 0.25s;
+}
+
+.hs-circle-main.submitted {
+    fill: rgba(16, 185, 129, 0.12);
+    stroke: rgba(16, 185, 129, 0.7);
+    stroke-dasharray: none;
+}
+
+.hs-crosshair line {
+    stroke: rgba(59, 130, 246, 0.45);
+    stroke-width: 0.25;
+}
+
+/* ── 半徑調整滑桿 ── */
+.hs-radius-wrap {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: white;
-    z-index: 5;
-    animation: marker-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    gap: 8px;
+    padding: 8px 14px;
+    background: #f1f3f4;
+    border-radius: 8px;
+    margin-top: 8px;
 }
 
-.hotspot-marker.correct {
-    background: #1e8e3e;
-    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+.hs-radius-slider {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #dadce0;
+    border-radius: 2px;
+    outline: none;
 }
 
-.hotspot-marker.wrong {
-    background: #d93025;
-    box-shadow: 0 2px 8px rgba(217, 48, 37, 0.4);
-}
-
-@keyframes marker-pop {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-    }
-
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-.hotspot-correct-zone {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    border: 2px dashed #1e8e3e;
+.hs-radius-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: rgba(34, 197, 94, 0.1);
+    background: #1a73e8;
+    border: 2px solid white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+/* ── Canvas 熱點圖 ── */
+.hs-heatmap-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
     pointer-events: none;
-    z-index: 4;
+    opacity: 0.72;
+    border-radius: inherit;
+}
+
+/* ── 人數統計 ── */
+.hs-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5f6368;
+    background: #f1f3f4;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+/* ── 熱點圖圖例 ── */
+.hs-heatmap-legend {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    margin-top: 8px;
+    padding: 0 4px;
+}
+
+.hs-legend-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #3c3cff, #00d4ff, #00ff6e, #d4ff00, #ff6e00, #ff0000);
+    opacity: 0.8;
+}
+
+.hs-legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #80868b;
+}
+
+/* ── 送出按鈕 & 結果 ── */
+.hotspot-actions {
+    margin-top: 10px;
+}
+
+.hs-submit-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.hs-submit-btn:hover:not(:disabled) {
+    background: #1557b0;
+}
+
+.hs-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 .hotspot-result {
     margin-top: 8px;
     font-size: 14px;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .hotspot-result.success {
@@ -3226,104 +3331,6 @@
 
 .hotspot-result.error {
     color: #d93025;
-}
-
-/* 十字準星 */
-.hotspot-crosshair {
-    display: none;
-    position: absolute;
-    pointer-events: none;
-    z-index: 10;
-    width: 36px;
-    height: 36px;
-    transform: translate(-50%, -50%);
-}
-
-.hotspot-crosshair::before,
-.hotspot-crosshair::after {
-    content: '';
-    position: absolute;
-    background: rgba(37, 99, 235, 0.5);
-}
-
-.hotspot-crosshair::before {
-    width: 1px;
-    height: 100%;
-    left: 50%;
-    top: 0;
-}
-
-.hotspot-crosshair::after {
-    height: 1px;
-    width: 100%;
-    top: 50%;
-    left: 0;
-}
-
-/* 提示文字 */
-.hotspot-hint {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 0;
-    font-size: 12px;
-    color: #444746;
-}
-
-/* 圈形標記（取代舊的 marker） */
-.hotspot-circle-marker {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 3px solid;
-    z-index: 5;
-    animation: hotspot-pulse 1.5s ease-out infinite;
-}
-
-.hotspot-circle-marker.correct {
-    border-color: #1e8e3e;
-    background: rgba(34, 197, 94, 0.15);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3);
-}
-
-.hotspot-circle-marker.wrong {
-    border-color: #d93025;
-    background: rgba(217, 48, 37, 0.15);
-    box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.3);
-}
-
-@keyframes hotspot-pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
-    }
-
-    70% {
-        box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-    }
-}
-
-.hotspot-circle-marker.wrong {
-    animation-name: hotspot-pulse-red;
-}
-
-@keyframes hotspot-pulse-red {
-    0% {
-        box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.4);
-    }
-
-    70% {
-        box-shadow: 0 0 0 14px rgba(217, 48, 37, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(217, 48, 37, 0);
-    }
 }
 
 /* ========================================

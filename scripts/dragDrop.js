@@ -1034,8 +1034,9 @@ export class DragDrop {
         }
 
         // Ctrl+C 複製元素（有選取時）
-        // 不 preventDefault — 讓系統剪貼簿正常運作，這樣外部複製的文字能正確貼上
+        // 必須 preventDefault 避免瀏覽器將 DOM 內容（含圖片）寫入系統剪貼簿，否則 paste 時會重複
         if (isMeta && e.key === 'c' && !e.shiftKey && this.editor.selectedElements.size > 0 && !isEditing) {
+            e.preventDefault();
             const slide = this.slideManager.getCurrentSlide();
             if (!slide) return;
             this._copiedElements = [...this.editor.selectedElements].map(sel => {
