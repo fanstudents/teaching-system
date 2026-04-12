@@ -660,17 +660,51 @@
         window.handleLogoUpload = async (input) => {
             const file = input.files[0];
             if (!file) return;
-            const key = `client-logos/${Date.now()}_${encodeURIComponent(file.name)}`;
+
+            // 限制 5MB 原始檔案
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('檔案過大（上限 5MB）');
+                input.value = '';
+                return;
+            }
+
+            showToast('上傳中…');
+
             try {
-                const { data, error } = await storage.upload('outline-files', key, file);
-                if (error) throw error;
+                // 壓縮圖片：轉 canvas → 限制 800px 寬、品質 0.85 的 JPEG/WebP
+                const compressed = await compressImage(file, 800, 0.85);
+                const ext = compressed.type === 'image/webp' ? 'webp' : 'jpg';
+                // 純 ASCII 檔名，避免 Supabase Storage 路徑問題
+                const key = `client-logos/${Date.now()}_${Math.random().toString(36).slice(2, 6)}.${ext}`;
+                const { data, error } = await storage.upload('outline-files', key, compressed);
+                if (error) throw new Error(error.message || error.error || JSON.stringify(error));
                 document.getElementById('clientLogo').value = data.url || storage.getPublicUrl('outline-files', key);
                 showToast('Logo 已上傳');
             } catch (err) {
-                showToast('上傳失敗');
+                console.error('[Logo upload]', err);
+                showToast('上傳失敗：' + (err.message || '未知錯誤'));
             }
             input.value = '';
         };
+
+        function compressImage(file, maxWidth, quality) {
+            return new Promise((resolve) => {
+                // 如果檔案已經很小（< 200KB），直接用
+                if (file.size < 200 * 1024) { resolve(file); return; }
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                    canvas.width = w;
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    canvas.toBlob(blob => resolve(blob || file), 'image/webp', quality);
+                };
+                img.onerror = () => resolve(file); // fallback
+                img.src = URL.createObjectURL(file);
+            });
+        }
 
         // ── Events ──
         function bindEvents() {
