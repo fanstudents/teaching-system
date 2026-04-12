@@ -3539,10 +3539,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 this.onlineStudents.set(p.studentId, {
                     id: p.studentId,
                     name: p.studentName,
+                    email: p.studentEmail || '',
                     joinedAt: Date.now()
                 });
                 this.updateViewerCount();
-                console.log('[Broadcast] student joined:', p.studentName);
+                console.log('[Broadcast] student joined:', p.studentName, p.studentEmail);
                 // ★ 不再重新 broadcastSlideData — 新學生自行從 DB 拉當前投影片
                 // 這樣不會打斷其他學生正在操作的互動元件（連連看、拖曳等）
             });
@@ -3561,6 +3562,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     this.onlineStudents.set(p.studentId, {
                         id: p.studentId,
                         name: p.studentName,
+                        email: p.studentEmail || '',
                         joinedAt: Date.now()
                     });
                     this.updateViewerCount();

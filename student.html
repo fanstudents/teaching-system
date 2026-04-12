@@ -791,7 +791,8 @@
                 setTimeout(() => {
                     realtime.publish(`session:${sessionCode}`, 'student_join', {
                         studentId,
-                        studentName
+                        studentName,
+                        studentEmail
                     });
                 }, 500);
 
@@ -799,7 +800,8 @@
                 heartbeatTimer = setInterval(() => {
                     realtime.publish(`session:${sessionCode}`, 'student_heartbeat', {
                         studentId,
-                        studentName
+                        studentName,
+                        studentEmail
                     });
                 }, 15000);
 
