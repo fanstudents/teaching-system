@@ -739,6 +739,21 @@
                     // 嘗試從 URL 的 session 參數取得場次 UUID
                     let sessionUUID = urlParams.get('session') || '';
 
+                    // ★ 如果 session 參數不是 UUID 格式（短碼如 KVMB2J），查詢真正的 UUID
+                    if (sessionUUID && !sessionUUID.includes('-')) {
+                        try {
+                            const { data: psRows } = await db.select('project_sessions', {
+                                filter: { session_code: `eq.${sessionUUID}` },
+                                select: 'id',
+                                limit: 1
+                            });
+                            if (psRows?.[0]?.id) {
+                                console.log('[Join] resolved session short code', sessionUUID, '→', psRows[0].id);
+                                sessionUUID = psRows[0].id;
+                            }
+                        } catch { /* non-critical */ }
+                    }
+
                     // 如果 URL 沒有 session UUID，試從 project_sessions 查
                     if (!sessionUUID && project?.id) {
                         try {

@@ -468,7 +468,8 @@
                     slides.href = project.course_link;
                     slides.setAttribute('target', '_blank');
                 } else {
-                    const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+                    const sessionId = sessionData?.id || sessionParam;
+                    const sessionQ = sessionId ? `&session=${sessionId}` : '';
                     slides.href = `student.html?code=${code}&joinCode=${code}${sessionQ}&autoJoin=1`;
                 }
                 const ss = document.getElementById('slidesStatus');
@@ -962,17 +963,20 @@
         // ── NAVIGATION ──
         window.goToSlides = function () {
             if (!code) return;
-            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            const sessionId = sessionData?.id || sessionParam;
+            const sessionQ = sessionId ? `&session=${sessionId}` : '';
             location.href = `student.html?code=${code}${sessionQ}`;
         };
         window.goToSummary = function () {
             if (!code) return;
-            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            const sessionId = sessionData?.id || sessionParam;
+            const sessionQ = sessionId ? `&session=${sessionId}` : '';
             location.href = `post-class.html?code=${code}${sessionQ}`;
         };
         window.goToHomework = function () {
             if (!code) return;
-            const sessionQ = sessionParam ? `&session=${sessionParam}` : '';
+            const sessionId = sessionData?.id || sessionParam;
+            const sessionQ = sessionId ? `&session=${sessionId}` : '';
             location.href = `homework.html?code=${code}${sessionQ}`;
         };
         window.logout = function () {
