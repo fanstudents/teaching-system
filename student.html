@@ -729,9 +729,36 @@
                     joinedAt: new Date().toISOString()
                 }));
 
-                // ★ 預設「加入課堂」得 1 分 → 確保每位同學都出現在排行榜
+                // ★ 場次隔離：在存 _join_bonus 之前，先找到場次 UUID 並設 override
+                // 確保 _join_bonus 的 session_id 存的是 UUID 而非 join_code
                 try {
                     const { stateManager } = await import('./scripts/interactive/stateManager.js');
+
+                    // 嘗試從 URL 的 session 參數取得場次 UUID
+                    let sessionUUID = urlParams.get('session') || '';
+
+                    // 如果 URL 沒有 session UUID，試從 project_sessions 查
+                    if (!sessionUUID && project?.id) {
+                        try {
+                            const today = new Date().toISOString().slice(0, 10);
+                            const { data: psRows } = await db.select('project_sessions', {
+                                filter: { project_id: `eq.${project.id}` },
+                                order: 'date.asc'
+                            });
+                            if (psRows && psRows.length > 0) {
+                                const todayS = psRows.find(s => s.date === today);
+                                sessionUUID = todayS?.id || psRows.find(s => s.date >= today)?.id || psRows[psRows.length - 1]?.id || '';
+                            }
+                        } catch { /* non-critical */ }
+                    }
+
+                    // 設定 session override
+                    if (sessionUUID) {
+                        stateManager.setSessionOverride(sessionUUID);
+                        console.log('[Join] session override set to:', sessionUUID);
+                    }
+
+                    // 預設「加入課堂」得 1 分 → 確保每位同學都出現在排行榜
                     await stateManager.save('_join_bonus', {
                         type: 'join',
                         title: '加入課堂',
