@@ -91,7 +91,7 @@
                     <span class="student-session-detail" id="displaySessionInfo"></span>
                 </div>
                 <div class="student-header-meta" id="headerMeta"
-                    style="display:none;margin-left:8px;font-size:11px;color:#80868b;display:flex;align-items:center;gap:6px;">
+                    style="display:none;margin-left:8px;font-size:11px;color:#80868b;align-items:center;gap:6px;">
                     <span id="headerTeacher" style="display:flex;align-items:center;gap:3px;"><span
                             class="material-symbols-outlined" style="font-size:14px;">person</span><span
                             id="headerTeacherName"></span></span>
@@ -159,6 +159,13 @@
             <button class="msp-item msp-btn" id="mspLBBtn" title="排行榜">
                 <span class="material-symbols-outlined">leaderboard</span>
                 <span class="msp-label">排行</span>
+            </button>
+            <div class="msp-divider"></div>
+            <button class="msp-item msp-btn msp-reaction-btn" data-emoji="👍" title="讚">
+                <span style="font-size:16px;">👍</span>
+            </button>
+            <button class="msp-item msp-btn msp-reaction-btn" data-emoji="❤️" title="愛心">
+                <span style="font-size:16px;">❤️</span>
             </button>
         </div>
         <!-- 進度條 -->
@@ -1198,6 +1205,27 @@
                     document.body.appendChild(toast);
                     setTimeout(() => toast.remove(), 2000);
                 });
+
+                // ★ #3 修復：iOS 鍵盤彈出時調整 QA 彈窗位置
+                if (window.visualViewport) {
+                    const adjustQAForKeyboard = () => {
+                        if (qaPopup.style.display !== 'flex') return;
+                        const vvHeight = window.visualViewport.height;
+                        const windowHeight = window.innerHeight;
+                        const keyboardHeight = windowHeight - vvHeight;
+                        if (keyboardHeight > 100) {
+                            // 鍵盤彈出：把彈窗底部上移
+                            qaPopup.style.bottom = keyboardHeight + 'px';
+                            qaPopup.style.maxHeight = (vvHeight * 0.6) + 'px';
+                        } else {
+                            qaPopup.style.bottom = '0';
+                            qaPopup.style.maxHeight = '';
+                        }
+                    };
+                    window.visualViewport.addEventListener('resize', adjustQAForKeyboard);
+                    window.visualViewport.addEventListener('scroll', adjustQAForKeyboard);
+                }
+
                 // 排行榜輪詢
                 async function updateStudentLeaderboard() {
                     if (!sessionCode) return;
@@ -2646,6 +2674,22 @@
             document.getElementById('studentLbClose')?.addEventListener('click', () => {
                 document.getElementById('studentLeaderboard')?.classList.remove('open');
             });
+
+            // ── 側面板 Emoji reaction 按鈕 ──
+            let lastMspReactionTime = 0;
+            document.querySelectorAll('.msp-reaction-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const now = Date.now();
+                    if (now - lastMspReactionTime < 1000) return; // 1秒節流
+                    lastMspReactionTime = now;
+                    const emoji = btn.dataset.emoji;
+                    btn.style.transform = 'scale(1.3)';
+                    setTimeout(() => { btn.style.transform = ''; }, 150);
+                    if (sessionCode) {
+                        realtime.publish(`session:${sessionCode}`, 'reaction', { emoji });
+                    }
+                });
+            });
         })();
 
         // ── 方向偵測：橫放提示 + 橫放自動開啟面板 ──
@@ -2726,6 +2770,10 @@
                     pres.classList.add('immersive-mode');
                 }
                 isImmersive = true;
+                // 手機版隱藏 header（沉浸模式最大化空間）
+                if (window.innerWidth <= 1024 && header) {
+                    header.classList.remove('mobile-visible');
+                }
                 if (btn) {
                     btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen_exit';
                     btn.title = '退出全螢幕';
@@ -2749,6 +2797,10 @@
                     btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
                     btn.title = '全螢幕';
                 }
+                // ★ #1/#10 修復：手機版退出沉浸模式後顯示 header
+                if (window.innerWidth <= 1024 && header) {
+                    header.classList.add('mobile-visible');
+                }
                 setTimeout(scaleSlide, 100);
                 // 移除提示
                 document.querySelector('.immersive-hint')?.remove();
@@ -2771,17 +2823,33 @@
                 });
             }
 
-            // ★ 點擊投影片進入沉浸模式（手機）
+            // ★ 點擊投影片進入沉浸模式（手機）— 使用 tap 檢測避免滑動/縮放誤觸
             if (slideEl) {
-                slideEl.addEventListener('click', (e) => {
-                    // 不要攔截互動元素的點擊
-                    if (e.target.closest('.interactive-element, button, input, textarea, select, a, .hw-card, .showcase-container')) return;
-                    if (isImmersive) {
-                        exitImmersive();
-                    } else if (window.innerWidth <= 1024) {
-                        // 只在手機上啟用點擊進入
-                        enterImmersive();
+                let _tapStart = null;
+                slideEl.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        _tapStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+                    } else {
+                        _tapStart = null; // 多指 = pinch-zoom，不是 tap
                     }
+                }, { passive: true });
+                slideEl.addEventListener('touchend', (e) => {
+                    if (!_tapStart) return;
+                    const dx = e.changedTouches[0].clientX - _tapStart.x;
+                    const dy = e.changedTouches[0].clientY - _tapStart.y;
+                    const dt = Date.now() - _tapStart.t;
+                    _tapStart = null;
+                    // 只有移動 < 12px 且時間 < 300ms 才算 tap
+                    if (Math.abs(dx) > 12 || Math.abs(dy) > 12 || dt > 300) return;
+                    if (e.target.closest('.interactive-element, button, input, textarea, select, a, .hw-card, .showcase-container')) return;
+                    if (isImmersive) exitImmersive();
+                    else enterImmersive();
+                });
+                // 桌面版保留 click（不影響手機）
+                slideEl.addEventListener('click', (e) => {
+                    if ('ontouchstart' in window) return; // 手機由上面處理
+                    if (e.target.closest('.interactive-element, button, input, textarea, select, a, .hw-card, .showcase-container')) return;
+                    if (isImmersive) exitImmersive();
                 });
             }
 
@@ -2793,6 +2861,10 @@
                     if (btn) {
                         btn.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
                         btn.title = '全螢幕';
+                    }
+                    // ★ 手機版恢復 header
+                    if (window.innerWidth <= 1024 && header) {
+                        header.classList.add('mobile-visible');
                     }
                     document.querySelector('.immersive-hint')?.remove();
                     setTimeout(scaleSlide, 100);

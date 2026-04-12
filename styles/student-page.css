@@ -890,6 +890,11 @@ body {
     .student-lb-fab .material-symbols-outlined {
         font-size: 17px !important;
     }
+
+    /* ── #2 修復：Emoji reaction bar 在手機隱藏（改由側面板處理） ── */
+    #studentReactionBar {
+        display: none !important;
+    }
 }
 
 /* ═══════════════════════════════════════════
@@ -946,15 +951,13 @@ body {
         width: 36px !important;
         height: 36px !important;
         border-radius: 50% !important;
-        background: rgba(0, 0, 0, 0.35) !important;
+        background: rgba(0, 0, 0, 0.55) !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         z-index: 310 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         padding: 0 !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
     }
 
     .student-presentation .slide-nav-arrow.prev {
@@ -1083,15 +1086,13 @@ body {
         width: 44px !important;
         height: 44px !important;
         border-radius: 50% !important;
-        background: rgba(255, 255, 255, 0.12) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background: rgba(255, 255, 255, 0.18) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
         z-index: 310 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         padding: 0 !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
     }
 
     .student-presentation .slide-nav-arrow.prev {
@@ -1111,7 +1112,7 @@ body {
         height: calc(100dvh - 36px - 50px) !important;
     }
 
-    /* 橫放提示 — fixed 定位在頂部面板下方 */
+    /* 橫放提示 — fixed 定位在頂部面板下方（#5 強化可見度） */
     .rotate-hint {
         display: flex !important;
         position: fixed !important;
@@ -1122,12 +1123,18 @@ body {
         align-items: center;
         justify-content: center;
         gap: 10px;
-        padding: 6px 16px;
-        background: rgba(15, 23, 42, 0.8) !important;
-        color: rgba(255, 255, 255, 0.55);
-        font-size: 11px;
-        font-weight: 500;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(79, 70, 229, 0.9)) !important;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 12px;
+        font-weight: 600;
         letter-spacing: 0.03em;
+        animation: rotateHintPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes rotateHintPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
     }
 
     .rotate-hint svg {
@@ -1396,23 +1403,26 @@ body {
         color: white !important;
     }
 
-    /* 排行榜面板 — 右側滿版 */
+    /* 排行榜面板 — 手機版底部抽屜式（取代右側寬面板） */
     #studentLeaderboard {
         position: fixed !important;
-        top: 0 !important;
         bottom: 0 !important;
+        left: 0 !important;
         right: 0 !important;
-        left: auto !important;
-        width: 220px !important;
-        max-height: none !important;
-        height: 100vh !important;
+        top: auto !important;
+        width: 100% !important;
+        max-height: 55vh !important;
+        height: auto !important;
         overflow-y: auto;
-        border-radius: 0 !important;
+        border-radius: 20px 20px 0 0 !important;
         z-index: 350 !important;
-        background: rgba(15, 23, 42, 0.95) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background: rgba(15, 23, 42, 0.97) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-left: none !important;
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4) !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     }
 }
 

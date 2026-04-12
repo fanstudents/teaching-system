@@ -87,6 +87,22 @@ export class OrderingGame {
         // State
         let draggedChip = null;
         let originParent = null;   // where the chip came from
+
+        // ── ★ 手機版：偵測 scale 容器，改用全螢幕 overlay ──
+        const isMobileScaled = (() => {
+            if (window.innerWidth > 1024) return false;
+            const slide = container.closest('.student-slide');
+            if (!slide) return false;
+            const t = slide.style.transform || '';
+            const m = t.match(/scale\(([^)]+)\)/);
+            return m && parseFloat(m[1]) < 0.9;
+        })();
+
+        if (isMobileScaled) {
+            this._setupMobileOverlay(container, elementId);
+            return;
+        }
+
         let ghostEl = null;
         let pointerOffsetX = 0;
         let pointerOffsetY = 0;
@@ -470,5 +486,79 @@ export class OrderingGame {
             state: { completed: true, order, correct, total },
         });
         if (_r?.isRetry) stateManager.showRetryBanner(container);
+    }
+
+    /**
+     * ★ 手機版全螢幕 overlay — 繞過 scale 容器
+     */
+    _setupMobileOverlay(origContainer, elementId) {
+        const launcher = document.createElement('div');
+        launcher.className = 'ordering-mobile-launcher';
+        launcher.innerHTML = `
+            <button class="ordering-mobile-launch-btn">
+                <span class="material-symbols-outlined" style="font-size:20px;">fullscreen</span>
+                開始排序
+            </button>
+        `;
+        launcher.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);border-radius:12px;z-index:10;';
+        launcher.querySelector('button').style.cssText = 'display:flex;align-items:center;gap:8px;padding:12px 24px;border:none;border-radius:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(16,185,129,0.4);font-family:inherit;';
+        origContainer.style.position = 'relative';
+        origContainer.appendChild(launcher);
+
+        launcher.querySelector('button').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this._openOrderingOverlay(origContainer, elementId);
+        });
+    }
+
+    _openOrderingOverlay(origContainer, elementId) {
+        const overlay = document.createElement('div');
+        overlay.className = 'ordering-mobile-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#0f172a;display:flex;flex-direction:column;overflow:hidden;';
+
+        // Header
+        const header = document.createElement('div');
+        header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(30,41,59,0.95);border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;';
+        header.innerHTML = `
+            <div style="font-size:15px;font-weight:600;color:#f1f5f9;">📋 排列順序</div>
+            <button class="ordering-overlay-close" style="display:flex;align-items:center;gap:4px;padding:6px 14px;border:1px solid #475569;border-radius:8px;background:transparent;color:#94a3b8;font-size:13px;cursor:pointer;font-family:inherit;">
+                <span class="material-symbols-outlined" style="font-size:16px;">close</span>關閉
+            </button>
+        `;
+        overlay.appendChild(header);
+
+        // Body
+        const body = document.createElement('div');
+        body.style.cssText = 'flex:1;overflow:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center;';
+
+        const newContainer = origContainer.cloneNode(true);
+        newContainer.querySelector('.ordering-mobile-launcher')?.remove();
+        newContainer.querySelector('.ordering-result')?.remove();
+        newContainer.style.cssText = 'width:100%;max-width:500px;height:auto;min-height:200px;position:relative;background:#f8f9fa;border-radius:12px;padding:20px;border:1px solid #dadce0;display:flex;flex-direction:column;gap:16px;';
+
+        body.appendChild(newContainer);
+        overlay.appendChild(body);
+        document.body.appendChild(overlay);
+
+        requestAnimationFrame(() => {
+            this.setupContainer(newContainer);
+        });
+
+        // 監聽完成
+        const resultObserver = new MutationObserver(() => {
+            if (newContainer.classList.contains('all-correct')) {
+                setTimeout(() => {
+                    overlay.remove();
+                    this.setupContainer(origContainer);
+                }, 1500);
+                resultObserver.disconnect();
+            }
+        });
+        resultObserver.observe(newContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+
+        header.querySelector('.ordering-overlay-close').addEventListener('click', () => {
+            overlay.remove();
+            resultObserver.disconnect();
+        });
     }
 }

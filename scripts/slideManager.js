@@ -595,7 +595,7 @@ export class SlideManager {
     /**
      * 建立新投影片
      */
-    createSlide(insertAfterCurrent = false, blank = false) {
+    createSlide(insertAfterCurrent = false, blank = true) {
         const gen = () => this.generateId();
         const slide = {
             id: gen(),

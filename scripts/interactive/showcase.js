@@ -473,7 +473,7 @@ export class Showcase {
 
         switch (s.type) {
             case 'text':
-                return `<div class="showcase-preview-text">${this.escapeHtml(content).substring(0, 200)}${content.length > 200 ? '…' : ''}</div>`;
+                return `<div class="showcase-preview-text">${this.linkifyUrls(this.escapeHtml(content).substring(0, 200))}${content.length > 200 ? '…' : ''}</div>`;
 
             case 'image': {
                 const { src, promptText } = this._extractImageSrc(s);
@@ -522,7 +522,7 @@ export class Showcase {
                 </div>`;
 
             default:
-                return `<div class="showcase-preview-text">${this.escapeHtml(content).substring(0, 120)}</div>`;
+                return `<div class="showcase-preview-text">${this.linkifyUrls(this.escapeHtml(content).substring(0, 120))}</div>`;
         }
     }
 
@@ -632,7 +632,7 @@ export class Showcase {
         const content = s.content || '';
         switch (s.type) {
             case 'text':
-                return `<div class="showcase-full-text">${this.escapeHtml(content)}</div>`;
+                return `<div class="showcase-full-text">${this.linkifyUrls(this.escapeHtml(content))}</div>`;
             case 'image': {
                 const { src, promptText } = this._extractImageSrc(s);
                 let html = src ? `<img src="${src}" class="showcase-full-img">` : '<p>圖片無法顯示</p>';
@@ -663,7 +663,7 @@ export class Showcase {
                     <div class="score-detail">${content}</div>
                 </div>`;
             default:
-                return `<div class="showcase-full-text">${this.escapeHtml(content)}</div>`;
+                return `<div class="showcase-full-text">${this.linkifyUrls(this.escapeHtml(content))}</div>`;
         }
     }
 
@@ -676,6 +676,16 @@ export class Showcase {
         const d = document.createElement('div');
         d.textContent = str;
         return d.innerHTML;
+    }
+
+    /**
+     * 將已 escape 的文字中的 URL 轉為可點擊超連結
+     */
+    linkifyUrls(escapedHtml) {
+        return escapedHtml.replace(
+            /(https?:\/\/[^\s<>&"]+)/gi,
+            '<a href="$1" target="_blank" rel="noopener" style="color:#3b82f6;text-decoration:underline;text-underline-offset:2px;word-break:break-all;" onclick="event.stopPropagation()">$1</a>'
+        );
     }
 
     truncate(str, max) {

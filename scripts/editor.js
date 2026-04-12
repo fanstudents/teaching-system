@@ -37,15 +37,17 @@ export class Editor {
             e.target.value = '';
         });
 
-        // 貼上事件：剪貼簿圖片 or 內部元素
+        // 貼上事件：剪貼簿圖片 / 內部元素 / 外部文字
         document.addEventListener('paste', (e) => {
-            // 如果正在編輯文字，不攔截
+            // 如果正在編輯文字，不攔截（讓瀏覽器原生貼上）
             const active = document.activeElement;
             if (active && (active.isContentEditable || active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
 
-            const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+            const clipboardData = e.clipboardData || e.originalEvent?.clipboardData;
+            const items = clipboardData?.items;
             let hasImage = false;
 
+            // 1) 剪貼簿有圖片 → 上傳圖片
             if (items) {
                 for (let i = 0; i < items.length; i++) {
                     if (items[i].type.indexOf('image/') === 0) {
@@ -59,13 +61,32 @@ export class Editor {
                     }
                 }
             }
+            if (hasImage) return;
 
-            // 剪貼簿沒有圖片 → 嘗試貼上內部複製的元素
-            // ★ 只在畫布有選取元素時才攔截，否則讓系統剪貼簿正常貼上
-            if (!hasImage && window._editorDragDrop?._copiedElements?.length > 0
-                && this.selectedElements?.size > 0) {
+            // 2) 有內部複製的元素 → 優先貼上元素（避免 Cmd+C 也寫入系統剪貼簿導致重複）
+            if (window._editorDragDrop?._copiedElements?.length > 0) {
                 e.preventDefault();
                 window._editorDragDrop._doPasteElements();
+                return;
+            }
+
+            // 3) 剪貼簿有純文字（外部複製的） → 新增文字元素到畫布
+            const clipText = clipboardData?.getData('text/plain')?.trim();
+            if (clipText) {
+                e.preventDefault();
+                const element = {
+                    type: 'text',
+                    x: 80,
+                    y: 80,
+                    width: Math.min(800, Math.max(300, clipText.length * 8)),
+                    height: Math.max(50, Math.ceil(clipText.length / 40) * 30),
+                    content: clipText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>'),
+                    fontSize: 18,
+                    color: '#1e293b',
+                };
+                this.slideManager.addElement(element);
+                this.selectElementById(element.id);
+                return;
             }
         });
     }
