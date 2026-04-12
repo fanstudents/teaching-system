@@ -1857,13 +1857,13 @@
                         el.innerHTML = `<div class="lb-widget"><div class="lb-widget-title"><span class="lb-trophy">🏆</span><span>${lbTitle}</span></div>${podium}${list}${data.length === 0 ? '<div class="lb-no-data">尚無排行資料</div>' : ''}</div>`;
                     };
                     renderLB([]);
-                    // 載入真實資料
-                    const sc = new URLSearchParams(location.search).get('code') || '';
-                    if (sc) {
-                        import('./scripts/interactive/stateManager.js').then(({ stateManager }) => {
+                    // 載入真實資料（使用 session UUID，與側欄排行榜一致）
+                    import('./scripts/interactive/stateManager.js').then(({ stateManager }) => {
+                        const sc = stateManager.getSessionCode() || new URLSearchParams(location.search).get('code') || '';
+                        if (sc) {
                             stateManager.getLeaderboard(sc).then(d => renderLB(d));
-                        }).catch(() => { });
-                    }
+                        }
+                    }).catch(() => { });
                     break;
                 }
 
