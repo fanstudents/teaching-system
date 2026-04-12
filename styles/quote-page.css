@@ -92,25 +92,15 @@ body {
     box-shadow: 0 2px 8px rgba(74,92,138,.25);
 }
 .q-compare-btn {
-    padding: 10px 18px; border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+    padding: 10px 18px; border: 1.5px solid var(--q-accent);
+    border-radius: 8px; background: var(--q-accent-light);
     cursor: pointer;
-    font-size: .82rem; font-weight: 700; color: #fff;
-    display: flex; align-items: center; gap: 7px;
-    font-family: inherit; transition: all .2s; white-space: nowrap;
-    box-shadow: 0 2px 10px rgba(99,102,241,.3);
-    position: relative; overflow: hidden;
-}
-.q-compare-btn::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,.15), transparent);
-    pointer-events: none;
+    font-size: .82rem; font-weight: 600; color: var(--q-accent);
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit; transition: all .15s; white-space: nowrap;
 }
 .q-compare-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(99,102,241,.4);
-    filter: brightness(1.08);
+    background: var(--q-accent); color: #fff;
 }
 
 /* Multi-pricing cards */

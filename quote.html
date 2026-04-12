@@ -74,8 +74,8 @@
         <div class="q-variant-tabs" id="variantTabs" style="display:none">
             <div class="q-variant-tabs-inner" id="variantTabsInner"></div>
             <button class="q-compare-btn" id="compareBtn" onclick="compareVersions()" style="display:none">
-                <span class="material-symbols-outlined" style="font-size:16px">auto_awesome</span>
-                AI 版本比較
+                <span class="material-symbols-outlined" style="font-size:16px">compare_arrows</span>
+                版本比較
             </button>
         </div>
 
@@ -1333,8 +1333,8 @@ function renderOutlineData(outline) {
             const dayKeys = Object.keys(days);
             if (dayKeys.length === 1) {
                 const d = days[dayKeys[0]];
-                container.innerHTML = `<div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>`
-                    + d.blocks.map(block => renderTimelineBlock(block, false)).join('');
+                // 只有一天時不顯示 Day 標籤
+                container.innerHTML = d.blocks.map(block => renderTimelineBlock(block, false)).join('');
             } else {
                 const cols = dayKeys.length;
                 const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : 'timeline-grid-2';
