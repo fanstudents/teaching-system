@@ -985,12 +985,32 @@
                     const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
                     document.getElementById('loginEmail').value = email;
                     document.getElementById('loginName').value = name;
+
+                    // ★ 如果 query params 被遺失，從 sessionStorage 還原
+                    const savedCode = sessionStorage.getItem('_portal_code');
+                    const savedSession = sessionStorage.getItem('_portal_session');
+                    if (savedSession && !document.getElementById('loginSessionCode').value) {
+                        document.getElementById('loginSessionCode').value = savedSession;
+                    }
+                    sessionStorage.removeItem('_portal_code');
+                    sessionStorage.removeItem('_portal_session');
+
                     // 清除 hash 但保留 query params
                     history.replaceState(null, '', location.pathname + location.search);
-                    // ★ 如果場次代碼已填好（從 URL 帶入），自動登入
+
+                    // ★ 如果場次代碼已填好，自動登入
                     const sessionCodeEl = document.getElementById('loginSessionCode');
-                    if (sessionCodeEl.value) {
+                    if (sessionCodeEl.value && project) {
                         document.getElementById('loginBtn').click();
+                    } else if (sessionCodeEl.value && !project) {
+                        // project 尚未載入完成，等 init 跑完再 click
+                        const _waitProject = setInterval(() => {
+                            if (project) {
+                                clearInterval(_waitProject);
+                                document.getElementById('loginBtn').click();
+                            }
+                        }, 200);
+                        setTimeout(() => clearInterval(_waitProject), 5000);
                     } else {
                         document.getElementById('loginError').textContent = 'Google 登入成功！請輸入場次代碼後按「進入課程」';
                         document.getElementById('loginError').style.display = 'block';
@@ -1003,6 +1023,9 @@
 
         // ── Google 登入按鈕 ──
         document.getElementById('btnGooglePortal')?.addEventListener('click', () => {
+            // ★ 保存 code & session 到 sessionStorage，OAuth redirect 回來時還原
+            if (code) sessionStorage.setItem('_portal_code', code);
+            if (sessionParam) sessionStorage.setItem('_portal_session', sessionParam);
             auth.signInWithGoogle(location.href.split('#')[0]);
         });
 
