@@ -575,15 +575,29 @@
             const config = await getCourseConfig(code, db, sessionParam);
             if (config.date) document.getElementById('infoDate').textContent = config.date;
             if (config.time) document.getElementById('infoTime').textContent = config.time;
-            if (config.venue) {
+            if (config.sessionFormat === 'online') {
+                // ★ 線上直播模式
+                const venueEl = document.getElementById('infoVenue');
+                const iconEl = venueEl.closest('.info-item')?.querySelector('.material-symbols-outlined');
+                if (iconEl) iconEl.textContent = 'video_call';
+                const labelEl = venueEl.closest('.info-item')?.querySelector('.info-label');
+                if (labelEl) labelEl.textContent = '授課方式';
+                if (config.streamUrl) {
+                    venueEl.innerHTML = `<span style="display:flex;align-items:center;gap:6px;">線上直播 <a href="${config.streamUrl}" target="_blank" rel="noopener" style="color:#4285f4;text-decoration:underline;font-size:0.85rem;">進入直播</a></span>`;
+                } else {
+                    venueEl.textContent = '線上直播';
+                }
+                // 隱藏交通 / 地圖
+                document.getElementById('transportArea').style.display = 'none';
+            } else if (config.venue) {
                 const venueEl = document.getElementById('infoVenue');
                 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.venue)}`;
                 venueEl.innerHTML = `<a href="${mapUrl}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-color:rgba(255,255,255,0.25);text-underline-offset:3px;">${config.venue}</a>`;
             }
             if (config.instructor) document.getElementById('infoInstructor').textContent = config.instructor;
 
-            // Transport + Map
-            if (config.transportInfo || config.venueAddress || config.venue) {
+            // Transport + Map (only for onsite)
+            if (config.sessionFormat !== 'online' && (config.transportInfo || config.venueAddress || config.venue)) {
                 document.getElementById('transportArea').style.display = '';
                 if (config.transportInfo) {
                     const linkified = config.transportInfo.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#1a73e8;text-decoration:underline;">$1</a>');
