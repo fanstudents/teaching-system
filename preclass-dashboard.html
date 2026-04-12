@@ -1177,55 +1177,9 @@
         };
 
         window.loadAll = loadAll;
-
-        // ── PIN Protection Logic ──
-        let projectData = null;
-
-        async function initWithPin() {
-            // First, fetch project to check if PIN is set
-            if (code) {
-                const { data: pData } = await db.select('projects', {
-                    filter: { join_code: `eq.${code}` },
-                    select: 'id,name,dashboard_pin',
-                    limit: 1
-                });
-                projectData = pData?.[0] || null;
-            }
-
-            const pin = projectData?.dashboard_pin;
-            if (!pin) {
-                // No PIN set — auto-load
-                document.getElementById('pinOverlay').classList.add('hidden');
-                await loadAll();
-            }
-            // else: show PIN overlay (default visible)
-        }
-
-        window.verifyPin = function () {
-            const input = document.getElementById('pinInput').value.trim();
-            const errorEl = document.getElementById('pinError');
-            if (!input) { errorEl.textContent = '請輸入驗證碼'; return; }
-            if (input !== projectData?.dashboard_pin) {
-                errorEl.textContent = '驗證碼錯誤';
-                document.getElementById('pinInput').classList.add('error');
-                setTimeout(() => document.getElementById('pinInput').classList.remove('error'), 400);
-                return;
-            }
-            // Correct PIN
-            document.getElementById('pinOverlay').classList.add('hidden');
-            errorEl.textContent = '';
-            // Save to sessionStorage so refresh doesn't re-prompt
-            sessionStorage.setItem(`dash_pin_${code}`, 'ok');
-            loadAll();
-        };
-
-        // Check if already verified this session
-        if (sessionStorage.getItem(`dash_pin_${code}`) === 'ok') {
-            document.getElementById('pinOverlay').classList.add('hidden');
-            loadAll();
-        } else {
-            initWithPin();
-        }
+        // 直接載入（不需驗證碼）
+        document.getElementById('pinOverlay')?.remove();
+        loadAll();
     </script>
 </body>
 
