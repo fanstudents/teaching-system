@@ -421,6 +421,17 @@
                     <label>專長標籤（逗號分隔）</label>
                     <input type="text" id="instrSpecialties" placeholder="例：AI 教學, 簡報設計, 數位轉型">
                 </div>
+                <div class="form-group">
+                    <label>課程實況照片（最多 2 張）</label>
+                    <div id="instrPhotosContainer" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="text" id="instrPhotoAddUrl" placeholder="貼上圖片網址" style="flex:1;font-size:0.8rem;">
+                        <button type="button" class="btn btn-sm" onclick="addInstrPhoto()" style="white-space:nowrap;">
+                            <span class="material-symbols-outlined" style="font-size:14px;">add_photo_alternate</span> 新增
+                        </button>
+                    </div>
+                    <div style="font-size:0.7rem;color:#94a3b8;margin-top:4px;">授課現場的實績照片，會顯示在報價單講師簡介區</div>
+                </div>
                 <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;">
                 <details style="margin-bottom:12px;">
                     <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:#64748b;">💳 匯款資訊（選填）</summary>
@@ -626,6 +637,32 @@
         let instructors = [];
         let affCourses = [];
         let instrCourseIds = []; // temp state for course id tags
+        let instrPhotos = []; // temp state for teaching photos (max 2)
+
+        function renderInstrPhotos() {
+            const container = document.getElementById('instrPhotosContainer');
+            if (!container) return;
+            container.innerHTML = instrPhotos.map((url, i) => `
+                <div style="position:relative;width:140px;height:88px;border-radius:8px;overflow:hidden;border:1.5px solid #e2e8f0;">
+                    <img src="${url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+                    <button type="button" onclick="removeInstrPhoto(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,0.6);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;">&times;</button>
+                </div>
+            `).join('');
+        }
+
+        window.addInstrPhoto = function() {
+            if (instrPhotos.length >= 2) { showToast('最多 2 張照片'); return; }
+            const url = document.getElementById('instrPhotoAddUrl').value.trim();
+            if (!url) { showToast('請輸入圖片網址'); return; }
+            instrPhotos.push(url);
+            document.getElementById('instrPhotoAddUrl').value = '';
+            renderInstrPhotos();
+        };
+
+        window.removeInstrPhoto = function(idx) {
+            instrPhotos.splice(idx, 1);
+            renderInstrPhotos();
+        };
 
         // ── Teachify Coupon API ──
         const TEACHIFY_API = 'https://teachify.io/admin/graphql';
@@ -1111,6 +1148,8 @@
             document.getElementById('instrBio').value = '';
             document.getElementById('instrExperience').value = '';
             document.getElementById('instrSpecialties').value = '';
+            instrPhotos = [];
+            renderInstrPhotos();
             document.getElementById('instrBankName').value = '';
             document.getElementById('instrBankAccount').value = '';
             document.getElementById('instrHolder').value = '';
@@ -1159,6 +1198,8 @@
             document.getElementById('instrBio').value = i.bio || '';
             document.getElementById('instrExperience').value = (i.experience || []).join('\n');
             document.getElementById('instrSpecialties').value = (i.specialties || []).join(', ');
+            instrPhotos = [...(i.photos || [])];
+            renderInstrPhotos();
             document.getElementById('instrBankName').value = i.bank_name || '';
             document.getElementById('instrBankAccount').value = i.bank_account || '';
             document.getElementById('instrHolder').value = i.account_holder || '';
@@ -1198,6 +1239,7 @@
                 bio: document.getElementById('instrBio').value.trim(),
                 experience: document.getElementById('instrExperience').value.split('\n').map(s => s.trim()).filter(Boolean),
                 specialties: document.getElementById('instrSpecialties').value.split(',').map(s => s.trim()).filter(Boolean),
+                photos: instrPhotos,
                 bank_name: document.getElementById('instrBankName').value.trim(),
                 bank_account: document.getElementById('instrBankAccount').value.trim(),
                 account_holder: document.getElementById('instrHolder').value.trim(),
