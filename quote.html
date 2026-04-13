@@ -42,8 +42,11 @@
             <span class="q-topbar-brand">數位簡報室 TBR.Digital</span>
         </div>
         <div class="q-topbar-right">
-            <button class="q-btn q-btn-outline" onclick="window.print()" id="btnPrint">
-                <span class="material-symbols-outlined" style="font-size:16px">print</span> 列印 / PDF
+            <button class="q-btn q-btn-outline" onclick="document.getElementById('confirmSection')?.scrollIntoView({behavior:'smooth'})">
+                <span class="material-symbols-outlined" style="font-size:16px">draw</span> 電子簽核
+            </button>
+            <button class="q-btn q-btn-outline" onclick="window.print()">
+                <span class="material-symbols-outlined" style="font-size:16px">print</span> 列印紙本
             </button>
         </div>
     </header>
@@ -204,16 +207,25 @@
                     <thead>
                         <tr>
                             <th class="q-th-item">項目</th>
-                            <th class="q-th-detail">說明</th>
-                            <th class="q-th-amount">金額</th>
+                            <th class="q-th-price">單價</th>
+                            <th class="q-th-qty">數量</th>
+                            <th class="q-th-amount">總價</th>
                         </tr>
                     </thead>
                     <tbody id="quoteTableBody">
                     </tbody>
                     <tfoot>
+                        <tr class="q-total-row q-subtotal-row" id="subtotalRow" style="display:none">
+                            <td colspan="3" class="q-total-label">小計</td>
+                            <td class="q-total-amount" id="subtotalAmount" style="font-size:1.05rem;color:var(--q-text-2)"></td>
+                        </tr>
+                        <tr class="q-discount-row" id="discountRow" style="display:none">
+                            <td colspan="3" class="q-total-label" style="color:#10b981">折扣優惠</td>
+                            <td class="q-total-amount" id="discountAmount" style="font-size:1.05rem;color:#10b981"></td>
+                        </tr>
                         <tr class="q-total-row">
-                            <td colspan="2" class="q-total-label">合計（未稅）</td>
-                            <td class="q-total-amount" id="totalAmount">NT$ 0</td>
+                            <td colspan="3" class="q-total-label">合計（未稅）</td>
+                            <td class="q-total-amount" id="totalAmount">$0</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -548,23 +560,31 @@ function renderPricingCards(variants) {
         const items = v.items || [];
         let total = 0;
         const rowsHtml = items.map(item => {
-            let detail = '', amount = 0;
-            if (item.type === 'hourly') { detail = `${item.hours||0}h × ${fmt(item.rate)}/時`; amount = (item.hours||0) * (item.rate||0); }
-            else if (item.type === 'perhead') { detail = `${item.count||0}人 × ${fmt(item.rate)}/人`; amount = (item.count||0) * (item.rate||0); }
-            else { detail = '固定'; amount = item.amount || 0; }
+            let unitPrice = 0, qty = 0, qtyUnit = '', amount = 0;
+            if (item.type === 'hourly') { unitPrice = item.rate||0; qty = item.hours||0; qtyUnit = '時'; amount = qty * unitPrice; }
+            else if (item.type === 'perhead') { unitPrice = item.rate||0; qty = item.count||0; qtyUnit = '人'; amount = qty * unitPrice; }
+            else { unitPrice = item.amount||0; qty = 1; qtyUnit = '式'; amount = unitPrice; }
             total += amount;
             if (amount === 0) return '';
             return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.88rem">
-                <span>${item.label}</span>
-                <span style="color:var(--q-text-2);font-size:.82rem">${detail}</span>
-                <span style="font-weight:600;min-width:90px;text-align:right">${fmt(amount)}</span>
+                <span style="flex:1">${item.label}</span>
+                <span style="color:var(--q-text-3);font-size:.78rem;min-width:80px;text-align:center">${fmt(unitPrice)}/${qtyUnit}</span>
+                <span style="color:var(--q-text-3);font-size:.78rem;min-width:50px;text-align:center">${qty}${qtyUnit}</span>
+                <span style="font-weight:600;min-width:80px;text-align:right">${fmt(amount)}</span>
             </div>`;
         }).filter(Boolean).join('');
+
+        const discountTotal = v.discount_total || 0;
+        const finalTotal = (discountTotal > 0 && discountTotal < total) ? discountTotal : (v.total || total);
+        const discountHtml = (discountTotal > 0 && discountTotal < total)
+            ? `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.82rem;color:var(--q-text-3)"><span>小計</span><span>${fmt(total)}</span></div>
+               <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.82rem;color:#10b981;font-weight:600"><span>折扣優惠</span><span>-${fmt(total - discountTotal)}</span></div>` : '';
 
         return `<div class="q-pricing-card ${isActive ? 'active-card' : 'dimmed'}" data-vidx="${i}" onclick="switchVariant(${i})">
             <div class="q-pricing-card-label"><span class="material-symbols-outlined" style="font-size:16px">${isActive ? 'check_circle' : 'radio_button_unchecked'}</span> ${v.name || '方案 ' + (i+1)}</div>
             ${rowsHtml}
-            <div class="q-pricing-card-total">${fmt(v.total || total)}</div>
+            ${discountHtml}
+            <div class="q-pricing-card-total">${fmt(finalTotal)}</div>
         </div>`;
     }).join('');
 }
@@ -596,18 +616,35 @@ window.switchVariant = function(idx) {
     if (variant.items) {
         const tbody = document.getElementById('quoteTableBody');
         tbody.innerHTML = '';
+        let calcTotal = 0;
         variant.items.forEach(item => {
             const tr = document.createElement('tr');
-            let detail = '', amount = 0;
-            if (item.type === 'hourly') { detail = `${item.hours || 0} 小時 × ${fmt(item.rate)}/時`; amount = (item.hours || 0) * (item.rate || 0); }
-            else if (item.type === 'perhead') { detail = `${item.count || 0} 人 × ${fmt(item.rate)}/人`; amount = (item.count || 0) * (item.rate || 0); }
-            else { detail = item.detail || '—'; amount = item.amount || 0; }
-            if (amount === 0 && item.type === 'fixed') detail = '本次不適用';
-            tr.innerHTML = `<td class="q-td-item">${item.label || ''}</td><td class="q-td-detail">${detail}</td><td class="q-td-amount">${amount > 0 ? fmt(amount) : '—'}</td>`;
-            if (amount === 0) tr.classList.add('q-row-zero');
+            let unitPrice = 0, qty = 0, qtyUnit = '', amount = 0;
+            if (item.type === 'hourly') { unitPrice = item.rate||0; qty = item.hours||0; qtyUnit = '時'; amount = qty * unitPrice; }
+            else if (item.type === 'perhead') { unitPrice = item.rate||0; qty = item.count||0; qtyUnit = '人'; amount = qty * unitPrice; }
+            else { unitPrice = item.amount||0; qty = 1; qtyUnit = '式'; amount = unitPrice; }
+            calcTotal += amount;
+            if (amount === 0) {
+                tr.classList.add('q-row-zero');
+                tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">—</td><td class="q-td-qty">—</td><td class="q-td-amount">—</td>`;
+            } else {
+                tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">${fmt(unitPrice)}/${qtyUnit}</td><td class="q-td-qty">${qty} ${qtyUnit}</td><td class="q-td-amount">${fmt(amount)}</td>`;
+            }
             tbody.appendChild(tr);
         });
-        document.getElementById('totalAmount').textContent = fmt(variant.total || 0);
+        // Discount
+        const discountTotal = variant.discount_total || 0;
+        if (discountTotal > 0 && discountTotal < calcTotal) {
+            document.getElementById('subtotalRow').style.display = '';
+            document.getElementById('subtotalAmount').textContent = fmt(calcTotal);
+            document.getElementById('discountRow').style.display = '';
+            document.getElementById('discountAmount').textContent = '-' + fmt(calcTotal - discountTotal);
+            document.getElementById('totalAmount').textContent = fmt(discountTotal);
+        } else {
+            document.getElementById('subtotalRow').style.display = 'none';
+            document.getElementById('discountRow').style.display = 'none';
+            document.getElementById('totalAmount').textContent = fmt(variant.total || calcTotal);
+        }
     }
 
     // Reset all optional sections first
@@ -797,7 +834,7 @@ async function generateAICompare(vData) {
     // 構建版本摘要給 AI
     const summaries = vData.map((v, i) => {
         const lines = [`## ${v.name || '方案' + (i + 1)}`];
-        lines.push(`- 價格：NT$ ${(v.total || 0).toLocaleString()}`);
+        lines.push(`- 價格：$${(v.total || 0).toLocaleString()}`);
         lines.push(`- 天數：${v.days} 天 / ${v.hours} 小時`);
         if (v.groupSize) lines.push(`- 人數：${v.groupSize}`);
         if (v.location) lines.push(`- 授課方式：${v.location}`);
@@ -876,7 +913,7 @@ function showError(msg) {
     document.getElementById('errorScreen').style.display = 'flex';
 }
 
-function fmt(n) { return 'NT$ ' + (n || 0).toLocaleString('zh-TW'); }
+function fmt(n) { return '$' + (n || 0).toLocaleString('zh-TW'); }
 
 function applySectionVisibility(sv) {
     if (!sv) return; // default: show all
@@ -987,19 +1024,36 @@ function renderQuote(q) {
     const items = q.items || [];
     const tbody = document.getElementById('quoteTableBody');
     tbody.innerHTML = '';
+    let calcTotal = 0;
     items.forEach(item => {
         const tr = document.createElement('tr');
-        let detail = '', amount = 0;
-        if (item.type === 'hourly') { detail = `${item.hours || 0} 小時 × ${fmt(item.rate)}/時`; amount = (item.hours || 0) * (item.rate || 0); }
-        else if (item.type === 'perhead') { detail = `${item.count || 0} 人 × ${fmt(item.rate)}/人`; amount = (item.count || 0) * (item.rate || 0); }
-        else { detail = item.detail || '—'; amount = item.amount || 0; }
-        if (amount === 0 && item.type === 'fixed') detail = '本次不適用';
-        tr.innerHTML = `<td class="q-td-item">${item.label || ''}</td><td class="q-td-detail">${detail}</td><td class="q-td-amount">${amount > 0 ? fmt(amount) : '—'}</td>`;
-        if (amount === 0) tr.classList.add('q-row-zero');
+        let unitPrice = 0, qty = 0, qtyUnit = '', amount = 0;
+        if (item.type === 'hourly') { unitPrice = item.rate||0; qty = item.hours||0; qtyUnit = '時'; amount = qty * unitPrice; }
+        else if (item.type === 'perhead') { unitPrice = item.rate||0; qty = item.count||0; qtyUnit = '人'; amount = qty * unitPrice; }
+        else { unitPrice = item.amount||0; qty = 1; qtyUnit = '式'; amount = unitPrice; }
+        calcTotal += amount;
+        if (amount === 0) {
+            tr.classList.add('q-row-zero');
+            tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">—</td><td class="q-td-qty">—</td><td class="q-td-amount">—</td>`;
+        } else {
+            tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">${fmt(unitPrice)}/${qtyUnit}</td><td class="q-td-qty">${qty} ${qtyUnit}</td><td class="q-td-amount">${fmt(amount)}</td>`;
+        }
         tbody.appendChild(tr);
     });
 
-    document.getElementById('totalAmount').textContent = fmt(q.total_amount || 0);
+    // Discount support
+    const discountTotal = q.discount_total || 0;
+    if (discountTotal > 0 && discountTotal < calcTotal) {
+        document.getElementById('subtotalRow').style.display = '';
+        document.getElementById('subtotalAmount').textContent = fmt(calcTotal);
+        document.getElementById('discountRow').style.display = '';
+        document.getElementById('discountAmount').textContent = '-' + fmt(calcTotal - discountTotal);
+        document.getElementById('totalAmount').textContent = fmt(discountTotal);
+    } else {
+        document.getElementById('subtotalRow').style.display = 'none';
+        document.getElementById('discountRow').style.display = 'none';
+        document.getElementById('totalAmount').textContent = fmt(q.total_amount || calcTotal);
+    }
 
     if (q.notes) { document.getElementById('notesSection').style.display = 'block'; document.getElementById('notesContent').textContent = q.notes; }
 

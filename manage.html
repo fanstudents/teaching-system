@@ -3657,12 +3657,14 @@ ${gscQueriesStr || '無搜尋資料'}
                             name: v.name || '未命名方案',
                             items: items.length > 0 ? items : _quoteItems,
                             total: items.length > 0 ? vTotal : total,
+                            discount_total: od.discount_total || 0,
                             outline_data: od
                         };
                     });
                     // Use first variant's items/total as the main
                     record.items = record.variants[0].items;
                     record.total_amount = record.variants[0].total;
+                    record.discount_total = record.variants[0].discount_total || 0;
                 } else if (proj?.outline_data) {
                     // Single version — create single variant with outline
                     const od = proj.outline_data;
@@ -3670,6 +3672,7 @@ ${gscQueriesStr || '無搜尋資料'}
                         name: '標準方案',
                         items: _quoteItems,
                         total: total,
+                        discount_total: od.discount_total || 0,
                         outline_data: od
                     }];
                 }

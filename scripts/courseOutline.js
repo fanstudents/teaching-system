@@ -1693,11 +1693,32 @@ window.recalcPricingTotal = function() {
         else if (item.type === 'perhead') total += (item.count||0) * (item.rate||0);
         else total += (item.amount||0);
     });
-    const str = 'NT$ ' + total.toLocaleString();
+    const str = '$' + total.toLocaleString();
     const el = document.getElementById('oePricingTotal');
     const el2 = document.getElementById('oePricingTotalLarge');
     if (el) el.textContent = str;
     if (el2) el2.textContent = str;
+    updateDiscountDisplay();
+};
+
+window.updateDiscountDisplay = function() {
+    const el = document.getElementById('oeDiscountTotal');
+    const label = document.getElementById('oeDiscountLabel');
+    if (!el || !label) return;
+    const discount = parseFloat(el.value) || 0;
+    if (discount > 0) {
+        const items = collectPricingItems();
+        let total = 0;
+        items.forEach(item => {
+            if (item.type === 'hourly') total += (item.hours||0) * (item.rate||0);
+            else if (item.type === 'perhead') total += (item.count||0) * (item.rate||0);
+            else total += (item.amount||0);
+        });
+        const saved = total - discount;
+        label.textContent = saved > 0 ? `省 $${saved.toLocaleString()}` : '';
+    } else {
+        label.textContent = '';
+    }
 };
 
 function collectPricingItems() {
@@ -1983,6 +2004,8 @@ function collectOutlineData() {
 
     // Pricing items
     od.pricing = collectPricingItems();
+    const discVal = parseFloat(document.getElementById('oeDiscountTotal')?.value) || 0;
+    if (discVal > 0) od.discount_total = discVal;
 
     return od;
 }
@@ -2266,6 +2289,8 @@ function _applyOutlineData(od) {
 
     // Pricing
     applyPricingItems(od.pricing);
+    _v('oeDiscountTotal', od.discount_total || '');
+    updateDiscountDisplay();
 
     initDragAndDrop();
     if (typeof _updateTimelineTimeRanges === 'function') _updateTimelineTimeRanges();

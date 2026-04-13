@@ -197,14 +197,18 @@ body {
     border-bottom: 1px solid var(--q-border);
     letter-spacing: .02em;
 }
-.q-th-amount { text-align: right; }
+.q-th-amount, .q-th-price, .q-th-qty { text-align: right; }
+.q-th-qty { text-align: center; }
 .q-table td { padding: 22px 8px; border-bottom: 1px solid var(--q-border); font-size: 1rem; }
 .q-table tr:hover { background: var(--q-hover); }
 .q-td-item { font-weight: 600; min-width: 140px; }
-.q-td-detail { color: var(--q-text-2); font-size: .95rem; }
+.q-td-price { text-align: right; color: var(--q-text-2); font-size: .95rem; }
+.q-td-qty { text-align: center; color: var(--q-text-2); font-size: .95rem; }
 .q-td-amount { text-align: right; font-weight: 700; font-family: -apple-system, monospace; font-size: 1.05rem; white-space: nowrap; }
-.q-row-zero .q-td-item, .q-row-zero .q-td-detail { color: var(--q-text-3); }
+.q-row-zero .q-td-item, .q-row-zero .q-td-price, .q-row-zero .q-td-qty { color: var(--q-text-3); }
 .q-row-zero .q-td-amount { color: var(--q-text-3); font-weight: 400; }
+.q-subtotal-row td { border-top: 1px solid var(--q-border); border-bottom: none; }
+.q-discount-row td { border-bottom: none; }
 .q-total-row td { border-top: 2px solid var(--q-text); border-bottom: none; }
 .q-total-label { text-align: right; font-weight: 700; font-size: 1rem; padding: 20px 8px; }
 .q-total-amount { text-align: right; font-weight: 800; font-size: 1.35rem; font-family: -apple-system, monospace; color: var(--q-accent); padding: 20px 8px; }
@@ -614,14 +618,16 @@ body {
     /* Quote Table — card-style stacked */
     .q-table thead { display: none; }
     .q-table tbody tr {
-        display: flex; flex-direction: column;
+        display: grid; grid-template-columns: 1fr auto auto;
         padding: 16px 0; border-bottom: 1px solid var(--q-border);
+        gap: 2px 12px;
     }
     .q-table tbody tr:hover { background: none; }
     .q-table td { padding: 2px 0; border: none; }
-    .q-td-item { font-size: .95rem; margin-bottom: 2px; }
-    .q-td-detail { font-size: .82rem; }
-    .q-td-amount { text-align: left; font-size: .95rem; color: var(--q-accent); margin-top: 4px; }
+    .q-td-item { font-size: .95rem; margin-bottom: 2px; grid-column: 1 / -1; }
+    .q-td-price { text-align: left; font-size: .82rem; }
+    .q-td-qty { text-align: left; font-size: .82rem; }
+    .q-td-amount { text-align: right; font-size: .95rem; color: var(--q-accent); }
     .q-total-row td { padding: 16px 0; }
     .q-total-label { text-align: left; }
     .q-total-amount { text-align: left; font-size: 1.2rem; }
