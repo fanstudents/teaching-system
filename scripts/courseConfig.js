@@ -61,6 +61,7 @@ export async function getCourseConfig(joinCode, db, sessionCode) {
                         if (s.group_link_icon_url) config.groupLinkIconUrl = s.group_link_icon_url;
                         if (s.session_format) config.sessionFormat = s.session_format;
                         if (s.stream_url) config.streamUrl = s.stream_url;
+                        if (s.instructor) config.instructor = s.instructor;
                         config.sessionCode = s.session_code;
                     }
                 } catch (e2) {
