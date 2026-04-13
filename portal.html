@@ -469,8 +469,16 @@
                     slides.setAttribute('target', '_blank');
                 } else {
                     const sessionId = sessionData?.id || sessionParam;
-                    const sessionQ = sessionId ? `&session=${sessionId}` : '';
-                    slides.href = `student.html?code=${code}&joinCode=${code}${sessionQ}&autoJoin=1`;
+                    if (phase === 'post-class') {
+                        // ★ 課後回顧：用 preview 模式直接讀取該場次的 slides_data
+                        // 避免 autoJoin 連到共用的即時廣播 channel 而顯示錯誤場次的簡報
+                        const sessionQ = sessionId ? `&session=${sessionId}` : '';
+                        slides.href = `student.html?code=${code}${sessionQ}&preview=all`;
+                    } else {
+                        // ★ 課中：即時廣播模式
+                        const sessionQ = sessionId ? `&session=${sessionId}` : '';
+                        slides.href = `student.html?code=${code}&joinCode=${code}${sessionQ}&autoJoin=1`;
+                    }
                 }
                 const ss = document.getElementById('slidesStatus');
                 if (phase === 'in-class') {
