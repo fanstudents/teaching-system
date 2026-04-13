@@ -1786,43 +1786,42 @@ function initVersions() {
 function renderVersionTabs() {
     let container = document.getElementById('outlineVersionTabs');
     if (!container) {
-        // Create tab bar after admin-section-title
         const sectionTitle = document.querySelector('#adminPanel .admin-section-title');
         if (!sectionTitle) return;
         container = document.createElement('div');
         container.id = 'outlineVersionTabs';
-        container.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 24px 16px;';
+        container.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 24px 18px;';
         sectionTitle.parentElement.insertBefore(container, sectionTitle.nextSibling);
     }
     container.innerHTML = outlineVersions.map((v, i) => {
         const isActive = i === activeVersionIdx;
         const showDelete = outlineVersions.length > 1;
-        return `<div style="display:inline-flex;align-items:center;gap:0;position:relative">
-            <button class="oe-version-tab${isActive ? ' active' : ''}" onclick="switchVersion(${i})" style="
-                padding:8px 18px;border-radius:10px 0 0 10px;border:1.5px solid ${isActive ? 'var(--accent,#1a73e8)' : '#e2e8f0'};
-                background:${isActive ? 'var(--accent,#1a73e8)' : 'white'};color:${isActive ? '#fff' : '#64748b'};
-                font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;border-right:none;
-                ${!isActive ? 'box-shadow:0 1px 2px rgba(0,0,0,0.04);' : 'box-shadow:0 2px 8px rgba(26,115,232,0.2);'}
+        const bc = isActive ? '#4a5c8a' : '#e8e8e8';
+        const bg = isActive ? '#4a5c8a' : '#fff';
+        const c = isActive ? '#fff' : '#555';
+        return `<div style="display:inline-flex;align-items:center;gap:0">
+            <button onclick="switchVersion(${i})" style="
+                padding:8px 18px;border-radius:8px 0 0 8px;border:1px solid ${bc};
+                background:${bg};color:${c};
+                font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border-right:none;
             " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>
             <button onclick="event.stopPropagation();renameVersion(${i})" title="重新命名" style="
-                padding:6px 8px;border-radius:0${showDelete ? '' : ' 10px 10px'} 0;border:1.5px solid ${isActive ? 'var(--accent,#1a73e8)' : '#e2e8f0'};
-                background:${isActive ? 'var(--accent,#1a73e8)' : 'white'};color:${isActive ? 'rgba(255,255,255,.7)' : '#94a3b8'};
-                cursor:pointer;display:flex;align-items:center;transition:all .2s;${showDelete ? 'border-right:none;' : ''}
-                ${!isActive ? 'box-shadow:0 1px 2px rgba(0,0,0,0.04);' : ''}
+                padding:6px 8px;border-radius:0${showDelete ? '' : ' 8px 8px'} 0;border:1px solid ${bc};
+                background:${bg};color:${isActive ? 'rgba(255,255,255,.6)' : '#999'};
+                cursor:pointer;display:flex;align-items:center;transition:all .15s;${showDelete ? 'border-right:none;' : ''}
             "><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
             ${showDelete ? `<button onclick="event.stopPropagation();deleteVersion(${i})" title="刪除版本" style="
-                padding:6px 6px;border-radius:0 10px 10px 0;border:1.5px solid ${isActive ? 'var(--accent,#1a73e8)' : '#e2e8f0'};
-                background:${isActive ? 'var(--accent,#1a73e8)' : 'white'};color:${isActive ? 'rgba(255,255,255,.4)' : '#d1d5db'};
-                cursor:pointer;display:flex;align-items:center;transition:all .2s;
-                ${!isActive ? 'box-shadow:0 1px 2px rgba(0,0,0,0.04);' : ''}
-            " onmouseenter="this.style.color='${isActive ? '#fca5a5' : '#ef4444'}'" onmouseleave="this.style.color='${isActive ? 'rgba(255,255,255,.4)' : '#d1d5db'}'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>` : ''}
+                padding:6px 6px;border-radius:0 8px 8px 0;border:1px solid ${bc};
+                background:${bg};color:${isActive ? 'rgba(255,255,255,.4)' : '#ccc'};
+                cursor:pointer;display:flex;align-items:center;transition:all .15s;
+            " onmouseenter="this.style.color='${isActive ? '#fca5a5' : '#d93025'}'" onmouseleave="this.style.color='${isActive ? 'rgba(255,255,255,.4)' : '#ccc'}'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>` : ''}
         </div>`;
     }).join('') +
     `<button onclick="addVersion()" style="
-        padding:8px 16px;border-radius:10px;border:1.5px dashed #e2e8f0;
-        background:transparent;color:#94a3b8;font-size:0.82rem;cursor:pointer;font-family:inherit;font-weight:500;
-        transition:all .2s;
-    " onmouseover="this.style.borderColor='var(--accent,#1a73e8)';this.style.color='var(--accent,#1a73e8)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8'">+ 新增版本</button>`;
+        padding:8px 16px;border-radius:8px;border:1.5px dashed #e8e8e8;
+        background:transparent;color:#999;font-size:0.82rem;cursor:pointer;font-family:inherit;font-weight:500;
+        transition:all .15s;
+    " onmouseover="this.style.borderColor='#4a5c8a';this.style.color='#4a5c8a'" onmouseout="this.style.borderColor='#e8e8e8';this.style.color='#999'">+ 新增版本</button>`;
 }
 
 window.switchVersion = function(idx) {
