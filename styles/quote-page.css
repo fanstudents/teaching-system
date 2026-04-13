@@ -654,10 +654,12 @@ body {
     .q-container { padding: 16px 16px 40px; }
 
     /* Topbar compact */
-    .q-topbar { padding: 10px 16px; }
-    .q-topbar-brand { font-size: .78rem; }
-    .q-topbar-logo { width: 24px; height: 24px; }
-    .q-btn { padding: 8px 14px; font-size: .8rem; }
+    /* Topbar compact */
+    .q-topbar { padding: 10px 12px; gap: 8px; }
+    .q-topbar-brand { font-size: .75rem; }
+    .q-topbar-logo { width: 22px; height: 22px; }
+    .q-topbar-right { gap: 6px; }
+    .q-btn { padding: 7px 10px; font-size: .72rem; white-space: nowrap; gap: 4px; }
 
     /* Hero compact */
     .q-header { padding: 28px 22px; margin-bottom: 14px; }
