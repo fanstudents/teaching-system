@@ -2185,7 +2185,7 @@ async function importFromProject() {
 
     try {
         const { data: allProjects } = await db.select('projects', {
-            select: 'id,name,outline_data',
+            select: 'id,name,outline_data,outline_versions',
             order: 'updated_at.desc'
         });
 
@@ -2205,61 +2205,143 @@ async function importFromProject() {
         const modal = document.createElement('div');
         modal.style.cssText = 'background:#fff;border-radius:16px;padding:28px 32px;max-width:480px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
 
-        let html = '<h3 style="margin:0 0 8px;font-size:1.1rem">導入其他專案課綱</h3>';
-        html += '<p style="font-size:0.82rem;color:#64748b;margin:0 0 20px">選擇一個專案，其課綱內容將覆蓋<strong>目前版本</strong>的編輯內容</p>';
-        html += '<div style="display:flex;flex-direction:column;gap:8px">';
+        function renderProjectList() {
+            let html = '<h3 style="margin:0 0 8px;font-size:1.1rem">導入其他專案課綱</h3>';
+            html += '<p style="font-size:0.82rem;color:#64748b;margin:0 0 20px">選擇一個專案，其課綱內容將覆蓋<strong>目前版本</strong>的編輯內容</p>';
+            html += '<div style="display:flex;flex-direction:column;gap:8px">';
 
-        available.forEach(p => {
-            const tl = p.outline_data?.timeline || [];
-            const tools = p.outline_data?.tools || [];
-            const moduleCount = tl.filter(b => !b.isBreak).length;
-            const subtitle = p.outline_data?.hero?.subtitle || '';
-            const meta = [];
-            if (moduleCount) meta.push(moduleCount + ' 個模組');
-            if (tools.length) meta.push(tools.length + ' 個工具');
-            const metaStr = meta.length ? meta.join(' · ') : '尚無內容';
+            available.forEach(p => {
+                const tl = p.outline_data?.timeline || [];
+                const tools = p.outline_data?.tools || [];
+                const moduleCount = tl.filter(b => !b.isBreak).length;
+                const subtitle = p.outline_data?.hero?.subtitle || '';
+                const versions = p.outline_versions || [];
+                const meta = [];
+                if (moduleCount) meta.push(moduleCount + ' 個模組');
+                if (tools.length) meta.push(tools.length + ' 個工具');
+                if (versions.length > 1) meta.push(versions.length + ' 個版本');
+                const metaStr = meta.length ? meta.join(' · ') : '尚無內容';
 
-            html += '<button class="import-proj-item" data-id="' + p.id + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
-            html += '<div style="font-weight:700;font-size:0.92rem;margin-bottom:4px">' + (p.name || '未命名專案') + '</div>';
-            if (subtitle) html += '<div style="font-size:0.78rem;color:#64748b;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px">' + subtitle + '</div>';
-            html += '<div style="font-size:0.72rem;color:#94a3b8">' + metaStr + '</div>';
-            html += '</button>';
-        });
+                html += '<button class="import-proj-item" data-id="' + p.id + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
+                html += '<div style="font-weight:700;font-size:0.92rem;margin-bottom:4px">' + (p.name || '未命名專案') + '</div>';
+                if (subtitle) html += '<div style="font-size:0.78rem;color:#64748b;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px">' + subtitle + '</div>';
+                html += '<div style="font-size:0.72rem;color:#94a3b8">' + metaStr + '</div>';
+                html += '</button>';
+            });
 
-        html += '</div>';
-        html += '<button id="importProjCancel" style="margin-top:16px;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:0.85rem;font-family:inherit;color:#64748b">取消</button>';
-        modal.innerHTML = html;
-        overlay.appendChild(modal);
-        document.body.appendChild(overlay);
+            html += '</div>';
+            html += '<button id="importProjCancel" style="margin-top:16px;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:0.85rem;font-family:inherit;color:#64748b">取消</button>';
+            modal.innerHTML = html;
+            bindProjectEvents();
+        }
 
-        // Hover
-        modal.querySelectorAll('.import-proj-item').forEach(b => {
-            b.addEventListener('mouseenter', () => { b.style.borderColor = '#1a73e8'; b.style.background = '#f5f3ff'; });
-            b.addEventListener('mouseleave', () => { b.style.borderColor = '#e2e8f0'; b.style.background = '#fff'; });
-        });
+        function renderVersionList(proj) {
+            const versions = proj.outline_versions || [];
+            let html = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">';
+            html += '<button id="importBackBtn" style="padding:4px 8px;border:none;background:none;cursor:pointer;color:#64748b;font-size:1.1rem">←</button>';
+            html += '<div><h3 style="margin:0;font-size:1.05rem">' + (proj.name || '未命名') + '</h3><p style="margin:2px 0 0;font-size:.78rem;color:#94a3b8">選擇要導入的版本</p></div>';
+            html += '</div>';
+            html += '<div style="display:flex;flex-direction:column;gap:8px">';
 
-        // Close on overlay click (use mousedown to avoid confirm() triggering close)
+            versions.forEach((v, i) => {
+                const vData = v.data || {};
+                const tl = vData.timeline || [];
+                const tools = vData.tools || [];
+                const moduleCount = tl.filter(b => !b.isBreak).length;
+                const meta = [];
+                if (moduleCount) meta.push(moduleCount + ' 個模組');
+                if (tools.length) meta.push(tools.length + ' 個工具');
+                if (v.created_at) {
+                    const d = new Date(v.created_at);
+                    meta.push(d.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }));
+                }
+                const metaStr = meta.length ? meta.join(' · ') : '';
+                const subtitle = vData.hero?.subtitle || '';
+
+                html += '<button class="import-version-item" data-vidx="' + i + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
+                html += '<div style="font-weight:700;font-size:0.88rem;margin-bottom:3px">' + (v.name || '版本 ' + (i + 1)) + '</div>';
+                if (subtitle) html += '<div style="font-size:0.76rem;color:#64748b;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px">' + subtitle + '</div>';
+                if (metaStr) html += '<div style="font-size:0.7rem;color:#94a3b8">' + metaStr + '</div>';
+                html += '</button>';
+            });
+
+            html += '</div>';
+            html += '<button id="importProjCancel" style="margin-top:16px;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:0.85rem;font-family:inherit;color:#64748b">取消</button>';
+            modal.innerHTML = html;
+
+            // Back button
+            document.getElementById('importBackBtn').addEventListener('click', () => renderProjectList());
+
+            // Hover
+            modal.querySelectorAll('.import-version-item').forEach(b => {
+                b.addEventListener('mouseenter', () => { b.style.borderColor = '#1a73e8'; b.style.background = '#f5f3ff'; });
+                b.addEventListener('mouseleave', () => { b.style.borderColor = '#e2e8f0'; b.style.background = '#fff'; });
+            });
+
+            // Select version
+            modal.querySelectorAll('.import-version-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const vidx = parseInt(item.dataset.vidx);
+                    const version = versions[vidx];
+                    if (!version?.data) { alert('此版本無課綱資料'); return; }
+                    const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
+                    if (!confirm('確定要將「' + (proj.name || '未命名') + ' → ' + (version.name || '版本') + '」導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
+                    overlay.remove();
+                    _applyOutlineData(version.data);
+                    outlineVersions[activeVersionIdx].data = collectOutlineData();
+                });
+            });
+
+            document.getElementById('importProjCancel').addEventListener('click', () => overlay.remove());
+        }
+
+        function doImport(proj) {
+            const versions = proj.outline_versions || [];
+            if (versions.length > 1) {
+                // Show version picker
+                renderVersionList(proj);
+            } else {
+                // Single or no versions — import outline_data directly
+                const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
+                if (!confirm('確定要將「' + (proj.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
+                overlay.remove();
+                _applyOutlineData(proj.outline_data);
+                outlineVersions[activeVersionIdx].data = collectOutlineData();
+            }
+        }
+
+        function bindProjectEvents() {
+            // Hover
+            modal.querySelectorAll('.import-proj-item').forEach(b => {
+                b.addEventListener('mouseenter', () => { b.style.borderColor = '#1a73e8'; b.style.background = '#f5f3ff'; });
+                b.addEventListener('mouseleave', () => { b.style.borderColor = '#e2e8f0'; b.style.background = '#fff'; });
+            });
+
+            // Close
+            document.getElementById('importProjCancel').addEventListener('click', () => overlay.remove());
+
+            // Select
+            modal.querySelectorAll('.import-proj-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const selected = available.find(p => p.id === item.dataset.id);
+                    if (!selected) return;
+                    doImport(selected);
+                });
+            });
+        }
+
+        // Close on overlay click
         let _overlayMouseDownTarget = null;
         overlay.addEventListener('mousedown', e => { _overlayMouseDownTarget = e.target; });
         overlay.addEventListener('click', e => {
             if (e.target === overlay && _overlayMouseDownTarget === overlay) overlay.remove();
         });
-        document.getElementById('importProjCancel').addEventListener('click', () => overlay.remove());
 
-        // Select
-        modal.querySelectorAll('.import-proj-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const selected = available.find(p => p.id === item.dataset.id);
-                if (!selected) return;
-                const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
-                if (!confirm('確定要將「' + (selected.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
-                overlay.remove();
-                _applyOutlineData(selected.outline_data);
-                // Explicitly save to active version only
-                outlineVersions[activeVersionIdx].data = collectOutlineData();
-            });
-        });
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        renderProjectList();
     } catch(err) {
         console.error('Import error:', err);
         btn.disabled = false;
