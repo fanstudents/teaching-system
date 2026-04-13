@@ -425,9 +425,9 @@
                     <label>課程實況照片（最多 2 張）</label>
                     <div id="instrPhotosContainer" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;"></div>
                     <div style="display:flex;gap:8px;align-items:center;">
-                        <input type="text" id="instrPhotoAddUrl" placeholder="貼上圖片網址" style="flex:1;font-size:0.8rem;">
-                        <button type="button" class="btn btn-sm" onclick="addInstrPhoto()" style="white-space:nowrap;">
-                            <span class="material-symbols-outlined" style="font-size:14px;">add_photo_alternate</span> 新增
+                        <input type="file" id="instrPhotoAddFile" accept="image/*" style="flex:1;font-size:0.78rem;">
+                        <button type="button" class="btn btn-sm" onclick="uploadInstrPhoto()" style="white-space:nowrap;" id="btnUploadInstrPhoto">
+                            <span class="material-symbols-outlined" style="font-size:14px;">cloud_upload</span> 上傳
                         </button>
                     </div>
                     <div style="font-size:0.7rem;color:#94a3b8;margin-top:4px;">授課現場的實績照片，會顯示在報價單講師簡介區</div>
@@ -650,13 +650,29 @@
             `).join('');
         }
 
-        window.addInstrPhoto = function() {
+        window.uploadInstrPhoto = async function() {
             if (instrPhotos.length >= 2) { showToast('最多 2 張照片'); return; }
-            const url = document.getElementById('instrPhotoAddUrl').value.trim();
-            if (!url) { showToast('請輸入圖片網址'); return; }
-            instrPhotos.push(url);
-            document.getElementById('instrPhotoAddUrl').value = '';
-            renderInstrPhotos();
+            const fileInput = document.getElementById('instrPhotoAddFile');
+            const file = fileInput.files[0];
+            if (!file) { showToast('請選擇圖片檔案'); return; }
+            const btn = document.getElementById('btnUploadInstrPhoto');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;animation:spin .7s linear infinite">progress_activity</span> 上傳中…';
+            try {
+                const key = `instructor-teaching/${Date.now()}_${encodeURIComponent(file.name)}`;
+                const { data, error } = await storage.upload('instructor-photos', key, file);
+                if (error) throw error;
+                const url = data?.url || storage.getPublicUrl('instructor-photos', key);
+                instrPhotos.push(url);
+                fileInput.value = '';
+                renderInstrPhotos();
+                showToast('照片已上傳');
+            } catch (err) {
+                console.error('Photo upload error:', err);
+                showToast('上傳失敗：' + (err.message || ''));
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">cloud_upload</span> 上傳';
         };
 
         window.removeInstrPhoto = function(idx) {
