@@ -1560,7 +1560,8 @@ async function resolveInstructorIds(ids) {
                 title: i.title,
                 bio: i.bio,
                 experience: i.experience || [],
-                tags: i.specialties || []
+                tags: i.specialties || [],
+                photos: i.photos || []
             })));
         }
     } catch (e) { console.warn('resolveInstructorIds:', e); }
