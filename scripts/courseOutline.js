@@ -2189,13 +2189,18 @@ async function importFromProject() {
             b.addEventListener('mouseleave', () => { b.style.borderColor = '#e2e8f0'; b.style.background = '#fff'; });
         });
 
-        // Close
-        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+        // Close on overlay click (use mousedown to avoid confirm() triggering close)
+        let _overlayMouseDownTarget = null;
+        overlay.addEventListener('mousedown', e => { _overlayMouseDownTarget = e.target; });
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay && _overlayMouseDownTarget === overlay) overlay.remove();
+        });
         document.getElementById('importProjCancel').addEventListener('click', () => overlay.remove());
 
         // Select
         modal.querySelectorAll('.import-proj-item').forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const selected = available.find(p => p.id === item.dataset.id);
                 if (!selected) return;
                 if (!confirm('確定要導入「' + (selected.name || '未命名') + '」的課綱嗎？\n目前的編輯內容將被覆蓋。')) return;

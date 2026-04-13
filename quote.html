@@ -35,6 +35,18 @@
 
 <!-- Main Content -->
 <div class="q-page" id="mainContent" style="display:none">
+    <!-- Print-only Cover Page (first child for print order) -->
+    <div class="q-print-cover" id="printCover">
+        <img src="assets/images/tbrlogo.png" alt="TBR" class="q-print-cover-logo">
+        <div class="q-print-cover-title" id="printCoverTitle">課程報價</div>
+        <div class="q-print-cover-client" id="printCoverClient"></div>
+        <div class="q-print-cover-date" id="printCoverDate"></div>
+        <div class="q-print-cover-divider"></div>
+        <div class="q-print-cover-brand">數位簡報室 TBR.Digital</div>
+        <div class="q-print-cover-url">https://tbr.digital</div>
+        <div class="q-print-cover-time" id="printCoverTime"></div>
+    </div>
+
     <!-- Print Header -->
     <header class="q-topbar" id="topbar">
         <div class="q-topbar-left">
@@ -45,8 +57,8 @@
             <button class="q-btn q-btn-outline" onclick="openEsign()">
                 <span class="material-symbols-outlined" style="font-size:16px">draw</span> 電子簽核
             </button>
-            <button class="q-btn q-btn-outline" onclick="window.print()">
-                <span class="material-symbols-outlined" style="font-size:16px">print</span> 列印紙本
+            <button class="q-btn q-btn-outline" onclick="openPrintOptions()">
+                <span class="material-symbols-outlined" style="font-size:16px">print</span> 列印 / 匯出
             </button>
         </div>
     </header>
@@ -350,6 +362,23 @@
             由 <a href="https://tbr.digital" target="_blank">數位簡報室 TBR.Digital</a> 製作 · 本報價單僅供授權對象閱覽
         </footer>
     </div>
+
+    <!-- Print-only Page Footer (fixed bottom in print) -->
+    <div class="q-print-page-footer" id="printFooter">
+        <span>數位簡報室 TBR.Digital — https://tbr.digital</span>
+        <span id="printFooterTime"></span>
+    </div>
+
+    <!-- Print-only Comparison Section (last page if included) -->
+    <div class="q-print-comparison" id="printComparison">
+        <section class="q-section">
+            <div class="q-section-header">
+                <div class="q-section-icon"><span class="material-symbols-outlined">compare_arrows</span></div>
+                <div><div class="q-section-title">版本差異比較</div><div class="q-section-desc">各方案內容對照</div></div>
+            </div>
+            <div id="printComparisonContent" style="padding:20px 0"></div>
+        </section>
+    </div>
 </div>
 
 <!-- Bottom Sheet: Suggest Topic -->
@@ -416,36 +445,64 @@
     <!-- Step 1: Email input -->
     <div id="esignStep1">
         <div style="text-align:center;margin-bottom:24px">
-            <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px">
-                <span class="material-symbols-outlined" style="font-size:28px;color:#fff">draw</span>
+            <div class="q-esign-icon-wrap">
+                <span class="material-symbols-outlined">draw</span>
             </div>
             <h3 style="margin:0 0 4px;font-size:1.15rem;font-weight:700;color:var(--q-text)">接收電子報價單</h3>
             <p style="margin:0;font-size:.85rem;color:var(--q-text-3)">輸入 Email 以接收正式電子報價單</p>
         </div>
         <div style="margin-bottom:16px">
             <label style="font-size:.78rem;font-weight:600;color:var(--q-text-2);display:block;margin-bottom:6px">Email 地址</label>
-            <input type="email" id="esignEmail" placeholder="your@company.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--q-border);border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='var(--q-border)'">
+            <input type="email" id="esignEmail" class="q-esign-input" placeholder="your@company.com">
         </div>
         <div style="margin-bottom:16px">
             <label style="font-size:.78rem;font-weight:600;color:var(--q-text-2);display:block;margin-bottom:6px">聯絡人姓名 <span style="color:var(--q-text-3);font-weight:400">（選填）</span></label>
-            <input type="text" id="esignName" placeholder="您的姓名" style="width:100%;padding:12px 14px;border:1.5px solid var(--q-border);border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='var(--q-border)'">
+            <input type="text" id="esignName" class="q-esign-input" placeholder="您的姓名">
         </div>
-        <button onclick="submitEsign()" id="esignSubmitBtn" style="width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s">
+        <button onclick="submitEsign()" id="esignSubmitBtn" class="q-esign-btn">
             <span class="material-symbols-outlined" style="font-size:18px">send</span> 請求電子報價單
         </button>
         <p id="esignError" style="margin:8px 0 0;font-size:.82rem;color:#ef4444;text-align:center;display:none"></p>
     </div>
     <!-- Step 2: Success -->
     <div id="esignStep2" style="display:none;text-align:center">
-        <div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px">
-            <span class="material-symbols-outlined" style="font-size:32px;color:#16a34a">check_circle</span>
+        <div style="width:56px;height:56px;border-radius:50%;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <span class="material-symbols-outlined" style="font-size:28px;color:#16a34a">check_circle</span>
         </div>
         <h3 style="margin:0 0 8px;font-size:1.15rem;font-weight:700;color:var(--q-text)">申請已送出！</h3>
         <p style="margin:0 0 4px;font-size:.92rem;color:var(--q-text-2);line-height:1.6">我們將在 <strong>一個工作天內</strong> 將正式電子報價單寄送至：</p>
-        <p id="esignConfirmEmail" style="margin:8px 0 20px;font-size:1rem;font-weight:700;color:#6366f1"></p>
-        <button onclick="closeEsign()" style="padding:10px 28px;background:#f1f3f4;color:var(--q-text);border:none;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit">關閉</button>
+        <p id="esignConfirmEmail" style="margin:8px 0 20px;font-size:1rem;font-weight:700;color:var(--q-accent)"></p>
+        <button onclick="closeEsign()" style="padding:10px 28px;background:#f2f2f2;color:var(--q-text);border:none;border-radius:var(--q-radius);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit">關閉</button>
     </div>
     <button class="q-esign-close" onclick="closeEsign()">
+        <span class="material-symbols-outlined" style="font-size:18px">close</span>
+    </button>
+</div>
+
+<!-- Print Options Modal -->
+<div class="q-print-modal-overlay" id="printModalOverlay" onclick="if(event.target===this)closePrintOptions()"></div>
+<div class="q-print-modal" id="printModal">
+    <div style="text-align:center;margin-bottom:24px">
+        <div class="q-esign-icon-wrap">
+            <span class="material-symbols-outlined">print</span>
+        </div>
+        <h3 style="margin:0 0 4px;font-size:1.15rem;font-weight:700;color:var(--q-text)">列印 / 匯出 PDF</h3>
+        <p style="margin:0;font-size:.85rem;color:var(--q-text-3)">選擇要包含的內容後進行列印</p>
+    </div>
+    <label class="q-print-option" id="printOptionCompare" style="display:none">
+        <input type="checkbox" id="printIncludeCompare">
+        <div class="q-print-option-text">
+            <div class="q-print-option-title">包含版本比較</div>
+            <div class="q-print-option-desc">將各方案差異比較表匯出至報價單最後</div>
+        </div>
+    </label>
+    <div class="q-print-actions">
+        <button class="q-print-cancel" onclick="closePrintOptions()">取消</button>
+        <button class="q-print-go" onclick="executePrint()">
+            <span class="material-symbols-outlined" style="font-size:18px">print</span> 開始列印
+        </button>
+    </div>
+    <button class="q-print-modal-close" onclick="closePrintOptions()">
         <span class="material-symbols-outlined" style="font-size:18px">close</span>
     </button>
 </div>
@@ -1446,6 +1503,7 @@ function renderInstructorCards(instructors) {
     document.getElementById('instructorContent').innerHTML = instructors.map(ins => {
         const exp = ins.experience || [];
         const specs = ins.tags || ins.specialties || [];
+        const photos = ins.photos || [];
         const expList = exp.length > 0
             ? `<div style="margin-top:12px">
                 <div style="font-size:.82rem;font-weight:700;color:var(--q-text);margin-bottom:6px;display:flex;align-items:center;gap:6px">
@@ -1464,6 +1522,15 @@ function renderInstructorCards(instructors) {
                     ${specs.map(s => `<li>${s}</li>`).join('')}
                 </ul>
               </div>` : '';
+        const galleryHtml = photos.length > 0
+            ? `<div class="q-instructor-gallery">
+                <div class="q-instructor-gallery-label">
+                    <span class="material-symbols-outlined">photo_camera</span> 課程實況
+                </div>
+                <div class="q-instructor-gallery-grid">
+                    ${photos.slice(0, 2).map(p => `<img src="${p}" class="q-instructor-gallery-img" alt="課程實況" onerror="this.style.display='none'">`).join('')}
+                </div>
+              </div>` : '';
         return `
         <div class="q-instructor-card">
             <div class="q-instructor-main">
@@ -1476,6 +1543,7 @@ function renderInstructorCards(instructors) {
                     ${specList}
                 </div>
             </div>
+            ${galleryHtml}
         </div>`;
     }).join('');
 }
@@ -1619,6 +1687,116 @@ window.submitEsign = async function() {
     btn.disabled = false;
     btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">send</span> 請求電子報價單';
 };
+
+// ── Print Options Modal ──
+window.openPrintOptions = function() {
+    // Show compare option only if there are 2+ variants
+    const hasVariants = _allVariants && _allVariants.length >= 2;
+    document.getElementById('printOptionCompare').style.display = hasVariants ? 'flex' : 'none';
+    document.getElementById('printIncludeCompare').checked = false;
+    document.getElementById('printModalOverlay').classList.add('active');
+    document.getElementById('printModal').classList.add('active');
+};
+
+window.closePrintOptions = function() {
+    document.getElementById('printModalOverlay').classList.remove('active');
+    document.getElementById('printModal').classList.remove('active');
+};
+
+window.executePrint = function() {
+    const includeCompare = document.getElementById('printIncludeCompare').checked;
+    const compSection = document.getElementById('printComparison');
+
+    // Populate cover page info
+    const title = document.getElementById('quoteTitle')?.textContent || '課程報價';
+    const client = document.getElementById('clientNameDisplay')?.textContent || '';
+    document.getElementById('printCoverTitle').textContent = title;
+    document.getElementById('printCoverClient').textContent = client;
+    const now = new Date();
+    document.getElementById('printCoverDate').textContent = now.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+    document.getElementById('printCoverTime').textContent = '列印時間：' + timeStr;
+    document.getElementById('printFooterTime').textContent = '列印時間：' + timeStr;
+
+    // Handle comparison section
+    if (includeCompare && _allVariants && _allVariants.length >= 2) {
+        compSection.classList.add('print-include');
+        buildPrintComparison();
+    } else {
+        compSection.classList.remove('print-include');
+    }
+
+    closePrintOptions();
+    setTimeout(() => window.print(), 200);
+};
+
+function buildPrintComparison() {
+    const n = _allVariants.length;
+    const calcAmt = (item) => {
+        if (!item) return 0;
+        if (item.type === 'hourly') return (item.hours||0) * (item.rate||0);
+        if (item.type === 'perhead') return (item.count||0) * (item.rate||0);
+        return item.amount || 0;
+    };
+
+    const vData = _allVariants.map(v => {
+        const od = v.outline_data || {};
+        const sched = od.schedule || [];
+        const topics = (od.timeline||[]).map(t => t.title);
+        const tools = (od.tools||[]).map(t => t.name);
+        const days = sched.length;
+        const hours = sched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
+        return { name: v.name, total: v.total||0, days, hours, topics, tools, items: v.items||[] };
+    });
+
+    const gridCols = `minmax(120px,160px) repeat(${n}, 1fr)`;
+    let html = '';
+
+    // Summary cards
+    html += `<div style="display:flex;gap:12px;margin-bottom:20px">`;
+    vData.forEach((v, i) => {
+        html += `<div style="flex:1;padding:18px;border:1.5px solid var(--q-border);border-radius:var(--q-radius);text-align:center">
+            <div style="font-weight:700;margin-bottom:4px">${v.name || '方案'+(i+1)}</div>
+            <div style="font-size:1.3rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}</div>
+            <div style="font-size:.78rem;color:var(--q-text-3);margin-top:4px">${v.days} 天 / ${v.hours} 小時</div>
+        </div>`;
+    });
+    html += `</div>`;
+
+    // Grid table
+    let grid = `<div style="border:1px solid var(--q-border);border-radius:10px;overflow:hidden">`;
+    function row(label, vals, bold) {
+        let r = `<div style="display:grid;grid-template-columns:${gridCols};border-bottom:1px solid #f0f1f3">`;
+        r += `<div style="padding:10px 14px;font-size:.82rem;font-weight:600;color:var(--q-text-2)">${label}</div>`;
+        vals.forEach(v => r += `<div style="padding:10px;text-align:center;font-size:.88rem;${bold?'font-weight:800;color:var(--q-accent)':''}"/>${v}</div>`);
+        r += `</div>`;
+        return r;
+    }
+
+    grid += `<div style="padding:10px 14px;font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--q-accent);background:#f8f9ff;border-bottom:1px solid var(--q-border)">基本資訊</div>`;
+    grid += row('授課天數', vData.map(v => `${v.days} 天`));
+    grid += row('總時數', vData.map(v => `${v.hours} 小時`));
+    grid += row('主題數', vData.map(v => `${v.topics.length} 個`));
+
+    const allLabels = [...new Set(vData.flatMap(v => v.items.map(i => i.label)))];
+    if (allLabels.length) {
+        grid += `<div style="padding:10px 14px;font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--q-accent);background:#f8f9ff;border-bottom:1px solid var(--q-border)">費用明細</div>`;
+        allLabels.forEach(label => {
+            const vals = vData.map(v => {
+                const item = v.items.find(i => i.label === label);
+                const amt = calcAmt(item);
+                return amt > 0 ? fmt(amt) : '—';
+            });
+            grid += row(label, vals);
+        });
+        grid += row('合計', vData.map(v => fmt(v.total)), true);
+    }
+
+    grid += `</div>`;
+    html += grid;
+
+    document.getElementById('printComparisonContent').innerHTML = html;
+}
 
 init();
 </script>
