@@ -1788,22 +1788,31 @@ function renderVersionTabs() {
         container.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding:10px 20px;background:#f8fafc;border-bottom:1px solid var(--border,#e2e8f0)';
         sectionTitle.parentElement.insertBefore(container, sectionTitle.nextSibling);
     }
-    container.innerHTML = outlineVersions.map((v, i) =>
-        `<div style="display:inline-flex;align-items:center;gap:0;position:relative">
-            <button class="oe-version-tab${i === activeVersionIdx ? ' active' : ''}" onclick="switchVersion(${i})" style="
-                padding:8px 16px;border-radius:8px 0 0 8px;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
-                background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
-                color:${i === activeVersionIdx ? '#fff' : '#64748b'};
+    container.innerHTML = outlineVersions.map((v, i) => {
+        const isActive = i === activeVersionIdx;
+        const borderColor = isActive ? 'var(--accent,#6366f1)' : '#d1d5db';
+        const bg = isActive ? 'var(--accent,#6366f1)' : '#fff';
+        const color = isActive ? '#fff' : '#64748b';
+        const editColor = isActive ? 'rgba(255,255,255,.7)' : '#9ca3af';
+        const showDelete = outlineVersions.length > 1;
+        return `<div style="display:inline-flex;align-items:center;gap:0;position:relative">
+            <button class="oe-version-tab${isActive ? ' active' : ''}" onclick="switchVersion(${i})" style="
+                padding:8px 16px;border-radius:8px 0 0 8px;border:1.5px solid ${borderColor};
+                background:${bg};color:${color};
                 font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border-right:none;
             " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>
             <button onclick="event.stopPropagation();renameVersion(${i})" title="重新命名" style="
-                padding:6px 8px;border-radius:0 8px 8px 0;border:1.5px solid ${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#d1d5db'};
-                background:${i === activeVersionIdx ? 'var(--accent,#6366f1)' : '#fff'};
-                color:${i === activeVersionIdx ? 'rgba(255,255,255,.7)' : '#9ca3af'};
-                cursor:pointer;display:flex;align-items:center;transition:all .15s;
+                padding:6px 8px;border-radius:0${showDelete ? '' : ' 8px 8px'} 0;border:1.5px solid ${borderColor};
+                background:${bg};color:${editColor};
+                cursor:pointer;display:flex;align-items:center;transition:all .15s;${showDelete ? 'border-right:none;' : ''}
             "><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
-        </div>`
-    ).join('') +
+            ${showDelete ? `<button onclick="event.stopPropagation();deleteVersion(${i})" title="刪除版本" style="
+                padding:6px 6px;border-radius:0 8px 8px 0;border:1.5px solid ${borderColor};
+                background:${bg};color:${isActive ? 'rgba(255,255,255,.5)' : '#d1d5db'};
+                cursor:pointer;display:flex;align-items:center;transition:all .15s;
+            " onmouseenter="this.style.color='${isActive ? '#fca5a5' : '#ef4444'}'" onmouseleave="this.style.color='${isActive ? 'rgba(255,255,255,.5)' : '#d1d5db'}'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>` : ''}
+        </div>`;
+    }).join('') +
     `<button onclick="addVersion()" style="
         padding:8px 14px;border-radius:8px;border:1.5px dashed #d1d5db;
         background:none;color:#9ca3af;font-size:0.82rem;cursor:pointer;font-family:inherit;
@@ -1840,6 +1849,35 @@ window.addVersion = function() {
     renderVersionTabs();
     // Apply (already same data, but re-render to be safe)
     _applyOutlineData(newVersion.data);
+};
+
+window.deleteVersion = function(idx) {
+    if (outlineVersions.length <= 1) return;
+    const name = outlineVersions[idx].name || '版本 ' + (idx + 1);
+    if (!confirm(`確定要刪除「${name}」嗎？此操作無法復原。`)) return;
+    outlineVersions.splice(idx, 1);
+    // Adjust activeVersionIdx
+    if (activeVersionIdx >= outlineVersions.length) {
+        activeVersionIdx = outlineVersions.length - 1;
+    } else if (activeVersionIdx > idx) {
+        activeVersionIdx--;
+    } else if (activeVersionIdx === idx) {
+        activeVersionIdx = Math.min(idx, outlineVersions.length - 1);
+    }
+    renderVersionTabs();
+    const vData = outlineVersions[activeVersionIdx]?.data;
+    if (vData) {
+        _applyOutlineData(vData);
+    } else {
+        _clearEditorFields();
+    }
+    const status = document.getElementById('outlineSaveStatus');
+    if (status) {
+        status.textContent = `✓ 已刪除「${name}」，請記得按「儲存」`;
+        status.style.display = 'block';
+        status.style.color = '#ef4444';
+        setTimeout(() => { status.style.display = 'none'; }, 4000);
+    }
 };
 
 window.renameVersion = function(idx) {
