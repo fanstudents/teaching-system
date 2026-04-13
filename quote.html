@@ -769,7 +769,7 @@ window.compareVersions = function() {
         vData.forEach((v, i) => {
             html += `<div class="cmp-card">
                 <div class="cmp-card-name">${v.name || '方案'+(i+1)}</div>
-                <div class="cmp-card-price">${fmt(v.total)}</div>
+                <div class="cmp-card-price">${fmt(v.total)}<span style="font-size:.6rem;font-weight:500;color:var(--q-text-3);margin-left:4px">未稅</span></div>
                 ${v.subtitle ? `<div class="cmp-card-sub">${v.subtitle}</div>` : ''}
                 <div class="cmp-tags">${v.tags.map(t => `<span class="cmp-tag">${t}</span>`).join('')}</div>
             </div>`;
@@ -826,7 +826,7 @@ window.compareVersions = function() {
                 });
                 grid += row(label, vals);
             });
-            grid += row('<span style="font-weight:800">合計</span>', vData.map(v =>
+            grid += row('<span style="font-weight:800">合計（未稅）</span>', vData.map(v =>
                 `<span style="font-size:1.05rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}</span>`
             ), { highlight: true });
         }
@@ -1743,7 +1743,7 @@ function buildPrintComparison() {
     vData.forEach((v, i) => {
         html += `<div style="flex:1;padding:18px;border:1.5px solid var(--q-border);border-radius:var(--q-radius);text-align:center">
             <div style="font-weight:700;margin-bottom:4px">${v.name || '方案'+(i+1)}</div>
-            <div style="font-size:1.3rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}</div>
+            <div style="font-size:1.3rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}<span style="font-size:.65rem;font-weight:500;color:var(--q-text-3);margin-left:4px">未稅</span></div>
             <div style="font-size:.78rem;color:var(--q-text-3);margin-top:4px">${v.days} 天 / ${v.hours} 小時</div>
         </div>`;
     });
@@ -1775,7 +1775,7 @@ function buildPrintComparison() {
             });
             grid += row(label, vals);
         });
-        grid += row('合計', vData.map(v => fmt(v.total)), true);
+        grid += row('合計（未稅）', vData.map(v => fmt(v.total)), true);
     }
 
     grid += `</div>`;
