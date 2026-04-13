@@ -1379,10 +1379,20 @@ async function loadSuggestions() {
             const t = new Date(s.created_at);
             const timeStr = t.toLocaleDateString('zh-TW');
             const title = s.block_title.replace('【建議新增】', '');
-            return `<div class="suggested-item"><div><strong>${title}</strong><span>${s.comment_text !== title ? s.comment_text : ''}</span></div><time>${timeStr}</time></div>`;
+            return `<div class="suggested-item" style="position:relative"><div><strong>${title}</strong><span>${s.comment_text !== title ? s.comment_text : ''}</span></div><time>${timeStr}</time><button onclick="deleteSuggestion('${s.id}')" title="刪除" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#d1d5db;padding:4px;display:flex;align-items:center;transition:color .15s" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></div>`;
         }).join('');
     } catch (e) { console.warn('loadSuggestions:', e); }
 }
+
+window.deleteSuggestion = async function(id) {
+    try {
+        await db.delete('quote_comments', { id: `eq.${id}` });
+        loadSuggestions();
+    } catch (e) {
+        console.error('deleteSuggestion:', e);
+        alert('刪除失敗：' + e.message);
+    }
+};
 
 // ── Invoice Email ──
 window.submitInvoiceEmail = async function() {
