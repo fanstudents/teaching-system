@@ -1501,48 +1501,52 @@ function renderOutlineData(outline) {
 function renderInstructorCards(instructors) {
     document.getElementById('instructorSection').style.display = 'block';
     document.getElementById('instructorContent').innerHTML = instructors.map(ins => {
-        const exp = ins.experience || [];
+        const exp = (ins.experience || []).map(e => e.replace(/^-\s*/, ''));
         const specs = ins.tags || ins.specialties || [];
         const photos = ins.photos || [];
-        const expList = exp.length > 0
-            ? `<div style="margin-top:12px">
-                <div style="font-size:.82rem;font-weight:700;color:var(--q-text);margin-bottom:6px;display:flex;align-items:center;gap:6px">
-                    <span class="material-symbols-outlined" style="font-size:16px;color:var(--q-accent)">work_history</span> 經歷
+
+        const expHtml = exp.length > 0
+            ? `<div style="margin-top:14px">
+                <div style="font-size:.78rem;font-weight:700;color:var(--q-text);margin-bottom:8px;display:flex;align-items:center;gap:5px">
+                    <span class="material-symbols-outlined" style="font-size:15px;color:var(--q-accent)">apartment</span> 授課企業與機構
                 </div>
-                <ul style="margin:0;padding-left:20px;font-size:.88rem;color:var(--q-text-2);line-height:1.8">
-                    ${exp.map(e => `<li>${e}</li>`).join('')}
-                </ul>
-              </div>` : '';
-        const specList = specs.length > 0
-            ? `<div style="margin-top:12px">
-                <div style="font-size:.82rem;font-weight:700;color:var(--q-text);margin-bottom:6px;display:flex;align-items:center;gap:6px">
-                    <span class="material-symbols-outlined" style="font-size:16px;color:var(--q-accent)">stars</span> 專長
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    ${exp.map(e => `<span style="display:inline-block;padding:4px 12px;background:var(--q-bg-soft,#f5f5f5);border:1px solid var(--q-border);border-radius:20px;font-size:.78rem;color:var(--q-text-2);white-space:nowrap">${e}</span>`).join('')}
                 </div>
-                <ul style="margin:0;padding-left:20px;font-size:.88rem;color:var(--q-text-2);line-height:1.8">
-                    ${specs.map(s => `<li>${s}</li>`).join('')}
-                </ul>
               </div>` : '';
+
+        const specHtml = specs.length > 0
+            ? `<div style="margin-top:12px">
+                <div style="font-size:.78rem;font-weight:700;color:var(--q-text);margin-bottom:8px;display:flex;align-items:center;gap:5px">
+                    <span class="material-symbols-outlined" style="font-size:15px;color:var(--q-accent)">stars</span> 專長領域
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    ${specs.map(s => `<span style="display:inline-block;padding:4px 12px;background:rgba(var(--q-accent-rgb,66,99,235),.08);border:1px solid rgba(var(--q-accent-rgb,66,99,235),.2);border-radius:20px;font-size:.78rem;color:var(--q-accent);font-weight:600;white-space:nowrap">${s}</span>`).join('')}
+                </div>
+              </div>` : '';
+
         const galleryHtml = photos.length > 0
-            ? `<div class="q-instructor-gallery">
-                <div class="q-instructor-gallery-label">
-                    <span class="material-symbols-outlined">photo_camera</span> 課程實況
+            ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--q-border)">
+                <div style="font-size:.78rem;font-weight:700;color:var(--q-text);margin-bottom:10px;display:flex;align-items:center;gap:5px">
+                    <span class="material-symbols-outlined" style="font-size:15px;color:var(--q-accent)">photo_camera</span> 課程實況
                 </div>
-                <div class="q-instructor-gallery-grid">
-                    ${photos.slice(0, 2).map(p => `<img src="${p}" class="q-instructor-gallery-img" alt="課程實況" onerror="this.style.display='none'">`).join('')}
+                <div style="display:grid;grid-template-columns:repeat(${photos.length}, 1fr);gap:10px;">
+                    ${photos.slice(0, 2).map(p => `<img src="${p}" style="width:100%;height:180px;object-fit:cover;border-radius:12px;border:1px solid var(--q-border);" alt="課程實況" onerror="this.style.display='none'">`).join('')}
                 </div>
               </div>` : '';
+
         return `
         <div class="q-instructor-card">
             <div class="q-instructor-main">
                 ${ins.photoUrl || ins.photo_url ? `<img src="${ins.photoUrl || ins.photo_url}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
-                <div>
+                <div style="flex:1">
                     <div class="q-instructor-name">${ins.name || ''}</div>
                     <div class="q-instructor-title">${ins.title || ''}</div>
                     ${ins.bio ? `<div class="q-instructor-bio">${ins.bio}</div>` : ''}
-                    ${expList}
-                    ${specList}
                 </div>
             </div>
+            ${expHtml}
+            ${specHtml}
             ${galleryHtml}
         </div>`;
     }).join('');
