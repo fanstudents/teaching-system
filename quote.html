@@ -1029,8 +1029,21 @@ function renderQuote(q) {
         logo.style.display = 'block';
     }
 
-    const created = new Date(q.created_at);
-    document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
+    // Show course date from outline schedule, fallback to created_at
+    const schedule = q.variants?.[0]?.outline_data?.schedule || [];
+    if (schedule.length > 0 && schedule[0].date) {
+        const dates = schedule.map(s => s.date).filter(Boolean).sort();
+        const firstDate = new Date(dates[0] + 'T00:00:00');
+        if (dates.length === 1) {
+            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> 預定日期：${firstDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
+        } else {
+            const lastDate = new Date(dates[dates.length - 1] + 'T00:00:00');
+            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${firstDate.toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' })} — ${lastDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
+        }
+    } else {
+        const created = new Date(q.created_at);
+        document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
+    }
     if (q.valid_until) {
         const validDate = new Date(q.valid_until);
         document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${validDate.toLocaleDateString('zh-TW')}`;
