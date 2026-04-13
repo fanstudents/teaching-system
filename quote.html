@@ -232,7 +232,7 @@
             </div>
             <div class="q-payment-note">
                 <span class="material-symbols-outlined">info</span>
-                我們會先開立發票，請您們再按時間付款。
+                為保留講師時段，請依付款時間完成匯款，我們將開立電子發票。
             </div>
             <div class="q-payment-grid">
                 <div class="q-payment-card">
@@ -950,16 +950,15 @@ ${summaries}
     }
 }
 
-window.copyBankAccount = function(account) {
+window.copyBankAccount = function(e, account) {
+    const btn = e.currentTarget || e.target.closest('button');
     navigator.clipboard.writeText(account).then(() => {
-        const btn = event.currentTarget;
         const orig = btn.innerHTML;
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:#10b981">check</span>已複製';
         btn.style.borderColor = '#10b981';
         btn.style.color = '#10b981';
         setTimeout(() => { btn.innerHTML = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
     }).catch(() => {
-        // Fallback
         const ta = document.createElement('textarea');
         ta.value = account; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
     });
@@ -1118,14 +1117,12 @@ function renderQuote(q) {
     document.getElementById('paymentMethod').textContent = q.payment_method || '銀行匯款';
     document.getElementById('paymentTerms').textContent = q.payment_terms || '為保留老師的時間，請於開課前五天前支付款項';
 
-    const bank = q.bank_info && (q.bank_info.bank || q.bank_info.account) ? q.bank_info : {
-        bank: '國泰世華銀行', branch: '永春分行', account: '078-03-501292-2', name: '原騰數位科技有限公司'
-    };
+    const bank = q.bank_info && (q.bank_info.bank || q.bank_info.account) ? q.bank_info : null;
     const bankEl = document.getElementById('bankDetails');
-    if (bank.bank || bank.account) {
+    if (bank && (bank.bank || bank.account)) {
         bankEl.innerHTML = `
             ${bank.bank ? `<div class="q-bank-row"><span class="q-bank-label">銀行</span><span>${bank.bank}${bank.branch ? ' ' + bank.branch : ''}</span></div>` : ''}
-            ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span style="display:flex;align-items:center;gap:8px"><span class="q-bank-account">${bank.account}</span><button onclick="copyBankAccount('${bank.account}')" style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border:1px solid var(--q-border);border-radius:6px;background:#f8fafc;color:var(--q-text-2);font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)'" onmouseout="this.style.borderColor='var(--q-border)';this.style.color='var(--q-text-2)'"><span class="material-symbols-outlined" style="font-size:14px">content_copy</span>複製</button></span></div>` : ''}
+            ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span style="display:flex;align-items:center;gap:8px"><span class="q-bank-account">${bank.account}</span><button onclick="copyBankAccount(event,'${bank.account}')" style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border:1px solid var(--q-border);border-radius:6px;background:#f8fafc;color:var(--q-text-2);font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)'" onmouseout="this.style.borderColor='var(--q-border)';this.style.color='var(--q-text-2)'"><span class="material-symbols-outlined" style="font-size:14px">content_copy</span>複製</button></span></div>` : ''}
             ${bank.name ? `<div class="q-bank-row"><span class="q-bank-label">戶名</span><span>${bank.name}</span></div>` : ''}
         `;
     } else { document.getElementById('bankInfoCard').style.display = 'none'; }
@@ -1779,7 +1776,7 @@ function buildPrintComparison() {
     function row(label, vals, bold) {
         let r = `<div style="display:grid;grid-template-columns:${gridCols};border-bottom:1px solid #f0f1f3">`;
         r += `<div style="padding:10px 14px;font-size:.82rem;font-weight:600;color:var(--q-text-2)">${label}</div>`;
-        vals.forEach(v => r += `<div style="padding:10px;text-align:center;font-size:.88rem;${bold?'font-weight:800;color:var(--q-accent)':''}"/>${v}</div>`);
+        vals.forEach(v => r += `<div style="padding:10px;text-align:center;font-size:.88rem;${bold?'font-weight:800;color:var(--q-accent)':''}">${v}</div>`);
         r += `</div>`;
         return r;
     }
