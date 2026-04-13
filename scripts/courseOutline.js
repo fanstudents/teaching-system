@@ -1773,7 +1773,13 @@ function initVersions() {
             created_at: new Date().toISOString()
         }];
     }
-    activeVersionIdx = 0;
+    // Restore last active version index
+    const savedIdx = projectData?.active_version_idx;
+    if (typeof savedIdx === 'number' && savedIdx >= 0 && savedIdx < outlineVersions.length) {
+        activeVersionIdx = savedIdx;
+    } else {
+        activeVersionIdx = 0;
+    }
     renderVersionTabs();
 }
 
@@ -2057,19 +2063,24 @@ async function saveOutlineData() {
     btn.textContent = '儲存中...';
     try {
         const outline_data = collectOutlineData();
-        // Update active version
+        // Update active version's data
         if (outlineVersions.length > 0) {
             outlineVersions[activeVersionIdx].data = outline_data;
         }
-        // Save both outline_data (active) and outline_versions (all)
-        const payload = { outline_data };
+        // outline_data field always stores version 0 (default for student view)
+        // outline_versions stores ALL versions with their data
+        const payload = {
+            outline_data: outlineVersions[0]?.data || outline_data,
+            active_version_idx: activeVersionIdx
+        };
         if (outlineVersions.length > 0) {
             payload.outline_versions = outlineVersions;
         }
         const { error } = await db.update('projects', payload, { id: `eq.${projectData.id}` });
         if (error) throw new Error(JSON.stringify(error));
-        projectData.outline_data = outline_data;
+        projectData.outline_data = payload.outline_data;
         projectData.outline_versions = outlineVersions;
+        projectData.active_version_idx = activeVersionIdx;
         renderOutlineFromDB();
         const vName = outlineVersions[activeVersionIdx]?.name || '';
         statusEl.textContent = `✓ 已儲存${vName ? '「' + vName + '」' : ''}（${new Date().toLocaleTimeString('zh-TW')}）`;
