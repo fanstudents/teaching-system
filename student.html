@@ -430,7 +430,8 @@
             }
         }
         // ── Auto-rejoin on refresh (from sessionStorage) ──
-        else {
+        // ★ preview 模式下不執行，避免 sessionStorage 的舊 session 覆蓋 preview 的投影片
+        else if (urlParams.get('preview') !== 'all') {
             const saved = JSON.parse(sessionStorage.getItem('ix_student_session') || 'null');
             if (saved && saved.sessionCode && saved.studentName && saved.studentEmail) {
                 document.getElementById('sessionCode').value = saved.sessionCode;
