@@ -373,45 +373,88 @@
 
     <!-- Instructor Modal -->
     <div class="modal-overlay" id="instrOverlay">
-        <div class="modal">
+        <div class="modal" style="max-width:620px;max-height:90vh;display:flex;flex-direction:column;">
             <div class="modal-header">
                 <h3 id="instrModalTitle">新增講師</h3>
                 <button class="modal-close" onclick="closeModal('instrOverlay')">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="overflow-y:auto;flex:1;">
                 <input type="hidden" id="instrEditId">
-                <div class="form-group">
-                    <label>姓名 <span style="color:#c5221f">*</span></label>
-                    <input type="text" id="instrName" placeholder="講師姓名">
-                </div>
-                <div class="form-group">
-                    <label>Email <span style="color:#c5221f">*</span></label>
-                    <input type="email" id="instrEmail" placeholder="email@example.com">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label>姓名 <span style="color:#c5221f">*</span></label>
+                        <input type="text" id="instrName" placeholder="講師姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>Email <span style="color:#c5221f">*</span></label>
+                        <input type="email" id="instrEmail" placeholder="email@example.com">
+                    </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
-                        <label>銀行名稱</label>
-                        <input type="text" id="instrBankName" placeholder="例：玉山銀行">
+                        <label>職稱</label>
+                        <input type="text" id="instrTitle" placeholder="例：AI 數位教學設計師">
                     </div>
                     <div class="form-group">
-                        <label>戶名</label>
-                        <input type="text" id="instrHolder" placeholder="帳戶戶名">
+                        <label>講師照片</label>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div id="instrPhotoPreview" style="width:56px;height:56px;border-radius:50%;background:#f1f3f4;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2px solid #e2e8f0;flex-shrink:0;">
+                                <span class="material-symbols-outlined" style="color:#9ca3af">person</span>
+                            </div>
+                            <div style="flex:1;">
+                                <input type="text" id="instrPhotoUrl" placeholder="圖片網址" style="font-size:0.8rem;margin-bottom:4px;">
+                                <input type="file" id="instrPhotoFile" accept="image/*" style="font-size:0.75rem;width:100%;">
+                                <input type="hidden" id="instrPhotoFinal">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>銀行帳號</label>
-                    <input type="text" id="instrBankAccount" placeholder="帳號（含分行代碼）">
+                    <label>簡介</label>
+                    <textarea id="instrBio" rows="3" placeholder="講師經歷、背景介紹..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>課程編號（Teachify Product ID）</label>
-                    <div id="courseIdTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-                    <div style="display:flex;gap:6px;">
-                        <input type="text" id="instrCourseIdInput" placeholder="輸入課程編號後按 Enter 或點新增">
-                        <button type="button" class="btn btn-dark" id="btnAddCourseId" style="flex-shrink:0;">
-                            <span class="material-symbols-outlined">add</span>
-                        </button>
-                    </div>
+                    <label>經歷（每行一項）</label>
+                    <textarea id="instrExperience" rows="3" placeholder="例：&#10;前 Google 資深工程師&#10;台大資工系兼任講師&#10;累計培訓超過 500 間企業"></textarea>
                 </div>
+                <div class="form-group">
+                    <label>專長標籤（逗號分隔）</label>
+                    <input type="text" id="instrSpecialties" placeholder="例：AI 教學, 簡報設計, 數位轉型">
+                </div>
+                <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;">
+                <details style="margin-bottom:12px;">
+                    <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:#64748b;">💳 匯款資訊（選填）</summary>
+                    <div style="margin-top:12px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div class="form-group">
+                                <label>銀行名稱</label>
+                                <input type="text" id="instrBankName" placeholder="例：玉山銀行">
+                            </div>
+                            <div class="form-group">
+                                <label>戶名</label>
+                                <input type="text" id="instrHolder" placeholder="帳戶戶名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>銀行帳號</label>
+                            <input type="text" id="instrBankAccount" placeholder="帳號（含分行代碼）">
+                        </div>
+                    </div>
+                </details>
+                <details style="margin-bottom:12px;">
+                    <summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:#64748b;">📦 課程編號（Teachify）</summary>
+                    <div style="margin-top:12px;">
+                        <div class="form-group">
+                            <div id="courseIdTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+                            <div style="display:flex;gap:6px;">
+                                <input type="text" id="instrCourseIdInput" placeholder="輸入課程編號後按 Enter 或點新增">
+                                <button type="button" class="btn btn-dark" id="btnAddCourseId" style="flex-shrink:0;">
+                                    <span class="material-symbols-outlined">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </details>
                 <div class="form-group">
                     <label>備註</label>
                     <textarea id="instrNotes" placeholder="選填"></textarea>
@@ -576,7 +619,7 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { db, requireAuth } from './scripts/supabase.js';
+        import { db, storage, requireAuth } from './scripts/supabase.js';
         const _authCheck = await requireAuth(); if (!_authCheck) throw new Error('unauthorized');
 
         let affiliates = [];
@@ -1060,6 +1103,14 @@
             document.getElementById('instrEditId').value = '';
             document.getElementById('instrName').value = '';
             document.getElementById('instrEmail').value = '';
+            document.getElementById('instrTitle').value = '';
+            document.getElementById('instrPhotoUrl').value = '';
+            document.getElementById('instrPhotoFile').value = '';
+            document.getElementById('instrPhotoFinal').value = '';
+            document.getElementById('instrPhotoPreview').innerHTML = '<span class="material-symbols-outlined" style="color:#9ca3af">person</span>';
+            document.getElementById('instrBio').value = '';
+            document.getElementById('instrExperience').value = '';
+            document.getElementById('instrSpecialties').value = '';
             document.getElementById('instrBankName').value = '';
             document.getElementById('instrBankAccount').value = '';
             document.getElementById('instrHolder').value = '';
@@ -1070,6 +1121,25 @@
             document.getElementById('instrOverlay').classList.add('active');
         });
 
+        // Photo preview on file select
+        document.getElementById('instrPhotoFile').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('instrPhotoPreview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        // Photo preview on URL change
+        document.getElementById('instrPhotoUrl').addEventListener('blur', function() {
+            const url = this.value.trim();
+            if (url) {
+                document.getElementById('instrPhotoPreview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span class=material-symbols-outlined style=color:#9ca3af>person</span>'">`;
+            }
+        });
+
         window.openInstrEdit = function (id) {
             const i = instructors.find(x => x.id === id);
             if (!i) return;
@@ -1077,6 +1147,18 @@
             document.getElementById('instrEditId').value = id;
             document.getElementById('instrName').value = i.name || '';
             document.getElementById('instrEmail').value = i.email || '';
+            document.getElementById('instrTitle').value = i.title || '';
+            document.getElementById('instrPhotoUrl').value = i.photo_url || '';
+            document.getElementById('instrPhotoFile').value = '';
+            document.getElementById('instrPhotoFinal').value = i.photo_url || '';
+            if (i.photo_url) {
+                document.getElementById('instrPhotoPreview').innerHTML = `<img src="${i.photo_url}" style="width:100%;height:100%;object-fit:cover">`;
+            } else {
+                document.getElementById('instrPhotoPreview').innerHTML = '<span class="material-symbols-outlined" style="color:#9ca3af">person</span>';
+            }
+            document.getElementById('instrBio').value = i.bio || '';
+            document.getElementById('instrExperience').value = (i.experience || []).join('\n');
+            document.getElementById('instrSpecialties').value = (i.specialties || []).join(', ');
             document.getElementById('instrBankName').value = i.bank_name || '';
             document.getElementById('instrBankAccount').value = i.bank_account || '';
             document.getElementById('instrHolder').value = i.account_holder || '';
@@ -1093,8 +1175,29 @@
             const email = document.getElementById('instrEmail').value.trim();
             if (!name || !email) { showToast('請填寫姓名和 Email'); return; }
 
+            // Handle photo: file upload takes priority, then URL input
+            let photoUrl = document.getElementById('instrPhotoUrl').value.trim();
+            const fileInput = document.getElementById('instrPhotoFile');
+            if (fileInput.files[0]) {
+                try {
+                    const file = fileInput.files[0];
+                    const key = `instructors/${Date.now()}_${encodeURIComponent(file.name)}`;
+                    const { data: uploadData, error } = await storage.upload('instructor-photos', key, file);
+                    if (!error && uploadData?.url) {
+                        photoUrl = uploadData.url;
+                    }
+                } catch (uploadErr) {
+                    console.error('Photo upload:', uploadErr);
+                }
+            }
+
             const data = {
                 name, email,
+                title: document.getElementById('instrTitle').value.trim(),
+                photo_url: photoUrl,
+                bio: document.getElementById('instrBio').value.trim(),
+                experience: document.getElementById('instrExperience').value.split('\n').map(s => s.trim()).filter(Boolean),
+                specialties: document.getElementById('instrSpecialties').value.split(',').map(s => s.trim()).filter(Boolean),
                 bank_name: document.getElementById('instrBankName').value.trim(),
                 bank_account: document.getElementById('instrBankAccount').value.trim(),
                 account_holder: document.getElementById('instrHolder').value.trim(),
