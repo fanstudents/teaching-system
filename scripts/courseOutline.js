@@ -2195,7 +2195,7 @@ async function importFromProject() {
         modal.style.cssText = 'background:#fff;border-radius:16px;padding:28px 32px;max-width:480px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
 
         let html = '<h3 style="margin:0 0 8px;font-size:1.1rem">導入其他專案課綱</h3>';
-        html += '<p style="font-size:0.82rem;color:#64748b;margin:0 0 20px">選擇一個專案，其課綱內容將覆蓋目前的編輯內容</p>';
+        html += '<p style="font-size:0.82rem;color:#64748b;margin:0 0 20px">選擇一個專案，其課綱內容將覆蓋<strong>目前版本</strong>的編輯內容</p>';
         html += '<div style="display:flex;flex-direction:column;gap:8px">';
 
         available.forEach(p => {
@@ -2241,9 +2241,12 @@ async function importFromProject() {
                 e.stopPropagation();
                 const selected = available.find(p => p.id === item.dataset.id);
                 if (!selected) return;
-                if (!confirm('確定要導入「' + (selected.name || '未命名') + '」的課綱嗎？\n目前的編輯內容將被覆蓋。')) return;
+                const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
+                if (!confirm('確定要將「' + (selected.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
                 overlay.remove();
                 _applyOutlineData(selected.outline_data);
+                // Explicitly save to active version only
+                outlineVersions[activeVersionIdx].data = collectOutlineData();
             });
         });
     } catch(err) {
