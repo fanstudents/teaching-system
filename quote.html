@@ -1305,7 +1305,6 @@ function renderComments(idx, comments) {
 }
 
 window.deleteComment = async function(commentId, blockIdx) {
-    if (!confirm('確定要刪除這則建議？')) return;
     try {
         await db.delete('quote_comments', { id: `eq.${commentId}` });
         // 重新載入該 block 的留言
