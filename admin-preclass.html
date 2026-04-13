@@ -436,11 +436,19 @@
                 <div class="form-field">
                     <label>說明（選填）</label>
                     <textarea id="checklistDesc" rows="2" placeholder="補充說明…&#10;支援超連結格式：[顯示文字](https://網址)"></textarea>
-                    <button type="button" class="btn btn-sm btn-outline" onclick="insertLink()"
-                        style="margin-top:6px;font-size:0.78rem;">
+                    <button type="button" class="btn btn-sm btn-outline" onclick="toggleLinkForm()"
+                        style="margin-top:6px;font-size:0.78rem;" id="insertLinkToggle">
                         <span class="material-symbols-rounded" style="font-size:14px;vertical-align:middle;">link</span>
                         插入連結
                     </button>
+                    <div id="linkInsertForm" style="display:none;margin-top:8px;padding:10px 12px;background:#f8f9fa;border-radius:8px;border:1px solid #dadce0;">
+                        <input type="url" id="linkUrl" class="field-input" placeholder="https://..." style="margin-bottom:6px;font-size:0.85rem;">
+                        <input type="text" id="linkLabel" class="field-input" placeholder="顯示文字（留空則使用網址）" style="margin-bottom:8px;font-size:0.85rem;">
+                        <div style="display:flex;gap:6px;">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="confirmInsertLink()" style="font-size:0.78rem;">確認插入</button>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="toggleLinkForm()" style="font-size:0.78rem;">取消</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-outline" onclick="closeModal('checklistModal')">取消</button>
@@ -795,13 +803,23 @@
                     '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#1a73e8;text-decoration:underline;">$1</a>');
             }
 
-            window.insertLink = function () {
-                const url = prompt('請輸入連結網址：', 'https://');
+            window.toggleLinkForm = function () {
+                const form = document.getElementById('linkInsertForm');
+                const isOpen = form.style.display !== 'none';
+                form.style.display = isOpen ? 'none' : 'block';
+                if (!isOpen) {
+                    document.getElementById('linkUrl').value = 'https://';
+                    document.getElementById('linkLabel').value = '';
+                    document.getElementById('linkUrl').focus();
+                }
+            };
+
+            window.confirmInsertLink = function () {
+                const url = document.getElementById('linkUrl').value.trim();
                 if (!url || url === 'https://') return;
-                const label = prompt('請輸入顯示文字（留空則使用網址）：', '') || url;
+                const label = document.getElementById('linkLabel').value.trim() || url;
                 const textarea = document.getElementById('checklistDesc');
                 const linkText = `[${label}](${url})`;
-                // Insert at cursor position
                 const start = textarea.selectionStart;
                 const end = textarea.selectionEnd;
                 const before = textarea.value.substring(0, start);
@@ -809,6 +827,7 @@
                 textarea.value = before + linkText + after;
                 textarea.focus();
                 textarea.selectionStart = textarea.selectionEnd = start + linkText.length;
+                document.getElementById('linkInsertForm').style.display = 'none';
             };
 
             // ══════════════════════════════════════
