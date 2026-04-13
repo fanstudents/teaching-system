@@ -786,3 +786,28 @@ body {
     .q-confirm-form { flex-direction: column; }
     .q-confirm-btn { justify-content: center; }
 }
+
+/* ═══ E-Sign Modal ═══ */
+.q-esign-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
+    z-index: 9999; opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.q-esign-overlay.active { opacity: 1; pointer-events: auto; }
+.q-esign-modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.92);
+    background: var(--q-card); border-radius: 20px; padding: 36px 32px;
+    width: 380px; max-width: calc(100vw - 32px); box-shadow: 0 24px 80px rgba(0,0,0,.18);
+    z-index: 10000; opacity: 0; pointer-events: none; transition: all .3s cubic-bezier(.22,1,.36,1);
+}
+.q-esign-modal.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.q-esign-close {
+    position: absolute; top: 12px; right: 12px; width: 32px; height: 32px;
+    border-radius: 50%; border: none; background: var(--q-hover); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: var(--q-text-3);
+    transition: background .15s;
+}
+.q-esign-close:hover { background: #e5e7eb; }
+
+@media print {
+    .q-esign-overlay, .q-esign-modal { display: none !important; }
+}
