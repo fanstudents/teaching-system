@@ -362,9 +362,17 @@
                     <div class="setup-section-title">
                         <span class="material-symbols-rounded">checklist</span> 課前準備清單
                     </div>
-                    <button class="btn btn-sm btn-primary" onclick="showAddChecklist()">
-                        <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增項目
-                    </button>
+                    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                        <button class="btn btn-sm btn-outline" onclick="openTemplateImport('checklist')" style="font-size:.75rem">
+                            <span class="material-symbols-rounded" style="font-size:14px">download</span> 從模板匯入
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="saveAsTemplate('checklist')" style="font-size:.75rem">
+                            <span class="material-symbols-rounded" style="font-size:14px">save</span> 存為模板
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="showAddChecklist()">
+                            <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增項目
+                        </button>
+                    </div>
                 </div>
                 <ul class="manage-list" id="checklistList">
                     <li class="empty-msg">載入中…</li>
@@ -377,12 +385,18 @@
                     <div class="setup-section-title">
                         <span class="material-symbols-rounded">quiz</span> 課前問卷題目
                     </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
                         <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#5f6368;cursor:pointer;user-select:none;">
                             <input type="checkbox" id="showSurveyToggle" checked
                                 style="width:16px;height:16px;accent-color:#1a73e8;cursor:pointer;">
                             顯示問卷
                         </label>
+                        <button class="btn btn-sm btn-outline" onclick="openTemplateImport('survey')" style="font-size:.75rem">
+                            <span class="material-symbols-rounded" style="font-size:14px">download</span> 從模板匯入
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="saveAsTemplate('survey')" style="font-size:.75rem">
+                            <span class="material-symbols-rounded" style="font-size:14px">save</span> 存為模板
+                        </button>
                         <button class="btn btn-sm btn-primary" onclick="showAddQuestion()">
                             <span class="material-symbols-rounded" style="font-size:16px;">add</span> 新增題目
                         </button>
@@ -493,6 +507,50 @@
                 <div class="modal-actions">
                     <button class="btn btn-outline" onclick="closeModal('surveyModal')">取消</button>
                     <button class="btn btn-primary" onclick="saveSurveyQuestion()">儲存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ Modal：模板匯入 ═══════ -->
+        <div class="modal-overlay" id="templateModal">
+            <div class="modal" style="max-width:520px;max-height:80vh;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                    <h3 id="templateModalTitle" style="margin:0">從模板匯入</h3>
+                    <button class="modal-close" onclick="closeModal('templateModal')">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+                    <label class="field-label" style="margin-bottom:0;white-space:nowrap">分組</label>
+                    <select id="templateGroupSelect" class="field-input" style="flex:1" onchange="renderTemplateItems()"></select>
+                    <button class="btn btn-sm btn-outline" onclick="deleteTemplateGroup()" title="刪除此分組" style="color:#d93025;padding:5px 6px">
+                        <span class="material-symbols-rounded" style="font-size:14px">delete</span>
+                    </button>
+                </div>
+                <div style="margin-bottom:8px;display:flex;gap:6px">
+                    <button class="btn btn-sm btn-outline" onclick="toggleAllTemplateItems(true)" style="font-size:.72rem">全選</button>
+                    <button class="btn btn-sm btn-outline" onclick="toggleAllTemplateItems(false)" style="font-size:.72rem">取消全選</button>
+                </div>
+                <div id="templateItemsList" style="flex:1;overflow-y:auto;max-height:350px;border:1px solid #e8eaed;border-radius:8px;padding:6px"></div>
+                <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+                    <button class="btn btn-outline" onclick="closeModal('templateModal')">取消</button>
+                    <button class="btn btn-primary" id="templateImportBtn" onclick="importSelectedTemplates()">匯入已選 (0)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════ Modal：存為模板 ═══════ -->
+        <div class="modal-overlay" id="saveTemplateModal">
+            <div class="modal" style="max-width:400px">
+                <h3>存為模板分組</h3>
+                <div class="form-field">
+                    <label>選擇現有分組或建立新分組</label>
+                    <select id="saveTemplateGroupSelect" class="field-input" style="margin-bottom:8px" onchange="onSaveGroupSelectChange()"></select>
+                    <input type="text" id="saveTemplateNewName" class="field-input" placeholder="輸入新分組名稱…" style="display:none">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" onclick="closeModal('saveTemplateModal')">取消</button>
+                    <button class="btn btn-primary" onclick="confirmSaveTemplate()">儲存</button>
                 </div>
             </div>
         </div>
@@ -1294,7 +1352,251 @@
             });
 
 
+            // ══════════════════════════════════════
+            //   Template System
+            // ══════════════════════════════════════
+            let _templates = { checklist_groups: [], survey_groups: [] };
+            let _templateType = 'checklist'; // current modal type
+
+            async function loadTemplates() {
+                if (!_proj?.id) return;
+                try {
+                    const { data } = await db.select('projects', {
+                        filter: { id: `eq.${_proj.id}` },
+                        columns: 'preclass_templates'
+                    });
+                    const raw = data?.[0]?.preclass_templates;
+                    if (raw && typeof raw === 'object') {
+                        _templates = {
+                            checklist_groups: raw.checklist_groups || [],
+                            survey_groups: raw.survey_groups || []
+                        };
+                    }
+                } catch (e) { console.warn('loadTemplates:', e); }
+                // 自動初始化預設模板（如果還沒有任何分組）
+                if (_templates.checklist_groups.length === 0 && _templates.survey_groups.length === 0) {
+                    await initDefaultTemplates();
+                }
+            }
+
+            async function initDefaultTemplates() {
+                _templates = {
+                    checklist_groups: [{
+                        name: 'AI 課程（預設）',
+                        items: [
+                            { title: '註冊 ChatGPT 帳號', description: '請至 [chat.openai.com](https://chat.openai.com) 註冊免費帳號，並確認可以正常登入使用。建議使用 Google 帳號直接註冊，方便快速。', icon_url: null },
+                            { title: '註冊 Claude 帳號', description: '請至 [claude.ai](https://claude.ai) 註冊帳號，作為課堂上的備用 AI 工具。', icon_url: null },
+                            { title: '攜帶筆記型電腦', description: '課程需要實際操作，請務必攜帶已充飽電的筆電，並確認 Wi-Fi 功能正常。', icon_url: null },
+                            { title: '更新瀏覽器至最新版本', description: '建議使用 Chrome 或 Edge 瀏覽器，並更新至最新版本以確保相容性。', icon_url: null },
+                            { title: '準備一段您的工作情境描述', description: '請事先想好 1-2 個您工作中想用 AI 解決的具體問題或場景，課堂上會直接拿來練習。', icon_url: null },
+                            { title: '加入課程 LINE 群組', description: '掃描課前通知信中的 QR Code 加入課程群組，方便課中即時提問與分享連結。', icon_url: null },
+                            { title: '填寫課前問卷', description: '請完成下方的課前問卷，讓講師了解您的背景與學習期待。', icon_url: null },
+                        ]
+                    }],
+                    survey_groups: [{
+                        name: '標準問卷（預設）',
+                        questions: [
+                            { question_type: 'fillblank', question_text: '您的職稱', options: [] },
+                            { question_type: 'fillblank', question_text: '工作內容簡要說明', options: [] },
+                            { question_type: 'choice', question_text: '您對本次課程主題的了解程度？', options: ['非常了解','了解','普通','不太了解','完全不了解'] },
+                            { question_type: 'fillblank', question_text: '您是否曾參加過類似主題的課程或訓練?若有，請簡述', options: [] },
+                            { question_type: 'choice', question_text: '您在工作中是否常需要應用到本課程主題的相關技能？', options: ['經常需要','偶爾需要','很少需要','目前不需要但未來可能會','完全不需要'] },
+                            { question_type: 'fillblank', question_text: '您目前在工作中遇到哪些與本課程主題相關的問題或困難？', options: [] },
+                            { question_type: 'fillblank', question_text: '您預期課後能將所學應用在哪些工作情境或任務？', options: [] },
+                            { question_type: 'multi_select', question_text: '您希望老師在課程中多著重哪一類內容?（可複選）', options: ['基礎概念與原理','實務操作與工具示範','案例分析與產業應用','互動練習與即時實作','進階技巧與最新趨勢','團隊協作與溝通應用'] },
+                            { question_type: 'fillblank', question_text: '課程中，您是否有希望老師特別說明或討論的問題?', options: [] },
+                            { question_type: 'fillblank', question_text: '其他建議或希望講師能事先了解的事項', options: [] },
+                        ]
+                    }]
+                };
+                await saveTemplatesToDB();
+            }
+
+            async function saveTemplatesToDB() {
+                if (!_proj?.id) return;
+                try {
+                    await db.update('projects', { preclass_templates: _templates }, { id: `eq.${_proj.id}` });
+                } catch (e) { console.warn('saveTemplates:', e); showToast('模板儲存失敗', { type: 'error' }); }
+            }
+
+            // ── 匯入模板 Modal ──
+            window.openTemplateImport = function(type) {
+                _templateType = type;
+                const groups = type === 'checklist' ? _templates.checklist_groups : _templates.survey_groups;
+                const title = type === 'checklist' ? '匯入準備清單模板' : '匯入問卷模板';
+                document.getElementById('templateModalTitle').textContent = title;
+                const sel = document.getElementById('templateGroupSelect');
+                if (groups.length === 0) {
+                    sel.innerHTML = '<option value="">（尚無模板，請先「存為模板」）</option>';
+                    document.getElementById('templateItemsList').innerHTML = '<div style="padding:20px;text-align:center;color:#80868b;font-size:.82rem">此類型尚無模板分組<br>請先在當前場次建好項目後點「存為模板」</div>';
+                    document.getElementById('templateImportBtn').textContent = '匯入已選 (0)';
+                } else {
+                    sel.innerHTML = groups.map((g, i) => `<option value="${i}">${g.name}</option>`).join('');
+                    renderTemplateItems();
+                }
+                document.getElementById('templateModal').classList.add('active');
+            };
+
+            window.renderTemplateItems = function() {
+                const groups = _templateType === 'checklist' ? _templates.checklist_groups : _templates.survey_groups;
+                const idx = parseInt(document.getElementById('templateGroupSelect').value);
+                const group = groups[idx];
+                if (!group) { document.getElementById('templateItemsList').innerHTML = ''; return; }
+                const items = _templateType === 'checklist' ? group.items : group.questions;
+                const typeBadges = { choice: '單選', multi_select: '複選', truefalse: '是非', fillblank: '文字' };
+                document.getElementById('templateItemsList').innerHTML = items.map((item, i) => {
+                    const label = _templateType === 'checklist'
+                        ? item.title
+                        : `<span style="display:inline-block;padding:1px 6px;background:#e8f0fe;color:#1a73e8;border-radius:4px;font-size:.68rem;font-weight:600;margin-right:4px">${typeBadges[item.question_type] || ''}</span>${item.question_text}`;
+                    return `<label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''">
+                        <input type="checkbox" checked class="tpl-item-cb" data-idx="${i}" onchange="updateImportCount()" style="margin-top:2px;width:16px;height:16px;accent-color:#1a73e8">
+                        <span style="font-size:.82rem;color:#1f1f1f;line-height:1.4">${label}</span>
+                    </label>`;
+                }).join('');
+                updateImportCount();
+            };
+
+            window.toggleAllTemplateItems = function(checked) {
+                document.querySelectorAll('#templateItemsList .tpl-item-cb').forEach(cb => cb.checked = checked);
+                updateImportCount();
+            };
+
+            window.updateImportCount = function() {
+                const count = document.querySelectorAll('#templateItemsList .tpl-item-cb:checked').length;
+                document.getElementById('templateImportBtn').textContent = `匯入已選 (${count})`;
+            };
+
+            window.importSelectedTemplates = async function() {
+                const groups = _templateType === 'checklist' ? _templates.checklist_groups : _templates.survey_groups;
+                const idx = parseInt(document.getElementById('templateGroupSelect').value);
+                const group = groups[idx];
+                if (!group) return;
+                const items = _templateType === 'checklist' ? group.items : group.questions;
+                const checked = Array.from(document.querySelectorAll('#templateItemsList .tpl-item-cb:checked')).map(cb => parseInt(cb.dataset.idx));
+                if (checked.length === 0) { showToast('請至少選擇一項', { type: 'error' }); return; }
+
+                const btn = document.getElementById('templateImportBtn');
+                btn.disabled = true;
+                btn.textContent = '匯入中…';
+
+                try {
+                    if (_templateType === 'checklist') {
+                        const maxOrder = checklistItems.length > 0 ? Math.max(...checklistItems.map(x => x.sort_order || 0)) : 0;
+                        for (let j = 0; j < checked.length; j++) {
+                            const item = items[checked[j]];
+                            await db.insert('checklist_items', {
+                                session_code: dataCode,
+                                title: item.title,
+                                description: item.description || '',
+                                icon_url: item.icon_url || null,
+                                sort_order: maxOrder + j + 1
+                            });
+                        }
+                        await loadChecklist();
+                    } else {
+                        const maxOrder = surveyQuestions.length > 0 ? Math.max(...surveyQuestions.map(x => x.sort_order || 0)) : 0;
+                        for (let j = 0; j < checked.length; j++) {
+                            const q = items[checked[j]];
+                            await db.insert('survey_questions', {
+                                session_code: dataCode,
+                                question_type: q.question_type,
+                                question_text: q.question_text,
+                                options: JSON.stringify(q.options || []),
+                                sort_order: maxOrder + j + 1
+                            });
+                        }
+                        await loadSurvey();
+                    }
+                    showToast(`已匯入 ${checked.length} 項`);
+                    closeModal('templateModal');
+                } catch (e) {
+                    showToast('匯入失敗：' + e.message, { type: 'error' });
+                } finally {
+                    btn.disabled = false;
+                    updateImportCount();
+                }
+            };
+
+            // ── 存為模板 ──
+            window.saveAsTemplate = function(type) {
+                _templateType = type;
+                const groups = type === 'checklist' ? _templates.checklist_groups : _templates.survey_groups;
+                const currentItems = type === 'checklist' ? checklistItems : surveyQuestions;
+                if (currentItems.length === 0) { showToast('目前沒有項目可存為模板', { type: 'error' }); return; }
+
+                const sel = document.getElementById('saveTemplateGroupSelect');
+                sel.innerHTML = groups.map((g, i) => `<option value="${i}">${g.name}（覆蓋）</option>`).join('')
+                    + '<option value="__new__">＋ 建立新分組</option>';
+                sel.value = '__new__';
+                document.getElementById('saveTemplateNewName').style.display = '';
+                document.getElementById('saveTemplateNewName').value = '';
+                document.getElementById('saveTemplateModal').classList.add('active');
+                setTimeout(() => document.getElementById('saveTemplateNewName').focus(), 100);
+            };
+
+            window.onSaveGroupSelectChange = function() {
+                const v = document.getElementById('saveTemplateGroupSelect').value;
+                document.getElementById('saveTemplateNewName').style.display = v === '__new__' ? '' : 'none';
+            };
+
+            window.confirmSaveTemplate = async function() {
+                const sel = document.getElementById('saveTemplateGroupSelect');
+                const v = sel.value;
+                const groups = _templateType === 'checklist' ? _templates.checklist_groups : _templates.survey_groups;
+                let groupName;
+                let groupIdx;
+
+                if (v === '__new__') {
+                    groupName = document.getElementById('saveTemplateNewName').value.trim();
+                    if (!groupName) { showToast('請輸入分組名稱', { type: 'error' }); return; }
+                    groupIdx = groups.length;
+                    groups.push({ name: groupName });
+                } else {
+                    groupIdx = parseInt(v);
+                    groupName = groups[groupIdx].name;
+                }
+
+                if (_templateType === 'checklist') {
+                    groups[groupIdx].items = checklistItems.map(item => ({
+                        title: item.title,
+                        description: item.description || '',
+                        icon_url: item.icon_url || null
+                    }));
+                    _templates.checklist_groups = groups;
+                } else {
+                    groups[groupIdx].questions = surveyQuestions.map(q => {
+                        const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options || '[]');
+                        return {
+                            question_type: q.question_type,
+                            question_text: q.question_text,
+                            options: opts
+                        };
+                    });
+                    _templates.survey_groups = groups;
+                }
+
+                await saveTemplatesToDB();
+                showToast(`已儲存到「${groupName}」`);
+                closeModal('saveTemplateModal');
+            };
+
+            window.deleteTemplateGroup = async function() {
+                const groups = _templateType === 'checklist' ? _templates.checklist_groups : _templates.survey_groups;
+                const idx = parseInt(document.getElementById('templateGroupSelect').value);
+                const group = groups[idx];
+                if (!group) return;
+                groups.splice(idx, 1);
+                if (_templateType === 'checklist') _templates.checklist_groups = groups;
+                else _templates.survey_groups = groups;
+                await saveTemplatesToDB();
+                showToast(`已刪除「${group.name}」`);
+                if (groups.length === 0) { closeModal('templateModal'); return; }
+                document.getElementById('templateGroupSelect').innerHTML = groups.map((g, i) => `<option value="${i}">${g.name}</option>`).join('');
+                renderTemplateItems();
+            };
+
             // ── Init ──
+            await loadTemplates();
             loadChecklist();
             loadSurvey();
 
