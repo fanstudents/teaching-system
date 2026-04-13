@@ -386,36 +386,39 @@
     <!-- Admin panel content (rendered into #adminPanel above) -->
     <template id="adminPanelContent">
 
-        <!-- ═══ Course Content Editor ═══ -->
-        <div class="admin-section">
-            <div class="admin-section-title">
-                <a id="btnBackToProject" href="/manage.html" style="display:inline-flex;align-items:center;gap:2px;color:#444746;text-decoration:none;font-size:0.82rem;padding:5px 8px;border-radius:8px;transition:background 0.15s;margin-right:4px" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
-                    <span class="material-symbols-outlined" style="font-size:18px">arrow_back</span>
+        <!-- ═══ Editor Topbar ═══ -->
+        <div class="oe-topbar">
+            <div class="oe-topbar-left">
+                <a id="btnBackToProject" href="/manage.html" class="oe-topbar-back" title="回到專案管理">
+                    <span class="material-symbols-outlined">arrow_back</span>
                 </a>
-                <span class="material-symbols-outlined">edit_note</span>
-                課程內容編輯
-                <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
-                    <a id="btnPreviewOutline" href="#" target="_blank" style="font-size:0.78rem;color:#444746;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:8px;transition:background 0.15s" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
-                        <span class="material-symbols-outlined" style="font-size:14px">visibility</span> 預覽
-                    </a>
-                    <button id="btnCopyClientLink" class="btn btn-outline" style="padding:5px 10px;font-size:0.78rem">
-                        <span class="material-symbols-outlined" style="font-size:14px">link</span> 複製客戶連結
-                    </button>
-                    <button class="btn btn-outline" id="btnAiGenOutline" style="padding:5px 12px;font-size:0.78rem">
-                        <span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span> AI 生成
-                    </button>
-                    <button class="btn btn-outline" id="btnImportDefaults" style="padding:5px 10px;font-size:0.78rem">
-                        <span class="material-symbols-outlined" style="font-size:14px">download</span> 匯入預設值
-                    </button>
-                    <button class="btn btn-outline" id="btnImportProject" style="padding:5px 10px;font-size:0.78rem">
-                        <span class="material-symbols-outlined" style="font-size:14px">content_copy</span> 導入其他專案
-                    </button>
-                    <button class="btn btn-dark" id="btnSaveOutline" style="padding:5px 14px;font-size:0.78rem">
-                        <span class="material-symbols-outlined" style="font-size:14px">check</span> 儲存
-                    </button>
-                </div>
+                <span class="oe-topbar-title">課程內容編輯</span>
             </div>
-            <div id="outlineSaveStatus" style="font-size:0.78rem;color:var(--accent);margin-bottom:8px;display:none"></div>
+            <div class="oe-topbar-actions">
+                <a id="btnPreviewOutline" href="#" target="_blank" class="oe-topbar-btn">
+                    <span class="material-symbols-outlined">visibility</span><span class="oe-topbar-btn-label">預覽</span>
+                </a>
+                <button id="btnCopyClientLink" class="oe-topbar-btn">
+                    <span class="material-symbols-outlined">link</span><span class="oe-topbar-btn-label">複製連結</span>
+                </button>
+                <button id="btnAiGenOutline" class="oe-topbar-btn">
+                    <span class="material-symbols-outlined">auto_awesome</span><span class="oe-topbar-btn-label">AI 生成</span>
+                </button>
+                <button id="btnImportDefaults" class="oe-topbar-btn">
+                    <span class="material-symbols-outlined">download</span><span class="oe-topbar-btn-label">匯入預設</span>
+                </button>
+                <button id="btnImportProject" class="oe-topbar-btn">
+                    <span class="material-symbols-outlined">content_copy</span><span class="oe-topbar-btn-label">導入專案</span>
+                </button>
+                <button id="btnSaveOutline" class="oe-topbar-btn oe-topbar-btn-save">
+                    <span class="material-symbols-outlined">check</span><span class="oe-topbar-btn-label">儲存</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══ Course Content Editor ═══ -->
+        <div class="admin-section" style="border:none;padding:0;background:transparent;">
+            <div id="outlineSaveStatus" style="font-size:0.78rem;color:#4a5c8a;margin-bottom:8px;display:none;padding:0 4px"></div>
 
             <!-- Hero 設定 -->
             <details class="outline-edit-group" open>
