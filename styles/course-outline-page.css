@@ -644,7 +644,7 @@ body {
 .file-delete-btn:hover { color: var(--danger); background: #fce8e6; }
 
 /* ── Admin Panel ── */
-.admin-panel { display: none; padding: 32px; max-width: 960px; margin: 0 auto; }
+.admin-panel { display: none; padding: 28px; max-width: 960px; margin: 0 auto; background: #f5f7fa; min-height: 100vh; }
 .admin-panel.show { display: block; }
 /* Widen admin panel when multi-day columns are active */
 .admin-panel:has(.oe-timeline-columns-2) { max-width: 1200px; }
@@ -652,32 +652,39 @@ body {
 .admin-panel:has(.oe-timeline-columns-4) { max-width: 1600px; }
 
 .admin-section {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 28px; margin-bottom: 24px;
-    box-shadow: var(--shadow-sm);
+    background: white; border: none;
+    border-radius: 20px; padding: 28px; margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);
 }
 .admin-section-title {
-    font-size: 1rem; font-weight: 700; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 10px;
+    font-size: 1.05rem; font-weight: 700; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
 }
-.admin-section-title .material-symbols-outlined { font-size: 20px; color: var(--accent); }
+.admin-section-title .material-symbols-outlined {
+    font-size: 22px; color: var(--accent);
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #e8f0fe, #d2e3fc);
+}
 
 .admin-toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 
 .btn {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 16px; border-radius: var(--radius-sm);
+    padding: 8px 16px; border-radius: 10px;
     font-size: 0.85rem; font-weight: 600; font-family: inherit;
-    cursor: pointer; border: none; transition: all 0.15s ease;
+    cursor: pointer; border: none; transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
 }
 .btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-0.5px); box-shadow: 0 4px 12px rgba(26,115,232,0.2); }
 .btn-success { background: #188038; color: white; }
 .btn-success:hover { background: #047857; }
-.btn-outline { background: white; color: var(--text); border: 1px solid var(--border); }
-.btn-outline:hover { background: var(--surface-alt); }
+.btn-outline { background: white; color: #475569; border: 1.5px solid #e2e8f0; }
+.btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
 .btn-danger { background: var(--danger); color: white; }
 .btn-danger:hover { background: #c5221f; }
+.btn-dark { background: #1e293b; color: white; }
+.btn-dark:hover { background: #0f172a; transform: translateY(-0.5px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .btn .material-symbols-outlined { font-size: 16px; }
 
 .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -1001,48 +1008,79 @@ body {
 }
 
 /* ══════════════════════════════════════
-   OUTLINE CONTENT EDITOR (Enhanced)
+   OUTLINE CONTENT EDITOR (Modern Redesign)
    ══════════════════════════════════════ */
 .outline-edit-group {
-    border: 1px solid var(--border); border-radius: var(--radius-lg);
-    margin-bottom: 16px; overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.2s ease;
+    border: none; border-radius: 16px;
+    margin-bottom: 12px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    background: white;
 }
-.outline-edit-group:hover { box-shadow: var(--shadow-md); }
+.outline-edit-group:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.06);
+}
 .outline-edit-group summary {
-    padding: 14px 20px; font-size: 0.9rem; font-weight: 700;
+    padding: 16px 22px; font-size: 0.88rem; font-weight: 700;
     cursor: pointer; user-select: none; list-style: none;
-    display: flex; align-items: center; gap: 10px;
-    background: linear-gradient(135deg, var(--surface-alt) 0%, #e8f0fe 100%);
+    display: flex; align-items: center; gap: 12px;
+    background: white;
     transition: background 0.2s;
     letter-spacing: -0.01em;
+    color: var(--text);
 }
-.outline-edit-group summary:hover { background: linear-gradient(135deg, #e8f0fe 0%, #d2e3fc 100%); }
+.outline-edit-group summary:hover {
+    background: #f8fafc;
+}
 .outline-edit-group summary::before {
-    content: '▸'; font-size: 0.75rem; color: var(--accent);
-    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); flex-shrink: 0;
-    width: 16px; text-align: center;
+    content: '';
+    width: 22px; height: 22px; border-radius: 6px;
+    background: #f1f5f9;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
 }
-.outline-edit-group[open] summary::before { transform: rotate(90deg); }
-.outline-edit-group summary .material-symbols-outlined { color: var(--accent); font-size: 18px; }
+.outline-edit-group[open] summary::before {
+    transform: rotate(90deg);
+    background-color: #e8f0fe;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a73e8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+}
+.outline-edit-group summary .material-symbols-outlined {
+    font-size: 20px; color: #64748b;
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: #f1f5f9;
+    transition: all 0.2s;
+}
 
-/* Open state inner glow */
+/* Open state */
 .outline-edit-group[open] {
-    border-color: rgba(26,115,232,0.2);
-    box-shadow: 0 4px 20px rgba(26,115,232,0.06);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 0 0 1px rgba(26,115,232,0.12);
+}
+.outline-edit-group[open] summary {
+    border-bottom: 1px solid #f1f5f9;
+}
+.outline-edit-group[open] summary .material-symbols-outlined {
+    background: linear-gradient(135deg, #e8f0fe, #d2e3fc);
+    color: var(--accent);
 }
 
-.oe-fields { padding: 20px; display: flex; flex-direction: column; gap: 14px; background: #fafbfe; }
-.oe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.oe-field { display: flex; flex-direction: column; gap: 5px; }
+.oe-fields {
+    padding: 24px; display: flex; flex-direction: column; gap: 18px;
+    background: #fafbfd;
+}
+.oe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.oe-field { display: flex; flex-direction: column; gap: 6px; }
 .oe-field label {
-    font-size: 0.73rem; font-weight: 700; color: var(--text-2);
-    text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: 0.76rem; font-weight: 600; color: #64748b;
+    letter-spacing: 0.02em;
 }
 .oe-field input, .oe-field textarea, .oe-field select {
-    padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px;
-    font-size: 0.85rem; font-family: inherit; background: white; color: var(--text);
+    padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 0.88rem; font-family: inherit; background: white; color: var(--text);
     outline: none; transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
 }
 .oe-field input:focus, .oe-field textarea:focus, .oe-field select:focus {
@@ -1051,37 +1089,37 @@ body {
     background: white;
 }
 .oe-field input::placeholder, .oe-field textarea::placeholder {
-    color: #b0b8c9;
+    color: #c1c8d6;
 }
 .oe-field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
 
 /* ── List Container ── */
 .oe-list {
-    padding: 16px 20px; display: flex; flex-direction: column; gap: 10px;
-    background: #fafbfe;
+    padding: 20px 24px; display: flex; flex-direction: column; gap: 10px;
+    background: #fafbfd;
     counter-reset: oe-item;
 }
 .oe-list:empty::after {
     content: '尚無項目，點擊下方按鈕新增';
     display: flex; align-items: center; justify-content: center;
-    padding: 32px 16px;
-    font-size: 0.82rem; color: var(--text-3);
-    border: 2px dashed var(--border); border-radius: var(--radius-md);
+    padding: 40px 16px;
+    font-size: 0.84rem; color: #94a3b8;
+    border: 2px dashed #e2e8f0; border-radius: 14px;
     background: white;
 }
 
 /* ── List Item Card ── */
 .oe-list-item {
-    border: 1.5px solid var(--border); border-radius: var(--radius-md);
-    padding: 16px 16px 16px 48px; background: white; position: relative;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    border: 1.5px solid #e2e8f0; border-radius: 14px;
+    padding: 16px 16px 16px 52px; background: white; position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
     border-left: 3px solid var(--accent);
     counter-increment: oe-item;
 }
 .oe-list-item:hover {
-    box-shadow: 0 4px 16px rgba(26,115,232,0.08);
-    border-color: rgba(26,115,232,0.25);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    border-color: rgba(26,115,232,0.2);
     transform: translateY(-1px);
 }
 
@@ -1089,7 +1127,7 @@ body {
 .oe-list-item::after {
     content: counter(oe-item);
     position: absolute; left: 14px; top: 16px;
-    width: 24px; height: 24px; border-radius: 8px;
+    width: 26px; height: 26px; border-radius: 8px;
     background: linear-gradient(135deg, var(--accent) 0%, #4285f4 100%);
     color: white; font-size: 0.72rem; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
@@ -1099,23 +1137,23 @@ body {
 /* Delete button */
 .oe-list-item .oe-delete {
     position: absolute; top: 10px; right: 10px;
-    background: none; border: none; cursor: pointer; color: var(--text-3);
+    background: none; border: none; cursor: pointer; color: #cbd5e1;
     padding: 4px; border-radius: 8px; transition: all 0.2s;
     width: 28px; height: 28px;
     display: flex; align-items: center; justify-content: center;
-    opacity: 0.4;
+    opacity: 0;
 }
 .oe-list-item:hover .oe-delete { opacity: 1; }
-.oe-list-item .oe-delete:hover { color: var(--danger); background: #fce8e6; }
+.oe-list-item .oe-delete:hover { color: var(--danger); background: #fef2f2; }
 .oe-list-item .oe-delete .material-symbols-outlined { font-size: 16px; }
 
 /* ── Drag Handle ── */
 .oe-drag-handle {
-    position: absolute; left: -2px; top: 0; bottom: 0; width: 42px;
+    position: absolute; left: -2px; top: 0; bottom: 0; width: 46px;
     display: flex; align-items: center; justify-content: center;
-    cursor: grab; color: var(--text-3);
+    cursor: grab; color: #d1d5db;
     opacity: 0; transition: opacity 0.2s;
-    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    border-radius: 14px 0 0 14px;
     z-index: 2;
 }
 .oe-drag-handle .material-symbols-outlined { font-size: 18px; pointer-events: none; }
@@ -1144,17 +1182,18 @@ body {
 
 /* ── Add Button ── */
 .oe-add-btn {
-    margin: 4px 20px 16px; font-size: 0.8rem !important; padding: 8px 16px !important;
-    border-radius: 10px !important;
-    border: 2px dashed var(--border) !important;
-    color: var(--text-2) !important;
+    margin: 4px 24px 20px; font-size: 0.82rem !important; padding: 10px 18px !important;
+    border-radius: 12px !important;
+    border: 2px dashed #e2e8f0 !important;
+    color: #94a3b8 !important;
     transition: all 0.2s !important;
     justify-content: center;
+    background: transparent !important;
 }
 .oe-add-btn:hover {
     border-color: var(--accent) !important;
     color: var(--accent) !important;
-    background: rgba(26,115,232,0.04) !important;
+    background: rgba(26,115,232,0.03) !important;
 }
 
 /* Break block indicator */

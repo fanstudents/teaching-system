@@ -1791,38 +1791,38 @@ function renderVersionTabs() {
         if (!sectionTitle) return;
         container = document.createElement('div');
         container.id = 'outlineVersionTabs';
-        container.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding:10px 20px;background:#f8fafc;border-bottom:1px solid var(--border,#e2e8f0)';
+        container.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 24px 16px;';
         sectionTitle.parentElement.insertBefore(container, sectionTitle.nextSibling);
     }
     container.innerHTML = outlineVersions.map((v, i) => {
         const isActive = i === activeVersionIdx;
-        const borderColor = isActive ? 'var(--accent,#6366f1)' : '#d1d5db';
-        const bg = isActive ? 'var(--accent,#6366f1)' : '#fff';
-        const color = isActive ? '#fff' : '#64748b';
-        const editColor = isActive ? 'rgba(255,255,255,.7)' : '#9ca3af';
         const showDelete = outlineVersions.length > 1;
         return `<div style="display:inline-flex;align-items:center;gap:0;position:relative">
             <button class="oe-version-tab${isActive ? ' active' : ''}" onclick="switchVersion(${i})" style="
-                padding:8px 16px;border-radius:8px 0 0 8px;border:1.5px solid ${borderColor};
-                background:${bg};color:${color};
-                font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;border-right:none;
+                padding:8px 18px;border-radius:10px 0 0 10px;border:1.5px solid ${isActive ? 'var(--accent,#1a73e8)' : '#e2e8f0'};
+                background:${isActive ? 'var(--accent,#1a73e8)' : 'white'};color:${isActive ? '#fff' : '#64748b'};
+                font-size:0.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;border-right:none;
+                ${!isActive ? 'box-shadow:0 1px 2px rgba(0,0,0,0.04);' : 'box-shadow:0 2px 8px rgba(26,115,232,0.2);'}
             " ondblclick="renameVersion(${i})">${v.name || '版本 ' + (i+1)}</button>
             <button onclick="event.stopPropagation();renameVersion(${i})" title="重新命名" style="
-                padding:6px 8px;border-radius:0${showDelete ? '' : ' 8px 8px'} 0;border:1.5px solid ${borderColor};
-                background:${bg};color:${editColor};
-                cursor:pointer;display:flex;align-items:center;transition:all .15s;${showDelete ? 'border-right:none;' : ''}
+                padding:6px 8px;border-radius:0${showDelete ? '' : ' 10px 10px'} 0;border:1.5px solid ${isActive ? 'var(--accent,#1a73e8)' : '#e2e8f0'};
+                background:${isActive ? 'var(--accent,#1a73e8)' : 'white'};color:${isActive ? 'rgba(255,255,255,.7)' : '#94a3b8'};
+                cursor:pointer;display:flex;align-items:center;transition:all .2s;${showDelete ? 'border-right:none;' : ''}
+                ${!isActive ? 'box-shadow:0 1px 2px rgba(0,0,0,0.04);' : ''}
             "><span class="material-symbols-outlined" style="font-size:14px">edit</span></button>
             ${showDelete ? `<button onclick="event.stopPropagation();deleteVersion(${i})" title="刪除版本" style="
-                padding:6px 6px;border-radius:0 8px 8px 0;border:1.5px solid ${borderColor};
-                background:${bg};color:${isActive ? 'rgba(255,255,255,.5)' : '#d1d5db'};
-                cursor:pointer;display:flex;align-items:center;transition:all .15s;
-            " onmouseenter="this.style.color='${isActive ? '#fca5a5' : '#ef4444'}'" onmouseleave="this.style.color='${isActive ? 'rgba(255,255,255,.5)' : '#d1d5db'}'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>` : ''}
+                padding:6px 6px;border-radius:0 10px 10px 0;border:1.5px solid ${isActive ? 'var(--accent,#1a73e8)' : '#e2e8f0'};
+                background:${isActive ? 'var(--accent,#1a73e8)' : 'white'};color:${isActive ? 'rgba(255,255,255,.4)' : '#d1d5db'};
+                cursor:pointer;display:flex;align-items:center;transition:all .2s;
+                ${!isActive ? 'box-shadow:0 1px 2px rgba(0,0,0,0.04);' : ''}
+            " onmouseenter="this.style.color='${isActive ? '#fca5a5' : '#ef4444'}'" onmouseleave="this.style.color='${isActive ? 'rgba(255,255,255,.4)' : '#d1d5db'}'"><span class="material-symbols-outlined" style="font-size:14px">close</span></button>` : ''}
         </div>`;
     }).join('') +
     `<button onclick="addVersion()" style="
-        padding:8px 14px;border-radius:8px;border:1.5px dashed #d1d5db;
-        background:none;color:#9ca3af;font-size:0.82rem;cursor:pointer;font-family:inherit;
-    " onmouseover="this.style.borderColor='var(--accent,#6366f1)';this.style.color='var(--accent,#6366f1)'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#9ca3af'">+ 新增版本</button>`;
+        padding:8px 16px;border-radius:10px;border:1.5px dashed #e2e8f0;
+        background:transparent;color:#94a3b8;font-size:0.82rem;cursor:pointer;font-family:inherit;font-weight:500;
+        transition:all .2s;
+    " onmouseover="this.style.borderColor='var(--accent,#1a73e8)';this.style.color='var(--accent,#1a73e8)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8'">+ 新增版本</button>`;
 }
 
 window.switchVersion = function(idx) {
