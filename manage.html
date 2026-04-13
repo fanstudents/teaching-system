@@ -3533,10 +3533,12 @@ ${gscQueriesStr || '無搜尋資料'}
                 document.getElementById('quoteClientLogo').value = '';
                 document.getElementById('quotePaymentMethod').value = '銀行匯款';
                 document.getElementById('quotePaymentTerms').value = '開課前全額付款';
-                document.getElementById('quoteBankName').value = '';
-                document.getElementById('quoteBankBranch').value = '';
-                document.getElementById('quoteBankAccount').value = '';
-                document.getElementById('quoteBankHolder').value = '數位簡報室';
+                // 銀行資訊從 localStorage 讀取預設值
+                const savedBank = JSON.parse(localStorage.getItem('quoteBankDefaults') || 'null');
+                document.getElementById('quoteBankName').value = savedBank?.bank || '';
+                document.getElementById('quoteBankBranch').value = savedBank?.branch || '';
+                document.getElementById('quoteBankAccount').value = savedBank?.account || '';
+                document.getElementById('quoteBankHolder').value = savedBank?.name || '數位簡報室';
                 document.getElementById('quoteNotes').value = '';
                 document.getElementById('quoteValidUntil').value = '';
                 document.getElementById('quoteStatus').value = 'draft';
@@ -3552,6 +3554,28 @@ ${gscQueriesStr || '無搜尋資料'}
                         document.getElementById('quoteClientName').value = clientMap[proj.organization_id];
                     }
                 }
+                // 自動從課綱匯入報價項目
+                try {
+                    const { data: projArr } = await db.select('projects', {
+                        select: 'outline_versions,outline_data',
+                        filter: { id: `eq.${currentProjectId}` },
+                        limit: 1
+                    });
+                    const p = projArr?.[0];
+                    const versions = p?.outline_versions || [];
+                    const od = versions.length > 0 ? (versions[0]?.data || {}) : (p?.outline_data || {});
+                    const pricing = od.pricing || [];
+                    if (pricing.length > 0) {
+                        _quoteItems = pricing.map(item => ({
+                            label: item.label || '',
+                            type: item.type || 'fixed',
+                            hours: item.hours || 0,
+                            rate: item.rate || 0,
+                            count: item.count || 0,
+                            amount: item.amount || 0
+                        }));
+                    }
+                } catch(e) { console.warn('Auto-import pricing failed:', e); }
             }
             renderQuoteItems();
             // Load outline version pricing summary
@@ -3766,6 +3790,10 @@ ${gscQueriesStr || '無搜尋資料'}
             if (result.error) {
                 showToast('儲存失敗：' + (result.error.message || JSON.stringify(result.error)));
                 return;
+            }
+            // 儲存銀行資訊到 localStorage 作為下次預設值
+            if (record.bank_info && (record.bank_info.bank || record.bank_info.account)) {
+                localStorage.setItem('quoteBankDefaults', JSON.stringify(record.bank_info));
             }
             showToast('報價單已儲存（已同步 ' + (record.variants?.length || 0) + ' 個課綱版本）');
             closeModal('quotationModal');
