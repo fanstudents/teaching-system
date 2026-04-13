@@ -431,7 +431,14 @@
             }
 
             // Phase-based button controls (always from session, not project)
-            const phase = (sessionData && sessionData.current_phase) ? sessionData.current_phase : 'pre-class';
+            let phase = (sessionData && sessionData.current_phase) ? sessionData.current_phase : 'pre-class';
+            // ★ 場次日期已過 → 自動視為 post-class（不依賴講師手動切換）
+            if (sessionData?.date) {
+                const sessionDate = new Date(sessionData.date + 'T23:59:59');
+                if (sessionDate < new Date()) {
+                    phase = 'post-class';
+                }
+            }
             updatePhaseButtons(phase);
 
             // Load course config
