@@ -3501,7 +3501,7 @@ ${gscQueriesStr || '無搜尋資料'}
         };
 
         // 開啟報價編輯器
-        window.openQuoteEditor = function(quoteId) {
+        window.openQuoteEditor = async function(quoteId) {
             const isEdit = !!quoteId;
             document.getElementById('quotationModalTitle').textContent = isEdit ? '編輯報價單' : '建立報價單';
             document.getElementById('quoteDelete').style.display = isEdit ? '' : 'none';
