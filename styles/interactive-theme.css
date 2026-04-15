@@ -120,6 +120,67 @@
     display: none !important;
 }
 
+/* 簡報模式：互動元件允許捲動 */
+.presentation-slide .interactive-element {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 簡報模式：隱藏捲軸但保留捲動功能 */
+.presentation-slide .interactive-element::-webkit-scrollbar {
+    width: 4px;
+}
+.presentation-slide .interactive-element::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 4px;
+}
+.presentation-slide .interactive-element::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ── 小螢幕簡報模式：縮減互動元件 padding ── */
+@media (max-height: 768px) {
+    .presentation-slide .quiz-container,
+    .presentation-slide .poll-container,
+    .presentation-slide .truefalse-container,
+    .presentation-slide .opentext-container,
+    .presentation-slide .scale-container,
+    .presentation-slide .buzzer-container,
+    .presentation-slide .wordcloud-container {
+        padding: 16px 20px;
+    }
+    .presentation-slide .quiz-question,
+    .presentation-slide .poll-question {
+        font-size: 0.95rem;
+        margin-bottom: 14px;
+    }
+    .presentation-slide .quiz-option,
+    .presentation-slide .poll-option {
+        padding: 10px 14px;
+    }
+    .presentation-slide .quiz-options,
+    .presentation-slide .poll-options {
+        gap: 6px;
+    }
+}
+
+/* ── presTopBar 小螢幕適配 ── */
+@media (max-width: 1280px) {
+    .pres-bar-btn {
+        padding: 3px 7px;
+        font-size: 10px;
+    }
+    .pres-bar-group {
+        gap: 2px;
+    }
+    .pres-bar-divider {
+        margin: 0 2px;
+    }
+    .pres-info-text {
+        max-width: 120px;
+    }
+}
+
 /* ========================================
    通用按鈕基底
    ======================================== */

@@ -3447,6 +3447,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             lb?.classList.toggle('open');
             const isOpen = lb?.classList.contains('open') || false;
             pm?.classList.toggle('lb-active', isOpen);
+            this.scalePresentationSlide(); // 重新計算縮放
 
             // 排行榜音樂（從 IndexedDB 讀取）
             if (!this._lbAudio) {
@@ -5260,8 +5261,19 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     scalePresentationSlide() {
         const presentationSlide = document.getElementById('presentationSlide');
-        const scaleX = window.innerWidth / 960;
-        const scaleY = window.innerHeight / 540;
+        if (!presentationSlide) return;
+
+        // 計算可用空間（扣除 top bar + 底部導航 + 排行榜側欄）
+        const presMode = document.getElementById('presentationMode');
+        const topBarH = 42; // presTopBar 高度
+        const bottomNavH = 60; // 底部導航 + margin
+        const lbWidth = presMode?.classList.contains('lb-active') ? 280 : 0;
+
+        const availW = window.innerWidth - lbWidth;
+        const availH = window.innerHeight - topBarH - bottomNavH;
+
+        const scaleX = availW / 960;
+        const scaleY = availH / 540;
         const scale = Math.min(scaleX, scaleY) * 0.95;
         presentationSlide.style.transform = `scale(${scale})`;
     }
