@@ -2297,17 +2297,23 @@ async function importFromProject() {
         }
 
         function doImport(proj) {
+            console.log('[Import] doImport called. versions:', (proj.outline_versions || []).length);
             const versions = proj.outline_versions || [];
             if (versions.length > 1) {
-                // Show version picker
+                console.log('[Import] showing version picker');
                 renderVersionList(proj);
             } else {
-                // Single or no versions — import outline_data directly
                 const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
-                if (!confirm('確定要將「' + (proj.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
+                console.log('[Import] single version, showing confirm');
+                if (!confirm('確定要將「' + (proj.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) {
+                    console.log('[Import] user cancelled');
+                    return;
+                }
                 try {
+                    console.log('[Import] applying outline data...');
                     _applyOutlineData(proj.outline_data);
                     outlineVersions[activeVersionIdx].data = collectOutlineData();
+                    console.log('[Import] ✅ success, removing overlay');
                     overlay.remove();
                 } catch (err) {
                     console.error('[Import] apply error:', err);
@@ -2331,8 +2337,10 @@ async function importFromProject() {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('[Import] project clicked:', item.dataset.id);
                     const selected = available.find(p => p.id === item.dataset.id);
-                    if (!selected) return;
+                    if (!selected) { console.log('[Import] project NOT FOUND'); return; }
+                    console.log('[Import] calling doImport for:', selected.name);
                     doImport(selected);
                 });
             });
@@ -2340,13 +2348,34 @@ async function importFromProject() {
 
         // Close on overlay click
         let _overlayMouseDownTarget = null;
-        overlay.addEventListener('mousedown', e => { _overlayMouseDownTarget = e.target; });
-        overlay.addEventListener('click', e => {
-            if (e.target === overlay && _overlayMouseDownTarget === overlay) overlay.remove();
+        overlay.addEventListener('mousedown', e => {
+            _overlayMouseDownTarget = e.target;
+            console.log('[Import] mousedown on:', e.target.tagName, e.target.className || e.target.id || '(overlay)');
         });
+        overlay.addEventListener('click', e => {
+            console.log('[Import] click on overlay. e.target===overlay?', e.target === overlay, 'mouseDownTarget===overlay?', _overlayMouseDownTarget === overlay);
+            if (e.target === overlay && _overlayMouseDownTarget === overlay) {
+                console.log('[Import] ⚠️ CLOSING via overlay click');
+                overlay.remove();
+            }
+        });
+
+        // Track any removal
+        const obs = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                for (const node of m.removedNodes) {
+                    if (node === overlay || node.contains?.(overlay)) {
+                        console.log('[Import] ⚠️ OVERLAY REMOVED by MutationObserver! Parent:', m.target.tagName, m.target.id);
+                        console.trace('[Import] removal stack trace');
+                    }
+                }
+            }
+        });
+        obs.observe(document.body, { childList: true, subtree: true });
 
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
+        console.log('[Import] modal appended to body ✅');
         renderProjectList();
     } catch(err) {
         console.error('Import error:', err);
