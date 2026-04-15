@@ -2277,18 +2277,26 @@ async function importFromProject() {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     const vidx = parseInt(item.dataset.vidx);
                     const version = versions[vidx];
                     if (!version?.data) { alert('此版本無課綱資料'); return; }
-                    const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
-                    if (!confirm('確定要將「' + (proj.name || '未命名') + ' → ' + (version.name || '版本') + '」導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
+                    _importing = true;
                     try {
                         _applyOutlineData(version.data);
                         outlineVersions[activeVersionIdx].data = collectOutlineData();
                         overlay.remove();
+                        const status = document.getElementById('outlineSaveStatus');
+                        if (status) {
+                            status.textContent = '✓ 已從「' + (proj.name || '未命名') + ' → ' + (version.name || '版本') + '」導入課綱';
+                            status.style.display = 'block';
+                            status.style.color = '#059669';
+                            setTimeout(() => { status.style.display = 'none'; }, 5000);
+                        }
                     } catch (err) {
                         console.error('[Import] apply version error:', err);
                         alert('導入失敗：' + err.message);
+                        _importing = false;
                     }
                 });
             });
@@ -2303,18 +2311,18 @@ async function importFromProject() {
                 console.log('[Import] showing version picker');
                 renderVersionList(proj);
             } else {
-                const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
-                console.log('[Import] single version, showing confirm');
-                if (!confirm('確定要將「' + (proj.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) {
-                    console.log('[Import] user cancelled');
-                    return;
-                }
+                // Single or no versions — import directly (no confirm dialog)
                 try {
-                    console.log('[Import] applying outline data...');
                     _applyOutlineData(proj.outline_data);
                     outlineVersions[activeVersionIdx].data = collectOutlineData();
-                    console.log('[Import] ✅ success, removing overlay');
                     overlay.remove();
+                    const status = document.getElementById('outlineSaveStatus');
+                    if (status) {
+                        status.textContent = '✓ 已從「' + (proj.name || '未命名') + '」導入課綱，請記得按「儲存」';
+                        status.style.display = 'block';
+                        status.style.color = '#059669';
+                        setTimeout(() => { status.style.display = 'none'; }, 5000);
+                    }
                 } catch (err) {
                     console.error('[Import] apply error:', err);
                     alert('導入失敗：' + err.message);
@@ -2332,50 +2340,29 @@ async function importFromProject() {
             // Close
             document.getElementById('importProjCancel').addEventListener('click', () => overlay.remove());
 
-            // Select
+            // Select — use mousedown+mouseup on same element to avoid overlay conflict
             modal.querySelectorAll('.import-proj-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('[Import] project clicked:', item.dataset.id);
+                    e.stopImmediatePropagation();
                     const selected = available.find(p => p.id === item.dataset.id);
-                    if (!selected) { console.log('[Import] project NOT FOUND'); return; }
-                    console.log('[Import] calling doImport for:', selected.name);
+                    if (!selected) return;
+                    _importing = true;
                     doImport(selected);
                 });
             });
         }
 
-        // Close on overlay click
-        let _overlayMouseDownTarget = null;
-        overlay.addEventListener('mousedown', e => {
-            _overlayMouseDownTarget = e.target;
-            console.log('[Import] mousedown on:', e.target.tagName, e.target.className || e.target.id || '(overlay)');
-        });
+        // Close on overlay click — locked during import
+        let _importing = false;
         overlay.addEventListener('click', e => {
-            console.log('[Import] click on overlay. e.target===overlay?', e.target === overlay, 'mouseDownTarget===overlay?', _overlayMouseDownTarget === overlay);
-            if (e.target === overlay && _overlayMouseDownTarget === overlay) {
-                console.log('[Import] ⚠️ CLOSING via overlay click');
-                overlay.remove();
-            }
+            if (_importing) return;
+            if (e.target === overlay) overlay.remove();
         });
-
-        // Track any removal
-        const obs = new MutationObserver((mutations) => {
-            for (const m of mutations) {
-                for (const node of m.removedNodes) {
-                    if (node === overlay || node.contains?.(overlay)) {
-                        console.log('[Import] ⚠️ OVERLAY REMOVED by MutationObserver! Parent:', m.target.tagName, m.target.id);
-                        console.trace('[Import] removal stack trace');
-                    }
-                }
-            }
-        });
-        obs.observe(document.body, { childList: true, subtree: true });
 
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
-        console.log('[Import] modal appended to body ✅');
         renderProjectList();
     } catch(err) {
         console.error('Import error:', err);
