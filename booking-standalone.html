@@ -1,0 +1,346 @@
+<!--
+  預約模組 — 純 HTML + CSS
+  JS 放到 kaik.io 的「自訂 JavaScript」區
+  HTML 放到 kaik.io 的「HTML 區塊」
+-->
+
+<style>
+/* ── Reset & Base ── */
+.bk-root *, .bk-root *::before, .bk-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.bk-root {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'Helvetica Neue', sans-serif;
+    color: #1e293b; line-height: 1.6; text-align: left;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Trigger Button ── */
+.bk-trigger-wrap { text-align: center; padding: 40px 20px; }
+.bk-trigger {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d55 100%);
+    color: #fff; border: none; border-radius: 100px;
+    font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: all .3s cubic-bezier(.22,1,.36,1);
+    box-shadow: 0 4px 20px rgba(26,26,46,.25);
+}
+.bk-trigger:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(26,26,46,.35); }
+
+/* ── Modal Overlay ── */
+.bk-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 99999; display: none;
+    align-items: center; justify-content: center; padding: 20px;
+}
+.bk-overlay.active { display: flex; }
+
+/* ── Modal ── */
+.bk-modal {
+    background: #fff; border-radius: 24px;
+    width: 100%; max-width: 580px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+    animation: bkModalUp .3s cubic-bezier(.22,1,.36,1);
+    text-align: left;
+}
+@keyframes bkModalUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.bk-drag-handle {
+    display: none; width: 36px; height: 4px; border-radius: 2px;
+    background: #cbd5e1; margin: 10px auto 0;
+}
+.bk-header {
+    padding: 28px 32px 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    text-align: left;
+}
+.bk-header h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; text-align: left; }
+.bk-header p { font-size: .88rem; color: #94a3b8; margin-top: 6px; text-align: left; }
+.bk-close {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: #f1f5f9; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: #94a3b8; transition: all .2s; flex-shrink: 0;
+}
+.bk-close:hover { background: #e2e8f0; color: #1e293b; }
+
+/* ── Step indicator ── */
+.bk-steps { display: flex; gap: 0; padding: 16px 32px; border-bottom: 1px solid #f0f0f5; text-align: left; }
+.bk-stp {
+    flex: 1; display: flex; align-items: center; gap: 8px; padding: 10px 0;
+    color: #94a3b8; font-size: .82rem; font-weight: 500;
+}
+.bk-stp span {
+    width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700; color: #64748b; transition: all .3s; flex-shrink: 0;
+}
+.bk-stp.active span { background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; }
+.bk-stp.active { color: #1e293b; font-weight: 600; }
+.bk-stp.done span { background: #10b981; color: #fff; }
+.bk-stp.done { color: #10b981; }
+
+/* ── Step content ── */
+.bk-body { padding: 0; text-align: left; }
+.bk-step { display: none; padding: 20px 32px 28px; text-align: left; }
+.bk-step.active { display: block; }
+
+/* ── Calendar ── */
+.bk-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.bk-cal-month { font-size: 1rem; font-weight: 700; color: #1e293b; text-align: center; }
+.bk-cal-btn {
+    background: none; border: 1px solid #e2e8f0; border-radius: 8px;
+    width: 40px; height: 40px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; color: #475569; font-size: 1.2rem;
+}
+.bk-cal-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+.bk-cal-btn:disabled { opacity: .3; cursor: not-allowed; }
+.bk-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; min-height: 240px; }
+.bk-cal-head { text-align: center; font-size: .72rem; color: #94a3b8; font-weight: 600; padding: 8px 0; }
+.bk-cal-day {
+    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 10px; font-size: .85rem; font-weight: 600; cursor: pointer;
+    border: 2px solid transparent; transition: all .2s; position: relative; text-align: center;
+}
+.bk-cal-day:hover:not(.dis):not(.emp) { border-color: #3b82f6; background: #eff6ff; }
+.bk-cal-day.sel { border-color: #3b82f6; background: #3b82f6; color: #fff; }
+.bk-cal-day.dis { color: #cbd5e1; cursor: not-allowed; opacity: .4; }
+.bk-cal-day.emp { cursor: default; }
+.bk-cal-day .dot { width: 5px; height: 5px; border-radius: 50%; background: #10b981; margin-top: 2px; }
+.bk-cal-day.sel .dot { background: #a7f3d0; }
+.bk-cal-day.dis .dot { background: #cbd5e1; }
+.bk-loading {
+    grid-column: 1/-1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px; padding: 40px 0;
+    color: #94a3b8; font-size: .85rem; text-align: center;
+}
+.bk-spinner {
+    width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #3b82f6;
+    border-radius: 50%; animation: bkSpin .6s linear infinite;
+}
+@keyframes bkSpin { to { transform: rotate(360deg); } }
+
+/* ── Time Slots ── */
+.bk-sel-date {
+    font-size: .92rem; font-weight: 600; color: #1e293b; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 6px; text-align: left;
+}
+.bk-time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+.bk-time-slot {
+    padding: 12px 8px; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center;
+    font-size: .88rem; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.bk-time-slot:hover { border-color: #3b82f6; background: #eff6ff; }
+.bk-time-slot.sel { border-color: #3b82f6; background: #3b82f6; color: #fff; }
+.bk-time-slot .tl { font-size: .72rem; color: #94a3b8; font-weight: 400; margin-top: 2px; }
+.bk-time-slot.sel .tl { color: #bfdbfe; }
+.bk-back {
+    background: none; border: none; color: #64748b; font-size: .85rem; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px; padding: 8px 0;
+    font-family: inherit; text-align: left;
+}
+.bk-back:hover { color: #3b82f6; }
+
+/* ── Form ── */
+.bk-summary {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+    font-size: .88rem; color: #1e293b; text-align: left;
+}
+.bk-summary .icn { font-size: 1.3rem; }
+.bk-fg { margin-bottom: 18px; text-align: left; }
+.bk-fg label {
+    display: block; font-size: .85rem; font-weight: 600; color: #1e293b;
+    margin-bottom: 8px; text-align: left;
+}
+.bk-fg label .rq { color: #3b82f6; }
+.bk-fg input, .bk-fg select, .bk-fg textarea {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: .92rem;
+    font-family: inherit; color: #1e293b;
+    outline: none; transition: all .2s; background: #fff; text-align: left;
+}
+.bk-fg input:focus, .bk-fg select:focus, .bk-fg textarea:focus {
+    border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+}
+.bk-fg textarea { resize: vertical; min-height: 80px; }
+.bk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bk-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.bk-submit {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px; background: #1a1a2e; color: #fff;
+    border: none; border-radius: 100px;
+    font-size: .95rem; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: all .25s;
+}
+.bk-submit:hover { background: #000; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+.bk-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* ── Success ── */
+.bk-success { text-align: center; padding: 40px 0; }
+.bk-success .emoji { font-size: 3.5rem; margin-bottom: 16px; }
+.bk-success h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
+.bk-success p { color: #64748b; font-size: .92rem; line-height: 1.7; margin-bottom: 8px; }
+.bk-line-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px; background: #06c755; color: #fff; border: none; border-radius: 100px;
+    font-size: .95rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    font-family: inherit; transition: all .25s; margin-top: 16px;
+}
+.bk-line-btn:hover { background: #05b34d; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(6,199,85,.3); }
+
+/* ── Mobile: Full-screen bottom sheet (APP feel) ── */
+@media (max-width: 600px) {
+    .bk-overlay { align-items: flex-end; padding: 0; }
+    .bk-modal {
+        max-width: 100%; max-height: 100%;
+        border-radius: 20px 20px 0 0;
+        height: 95vh; height: 95dvh;
+        animation: bkSlideUp .35s cubic-bezier(.22,1,.36,1);
+        display: flex; flex-direction: column;
+    }
+    @keyframes bkSlideUp {
+        from { transform: translateY(100%); }
+        to   { transform: translateY(0); }
+    }
+    .bk-drag-handle { display: block; }
+    .bk-header { padding: 16px 20px 0; }
+    .bk-header h2 { font-size: 1.2rem; }
+    .bk-steps { padding: 12px 20px; }
+    .bk-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .bk-step { padding: 16px 20px 32px; }
+    .bk-step.active { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+    .bk-time-grid { grid-template-columns: repeat(3, 1fr); }
+    .bk-row { grid-template-columns: 1fr; }
+    .bk-actions {
+        flex-direction: column-reverse; gap: 12px;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .bk-submit { width: 100%; justify-content: center; padding: 16px; font-size: 1rem; }
+    .bk-back { justify-content: center; width: 100%; }
+    .bk-cal-day { font-size: .9rem; }
+    .bk-time-slot { padding: 14px 8px; }
+}
+</style>
+
+<div class="bk-root">
+    <div class="bk-trigger-wrap">
+        <button class="bk-trigger">📅 預約免費 AI 諮詢</button>
+    </div>
+
+    <div class="bk-overlay" id="bkOverlay">
+        <div class="bk-modal">
+            <div class="bk-drag-handle"></div>
+            <div class="bk-header">
+                <div>
+                    <h2 id="bkTitle">預約免費諮詢</h2>
+                    <p id="bkSubtitle">選擇您方便的日期與時段</p>
+                </div>
+                <button class="bk-close">✕</button>
+            </div>
+
+            <div class="bk-steps" id="bkSteps">
+                <div class="bk-stp active" data-s="1"><span>1</span>選日期</div>
+                <div class="bk-stp" data-s="2"><span>2</span>選時段</div>
+                <div class="bk-stp" data-s="3"><span>3</span>填寫資料</div>
+            </div>
+
+            <div class="bk-body">
+                <!-- Step 1: Calendar -->
+                <div class="bk-step active" id="bkS1">
+                    <div class="bk-cal-nav">
+                        <button class="bk-cal-btn" id="bkCalPrev">‹</button>
+                        <div class="bk-cal-month" id="bkCalLabel"></div>
+                        <button class="bk-cal-btn" id="bkCalNext">›</button>
+                    </div>
+                    <div class="bk-cal-grid" id="bkCalGrid">
+                        <div class="bk-loading">
+                            <div class="bk-spinner"></div>
+                            <p>正在載入可用時段...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Time slots -->
+                <div class="bk-step" id="bkS2">
+                    <div class="bk-sel-date" id="bkDateLabel"></div>
+                    <div class="bk-time-grid" id="bkTimeGrid"></div>
+                    <button class="bk-back">← 重選日期</button>
+                </div>
+
+                <!-- Step 3: Form -->
+                <div class="bk-step" id="bkS3">
+                    <div class="bk-summary" id="bkSummary"></div>
+                    <form id="bkForm">
+                        <div class="bk-row">
+                            <div class="bk-fg">
+                                <label>聯絡人姓名 <span class="rq">*</span></label>
+                                <input type="text" id="bkFName" required placeholder="例：王大明">
+                            </div>
+                            <div class="bk-fg">
+                                <label>職稱</label>
+                                <input type="text" id="bkFTitle" placeholder="例：行銷總監">
+                            </div>
+                        </div>
+                        <div class="bk-row">
+                            <div class="bk-fg">
+                                <label>Email <span class="rq">*</span></label>
+                                <input type="email" id="bkFEmail" required placeholder="your@email.com">
+                            </div>
+                            <div class="bk-fg">
+                                <label>電話</label>
+                                <input type="tel" id="bkFPhone" placeholder="09xx-xxx-xxx">
+                            </div>
+                        </div>
+                        <div class="bk-row">
+                            <div class="bk-fg">
+                                <label>公司名稱</label>
+                                <input type="text" id="bkFCompany" placeholder="貴公司全名">
+                            </div>
+                            <div class="bk-fg">
+                                <label>LINE ID</label>
+                                <input type="text" id="bkFLine" placeholder="方便聯繫">
+                            </div>
+                        </div>
+                        <div class="bk-fg">
+                            <label>公司規模</label>
+                            <select id="bkFHeadcount" style="max-width:240px;">
+                                <option value="">請選擇</option>
+                                <option>1-10 人</option>
+                                <option>11-50 人</option>
+                                <option>51-200 人</option>
+                                <option>200 人以上</option>
+                            </select>
+                        </div>
+                        <div class="bk-fg">
+                            <label>目前遇到的挑戰或期望</label>
+                            <textarea id="bkFMessage" rows="3" placeholder="簡述您目前在 AI 導入上遇到的困難…"></textarea>
+                        </div>
+                        <div class="bk-actions">
+                            <button type="button" class="bk-back">← 重選時段</button>
+                            <button type="submit" class="bk-submit" id="bkSubmitBtn">✓ 確認預約</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Success -->
+                <div class="bk-step" id="bkSuccess">
+                    <div class="bk-success">
+                        <div class="emoji">🎉</div>
+                        <h3>預約成功！</h3>
+                        <p id="bkSuccessDetail"></p>
+                        <p style="font-size:.85rem;">我們已發送行事曆邀請到您的信箱，也會在 24 小時內主動聯繫您。</p>
+                        <a href="https://lin.ee/rs72Zfm" target="_blank" rel="noopener" class="bk-line-btn">
+                            💬 LINE 即時聯繫
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

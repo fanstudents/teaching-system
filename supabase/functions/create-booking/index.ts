@@ -98,6 +98,7 @@ serve(async (req) => {
                 const startDt = new Date(`${date}T${String(hour).padStart(2, '0')}:00:00+08:00`);
                 const endDt = new Date(startDt.getTime() + 60 * 60 * 1000);
 
+                const ownerEmail = calendarId === 'primary' ? sa.client_email : calendarId;
                 const eventBody = {
                     summary: `【諮詢預約】${name}${company ? ` - ${company}` : ''}`,
                     description: [
@@ -117,7 +118,10 @@ serve(async (req) => {
                         dateTime: endDt.toISOString(),
                         timeZone: 'Asia/Taipei'
                     },
-                    attendees: [{ email }],
+                    attendees: [
+                        { email: ownerEmail, responseStatus: 'accepted' },
+                        { email }
+                    ],
                     reminders: {
                         useDefault: false,
                         overrides: [

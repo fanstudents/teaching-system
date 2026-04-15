@@ -2216,7 +2216,7 @@ async function importFromProject() {
                 if (versions.length > 1) meta.push(versions.length + ' 個版本');
                 const metaStr = meta.length ? meta.join(' · ') : '尚無內容';
 
-                html += '<button class="import-proj-item" data-id="' + p.id + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
+                html += '<button type="button" class="import-proj-item" data-id="' + p.id + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
                 html += '<div style="font-weight:700;font-size:0.92rem;margin-bottom:4px">' + (p.name || '未命名專案') + '</div>';
                 if (subtitle) html += '<div style="font-size:0.78rem;color:#64748b;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px">' + subtitle + '</div>';
                 html += '<div style="font-size:0.72rem;color:#94a3b8">' + metaStr + '</div>';
@@ -2224,7 +2224,7 @@ async function importFromProject() {
             });
 
             html += '</div>';
-            html += '<button id="importProjCancel" style="margin-top:16px;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:0.85rem;font-family:inherit;color:#64748b">取消</button>';
+            html += '<button type="button" id="importProjCancel" style="margin-top:16px;width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;cursor:pointer;font-size:0.85rem;font-family:inherit;color:#64748b">取消</button>';
             modal.innerHTML = html;
             bindProjectEvents();
         }
@@ -2232,7 +2232,7 @@ async function importFromProject() {
         function renderVersionList(proj) {
             const versions = proj.outline_versions || [];
             let html = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">';
-            html += '<button id="importBackBtn" style="padding:4px 8px;border:none;background:none;cursor:pointer;color:#64748b;font-size:1.1rem">←</button>';
+            html += '<button type="button" id="importBackBtn" style="padding:4px 8px;border:none;background:none;cursor:pointer;color:#64748b;font-size:1.1rem">←</button>';
             html += '<div><h3 style="margin:0;font-size:1.05rem">' + (proj.name || '未命名') + '</h3><p style="margin:2px 0 0;font-size:.78rem;color:#94a3b8">選擇要導入的版本</p></div>';
             html += '</div>';
             html += '<div style="display:flex;flex-direction:column;gap:8px">';
@@ -2252,7 +2252,7 @@ async function importFromProject() {
                 const metaStr = meta.length ? meta.join(' · ') : '';
                 const subtitle = vData.hero?.subtitle || '';
 
-                html += '<button class="import-version-item" data-vidx="' + i + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
+                html += '<button type="button" class="import-version-item" data-vidx="' + i + '" style="text-align:left;padding:14px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;cursor:pointer;transition:all 0.15s;font-family:inherit">';
                 html += '<div style="font-weight:700;font-size:0.88rem;margin-bottom:3px">' + (v.name || '版本 ' + (i + 1)) + '</div>';
                 if (subtitle) html += '<div style="font-size:0.76rem;color:#64748b;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:380px">' + subtitle + '</div>';
                 if (metaStr) html += '<div style="font-size:0.7rem;color:#94a3b8">' + metaStr + '</div>';
@@ -2275,15 +2275,21 @@ async function importFromProject() {
             // Select version
             modal.querySelectorAll('.import-version-item').forEach(item => {
                 item.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     const vidx = parseInt(item.dataset.vidx);
                     const version = versions[vidx];
                     if (!version?.data) { alert('此版本無課綱資料'); return; }
                     const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
                     if (!confirm('確定要將「' + (proj.name || '未命名') + ' → ' + (version.name || '版本') + '」導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
-                    overlay.remove();
-                    _applyOutlineData(version.data);
-                    outlineVersions[activeVersionIdx].data = collectOutlineData();
+                    try {
+                        _applyOutlineData(version.data);
+                        outlineVersions[activeVersionIdx].data = collectOutlineData();
+                        overlay.remove();
+                    } catch (err) {
+                        console.error('[Import] apply version error:', err);
+                        alert('導入失敗：' + err.message);
+                    }
                 });
             });
 
@@ -2299,9 +2305,14 @@ async function importFromProject() {
                 // Single or no versions — import outline_data directly
                 const vName = outlineVersions[activeVersionIdx]?.name || '版本 ' + (activeVersionIdx + 1);
                 if (!confirm('確定要將「' + (proj.name || '未命名') + '」的課綱導入到「' + vName + '」嗎？\n僅替換目前版本，其他版本不受影響。')) return;
-                overlay.remove();
-                _applyOutlineData(proj.outline_data);
-                outlineVersions[activeVersionIdx].data = collectOutlineData();
+                try {
+                    _applyOutlineData(proj.outline_data);
+                    outlineVersions[activeVersionIdx].data = collectOutlineData();
+                    overlay.remove();
+                } catch (err) {
+                    console.error('[Import] apply error:', err);
+                    alert('導入失敗：' + err.message);
+                }
             }
         }
 
@@ -2318,6 +2329,7 @@ async function importFromProject() {
             // Select
             modal.querySelectorAll('.import-proj-item').forEach(item => {
                 item.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     const selected = available.find(p => p.id === item.dataset.id);
                     if (!selected) return;
