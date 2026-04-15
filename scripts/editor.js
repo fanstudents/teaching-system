@@ -210,6 +210,8 @@ export class Editor {
      * 處理圖片上傳 — 壓縮 + 上傳到 Storage（fallback base64）
      */
     async handleImageUpload(file) {
+        const isGif = file.type === 'image/gif';
+
         // 讀取原始圖片取得尺寸
         const dataUrl = await new Promise((resolve) => {
             const reader = new FileReader();
@@ -230,33 +232,52 @@ export class Editor {
         if (width > maxWidth) { height = (height / width) * maxWidth; width = maxWidth; }
         if (height > maxHeight) { width = (width / height) * maxHeight; height = maxHeight; }
 
-        // ── 壓縮圖片（max 1920px, JPEG 0.92）避免 base64 過大 ──
-        const MAX_DIM = 1920;
-        let cw = img.width, ch = img.height;
-        if (cw > MAX_DIM || ch > MAX_DIM) {
-            if (cw > ch) { ch = Math.round(ch * MAX_DIM / cw); cw = MAX_DIM; }
-            else { cw = Math.round(cw * MAX_DIM / ch); ch = MAX_DIM; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = cw;
-        canvas.height = ch;
-        canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
-        const compressedBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
-        const compressedUrl = canvas.toDataURL('image/jpeg', 0.92);
-        console.log(`[Image] original ${(file.size / 1024).toFixed(0)}KB → compressed ${(compressedBlob.size / 1024).toFixed(0)}KB (${cw}x${ch})`);
+        let src;
 
-        // ── 嘗試上傳到 Supabase Storage ──
-        let src = compressedUrl; // fallback = compressed base64
-        try {
-            const { storage } = await import('./supabase.js');
-            const key = `images/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
-            const result = await storage.upload('homework', key, compressedBlob);
-            if (result.data?.url) {
-                src = result.data.url;
-                console.log('[Image] uploaded to Storage:', src);
+        if (isGif) {
+            // ── GIF：不壓縮（canvas 會殺掉動畫），直接上傳原檔 ──
+            try {
+                const { storage } = await import('./supabase.js');
+                const key = `images/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.gif`;
+                const result = await storage.upload('slides', key, file);
+                if (result.data?.url) {
+                    src = result.data.url;
+                    console.log('[Image] GIF uploaded to Storage:', src);
+                } else {
+                    throw new Error(result.error?.message || 'Upload failed');
+                }
+            } catch (e) {
+                console.warn('[Image] GIF upload failed, using base64:', e.message);
+                src = dataUrl;
             }
-        } catch (e) {
-            console.warn('[Image] Storage upload failed, using compressed base64:', e.message);
+        } else {
+            // ── 非 GIF：壓縮 + 上傳 ──
+            const MAX_DIM = 1920;
+            let cw = img.width, ch = img.height;
+            if (cw > MAX_DIM || ch > MAX_DIM) {
+                if (cw > ch) { ch = Math.round(ch * MAX_DIM / cw); cw = MAX_DIM; }
+                else { cw = Math.round(cw * MAX_DIM / ch); ch = MAX_DIM; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = cw;
+            canvas.height = ch;
+            canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+            const compressedBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.92));
+            const compressedUrl = canvas.toDataURL('image/jpeg', 0.92);
+            console.log(`[Image] original ${(file.size / 1024).toFixed(0)}KB → compressed ${(compressedBlob.size / 1024).toFixed(0)}KB (${cw}x${ch})`);
+
+            src = compressedUrl; // fallback
+            try {
+                const { storage } = await import('./supabase.js');
+                const key = `images/${this.slideManager.currentProjectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+                const result = await storage.upload('slides', key, compressedBlob);
+                if (result.data?.url) {
+                    src = result.data.url;
+                    console.log('[Image] uploaded to Storage:', src);
+                }
+            } catch (e) {
+                console.warn('[Image] Storage upload failed, using compressed base64:', e.message);
+            }
         }
 
         const element = {
