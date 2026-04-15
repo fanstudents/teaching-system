@@ -4470,7 +4470,7 @@ export class SlideManager {
             const page = await pdf.getPage(pageNum);
 
             if (mode === 'image') {
-                // ── 截圖模式：渲染為圖片 ──
+                // ── 截圖模式：渲染為圖片，上傳到 Storage ──
                 const scale = 2;
                 const viewport = page.getViewport({ scale });
                 const canvas = document.createElement('canvas');
@@ -4479,12 +4479,26 @@ export class SlideManager {
                 const ctx = canvas.getContext('2d');
 
                 await page.render({ canvasContext: ctx, viewport }).promise;
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                // 上傳到 Supabase Storage
+                let imgSrc;
+                try {
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+                    const { storage } = await import('./supabase.js');
+                    const projectId = this.currentProjectId || 'unknown';
+                    const key = `pdf-slides/${projectId}/${Date.now()}-p${pageNum}.jpg`;
+                    const { data: uploadData, error: uploadErr } = await storage.upload('slides', key, blob);
+                    if (uploadErr) throw new Error(uploadErr.message || 'Upload failed');
+                    imgSrc = uploadData.url;
+                } catch (uploadErr) {
+                    console.warn(`[PDF] 第 ${pageNum} 頁上傳失敗，使用 base64 fallback:`, uploadErr.message);
+                    imgSrc = canvas.toDataURL('image/jpeg', 0.85);
+                }
 
                 newSlides.push({
                     id: gen(),
                     elements: [
-                        { id: gen(), type: 'image', x: 0, y: 0, width: 960, height: 540, src: dataUrl }
+                        { id: gen(), type: 'image', x: 0, y: 0, width: 960, height: 540, src: imgSrc }
                     ],
                     background: '#ffffff'
                 });
