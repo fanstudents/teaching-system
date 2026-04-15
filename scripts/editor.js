@@ -3158,6 +3158,19 @@ ${truncated}
                     <label>題目</label>
                     <input type="text" id="pollQuestion" value="${elementData.question || ''}" placeholder="請輸入投票題目">
                 </div>
+                <div class="property-row" style="margin-top:8px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
+                        <input type="checkbox" id="pollMultiSelect" ${elementData.multiSelect ? 'checked' : ''} style="accent-color:#4285f4;width:16px;height:16px;">
+                        允許多選
+                    </label>
+                    ${elementData.multiSelect ? `
+                    <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+                        <label style="font-size:0.8rem;color:#64748b;">最多可選</label>
+                        <input type="number" id="pollMaxSelect" value="${elementData.maxSelect || 0}" min="0" max="10" style="width:50px;padding:3px 6px;border:1px solid #d1d5db;border-radius:6px;font-size:0.8rem;text-align:center;">
+                        <span style="font-size:0.75rem;color:#94a3b8;">0=不限</span>
+                    </div>
+                    ` : ''}
+                </div>
             </div>
             <div class="property-section">
                 <div class="property-section-title">選項</div>
@@ -3259,6 +3272,22 @@ ${truncated}
             this.slideManager.renderCurrentSlide();
             this.selectElementById(elementId);
         });
+
+        // 多選開關
+        const multiSelectCb = document.getElementById('pollMultiSelect');
+        if (multiSelectCb) {
+            multiSelectCb.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { multiSelect: multiSelectCb.checked });
+                this.slideManager.renderCurrentSlide();
+                this.selectElementById(elementId);
+            });
+        }
+        const maxSelectInput = document.getElementById('pollMaxSelect');
+        if (maxSelectInput) {
+            maxSelectInput.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { maxSelect: parseInt(maxSelectInput.value) || 0 });
+            });
+        }
 
         if (optionList) {
             optionList.querySelectorAll('.pair-item').forEach(item => {

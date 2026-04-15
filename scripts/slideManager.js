@@ -1132,7 +1132,11 @@ export class SlideManager {
                     const fetchAndRender = () => {
                         import('./interactive/stateManager.js').then(({ stateManager }) => {
                             // ★ 使用與側欄相同的 effectiveSessionId（場次 UUID 優先）
-                            const effectiveSessionId = stateManager.getSessionCode() || window.app.sessionCode;
+                            const effectiveSessionId = stateManager.getSessionCode()
+                                || (window.app && window.app.sessionCode)
+                                || new URLSearchParams(location.search).get('code')
+                                || new URLSearchParams(location.search).get('session')
+                                || '';
                             stateManager.getLeaderboard(effectiveSessionId, projectId).then(data => {
                                 if (data.length > 0) self._renderLeaderboardContent(el, title, data);
                             });
@@ -2557,10 +2561,13 @@ export class SlideManager {
     renderPollElement(el, element) {
         const markers = 'ABCDEFGHIJ';
         const options = element.options || [];
+        const isMulti = element.multiSelect || false;
+        const maxSel = element.maxSelect || 0;
+        const hint = isMulti ? (maxSel > 0 ? `可多選（最多 ${maxSel} 項）` : '可多選') : '';
 
         el.innerHTML = `
-            <div class="poll-container" data-element-id="${element.id}">
-                <div class="poll-question">${element.question || '請投票'}</div>
+            <div class="poll-container" data-element-id="${element.id}"${isMulti ? ` data-multi-select="true"` : ''}${maxSel > 0 ? ` data-max-select="${maxSel}"` : ''}>
+                <div class="poll-question">${element.question || '請投票'}${hint ? `<span style="font-size:0.75em;font-weight:400;color:#64748b;margin-left:8px;">${hint}</span>` : ''}</div>
                 <div class="poll-options">
                     ${options.map((opt, i) => `
                         <div class="poll-option" data-index="${i}">
@@ -2571,6 +2578,7 @@ export class SlideManager {
                 </div>
                 <div class="poll-footer">
                     <span class="poll-total"></span>
+                    ${isMulti ? '<button class="poll-multi-submit" style="display:none;margin-left:auto;padding:6px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">確認送出</button>' : ''}
                 </div>
             </div>
         `;

@@ -739,8 +739,8 @@
                 try {
                     const { stateManager } = await import('./scripts/interactive/stateManager.js');
 
-                    // 嘗試從 URL 的 session 參數取得場次 UUID
-                    let sessionUUID = urlParams.get('session') || '';
+                    // 嘗試從 URL 的 sid 或 session 參數取得場次 UUID
+                    let sessionUUID = urlParams.get('sid') || urlParams.get('session') || '';
 
                     // ★ 如果 session 參數不是 UUID 格式（短碼如 KVMB2J），查詢真正的 UUID
                     if (sessionUUID && !sessionUUID.includes('-')) {

@@ -28,6 +28,8 @@ export class PollGame {
         const optionEls = container.querySelectorAll('.poll-option');
         const elementId = container.closest('[data-id]')?.dataset.id || container.dataset.elementId || '';
         const sessionCode = this._getSessionCode();
+        const isMulti = container.dataset.multiSelect === 'true';
+        const maxSelect = parseInt(container.dataset.maxSelect) || 0;
 
         // 載入歷史票數
         this._loadVotes(elementId, sessionCode, container);
@@ -39,19 +41,60 @@ export class PollGame {
             return;
         }
 
-        optionEls.forEach((opt, i) => {
-            opt.addEventListener('click', () => {
-                if (this._voted.has(elementId) || container.classList.contains('poll-locked')) return;
-                this._voted.add(elementId);
+        if (isMulti) {
+            // ── 多選模式 ──
+            const selected = new Set();
+            const submitBtn = container.querySelector('.poll-multi-submit');
 
-                // 視覺回饋
-                optionEls.forEach(o => o.classList.remove('poll-selected'));
-                opt.classList.add('poll-selected');
+            optionEls.forEach((opt, i) => {
+                opt.addEventListener('click', () => {
+                    if (this._voted.has(elementId) || container.classList.contains('poll-locked')) return;
 
-                // 記錄投票
-                this._submitVote(elementId, i, sessionCode, container, optionEls);
+                    if (selected.has(i)) {
+                        selected.delete(i);
+                        opt.classList.remove('poll-selected');
+                    } else {
+                        if (maxSelect > 0 && selected.size >= maxSelect) return; // 已達上限
+                        selected.add(i);
+                        opt.classList.add('poll-selected');
+                    }
+
+                    // 顯示/隱藏送出按鈕
+                    if (submitBtn) {
+                        submitBtn.style.display = selected.size > 0 ? 'inline-block' : 'none';
+                        submitBtn.textContent = `確認送出（${selected.size}）`;
+                    }
+                });
             });
-        });
+
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => {
+                    if (selected.size === 0 || this._voted.has(elementId)) return;
+                    this._voted.add(elementId);
+                    // 為每個選中的選項提交一票
+                    for (const idx of selected) {
+                        this._submitVote(elementId, idx, sessionCode, container, optionEls);
+                    }
+                    this._markVoted(container, optionEls);
+                    submitBtn.style.display = 'none';
+                });
+            }
+        } else {
+            // ── 單選模式（原邏輯）──
+            optionEls.forEach((opt, i) => {
+                opt.addEventListener('click', () => {
+                    if (this._voted.has(elementId) || container.classList.contains('poll-locked')) return;
+                    this._voted.add(elementId);
+
+                    // 視覺回饋
+                    optionEls.forEach(o => o.classList.remove('poll-selected'));
+                    opt.classList.add('poll-selected');
+
+                    // 記錄投票
+                    this._submitVote(elementId, i, sessionCode, container, optionEls);
+                });
+            });
+        }
 
         // 監聽開票鎖定
         if (typeof realtime !== 'undefined' && realtime.isConnected && sessionCode) {
