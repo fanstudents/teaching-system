@@ -458,12 +458,22 @@
             badge.innerHTML = `<span class="material-symbols-outlined icon-xs">radio_button_checked</span> ${phaseLabels[phase]}`;
 
             // Hide homework & summary for external slide mode
-            const isExternal = project.slide_mode === 'external';
+            // 場次設定優先，fallback 到專案設定
+            const effSlideMode = (sessionData?.slide_mode && sessionData.slide_mode !== 'inherit')
+                ? sessionData.slide_mode
+                : (project.slide_mode || 'internal');
+            const effExternalUrl = (sessionData?.slide_mode === 'external' && sessionData.external_url)
+                ? sessionData.external_url
+                : project.course_link;
+            const isExternal = effSlideMode === 'external';
             if (isExternal) {
                 const duo = document.querySelector('.res-duo');
                 if (duo) duo.style.display = 'none';
                 const heroDesc = document.querySelector('.res-hero-desc');
                 if (heroDesc) heroDesc.textContent = '點擊前往外部課程講義';
+                // 更換 icon
+                const heroIcon = document.querySelector('.res-hero-icon .material-symbols-outlined');
+                if (heroIcon) heroIcon.textContent = 'open_in_new';
             }
 
             const slides = document.getElementById('btnSlides');
@@ -471,8 +481,8 @@
                 slides.classList.remove('locked');
                 slides.classList.add('unlocked');
                 slides.removeAttribute('aria-disabled');
-                if (isExternal && project.course_link) {
-                    slides.href = project.course_link;
+                if (isExternal && effExternalUrl) {
+                    slides.href = effExternalUrl;
                     slides.setAttribute('target', '_blank');
                 } else {
                     const sessionId = sessionData?.id || sessionParam;
