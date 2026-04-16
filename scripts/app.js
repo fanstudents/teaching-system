@@ -3475,21 +3475,13 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             }
         });
 
-        // 演講者備忘稿 toggle
+        // 演講者備忘稿 toggle → 獨立彈出視窗
         document.getElementById('presNotesToggle')?.addEventListener('click', () => {
-            const panel = document.getElementById('presNotesPanel');
-            const pm = document.getElementById('presentationMode');
-            panel?.classList.toggle('open');
-            const isOpen = panel?.classList.contains('open') || false;
-            pm?.classList.toggle('notes-active', isOpen);
-            this.scalePresentationSlide();
-
-            if (isOpen) {
-                this._startPresTimer();
-                this._updatePresNotes();
-            } else {
-                this._stopPresTimer();
+            if (this._notesPopup && !this._notesPopup.closed) {
+                this._notesPopup.focus();
+                return;
             }
+            this._openNotesPopup();
         });
     }
 
@@ -5276,12 +5268,17 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.removeQA();
 
         // 清理備忘稿面板
-        this._stopPresTimer();
+        if (this._presTimerInterval) {
+            clearInterval(this._presTimerInterval);
+            this._presTimerInterval = null;
+        }
+        if (this._notesPopup && !this._notesPopup.closed) {
+            this._notesPopup.close();
+        }
+        this._notesPopup = null;
         const notesPanel = document.getElementById('presNotesPanel');
         notesPanel?.classList.remove('open');
         document.getElementById('presentationMode')?.classList.remove('notes-active');
-        const timerEl = document.getElementById('presTimer');
-        if (timerEl) timerEl.textContent = '00:00';
     }
 
     scalePresentationSlide() {
@@ -5293,9 +5290,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const topBarH = 42; // presTopBar 高度
         const bottomNavH = 60; // 底部導航 + margin
         const lbWidth = presMode?.classList.contains('lb-active') ? 280 : 0;
-        const notesWidth = presMode?.classList.contains('notes-active') ? 320 : 0;
 
-        const availW = window.innerWidth - lbWidth - notesWidth;
+        const availW = window.innerWidth - lbWidth;
         const availH = window.innerHeight - topBarH - bottomNavH;
 
         const scaleX = availW / 960;
@@ -5304,113 +5300,148 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         presentationSlide.style.transform = `scale(${scale})`;
     }
 
-    // ── 演講者備忘稿面板 ──
+    _openNotesPopup() {
+        const w = 420, h = 650;
+        const left = window.screenX + window.outerWidth - w - 30;
+        const top = window.screenY + 60;
+        this._notesPopup = window.open('', 'presenterNotes',
+            `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+        if (!this._notesPopup) {
+            alert('請允許彈出視窗（瀏覽器可能已封鎖）');
+            return;
+        }
+        const doc = this._notesPopup.document;
+        doc.title = '演講者備忘稿';
+        doc.head.innerHTML = `<meta charset="utf-8"><style>
+            *{margin:0;padding:0;box-sizing:border-box}
+            body{font-family:'Inter','Noto Sans TC',system-ui,sans-serif;background:#1a1a2e;color:#e2e8f0;padding:16px;overflow-y:auto}
+            .timer{font-size:2rem;font-weight:700;text-align:center;color:#60a5fa;font-variant-numeric:tabular-nums;margin-bottom:12px}
+            .counter{text-align:center;font-size:.85rem;color:#94a3b8;margin-bottom:16px}
+            .section-label{font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+            .notes-content{font-size:.95rem;line-height:1.7;color:#e2e8f0;white-space:pre-wrap;padding:12px 16px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.06);margin-bottom:20px;min-height:120px}
+            .notes-empty{color:#475569;font-style:italic;font-size:.85rem}
+            .next-label{margin-top:8px}
+            .next-wrap{position:relative;width:100%;padding-top:56.25%;background:#0f172a;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+            .next-wrap .preview-inner{position:absolute;top:0;left:0;width:960px;height:540px;transform-origin:top left;pointer-events:none}
+            .next-end{display:flex;align-items:center;justify-content:center;position:absolute;top:0;left:0;right:0;bottom:0;color:#475569;font-size:.85rem}
+        </style>`;
+        doc.body.innerHTML = `
+            <div class="timer" id="popupTimer">00:00</div>
+            <div class="counter" id="popupCounter">— / —</div>
+            <div class="section-label">📝 備忘稿</div>
+            <div class="notes-content" id="popupNotes"><span class="notes-empty">載入中…</span></div>
+            <div class="section-label next-label">👁 下一張投影片</div>
+            <div class="next-wrap" id="popupNext"><div class="next-end">載入中…</div></div>
+        `;
 
-    _startPresTimer() {
-        if (this._presTimerInterval) return;
+        // 啟動計時器
         this._presTimerStart = Date.now();
-        const timerEl = document.getElementById('presTimer');
         this._presTimerInterval = setInterval(() => {
-            if (!timerEl) return;
+            if (this._notesPopup?.closed) { this._stopPresTimer(); return; }
             const elapsed = Math.floor((Date.now() - this._presTimerStart) / 1000);
             const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
             const s = String(elapsed % 60).padStart(2, '0');
-            timerEl.textContent = `${m}:${s}`;
+            try { this._notesPopup.document.getElementById('popupTimer').textContent = `${m}:${s}`; } catch {}
         }, 1000);
-    }
 
-    _stopPresTimer() {
-        if (this._presTimerInterval) {
-            clearInterval(this._presTimerInterval);
-            this._presTimerInterval = null;
-        }
+        // 首次更新
+        setTimeout(() => this._updatePresNotes(), 200);
     }
 
     _updatePresNotes() {
+        // 檢查彈出視窗 + 舊的嵌入面板
+        const popup = this._notesPopup;
+        const popupAlive = popup && !popup.closed;
         const panel = document.getElementById('presNotesPanel');
-        if (!panel?.classList.contains('open')) return;
+        const panelOpen = panel?.classList.contains('open');
+
+        if (!popupAlive && !panelOpen) return;
 
         const slides = this.slideManager.slides;
         const idx = this.presentationIndex;
         const currentSlide = slides[idx];
         const nextSlide = slides[idx + 1];
+        const notes = (currentSlide?.notes || currentSlide?.speakerNotes || '').trim();
 
-        // 備忘稿內容
-        const notesEl = document.getElementById('presNotesContent');
-        if (notesEl) {
-            const notes = (currentSlide?.notes || currentSlide?.speakerNotes || '').trim();
-            if (notes) {
-                notesEl.textContent = notes;
-                notesEl.classList.remove('pres-notes-empty');
-            } else {
-                notesEl.innerHTML = '<div class="pres-notes-empty">此頁無備忘稿</div>';
-            }
-        }
-
-        // 下一張預覽
-        const nextEl = document.getElementById('presNotesNext');
-        if (nextEl) {
-            if (nextSlide) {
-                // 用一個縮小版的投影片渲染
-                nextEl.innerHTML = '';
-                const previewDiv = document.createElement('div');
-                previewDiv.className = 'next-slide-preview';
-                previewDiv.style.cssText = 'width:960px;height:540px;transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none;';
-
-                // 計算縮放比例
-                const containerW = nextEl.clientWidth || 284;
-                const previewScale = containerW / 960;
-                previewDiv.style.transform = `scale(${previewScale})`;
-
-                // 設定背景
-                if (nextSlide.background) {
-                    if (nextSlide.background.startsWith('#') || nextSlide.background.startsWith('rgb') || nextSlide.background.startsWith('linear')) {
-                        previewDiv.style.background = nextSlide.background;
-                    } else {
-                        previewDiv.style.backgroundImage = `url(${nextSlide.background})`;
-                        previewDiv.style.backgroundSize = 'cover';
-                        previewDiv.style.backgroundPosition = 'center';
-                    }
-                } else {
-                    previewDiv.style.background = '#ffffff';
+        // ── 更新彈出視窗 ──
+        if (popupAlive) {
+            try {
+                const doc = popup.document;
+                const notesEl = doc.getElementById('popupNotes');
+                if (notesEl) {
+                    notesEl.innerHTML = notes
+                        ? notes.replace(/\n/g, '<br>')
+                        : '<span class="notes-empty">此頁無備忘稿</span>';
                 }
+                const counterEl = doc.getElementById('popupCounter');
+                if (counterEl) counterEl.textContent = `${idx + 1} / ${slides.length}`;
 
-                // 渲染元素（簡化版：只渲染文字和圖片）
-                (nextSlide.elements || []).forEach(element => {
-                    const el = document.createElement('div');
-                    el.style.cssText = `position:absolute;left:${element.x}px;top:${element.y}px;width:${element.width}px;height:${element.height}px;overflow:hidden;`;
+                // 下一張預覽
+                const nextWrap = doc.getElementById('popupNext');
+                if (nextWrap) {
+                    if (nextSlide) {
+                        nextWrap.innerHTML = '';
+                        const containerW = nextWrap.clientWidth || 388;
+                        const previewScale = containerW / 960;
+                        const previewDiv = doc.createElement('div');
+                        previewDiv.className = 'preview-inner';
+                        previewDiv.style.transform = `scale(${previewScale})`;
 
-                    if (element.type === 'text') {
-                        el.innerHTML = element.content || '';
-                        el.style.fontSize = (element.fontSize || 16) + 'px';
-                        el.style.color = element.color || '#000';
-                        el.style.fontWeight = element.bold ? 'bold' : 'normal';
-                    } else if (element.type === 'image' && element.src) {
-                        const img = document.createElement('img');
-                        img.src = element.src;
-                        img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-                        el.appendChild(img);
-                    } else if (['quiz', 'poll', 'truefalse', 'buzzer', 'wordcloud', 'opentext', 'scale', 'hotspot', 'matching', 'ordering'].includes(element.type)) {
-                        el.style.cssText += 'background:rgba(26,115,232,0.06);border:1px solid rgba(26,115,232,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;';
-                        el.innerHTML = `<span style="font-size:12px;color:#64748b;">${element.type}</span>`;
-                    } else if (element.type === 'shape') {
-                        el.style.background = element.fill || '#e5e7eb';
-                        el.style.borderRadius = element.shape === 'circle' ? '50%' : (element.borderRadius || 0) + 'px';
+                        if (nextSlide.background) {
+                            if (nextSlide.background.startsWith('#') || nextSlide.background.startsWith('rgb') || nextSlide.background.startsWith('linear')) {
+                                previewDiv.style.background = nextSlide.background;
+                            } else {
+                                previewDiv.style.backgroundImage = `url(${nextSlide.background})`;
+                                previewDiv.style.backgroundSize = 'cover';
+                                previewDiv.style.backgroundPosition = 'center';
+                            }
+                        } else {
+                            previewDiv.style.background = '#ffffff';
+                        }
+
+                        (nextSlide.elements || []).forEach(element => {
+                            const el = doc.createElement('div');
+                            el.style.cssText = `position:absolute;left:${element.x}px;top:${element.y}px;width:${element.width}px;height:${element.height}px;overflow:hidden;`;
+                            if (element.type === 'text') {
+                                el.innerHTML = element.content || '';
+                                el.style.fontSize = (element.fontSize || 16) + 'px';
+                                el.style.color = element.color || '#000';
+                                el.style.fontWeight = element.bold ? 'bold' : 'normal';
+                            } else if (element.type === 'image' && element.src) {
+                                const img = doc.createElement('img');
+                                img.src = element.src;
+                                img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+                                el.appendChild(img);
+                            } else if (['quiz', 'poll', 'truefalse', 'buzzer', 'wordcloud', 'opentext', 'scale', 'hotspot', 'matching', 'ordering'].includes(element.type)) {
+                                el.style.cssText += 'background:rgba(26,115,232,0.06);border:1px solid rgba(26,115,232,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;';
+                                el.innerHTML = `<span style="font-size:12px;color:#64748b;">${element.type}</span>`;
+                            } else if (element.type === 'shape') {
+                                el.style.background = element.fill || '#e5e7eb';
+                                el.style.borderRadius = element.shape === 'circle' ? '50%' : (element.borderRadius || 0) + 'px';
+                            }
+                            previewDiv.appendChild(el);
+                        });
+                        nextWrap.appendChild(previewDiv);
+                    } else {
+                        nextWrap.innerHTML = '<div class="next-end">最後一頁</div>';
                     }
-
-                    previewDiv.appendChild(el);
-                });
-
-                nextEl.appendChild(previewDiv);
-            } else {
-                nextEl.innerHTML = '<div class="pres-notes-empty">最後一頁</div>';
-            }
+                }
+            } catch (e) { console.warn('[PresNotes] popup update error:', e); }
         }
 
-        // 頁碼
-        const counterEl = document.getElementById('presNotesCounter');
-        if (counterEl) {
-            counterEl.textContent = `${idx + 1} / ${slides.length}`;
+        // ── 嵌入面板（向後相容，如果 HTML 還有的話） ──
+        if (panelOpen) {
+            const notesEl = document.getElementById('presNotesContent');
+            if (notesEl) {
+                if (notes) {
+                    notesEl.textContent = notes;
+                    notesEl.classList.remove('pres-notes-empty');
+                } else {
+                    notesEl.innerHTML = '<div class="pres-notes-empty">此頁無備忘稿</div>';
+                }
+            }
+            const counterEl = document.getElementById('presNotesCounter');
+            if (counterEl) counterEl.textContent = `${idx + 1} / ${slides.length}`;
         }
     }
 
