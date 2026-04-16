@@ -5337,12 +5337,27 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 啟動計時器
         this._presTimerStart = Date.now();
         this._presTimerInterval = setInterval(() => {
-            if (this._notesPopup?.closed) { this._stopPresTimer(); return; }
+            if (this._notesPopup?.closed) {
+                clearInterval(this._presTimerInterval);
+                this._presTimerInterval = null;
+                return;
+            }
             const elapsed = Math.floor((Date.now() - this._presTimerStart) / 1000);
             const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
             const s = String(elapsed % 60).padStart(2, '0');
             try { this._notesPopup.document.getElementById('popupTimer').textContent = `${m}:${s}`; } catch {}
         }, 1000);
+
+        // 備忘稿視窗的鍵盤事件轉發到主視窗（讓講師在備忘稿視窗也能按方向鍵換頁）
+        this._notesPopup.document.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.key)) {
+                e.preventDefault();
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, code: e.code }));
+            }
+        });
+
+        // 把焦點還給主視窗（避免鍵盤卡在彈出視窗）
+        setTimeout(() => window.focus(), 300);
 
         // 首次更新
         setTimeout(() => this._updatePresNotes(), 200);
