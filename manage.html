@@ -582,6 +582,25 @@
                         <option value="post-class">已結束</option>
                     </select>
                 </div>
+                <div class="form-group" style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:8px;">
+                    <label style="font-weight:600;">講義模式</label>
+                    <div style="display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;">
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="sessionSlideMode" value="inherit" checked> 繼承專案設定
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="sessionSlideMode" value="internal"> 互動式簡報
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;font-weight:500;white-space:nowrap;">
+                            <input type="radio" name="sessionSlideMode" value="external"> 外部連結
+                        </label>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">場次可覆蓋專案的預設講義設定</div>
+                </div>
+                <div class="form-group" id="sessionExternalUrlGroup" style="display:none;">
+                    <label>外部講義連結</label>
+                    <input type="url" id="sessionExternalUrl" placeholder="https://...">
+                </div>
                 <!-- 課後 Email 模板 -->
                 <div class="form-group" style="border-top:1px solid #e8eaed;padding-top:16px;margin-top:8px;">
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;"
@@ -1359,8 +1378,15 @@
             // ★ 自動取最近場次 sid
             const detailLatestSess = projectSessions.length > 0 ? projectSessions[0] : null;
             const detailSid = detailLatestSess ? `&sid=${detailLatestSess.id}` : '';
-            const slideLink = p.slide_mode === 'external' && p.course_link
-                ? { href: p.course_link, target: '_blank', icon: 'open_in_new' }
+            // 講義連結：場次設定優先，fallback 到專案設定
+            const effSlideMode = (detailLatestSess?.slide_mode && detailLatestSess.slide_mode !== 'inherit')
+                ? detailLatestSess.slide_mode
+                : (p.slide_mode || 'internal');
+            const effExternalUrl = (detailLatestSess?.slide_mode === 'external' && detailLatestSess.external_url)
+                ? detailLatestSess.external_url
+                : p.course_link;
+            const slideLink = effSlideMode === 'external' && effExternalUrl
+                ? { href: effExternalUrl, target: '_blank', icon: 'open_in_new' }
                 : { href: `editor.html?id=${p.id}${detailSid}#id=${p.id}`, onclick: `localStorage.setItem('current_project_id','${p.id}')`, icon: 'slideshow' };
 
             document.getElementById('projectDetailHeader').innerHTML = `
@@ -1489,11 +1515,23 @@
                     : (s.venue || '—');
                 const studentCount = students.filter(st => st.session_id === s.id || st.session_code === s.session_code).length;
 
+                // 場次講義模式
+                const sessSlideMode = (s.slide_mode && s.slide_mode !== 'inherit') ? s.slide_mode : (p?.slide_mode || 'internal');
+                const sessExtUrl = (s.slide_mode === 'external' && s.external_url) ? s.external_url : p?.course_link;
+                const slideBtn = sessSlideMode === 'external' && sessExtUrl
+                    ? `<a class="btn btn-sm btn-dark" href="${sessExtUrl}" target="_blank" title="外部講義連結">
+                        <span class="material-symbols-outlined">open_in_new</span> 講義
+                       </a>`
+                    : `<a class="btn btn-sm btn-dark" href="editor.html?id=${p?.id}&sid=${s.id}#id=${p?.id}" onclick="localStorage.setItem('current_project_id','${p?.id}')" title="編輯此場次簡報">
+                        <span class="material-symbols-outlined">slideshow</span> 簡報
+                       </a>`;
+                const slideModeTag = s.slide_mode === 'external' ? '<span style="font-size:10px;color:#f59e0b;font-weight:600;margin-left:4px;">外部</span>' : '';
+
                 return `
                 <div class="session-card">
                     <div class="sc-header">
                         <span class="session-dot ${phase}"></span>
-                        ${fmtTag}
+                        ${fmtTag}${slideModeTag}
                         <span class="sc-date">${s.date || '未設定'} ${s.time || ''}</span>
                         <span class="card-phase ${phase}" style="margin-left:auto;"><span class="card-phase-dot"></span> ${phaseLabel[phase]}</span>
                     </div>
@@ -1503,9 +1541,7 @@
                         <span class="sc-meta"><span class="material-symbols-outlined" style="font-size:14px;">tag</span> ${s.session_code || ''}</span>
                     </div>
                     <div class="sc-actions">
-                        <a class="btn btn-sm btn-dark" href="editor.html?id=${p?.id}&sid=${s.id}#id=${p?.id}" onclick="localStorage.setItem('current_project_id','${p?.id}')" title="編輯此場次簡報">
-                            <span class="material-symbols-outlined">slideshow</span> 簡報
-                        </a>
+                        ${slideBtn}
                         <a class="btn btn-sm" href="md-editor.html?id=${p?.id}&sid=${s.id}" title="用 Markdown 編輯簡報">
                             <span class="material-symbols-outlined">edit_note</span> MD
                         </a>
@@ -2139,6 +2175,10 @@
             document.getElementById('sessionCapacity').value = '30';
             document.getElementById('sessionTeachifyPlanId').value = '';
             document.getElementById('sessionPhase').value = 'pre-class';
+            // 講義模式
+            document.querySelector('input[name="sessionSlideMode"][value="inherit"]').checked = true;
+            document.getElementById('sessionExternalUrlGroup').style.display = 'none';
+            document.getElementById('sessionExternalUrl').value = '';
             // Email template fields
             document.getElementById('sessionEmailPrompt').value = '';
             document.getElementById('sessionEmailTemplate').value = '';
@@ -2199,6 +2239,12 @@
             document.querySelector(`input[name="sessionFormat"][value="${fmt}"]`).checked = true;
             toggleSessionFormat(fmt);
 
+            // 講義模式
+            const slideMode = s.slide_mode || 'inherit';
+            document.querySelector(`input[name="sessionSlideMode"][value="${slideMode}"]`).checked = true;
+            document.getElementById('sessionExternalUrlGroup').style.display = slideMode === 'external' ? '' : 'none';
+            document.getElementById('sessionExternalUrl').value = s.external_url || '';
+
             const sel = document.getElementById('sessionProjectId');
             sel.innerHTML = projects.map(p =>
                 `<option value="${p.id}" ${p.id === s.project_id ? 'selected' : ''}>${p.name || '未命名'}</option>`
@@ -2230,6 +2276,13 @@
         // Radio change listeners — session format
         document.querySelectorAll('input[name="sessionFormat"]').forEach(r => {
             r.addEventListener('change', () => toggleSessionFormat(r.value));
+        });
+
+        // Radio change listeners — session slide mode
+        document.querySelectorAll('input[name="sessionSlideMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('sessionExternalUrlGroup').style.display = r.value === 'external' ? '' : 'none';
+            });
         });
 
         function generateCode(len) {
@@ -2298,6 +2351,9 @@
 
                 if (!projectId) { showToast('請選擇專案'); return; }
 
+                const slide_mode = document.querySelector('input[name="sessionSlideMode"]:checked')?.value || 'inherit';
+                const external_url = document.getElementById('sessionExternalUrl').value.trim();
+
                 const sessionData = {
                     project_id: projectId,
                     date, time, venue, venue_address, max_capacity,
@@ -2308,6 +2364,8 @@
                     reminders: reminders_val,
                     group_link_url,
                     group_link_label,
+                    slide_mode,
+                    external_url: slide_mode === 'external' ? external_url : '',
                     post_email_template: {
                         ai_prompt: document.getElementById('sessionEmailPrompt').value.trim(),
                         template: document.getElementById('sessionEmailTemplate').value.trim(),
