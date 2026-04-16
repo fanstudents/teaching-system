@@ -5338,7 +5338,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 備忘稿內容
         const notesEl = document.getElementById('presNotesContent');
         if (notesEl) {
-            const notes = currentSlide?.speakerNotes?.trim();
+            const notes = (currentSlide?.notes || currentSlide?.speakerNotes || '').trim();
             if (notes) {
                 notesEl.textContent = notes;
                 notesEl.classList.remove('pres-notes-empty');
