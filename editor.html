@@ -1240,6 +1240,32 @@
             <span class="material-symbols-outlined">leaderboard</span>
         </button>
 
+        <!-- 演講者備忘稿面板 -->
+        <div id="presNotesPanel" class="pres-notes-panel">
+            <div class="pres-notes-header">
+                <span class="material-symbols-outlined" style="font-size:18px;">description</span>
+                <span>演講者備忘稿</span>
+                <span id="presTimer" class="pres-timer">00:00</span>
+            </div>
+            <div class="pres-notes-body">
+                <div class="pres-notes-content" id="presNotesContent">
+                    <div class="pres-notes-empty">此頁無備忘稿</div>
+                </div>
+                <div class="pres-notes-divider"></div>
+                <div class="pres-notes-next-label">
+                    <span class="material-symbols-outlined" style="font-size:14px;">skip_next</span>
+                    下一張投影片
+                </div>
+                <div class="pres-notes-next" id="presNotesNext">
+                    <div class="pres-notes-empty">最後一頁</div>
+                </div>
+                <div class="pres-notes-counter" id="presNotesCounter"></div>
+            </div>
+        </div>
+        <button id="presNotesToggle" class="pres-notes-toggle" title="演講者備忘稿">
+            <span class="material-symbols-outlined">sticky_note_2</span>
+        </button>
+
         <!-- 頂部統一資訊列 -->
         <div id="presTopBar" class="pres-top-bar">
             <!-- 左: 廣播狀態 -->

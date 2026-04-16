@@ -3474,6 +3474,23 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 });
             }
         });
+
+        // 演講者備忘稿 toggle
+        document.getElementById('presNotesToggle')?.addEventListener('click', () => {
+            const panel = document.getElementById('presNotesPanel');
+            const pm = document.getElementById('presentationMode');
+            panel?.classList.toggle('open');
+            const isOpen = panel?.classList.contains('open') || false;
+            pm?.classList.toggle('notes-active', isOpen);
+            this.scalePresentationSlide();
+
+            if (isOpen) {
+                this._startPresTimer();
+                this._updatePresNotes();
+            } else {
+                this._stopPresTimer();
+            }
+        });
     }
 
     async startBroadcast() {
@@ -5257,25 +5274,144 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.removeQRCode();
         this.stopReactions();
         this.removeQA();
+
+        // 清理備忘稿面板
+        this._stopPresTimer();
+        const notesPanel = document.getElementById('presNotesPanel');
+        notesPanel?.classList.remove('open');
+        document.getElementById('presentationMode')?.classList.remove('notes-active');
+        const timerEl = document.getElementById('presTimer');
+        if (timerEl) timerEl.textContent = '00:00';
     }
 
     scalePresentationSlide() {
         const presentationSlide = document.getElementById('presentationSlide');
         if (!presentationSlide) return;
 
-        // 計算可用空間（扣除 top bar + 底部導航 + 排行榜側欄）
+        // 計算可用空間（扣除 top bar + 底部導航 + 排行榜側欄 + 備忘稿面板）
         const presMode = document.getElementById('presentationMode');
         const topBarH = 42; // presTopBar 高度
         const bottomNavH = 60; // 底部導航 + margin
         const lbWidth = presMode?.classList.contains('lb-active') ? 280 : 0;
+        const notesWidth = presMode?.classList.contains('notes-active') ? 320 : 0;
 
-        const availW = window.innerWidth - lbWidth;
+        const availW = window.innerWidth - lbWidth - notesWidth;
         const availH = window.innerHeight - topBarH - bottomNavH;
 
         const scaleX = availW / 960;
         const scaleY = availH / 540;
         const scale = Math.min(scaleX, scaleY) * 0.95;
         presentationSlide.style.transform = `scale(${scale})`;
+    }
+
+    // ── 演講者備忘稿面板 ──
+
+    _startPresTimer() {
+        if (this._presTimerInterval) return;
+        this._presTimerStart = Date.now();
+        const timerEl = document.getElementById('presTimer');
+        this._presTimerInterval = setInterval(() => {
+            if (!timerEl) return;
+            const elapsed = Math.floor((Date.now() - this._presTimerStart) / 1000);
+            const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const s = String(elapsed % 60).padStart(2, '0');
+            timerEl.textContent = `${m}:${s}`;
+        }, 1000);
+    }
+
+    _stopPresTimer() {
+        if (this._presTimerInterval) {
+            clearInterval(this._presTimerInterval);
+            this._presTimerInterval = null;
+        }
+    }
+
+    _updatePresNotes() {
+        const panel = document.getElementById('presNotesPanel');
+        if (!panel?.classList.contains('open')) return;
+
+        const slides = this.slideManager.slides;
+        const idx = this.presentationIndex;
+        const currentSlide = slides[idx];
+        const nextSlide = slides[idx + 1];
+
+        // 備忘稿內容
+        const notesEl = document.getElementById('presNotesContent');
+        if (notesEl) {
+            const notes = currentSlide?.speakerNotes?.trim();
+            if (notes) {
+                notesEl.textContent = notes;
+                notesEl.classList.remove('pres-notes-empty');
+            } else {
+                notesEl.innerHTML = '<div class="pres-notes-empty">此頁無備忘稿</div>';
+            }
+        }
+
+        // 下一張預覽
+        const nextEl = document.getElementById('presNotesNext');
+        if (nextEl) {
+            if (nextSlide) {
+                // 用一個縮小版的投影片渲染
+                nextEl.innerHTML = '';
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'next-slide-preview';
+                previewDiv.style.cssText = 'width:960px;height:540px;transform-origin:top left;position:absolute;top:0;left:0;pointer-events:none;';
+
+                // 計算縮放比例
+                const containerW = nextEl.clientWidth || 284;
+                const previewScale = containerW / 960;
+                previewDiv.style.transform = `scale(${previewScale})`;
+
+                // 設定背景
+                if (nextSlide.background) {
+                    if (nextSlide.background.startsWith('#') || nextSlide.background.startsWith('rgb') || nextSlide.background.startsWith('linear')) {
+                        previewDiv.style.background = nextSlide.background;
+                    } else {
+                        previewDiv.style.backgroundImage = `url(${nextSlide.background})`;
+                        previewDiv.style.backgroundSize = 'cover';
+                        previewDiv.style.backgroundPosition = 'center';
+                    }
+                } else {
+                    previewDiv.style.background = '#ffffff';
+                }
+
+                // 渲染元素（簡化版：只渲染文字和圖片）
+                (nextSlide.elements || []).forEach(element => {
+                    const el = document.createElement('div');
+                    el.style.cssText = `position:absolute;left:${element.x}px;top:${element.y}px;width:${element.width}px;height:${element.height}px;overflow:hidden;`;
+
+                    if (element.type === 'text') {
+                        el.innerHTML = element.content || '';
+                        el.style.fontSize = (element.fontSize || 16) + 'px';
+                        el.style.color = element.color || '#000';
+                        el.style.fontWeight = element.bold ? 'bold' : 'normal';
+                    } else if (element.type === 'image' && element.src) {
+                        const img = document.createElement('img');
+                        img.src = element.src;
+                        img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+                        el.appendChild(img);
+                    } else if (['quiz', 'poll', 'truefalse', 'buzzer', 'wordcloud', 'opentext', 'scale', 'hotspot', 'matching', 'ordering'].includes(element.type)) {
+                        el.style.cssText += 'background:rgba(26,115,232,0.06);border:1px solid rgba(26,115,232,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;';
+                        el.innerHTML = `<span style="font-size:12px;color:#64748b;">${element.type}</span>`;
+                    } else if (element.type === 'shape') {
+                        el.style.background = element.fill || '#e5e7eb';
+                        el.style.borderRadius = element.shape === 'circle' ? '50%' : (element.borderRadius || 0) + 'px';
+                    }
+
+                    previewDiv.appendChild(el);
+                });
+
+                nextEl.appendChild(previewDiv);
+            } else {
+                nextEl.innerHTML = '<div class="pres-notes-empty">最後一頁</div>';
+            }
+        }
+
+        // 頁碼
+        const counterEl = document.getElementById('presNotesCounter');
+        if (counterEl) {
+            counterEl.textContent = `${idx + 1} / ${slides.length}`;
+        }
     }
 
     renderPresentationSlide() {
@@ -5395,6 +5531,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
         // QR Code（廣播中 + 互動頁才顯示）
         this.updateQRCode();
+
+        // 更新演講者備忘稿
+        this._updatePresNotes();
     }
 
     _renderSectionProgressBar() {
