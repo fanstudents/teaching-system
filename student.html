@@ -802,8 +802,68 @@
                         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
                     ]);
                 } catch (rtErr) {
-                    console.warn('[Student] realtime connect failed (non-fatal):', rtErr);
+                    console.warn('[Student] realtime connect failed, retrying in background:', rtErr);
+                    // 背景重試（最多 3 次，指數退避）
+                    (async () => {
+                        for (let i = 0; i < 3; i++) {
+                            await new Promise(r => setTimeout(r, 2000 * Math.pow(2, i)));
+                            try {
+                                if (!realtime.isConnected) await realtime.connect();
+                                await realtime.subscribe(`session:${sessionCode}`);
+                                console.log('[Student] realtime connected on retry', i + 1);
+                                break;
+                            } catch (e) { console.warn(`[Student] retry ${i + 1} failed:`, e); }
+                        }
+                    })();
                 }
+
+                // ── 從 DB 同步講師目前投影片（用於重連/喚醒後對齊） ──
+                async function syncCurrentSlideFromDB() {
+                    try {
+                        const { data: sessRows } = await db.select('sessions', {
+                            filter: { session_code: `eq.${sessionCode}` },
+                            select: 'current_slide',
+                            limit: 1
+                        });
+                        const dbIndex = parseInt(sessRows?.[0]?.current_slide || '0', 10);
+                        if (mode === 'follow' && dbIndex !== currentIndex && slidesCache[dbIndex]) {
+                            console.log(`[Student] sync from DB: ${currentIndex} → ${dbIndex}`);
+                            currentIndex = dbIndex;
+                            instructorIndex = dbIndex;
+                            renderSlide(slidesCache[dbIndex], dbIndex, totalSlides);
+                            updateNavButtons();
+                        }
+                    } catch (e) { console.warn('[Student] DB sync failed:', e); }
+                }
+
+                // ── Realtime 重連後自動同步 ──
+                realtime.onStatusChange((status) => {
+                    if (status === 'connected') {
+                        console.log('[Student] realtime reconnected, syncing slide from DB');
+                        syncCurrentSlideFromDB();
+                        // 重連後重新通知講師上線
+                        setTimeout(() => {
+                            realtime.publish(`session:${sessionCode}`, 'student_join', {
+                                studentId, studentName, studentEmail
+                            });
+                        }, 300);
+                    }
+                });
+
+                // ── 手機切 app 回來 / 螢幕喚醒 → 檢查 WS 狀態 + 同步 ──
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') {
+                        console.log('[Student] page visible, checking realtime...');
+                        if (!realtime.isConnected || realtime.ws?.readyState !== WebSocket.OPEN) {
+                            console.log('[Student] ws disconnected, reconnecting...');
+                            realtime.connect().then(() => {
+                                realtime.subscribe(`session:${sessionCode}`);
+                            }).catch(e => console.warn('[Student] reconnect failed:', e));
+                        }
+                        // 無論如何都從 DB 同步一次
+                        syncCurrentSlideFromDB();
+                    }
+                });
 
                 // 通知講師上線（延遲確保 channel join 完成）
                 setTimeout(() => {
