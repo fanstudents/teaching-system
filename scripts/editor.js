@@ -1465,6 +1465,16 @@ export class Editor {
                     <div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.5;">
                         ${hasCorrect ? '答對得設定分數，答錯 0 分。部分正確依比例計算。' : '學員參與互動即得分。'}
                     </div>
+                    <div class="property-row" style="margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9;">
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
+                            <input type="checkbox" id="speedBonusToggle" ${elementData.speedBonus ? 'checked' : ''} style="accent-color:#f59e0b;width:16px;height:16px;">
+                            <span class="material-symbols-outlined" style="font-size:14px;color:#f59e0b;">bolt</span>
+                            按作答順序給分
+                        </label>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;line-height:1.5;">
+                        越快回答分數越高。每晚一位 -5% 分數，可得小數點分數。
+                    </div>
                 </div>
             `;
         }
@@ -1979,6 +1989,15 @@ export class Editor {
 
         // 統一計分 points 綁定
         bindSimple('elementPoints', 'points', v => parseInt(v) || 0);
+
+        // 按作答順序給分
+        const speedBonusCb = document.getElementById('speedBonusToggle');
+        if (speedBonusCb) {
+            speedBonusCb.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { speedBonus: speedBonusCb.checked });
+                rerender();
+            });
+        }
         if (elementData.type === 'truefalse') {
             bindSimple('tfQuestion', 'question');
             bindSimple('tfAnswer', 'answer', v => v === 'true');

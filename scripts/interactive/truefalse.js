@@ -159,6 +159,7 @@ export class TrueFalseGame {
                 markChosen(chosen);
                 const title = container.querySelector('.tf-question')?.textContent || '是非題';
                 const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
+                const speedBonus = container.closest('[data-speed-bonus]')?.dataset.speedBonus === 'true';
                 const chosenLabel = chosen ? trueLabel : falseLabel;
                 const _r = await stateManager.save(elementId, {
                     type: 'truefalse', title,
@@ -166,6 +167,7 @@ export class TrueFalseGame {
                     isCorrect: chosen === correctAnswer,
                     score: chosen === correctAnswer ? 100 : 0,
                     points,
+                    speedBonus,
                     state: { chosen },
                 });
                 if (_r?.isRetry) stateManager.showRetryBanner(container);

@@ -143,6 +143,46 @@ class InteractionState {
                 }
             }
         }
+        // ── 速度加分：按作答順序遞減 ──
+        if (saved && !isRetry && data.speedBonus && awardedPoints > 0 && sessionId) {
+            try {
+                // 查詢此 element 已有多少筆 submission（含自己）
+                const { data: allSubs } = await db.select('submissions', {
+                    filter: {
+                        session_id: `eq.${sessionId}`,
+                        element_id: `eq.${elementId}`,
+                    },
+                    select: 'student_email,submitted_at',
+                    order: 'submitted_at.asc',
+                });
+                if (allSubs && allSubs.length > 0) {
+                    const rank = allSubs.findIndex(s => s.student_email === email);
+                    if (rank >= 0) {
+                        const decayRate = data.speedDecay || 0.05; // 每名遞減 5%
+                        const actualScore = Math.round(maxPoints * Math.pow(1 - decayRate, rank) * 100) / 100;
+
+                        // 更新本地 cache
+                        record.state._awarded = actualScore;
+                        record.awarded_points = actualScore;
+                        this._cache.set(k, record);
+
+                        // UPDATE DB（非阻塞）
+                        db.update('submissions', {
+                            state: record.state,
+                        }, {
+                            session_id: `eq.${sessionId}`,
+                            element_id: `eq.${elementId}`,
+                            student_email: `eq.${email}`,
+                        }).catch(e => console.warn('[speedBonus] update failed:', e));
+
+                        awardedPoints = actualScore;
+                        console.log(`[speedBonus] rank=${rank}, score=${actualScore}/${maxPoints}`);
+                    }
+                }
+            } catch (e) {
+                console.warn('[speedBonus] calculation failed:', e);
+            }
+        }
 
         // 加分動畫（真正首次作答 + 有得分 + 非講師端 + 非靜默儲存）
         if (!isRetry && awardedPoints > 0 && !data._skipPopup && !document.querySelector('.presentation-slide')) {

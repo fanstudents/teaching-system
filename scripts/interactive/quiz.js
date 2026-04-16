@@ -158,6 +158,7 @@ export class QuizGame {
         const elementId = container.closest('[data-id]')?.dataset.id || container.dataset.elementId || '';
         const title = container.querySelector('.quiz-question')?.textContent || '選擇題';
         const points = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
+        const speedBonus = container.closest('[data-speed-bonus]')?.dataset.speedBonus === 'true';
 
         const result = await stateManager.save(elementId, {
             type: 'quiz',
@@ -166,6 +167,7 @@ export class QuizGame {
             isCorrect: allCorrect,
             score: Math.round((correct / total) * 100),
             points,
+            speedBonus,
             state: { selected: selectedIndices, correct: allCorrect },
         });
         if (result?.isRetry) {

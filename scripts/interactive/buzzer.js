@@ -142,9 +142,10 @@ export class BuzzerGame {
 
             const title = container.querySelector('.buzzer-question')?.textContent || '搶答';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 10;
+            const speedBonus = container.closest('[data-speed-bonus]')?.dataset.speedBonus === 'true';
             const _r = await stateManager.save(elementId, {
                 type: 'buzzer', title, content: answer,
-                isCorrect: null, score: null, points, participated: true,
+                isCorrect: null, score: null, points, speedBonus, participated: true,
                 state: { pressed: true, answer, timestamp },
             });
             if (_r?.isRetry) stateManager.showRetryBanner(container);

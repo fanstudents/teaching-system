@@ -2217,6 +2217,11 @@ export class SlideManager {
         const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, assessment: 15 };
         const pts = element.points ?? defaultPts[element.type] ?? 0;
         el.dataset.points = pts;
+
+        // 速度加分（按作答順序遞減）
+        if (element.speedBonus) {
+            el.dataset.speedBonus = 'true';
+        }
     }
 
     /**
@@ -2227,7 +2232,8 @@ export class SlideManager {
         if (pts <= 0) return;
         const badge = document.createElement('div');
         badge.className = 'element-score-badge';
-        badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px;">stars</span> 1~${pts}分`;
+        const speedIcon = element.speedBonus ? '<span class="material-symbols-outlined" style="font-size:12px;">bolt</span> ' : '';
+        badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px;">stars</span> ${speedIcon}1~${pts}分`;
         el.appendChild(badge);
     }
 
