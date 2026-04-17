@@ -11,7 +11,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
  */
 
 // ── Resend 設定 ──
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || 're_ZaV22t8T_8qh2TiAfCA3cXDYfZNZjB7xn';
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || 're_DxAbQkWb_PxLtAcFT1bACsR7BVaa4i6kK';
 const FROM_EMAIL = 'service@mail.tbr.digital';
 const FROM_NAME = '數位簡報室';
 const AFFILIATE_DASHBOARD_URL = 'https://tbr.digital/affiliate-dashboard';

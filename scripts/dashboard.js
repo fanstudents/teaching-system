@@ -290,6 +290,47 @@ window._dashRefresh = async function () {
     setTimeout(() => btn?.classList.remove('spinning'), 500);
 };
 
+window._dashResetSession = async function () {
+    const qid = sessionUUID || currentSessionCode;
+    if (!qid) { alert('無法取得場次 ID'); return; }
+
+    const msg = `確定要重置此場次的所有互動資料？\n\n將清除：\n• 所有學員作答紀錄 (submissions)\n• 所有投票紀錄 (poll_votes)\n• 所有學員登入紀錄 (students)\n\n此操作無法復原！`;
+    if (!confirm(msg)) return;
+
+    const btn = document.getElementById('resetSessionBtn');
+    if (btn) btn.disabled = true;
+
+    try {
+        // 刪除 submissions
+        await db.delete('submissions', { session_id: `eq.${qid}` });
+        // 刪除 poll_votes
+        await db.delete('poll_votes', { session_code: `eq.${qid}` });
+        // 刪除 students
+        await db.delete('students', { session_code: `eq.${qid}` });
+
+        // 廣播重置事件
+        if (realtime.isConnected && currentSessionCode) {
+            realtime.publish(`session:${currentSessionCode}`, 'session_reset', { sessionCode: currentSessionCode });
+        }
+
+        // 清空本地 state
+        onlineStudents = new Set();
+        submissionsMap = {};
+        pollVotesMap = {};
+        rawSubmissions = [];
+        studentNames = {};
+
+        renderAll();
+        updateHeaderMeta();
+        alert('✅ 場次資料已重置');
+    } catch (e) {
+        console.error('[dashboard] resetSession error:', e);
+        alert('重置失敗: ' + e.message);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+};
+
 // ══════════════════════
 //  View Toggle
 // ══════════════════════

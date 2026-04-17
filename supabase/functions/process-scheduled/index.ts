@@ -169,7 +169,7 @@ serve(async (req) => {
                         to: email.student_email,
                         subject,
                         body,
-                        replyTo: 'service@tbr.digital',
+                        replyTo: 'service@mail.tbr.digital',
                     }),
                 });
 

@@ -112,6 +112,32 @@ export class PollGame {
                     lockStatus.textContent = '🔒 投票已截止';
                 }
             });
+
+            // 監聽投票重置（講師觸發）
+            realtime.on('poll_reset', (msg) => {
+                if (msg.elementId === elementId) {
+                    // 清除本地投票狀態
+                    this._voted.delete(elementId);
+                    this._clearVotedLocal(elementId);
+                    this._voteCounts[elementId] = new Array(optionEls.length).fill(0);
+
+                    // 重置 UI
+                    container.classList.remove('poll-voted', 'poll-locked');
+                    container.querySelector('.poll-status')?.remove();
+                    container.querySelector('.poll-lock-status')?.remove();
+                    optionEls.forEach(opt => {
+                        opt.classList.remove('poll-selected');
+                        opt.style.cursor = '';
+                        opt.style.pointerEvents = '';
+                        opt.querySelector('.poll-bar')?.remove();
+                        opt.querySelector('.poll-pct')?.remove();
+                    });
+
+                    // 重新綁定事件（透過重新 init）
+                    container.dataset.pollInit = 'false';
+                    this.setupContainer(container);
+                }
+            });
         }
     }
 
@@ -323,6 +349,16 @@ export class PollGame {
                 revealBtn.addEventListener('click', () => this.revealResults(elementId, sessionCode));
                 c.appendChild(revealBtn);
             }
+
+            // 新增「重置投票」按鈕
+            if (!c.querySelector('.poll-reset-btn')) {
+                const resetBtn = document.createElement('button');
+                resetBtn.className = 'poll-reset-btn';
+                resetBtn.style.cssText = 'display:block;margin:6px auto 0;padding:6px 16px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:inherit;';
+                resetBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-right:2px;">refresh</span>重置投票';
+                resetBtn.addEventListener('click', () => this.resetPoll(elementId, sessionCode, c));
+                c.appendChild(resetBtn);
+            }
         }
     }
 
@@ -401,6 +437,72 @@ export class PollGame {
         });
     }
 
+    /**
+     * 講師端：重置投票 — 清除 DB 資料 + 廣播重置事件
+     */
+    async resetPoll(elementId, sessionCode, container) {
+        if (!confirm('確定要重置此投票？所有票數和學員投票紀錄都會被清除。')) return;
+
+        const sid = window._activeSessionUUID || sessionCode || 'free';
+
+        // 清除 DB
+        try {
+            await db.delete('poll_votes', {
+                session_code: `eq.${sid}`,
+                element_id: `eq.${elementId}`,
+            });
+        } catch (e) { console.warn('reset poll_votes failed:', e); }
+
+        try {
+            await db.delete('submissions', {
+                session_id: `eq.${sid}`,
+                element_id: `eq.${elementId}`,
+            });
+        } catch (e) { console.warn('reset submissions failed:', e); }
+
+        // 清除內存
+        this._voteCounts[elementId] = [];
+        this._voteNames[elementId] = [];
+        this._voted.delete(elementId);
+        this._revealed.delete(elementId);
+
+        // 重置 UI
+        const optionEls = container.querySelectorAll('.poll-option');
+        optionEls.forEach(opt => {
+            opt.querySelector('.poll-bar')?.remove();
+            opt.querySelector('.poll-pct')?.remove();
+            opt.querySelector('.poll-voters')?.remove();
+        });
+        container.querySelector('.poll-revealed-tag')?.remove();
+        container.querySelector('.poll-lock-status')?.remove();
+        container.classList.remove('poll-locked');
+
+        // 重新載入（清零 bars）
+        this._voteCounts[elementId] = new Array(optionEls.length).fill(0);
+        this._voteNames[elementId] = Array.from({ length: optionEls.length }, () => []);
+        this._renderBars(container, optionEls, this._voteCounts[elementId]);
+
+        // 恢復「公布結果」按鈕
+        if (!container.querySelector('.poll-reveal-btn')) {
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'poll-reveal-btn';
+            revealBtn.style.cssText = 'display:block;margin:10px auto 0;padding:8px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#1a73e8,#4285f4);color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;';
+            revealBtn.textContent = '📊 公布結果';
+            revealBtn.addEventListener('click', () => this.revealResults(elementId, sessionCode));
+            // 插在 reset 按鈕之前
+            const resetBtn = container.querySelector('.poll-reset-btn');
+            if (resetBtn) container.insertBefore(revealBtn, resetBtn);
+            else container.appendChild(revealBtn);
+        }
+
+        // 廣播重置事件給學員
+        if (realtime.isConnected && sessionCode) {
+            realtime.publish(`session:${sessionCode}`, 'poll_reset', { elementId });
+        }
+
+        console.log(`[poll] Reset elementId=${elementId} in session=${sid}`);
+    }
+
     // ─ Helpers ─
     _getSessionCode() {
         // 優先用 stateManager 的 session override
@@ -423,5 +525,9 @@ export class PollGame {
 
     _setVotedLocal(elementId) {
         localStorage.setItem(`poll_voted_${elementId}`, 'true');
+    }
+
+    _clearVotedLocal(elementId) {
+        localStorage.removeItem(`poll_voted_${elementId}`);
     }
 }
