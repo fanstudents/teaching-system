@@ -284,7 +284,7 @@ export class PollGame {
         if (!this._voteCounts[elementId]) {
             const containers = document.querySelectorAll('.poll-container');
             containers.forEach(c => {
-                const eid = c.closest('[data-id]')?.dataset.id || '';
+                const eid = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
                 if (!this._voteCounts[eid]) {
                     const opts = c.querySelectorAll('.poll-option');
                     this._voteCounts[eid] = new Array(opts.length).fill(0);
@@ -301,7 +301,7 @@ export class PollGame {
 
             const containers = document.querySelectorAll('.poll-container');
             containers.forEach(c => {
-                const eid = c.closest('[data-id]')?.dataset.id || '';
+                const eid = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
                 if (eid === elementId) {
                     const optionEls = c.querySelectorAll('.poll-option');
                     if (this._revealed.has(elementId)) {
@@ -471,6 +471,7 @@ export class PollGame {
         this._voteNames[elementId] = [];
         this._voted.delete(elementId);
         this._revealed.delete(elementId);
+        this._clearVotedLocal(elementId); // ★ 清 localStorage
 
         // 重置 UI
         const optionEls = container.querySelectorAll('.poll-option');
@@ -478,10 +479,14 @@ export class PollGame {
             opt.querySelector('.poll-bar')?.remove();
             opt.querySelector('.poll-pct')?.remove();
             opt.querySelector('.poll-voters')?.remove();
+            opt.classList.remove('poll-selected');
+            opt.style.cursor = '';
+            opt.style.pointerEvents = '';
         });
         container.querySelector('.poll-revealed-tag')?.remove();
         container.querySelector('.poll-lock-status')?.remove();
-        container.classList.remove('poll-locked');
+        container.querySelector('.poll-status')?.remove(); // ★ 清「✓ 已投票」
+        container.classList.remove('poll-locked', 'poll-voted'); // ★ 清 poll-voted
 
         // 重新載入（清零 bars）
         this._voteCounts[elementId] = new Array(optionEls.length).fill(0);
