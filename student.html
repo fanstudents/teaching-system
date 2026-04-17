@@ -1655,6 +1655,10 @@
                     badge.innerHTML = `<span class="material-symbols-outlined" style="font-size:12px;">stars</span> 1~${pts}分`;
                     setTimeout(() => el.appendChild(badge), 0);
                 }
+                // ★ 速度加分標記（講師端在 slideManager 設定，學員端也必須設）
+                if (element.speedBonus) {
+                    el.dataset.speedBonus = 'true';
+                }
             }
 
             switch (element.type) {
