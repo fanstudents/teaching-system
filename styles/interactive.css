@@ -3562,6 +3562,7 @@
 /* ── 名字 ── */
 .lb-name {
     flex: 1;
+    min-width: 0; /* ★ 允許 flexbox 子元素縮小，text-overflow 才能生效 */
     font-size: 13px;
     color: #5f6368;
     white-space: nowrap;

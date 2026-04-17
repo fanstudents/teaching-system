@@ -3933,14 +3933,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
      * 從排行榜刪除學員 — 雙重確認防呆
      */
     async _deleteLeaderboardStudent(email, name) {
-        // 第一層確認
         if (!confirm(`確定要刪除「${name}」的所有互動紀錄嗎？\n\n⚠️ 此操作無法復原，該學員的所有得分、作業、測驗紀錄都會被清除。`)) {
-            return;
-        }
-        // 第二層確認：輸入學員名字
-        const input = prompt(`請輸入學員名字「${name}」以確認刪除：`);
-        if (!input || input.trim() !== name) {
-            this.showToast('名字不符，已取消刪除');
             return;
         }
 
