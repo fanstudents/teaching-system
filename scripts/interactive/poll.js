@@ -31,7 +31,7 @@ export class PollGame {
         const isMulti = container.dataset.multiSelect === 'true';
         const maxSelect = parseInt(container.dataset.maxSelect) || 0;
 
-        // 載入歷史票數
+        // 載入歷史票數（async，完成後會自動判斷已投票狀態）
         this._loadVotes(elementId, sessionCode, container);
 
         // ★ 先註冊 realtime 監聽（必須在 early return 之前，否則已投票的學員永遠收不到重置事件）
@@ -51,7 +51,7 @@ export class PollGame {
                 }
             });
 
-            // 監聽投票重置（講師觸發）
+            // 監聯投票重置（講師觸發）
             realtime.on('poll_reset', (msg) => {
                 if (msg.elementId === elementId) {
                     // 清除本地投票狀態
@@ -78,12 +78,9 @@ export class PollGame {
             });
         }
 
-        // 檢查是否已投過票
-        const user = this._getUser();
-        if (user?.email && this._hasVotedLocal(elementId)) {
-            this._markVoted(container, optionEls);
-            return;
-        }
+        // ★ 不再同步 early return — click handler 無條件註冊
+        //   已投票狀態由 _loadVotes async 完成後透過 _markVoted 處理
+        //   click handler 內的 _voted.has() 檢查會阻擋重複投票
 
         if (isMulti) {
             // ── 多選模式 ──
@@ -92,7 +89,7 @@ export class PollGame {
 
             optionEls.forEach((opt, i) => {
                 opt.addEventListener('click', () => {
-                    if (this._voted.has(elementId) || container.classList.contains('poll-locked')) return;
+                    if (this._voted.has(elementId) || container.classList.contains('poll-locked') || container.classList.contains('poll-voted')) return;
 
                     if (selected.has(i)) {
                         selected.delete(i);
@@ -127,7 +124,7 @@ export class PollGame {
             // ── 單選模式（原邏輯）──
             optionEls.forEach((opt, i) => {
                 opt.addEventListener('click', () => {
-                    if (this._voted.has(elementId) || container.classList.contains('poll-locked')) return;
+                    if (this._voted.has(elementId) || container.classList.contains('poll-locked') || container.classList.contains('poll-voted')) return;
                     this._voted.add(elementId);
 
                     // 視覺回饋
@@ -201,6 +198,7 @@ export class PollGame {
     async _loadVotes(elementId, sessionCode, container) {
         const optionEls = container.querySelectorAll('.poll-option');
         const counts = new Array(optionEls.length).fill(0);
+        let dbRows = [];
         try {
             const code = stateManager.getSessionCode() || sessionCode || 'free';
             const rows = await db.select('poll_votes', {
@@ -209,9 +207,9 @@ export class PollGame {
                     element_id: `eq.${elementId}`,
                 },
             });
-            const data = rows?.data || rows || [];
-            if (data && data.length > 0) {
-                data.forEach(r => {
+            dbRows = rows?.data || rows || [];
+            if (dbRows && dbRows.length > 0) {
+                dbRows.forEach(r => {
                     if (r.option_index >= 0 && r.option_index < counts.length) {
                         counts[r.option_index]++;
                     }
@@ -221,6 +219,16 @@ export class PollGame {
             console.warn('poll votes load failed:', e);
         }
         this._voteCounts[elementId] = counts;
+
+        // ★ 自我修復：如果 DB 已無投票記錄（講師重置過）但 localStorage 仍標記已投票 → 清除
+        if ((!dbRows || dbRows.length === 0) && this._hasVotedLocal(elementId)) {
+            console.log(`[poll] self-heal: clearing stale voted flag for ${elementId}`);
+            this._clearVotedLocal(elementId);
+            this._voted.delete(elementId);
+            container.classList.remove('poll-voted');
+            container.querySelector('.poll-status')?.remove();
+            return; // 不需要 renderBars，已無資料
+        }
 
         // 如果已投票，顯示結果
         if (this._hasVotedLocal(elementId)) {
