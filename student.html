@@ -1030,7 +1030,9 @@
                         transition:left 0.06s linear, top 0.06s linear, opacity 0.3s ease;
                         animation: laserPulse 1.2s ease-in-out infinite;
                     `;
-                    slideEl.style.position = 'relative';
+                    // ★ 不設 slideEl.style.position = 'relative'
+                    // 因為 slideEl 有 CSS transform，transform 元素自動成為 containing block
+                    // 強制設 relative 會破壞手機版的 translate+scale 佈局
                     slideEl.appendChild(laserDot);
 
                     // Add pulse animation
