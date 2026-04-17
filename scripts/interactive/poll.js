@@ -51,15 +51,17 @@ export class PollGame {
                 }
             });
 
-            // 監聯投票重置（講師觸發）
+            // 監聽投票重置（講師觸發）
             realtime.on('poll_reset', (msg) => {
                 if (msg.elementId === elementId) {
+                    console.log('[poll] reset received for', elementId);
+
                     // 清除本地投票狀態
                     this._voted.delete(elementId);
                     this._clearVotedLocal(elementId);
                     this._voteCounts[elementId] = new Array(optionEls.length).fill(0);
 
-                    // 重置 UI
+                    // 重置 UI — 不需 re-init，原 click handler 的 _voted.has() 已被清除
                     container.classList.remove('poll-voted', 'poll-locked');
                     container.querySelector('.poll-status')?.remove();
                     container.querySelector('.poll-lock-status')?.remove();
@@ -70,10 +72,6 @@ export class PollGame {
                         opt.querySelector('.poll-bar')?.remove();
                         opt.querySelector('.poll-pct')?.remove();
                     });
-
-                    // 重新綁定事件（透過重新 init）
-                    container.dataset.pollInit = 'false';
-                    this.setupContainer(container);
                 }
             });
         }
