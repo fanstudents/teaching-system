@@ -31,6 +31,9 @@ export class PollGame {
         const isMulti = container.dataset.multiSelect === 'true';
         const maxSelect = parseInt(container.dataset.maxSelect) || 0;
 
+        // ★ 多選重置回呼（由 poll_reset handler 呼叫，清除 selected Set 和 submit 按鈕）
+        let _multiResetFn = null;
+
         // 載入歷史票數（async，完成後會自動判斷已投票狀態）
         this._loadVotes(elementId, sessionCode, container);
 
@@ -72,6 +75,9 @@ export class PollGame {
                         opt.querySelector('.poll-bar')?.remove();
                         opt.querySelector('.poll-pct')?.remove();
                     });
+
+                    // ★ 清除多選狀態（selected Set + submit 按鈕）
+                    if (_multiResetFn) _multiResetFn();
                 }
             });
         }
@@ -84,6 +90,12 @@ export class PollGame {
             // ── 多選模式 ──
             const selected = new Set();
             const submitBtn = container.querySelector('.poll-multi-submit');
+
+            // 提供給 poll_reset handler 的清理回呼
+            _multiResetFn = () => {
+                selected.clear();
+                if (submitBtn) submitBtn.style.display = 'none';
+            };
 
             optionEls.forEach((opt, i) => {
                 opt.addEventListener('click', () => {
@@ -320,7 +332,7 @@ export class PollGame {
     async loadVotesForPresenter(sessionCode) {
         const containers = document.querySelectorAll('.poll-container');
         for (const c of containers) {
-            const elementId = c.closest('[data-id]')?.dataset.id || '';
+            const elementId = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
             const optionEls = c.querySelectorAll('.poll-option');
             const counts = new Array(optionEls.length).fill(0);
             const names = Array.from({ length: optionEls.length }, () => []);
