@@ -1466,7 +1466,7 @@ export class Editor {
                         ${hasCorrect ? '答對得設定分數，答錯 0 分。部分正確依比例計算。' : '學員參與互動即得分。'}
                     </div>
                     <div class="property-row" style="margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9;">
-                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
+                        <label style="flex:1;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.85rem;">
                             <input type="checkbox" id="speedBonusToggle" ${elementData.speedBonus ? 'checked' : ''} style="accent-color:#f59e0b;width:16px;height:16px;">
                             <span class="material-symbols-outlined" style="font-size:14px;color:#f59e0b;">bolt</span>
                             按作答順序給分

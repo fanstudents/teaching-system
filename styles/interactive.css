@@ -888,11 +888,11 @@
     gap: 6px;
 }
 
-/* 分數徽章 — 固定在互動元件右上角 */
+/* 分數徽章 — 固定在互動元件右上角（框內） */
 .element-score-badge {
     position: absolute;
-    top: -8px;
-    right: -4px;
+    top: 6px;
+    right: 6px;
     z-index: 10;
     display: flex;
     align-items: center;
