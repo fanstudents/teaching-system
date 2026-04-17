@@ -3858,7 +3858,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     const nameEl = row.querySelector('.lb-name');
                     if (nameEl) nameEl.textContent = s.name;
                     const ptsEl = row.querySelector('.lb-pts');
-                    if (ptsEl) ptsEl.textContent = s.totalPoints;
+                    if (ptsEl) ptsEl.textContent = Number.isInteger(s.totalPoints) ? s.totalPoints : parseFloat(s.totalPoints.toFixed(1));
                     const barEl = row.querySelector('.lb-bar');
                     if (barEl) barEl.style.width = barPct + '%';
 
@@ -3885,7 +3885,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         <div class="lb-row-top">
                             <div class="lb-rank ${rankClass}">${i + 1}</div>
                             <div class="lb-name">${this._escHtml(s.name)}</div>
-                            <div class="lb-pts">${s.totalPoints}</div>
+                            <div class="lb-pts">${Number.isInteger(s.totalPoints) ? s.totalPoints : parseFloat(s.totalPoints.toFixed(1))}</div>
                             <button class="lb-del-btn" title="刪除此學員" style="background:none;border:none;color:#94a3b8;cursor:pointer;padding:2px 4px;border-radius:4px;font-size:14px;line-height:1;margin-left:4px;transition:all 0.15s;"
                                 onmouseenter="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)'"
                                 onmouseleave="this.style.color='#94a3b8';this.style.background='none'">

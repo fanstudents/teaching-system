@@ -158,8 +158,9 @@ class InteractionState {
                 if (allSubs && allSubs.length > 0) {
                     const rank = allSubs.findIndex(s => s.student_email === email);
                     if (rank >= 0) {
-                        const decayRate = data.speedDecay || 0.05; // 每名遞減 5%
-                        const actualScore = Math.round(maxPoints * Math.pow(1 - decayRate, rank) * 100) / 100;
+                        const decayRate = data.speedDecay || 0.02; // 每名遞減 2%（線性）
+                        const multiplier = Math.max(0, 1 - decayRate * rank);
+                        const actualScore = Math.round(maxPoints * multiplier * 100) / 100;
 
                         // 更新本地 cache
                         record.state._awarded = actualScore;
@@ -316,7 +317,7 @@ class InteractionState {
             return data.map(r => ({
                 name: r.name || r.email,
                 email: r.email,
-                totalPoints: parseInt(r.total_points) || 0
+                totalPoints: parseFloat(r.total_points) || 0
             }));
         } catch (e) {
             console.warn('[stateManager] getLeaderboard failed:', e);
@@ -344,7 +345,7 @@ class InteractionState {
                 }
                 let st = r.state;
                 if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                map.get(key).totalPoints += (parseInt(st?._awarded) || 0);
+                map.get(key).totalPoints += (parseFloat(st?._awarded) || 0);
             }
             return [...map.values()].sort((a, b) => b.totalPoints - a.totalPoints || a.name.localeCompare(b.name));
         } catch (e) {
