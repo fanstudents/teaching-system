@@ -883,6 +883,11 @@
                     });
                 }, 15000);
 
+                // ★ 定期 DB 同步（每 30 秒），作為 broadcast 漏掉時的 safety net
+                const dbSyncTimer = setInterval(() => {
+                    if (mode === 'follow') syncCurrentSlideFromDB();
+                }, 30000);
+
                 // 監聽 slide_change 事件
                 realtime.on('slide_change', (msg) => {
                     console.log('[Student] slide_change:', msg);
