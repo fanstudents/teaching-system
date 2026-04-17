@@ -34,6 +34,50 @@ export class PollGame {
         // 載入歷史票數
         this._loadVotes(elementId, sessionCode, container);
 
+        // ★ 先註冊 realtime 監聽（必須在 early return 之前，否則已投票的學員永遠收不到重置事件）
+        if (typeof realtime !== 'undefined' && realtime.isConnected && sessionCode) {
+            realtime.on('poll_lock', (msg) => {
+                if (msg.elementId === elementId) {
+                    container.classList.add('poll-locked');
+                    optionEls.forEach(opt => { opt.style.cursor = 'default'; opt.style.pointerEvents = 'none'; });
+                    let lockStatus = container.querySelector('.poll-lock-status');
+                    if (!lockStatus) {
+                        lockStatus = document.createElement('div');
+                        lockStatus.className = 'poll-lock-status';
+                        lockStatus.style.cssText = 'text-align:center;padding:6px;font-size:12px;color:#94a3b8;margin-top:8px;';
+                        container.appendChild(lockStatus);
+                    }
+                    lockStatus.textContent = '🔒 投票已截止';
+                }
+            });
+
+            // 監聽投票重置（講師觸發）
+            realtime.on('poll_reset', (msg) => {
+                if (msg.elementId === elementId) {
+                    // 清除本地投票狀態
+                    this._voted.delete(elementId);
+                    this._clearVotedLocal(elementId);
+                    this._voteCounts[elementId] = new Array(optionEls.length).fill(0);
+
+                    // 重置 UI
+                    container.classList.remove('poll-voted', 'poll-locked');
+                    container.querySelector('.poll-status')?.remove();
+                    container.querySelector('.poll-lock-status')?.remove();
+                    optionEls.forEach(opt => {
+                        opt.classList.remove('poll-selected');
+                        opt.style.cursor = '';
+                        opt.style.pointerEvents = '';
+                        opt.querySelector('.poll-bar')?.remove();
+                        opt.querySelector('.poll-pct')?.remove();
+                    });
+
+                    // 重新綁定事件（透過重新 init）
+                    container.dataset.pollInit = 'false';
+                    this.setupContainer(container);
+                }
+            });
+        }
+
         // 檢查是否已投過票
         const user = this._getUser();
         if (user?.email && this._hasVotedLocal(elementId)) {
@@ -93,50 +137,6 @@ export class PollGame {
                     // 記錄投票
                     this._submitVote(elementId, i, sessionCode, container, optionEls);
                 });
-            });
-        }
-
-        // 監聽開票鎖定
-        if (typeof realtime !== 'undefined' && realtime.isConnected && sessionCode) {
-            realtime.on('poll_lock', (msg) => {
-                if (msg.elementId === elementId) {
-                    container.classList.add('poll-locked');
-                    optionEls.forEach(opt => { opt.style.cursor = 'default'; opt.style.pointerEvents = 'none'; });
-                    let lockStatus = container.querySelector('.poll-lock-status');
-                    if (!lockStatus) {
-                        lockStatus = document.createElement('div');
-                        lockStatus.className = 'poll-lock-status';
-                        lockStatus.style.cssText = 'text-align:center;padding:6px;font-size:12px;color:#94a3b8;margin-top:8px;';
-                        container.appendChild(lockStatus);
-                    }
-                    lockStatus.textContent = '🔒 投票已截止';
-                }
-            });
-
-            // 監聽投票重置（講師觸發）
-            realtime.on('poll_reset', (msg) => {
-                if (msg.elementId === elementId) {
-                    // 清除本地投票狀態
-                    this._voted.delete(elementId);
-                    this._clearVotedLocal(elementId);
-                    this._voteCounts[elementId] = new Array(optionEls.length).fill(0);
-
-                    // 重置 UI
-                    container.classList.remove('poll-voted', 'poll-locked');
-                    container.querySelector('.poll-status')?.remove();
-                    container.querySelector('.poll-lock-status')?.remove();
-                    optionEls.forEach(opt => {
-                        opt.classList.remove('poll-selected');
-                        opt.style.cursor = '';
-                        opt.style.pointerEvents = '';
-                        opt.querySelector('.poll-bar')?.remove();
-                        opt.querySelector('.poll-pct')?.remove();
-                    });
-
-                    // 重新綁定事件（透過重新 init）
-                    container.dataset.pollInit = 'false';
-                    this.setupContainer(container);
-                }
             });
         }
     }
