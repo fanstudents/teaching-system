@@ -2051,9 +2051,12 @@
                     el.classList.add('interactive-element');
                     const pollMarkers = 'ABCDEFGHIJ';
                     const pollOptions = element.options || [];
+                    const isMultiPoll = element.multiSelect || false;
+                    const maxSelPoll = element.maxSelect || 0;
+                    const pollHint = isMultiPoll ? (maxSelPoll > 0 ? `可多選（最多 ${maxSelPoll} 項）` : '可多選') : '';
                     el.innerHTML = `
-                        <div class="poll-container" data-element-id="${element.id}">
-                            <div class="poll-question">${element.question || '請投票'}</div>
+                        <div class="poll-container" data-element-id="${element.id}"${isMultiPoll ? ' data-multi-select="true"' : ''}${maxSelPoll > 0 ? ` data-max-select="${maxSelPoll}"` : ''}>
+                            <div class="poll-question">${element.question || '請投票'}${pollHint ? `<span style="font-size:0.75em;font-weight:400;color:#64748b;margin-left:8px;">${pollHint}</span>` : ''}</div>
                             <div class="poll-options">
                                 ${pollOptions.map((opt, i) => `
                                     <div class="poll-option" data-index="${i}">
@@ -2064,6 +2067,7 @@
                             </div>
                             <div class="poll-footer">
                                 <span class="poll-total"></span>
+                                ${isMultiPoll ? '<button class="poll-multi-submit" style="display:none;margin-left:auto;padding:6px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">確認送出</button>' : ''}
                             </div>
                         </div>
                     `;
