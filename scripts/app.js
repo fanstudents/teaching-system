@@ -3671,12 +3671,15 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             // ★ 恢復投影片位置：使用 load 前的位置（確保不超出範圍）
             const restoredIndex = Math.min(savedIndex, this.slideManager.slides.length - 1);
             this.slideManager.currentIndex = restoredIndex;
+            // 重新渲染正確的頁面（load 會渲染到 chosen.currentIndex）
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            // ⚠️ 不呼叫 saveCurrentSlide — 避免用渲染後的 DOM 覆蓋目標頁
 
-            // 發送初始投影片資料
-            this.slideManager.saveCurrentSlide();
-            this.broadcastSlideData(restoredIndex);
-
+            // 廣播初始投影片
             this.broadcasting = true;
+            this.broadcastSlideData(restoredIndex);
 
             // ★ 場次隔離：用 project_sessions.id 作為全局 session UUID
             // Realtime 頻道仍用 join_code，但資料查詢全部改用此 UUID
@@ -3699,7 +3702,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             this.updateViewerCount();
 
             this.showToast(`🟢 廣播已開始！課堂代碼：${this.sessionCode}`);
-            console.log('[Broadcast] started, code:', this.sessionCode);
+            console.log('[Broadcast] started, code:', this.sessionCode, 'at slide:', restoredIndex);
 
             // 啟動排行榜輪詢
             this.startLeaderboardPolling();
