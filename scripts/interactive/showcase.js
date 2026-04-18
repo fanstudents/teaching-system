@@ -174,14 +174,27 @@ export class Showcase {
             if (!this._lastDataHash) this._lastDataHash = {};
             this._lastDataHash[cid] = dataHash;
 
-            this.cache[assignmentTitle] = data;
-            console.log('[Showcase] submissions for', assignmentTitle, ':', data.length, 'items');
+            // ★ 去重：同一學員只保留最新一筆（data 已按 submitted_at asc 排序）
+            const deduped = [];
+            const seen = new Map(); // student_name → index in deduped
+            for (const s of data) {
+                const key = s.student_name || s.student_email || s.id;
+                if (seen.has(key)) {
+                    deduped[seen.get(key)] = s; // 替換為更新的
+                } else {
+                    seen.set(key, deduped.length);
+                    deduped.push(s);
+                }
+            }
+
+            this.cache[assignmentTitle] = deduped;
+            console.log('[Showcase] submissions for', assignmentTitle, ':', data.length, 'raw →', deduped.length, 'deduped');
 
             // 保存捲動位置
             const grid = container.querySelector('.showcase-grid');
             const savedScroll = grid ? grid.scrollLeft : 0;
 
-            this.render(container, data, assignmentTitle);
+            this.render(container, deduped, assignmentTitle);
 
             // 恢復捲動位置
             requestAnimationFrame(() => {

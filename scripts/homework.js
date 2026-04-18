@@ -651,6 +651,19 @@ export class HomeworkSubmission {
         for (let attempt = 0; attempt < 3 && !saved; attempt++) {
             try {
                 if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+
+                // ★ 先刪除同學員+同作業的舊提交（避免作業牆出現重複卡片）
+                if (attempt === 0 && effectiveSessionId) {
+                    try {
+                        await db.delete('submissions', {
+                            assignment_title: `eq.${assignmentTitle}`,
+                            student_name: `eq.${user.name}`,
+                            session_id: `eq.${effectiveSessionId}`,
+                        });
+                        console.log('[Homework] 舊提交已清除 (upsert)');
+                    } catch (e) { console.warn('[Homework] 刪舊提交失敗:', e); }
+                }
+
                 const result = await db.insert('submissions', row);
                 if (result.error) throw new Error(result.error.message || 'DB insert error');
                 console.log('[Homework] ✅ saved to DB');
