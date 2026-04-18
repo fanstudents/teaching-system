@@ -534,7 +534,7 @@ export class Showcase {
                             session_code: `eq.${this.sessionCode || 'free'}`,
                             element_id: `eq.peer_vote_${assignmentTitle}`,
                             student_name: `eq.${myName}`,
-                            option_text: `eq.${subId}`,
+                            student_email: `eq.${subId}`,
                         }).catch(e => console.warn('[PeerVote] delete failed:', e));
                     } else {
                         // 檢查票數上限
@@ -552,8 +552,7 @@ export class Showcase {
                                 session_code: this.sessionCode || 'free',
                                 element_id: `peer_vote_${assignmentTitle}`,
                                 student_name: myName,
-                                student_email: currentUser?.email || '',
-                                option_text: String(subId),
+                                student_email: String(subId),
                                 option_index: 0,
                                 created_at: new Date().toISOString(),
                             });
@@ -619,7 +618,7 @@ export class Showcase {
                         // 計算每個 submission 的得票數（用 String 統一比對）
                         const tally = {};
                         votes.forEach(v => {
-                            const sid = String(v.option_text || '');
+                            const sid = String(v.student_email || '');
                             if (sid) tally[sid] = (tally[sid] || 0) + 1;
                         });
 
@@ -965,7 +964,7 @@ export class Showcase {
             const voteCounts = {};
 
             for (const v of votes) {
-                const sid = v.option_text; // submission ID
+                const sid = v.student_email; // submission ID (stored in student_email field)
                 voteCounts[sid] = (voteCounts[sid] || 0) + 1;
                 if (v.student_name === myName) {
                     myVotes.add(sid);
