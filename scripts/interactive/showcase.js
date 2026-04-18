@@ -585,9 +585,8 @@ export class Showcase {
             const settleBtn = container.querySelector('.showcase-settle-btn');
             if (settleBtn) {
                 settleBtn.addEventListener('click', async () => {
-                    if (!confirm('確定結算互評分數？將依得票比例計算分數。')) return;
                     settleBtn.disabled = true;
-                    settleBtn.textContent = '結算中…';
+                    settleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">hourglass_top</span> 結算中…';
 
                     try {
                         // 查所有投票
@@ -606,14 +605,17 @@ export class Showcase {
                         });
 
                         const maxVotes = Math.max(...Object.values(tally), 1);
-                        // 取作業的設定分數
                         const maxPts = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
+
+                        // 結算結果陣列
+                        const results = [];
 
                         // 逐一更新 submission 分數
                         for (const sub of submissions) {
                             const vc = tally[sub.id] || 0;
                             if (vc <= 0) continue;
                             const score = Math.round(maxPts * (vc / maxVotes) * 100) / 100;
+                            results.push({ name: sub.student_name, votes: vc, score });
 
                             try {
                                 const { error } = await db.rpc('instructor_score_submission', {
@@ -627,16 +629,41 @@ export class Showcase {
                             } catch (e) { console.warn('[PeerVote] settle error:', e); }
                         }
 
-                        settleBtn.textContent = '✓ 已結算';
+                        settleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">check_circle</span> 已結算';
+
+                        // ★ 顯示結算摘要卡片
+                        results.sort((a, b) => b.votes - a.votes);
+                        const summaryRows = results.map((r, i) => `
+                            <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+                                <span style="font-size:12px;color:#94a3b8;width:20px;text-align:right;">#${i + 1}</span>
+                                <span style="flex:1;font-size:13px;font-weight:500;color:#1e293b;">${this.escapeHtml(r.name)}</span>
+                                <span style="font-size:12px;color:#ef4444;">❤️ ${r.votes}</span>
+                                <span style="font-size:13px;font-weight:700;color:#059669;">${r.score} 分</span>
+                            </div>
+                        `).join('');
+
+                        const summaryCard = document.createElement('div');
+                        summaryCard.className = 'showcase-settle-summary';
+                        summaryCard.innerHTML = `
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                                <span style="font-size:13px;font-weight:700;color:#1e293b;">📊 互評結算結果</span>
+                                <span style="font-size:11px;color:#94a3b8;">${votes?.length || 0} 票 → ${results.length} 人得分（滿分 ${maxPts}）</span>
+                            </div>
+                            ${summaryRows || '<div style="color:#94a3b8;font-size:13px;">無投票資料</div>'}
+                        `;
+
+                        // 插入在 status-row 和 grid 之間
+                        const existingSummary = container.querySelector('.showcase-settle-summary');
+                        if (existingSummary) existingSummary.remove();
+                        const gridEl = container.querySelector('.showcase-grid');
+                        if (gridEl) gridEl.parentElement.insertBefore(summaryCard, gridEl);
+
                         // 刷新排行榜
                         if (window.app) setTimeout(() => window.app.updateLeaderboard(), 1500);
-                        // 刷新作業牆顯示
-                        if (this._lastDataHash) delete this._lastDataHash[container._showcaseId];
-                        setTimeout(() => this.fetchAndRender(container, assignmentTitle), 2000);
                     } catch (e) {
                         console.error('[PeerVote] settle failed:', e);
                         settleBtn.disabled = false;
-                        settleBtn.textContent = '結算失敗';
+                        settleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">error</span> 結算失敗';
                     }
                 });
             }
