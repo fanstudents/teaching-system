@@ -1371,6 +1371,10 @@ export class SlideManager {
                 el.classList.add('interactive-element', 'showcase-container');
                 el.dataset.assignmentTitle = element.assignmentTitle || element.linkedHomeworkTitle || '';
                 if (element.linkedHomeworkId) el.dataset.linkedHomeworkId = element.linkedHomeworkId;
+                if (element.peerVoteEnabled) {
+                    el.dataset.peerVote = 'true';
+                    el.dataset.peerVoteCount = element.peerVoteCount || 3;
+                }
                 el.innerHTML = `
                     <div class="showcase-placeholder">
                         <span class="material-symbols-outlined" style="font-size:2rem;">gallery_thumbnail</span>

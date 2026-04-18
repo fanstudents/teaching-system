@@ -2557,6 +2557,10 @@
                 case 'showcase': {
                     el.classList.add('interactive-element', 'showcase-container');
                     el.dataset.assignmentTitle = element.assignmentTitle || '';
+                    if (element.peerVoteEnabled) {
+                        el.dataset.peerVote = 'true';
+                        el.dataset.peerVoteCount = element.peerVoteCount || 3;
+                    }
                     break;
                 }
 

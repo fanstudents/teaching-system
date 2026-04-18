@@ -3243,6 +3243,18 @@ ${truncated}
                          ${optionsHtml}
                     </select>
                 </div>
+                <div class="property-row" style="margin-top:8px;">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="peerVoteToggle" ${elementData.peerVoteEnabled ? 'checked' : ''} style="accent-color:#f59e0b;width:16px;height:16px;">
+                        學員互評投票
+                    </label>
+                </div>
+                <div class="property-row" id="peerVoteCountRow" style="margin-top:4px;${elementData.peerVoteEnabled ? '' : 'display:none;'}">
+                    <label>每人票數</label>
+                    <select id="peerVoteCount" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                        ${[1,2,3,4,5].map(n => `<option value="${n}" ${(elementData.peerVoteCount || 3) === n ? 'selected' : ''}>${n} 票</option>`).join('')}
+                    </select>
+                </div>
             </div>
         `;
     }
@@ -3274,6 +3286,23 @@ ${truncated}
             this.slideManager.renderCurrentSlide();
             this.selectElementById(elementId);
         });
+
+        // ── 學員互評設定 ──
+        const peerToggle = document.getElementById('peerVoteToggle');
+        const peerCountRow = document.getElementById('peerVoteCountRow');
+        const peerCountSel = document.getElementById('peerVoteCount');
+
+        if (peerToggle) {
+            peerToggle.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { peerVoteEnabled: peerToggle.checked });
+                if (peerCountRow) peerCountRow.style.display = peerToggle.checked ? '' : 'none';
+            });
+        }
+        if (peerCountSel) {
+            peerCountSel.addEventListener('change', () => {
+                this.slideManager.updateElement(elementId, { peerVoteCount: parseInt(peerCountSel.value) || 3 });
+            });
+        }
     }
 
     /**

@@ -1581,6 +1581,108 @@
     font-variation-settings: 'FILL' 1;
 }
 
+/* ── 互評投票 ── */
+.showcase-peer-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-top: 1px solid #f1f3f4;
+    background: #fafafa;
+}
+
+.showcase-vote-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 28px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.showcase-vote-btn .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0;
+}
+
+.showcase-vote-btn:hover:not(:disabled) {
+    border-color: #fca5a5;
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.showcase-vote-btn.voted {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.showcase-vote-btn.voted .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+}
+
+.showcase-vote-btn.is-mine {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.showcase-vote-btn:disabled:not(.is-mine):not(.voted) {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.showcase-peer-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    min-width: 14px;
+}
+
+.showcase-votes-remaining {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f59e0b;
+    padding: 2px 10px;
+    background: rgba(245,158,11,0.12);
+    border-radius: 4px;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+
+.showcase-settle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 12px;
+    border: 1.5px solid #a78bfa;
+    border-radius: 6px;
+    background: rgba(167,139,250,0.08);
+    color: #7c3aed;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: 6px;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.showcase-settle-btn:hover {
+    background: rgba(167,139,250,0.18);
+    border-color: #7c3aed;
+}
+
+.showcase-settle-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* ========================================
    展示聚焦 Overlay
    ======================================== */

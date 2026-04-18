@@ -65,6 +65,10 @@ export class Showcase {
             </div>`;
 
         try {
+            // ★ 載入互評投票資料（在 fetchAndRender 之前）
+            if (container.dataset.peerVote === 'true' && this.sessionCode) {
+                await this._loadPeerVotes(container, title);
+            }
             await this.fetchAndRender(container, title);
         } catch (e) {
             console.error('[Showcase] setupContainer failed:', e);
@@ -219,6 +223,16 @@ export class Showcase {
         const count = submissions.length;
         const isPresenter = container._showcaseIsPresenter && container._showcaseBroadcasting;
 
+        // ── 互評投票設定 ──
+        const peerVoteEnabled = container.dataset.peerVote === 'true';
+        const peerVoteMax = parseInt(container.dataset.peerVoteCount) || 3;
+        const myVotes = container._peerMyVotes || new Set();  // submission IDs I voted for
+        const voteCounts = container._peerVoteCounts || {};    // submission_id → count
+        const currentUser = (() => {
+            try { return JSON.parse(sessionStorage.getItem('homework_user')); } catch { return null; }
+        })();
+        const myName = currentUser?.name || '';
+
         const statusHtml = submissions.map(s => {
             const safeName = this.escapeHtml(s.student_name || '?');
             return `
@@ -237,7 +251,10 @@ export class Showcase {
                 return (st?._instructorScored) ? (parseInt(st?._awarded) || 0) : 0;
             })();
             const safeName = this.escapeHtml(s.student_name || '匿名');
-            // 5 星評分（每星 = 1 分，滿分 5 分）
+            const subId = s.id;
+            const vc = voteCounts[subId] || 0;
+
+            // 講師端：5 星評分
             const scoreHtml = isPresenter ? `
                 <div class="showcase-score-bar" data-sub-id="${s.id}">
                     <div class="showcase-score-stars">
@@ -255,8 +272,32 @@ export class Showcase {
                     <span class="material-symbols-outlined">star</span>
                     <span>${s.instructor_score} 分</span>
                 </div>` : '');
+
+            // 互評投票列（講師端顯示得票數，學員端顯示投票按鈕）
+            let peerHtml = '';
+            if (peerVoteEnabled) {
+                const isMine = s.student_name === myName;
+                const voted = myVotes.has(subId);
+                if (isPresenter) {
+                    // 講師端：只顯示得票數
+                    peerHtml = `<div class="showcase-peer-bar">
+                        <span class="material-symbols-outlined" style="font-size:14px;color:${vc > 0 ? '#ef4444' : '#cbd5e1'};">favorite</span>
+                        <span class="showcase-peer-count">${vc}</span>
+                    </div>`;
+                } else {
+                    // 學員端：投票按鈕
+                    peerHtml = `<div class="showcase-peer-bar">
+                        <button class="showcase-vote-btn ${voted ? 'voted' : ''} ${isMine ? 'is-mine' : ''}"
+                                data-sub-id="${subId}" ${isMine ? 'disabled title="不能投自己"' : ''}>
+                            <span class="material-symbols-outlined">${voted ? 'favorite' : 'favorite_border'}</span>
+                        </button>
+                        <span class="showcase-peer-count">${vc || ''}</span>
+                    </div>`;
+                }
+            }
+
             return `
-                <div class="showcase-work-card" data-index="${i}">
+                <div class="showcase-work-card" data-index="${i}" data-sub-id="${subId}">
                     <div class="showcase-work-header">
                         <span class="showcase-work-avatar">${safeName[0]}</span>
                         <div style="flex:1;min-width:0;">
@@ -267,6 +308,7 @@ export class Showcase {
                     </div>
                     <div class="showcase-work-body">${preview}</div>
                     ${scoreHtml}
+                    ${peerHtml}
                 </div>`;
         }).join('');
 
@@ -275,6 +317,15 @@ export class Showcase {
         const countLabel = total > 0
             ? `已繳 ${count} / 應繳 ${total}　<span class="showcase-header-pending">${notSubmitted} 人未繳</span>`
             : `${count} 份繳交`;
+
+        // 互評剩餘票數提示
+        const remaining = peerVoteMax - myVotes.size;
+        const peerInfoHtml = peerVoteEnabled ? (isPresenter
+            ? `<button class="showcase-settle-btn" title="結算互評分數">
+                <span class="material-symbols-outlined" style="font-size:14px;">calculate</span> 結算
+              </button>`
+            : `<span class="showcase-votes-remaining">${remaining > 0 ? `剩 ${remaining} 票` : '已投完'}</span>`
+        ) : '';
 
         container.innerHTML = `
             <div class="showcase-header-bar">
@@ -292,6 +343,7 @@ export class Showcase {
                             <span class="material-symbols-outlined">apps</span>
                         </button>
                     </div>
+                    ${peerInfoHtml}
                 </div>
                 <span class="showcase-header-count">${countLabel}</span>
             </div>
@@ -462,6 +514,133 @@ export class Showcase {
                 });
             }
         });
+
+        // ── 學員互評投票 ──
+        if (peerVoteEnabled && !isPresenter) {
+            container.querySelectorAll('.showcase-vote-btn:not(.is-mine)').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const subId = btn.dataset.subId;
+                    if (!subId || !myName) return;
+
+                    if (myVotes.has(subId)) {
+                        // 取消投票
+                        myVotes.delete(subId);
+                        voteCounts[subId] = Math.max(0, (voteCounts[subId] || 1) - 1);
+                        btn.classList.remove('voted');
+                        btn.querySelector('.material-symbols-outlined').textContent = 'favorite_border';
+                        // 刪 DB
+                        db.delete('poll_votes', {
+                            session_code: `eq.${this.sessionCode || 'free'}`,
+                            element_id: `eq.peer_vote_${assignmentTitle}`,
+                            student_name: `eq.${myName}`,
+                            option_text: `eq.${subId}`,
+                        }).catch(e => console.warn('[PeerVote] delete failed:', e));
+                    } else {
+                        // 檢查票數上限
+                        if (myVotes.size >= peerVoteMax) {
+                            import('../ui.js').then(m => m.showToast(`你最多只能投 ${peerVoteMax} 票`, { type: 'error' }));
+                            return;
+                        }
+                        myVotes.add(subId);
+                        voteCounts[subId] = (voteCounts[subId] || 0) + 1;
+                        btn.classList.add('voted');
+                        btn.querySelector('.material-symbols-outlined').textContent = 'favorite';
+                        // 寫 DB
+                        db.insert('poll_votes', {
+                            session_code: this.sessionCode || 'free',
+                            element_id: `peer_vote_${assignmentTitle}`,
+                            student_name: myName,
+                            student_email: currentUser?.email || '',
+                            option_text: subId,
+                            option_index: 0,
+                            created_at: new Date().toISOString(),
+                        }).catch(e => console.warn('[PeerVote] insert failed:', e));
+                    }
+
+                    container._peerMyVotes = myVotes;
+                    container._peerVoteCounts = voteCounts;
+
+                    // 更新得票數顯示
+                    const countEl = btn.parentElement?.querySelector('.showcase-peer-count');
+                    if (countEl) countEl.textContent = voteCounts[subId] || '';
+
+                    // 更新剩餘票數
+                    const remainEl = container.querySelector('.showcase-votes-remaining');
+                    const rem = peerVoteMax - myVotes.size;
+                    if (remainEl) remainEl.textContent = rem > 0 ? `剩 ${rem} 票` : '已投完';
+
+                    // 禁用其他未投按鈕（票數用完）
+                    if (rem <= 0) {
+                        container.querySelectorAll('.showcase-vote-btn:not(.voted):not(.is-mine)').forEach(b => b.disabled = true);
+                    } else {
+                        container.querySelectorAll('.showcase-vote-btn:not(.is-mine)').forEach(b => b.disabled = false);
+                    }
+                });
+            });
+        }
+
+        // ── 講師結算互評 ──
+        if (peerVoteEnabled && isPresenter) {
+            const settleBtn = container.querySelector('.showcase-settle-btn');
+            if (settleBtn) {
+                settleBtn.addEventListener('click', async () => {
+                    if (!confirm('確定結算互評分數？將依得票比例計算分數。')) return;
+                    settleBtn.disabled = true;
+                    settleBtn.textContent = '結算中…';
+
+                    try {
+                        // 查所有投票
+                        const { data: votes } = await db.select('poll_votes', {
+                            filter: {
+                                session_code: `eq.${this.sessionCode || 'free'}`,
+                                element_id: `eq.peer_vote_${assignmentTitle}`,
+                            }
+                        });
+
+                        // 計算每個 submission 的得票數
+                        const tally = {};
+                        (votes || []).forEach(v => {
+                            const sid = v.option_text;
+                            tally[sid] = (tally[sid] || 0) + 1;
+                        });
+
+                        const maxVotes = Math.max(...Object.values(tally), 1);
+                        // 取作業的設定分數
+                        const maxPts = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
+
+                        // 逐一更新 submission 分數
+                        for (const sub of submissions) {
+                            const vc = tally[sub.id] || 0;
+                            if (vc <= 0) continue;
+                            const score = Math.round(maxPts * (vc / maxVotes) * 100) / 100;
+
+                            try {
+                                const { error } = await db.rpc('instructor_score_submission', {
+                                    p_submission_id: sub.id,
+                                    p_score: score,
+                                    p_session_id: window._activeSessionUUID || this.sessionCode || null,
+                                    p_student_email: sub.student_email || null,
+                                });
+                                if (error) console.warn('[PeerVote] settle score failed:', error);
+                                else console.log(`[PeerVote] ${sub.student_name}: ${vc} votes → ${score} pts`);
+                            } catch (e) { console.warn('[PeerVote] settle error:', e); }
+                        }
+
+                        settleBtn.textContent = '✓ 已結算';
+                        // 刷新排行榜
+                        if (window.app) setTimeout(() => window.app.updateLeaderboard(), 1500);
+                        // 刷新作業牆顯示
+                        if (this._lastDataHash) delete this._lastDataHash[container._showcaseId];
+                        setTimeout(() => this.fetchAndRender(container, assignmentTitle), 2000);
+                    } catch (e) {
+                        console.error('[PeerVote] settle failed:', e);
+                        settleBtn.disabled = false;
+                        settleBtn.textContent = '結算失敗';
+                    }
+                });
+            }
+        }
 
         // 講師端：廣播捲動位置
         const grid = container.querySelector('.showcase-grid');
@@ -712,6 +891,43 @@ export class Showcase {
                 </div>`;
             default:
                 return `<div class="showcase-full-text">${this.linkifyUrls(this.escapeHtml(content))}</div>`;
+        }
+    }
+
+    /**
+     * 載入互評投票資料
+     */
+    async _loadPeerVotes(container, assignmentTitle) {
+        try {
+            const { data: votes } = await db.select('poll_votes', {
+                filter: {
+                    session_code: `eq.${this.sessionCode}`,
+                    element_id: `eq.peer_vote_${assignmentTitle}`,
+                }
+            });
+            if (!votes || votes.length === 0) return;
+
+            const currentUser = (() => {
+                try { return JSON.parse(sessionStorage.getItem('homework_user')); } catch { return null; }
+            })();
+            const myName = currentUser?.name || '';
+
+            const myVotes = new Set();
+            const voteCounts = {};
+
+            for (const v of votes) {
+                const sid = v.option_text; // submission ID
+                voteCounts[sid] = (voteCounts[sid] || 0) + 1;
+                if (v.student_name === myName) {
+                    myVotes.add(sid);
+                }
+            }
+
+            container._peerMyVotes = myVotes;
+            container._peerVoteCounts = voteCounts;
+            console.log(`[PeerVote] loaded ${votes.length} votes, mine: ${myVotes.size}`);
+        } catch (e) {
+            console.warn('[PeerVote] load failed:', e);
         }
     }
 
