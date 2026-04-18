@@ -268,12 +268,46 @@ export class Showcase {
                 <div class="showcase-header-left">
                     <span class="material-symbols-outlined" style="font-size:18px;">gallery_thumbnail</span>
                     <span class="showcase-header-title">${assignmentTitle}</span>
+                    <div class="showcase-view-toggle">
+                        <button class="showcase-view-btn active" data-view="scroll" title="左右滑動">
+                            <span class="material-symbols-outlined">view_column</span>
+                        </button>
+                        <button class="showcase-view-btn" data-view="grid-3" title="9 宮格（3×3）">
+                            <span class="material-symbols-outlined">grid_view</span>
+                        </button>
+                        <button class="showcase-view-btn" data-view="grid-4" title="16 宮格（4×4）">
+                            <span class="material-symbols-outlined">apps</span>
+                        </button>
+                    </div>
                 </div>
                 <span class="showcase-header-count">${countLabel}</span>
             </div>
             <div class="showcase-status-row">${statusHtml}</div>
             <div class="showcase-grid">${cardsHtml || '<div class="showcase-empty">尚無人繳交</div>'}</div>
         `;
+
+        // ── 宮格模式切換邏輯 ──
+        const viewBtns = container.querySelectorAll('.showcase-view-btn');
+        const gridEl = container.querySelector('.showcase-grid');
+        // 恢復上次的模式
+        const savedView = container._showcaseViewMode || 'scroll';
+        if (savedView !== 'scroll' && gridEl) {
+            gridEl.classList.add('grid-mode', savedView);
+            viewBtns.forEach(b => b.classList.toggle('active', b.dataset.view === savedView));
+        }
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.view;
+                container._showcaseViewMode = mode;
+                viewBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (!gridEl) return;
+                gridEl.classList.remove('grid-mode', 'grid-3', 'grid-4');
+                if (mode !== 'scroll') {
+                    gridEl.classList.add('grid-mode', mode);
+                }
+            });
+        });
 
         container.querySelectorAll('.showcase-work-card').forEach(card => {
             // 點擊作品區域 → 聚焦放大（不含評分列）
