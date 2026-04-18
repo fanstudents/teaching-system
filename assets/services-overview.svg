@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .bg { animation: fadeIn 0.4s ease-out both; }
+  .main-title { animation: slideUp 0.5s ease-out 0.2s both; }
+  .card-1 { animation: scaleIn 0.5s ease-out 0.4s both; transform-origin: 178px 300px; }
+  .card-2 { animation: scaleIn 0.5s ease-out 0.6s both; transform-origin: 480px 300px; }
+  .card-3 { animation: scaleIn 0.5s ease-out 0.8s both; transform-origin: 782px 300px; }
+
+  .card-rect { cursor: pointer; transition: filter 0.25s, transform 0.25s; }
+  .card-group:hover .card-rect { filter: brightness(1.15) drop-shadow(0 4px 16px rgba(0,0,0,0.25)); }
+  .card-group:hover .card-icon { opacity: 1; }
+  .card-icon { opacity: 0.7; transition: opacity 0.2s; }
+
+  .tag { cursor: pointer; transition: opacity 0.2s; }
+  .tag:hover { opacity: 0.8; }
+</style>
+
+<!-- 背景 -->
+<rect class="bg" width="960" height="540" rx="16" fill="#f8fafc"/>
+
+<!-- 頂部裝飾線 -->
+<rect class="bg" x="0" y="0" width="960" height="6" rx="3" fill="url(#grad)"/>
+<defs>
+  <linearGradient id="grad" x1="0" y1="0" x2="960" y2="0">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="50%" stop-color="#a855f7"/>
+    <stop offset="100%" stop-color="#06b6d4"/>
+  </linearGradient>
+  <linearGradient id="card1bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#1e293b"/>
+    <stop offset="100%" stop-color="#0f172a"/>
+  </linearGradient>
+  <linearGradient id="card2bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#1e293b"/>
+    <stop offset="100%" stop-color="#0f172a"/>
+  </linearGradient>
+  <linearGradient id="card3bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#1e293b"/>
+    <stop offset="100%" stop-color="#0f172a"/>
+  </linearGradient>
+</defs>
+
+<!-- 主標題 -->
+<text class="main-title" x="480" y="56" text-anchor="middle" font-size="16" font-weight="600" fill="#6366f1" letter-spacing="4">OUR SERVICES</text>
+<text class="main-title" x="480" y="88" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b" style="animation-delay:0.3s;">我們的服務</text>
+
+<!-- ═══ Card 1: AI 專家派遣 ═══ -->
+<g class="card-1 card-group">
+  <rect class="card-rect" x="40" y="120" width="275" height="380" rx="16" fill="url(#card1bg)"/>
+  
+  <!-- 頂部標籤 -->
+  <rect class="tag" x="55" y="135" width="80" height="24" rx="12" fill="rgba(99,102,241,0.25)"/>
+  <text x="95" y="152" text-anchor="middle" font-size="11" font-weight="600" fill="#a5b4fc">企業導入</text>
+  
+  <!-- Icon -->
+  <text class="card-icon" x="55" y="200" font-size="36">🧑‍💻</text>
+  
+  <!-- 標題 -->
+  <text x="55" y="240" font-size="20" font-weight="800" fill="#ffffff">AI 專家派遣</text>
+  <text x="55" y="262" font-size="14" font-weight="500" fill="#94a3b8">AI 專家 ＋ PM 進駐辦公室</text>
+
+  <!-- 分隔線 -->
+  <line x1="55" y1="280" x2="295" y2="280" stroke="#334155" stroke-width="1"/>
+  
+  <!-- 項目 -->
+  <circle cx="65" cy="308" r="4" fill="#6366f1"/>
+  <text x="80" y="313" font-size="15" font-weight="600" fill="#e2e8f0">流程再造與 AI 化</text>
+  
+  <circle cx="65" cy="342" r="4" fill="#6366f1"/>
+  <text x="80" y="347" font-size="15" font-weight="600" fill="#e2e8f0">老系統智慧升級</text>
+  
+  <circle cx="65" cy="376" r="4" fill="#6366f1"/>
+  <text x="80" y="381" font-size="15" font-weight="600" fill="#e2e8f0">跨系統數據串聯</text>
+
+  <!-- 底部裝飾 -->
+  <rect x="40" y="470" width="275" height="30" rx="0" ry="0" fill="rgba(99,102,241,0.12)"/>
+  <rect x="40" y="484" width="275" height="16" rx="0" ry="16" fill="rgba(99,102,241,0.12)"/>
+  <text x="178" y="490" text-anchor="middle" font-size="12" font-weight="600" fill="#818cf8">由我們的團隊進駐</text>
+</g>
+
+<!-- ═══ Card 2: AI 培訓 ═══ -->
+<g class="card-2 card-group">
+  <rect class="card-rect" x="342" y="120" width="275" height="380" rx="16" fill="url(#card2bg)"/>
+  
+  <rect class="tag" x="357" y="135" width="80" height="24" rx="12" fill="rgba(168,85,247,0.25)"/>
+  <text x="397" y="152" text-anchor="middle" font-size="11" font-weight="600" fill="#c4b5fd">教育培訓</text>
+  
+  <text class="card-icon" x="357" y="200" font-size="36">🎓</text>
+  
+  <text x="357" y="240" font-size="20" font-weight="800" fill="#ffffff">AI 內訓 / 培育</text>
+  <text x="357" y="262" font-size="14" font-weight="500" fill="#94a3b8">帶企業與個人深化 AI 應用</text>
+  
+  <line x1="357" y1="280" x2="597" y2="280" stroke="#334155" stroke-width="1"/>
+  
+  <circle cx="367" cy="308" r="4" fill="#a855f7"/>
+  <text x="382" y="313" font-size="15" font-weight="600" fill="#e2e8f0">企業內部 AI 培訓</text>
+  
+  <circle cx="367" cy="342" r="4" fill="#a855f7"/>
+  <text x="382" y="347" font-size="15" font-weight="600" fill="#e2e8f0">一對一個人教練</text>
+  
+  <circle cx="367" cy="376" r="4" fill="#a855f7"/>
+  <text x="382" y="381" font-size="15" font-weight="600" fill="#e2e8f0">實戰工作坊設計</text>
+
+  <rect x="342" y="470" width="275" height="30" rx="0" ry="0" fill="rgba(168,85,247,0.12)"/>
+  <rect x="342" y="484" width="275" height="16" rx="0" ry="16" fill="rgba(168,85,247,0.12)"/>
+  <text x="480" y="490" text-anchor="middle" font-size="12" font-weight="600" fill="#a78bfa">量身定制學習路徑</text>
+</g>
+
+<!-- ═══ Card 3: Threads 代操 ═══ -->
+<g class="card-3 card-group">
+  <rect class="card-rect" x="644" y="120" width="275" height="380" rx="16" fill="url(#card3bg)"/>
+  
+  <rect class="tag" x="659" y="135" width="80" height="24" rx="12" fill="rgba(6,182,212,0.25)"/>
+  <text x="699" y="152" text-anchor="middle" font-size="11" font-weight="600" fill="#67e8f9">社群經營</text>
+  
+  <text class="card-icon" x="659" y="200" font-size="36">📱</text>
+  
+  <text x="659" y="240" font-size="20" font-weight="800" fill="#ffffff">Threads 代操</text>
+  <text x="659" y="262" font-size="14" font-weight="500" fill="#94a3b8">社群帶營運 ＋ 數據驅動</text>
+  
+  <line x1="659" y1="280" x2="899" y2="280" stroke="#334155" stroke-width="1"/>
+  
+  <circle cx="669" cy="308" r="4" fill="#06b6d4"/>
+  <text x="684" y="313" font-size="15" font-weight="600" fill="#e2e8f0">Threads 帳號代操</text>
+  
+  <circle cx="669" cy="342" r="4" fill="#06b6d4"/>
+  <text x="684" y="347" font-size="15" font-weight="600" fill="#e2e8f0">SEO 內容策略輔助</text>
+  
+  <circle cx="669" cy="376" r="4" fill="#06b6d4"/>
+  <text x="684" y="381" font-size="15" font-weight="600" fill="#e2e8f0">數據整合與成效控管</text>
+
+  <rect x="644" y="470" width="275" height="30" rx="0" ry="0" fill="rgba(6,182,212,0.12)"/>
+  <rect x="644" y="484" width="275" height="16" rx="0" ry="16" fill="rgba(6,182,212,0.12)"/>
+  <text x="782" y="490" text-anchor="middle" font-size="12" font-weight="600" fill="#22d3ee">用數據說話的社群</text>
+</g>
+
+<!-- 底部 -->
+<text x="480" y="528" text-anchor="middle" font-size="13" font-weight="500" fill="#94a3b8" style="animation: fadeIn 0.5s ease-out 1.2s both;">
+  從策略到落地，AI 轉型全方位支援
+</text>
+</svg>

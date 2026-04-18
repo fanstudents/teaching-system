@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes drawLine { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+  .title { animation: slideUp 0.6s ease-out both; }
+  .accent-line { animation: drawLine 0.8s ease-out 0.2s both; stroke-dasharray: 400; }
+  .row-1 { animation: slideRight 0.5s ease-out 0.4s both; }
+  .row-2 { animation: slideRight 0.5s ease-out 0.6s both; }
+  .row-3 { animation: slideRight 0.5s ease-out 0.8s both; }
+  .row-4 { animation: slideRight 0.5s ease-out 1.0s both; }
+
+  .dot { cursor: pointer; transition: filter 0.25s, r 0.25s; }
+  .dot:hover { filter: drop-shadow(0 0 10px currentColor) brightness(1.3); r: 18; }
+
+  .rule-group { cursor: pointer; }
+  .rule-group .card-bg { transition: opacity 0.25s, filter 0.25s; }
+  .rule-group:hover .card-bg { opacity: 0.8 !important; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.06)); }
+  .rule-group .score-badge { transition: transform 0.2s, filter 0.2s; }
+  .rule-group:hover .score-badge { filter: brightness(1.15) drop-shadow(0 2px 8px rgba(99,102,241,0.3)); }
+  .rule-group .rule-label { transition: fill 0.2s; }
+  .rule-group:hover .rule-label { fill: #0f172a; }
+  .rule-group .sub-label { transition: fill 0.2s; }
+  .rule-group:hover .sub-label { fill: #64748b; }
+
+  .reward-glow { animation: pulse 2.5s ease-in-out 1.5s infinite; transform-origin: 120px 394px; }
+  .footer { animation: fadeIn 0.5s ease-out 1.4s both; }
+</style>
+
+<!-- 背景 -->
+<rect width="960" height="540" fill="#ffffff" rx="16"/>
+
+<!-- 左側裝飾線 -->
+<line class="accent-line" x1="80" y1="95" x2="80" y2="445" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/>
+
+<!-- 標題 -->
+<text class="title" x="100" y="72" font-size="32" font-weight="800" fill="#1e293b">計分規則</text>
+<text class="title" x="880" y="72" text-anchor="end" font-size="14" font-weight="500" fill="#94a3b8" style="animation-delay:0.3s;">即時更新於排行榜</text>
+
+<!-- Row 1: 出席簽到 -->
+<g class="row-1 rule-group">
+  <rect class="card-bg" x="90" y="96" width="780" height="72" rx="12" fill="#f1f5f9" opacity="0"/>
+  <circle class="dot" cx="120" cy="132" r="14" fill="#6366f1">
+    <title>上線簽到即得 1 分</title>
+  </circle>
+  <text class="rule-label" x="150" y="126" font-size="22" font-weight="700" fill="#334155">出席簽到</text>
+  <text class="sub-label" x="150" y="150" font-size="14" font-weight="500" fill="#94a3b8">加入課程即自動獲得</text>
+  <g class="score-badge">
+    <rect x="710" y="113" width="72" height="38" rx="8" fill="rgba(99,102,241,0.08)" stroke="#6366f1" stroke-width="1.5"/>
+    <text x="746" y="138" text-anchor="middle" font-size="20" font-weight="800" fill="#6366f1">1 分</text>
+  </g>
+</g>
+
+<!-- Row 2: 參與互動 -->
+<g class="row-2 rule-group">
+  <rect class="card-bg" x="90" y="180" width="780" height="72" rx="12" fill="#f1f5f9" opacity="0"/>
+  <circle class="dot" cx="120" cy="216" r="14" fill="#a855f7">
+    <title>投票、問答、搶答最高 10 分</title>
+  </circle>
+  <text class="rule-label" x="150" y="210" font-size="22" font-weight="700" fill="#334155">參與互動</text>
+  <text class="sub-label" x="150" y="234" font-size="14" font-weight="500" fill="#94a3b8">投票 ∙ 問答 ∙ 搶答 ∙ 配對</text>
+  <g class="score-badge">
+    <rect x="670" y="197" width="112" height="38" rx="8" fill="rgba(168,85,247,0.08)" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="726" y="222" text-anchor="middle" font-size="20" font-weight="800" fill="#a855f7">1–10 分</text>
+  </g>
+</g>
+
+<!-- Row 3: 作業繳交 -->
+<g class="row-3 rule-group">
+  <rect class="card-bg" x="90" y="264" width="780" height="72" rx="12" fill="#f1f5f9" opacity="0"/>
+  <circle class="dot" cx="120" cy="300" r="14" fill="#22c55e">
+    <title>依作業設定，最高 10 分</title>
+  </circle>
+  <text class="rule-label" x="150" y="294" font-size="22" font-weight="700" fill="#334155">作業繳交</text>
+  <text class="sub-label" x="150" y="318" font-size="14" font-weight="500" fill="#94a3b8">完成課堂作業並提交</text>
+  <g class="score-badge">
+    <rect x="670" y="281" width="112" height="38" rx="8" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1.5"/>
+    <text x="726" y="306" text-anchor="middle" font-size="20" font-weight="800" fill="#16a34a">1–10 分</text>
+  </g>
+</g>
+
+<!-- Row 4: 冠軍獎勵 -->
+<g class="row-4 rule-group">
+  <rect class="card-bg" x="90" y="348" width="780" height="88" rx="12" fill="#f1f5f9" opacity="0"/>
+  <circle class="dot reward-glow" cx="120" cy="390" r="14" fill="#f59e0b">
+    <title>排行榜第一名獲得特別獎品！</title>
+  </circle>
+  <text class="rule-label" x="150" y="380" font-size="22" font-weight="700" fill="#334155">🏆 冠軍獎勵</text>
+  <text class="sub-label" x="150" y="412" font-size="17" font-weight="600" fill="#b45309">獲得「數位簡報室線上課程」一個</text>
+  <g class="score-badge">
+    <rect x="670" y="370" width="112" height="38" rx="8" fill="rgba(245,158,11,0.1)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="726" y="395" text-anchor="middle" font-size="18" font-weight="800" fill="#f59e0b">🎁 獎品</text>
+  </g>
+</g>
+
+<!-- 底部 -->
+<g class="footer">
+  <line x1="200" y1="490" x2="760" y2="490" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="480" y="515" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">積極參與就能拿高分 — 把握每一次互動機會！</text>
+</g>
+</svg>
