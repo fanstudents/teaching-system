@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes slideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes drawLine { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes countPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+  .title { animation: slideUp 0.6s ease-out both; }
+  .title-line { animation: drawLine 0.6s ease-out 0.3s both; stroke-dasharray: 200; }
+  .rule-1 { animation: slideRight 0.5s ease-out 0.5s both; }
+  .rule-2 { animation: slideRight 0.5s ease-out 0.7s both; }
+  .rule-3 { animation: slideRight 0.5s ease-out 0.9s both; }
+
+  .num { animation: scaleIn 0.4s ease-out both; }
+  .num-1 { animation-delay: 0.5s; transform-origin: 88px 195px; }
+  .num-2 { animation-delay: 0.7s; transform-origin: 88px 310px; }
+  .num-3 { animation-delay: 0.9s; transform-origin: 88px 425px; }
+
+  .rule-card { cursor: pointer; }
+  .rule-card .card-bg { transition: opacity 0.25s, filter 0.25s; opacity: 0; }
+  .rule-card:hover .card-bg { opacity: 1; filter: drop-shadow(0 2px 12px rgba(0,0,0,0.06)); }
+  .rule-card:hover .keyword { fill: #0f172a; }
+  .rule-card:hover .desc { fill: #334155; }
+  .rule-card .keyword { transition: fill 0.2s; }
+  .rule-card .desc { transition: fill 0.2s; }
+
+  .dot { cursor: pointer; transition: r 0.2s, filter 0.2s; }
+  .dot:hover { r: 24; filter: drop-shadow(0 0 10px rgba(22,163,74,0.4)); }
+
+  .icon-badge { transition: transform 0.2s; }
+  .rule-card:hover .icon-badge { transform: scale(1.15); }
+
+  .footer { animation: fadeIn 0.5s ease-out 1.2s both; }
+</style>
+
+<!-- 背景 -->
+<rect width="960" height="540" fill="#ffffff" rx="16"/>
+
+<!-- 頂部漸層裝飾 -->
+<rect x="0" y="0" width="960" height="5" rx="2.5" fill="url(#topGrad)"/>
+<defs>
+  <linearGradient id="topGrad" x1="0" y1="0" x2="960" y2="0">
+    <stop offset="0%" stop-color="#16a34a"/>
+    <stop offset="50%" stop-color="#22c55e"/>
+    <stop offset="100%" stop-color="#4ade80"/>
+  </linearGradient>
+</defs>
+
+<!-- 標題 -->
+<text class="title" x="80" y="80" font-size="30" font-weight="800" fill="#1e293b">AI 的三大使用原則</text>
+<line class="title-line" x1="80" y1="95" x2="280" y2="95" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+<text class="title" x="880" y="80" text-anchor="end" font-size="13" font-weight="500" fill="#94a3b8" style="animation-delay:0.4s;">使用 AI 前的必讀守則</text>
+
+<!-- ═══ Rule 1: 不盲信 ═══ -->
+<g class="rule-1 rule-card">
+  <rect class="card-bg" x="60" y="125" width="840" height="100" rx="14" fill="#f0fdf4"/>
+  
+  <!-- 數字圓 -->
+  <circle class="dot num num-1" cx="88" cy="175" r="20" fill="#16a34a"/>
+  <text x="88" y="181" text-anchor="middle" font-size="18" font-weight="800" fill="#ffffff">1</text>
+  
+  <!-- 關鍵字 -->
+  <text class="keyword" x="125" y="162" font-size="22" font-weight="800" fill="#16a34a">不盲信</text>
+  
+  <!-- 箭頭 -->
+  <text x="230" y="162" font-size="16" fill="#94a3b8">→</text>
+  
+  <!-- 說明 -->
+  <text class="desc" x="260" y="162" font-size="17" font-weight="500" fill="#475569">AI 會幻想（Hallucination）</text>
+  <text class="desc" x="125" y="192" font-size="15" font-weight="500" fill="#64748b">關鍵數據一定要交叉驗證，不能照單全收</text>
+
+  <!-- 右側圖示 -->
+  <g class="icon-badge" style="transform-origin: 850px 175px;">
+    <rect x="820" y="155" width="42" height="42" rx="10" fill="rgba(22,163,74,0.08)"/>
+    <text x="841" y="183" text-anchor="middle" font-size="22">🔍</text>
+  </g>
+</g>
+
+<!-- ═══ Rule 2: 不洩密 ═══ -->
+<g class="rule-2 rule-card">
+  <rect class="card-bg" x="60" y="240" width="840" height="100" rx="14" fill="#f0fdf4"/>
+  
+  <circle class="dot num num-2" cx="88" cy="290" r="20" fill="#16a34a"/>
+  <text x="88" y="296" text-anchor="middle" font-size="18" font-weight="800" fill="#ffffff">2</text>
+  
+  <text class="keyword" x="125" y="277" font-size="22" font-weight="800" fill="#16a34a">不洩密</text>
+  <text x="230" y="277" font-size="16" fill="#94a3b8">→</text>
+  <text class="desc" x="260" y="277" font-size="17" font-weight="500" fill="#475569">不要把客戶機密資料、個資直接貼給公開 AI</text>
+  <text class="desc" x="125" y="307" font-size="15" font-weight="500" fill="#64748b">機密文件請使用企業版或本地部署方案</text>
+
+  <g class="icon-badge" style="transform-origin: 850px 290px;">
+    <rect x="820" y="270" width="42" height="42" rx="10" fill="rgba(22,163,74,0.08)"/>
+    <text x="841" y="298" text-anchor="middle" font-size="22">🔒</text>
+  </g>
+</g>
+
+<!-- ═══ Rule 3: 要給情境 ═══ -->
+<g class="rule-3 rule-card">
+  <rect class="card-bg" x="60" y="355" width="840" height="100" rx="14" fill="#f0fdf4"/>
+  
+  <circle class="dot num num-3" cx="88" cy="405" r="20" fill="#16a34a"/>
+  <text x="88" y="411" text-anchor="middle" font-size="18" font-weight="800" fill="#ffffff">3</text>
+  
+  <text class="keyword" x="125" y="392" font-size="22" font-weight="800" fill="#16a34a">要給情境</text>
+  <text x="260" y="392" font-size="16" fill="#94a3b8">→</text>
+  <text class="desc" x="290" y="392" font-size="17" font-weight="500" fill="#475569">AI 不是通靈，你給的背景越多，產出越精準</text>
+  <text class="desc" x="125" y="422" font-size="15" font-weight="500" fill="#64748b">角色、目的、受眾、格式 — 寫清楚再送出</text>
+
+  <g class="icon-badge" style="transform-origin: 850px 405px;">
+    <rect x="820" y="385" width="42" height="42" rx="10" fill="rgba(22,163,74,0.08)"/>
+    <text x="841" y="413" text-anchor="middle" font-size="22">🎯</text>
+  </g>
+</g>
+
+<!-- 底部 -->
+<g class="footer">
+  <line x1="200" y1="490" x2="760" y2="490" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="480" y="518" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">掌握原則，讓 AI 成為你最可靠的工作夥伴</text>
+</g>
+</svg>
