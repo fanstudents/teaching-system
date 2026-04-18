@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes slideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes drawLine { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .title { animation: slideUp 0.6s ease-out both; }
+  .title-line { animation: drawLine 0.6s ease-out 0.3s both; stroke-dasharray: 200; }
+  .row-1 { animation: slideRight 0.5s ease-out 0.4s both; }
+  .row-2 { animation: slideRight 0.5s ease-out 0.55s both; }
+  .row-3 { animation: slideRight 0.5s ease-out 0.7s both; }
+  .row-4 { animation: slideRight 0.5s ease-out 0.85s both; }
+  .row-5 { animation: slideRight 0.5s ease-out 1.0s both; }
+
+  .dot { transition: r 0.2s, filter 0.2s; cursor: pointer; }
+  .dot:hover { r: 18; filter: drop-shadow(0 0 10px rgba(124,58,237,0.5)); }
+
+  .rule-card { cursor: pointer; }
+  .rule-card .card-bg { transition: opacity 0.25s; opacity: 0; }
+  .rule-card:hover .card-bg { opacity: 1; }
+  .rule-card:hover .kw { fill: #4c1d95; }
+  .rule-card:hover .eng { fill: #7c3aed; }
+  .rule-card:hover .example { fill: #1e293b; }
+  .rule-card .kw { transition: fill 0.2s; }
+  .rule-card .eng { transition: fill 0.2s; }
+  .rule-card .example { transition: fill 0.2s; }
+
+  .rule-card:hover .icon-box { opacity: 1; transform: scale(1.1); }
+  .icon-box { opacity: 0.6; transition: opacity 0.2s, transform 0.2s; }
+
+  .footer { animation: fadeIn 0.5s ease-out 1.3s both; }
+</style>
+
+<!-- 背景 -->
+<rect width="960" height="540" fill="#ffffff" rx="16"/>
+
+<!-- 頂部漸層 -->
+<rect x="0" y="0" width="960" height="5" rx="2.5" fill="url(#topG)"/>
+<defs>
+  <linearGradient id="topG" x1="0" y1="0" x2="960" y2="0">
+    <stop offset="0%" stop-color="#7c3aed"/>
+    <stop offset="50%" stop-color="#a855f7"/>
+    <stop offset="100%" stop-color="#c084fc"/>
+  </linearGradient>
+</defs>
+
+<!-- 標題 -->
+<text class="title" x="80" y="72" font-size="30" font-weight="800" fill="#1e293b">提示工程的基本框架</text>
+<line class="title-line" x1="80" y1="87" x2="310" y2="87" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+<text class="title" x="880" y="72" text-anchor="end" font-size="13" font-weight="500" fill="#94a3b8" style="animation-delay:0.4s;">Prompt Engineering 101</text>
+
+<!-- ═══ Row 1: 角色 Role ═══ -->
+<g class="row-1 rule-card">
+  <rect class="card-bg" x="60" y="105" width="840" height="68" rx="12" fill="#f5f3ff"/>
+  <circle class="dot" cx="88" cy="139" r="13" fill="#7c3aed"><title>Role：設定 AI 的角色定位</title></circle>
+  <text class="kw" x="115" y="134" font-size="20" font-weight="800" fill="#7c3aed">角色</text>
+  <text class="eng" x="175" y="134" font-size="14" font-weight="600" fill="#a78bfa">（Role）</text>
+  <text x="260" y="134" font-size="16" fill="#94a3b8">→</text>
+  <text class="example" x="290" y="134" font-size="16" font-weight="500" fill="#475569">「你是一位資深的 HR 系統產品經理」</text>
+  <text class="example" x="115" y="158" font-size="13" font-weight="400" fill="#94a3b8">告訴 AI 它扮演什麼專家角色</text>
+  <g class="icon-box" style="transform-origin:855px 139px;"><text x="855" y="147" text-anchor="middle" font-size="22">🎭</text></g>
+</g>
+
+<!-- ═══ Row 2: 情境 Context ═══ -->
+<g class="row-2 rule-card">
+  <rect class="card-bg" x="60" y="183" width="840" height="68" rx="12" fill="#f5f3ff"/>
+  <circle class="dot" cx="88" cy="217" r="13" fill="#8b5cf6"><title>Context：提供背景與脈絡</title></circle>
+  <text class="kw" x="115" y="212" font-size="20" font-weight="800" fill="#7c3aed">情境</text>
+  <text class="eng" x="175" y="212" font-size="14" font-weight="600" fill="#a78bfa">（Context）</text>
+  <text x="285" y="212" font-size="16" fill="#94a3b8">→</text>
+  <text class="example" x="315" y="212" font-size="16" font-weight="500" fill="#475569">「公司正在準備新一季的客戶提案」</text>
+  <text class="example" x="115" y="236" font-size="13" font-weight="400" fill="#94a3b8">說明任務的背景與使用場景</text>
+  <g class="icon-box" style="transform-origin:855px 217px;"><text x="855" y="225" text-anchor="middle" font-size="22">📋</text></g>
+</g>
+
+<!-- ═══ Row 3: 任務 Task ═══ -->
+<g class="row-3 rule-card">
+  <rect class="card-bg" x="60" y="261" width="840" height="68" rx="12" fill="#f5f3ff"/>
+  <circle class="dot" cx="88" cy="295" r="13" fill="#a855f7"><title>Task：明確指定你要 AI 做什麼</title></circle>
+  <text class="kw" x="115" y="290" font-size="20" font-weight="800" fill="#7c3aed">任務</text>
+  <text class="eng" x="175" y="290" font-size="14" font-weight="600" fill="#a78bfa">（Task）</text>
+  <text x="260" y="290" font-size="16" fill="#94a3b8">→</text>
+  <text class="example" x="290" y="290" font-size="16" font-weight="500" fill="#475569">「請幫我撰寫一份產品優勢比較表」</text>
+  <text class="example" x="115" y="314" font-size="13" font-weight="400" fill="#94a3b8">具體說出你需要的產出是什麼</text>
+  <g class="icon-box" style="transform-origin:855px 295px;"><text x="855" y="303" text-anchor="middle" font-size="22">✏️</text></g>
+</g>
+
+<!-- ═══ Row 4: 格式 Format ═══ -->
+<g class="row-4 rule-card">
+  <rect class="card-bg" x="60" y="339" width="840" height="68" rx="12" fill="#f5f3ff"/>
+  <circle class="dot" cx="88" cy="373" r="13" fill="#c084fc"><title>Format：指定輸出的格式</title></circle>
+  <text class="kw" x="115" y="368" font-size="20" font-weight="800" fill="#7c3aed">格式</text>
+  <text class="eng" x="175" y="368" font-size="14" font-weight="600" fill="#a78bfa">（Format）</text>
+  <text x="280" y="368" font-size="16" fill="#94a3b8">→</text>
+  <text class="example" x="310" y="368" font-size="16" font-weight="500" fill="#475569">「用 Markdown 表格、繁體中文」</text>
+  <text class="example" x="115" y="392" font-size="13" font-weight="400" fill="#94a3b8">規定產出的結構與語言</text>
+  <g class="icon-box" style="transform-origin:855px 373px;"><text x="855" y="381" text-anchor="middle" font-size="22">📐</text></g>
+</g>
+
+<!-- ═══ Row 5: 限制 Constraint ═══ -->
+<g class="row-5 rule-card">
+  <rect class="card-bg" x="60" y="417" width="840" height="68" rx="12" fill="#f5f3ff"/>
+  <circle class="dot" cx="88" cy="451" r="13" fill="#d8b4fe"><title>Constraint：設定品質限制條件</title></circle>
+  <text class="kw" x="115" y="446" font-size="20" font-weight="800" fill="#7c3aed">限制</text>
+  <text class="eng" x="175" y="446" font-size="14" font-weight="600" fill="#a78bfa">（Constraint）</text>
+  <text x="305" y="446" font-size="16" fill="#94a3b8">→</text>
+  <text class="example" x="335" y="446" font-size="16" font-weight="500" fill="#475569">「控制在 500 字內、語氣專業」</text>
+  <text class="example" x="115" y="470" font-size="13" font-weight="400" fill="#94a3b8">加上邊界條件讓產出更精確</text>
+  <g class="icon-box" style="transform-origin:855px 451px;"><text x="855" y="459" text-anchor="middle" font-size="22">⚙️</text></g>
+</g>
+
+<!-- 底部 -->
+<g class="footer">
+  <line x1="200" y1="505" x2="760" y2="505" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="480" y="530" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">五要素齊全 = 一次到位的高品質 AI 產出</text>
+</g>
+</svg>
