@@ -546,16 +546,25 @@ export class Showcase {
                         voteCounts[subId] = (voteCounts[subId] || 0) + 1;
                         btn.classList.add('voted');
                         btn.querySelector('.material-symbols-outlined').textContent = 'favorite';
-                        // 寫 DB
-                        db.insert('poll_votes', {
-                            session_code: this.sessionCode || 'free',
-                            element_id: `peer_vote_${assignmentTitle}`,
-                            student_name: myName,
-                            student_email: currentUser?.email || '',
-                            option_text: subId,
-                            option_index: 0,
-                            created_at: new Date().toISOString(),
-                        }).catch(e => console.warn('[PeerVote] insert failed:', e));
+                        // 寫 DB（await 確認寫入）
+                        try {
+                            const res = await db.insert('poll_votes', {
+                                session_code: this.sessionCode || 'free',
+                                element_id: `peer_vote_${assignmentTitle}`,
+                                student_name: myName,
+                                student_email: currentUser?.email || '',
+                                option_text: String(subId),
+                                option_index: 0,
+                                created_at: new Date().toISOString(),
+                            });
+                            if (res.error) {
+                                console.error('[PeerVote] insert error:', res.error);
+                            } else {
+                                console.log('[PeerVote] ✅ vote saved:', subId, 'session:', this.sessionCode);
+                            }
+                        } catch (e) {
+                            console.error('[PeerVote] insert failed:', e);
+                        }
                     }
 
                     container._peerMyVotes = myVotes;
@@ -590,19 +599,32 @@ export class Showcase {
 
                     try {
                         // 查所有投票
-                        const { data: votes } = await db.select('poll_votes', {
-                            filter: {
-                                session_code: `eq.${this.sessionCode || 'free'}`,
-                                element_id: `eq.peer_vote_${assignmentTitle}`,
-                            }
+                        const queryFilter = {
+                            session_code: `eq.${this.sessionCode || 'free'}`,
+                            element_id: `eq.peer_vote_${assignmentTitle}`,
+                        };
+                        console.log('[PeerVote] settle query:', queryFilter);
+
+                        const { data: votes, error: voteErr } = await db.select('poll_votes', {
+                            filter: queryFilter
                         });
 
-                        // 計算每個 submission 的得票數
+                        console.log('[PeerVote] settle votes:', votes?.length, 'error:', voteErr);
+
+                        if (!votes || votes.length === 0) {
+                            settleBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">info</span> 無投票';
+                            return;
+                        }
+
+                        // 計算每個 submission 的得票數（用 String 統一比對）
                         const tally = {};
-                        (votes || []).forEach(v => {
-                            const sid = v.option_text;
-                            tally[sid] = (tally[sid] || 0) + 1;
+                        votes.forEach(v => {
+                            const sid = String(v.option_text || '');
+                            if (sid) tally[sid] = (tally[sid] || 0) + 1;
                         });
+
+                        console.log('[PeerVote] tally:', tally);
+                        console.log('[PeerVote] submission IDs:', submissions.map(s => String(s.id)));
 
                         const maxVotes = Math.max(...Object.values(tally), 1);
                         const maxPts = parseInt(container.closest('[data-points]')?.dataset.points) || 5;
@@ -612,7 +634,7 @@ export class Showcase {
 
                         // 逐一更新 submission 分數
                         for (const sub of submissions) {
-                            const vc = tally[sub.id] || 0;
+                            const vc = tally[String(sub.id)] || 0;
                             if (vc <= 0) continue;
                             const score = Math.round(maxPts * (vc / maxVotes) * 100) / 100;
                             results.push({ name: sub.student_name, votes: vc, score });
