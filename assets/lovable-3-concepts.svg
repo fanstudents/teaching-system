@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .title { animation: slideUp 0.6s ease-out both; }
+  .subtitle { animation: fadeIn 0.5s ease-out 0.3s both; }
+  .card-1 { animation: slideUp 0.5s ease-out 0.5s both; }
+  .card-2 { animation: slideUp 0.5s ease-out 0.7s both; }
+  .card-3 { animation: slideUp 0.5s ease-out 0.9s both; }
+  .num-badge { animation: scaleIn 0.4s ease-out both; }
+  .num-1 { animation-delay: 0.5s; transform-origin: 193px 148px; }
+  .num-2 { animation-delay: 0.7s; transform-origin: 480px 148px; }
+  .num-3 { animation-delay: 0.9s; transform-origin: 767px 148px; }
+  .footer { animation: fadeIn 0.4s ease-out 1.2s both; }
+
+  .concept-card { cursor: pointer; }
+  .concept-card .card-bg { transition: all 0.3s; }
+  .concept-card:hover .card-bg { fill: #f8fafc; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.1)); transform: translateY(-4px); }
+  .concept-card:hover .icon-circle { fill: #1e293b; }
+  .concept-card:hover .icon-symbol { fill: #ffffff; }
+  .concept-card:hover .icon-stroke { stroke: #ffffff; }
+  .concept-card:hover .card-title { fill: #6366f1; }
+  .icon-circle { transition: fill 0.3s; }
+  .icon-symbol { transition: fill 0.3s; }
+  .icon-stroke { transition: stroke 0.3s; }
+  .card-title { transition: fill 0.2s; }
+  .concept-card:hover .float-icon { animation: float 1.5s ease-in-out infinite; }
+</style>
+
+<!-- 背景 -->
+<rect width="960" height="540" fill="#ffffff" rx="16"/>
+
+<!-- 頂部色帶 -->
+<rect x="0" y="0" width="960" height="5" rx="2.5" fill="url(#topBar)"/>
+<defs>
+  <linearGradient id="topBar" x1="0" y1="0" x2="960" y2="0">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="50%" stop-color="#8b5cf6"/>
+    <stop offset="100%" stop-color="#a855f7"/>
+  </linearGradient>
+</defs>
+
+<!-- 標題 -->
+<text class="title" x="480" y="60" text-anchor="middle" font-size="30" font-weight="800" fill="#1e293b">Vibe Coding 三個重要觀念</text>
+<text class="subtitle" x="480" y="88" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">使用 Lovable 開發前，你一定要知道的事</text>
+
+<!-- ═══ Card 1: 每次對話都要錢 ═══ -->
+<g class="card-1 concept-card">
+  <rect class="card-bg" x="50" y="115" width="260" height="310" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  
+  <!-- 數字 badge -->
+  <circle class="num-badge num-1" cx="193" cy="148" r="16" fill="#6366f1"/>
+  <text x="193" y="154" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">1</text>
+  
+  <!-- Icon -->
+  <g class="float-icon">
+    <circle class="icon-circle" cx="180" cy="235" r="46" fill="#f1f5f9"/>
+    <!-- $ symbol -->
+    <text class="icon-symbol" x="180" y="252" text-anchor="middle" font-size="44" font-weight="800" fill="#1e293b" font-family="'SF Mono', Consolas, monospace">$</text>
+  </g>
+  
+  <!-- 文字 -->
+  <text class="card-title" x="180" y="315" text-anchor="middle" font-size="20" font-weight="700" fill="#1e293b">每次對話都要錢</text>
+  <text x="180" y="345" text-anchor="middle" font-size="14" font-weight="500" fill="#64748b">Lovable 按訊息數計費</text>
+  <text x="180" y="367" text-anchor="middle" font-size="14" font-weight="500" fill="#64748b">每一句 prompt 都是成本</text>
+  <text x="180" y="395" text-anchor="middle" font-size="12" font-weight="600" fill="#a855f7">💡 想清楚再送出</text>
+</g>
+
+<!-- ═══ Card 2: 提供真實數據 ═══ -->
+<g class="card-2 concept-card">
+  <rect class="card-bg" x="350" y="115" width="260" height="310" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  
+  <circle class="num-badge num-2" cx="480" cy="148" r="16" fill="#8b5cf6"/>
+  <text x="480" y="154" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">2</text>
+  
+  <g class="float-icon">
+    <circle class="icon-circle" cx="480" cy="235" r="46" fill="#f1f5f9"/>
+    <!-- Database icon -->
+    <ellipse class="icon-stroke" cx="480" cy="220" rx="20" ry="7" fill="none" stroke="#1e293b" stroke-width="3"/>
+    <path class="icon-stroke" d="M 460 220 L 460 248 C 460 253, 469 258, 480 258 C 491 258, 500 253, 500 248 L 500 220" fill="none" stroke="#1e293b" stroke-width="3"/>
+    <path class="icon-stroke" d="M 460 232 C 460 237, 469 242, 480 242 C 491 242, 500 237, 500 232" fill="none" stroke="#1e293b" stroke-width="2.5"/>
+  </g>
+  
+  <text class="card-title" x="480" y="315" text-anchor="middle" font-size="20" font-weight="700" fill="#1e293b">用真實數據開發</text>
+  <text x="480" y="345" text-anchor="middle" font-size="14" font-weight="500" fill="#64748b">提供真實的內容與場景</text>
+  <text x="480" y="367" text-anchor="middle" font-size="14" font-weight="500" fill="#64748b">AI 才能做出實用成品</text>
+  <text x="480" y="395" text-anchor="middle" font-size="12" font-weight="600" fill="#a855f7">💡 別用假資料佔位</text>
+</g>
+
+<!-- ═══ Card 3: 三合一架構 ═══ -->
+<g class="card-3 concept-card">
+  <rect class="card-bg" x="650" y="115" width="260" height="310" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  
+  <circle class="num-badge num-3" cx="780" cy="148" r="16" fill="#a855f7"/>
+  <text x="780" y="154" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">3</text>
+  
+  <g class="float-icon">
+    <circle class="icon-circle" cx="780" cy="235" r="46" fill="#f1f5f9"/>
+    <!-- Cloud + code + db combined icon -->
+    <path class="icon-stroke" d="M 762 232 C 762 220, 770 212, 780 212 C 785 205, 795 205, 800 212 C 806 212, 812 218, 812 226 C 816 228, 818 232, 816 236 L 756 236 C 754 232, 755 228, 758 226 Z" fill="none" stroke="#1e293b" stroke-width="2.5"/>
+    <!-- Bottom connectors -->
+    <line class="icon-stroke" x1="768" y1="236" x2="768" y2="250" stroke="#1e293b" stroke-width="2"/>
+    <line class="icon-stroke" x1="780" y1="236" x2="780" y2="250" stroke="#1e293b" stroke-width="2"/>
+    <line class="icon-stroke" x1="792" y1="236" x2="792" y2="250" stroke="#1e293b" stroke-width="2"/>
+    <text class="icon-symbol" x="768" y="260" font-size="9" font-weight="700" fill="#1e293b" font-family="monospace">&lt;/&gt;</text>
+    <text class="icon-symbol" x="786" y="260" font-size="9" font-weight="700" fill="#1e293b" font-family="monospace">DB</text>
+  </g>
+  
+  <text class="card-title" x="780" y="315" text-anchor="middle" font-size="20" font-weight="700" fill="#1e293b">三合一架構</text>
+  <text x="780" y="345" text-anchor="middle" font-size="14" font-weight="500" fill="#64748b">伺服器 / 資料庫 / 程式碼</text>
+  <text x="780" y="367" text-anchor="middle" font-size="14" font-weight="500" fill="#64748b">Lovable 一次幫你搞定</text>
+  <text x="780" y="395" text-anchor="middle" font-size="12" font-weight="600" fill="#a855f7">💡 全端一站式部署</text>
+</g>
+
+<!-- 底部 -->
+<g class="footer">
+  <rect x="200" y="460" width="560" height="44" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="480" y="488" text-anchor="middle" font-size="14" font-weight="600" fill="#64748b">掌握這三點，讓你的 Lovable 開發效率翻倍 🚀</text>
+</g>
+</svg>
