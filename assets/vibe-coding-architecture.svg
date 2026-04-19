@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes drawPath { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+  @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes pulse { 0%,100% { r: 5; opacity: 0.8; } 50% { r: 7; opacity: 1; } }
+
+  .title { animation: slideUp 0.6s ease-out both; }
+  .conn-line { stroke-dasharray: 600; animation: drawPath 1.2s ease-out 0.5s both; }
+  .node-code { animation: scaleIn 0.5s ease-out 0.6s both; transform-origin: 200px 300px; }
+  .node-server { animation: scaleIn 0.5s ease-out 0.8s both; transform-origin: 580px 140px; }
+  .node-db { animation: scaleIn 0.5s ease-out 1.0s both; transform-origin: 720px 370px; }
+  .label { animation: fadeIn 0.4s ease-out 1.2s both; }
+  .arrow-label { animation: fadeIn 0.4s ease-out 1.4s both; }
+  .footer { animation: fadeIn 0.4s ease-out 1.6s both; }
+
+  .node-group { cursor: pointer; }
+  .node-group:hover .node-bg { filter: drop-shadow(0 4px 16px rgba(0,0,0,0.2)) brightness(1.05); }
+  .node-group:hover .node-icon { animation: float 1.5s ease-in-out infinite; }
+  .node-bg { transition: filter 0.3s; }
+  .node-icon { transition: transform 0.2s; }
+
+  .conn-dot { animation: pulse 2s ease-in-out infinite; }
+  .conn-dot-1 { animation-delay: 0s; }
+  .conn-dot-2 { animation-delay: 0.7s; }
+  .conn-dot-3 { animation-delay: 1.4s; }
+</style>
+
+<!-- 背景 -->
+<rect width="960" height="540" fill="#ffffff" rx="16"/>
+
+<!-- 標題 -->
+<text class="title" x="60" y="60" font-size="28" font-weight="800" fill="#1e293b">Vibe Coding 必懂的三大架構</text>
+<text class="title" x="900" y="60" text-anchor="end" font-size="13" font-weight="500" fill="#94a3b8" style="animation-delay:0.3s;">前端 × 後端 × 資料庫</text>
+
+<!-- ═══ 連接線（三角形曲線）═══ -->
+<!-- 程式碼 → 伺服器 -->
+<path class="conn-line" d="M 260 280 C 340 200, 440 140, 520 145" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
+<!-- 伺服器 → 資料庫 -->
+<path class="conn-line" d="M 640 180 C 680 240, 720 290, 720 330" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" style="animation-delay:0.7s;"/>
+<!-- 資料庫 → 程式碼 -->
+<path class="conn-line" d="M 660 400 C 540 440, 360 420, 240 350" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round" style="animation-delay:0.9s;"/>
+
+<!-- 連接線上的動態圓點 -->
+<circle class="conn-dot conn-dot-1" cx="390" cy="195" r="5" fill="#6366f1"/>
+<circle class="conn-dot conn-dot-2" cx="690" cy="255" r="5" fill="#6366f1"/>
+<circle class="conn-dot conn-dot-3" cx="440" cy="415" r="5" fill="#6366f1"/>
+
+<!-- 箭頭標籤 -->
+<g class="arrow-label">
+  <rect x="330" y="170" width="100" height="24" rx="6" fill="rgba(99,102,241,0.06)"/>
+  <text x="380" y="187" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">API 請求</text>
+</g>
+<g class="arrow-label" style="animation-delay:1.5s;">
+  <rect x="720" y="248" width="100" height="24" rx="6" fill="rgba(99,102,241,0.06)"/>
+  <text x="770" y="265" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">讀寫資料</text>
+</g>
+<g class="arrow-label" style="animation-delay:1.6s;">
+  <rect x="390" y="435" width="100" height="24" rx="6" fill="rgba(99,102,241,0.06)"/>
+  <text x="440" y="452" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">顯示結果</text>
+</g>
+
+<!-- ═══ Node 1: 程式碼 ═══ -->
+<g class="node-code node-group">
+  <circle class="node-bg" cx="200" cy="300" r="68" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+  <g class="node-icon">
+    <!-- <> icon -->
+    <text x="200" y="290" text-anchor="middle" font-size="42" font-weight="900" fill="#1e293b" font-family="'SF Mono', Consolas, monospace">&lt;/&gt;</text>
+  </g>
+  <text x="200" y="335" text-anchor="middle" font-size="11" font-weight="600" fill="#94a3b8">FRONTEND</text>
+  <title>前端程式碼：使用者看到的介面</title>
+</g>
+<g class="label">
+  <text x="200" y="400" text-anchor="middle" font-size="20" font-weight="700" fill="#1e293b">程式碼</text>
+  <text x="200" y="422" text-anchor="middle" font-size="13" font-weight="500" fill="#64748b">HTML / CSS / JS</text>
+</g>
+
+<!-- ═══ Node 2: 伺服器 ═══ -->
+<g class="node-server node-group">
+  <circle class="node-bg" cx="580" cy="140" r="68" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+  <g class="node-icon">
+    <!-- Cloud icon -->
+    <path d="M 555 150 C 555 130, 570 118, 585 118 C 592 108, 606 108, 612 118 C 622 118, 632 128, 632 140 C 638 142, 640 150, 636 156 L 544 156 C 540 150, 542 142, 548 140 Z" fill="#1e293b"/>
+  </g>
+  <text x="580" y="174" text-anchor="middle" font-size="11" font-weight="600" fill="#94a3b8">BACKEND</text>
+  <title>後端伺服器：處理商業邏輯與 API</title>
+</g>
+<g class="label" style="animation-delay:1.25s;">
+  <text x="580" y="240" text-anchor="middle" font-size="20" font-weight="700" fill="#1e293b">伺服器</text>
+  <text x="580" y="262" text-anchor="middle" font-size="13" font-weight="500" fill="#64748b">Node.js / Supabase</text>
+</g>
+
+<!-- ═══ Node 3: 資料庫 ═══ -->
+<g class="node-db node-group">
+  <circle class="node-bg" cx="720" cy="370" r="68" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+  <g class="node-icon">
+    <!-- Database icon -->
+    <ellipse cx="720" cy="348" rx="22" ry="8" fill="none" stroke="#1e293b" stroke-width="3"/>
+    <path d="M 698 348 L 698 380 C 698 385, 708 390, 720 390 C 732 390, 742 385, 742 380 L 742 348" fill="none" stroke="#1e293b" stroke-width="3"/>
+    <path d="M 698 360 C 698 365, 708 370, 720 370 C 732 370, 742 365, 742 360" fill="none" stroke="#1e293b" stroke-width="2.5"/>
+  </g>
+  <text x="720" y="404" text-anchor="middle" font-size="11" font-weight="600" fill="#94a3b8">DATABASE</text>
+  <title>資料庫：儲存與管理資料</title>
+</g>
+<g class="label" style="animation-delay:1.3s;">
+  <text x="720" y="468" text-anchor="middle" font-size="20" font-weight="700" fill="#1e293b">資料庫</text>
+  <text x="720" y="490" text-anchor="middle" font-size="13" font-weight="500" fill="#64748b">PostgreSQL / SQL</text>
+</g>
+
+<!-- 底部 -->
+<g class="footer">
+  <line x1="60" y1="510" x2="900" y2="510" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="480" y="530" text-anchor="middle" font-size="13" font-weight="500" fill="#94a3b8">三者協作形成完整的 Web 應用程式架構</text>
+</g>
+</svg>
