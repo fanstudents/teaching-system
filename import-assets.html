@@ -58,38 +58,7 @@
     import { db, requireAuth } from './scripts/supabase.js';
     const _auth = await requireAuth(); if (!_auth) throw new Error('unauthorized');
 
-    // Check existing assets first
-    const { data: existing } = await db.select('assets', { select: 'name' });
-    const existingNames = new Set((existing || []).map(a => a.name));
-
-    // Render list with checkboxes
-    const listEl = document.getElementById('list');
-    IMPORT_ASSETS.forEach((a, i) => {
-      const exists = existingNames.has(a.name);
-      const card = document.createElement('div');
-      card.className = 'card' + (exists ? ' disabled' : '');
-      card.id = `card-${i}`;
-      card.innerHTML = `
-        <div class="check"><input type="checkbox" id="chk-${i}" ${exists ? '' : 'checked'} ${exists ? 'disabled' : ''} onchange="updateCount()"></div>
-        <div class="preview">${a.content}</div>
-        <div class="info">
-          <div class="name">${a.name}</div>
-          <div class="desc">${a.description}</div>
-          <div class="tags">${a.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-        </div>
-        <div class="status ${exists ? 'exists' : 'wait'}" id="status-${i}">${exists ? '⚠️ 已存在' : '待匯入'}</div>
-      `;
-      listEl.appendChild(card);
-    });
-    updateCount();
-
-    window.toggleAll = function(checked) {
-      IMPORT_ASSETS.forEach((_, i) => {
-        const chk = document.getElementById(`chk-${i}`);
-        if (!chk.disabled) chk.checked = checked;
-      });
-      updateCount();
-    };
+    // ── 先定義所有函數 ──
 
     window.updateCount = function() {
       let count = 0;
@@ -98,6 +67,14 @@
         if (chk && chk.checked && !chk.disabled) count++;
       });
       document.getElementById('selectCount').textContent = `已選 ${count} 筆`;
+    };
+
+    window.toggleAll = function(checked) {
+      IMPORT_ASSETS.forEach((_, i) => {
+        const chk = document.getElementById(`chk-${i}`);
+        if (!chk.disabled) chk.checked = checked;
+      });
+      updateCount();
     };
 
     window.importSelected = async function() {
@@ -163,6 +140,31 @@
       alert(`已清理 ${count} 筆壞資料`);
       location.reload();
     };
+
+    // ── 載入現有資料並渲染 ──
+
+    const { data: existing } = await db.select('assets', { select: 'name' });
+    const existingNames = new Set((existing || []).map(a => a.name));
+
+    const listEl = document.getElementById('list');
+    IMPORT_ASSETS.forEach((a, i) => {
+      const exists = existingNames.has(a.name);
+      const card = document.createElement('div');
+      card.className = 'card' + (exists ? ' disabled' : '');
+      card.id = `card-${i}`;
+      card.innerHTML = `
+        <div class="check"><input type="checkbox" id="chk-${i}" ${exists ? '' : 'checked'} ${exists ? 'disabled' : ''} onchange="updateCount()"></div>
+        <div class="preview">${a.content}</div>
+        <div class="info">
+          <div class="name">${a.name}</div>
+          <div class="desc">${a.description}</div>
+          <div class="tags">${a.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>
+        <div class="status ${exists ? 'exists' : 'wait'}" id="status-${i}">${exists ? '⚠️ 已存在' : '待匯入'}</div>
+      `;
+      listEl.appendChild(card);
+    });
+    updateCount();
   </script>
 </body>
 </html>
