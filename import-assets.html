@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>素材匯入工具</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans TC',sans-serif; background:#f6f8fb; padding:40px; }
+    h1 { font-size:1.4rem; margin-bottom:8px; }
+    .sub { color:#80868b; font-size:0.85rem; margin-bottom:24px; }
+    .card { background:#fff; border:1px solid #dadce0; border-radius:12px; padding:16px; margin-bottom:12px; display:flex; align-items:center; gap:16px; }
+    .card .preview { width:160px; height:90px; background:#fafbfc; border-radius:8px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .card .preview svg { max-width:100%; max-height:100%; }
+    .card .info { flex:1; }
+    .card .name { font-weight:700; font-size:0.95rem; }
+    .card .desc { font-size:0.8rem; color:#80868b; margin-top:2px; }
+    .card .tags { margin-top:6px; display:flex; gap:4px; flex-wrap:wrap; }
+    .card .tag { font-size:0.7rem; padding:2px 8px; background:#f1f3f4; border-radius:8px; color:#444; }
+    .card .status { font-size:0.85rem; font-weight:600; min-width:80px; text-align:center; }
+    .card .status.ok { color:#16a34a; }
+    .card .status.err { color:#dc2626; }
+    .card .status.skip { color:#94a3b8; }
+    .card .status.wait { color:#80868b; }
+    .actions { display:flex; gap:10px; margin-bottom:24px; }
+    .btn { padding:10px 20px; border:none; border-radius:8px; font-size:0.9rem; font-family:inherit; cursor:pointer; font-weight:600; }
+    .btn-primary { background:#1a73e8; color:#fff; }
+    .btn-primary:hover { background:#1765cc; }
+    .btn-primary:disabled { background:#94a3b8; cursor:not-allowed; }
+    .btn-danger { background:#fce8e6; color:#c5221f; }
+    .btn-danger:hover { background:#f8d7d5; }
+    .summary { margin-top:16px; padding:12px 16px; background:#e8f5e9; border-radius:8px; font-size:0.85rem; color:#2e7d32; display:none; }
+  </style>
+</head>
+<body>
+  <h1>📦 素材庫批次匯入工具</h1>
+  <p class="sub">將本地 SVG 素材一鍵匯入資料庫。已存在的素材會自動跳過。</p>
+  <div class="actions">
+    <button class="btn btn-primary" id="importBtn" onclick="importAll()">🚀 一鍵匯入全部</button>
+    <button class="btn btn-danger" id="cleanBtn" onclick="cleanBadEntries()">🗑️ 清理壞資料</button>
+  </div>
+  <div id="list"></div>
+  <div class="summary" id="summary"></div>
+
+  <script src="_asset-data.js"></script>
+  <script type="module">
+    import { db, requireAuth } from './scripts/supabase.js';
+    const _auth = await requireAuth(); if (!_auth) throw new Error('unauthorized');
+
+    // Render list
+    const listEl = document.getElementById('list');
+    IMPORT_ASSETS.forEach((a, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = `card-${i}`;
+      card.innerHTML = `
+        <div class="preview">${a.content}</div>
+        <div class="info">
+          <div class="name">${a.name}</div>
+          <div class="desc">${a.description}</div>
+          <div class="tags">${a.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>
+        <div class="status wait" id="status-${i}">待匯入</div>
+      `;
+      listEl.appendChild(card);
+    });
+
+    window.importAll = async function() {
+      const btn = document.getElementById('importBtn');
+      btn.disabled = true;
+      btn.textContent = '匯入中…';
+
+      // Load existing assets to check duplicates
+      const { data: existing } = await db.select('assets', { select: 'name' });
+      const existingNames = new Set((existing || []).map(a => a.name));
+
+      let ok = 0, skip = 0, fail = 0;
+      for (let i = 0; i < IMPORT_ASSETS.length; i++) {
+        const a = IMPORT_ASSETS[i];
+        const statusEl = document.getElementById(`status-${i}`);
+
+        if (existingNames.has(a.name)) {
+          statusEl.textContent = '已存在';
+          statusEl.className = 'status skip';
+          skip++;
+          continue;
+        }
+
+        try {
+          const { error } = await db.insert('assets', {
+            name: a.name,
+            description: a.description,
+            type: a.type,
+            tags: a.tags,
+            content: a.content
+          });
+          if (error) throw error;
+          statusEl.textContent = '✅ 成功';
+          statusEl.className = 'status ok';
+          ok++;
+        } catch (e) {
+          statusEl.textContent = '❌ 失敗';
+          statusEl.className = 'status err';
+          console.error(a.name, e);
+          fail++;
+        }
+      }
+
+      btn.textContent = '✅ 完成';
+      const sum = document.getElementById('summary');
+      sum.style.display = 'block';
+      sum.textContent = `匯入完成：✅ 成功 ${ok} 筆、⏭️ 跳過 ${skip} 筆、❌ 失敗 ${fail} 筆`;
+    };
+
+    window.cleanBadEntries = async function() {
+      if (!confirm('將刪除 content 為空或含 502 的壞資料，確定？')) return;
+      const { data } = await db.select('assets');
+      let count = 0;
+      for (const a of (data || [])) {
+        if (!a.content || a.content.includes('502') || a.content.includes('Bad Gateway') || a.content.trim().length < 100) {
+          await db.delete('assets', { id: `eq.${a.id}` });
+          count++;
+        }
+      }
+      alert(`已清理 ${count} 筆壞資料`);
+      location.reload();
+    };
+  </script>
+</body>
+</html>
