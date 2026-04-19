@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<style>
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes drawLine { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+  @keyframes expandWidth { from { width: 0; } to { width: 100%; } }
+  @keyframes pulseGlow { 0%,100% { filter: drop-shadow(0 0 0 rgba(99,102,241,0)); } 50% { filter: drop-shadow(0 0 16px rgba(99,102,241,0.3)); } }
+  @keyframes stepIn { from { opacity: 0; transform: translateX(-15px) scale(0.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
+
+  .context { animation: slideUp 0.5s ease-out 0.2s both; }
+  .accent-line { stroke-dasharray: 400; animation: drawLine 0.6s ease-out 0.3s both; }
+  .main-text { animation: slideUp 0.6s ease-out 0.5s both; }
+  .plan-badge { animation: slideUp 0.5s ease-out 0.7s both; }
+  .sub-text { animation: fadeIn 0.5s ease-out 0.9s both; }
+  .step-1 { animation: stepIn 0.5s ease-out 1.1s both; }
+  .step-2 { animation: stepIn 0.5s ease-out 1.3s both; }
+  .step-3 { animation: stepIn 0.5s ease-out 1.5s both; }
+  .footer { animation: fadeIn 0.5s ease-out 1.7s both; }
+
+  .plan-badge { cursor: pointer; }
+  .plan-badge:hover rect { fill: #4f46e5; }
+  .plan-badge:hover text { fill: #ffffff; }
+  .plan-badge rect { transition: fill 0.25s; }
+  .plan-badge text { transition: fill 0.25s; }
+
+  .step-card { cursor: pointer; }
+  .step-card .step-bg { transition: all 0.25s; }
+  .step-card:hover .step-bg { fill: #f8fafc; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
+  .step-card:hover .step-num { fill: #4f46e5; }
+  .step-card:hover .step-label { fill: #1e293b; }
+  .step-num { transition: fill 0.2s; }
+  .step-label { transition: fill 0.2s; }
+
+  .glow { animation: pulseGlow 3s ease-in-out infinite; }
+</style>
+
+<!-- 背景 -->
+<rect width="960" height="540" fill="#ffffff" rx="16"/>
+
+<!-- 左側藍色裝飾線 -->
+<line class="accent-line" x1="72" y1="70" x2="72" y2="165" stroke="#4f46e5" stroke-width="5" stroke-linecap="round"/>
+
+<!-- 情境文字 -->
+<text class="context" x="90" y="100" font-size="24" font-weight="700" fill="#1e293b">當你需要進行一個</text>
+<text class="context" x="90" y="140" font-size="24" font-weight="700" fill="#1e293b">「<tspan fill="#4f46e5" font-weight="800">比較複雜的任務</tspan>」時</text>
+
+<!-- 箭頭指示 -->
+<text class="main-text" x="480" y="210" text-anchor="middle" font-size="18" fill="#94a3b8" style="animation-delay:0.6s;">↓</text>
+
+<!-- Plan/Planning 核心強調 -->
+<g class="plan-badge glow">
+  <rect x="200" y="230" width="560" height="80" rx="16" fill="#eef2ff" stroke="#c7d2fe" stroke-width="2"/>
+  <text x="480" y="265" text-anchor="middle" font-size="14" font-weight="600" fill="#6366f1">先使用</text>
+  <text x="480" y="295" text-anchor="middle" font-size="28" font-weight="800" fill="#4f46e5">「Plan / Planning 模式」</text>
+</g>
+
+<!-- 副標 -->
+<text class="sub-text" x="480" y="345" text-anchor="middle" font-size="16" font-weight="500" fill="#64748b">確認內容正確後，再按執行。</text>
+
+<!-- 三步驟流程 -->
+<g class="step-1 step-card">
+  <rect class="step-bg" x="100" y="380" width="230" height="80" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <circle class="step-num" cx="140" cy="420" r="18" fill="#6366f1" opacity="0.1"/>
+  <text class="step-num" x="140" y="426" text-anchor="middle" font-size="16" font-weight="800" fill="#6366f1">1</text>
+  <text class="step-label" x="230" y="414" text-anchor="middle" font-size="15" font-weight="700" fill="#334155">描述需求</text>
+  <text x="230" y="436" text-anchor="middle" font-size="12" font-weight="500" fill="#94a3b8">告訴 AI 你要什麼</text>
+</g>
+
+<text class="step-1" x="345" y="425" font-size="18" fill="#cbd5e1" style="animation-delay:1.2s;">→</text>
+
+<g class="step-2 step-card">
+  <rect class="step-bg" x="365" y="380" width="230" height="80" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <circle class="step-num" cx="405" cy="420" r="18" fill="#8b5cf6" opacity="0.1"/>
+  <text class="step-num" x="405" y="426" text-anchor="middle" font-size="16" font-weight="800" fill="#8b5cf6">2</text>
+  <text class="step-label" x="500" y="414" text-anchor="middle" font-size="15" font-weight="700" fill="#334155">審核計畫</text>
+  <text x="500" y="436" text-anchor="middle" font-size="12" font-weight="500" fill="#94a3b8">確認 AI 理解正確</text>
+</g>
+
+<text class="step-2" x="610" y="425" font-size="18" fill="#cbd5e1" style="animation-delay:1.4s;">→</text>
+
+<g class="step-3 step-card">
+  <rect class="step-bg" x="630" y="380" width="230" height="80" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+  <circle class="step-num" cx="670" cy="420" r="18" fill="#22c55e" opacity="0.1"/>
+  <text class="step-num" x="670" y="426" text-anchor="middle" font-size="16" font-weight="800" fill="#22c55e">3</text>
+  <text class="step-label" x="765" y="414" text-anchor="middle" font-size="15" font-weight="700" fill="#334155">執行開發</text>
+  <text x="765" y="436" text-anchor="middle" font-size="12" font-weight="500" fill="#94a3b8">按下 Execute 開始</text>
+</g>
+
+<!-- 底部 -->
+<g class="footer">
+  <line x1="200" y1="490" x2="760" y2="490" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="480" y="518" text-anchor="middle" font-size="13" font-weight="500" fill="#94a3b8">先規劃再執行 — 省下 80% 的來回修改時間 ⏱️</text>
+</g>
+</svg>
