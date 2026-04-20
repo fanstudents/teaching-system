@@ -1881,31 +1881,27 @@ window.deleteVersion = function(idx) {
 };
 
 window.renameVersion = function(idx) {
-    // Find the tab button for this version
     const tabContainer = document.getElementById('outlineVersionTabs');
     if (!tabContainer) return;
-    const tabBtn = tabContainer.querySelectorAll('.oe-version-tab')[idx];
+    const tabBtn = tabContainer.querySelectorAll('.oe-vtab')[idx];
     if (!tabBtn) return;
 
     const current = outlineVersions[idx].name || '版本 ' + (idx+1);
-    const parentDiv = tabBtn.closest('div[style*="inline-flex"]');
-    if (!parentDiv) return;
 
-    // Replace the tab group with an inline input
+    // Replace the tab button with an inline input
     const input = document.createElement('input');
     input.type = 'text';
     input.value = current;
     input.style.cssText = 'padding:7px 12px;border:2px solid var(--accent,#6366f1);border-radius:8px;font-size:0.82rem;font-weight:600;font-family:inherit;outline:none;width:120px;background:#fff;color:var(--text,#1e293b)';
-    input.setAttribute('autofocus', 'true');
 
-    // Hide the original buttons, show input
-    const origHTML = parentDiv.innerHTML;
-    parentDiv.innerHTML = '';
-    parentDiv.appendChild(input);
+    tabBtn.replaceWith(input);
     input.focus();
     input.select();
 
+    let committed = false;
     const commit = () => {
+        if (committed) return;
+        committed = true;
         const val = input.value.trim();
         if (val) outlineVersions[idx].name = val;
         renderVersionTabs();
