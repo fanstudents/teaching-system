@@ -196,6 +196,118 @@ body {
     gap: 14px;
 }
 
+/* ── View Toggle ── */
+.view-toggle {
+    display: flex;
+    gap: 0;
+    background: #eef0f4;
+    border-radius: 8px;
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.vt-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 30px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #9ca3af;
+    transition: all 0.2s ease;
+}
+
+.vt-btn:hover { color: #6b7280; }
+
+.vt-btn.active {
+    background: #fff;
+    color: #6366f1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.vt-btn .material-symbols-outlined { font-size: 18px; }
+
+/* ── List View Mode ── */
+.project-card-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 0;
+    background: #fff;
+    border: 1.5px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.project-card-grid.list-view .project-card {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    border-bottom: 1px solid #f0f1f3;
+    flex-direction: row;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 16px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.project-card-grid.list-view .project-card:last-child {
+    border-bottom: none;
+}
+
+.project-card-grid.list-view .project-card::before { display: none; }
+
+.project-card-grid.list-view .project-card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #f0f1f3;
+    background: #f8f9fb;
+}
+
+.project-card-grid.list-view .pcard-top {
+    padding: 0;
+    flex-shrink: 0;
+    gap: 6px;
+    min-width: 0;
+}
+
+.project-card-grid.list-view .pcard-name {
+    padding: 0;
+    font-size: 0.88rem;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project-card-grid.list-view .pcard-desc { display: none; }
+
+.project-card-grid.list-view .pcard-stats {
+    padding: 0;
+    flex-shrink: 0;
+    gap: 12px;
+}
+
+.project-card-grid.list-view .pcard-date {
+    padding: 0;
+    flex-shrink: 0;
+    min-width: 80px;
+    text-align: right;
+}
+
+.project-card-grid.list-view .pcard-actions {
+    padding: 0;
+    margin-top: 0;
+    border-top: none;
+    background: none;
+    flex-shrink: 0;
+    gap: 2px;
+}
+
 /* ── Project Card — Modern ── */
 .project-card {
     background: #fff;

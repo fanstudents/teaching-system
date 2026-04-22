@@ -87,6 +87,10 @@
                             <option value="course">公開課程</option>
                             <option value="corporate">企業內訓</option>
                         </select>
+                        <div class="view-toggle" id="viewToggle">
+                            <button class="vt-btn active" data-view="grid" title="卡片檢視"><span class="material-symbols-outlined">grid_view</span></button>
+                            <button class="vt-btn" data-view="list" title="列表檢視"><span class="material-symbols-outlined">view_list</span></button>
+                        </div>
                         <button class="btn btn-dark" id="btnCreateProject">
                             <span class="material-symbols-outlined">add</span> 建立專案
                         </button>
@@ -952,8 +956,10 @@
 
     <div class="toast" id="toast"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script type="module">
         import { db, storage, auth, functions, ai, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
+        import { exportSession } from './scripts/sessionExport.js';
 
         // ── Auth Guard ──
         const authResult = await requireAuth();
@@ -1245,7 +1251,8 @@
             const phaseLabel = { 'pre-class': '課前', 'in-class': '進行中', 'post-class': '已結束' };
             const catLabel = { 'course': '公開課程', 'corporate': '企業內訓' };
 
-            grid.className = 'project-card-grid';
+            const viewMode = localStorage.getItem('manage_view') || 'grid';
+            grid.className = 'project-card-grid' + (viewMode === 'list' ? ' list-view' : '');
             grid.innerHTML = filtered.map(p => {
                 const projectSessions = sessions.filter(s => s.project_id === p.id);
                 const projectStudents = students.filter(st => {
@@ -1560,6 +1567,9 @@
                         <a class="btn btn-sm" href="report.html?session=${s.id}" title="學習報告與 Email" onclick="localStorage.setItem('current_project_id','${p?.id}')">
                             <span class="material-symbols-outlined">mail</span> Email
                         </a>
+                        <button class="btn btn-sm" data-export-sid="${s.id}" onclick="window._exportSession('${s.id}')" title="匯出學員互動資料">
+                            <span class="material-symbols-outlined">download</span> 匯出
+                        </button>
                         <button class="btn btn-sm" onclick="editSession('${s.id}')">
                             <span class="material-symbols-outlined">edit</span> 編輯
                         </button>
@@ -1814,6 +1824,20 @@
 
         document.getElementById('projectSearch').addEventListener('input', e => renderProjects(e.target.value));
         document.getElementById('projectCategoryFilter').addEventListener('change', () => renderProjects(document.getElementById('projectSearch').value));
+
+        // ── View toggle (grid / list) ──
+        document.querySelectorAll('#viewToggle .vt-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#viewToggle .vt-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                localStorage.setItem('manage_view', btn.dataset.view);
+                renderProjects(document.getElementById('projectSearch')?.value || '');
+            });
+        });
+        // Restore saved view preference
+        const savedView = localStorage.getItem('manage_view') || 'grid';
+        document.querySelector(`#viewToggle .vt-btn[data-view="${savedView}"]`)?.classList.add('active');
+        document.querySelector(`#viewToggle .vt-btn[data-view="${savedView === 'list' ? 'grid' : 'list'}"]`)?.classList.remove('active');
         document.getElementById('studentSearch').addEventListener('input', () => renderStudentTable(currentProjectId));
         document.getElementById('studentSessionFilter').addEventListener('change', () => renderStudentTable(currentProjectId));
         document.getElementById('studentStatusFilter').addEventListener('change', () => renderStudentTable(currentProjectId));
@@ -3883,6 +3907,13 @@ ${gscQueriesStr || '無搜尋資料'}
                 }
             });
         });
+
+        // ── 匯出場次學員資料 ──
+        window._exportSession = function(sessionId) {
+            const s = sessions.find(x => x.id === sessionId);
+            const p = projects.find(x => x.id === s?.project_id);
+            exportSession(sessionId, p?.name || '課程', s);
+        };
 
         init();
     </script>
