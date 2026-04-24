@@ -1,0 +1,282 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<defs>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes drawIn { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+    @keyframes pulseGlow { 0%,100% { filter: drop-shadow(0 0 6px rgba(99,102,241,0.3)); } 50% { filter: drop-shadow(0 0 14px rgba(99,102,241,0.6)); } }
+    @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .title { animation: slideUp 0.6s ease both; }
+    .subtitle { animation: slideUp 0.6s ease 0.15s both; }
+    .layer-1 { animation: slideRight 0.5s ease 0.3s both; }
+    .layer-2 { animation: slideRight 0.5s ease 0.55s both; }
+    .layer-3 { animation: slideRight 0.5s ease 0.8s both; }
+    .arrow-line { stroke-dasharray: 600; animation: drawIn 0.8s ease 1.0s both; }
+    .arrow-line-2 { stroke-dasharray: 600; animation: drawIn 0.8s ease 1.3s both; }
+    .source-item { animation: fadeIn 0.4s ease both; }
+    .source-item:nth-child(1) { animation-delay: 0.4s; }
+    .source-item:nth-child(2) { animation-delay: 0.5s; }
+    .source-item:nth-child(3) { animation-delay: 0.6s; }
+    .source-item:nth-child(4) { animation-delay: 0.7s; }
+    .kb-item { animation: fadeIn 0.4s ease both; }
+    .kb-item:nth-child(1) { animation-delay: 0.7s; }
+    .kb-item:nth-child(2) { animation-delay: 0.8s; }
+    .kb-item:nth-child(3) { animation-delay: 0.9s; }
+    .action-item { animation: fadeIn 0.4s ease both; }
+    .action-item:nth-child(1) { animation-delay: 1.0s; }
+    .action-item:nth-child(2) { animation-delay: 1.1s; }
+    .action-item:nth-child(3) { animation-delay: 1.2s; }
+    .center-badge { animation: scaleIn 0.5s ease 1.5s both; }
+
+    /* Hover effects */
+    .source-card, .kb-card, .action-card {
+      cursor: pointer;
+      transition: filter 0.2s, transform 0.2s;
+    }
+    .source-card:hover, .kb-card:hover, .action-card:hover {
+      filter: brightness(1.05) drop-shadow(0 4px 12px rgba(0,0,0,0.12));
+    }
+    .layer-header {
+      cursor: default;
+    }
+  </style>
+
+  <!-- Arrow marker -->
+  <marker id="arrowRight" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-auto">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1"/>
+  </marker>
+  <marker id="arrowRight2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-auto">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+  </marker>
+
+  <!-- Gradients -->
+  <linearGradient id="gradBg" x1="0" y1="0" x2="960" y2="540" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#f8fafc"/>
+    <stop offset="100%" stop-color="#eef2ff"/>
+  </linearGradient>
+  <linearGradient id="gradLayer1" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="100%" stop-color="#4f46e5"/>
+  </linearGradient>
+  <linearGradient id="gradLayer2" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#f59e0b"/>
+    <stop offset="100%" stop-color="#d97706"/>
+  </linearGradient>
+  <linearGradient id="gradLayer3" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#22c55e"/>
+    <stop offset="100%" stop-color="#16a34a"/>
+  </linearGradient>
+</defs>
+
+<!-- Background -->
+<rect width="960" height="540" fill="url(#gradBg)" rx="0"/>
+
+<!-- Title area -->
+<g class="title">
+  <text x="480" y="42" text-anchor="middle" font-size="26" font-weight="800" fill="#1e293b">數據驅動架構</text>
+</g>
+<g class="subtitle">
+  <text x="480" y="66" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">Data-Driven Decision Architecture — 從多元數據到可執行行動</text>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- LAYER 1: 多種資料來源 (left) -->
+<!-- ════════════════════════════════════════ -->
+<g class="layer-1">
+  <!-- Layer header -->
+  <g class="layer-header">
+    <rect x="40" y="88" width="260" height="32" rx="16" fill="url(#gradLayer1)"/>
+    <text x="170" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">📡 多種資料來源</text>
+  </g>
+
+  <!-- Source cards -->
+  <g class="source-item">
+    <g class="source-card">
+      <rect x="40" y="130" width="260" height="52" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="40" y="130" width="5" height="52" rx="2.5" fill="#6366f1"/>
+      <text x="62" y="152" font-size="13" font-weight="700" fill="#1e293b">📊 GA4 / 廣告後台</text>
+      <text x="62" y="170" font-size="11" fill="#94a3b8">流量、轉換率、ROAS 等即時指標</text>
+      <title>Google Analytics 4、Meta Ads、Google Ads 等廣告投放後台的即時數據</title>
+    </g>
+  </g>
+
+  <g class="source-item">
+    <g class="source-card">
+      <rect x="40" y="190" width="260" height="52" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="40" y="190" width="5" height="52" rx="2.5" fill="#06b6d4"/>
+      <text x="62" y="212" font-size="13" font-weight="700" fill="#1e293b">🛒 電商 / CRM 系統</text>
+      <text x="62" y="230" font-size="11" fill="#94a3b8">客單價、回購率、客戶分群數據</text>
+      <title>Shopify、91APP、CRM 系統中的訂單與顧客行為數據</title>
+    </g>
+  </g>
+
+  <g class="source-item">
+    <g class="source-card">
+      <rect x="40" y="250" width="260" height="52" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="40" y="250" width="5" height="52" rx="2.5" fill="#22c55e"/>
+      <text x="62" y="272" font-size="13" font-weight="700" fill="#1e293b">📈 市場研究報告</text>
+      <text x="62" y="290" font-size="11" fill="#94a3b8">競品分析、產業趨勢、消費者洞察</text>
+      <title>外部市調機構、產業報告、競品監測工具數據</title>
+    </g>
+  </g>
+
+  <g class="source-item">
+    <g class="source-card">
+      <rect x="40" y="310" width="260" height="52" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="40" y="310" width="5" height="52" rx="2.5" fill="#ef4444"/>
+      <text x="62" y="332" font-size="13" font-weight="700" fill="#1e293b">💬 社群 / 客服回饋</text>
+      <text x="62" y="350" font-size="11" fill="#94a3b8">客訴主題、評論情緒、NPS 分數</text>
+      <title>社群平台評論、客服系統 Ticket、NPS 問卷結果</title>
+    </g>
+  </g>
+
+  <!-- Tool badge -->
+  <rect x="75" y="374" width="190" height="26" rx="13" fill="rgba(99,102,241,0.08)" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>
+  <text x="170" y="392" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">🔧 透過 AI 工具自動彙整</text>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- Arrow 1: Sources → Knowledge Base -->
+<!-- ════════════════════════════════════════ -->
+<line class="arrow-line" x1="310" y1="250" x2="348" y2="250" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrowRight)" stroke-linecap="round"/>
+
+<!-- ════════════════════════════════════════ -->
+<!-- LAYER 2: 公司內部知識庫 (center) -->
+<!-- ════════════════════════════════════════ -->
+<g class="layer-2">
+  <!-- Layer header -->
+  <g class="layer-header">
+    <rect x="355" y="88" width="250" height="32" rx="16" fill="url(#gradLayer2)"/>
+    <text x="480" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">🧠 公司內部知識庫</text>
+  </g>
+
+  <!-- KB cards -->
+  <g class="kb-item">
+    <g class="kb-card">
+      <rect x="355" y="130" width="250" height="80" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="355" y="130" width="5" height="80" rx="2.5" fill="#f59e0b"/>
+      <text x="377" y="152" font-size="13" font-weight="700" fill="#1e293b">📋 內部 KPI 定義</text>
+      <text x="377" y="170" font-size="11" fill="#64748b">• 各部門 OKR 與核心指標</text>
+      <text x="377" y="186" font-size="11" fill="#64748b">• 歷史基準值與季度目標</text>
+      <text x="377" y="202" font-size="11" fill="#64748b">• 指標間的因果關聯</text>
+      <title>公司定義的關鍵績效指標、歷史趨勢和部門目標</title>
+    </g>
+  </g>
+
+  <g class="kb-item">
+    <g class="kb-card">
+      <rect x="355" y="220" width="250" height="80" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="355" y="220" width="5" height="80" rx="2.5" fill="#f59e0b"/>
+      <text x="377" y="242" font-size="13" font-weight="700" fill="#1e293b">⚠️ 異常閥值規則</text>
+      <text x="377" y="260" font-size="11" fill="#64748b">• ROAS &lt; 3 → 立即告警</text>
+      <text x="377" y="276" font-size="11" fill="#64748b">• 退貨率 &gt; 8% → 品質審查</text>
+      <text x="377" y="292" font-size="11" fill="#64748b">• 轉換率週降 &gt;15% → 急件</text>
+      <title>公司根據經驗設定的異常判斷標準與分級機制</title>
+    </g>
+  </g>
+
+  <g class="kb-item">
+    <g class="kb-card">
+      <rect x="355" y="310" width="250" height="62" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="355" y="310" width="5" height="62" rx="2.5" fill="#f59e0b"/>
+      <text x="377" y="332" font-size="13" font-weight="700" fill="#1e293b">📚 過往決策紀錄</text>
+      <text x="377" y="350" font-size="11" fill="#64748b">• 歷次行動方案與成效回顧</text>
+      <text x="377" y="366" font-size="11" fill="#64748b">• 成功 / 失敗案例知識</text>
+      <title>過去面對類似異常時採取的策略和實際成效</title>
+    </g>
+  </g>
+
+  <!-- KB badge -->
+  <rect x="395" y="384" width="170" height="26" rx="13" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+  <text x="480" y="402" text-anchor="middle" font-size="11" font-weight="600" fill="#d97706">🗂️ 持續累積的組織智慧</text>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- Arrow 2: Knowledge Base → Actions -->
+<!-- ════════════════════════════════════════ -->
+<line class="arrow-line-2" x1="615" y1="250" x2="653" y2="250" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowRight2)" stroke-linecap="round"/>
+
+<!-- ════════════════════════════════════════ -->
+<!-- LAYER 3: 可行動的方案 (right) -->
+<!-- ════════════════════════════════════════ -->
+<g class="layer-3">
+  <!-- Layer header -->
+  <g class="layer-header">
+    <rect x="660" y="88" width="260" height="32" rx="16" fill="url(#gradLayer3)"/>
+    <text x="790" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">🎯 可行動的方案</text>
+  </g>
+
+  <!-- Action cards -->
+  <g class="action-item">
+    <g class="action-card">
+      <rect x="660" y="130" width="260" height="80" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="660" y="130" width="5" height="80" rx="2.5" fill="#22c55e"/>
+      <text x="682" y="150" font-size="12" font-weight="700" fill="#ef4444">🔴 ROAS 低於閥值</text>
+      <text x="682" y="168" font-size="12" font-weight="600" fill="#1e293b">→ 暫停低效素材、重分預算</text>
+      <rect x="682" y="178" width="56" height="22" rx="11" fill="rgba(99,102,241,0.1)"/>
+      <text x="710" y="194" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">行銷部</text>
+      <rect x="746" y="178" width="56" height="22" rx="11" fill="rgba(239,68,68,0.1)"/>
+      <text x="774" y="194" text-anchor="middle" font-size="11" font-weight="600" fill="#ef4444">急件</text>
+      <title>當 ROAS 低於 3 時，自動建議暫停低效廣告素材並重新分配預算，指派行銷部執行</title>
+    </g>
+  </g>
+
+  <g class="action-item">
+    <g class="action-card">
+      <rect x="660" y="220" width="260" height="80" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="660" y="220" width="5" height="80" rx="2.5" fill="#22c55e"/>
+      <text x="682" y="240" font-size="12" font-weight="700" fill="#f59e0b">🟡 退貨率異常升高</text>
+      <text x="682" y="258" font-size="12" font-weight="600" fill="#1e293b">→ 啟動品質抽查、更新描述</text>
+      <rect x="682" y="268" width="56" height="22" rx="11" fill="rgba(6,182,212,0.1)"/>
+      <text x="710" y="284" text-anchor="middle" font-size="11" font-weight="600" fill="#0891b2">品管部</text>
+      <rect x="746" y="268" width="56" height="22" rx="11" fill="rgba(99,102,241,0.1)"/>
+      <text x="774" y="284" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">商品部</text>
+      <title>退貨率超過 8% 時，同步通知品管部門抽查出貨品質，並請商品部更新產品描述</title>
+    </g>
+  </g>
+
+  <g class="action-item">
+    <g class="action-card">
+      <rect x="660" y="310" width="260" height="80" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="660" y="310" width="5" height="80" rx="2.5" fill="#22c55e"/>
+      <text x="682" y="330" font-size="12" font-weight="700" fill="#22c55e">🟢 轉換率穩定成長</text>
+      <text x="682" y="348" font-size="12" font-weight="600" fill="#1e293b">→ 放大預算、複製成功模式</text>
+      <rect x="682" y="358" width="56" height="22" rx="11" fill="rgba(99,102,241,0.1)"/>
+      <text x="710" y="374" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1">營運部</text>
+      <rect x="746" y="358" width="56" height="22" rx="11" fill="rgba(34,197,94,0.1)"/>
+      <text x="774" y="374" text-anchor="middle" font-size="11" font-weight="600" fill="#16a34a">持續</text>
+      <title>轉換率穩定上升時，建議放大預算並將成功素材/受眾模式複製到其他品項</title>
+    </g>
+  </g>
+
+  <!-- Action badge -->
+  <rect x="695" y="402" width="190" height="26" rx="13" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.2)" stroke-width="1"/>
+  <text x="790" y="420" text-anchor="middle" font-size="11" font-weight="600" fill="#16a34a">✅ 對應負責人，立即可執行</text>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- Bottom: Flow summary -->
+<!-- ════════════════════════════════════════ -->
+<g class="center-badge">
+  <!-- Flow summary bar -->
+  <rect x="130" y="448" width="700" height="48" rx="24" fill="#1e293b"/>
+  <text x="480" y="470" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">
+    <tspan fill="#818cf8">蒐集數據</tspan>
+    <tspan fill="#64748b"> → </tspan>
+    <tspan fill="#fbbf24">比對知識庫</tspan>
+    <tspan fill="#64748b"> → </tspan>
+    <tspan fill="#4ade80">觸發行動方案</tspan>
+    <tspan fill="#64748b"> → </tspan>
+    <tspan fill="#f87171">指派負責人</tspan>
+    <tspan fill="#64748b"> → </tspan>
+    <tspan fill="#22d3ee">追蹤成效</tspan>
+  </text>
+  <text x="480" y="488" text-anchor="middle" font-size="11" fill="#94a3b8">不再只是看報表 — 而是讓數據自動驅動決策與行動</text>
+</g>
+
+<!-- Source -->
+<text x="480" y="528" text-anchor="middle" font-size="11" fill="#94a3b8">數位簡報室 — AI 數據驅動決策架構（2026）</text>
+
+</svg>
