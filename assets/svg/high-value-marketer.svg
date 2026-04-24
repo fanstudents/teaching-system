@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<defs>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes pulseCenter { 0%,100% { filter: drop-shadow(0 0 8px rgba(99,102,241,0.4)); } 50% { filter: drop-shadow(0 0 20px rgba(99,102,241,0.7)); } }
+    @keyframes drawCircle { from { stroke-dashoffset: 800; } to { stroke-dashoffset: 0; } }
+    @keyframes floatBadge { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+    .title { animation: slideUp 0.6s ease both; }
+    .subtitle { animation: slideUp 0.6s ease 0.15s both; }
+
+    .circle-domain { stroke-dasharray: 800; animation: drawCircle 1s ease 0.3s both; }
+    .circle-ai { stroke-dasharray: 800; animation: drawCircle 1s ease 0.5s both; }
+    .circle-data { stroke-dasharray: 800; animation: drawCircle 1s ease 0.7s both; }
+
+    .fill-domain { animation: fadeIn 0.5s ease 0.8s both; }
+    .fill-ai { animation: fadeIn 0.5s ease 1.0s both; }
+    .fill-data { animation: fadeIn 0.5s ease 1.2s both; }
+
+    .label-domain { animation: slideUp 0.5s ease 1.0s both; }
+    .label-ai { animation: slideUp 0.5s ease 1.2s both; }
+    .label-data { animation: slideUp 0.5s ease 1.4s both; }
+
+    .intersect-label { animation: fadeIn 0.4s ease 1.6s both; }
+    .center-star { animation: scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 2.0s both; }
+    .center-glow { animation: pulseCenter 3s ease-in-out 2.5s infinite; }
+    .bottom-bar { animation: slideUp 0.6s ease 2.4s both; }
+    .side-card { animation: fadeIn 0.5s ease both; }
+    .side-card:nth-child(1) { animation-delay: 1.0s; }
+    .side-card:nth-child(2) { animation-delay: 1.2s; }
+    .side-card:nth-child(3) { animation-delay: 1.4s; }
+
+    /* Hover */
+    .circle-group { cursor: pointer; transition: filter 0.3s; }
+    .circle-group:hover { filter: brightness(1.08) drop-shadow(0 4px 16px rgba(0,0,0,0.12)); }
+    .intersect-zone { cursor: pointer; transition: opacity 0.2s; }
+    .intersect-zone:hover { opacity: 1 !important; }
+    .detail-card { cursor: pointer; transition: filter 0.2s, transform 0.2s; }
+    .detail-card:hover { filter: drop-shadow(0 3px 10px rgba(0,0,0,0.1)); }
+  </style>
+
+  <linearGradient id="bgGrad" x1="0" y1="0" x2="960" y2="540" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#f8fafc"/>
+    <stop offset="50%" stop-color="#f0f4ff"/>
+    <stop offset="100%" stop-color="#faf5ff"/>
+  </linearGradient>
+
+  <!-- Circle fills with transparency -->
+  <radialGradient id="domainFill" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#6366f1" stop-opacity="0.06"/>
+  </radialGradient>
+  <radialGradient id="aiFill" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#ef4444" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#ef4444" stop-opacity="0.06"/>
+  </radialGradient>
+  <radialGradient id="dataFill" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#22c55e" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#22c55e" stop-opacity="0.06"/>
+  </radialGradient>
+
+  <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+    <stop offset="60%" stop-color="#a855f7" stop-opacity="0.15"/>
+    <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+  </radialGradient>
+
+  <linearGradient id="centerBadge" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="50%" stop-color="#8b5cf6"/>
+    <stop offset="100%" stop-color="#a855f7"/>
+  </linearGradient>
+</defs>
+
+<!-- Background -->
+<rect width="960" height="540" fill="url(#bgGrad)"/>
+
+<!-- Title -->
+<g class="title">
+  <text x="480" y="40" text-anchor="middle" font-size="26" font-weight="800" fill="#1e293b">高價值行銷人才方程式</text>
+</g>
+<g class="subtitle">
+  <text x="480" y="62" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">未來行銷不只靠經驗 — 三大能力交叉才是真正的競爭壁壘</text>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Venn Diagram — 3 circles -->
+<!-- Center: 420, 280 -->
+<!-- ══════════════════════════════════════ -->
+
+<!-- Circle fills (behind strokes) -->
+<g class="fill-domain"><circle cx="360" cy="252" r="140" fill="url(#domainFill)"/></g>
+<g class="fill-ai"><circle cx="480" cy="252" r="140" fill="url(#aiFill)"/></g>
+<g class="fill-data"><circle cx="420" cy="356" r="140" fill="url(#dataFill)"/></g>
+
+<!-- Circle strokes (animated draw-in) -->
+<g class="circle-group">
+  <circle class="circle-domain" cx="360" cy="252" r="140" fill="none" stroke="#6366f1" stroke-width="2.5" opacity="0.7"/>
+  <title>專業領域：品牌策略、市場定位、消費者心理、通路管理</title>
+</g>
+<g class="circle-group">
+  <circle class="circle-ai" cx="480" cy="252" r="140" fill="none" stroke="#ef4444" stroke-width="2.5" opacity="0.7"/>
+  <title>AI 工具：ChatGPT、Midjourney、自動化工作流、AI Coding</title>
+</g>
+<g class="circle-group">
+  <circle class="circle-data" cx="420" cy="356" r="140" fill="none" stroke="#22c55e" stroke-width="2.5" opacity="0.7"/>
+  <title>數據能力：GA4 分析、A/B Test、歸因模型、BI 儀表板</title>
+</g>
+
+<!-- ── Primary labels (outside overlap) ── -->
+<g class="label-domain">
+  <text x="295" y="195" text-anchor="middle" font-size="22" font-weight="800" fill="#4f46e5">專業領域</text>
+  <text x="295" y="215" text-anchor="middle" font-size="12" fill="#6366f1" opacity="0.8">Domain Expertise</text>
+  <text x="295" y="235" text-anchor="middle" font-size="11" fill="#94a3b8">品牌策略 · 市場洞察</text>
+  <text x="295" y="251" text-anchor="middle" font-size="11" fill="#94a3b8">消費者心理 · 通路</text>
+</g>
+
+<g class="label-ai">
+  <text x="545" y="195" text-anchor="middle" font-size="22" font-weight="800" fill="#dc2626">AI</text>
+  <text x="545" y="215" text-anchor="middle" font-size="12" fill="#ef4444" opacity="0.8">AI Tools &amp; Workflow</text>
+  <text x="545" y="235" text-anchor="middle" font-size="11" fill="#94a3b8">提示工程 · 自動化</text>
+  <text x="545" y="251" text-anchor="middle" font-size="11" fill="#94a3b8">內容生成 · AI Coding</text>
+</g>
+
+<g class="label-data">
+  <text x="420" y="440" text-anchor="middle" font-size="22" font-weight="800" fill="#16a34a">數據</text>
+  <text x="420" y="460" text-anchor="middle" font-size="12" fill="#22c55e" opacity="0.8">Data Analytics</text>
+  <text x="420" y="480" text-anchor="middle" font-size="11" fill="#94a3b8">GA4 · A/B Test · 歸因模型 · BI</text>
+</g>
+
+<!-- ── Intersection labels (pairwise) ── -->
+<!-- Domain × AI -->
+<g class="intersect-label intersect-zone" opacity="0.9">
+  <text x="420" y="208" text-anchor="middle" font-size="11" font-weight="700" fill="#7c3aed">AI 驅動的</text>
+  <text x="420" y="222" text-anchor="middle" font-size="11" font-weight="700" fill="#7c3aed">策略產出</text>
+  <title>用 AI 加速品牌策略制定、市場調研、競品分析</title>
+</g>
+
+<!-- Domain × Data -->
+<g class="intersect-label intersect-zone" opacity="0.9">
+  <text x="355" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#0d9488">數據支撐的</text>
+  <text x="355" y="349" text-anchor="middle" font-size="11" font-weight="700" fill="#0d9488">市場判斷</text>
+  <title>用數據驗證市場假設、消費者分群、精準定位</title>
+</g>
+
+<!-- AI × Data -->
+<g class="intersect-label intersect-zone" opacity="0.9">
+  <text x="485" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#ea580c">AI 自動化</text>
+  <text x="485" y="349" text-anchor="middle" font-size="11" font-weight="700" fill="#ea580c">數據分析</text>
+  <title>AI 自動抓取數據、異常偵測、自動產出分析報告</title>
+</g>
+
+<!-- ── CENTER: The sweet spot ── -->
+<g class="center-star">
+  <g class="center-glow">
+    <circle cx="420" cy="280" r="42" fill="url(#centerGlow)"/>
+    <circle cx="420" cy="280" r="32" fill="url(#centerBadge)" opacity="0.95"/>
+    <text x="420" y="274" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">高價值</text>
+    <text x="420" y="291" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">行銷人才</text>
+  </g>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Right side: Detail cards -->
+<!-- ══════════════════════════════════════ -->
+
+<!-- Card 1 -->
+<g class="side-card">
+  <g class="detail-card">
+    <rect x="670" y="84" width="260" height="100" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="670" y="84" width="5" height="100" rx="2.5" fill="#6366f1"/>
+    <text x="692" y="108" font-size="14" font-weight="800" fill="#4f46e5">🎯 只有專業？</text>
+    <text x="692" y="128" font-size="12" fill="#64748b">有經驗但效率低，靠直覺做事</text>
+    <text x="692" y="146" font-size="12" fill="#64748b">無法規模化、難以量化成效</text>
+    <rect x="692" y="156" width="72" height="20" rx="10" fill="rgba(99,102,241,0.08)"/>
+    <text x="728" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#6366f1">容易被取代</text>
+    <title>純靠經驗的行銷人，在 AI 時代容易被工具取代</title>
+  </g>
+</g>
+
+<!-- Card 2 -->
+<g class="side-card">
+  <g class="detail-card">
+    <rect x="670" y="196" width="260" height="100" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="670" y="196" width="5" height="100" rx="2.5" fill="#ef4444"/>
+    <text x="692" y="220" font-size="14" font-weight="800" fill="#dc2626">🤖 只有 AI？</text>
+    <text x="692" y="240" font-size="12" fill="#64748b">工具用得快但不知為何而用</text>
+    <text x="692" y="258" font-size="12" fill="#64748b">產出看似專業，實際缺乏深度</text>
+    <rect x="692" y="268" width="72" height="20" rx="10" fill="rgba(239,68,68,0.08)"/>
+    <text x="728" y="282" text-anchor="middle" font-size="10" font-weight="600" fill="#ef4444">淪為工具人</text>
+    <title>只會用 AI 工具但缺乏行銷專業判斷力</title>
+  </g>
+</g>
+
+<!-- Card 3 -->
+<g class="side-card">
+  <g class="detail-card">
+    <rect x="670" y="308" width="260" height="100" rx="12" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="670" y="308" width="5" height="100" rx="2.5" fill="#22c55e"/>
+    <text x="692" y="332" font-size="14" font-weight="800" fill="#16a34a">📊 只有數據？</text>
+    <text x="692" y="352" font-size="12" fill="#64748b">看得懂數字但提不出策略</text>
+    <text x="692" y="370" font-size="12" fill="#64748b">分析報告寫得好，落地執行差</text>
+    <rect x="692" y="380" width="72" height="20" rx="10" fill="rgba(34,197,94,0.08)"/>
+    <text x="728" y="394" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">紙上談兵</text>
+    <title>數據分析能力強但無法轉化為實際行銷策略</title>
+  </g>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Connector lines from circles to cards -->
+<!-- ══════════════════════════════════════ -->
+<line x1="500" y1="180" x2="668" y2="134" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+<line x1="560" y1="252" x2="668" y2="246" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+<line x1="510" y1="400" x2="668" y2="358" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,4" opacity="0.3"/>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Bottom bar -->
+<!-- ══════════════════════════════════════ -->
+<g class="bottom-bar">
+  <rect x="100" y="498" width="760" height="32" rx="16" fill="#1e293b"/>
+  <text x="480" y="519" text-anchor="middle" font-size="13" font-weight="600" fill="#fff">
+    <tspan fill="#818cf8">專業領域</tspan>
+    <tspan fill="#64748b" font-size="16"> × </tspan>
+    <tspan fill="#f87171">AI 工具</tspan>
+    <tspan fill="#64748b" font-size="16"> × </tspan>
+    <tspan fill="#4ade80">數據分析</tspan>
+    <tspan fill="#94a3b8"> ＝ </tspan>
+    <tspan fill="#c4b5fd" font-weight="800">不可取代的高價值人才 🚀</tspan>
+  </text>
+</g>
+
+<!-- Source -->
+<text x="480" y="534" text-anchor="middle" font-size="10" fill="#cbd5e1">數位簡報室 — 高價值行銷人才能力模型（2026）</text>
+</svg>
