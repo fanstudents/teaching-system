@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<defs>
+  <style>
+    @keyframes slideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .q-title { animation: slideUp 0.5s ease both; }
+    .opt-a { animation: slideUp 0.4s ease 0.2s both; }
+    .opt-b { animation: slideUp 0.4s ease 0.3s both; }
+    .opt-c { animation: slideUp 0.4s ease 0.4s both; }
+    .opt-d { animation: slideUp 0.4s ease 0.5s both; }
+    .opt-e { animation: slideUp 0.4s ease 0.6s both; }
+    .source { animation: fadeIn 0.4s ease 0.8s both; }
+
+    .option-row { cursor: pointer; }
+    .option-row .opt-bg { transition: fill 0.2s, stroke 0.2s; }
+    .option-row:hover .opt-bg { fill: #f0f4ff; stroke: #a5b4fc; }
+    .option-row .badge-circle { transition: fill 0.2s; }
+    .option-row:hover .badge-circle { fill: #6366f1; }
+    .option-row:hover .badge-letter { fill: #fff; }
+  </style>
+</defs>
+
+<!-- Background -->
+<rect width="960" height="540" rx="0" fill="#f8fafc"/>
+
+<!-- Main card -->
+<rect x="80" y="30" width="800" height="480" rx="20" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"
+      filter="url(#cardShadow)"/>
+
+<!-- Card shadow -->
+<defs>
+  <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="108%">
+    <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#94a3b8" flood-opacity="0.08"/>
+  </filter>
+</defs>
+
+<!-- Question title -->
+<g class="q-title">
+  <text x="480" y="82" text-anchor="middle" font-size="24" font-weight="800" fill="#1e293b">公司內部打造 AI 的儀表板遇到最多的阻力是什麼？</text>
+</g>
+
+<!-- Divider -->
+<line x1="140" y1="105" x2="820" y2="105" stroke="#f1f5f9" stroke-width="1.5"/>
+
+<!-- ── Option A ── -->
+<g class="opt-a option-row">
+  <rect class="opt-bg" x="140" y="125" width="680" height="62" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <circle class="badge-circle" cx="182" cy="156" r="18" fill="#e8ecf4"/>
+  <text class="badge-letter" x="182" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#64748b">A</text>
+  <text x="216" y="162" font-size="17" font-weight="600" fill="#334155">現有、外包工程團隊不支援</text>
+  <title>選項 A：現有、外包工程團隊不支援</title>
+</g>
+
+<!-- ── Option B ── -->
+<g class="opt-b option-row">
+  <rect class="opt-bg" x="140" y="199" width="680" height="62" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <circle class="badge-circle" cx="182" cy="230" r="18" fill="#e8ecf4"/>
+  <text class="badge-letter" x="182" y="236" text-anchor="middle" font-size="14" font-weight="700" fill="#64748b">B</text>
+  <text x="216" y="236" font-size="17" font-weight="600" fill="#334155">多方數據來源雜亂</text>
+  <title>選項 B：多方數據來源雜亂</title>
+</g>
+
+<!-- ── Option C ── -->
+<g class="opt-c option-row">
+  <rect class="opt-bg" x="140" y="273" width="680" height="62" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <circle class="badge-circle" cx="182" cy="304" r="18" fill="#e8ecf4"/>
+  <text class="badge-letter" x="182" y="310" text-anchor="middle" font-size="14" font-weight="700" fill="#64748b">C</text>
+  <text x="216" y="310" font-size="17" font-weight="600" fill="#334155">報表呈現無法改善績效</text>
+  <title>選項 C：報表呈現無法改善績效</title>
+</g>
+
+<!-- ── Option D ── -->
+<g class="opt-d option-row">
+  <rect class="opt-bg" x="140" y="347" width="680" height="62" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <circle class="badge-circle" cx="182" cy="378" r="18" fill="#e8ecf4"/>
+  <text class="badge-letter" x="182" y="384" text-anchor="middle" font-size="14" font-weight="700" fill="#64748b">D</text>
+  <text x="216" y="384" font-size="17" font-weight="600" fill="#334155">沒有人力能夠主導報表分析</text>
+  <title>選項 D：沒有人力能夠主導報表分析</title>
+</g>
+
+<!-- ── Option E ── -->
+<g class="opt-e option-row">
+  <rect class="opt-bg" x="140" y="421" width="680" height="62" rx="14" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.2"/>
+  <circle class="badge-circle" cx="182" cy="452" r="18" fill="#e8ecf4"/>
+  <text class="badge-letter" x="182" y="458" text-anchor="middle" font-size="14" font-weight="700" fill="#64748b">E</text>
+  <text x="216" y="458" font-size="17" font-weight="600" fill="#334155">透過 AI 製作出儀表板</text>
+  <title>選項 E：透過 AI 製作出儀表板</title>
+</g>
+
+<!-- Source -->
+<g class="source">
+  <text x="480" y="528" text-anchor="middle" font-size="10" fill="#cbd5e1">數位簡報室 — AI 儀表板導入調查（2026）</text>
+</g>
+
+</svg>
