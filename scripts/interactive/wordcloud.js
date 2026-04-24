@@ -31,6 +31,41 @@ export class WordCloudGame {
         let cloudEl = container.querySelector('.wordcloud-cloud');
         let submitted = false;
 
+        // 判斷是否為講師端（簡報模式）
+        const isPresenter = !!container.closest('.presentation-slide');
+
+        // 確保 cloudEl 存在
+        if (!cloudEl) {
+            cloudEl = document.createElement('div');
+            cloudEl.className = 'wordcloud-cloud';
+        }
+
+        // ── 講師端：純顯示文字雲，不顯示輸入區 ──
+        if (isPresenter) {
+            // 移除舊的輸入區（如果有）
+            const oldInputArea = container.querySelector('.wordcloud-multi-input');
+            if (oldInputArea) oldInputArea.remove();
+
+            let bodyEl = container.querySelector('.wordcloud-body');
+            if (!bodyEl) {
+                bodyEl = document.createElement('div');
+                bodyEl.className = 'wordcloud-body';
+                container.appendChild(bodyEl);
+            }
+            bodyEl.innerHTML = '';
+            bodyEl.appendChild(cloudEl);
+            // 講師端文字雲全寬展示
+            cloudEl.classList.add('wc-cloud-expanded');
+
+            // 載入 + 定時刷新文字雲
+            this.renderCloud(elementId, cloudEl);
+            const intervalId = setInterval(() => this.renderCloud(elementId, cloudEl), 4000);
+            this._cloudIntervals.push(intervalId);
+            return; // 講師端到此結束，不建立輸入相關 UI
+        }
+
+        // ── 學員端：完整輸入 + 文字雲 ──
+
         // 重建輸入區：多個文字輸入框
         const oldInputArea = container.querySelector('.wordcloud-multi-input');
         if (oldInputArea) oldInputArea.remove();
@@ -45,11 +80,6 @@ export class WordCloudGame {
             </div>
             <div class="wordcloud-result"></div>
         `;
-        // 確保 cloudEl 存在
-        if (!cloudEl) {
-            cloudEl = document.createElement('div');
-            cloudEl.className = 'wordcloud-cloud';
-        }
 
         // 建立水平佈局包裝：左側輸入 + 右側文字雲
         let bodyEl = container.querySelector('.wordcloud-body');
