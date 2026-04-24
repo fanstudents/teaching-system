@@ -1,0 +1,300 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<defs>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideRight { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes scaleIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .title { animation: slideUp 0.6s ease both; }
+    .subtitle { animation: slideUp 0.5s ease 0.15s both; }
+    .col-1 { animation: slideUp 0.5s ease 0.3s both; }
+    .col-2 { animation: slideUp 0.5s ease 0.5s both; }
+    .col-3 { animation: slideUp 0.5s ease 0.7s both; }
+    .divider-1 { animation: fadeIn 0.4s ease 0.6s both; }
+    .divider-2 { animation: fadeIn 0.4s ease 0.8s both; }
+    .badge { animation: scaleIn 0.4s ease both; }
+    .badge-1a { animation-delay: 0.5s; }
+    .badge-1b { animation-delay: 0.6s; }
+    .badge-2a { animation-delay: 0.7s; }
+    .badge-3a { animation-delay: 0.8s; }
+    .badge-3b { animation-delay: 0.9s; }
+    .badge-3c { animation-delay: 1.0s; }
+    .level-bar { animation: fadeIn 0.5s ease 1.1s both; }
+    .source-text { animation: fadeIn 0.5s ease 1.3s both; }
+
+    .tool-badge { cursor: pointer; transition: filter 0.2s, transform 0.15s; }
+    .tool-badge:hover { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.12)); }
+    .col-card { cursor: default; transition: filter 0.2s; }
+    .col-card:hover { filter: drop-shadow(0 2px 8px rgba(0,0,0,0.06)); }
+  </style>
+
+  <linearGradient id="bgGrad" x1="0" y1="0" x2="960" y2="540" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#fafbff"/>
+    <stop offset="50%" stop-color="#f5f7ff"/>
+    <stop offset="100%" stop-color="#f0f4ff"/>
+  </linearGradient>
+
+  <!-- ChatGPT icon gradient -->
+  <linearGradient id="gptGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#10a37f"/>
+    <stop offset="100%" stop-color="#1a7f64"/>
+  </linearGradient>
+
+  <!-- Gemini icon gradient -->
+  <linearGradient id="geminiGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#4285f4"/>
+    <stop offset="30%" stop-color="#9b72cb"/>
+    <stop offset="60%" stop-color="#d96570"/>
+    <stop offset="100%" stop-color="#d2a755"/>
+  </linearGradient>
+
+  <!-- Lovable gradient -->
+  <linearGradient id="lovableGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#ff6b6b"/>
+    <stop offset="100%" stop-color="#ee5a24"/>
+  </linearGradient>
+
+  <!-- Cursor gradient -->
+  <linearGradient id="cursorGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#1e293b"/>
+    <stop offset="100%" stop-color="#334155"/>
+  </linearGradient>
+
+  <!-- Antigravity gradient -->
+  <linearGradient id="agGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="100%" stop-color="#4f46e5"/>
+  </linearGradient>
+
+  <!-- Windsurf gradient -->
+  <linearGradient id="wsGrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#f97316"/>
+    <stop offset="100%" stop-color="#ea580c"/>
+  </linearGradient>
+
+  <!-- Level bar gradient -->
+  <linearGradient id="levelGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#22c55e"/>
+    <stop offset="50%" stop-color="#f59e0b"/>
+    <stop offset="100%" stop-color="#6366f1"/>
+  </linearGradient>
+</defs>
+
+<!-- Background -->
+<rect width="960" height="540" fill="url(#bgGrad)"/>
+
+<!-- Title -->
+<g class="title">
+  <text x="480" y="52" text-anchor="middle" font-size="30" font-weight="800" fill="#1e293b">Vibe Coding 三種開發方式</text>
+</g>
+<g class="subtitle">
+  <text x="480" y="78" text-anchor="middle" font-size="14" font-weight="500" fill="#94a3b8">根據需求複雜度選擇合適的工具，從零程式到專業開發</text>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Column 1: Canvas 畫布模式 -->
+<!-- ══════════════════════════════════════ -->
+<g class="col-1">
+  <g class="col-card">
+    <!-- Card background -->
+    <rect x="40" y="100" width="270" height="380" rx="16" fill="#ffffff" stroke="#e8ecf4" stroke-width="1"/>
+
+    <!-- Level tag -->
+    <rect x="60" y="116" width="80" height="24" rx="12" fill="#dcfce7"/>
+    <text x="100" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#16a34a">入門級</text>
+
+    <!-- Column title -->
+    <text x="175" y="172" text-anchor="middle" font-size="19" font-weight="800" fill="#1e293b">Canvas 畫布模式</text>
+    <text x="175" y="192" text-anchor="middle" font-size="12" fill="#94a3b8">對話即開發，零門檻上手</text>
+
+    <!-- Divider line -->
+    <line x1="80" y1="208" x2="270" y2="208" stroke="#e8ecf4" stroke-width="1"/>
+
+    <!-- Tool badges -->
+    <g class="badge badge-1a tool-badge">
+      <rect x="68" y="224" width="184" height="48" rx="12" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+      <!-- ChatGPT icon (simplified knot) -->
+      <circle cx="100" cy="248" r="16" fill="url(#gptGrad)"/>
+      <text x="100" y="253" text-anchor="middle" font-size="14" fill="#fff" font-weight="700">G</text>
+      <text x="130" y="244" font-size="14" font-weight="700" fill="#10a37f">ChatGPT</text>
+      <text x="130" y="260" font-size="10" fill="#6b7280">Canvas 模式</text>
+      <title>ChatGPT Canvas — 在對話中直接生成、預覽網頁應用</title>
+    </g>
+
+    <g class="badge badge-1b tool-badge">
+      <rect x="68" y="282" width="184" height="48" rx="12" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+      <!-- Gemini icon (4-point star) -->
+      <g transform="translate(100,306)">
+        <polygon points="0,-14 4,-4 14,0 4,4 0,14 -4,4 -14,0 -4,-4" fill="url(#geminiGrad)" opacity="0.9"/>
+      </g>
+      <text x="130" y="302" font-size="14" font-weight="700" fill="#4285f4">Gemini</text>
+      <text x="130" y="318" font-size="10" fill="#6b7280">Canvas 模式</text>
+      <title>Google Gemini Canvas — AI 生成互動式網頁元件</title>
+    </g>
+
+    <!-- Description -->
+    <text x="80" y="360" font-size="13" font-weight="600" fill="#475569">透過 Canvas / 畫布</text>
+    <text x="80" y="380" font-size="13" font-weight="600" fill="#475569">產生簡單的網頁應用</text>
+
+    <!-- Feature tags -->
+    <rect x="68" y="400" width="56" height="22" rx="11" fill="#f0fdf4"/>
+    <text x="96" y="415" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">零程式</text>
+    <rect x="130" y="400" width="56" height="22" rx="11" fill="#f0fdf4"/>
+    <text x="158" y="415" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">快速</text>
+    <rect x="192" y="400" width="68" height="22" rx="11" fill="#f0fdf4"/>
+    <text x="226" y="415" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">即時預覽</text>
+
+    <!-- Complexity indicator -->
+    <rect x="68" y="436" width="184" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="68" y="436" width="50" height="6" rx="3" fill="#22c55e"/>
+    <text x="68" y="460" font-size="10" fill="#94a3b8">客製化程度</text>
+    <text x="252" y="460" text-anchor="end" font-size="10" font-weight="600" fill="#22c55e">低</text>
+  </g>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Divider 1 -->
+<!-- ══════════════════════════════════════ -->
+<g class="divider-1">
+  <line x1="335" y1="140" x2="335" y2="460" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="6,4"/>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Column 2: 一站式平台 -->
+<!-- ══════════════════════════════════════ -->
+<g class="col-2">
+  <g class="col-card">
+    <rect x="360" y="100" width="240" height="380" rx="16" fill="#ffffff" stroke="#e8ecf4" stroke-width="1"/>
+
+    <!-- Level tag -->
+    <rect x="380" y="116" width="80" height="24" rx="12" fill="#fef3c7"/>
+    <text x="420" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706">進階級</text>
+
+    <!-- Column title -->
+    <text x="480" y="172" text-anchor="middle" font-size="19" font-weight="800" fill="#1e293b">一站式平台</text>
+    <text x="480" y="192" text-anchor="middle" font-size="12" fill="#94a3b8">開發到部署，一個平台搞定</text>
+
+    <line x1="400" y1="208" x2="560" y2="208" stroke="#e8ecf4" stroke-width="1"/>
+
+    <!-- Lovable badge -->
+    <g class="badge badge-2a tool-badge">
+      <rect x="388" y="224" width="184" height="56" rx="12" fill="#fff5f5" stroke="#fecaca" stroke-width="1"/>
+      <!-- Lovable icon (heart) -->
+      <circle cx="420" cy="252" r="18" fill="url(#lovableGrad)"/>
+      <text x="420" y="257" text-anchor="middle" font-size="14" fill="#fff">♥</text>
+      <text x="452" y="246" font-size="16" font-weight="800" fill="#1e293b">Lovable</text>
+      <text x="452" y="264" font-size="10" fill="#6b7280">全端應用開發平台</text>
+      <title>Lovable — AI 驅動的全端開發平台，含資料庫、認證、部署</title>
+    </g>
+
+    <!-- Description -->
+    <text x="400" y="316" font-size="13" font-weight="600" fill="#475569">透過一站式服務，從開</text>
+    <text x="400" y="336" font-size="13" font-weight="600" fill="#475569">發、資料庫到上線全部</text>
+    <text x="400" y="356" font-size="13" font-weight="600" fill="#475569">搞定</text>
+
+    <!-- Feature tags -->
+    <rect x="388" y="376" width="56" height="22" rx="11" fill="#fef3c7"/>
+    <text x="416" y="391" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">全端</text>
+    <rect x="450" y="376" width="56" height="22" rx="11" fill="#fef3c7"/>
+    <text x="478" y="391" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">資料庫</text>
+    <rect x="512" y="376" width="56" height="22" rx="11" fill="#fef3c7"/>
+    <text x="540" y="391" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">部署</text>
+
+    <!-- Complexity indicator -->
+    <rect x="388" y="414" width="184" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="388" y="414" width="100" height="6" rx="3" fill="#f59e0b"/>
+    <text x="388" y="438" font-size="10" fill="#94a3b8">客製化程度</text>
+    <text x="572" y="438" text-anchor="end" font-size="10" font-weight="600" fill="#f59e0b">中</text>
+  </g>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Divider 2 -->
+<!-- ══════════════════════════════════════ -->
+<g class="divider-2">
+  <line x1="625" y1="140" x2="625" y2="460" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="6,4"/>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Column 3: IDE 開發模式 -->
+<!-- ══════════════════════════════════════ -->
+<g class="col-3">
+  <g class="col-card">
+    <rect x="650" y="100" width="275" height="380" rx="16" fill="#ffffff" stroke="#e8ecf4" stroke-width="1"/>
+
+    <!-- Level tag -->
+    <rect x="670" y="116" width="80" height="24" rx="12" fill="#e0e7ff"/>
+    <text x="710" y="133" text-anchor="middle" font-size="11" font-weight="700" fill="#4f46e5">專業級</text>
+
+    <!-- Column title -->
+    <text x="787" y="172" text-anchor="middle" font-size="19" font-weight="800" fill="#1e293b">IDE 開發模式</text>
+    <text x="787" y="192" text-anchor="middle" font-size="12" fill="#94a3b8">工程師等級，完全客製化</text>
+
+    <line x1="690" y1="208" x2="885" y2="208" stroke="#e8ecf4" stroke-width="1"/>
+
+    <!-- Cursor badge -->
+    <g class="badge badge-3a tool-badge">
+      <rect x="668" y="224" width="120" height="40" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+      <rect x="682" y="234" width="20" height="20" rx="4" fill="url(#cursorGrad)"/>
+      <text x="693" y="249" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">C</text>
+      <text x="712" y="249" font-size="13" font-weight="700" fill="#1e293b">Cursor</text>
+      <title>Cursor — AI-first 程式碼編輯器</title>
+    </g>
+
+    <!-- Antigravity badge -->
+    <g class="badge badge-3b tool-badge">
+      <rect x="668" y="274" width="120" height="40" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1"/>
+      <rect x="682" y="284" width="20" height="20" rx="4" fill="url(#agGrad)"/>
+      <text x="692" y="298" text-anchor="middle" font-size="9" fill="#fff" font-weight="800">A</text>
+      <text x="712" y="299" font-size="11" font-weight="700" fill="#4f46e5">Antigravity</text>
+      <title>Antigravity — Google DeepMind 的 AI Coding IDE</title>
+    </g>
+
+    <!-- Windsurf badge -->
+    <g class="badge badge-3c tool-badge">
+      <rect x="668" y="324" width="120" height="40" rx="10" fill="#fff7ed" stroke="#fed7aa" stroke-width="1"/>
+      <rect x="682" y="334" width="20" height="20" rx="4" fill="url(#wsGrad)"/>
+      <text x="692" y="349" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">W</text>
+      <text x="712" y="349" font-size="12" font-weight="700" fill="#ea580c">Windsurf</text>
+      <title>Windsurf — Codeium 的 AI IDE</title>
+    </g>
+
+    <!-- Right-side description -->
+    <text x="800" y="248" font-size="13" font-weight="600" fill="#475569">用工程師的模</text>
+    <text x="800" y="268" font-size="13" font-weight="600" fill="#475569">式開發網頁應</text>
+    <text x="800" y="288" font-size="13" font-weight="600" fill="#475569">用，能更客製</text>
+    <text x="800" y="308" font-size="13" font-weight="600" fill="#475569">化的調整細節</text>
+
+    <!-- Feature tags -->
+    <rect x="668" y="376" width="68" height="22" rx="11" fill="#e0e7ff"/>
+    <text x="702" y="391" text-anchor="middle" font-size="10" font-weight="600" fill="#4f46e5">完全控制</text>
+    <rect x="742" y="376" width="56" height="22" rx="11" fill="#e0e7ff"/>
+    <text x="770" y="391" text-anchor="middle" font-size="10" font-weight="600" fill="#4f46e5">擴充性</text>
+    <rect x="804" y="376" width="68" height="22" rx="11" fill="#e0e7ff"/>
+    <text x="838" y="391" text-anchor="middle" font-size="10" font-weight="600" fill="#4f46e5">版本管理</text>
+
+    <!-- Complexity indicator -->
+    <rect x="668" y="414" width="237" height="6" rx="3" fill="#e2e8f0"/>
+    <rect x="668" y="414" width="220" height="6" rx="3" fill="#6366f1"/>
+    <text x="668" y="438" font-size="10" fill="#94a3b8">客製化程度</text>
+    <text x="905" y="438" text-anchor="end" font-size="10" font-weight="600" fill="#6366f1">高</text>
+  </g>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Bottom: difficulty spectrum bar -->
+<!-- ══════════════════════════════════════ -->
+<g class="level-bar">
+  <rect x="40" y="496" width="885" height="8" rx="4" fill="url(#levelGrad)" opacity="0.3"/>
+  <text x="40" y="520" font-size="11" fill="#22c55e" font-weight="600">簡單 →</text>
+  <text x="480" y="520" text-anchor="middle" font-size="11" fill="#94a3b8">技術門檻</text>
+  <text x="925" y="520" text-anchor="end" font-size="11" fill="#6366f1" font-weight="600">→ 專業</text>
+</g>
+
+<!-- Source -->
+<g class="source-text">
+  <text x="480" y="536" text-anchor="middle" font-size="10" fill="#cbd5e1">數位簡報室 — Vibe Coding 開發方式比較（2026）</text>
+</g>
+
+</svg>
