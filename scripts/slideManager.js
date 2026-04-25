@@ -967,7 +967,26 @@ export class SlideManager {
                 // SVG data URI → inline 渲染（動畫重播 + 連結可點擊）
                 if (src.startsWith('data:image/svg+xml;base64,')) {
                     try {
-                        const svgStr = decodeURIComponent(escape(atob(src.split(',')[1])));
+                        let svgStr = decodeURIComponent(escape(atob(src.split(',')[1])));
+                        // ★ SVG ID 去重：避免同一 SVG 在 canvas + presentationSlide 同時存在時
+                        //   gradient/filter/clipPath 的 id 衝突，導致 url(#id) 引用到隱藏 canvas 的副本
+                        const uid = '_s' + Math.random().toString(36).slice(2, 8);
+                        const idMap = new Map();
+                        svgStr = svgStr.replace(/\bid\s*=\s*["']([^"']+)["']/g, (match, id) => {
+                            const newId = id + uid;
+                            idMap.set(id, newId);
+                            return `id="${newId}"`;
+                        });
+                        if (idMap.size > 0) {
+                            idMap.forEach((newId, oldId) => {
+                                // url(#id) — used by fill, stroke, clip-path, mask, filter, marker-*
+                                svgStr = svgStr.replaceAll(`url(#${oldId})`, `url(#${newId})`);
+                                // href="#id" — used by <use>, <textPath>, <animate>
+                                svgStr = svgStr.replaceAll(`href="#${oldId}"`, `href="#${newId}"`);
+                                // xlink:href="#id" — legacy SVG 1.1
+                                svgStr = svgStr.replaceAll(`xlink:href="#${oldId}"`, `xlink:href="#${newId}"`);
+                            });
+                        }
                         el.innerHTML = `<div style="${clipStyle}width:100%;height:100%;overflow:hidden;">${svgStr}</div>`;
                         const svgEl = el.querySelector('svg');
                         if (svgEl) {
@@ -1346,8 +1365,25 @@ export class SlideManager {
 
             case 'svg':
                 {
-                    const svgCode = element.svgContent || '';
+                    let svgCode = element.svgContent || '';
                     const label = element.label || '圖表';
+                    // ★ SVG ID 去重（同 image case）
+                    if (svgCode) {
+                        const uid = '_s' + Math.random().toString(36).slice(2, 8);
+                        const idMap = new Map();
+                        svgCode = svgCode.replace(/\bid\s*=\s*["']([^"']+)["']/g, (match, id) => {
+                            const newId = id + uid;
+                            idMap.set(id, newId);
+                            return `id="${newId}"`;
+                        });
+                        if (idMap.size > 0) {
+                            idMap.forEach((newId, oldId) => {
+                                svgCode = svgCode.replaceAll(`url(#${oldId})`, `url(#${newId})`);
+                                svgCode = svgCode.replaceAll(`href="#${oldId}"`, `href="#${newId}"`);
+                                svgCode = svgCode.replaceAll(`xlink:href="#${oldId}"`, `xlink:href="#${newId}"`);
+                            });
+                        }
+                    }
                     el.innerHTML = `
                         <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
                             <div style="flex:1;display:flex;align-items:center;justify-content:center;width:100%;">
