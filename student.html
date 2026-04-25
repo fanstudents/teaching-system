@@ -2623,8 +2623,8 @@
                     el.classList.add('interactive-element');
                     const sMin = element.min || 1;
                     const sMax = element.max || 10;
-                    const sStep = element.step || 1;
-                    const defaultVal = Math.round((sMin + sMax) / 2);
+                    const sStep = element.step || 0.1;
+                    const defaultVal = +((sMin + sMax) / 2).toFixed(1);
                     el.innerHTML = `
                         <div class="scale-container">
                             <div class="scale-question">${element.question || '請評分'}</div>

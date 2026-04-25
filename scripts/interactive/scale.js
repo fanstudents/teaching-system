@@ -63,7 +63,7 @@ export class ScaleGame {
 
         submitBtn?.addEventListener('click', async () => {
             if (submitted) return;
-            const value = parseInt(slider?.value || '5', 10);
+            const value = parseFloat(slider?.value || '5');
             showSubmitted(value);
             const title = container.querySelector('.scale-question')?.textContent || '量表評分';
             const points = parseInt(container.closest('[data-points]')?.dataset.points) || 1;
