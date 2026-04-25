@@ -290,70 +290,95 @@ window._dashRefresh = async function () {
     setTimeout(() => btn?.classList.remove('spinning'), 500);
 };
 
-window._dashResetSession = async function () {
+window._dashResetSession = function () {
     const qid = sessionUUID || currentSessionCode;
     if (!qid) { alert('無法取得場次 ID'); return; }
 
-    // ★ 停止輪詢，避免 confirm 期間的 renderAll 干擾
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    // ★ 用自製 modal 取代 confirm()（popup 視窗的 confirm 會被父視窗搶焦點導致閃退）
+    const existing = document.getElementById('resetConfirmModal');
+    if (existing) existing.remove();
 
-    const msg = `確定要重置此場次的所有互動資料？\n\n將清除：\n• 所有學員作答紀錄 (submissions)\n• 所有投票紀錄 (poll_votes)\n• 所有學員登入紀錄 (students)\n\n此操作無法復原！`;
-    let confirmed = false;
-    try { confirmed = confirm(msg); } catch (_) { /* confirm blocked */ }
-    if (!confirmed) {
-        startPolling(); // 恢復輪詢
-        return;
-    }
+    const modal = document.createElement('div');
+    modal.id = 'resetConfirmModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);';
+    modal.innerHTML = `
+        <div style="background:#fff;border-radius:16px;padding:28px 32px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.25);font-family:inherit;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <span class="material-symbols-outlined" style="font-size:28px;color:#dc2626;">warning</span>
+                <span style="font-size:18px;font-weight:700;color:#1e293b;">重置場次資料</span>
+            </div>
+            <div style="font-size:14px;color:#475569;line-height:1.7;margin-bottom:20px;">
+                確定要重置此場次的所有互動資料？<br><br>
+                將清除：<br>
+                • 所有學員作答紀錄<br>
+                • 所有投票紀錄<br>
+                • 所有學員登入紀錄<br><br>
+                <strong style="color:#dc2626;">此操作無法復原！</strong>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button id="resetCancelBtn" style="padding:8px 20px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;color:#475569;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">取消</button>
+                <button id="resetConfirmBtn" style="padding:8px 20px;border:none;border-radius:8px;background:#dc2626;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">確定重置</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
 
-    const btn = document.getElementById('resetSessionBtn');
-    if (btn) btn.disabled = true;
+    // 取消
+    modal.querySelector('#resetCancelBtn').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 
-    try {
-        const errors = [];
+    // 確定
+    modal.querySelector('#resetConfirmBtn').addEventListener('click', async () => {
+        const confirmBtn = modal.querySelector('#resetConfirmBtn');
+        confirmBtn.textContent = '重置中…';
+        confirmBtn.disabled = true;
 
-        // 刪除 submissions（用 session_id 查詢）
-        const r1 = await db.delete('submissions', { session_id: `eq.${qid}` });
-        if (r1.error) errors.push('submissions: ' + (r1.error.message || JSON.stringify(r1.error)));
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        const btn = document.getElementById('resetSessionBtn');
+        if (btn) btn.disabled = true;
 
-        // 刪除 poll_votes（用 session_code 查詢 — 可能是 UUID 或 join_code）
-        const r2 = await db.delete('poll_votes', { session_code: `eq.${qid}` });
-        if (r2.error) errors.push('poll_votes(uuid): ' + (r2.error.message || JSON.stringify(r2.error)));
-        // ★ 也用 join_code 嘗試刪除（poll_votes 可能存的是 join_code 而非 UUID）
-        if (currentSessionCode && currentSessionCode !== qid) {
-            const r2b = await db.delete('poll_votes', { session_code: `eq.${currentSessionCode}` });
-            if (r2b.error) errors.push('poll_votes(code): ' + (r2b.error.message || JSON.stringify(r2b.error)));
+        try {
+            const errors = [];
+
+            const r1 = await db.delete('submissions', { session_id: `eq.${qid}` });
+            if (r1.error) errors.push('submissions: ' + (r1.error.message || JSON.stringify(r1.error)));
+
+            const r2 = await db.delete('poll_votes', { session_code: `eq.${qid}` });
+            if (r2.error) errors.push('poll_votes(uuid): ' + (r2.error.message || JSON.stringify(r2.error)));
+            if (currentSessionCode && currentSessionCode !== qid) {
+                const r2b = await db.delete('poll_votes', { session_code: `eq.${currentSessionCode}` });
+                if (r2b.error) errors.push('poll_votes(code): ' + (r2b.error.message || JSON.stringify(r2b.error)));
+            }
+
+            const r3 = await db.delete('students', { session_code: `eq.${currentSessionCode}` });
+            if (r3.error) errors.push('students: ' + (r3.error.message || JSON.stringify(r3.error)));
+
+            if (errors.length > 0) console.warn('[dashboard] resetSession partial errors:', errors);
+
+            onlineStudents = new Set();
+            submissionsMap = {};
+            pollVotesMap = {};
+            rawSubmissions = [];
+            studentNames = {};
+
+            renderAll();
+            updateHeaderMeta();
+            modal.remove();
+
+            if (errors.length > 0) {
+                alert('⚠️ 部分資料刪除失敗：\n' + errors.join('\n'));
+            } else {
+                alert('✅ 場次資料已重置');
+            }
+        } catch (e) {
+            console.error('[dashboard] resetSession error:', e);
+            modal.remove();
+            alert('重置失敗: ' + (e.message || e));
+        } finally {
+            if (btn) btn.disabled = false;
+            startPolling();
         }
-
-        // 刪除 students
-        const r3 = await db.delete('students', { session_code: `eq.${currentSessionCode}` });
-        if (r3.error) errors.push('students: ' + (r3.error.message || JSON.stringify(r3.error)));
-
-        if (errors.length > 0) {
-            console.warn('[dashboard] resetSession partial errors:', errors);
-        }
-
-        // 清空本地 state
-        onlineStudents = new Set();
-        submissionsMap = {};
-        pollVotesMap = {};
-        rawSubmissions = [];
-        studentNames = {};
-
-        renderAll();
-        updateHeaderMeta();
-
-        if (errors.length > 0) {
-            alert('⚠️ 部分資料刪除失敗：\n' + errors.join('\n'));
-        } else {
-            alert('✅ 場次資料已重置');
-        }
-    } catch (e) {
-        console.error('[dashboard] resetSession error:', e);
-        alert('重置失敗: ' + (e.message || e));
-    } finally {
-        if (btn) btn.disabled = false;
-        startPolling(); // ★ 恢復輪詢
-    }
+    });
 };
 
 // ══════════════════════
