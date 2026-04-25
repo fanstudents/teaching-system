@@ -294,23 +294,42 @@ window._dashResetSession = async function () {
     const qid = sessionUUID || currentSessionCode;
     if (!qid) { alert('無法取得場次 ID'); return; }
 
+    // ★ 停止輪詢，避免 confirm 期間的 renderAll 干擾
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+
     const msg = `確定要重置此場次的所有互動資料？\n\n將清除：\n• 所有學員作答紀錄 (submissions)\n• 所有投票紀錄 (poll_votes)\n• 所有學員登入紀錄 (students)\n\n此操作無法復原！`;
-    if (!confirm(msg)) return;
+    let confirmed = false;
+    try { confirmed = confirm(msg); } catch (_) { /* confirm blocked */ }
+    if (!confirmed) {
+        startPolling(); // 恢復輪詢
+        return;
+    }
 
     const btn = document.getElementById('resetSessionBtn');
     if (btn) btn.disabled = true;
 
     try {
-        // 刪除 submissions
-        await db.delete('submissions', { session_id: `eq.${qid}` });
-        // 刪除 poll_votes
-        await db.delete('poll_votes', { session_code: `eq.${qid}` });
-        // 刪除 students
-        await db.delete('students', { session_code: `eq.${qid}` });
+        const errors = [];
 
-        // 廣播重置事件
-        if (realtime.isConnected && currentSessionCode) {
-            realtime.publish(`session:${currentSessionCode}`, 'session_reset', { sessionCode: currentSessionCode });
+        // 刪除 submissions（用 session_id 查詢）
+        const r1 = await db.delete('submissions', { session_id: `eq.${qid}` });
+        if (r1.error) errors.push('submissions: ' + (r1.error.message || JSON.stringify(r1.error)));
+
+        // 刪除 poll_votes（用 session_code 查詢 — 可能是 UUID 或 join_code）
+        const r2 = await db.delete('poll_votes', { session_code: `eq.${qid}` });
+        if (r2.error) errors.push('poll_votes(uuid): ' + (r2.error.message || JSON.stringify(r2.error)));
+        // ★ 也用 join_code 嘗試刪除（poll_votes 可能存的是 join_code 而非 UUID）
+        if (currentSessionCode && currentSessionCode !== qid) {
+            const r2b = await db.delete('poll_votes', { session_code: `eq.${currentSessionCode}` });
+            if (r2b.error) errors.push('poll_votes(code): ' + (r2b.error.message || JSON.stringify(r2b.error)));
+        }
+
+        // 刪除 students
+        const r3 = await db.delete('students', { session_code: `eq.${currentSessionCode}` });
+        if (r3.error) errors.push('students: ' + (r3.error.message || JSON.stringify(r3.error)));
+
+        if (errors.length > 0) {
+            console.warn('[dashboard] resetSession partial errors:', errors);
         }
 
         // 清空本地 state
@@ -322,12 +341,18 @@ window._dashResetSession = async function () {
 
         renderAll();
         updateHeaderMeta();
-        alert('✅ 場次資料已重置');
+
+        if (errors.length > 0) {
+            alert('⚠️ 部分資料刪除失敗：\n' + errors.join('\n'));
+        } else {
+            alert('✅ 場次資料已重置');
+        }
     } catch (e) {
         console.error('[dashboard] resetSession error:', e);
-        alert('重置失敗: ' + e.message);
+        alert('重置失敗: ' + (e.message || e));
     } finally {
         if (btn) btn.disabled = false;
+        startPolling(); // ★ 恢復輪詢
     }
 };
 
