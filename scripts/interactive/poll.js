@@ -332,7 +332,7 @@ export class PollGame {
     async loadVotesForPresenter(sessionCode) {
         const containers = document.querySelectorAll('.poll-container');
         for (const c of containers) {
-            const elementId = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
+            const elementId = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || c.dataset.pollElementId || '';
             const optionEls = c.querySelectorAll('.poll-option');
             const counts = new Array(optionEls.length).fill(0);
             const names = Array.from({ length: optionEls.length }, () => []);
@@ -394,7 +394,7 @@ export class PollGame {
         // 更新講師端 UI
         const containers = document.querySelectorAll('.poll-container');
         containers.forEach(c => {
-            const eid = c.closest('[data-id]')?.dataset.id || '';
+            const eid = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || c.dataset.pollElementId || '';
             if (eid === elementId) {
                 const optionEls = c.querySelectorAll('.poll-option');
                 const counts = this._voteCounts[elementId] || [];
