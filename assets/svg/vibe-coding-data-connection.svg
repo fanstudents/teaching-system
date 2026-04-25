@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="'Noto Sans TC', sans-serif">
+<defs>
+  <style>
+    @keyframes slideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideRight { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+
+    .title { animation: slideUp 0.5s ease both; }
+    .subtitle { animation: slideUp 0.5s ease 0.12s both; }
+    .row-1 { animation: slideRight 0.45s ease 0.25s both; }
+    .row-2 { animation: slideRight 0.45s ease 0.38s both; }
+    .row-3 { animation: slideRight 0.45s ease 0.51s both; }
+    .row-4 { animation: slideRight 0.45s ease 0.64s both; }
+    .row-5 { animation: slideRight 0.45s ease 0.77s both; }
+    .auto-bar { animation: fadeIn 0.5s ease 0.9s both; }
+    .source { animation: fadeIn 0.4s ease 1.1s both; }
+
+    .mode-card { cursor: pointer; }
+    .mode-card .card-bg { transition: fill 0.2s, stroke 0.2s, filter 0.2s; }
+    .mode-card:hover .card-bg { fill: #f0f4ff; stroke: #a5b4fc; filter: drop-shadow(0 3px 8px rgba(99,102,241,0.1)); }
+    .mode-card:hover .num-circle { filter: brightness(1.1); }
+  </style>
+
+  <linearGradient id="bgGrad" x1="0" y1="0" x2="960" y2="540" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#fafbff"/>
+    <stop offset="100%" stop-color="#f0f4ff"/>
+  </linearGradient>
+
+  <linearGradient id="autoGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#6366f1"/>
+    <stop offset="25%" stop-color="#06b6d4"/>
+    <stop offset="50%" stop-color="#22c55e"/>
+    <stop offset="75%" stop-color="#f59e0b"/>
+    <stop offset="100%" stop-color="#94a3b8"/>
+  </linearGradient>
+</defs>
+
+<!-- Background -->
+<rect width="960" height="540" fill="url(#bgGrad)"/>
+
+<!-- Title -->
+<g class="title">
+  <text x="480" y="42" text-anchor="middle" font-size="28" font-weight="800" fill="#1e293b">Vibe Coding 資料連接模式</text>
+</g>
+<g class="subtitle">
+  <text x="480" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#94a3b8">五種方式將外部資料接進你的應用 — 從全自動到手動</text>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Automation level bar (left side) -->
+<!-- ══════════════════════════════════════ -->
+<g class="auto-bar">
+  <rect x="48" y="96" width="8" height="400" rx="4" fill="url(#autoGrad)" opacity="0.6"/>
+  <text x="52" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#6366f1">⚡ 自動</text>
+  <text x="52" y="510" text-anchor="middle" font-size="10" font-weight="700" fill="#94a3b8">✋ 手動</text>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Mode 1: API -->
+<!-- ══════════════════════════════════════ -->
+<g class="row-1 mode-card">
+  <rect class="card-bg" x="80" y="90" width="840" height="76" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <!-- Number badge -->
+  <circle class="num-circle" cx="118" cy="128" r="18" fill="#6366f1"/>
+  <text x="118" y="134" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">1</text>
+
+  <!-- Icon area -->
+  <rect x="148" y="108" width="40" height="40" rx="10" fill="#eef2ff"/>
+  <text x="168" y="135" text-anchor="middle" font-size="20">🔌</text>
+
+  <!-- Content -->
+  <text x="204" y="122" font-size="17" font-weight="800" fill="#1e293b">API 串接</text>
+  <text x="204" y="144" font-size="13" fill="#64748b">請 AI 讀取 API 文件，提供授權金鑰，自動完成資料拉取與格式轉換</text>
+
+  <!-- Tags -->
+  <rect x="720" y="110" width="72" height="22" rx="11" fill="#eef2ff"/>
+  <text x="756" y="125" text-anchor="middle" font-size="10" font-weight="600" fill="#4f46e5">全自動</text>
+  <rect x="720" y="136" width="72" height="22" rx="11" fill="#f0fdf4"/>
+  <text x="756" y="151" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">即時更新</text>
+
+  <title>API 串接：將 API 文件和授權提供給 AI，自動串接第三方服務數據</title>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Mode 2: MCP -->
+<!-- ══════════════════════════════════════ -->
+<g class="row-2 mode-card">
+  <rect class="card-bg" x="80" y="174" width="840" height="76" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <circle class="num-circle" cx="118" cy="212" r="18" fill="#06b6d4"/>
+  <text x="118" y="218" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">2</text>
+
+  <rect x="148" y="192" width="40" height="40" rx="10" fill="#ecfeff"/>
+  <text x="168" y="219" text-anchor="middle" font-size="20">🔗</text>
+
+  <text x="204" y="206" font-size="17" font-weight="800" fill="#1e293b">MCP 協定連接</text>
+  <text x="204" y="228" font-size="13" fill="#64748b">若服務支援 MCP（Model Context Protocol），AI 可直接連通索取結構化資料</text>
+
+  <rect x="720" y="194" width="72" height="22" rx="11" fill="#ecfeff"/>
+  <text x="756" y="209" text-anchor="middle" font-size="10" font-weight="600" fill="#0891b2">直接連通</text>
+  <rect x="720" y="220" width="72" height="22" rx="11" fill="#f0fdf4"/>
+  <text x="756" y="235" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">標準化</text>
+
+  <title>MCP 連接：服務若支援 Model Context Protocol，AI 可透過標準協定直接存取資料</title>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Mode 3: 爬蟲 -->
+<!-- ══════════════════════════════════════ -->
+<g class="row-3 mode-card">
+  <rect class="card-bg" x="80" y="258" width="840" height="76" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <circle class="num-circle" cx="118" cy="296" r="18" fill="#22c55e"/>
+  <text x="118" y="302" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">3</text>
+
+  <rect x="148" y="276" width="40" height="40" rx="10" fill="#f0fdf4"/>
+  <text x="168" y="303" text-anchor="middle" font-size="20">🕷️</text>
+
+  <text x="204" y="290" font-size="17" font-weight="800" fill="#1e293b">公開資料爬蟲</text>
+  <text x="204" y="312" font-size="13" fill="#64748b">針對公開網頁資料，讓 AI 撰寫爬蟲自動擷取、解析並匯入系統</text>
+
+  <rect x="720" y="278" width="72" height="22" rx="11" fill="#f0fdf4"/>
+  <text x="756" y="293" text-anchor="middle" font-size="10" font-weight="600" fill="#16a34a">自動擷取</text>
+  <rect x="720" y="304" width="72" height="22" rx="11" fill="#fef3c7"/>
+  <text x="756" y="319" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">需維護</text>
+
+  <title>爬蟲：AI 自動撰寫爬蟲程式，從公開網頁擷取資料並結構化匯入</title>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Mode 4: Excel -->
+<!-- ══════════════════════════════════════ -->
+<g class="row-4 mode-card">
+  <rect class="card-bg" x="80" y="342" width="840" height="76" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <circle class="num-circle" cx="118" cy="380" r="18" fill="#f59e0b"/>
+  <text x="118" y="386" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">4</text>
+
+  <rect x="148" y="360" width="40" height="40" rx="10" fill="#fef3c7"/>
+  <text x="168" y="387" text-anchor="middle" font-size="20">📊</text>
+
+  <text x="204" y="374" font-size="17" font-weight="800" fill="#1e293b">上傳 Excel / CSV</text>
+  <text x="204" y="396" font-size="13" fill="#64748b">將既有的試算表檔案上傳，AI 自動解析欄位並匯入資料庫</text>
+
+  <rect x="720" y="362" width="72" height="22" rx="11" fill="#fef3c7"/>
+  <text x="756" y="377" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">半自動</text>
+  <rect x="720" y="388" width="72" height="22" rx="11" fill="#fef3c7"/>
+  <text x="756" y="403" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">批次匯入</text>
+
+  <title>Excel 上傳：將現有的 Excel 或 CSV 檔案上傳，AI 解析並寫入資料庫</title>
+</g>
+
+<!-- ══════════════════════════════════════ -->
+<!-- Mode 5: 手動輸入 -->
+<!-- ══════════════════════════════════════ -->
+<g class="row-5 mode-card">
+  <rect class="card-bg" x="80" y="426" width="840" height="76" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <circle class="num-circle" cx="118" cy="464" r="18" fill="#94a3b8"/>
+  <text x="118" y="470" text-anchor="middle" font-size="14" font-weight="800" fill="#fff">5</text>
+
+  <rect x="148" y="444" width="40" height="40" rx="10" fill="#f1f5f9"/>
+  <text x="168" y="471" text-anchor="middle" font-size="20">⌨️</text>
+
+  <text x="204" y="458" font-size="17" font-weight="800" fill="#1e293b">手動輸入</text>
+  <text x="204" y="480" font-size="13" fill="#64748b">在介面上直接 key 入資料，適合少量、一次性或需要人工判斷的內容</text>
+
+  <rect x="720" y="446" width="72" height="22" rx="11" fill="#f1f5f9"/>
+  <text x="756" y="461" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">手動</text>
+  <rect x="720" y="472" width="72" height="22" rx="11" fill="#f1f5f9"/>
+  <text x="756" y="487" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">最彈性</text>
+
+  <title>手動輸入：在應用介面上直接輸入資料，最彈性但最耗人力</title>
+</g>
+
+<!-- Source -->
+<g class="source">
+  <text x="480" y="530" text-anchor="middle" font-size="10" fill="#cbd5e1">數位簡報室 — Vibe Coding 資料連接模式（2026）</text>
+</g>
+
+</svg>
