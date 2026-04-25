@@ -2622,7 +2622,7 @@
                 case 'scale': {
                     el.classList.add('interactive-element');
                     const sMin = element.min || 1;
-                    const sMax = element.max || 10;
+                    const sMax = element.max || 5;
                     const sStep = element.step || 0.1;
                     const defaultVal = +((sMin + sMax) / 2).toFixed(1);
                     el.innerHTML = `

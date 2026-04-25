@@ -2681,7 +2681,7 @@ export class SlideManager {
 
     renderScaleElement(el, element) {
         const min = element.min || 1;
-        const max = element.max || 10;
+        const max = element.max || 5;
         const step = element.step || 0.1;
         const defaultVal = +((min + max) / 2).toFixed(1);
         const labelLeft = element.labelLeft || '';

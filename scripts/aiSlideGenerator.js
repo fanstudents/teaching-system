@@ -534,7 +534,7 @@ export class AiSlideGenerator {
             elements: [{
                 id: gen(), type: 'scale', x: 50, y: 30, width: 860, height: 460,
                 question: ins.question || '評分',
-                min: ins.min || 1, max: ins.max || 10, step: 1,
+                min: ins.min || 1, max: ins.max || 5, step: 0.1,
                 labelLeft: ins.labelLeft || '不同意', labelRight: ins.labelRight || '非常同意'
             }]
         };

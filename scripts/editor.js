@@ -1370,7 +1370,7 @@ export class Editor {
                     </div>
                     <div class="property-row">
                         <label>最大值</label>
-                        <input type="number" id="scaleMax" value="${elementData.max || 10}">
+                        <input type="number" id="scaleMax" value="${elementData.max || 5}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">左端標籤</label>
