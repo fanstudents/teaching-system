@@ -3189,6 +3189,29 @@
                 offscreen.style.cssText = 'position:fixed;left:-9999px;top:0;width:960px;height:540px;overflow:hidden;z-index:-1;';
                 document.body.appendChild(offscreen);
 
+                // ★ 注入全域樣式：強制跳過所有動畫，確保擷取到最終狀態
+                const killAnimStyle = document.createElement('style');
+                killAnimStyle.id = 'pdf-kill-anim';
+                killAnimStyle.textContent = `
+                    #pdfOffscreenSlide *, #pdfOffscreenSlide *::before, #pdfOffscreenSlide *::after {
+                        animation: none !important;
+                        animation-delay: 0s !important;
+                        animation-duration: 0s !important;
+                        transition: none !important;
+                    }
+                    #pdfOffscreenSlide svg * {
+                        animation: none !important;
+                        animation-delay: 0s !important;
+                        animation-duration: 0s !important;
+                    }
+                    /* SVG 素材的動畫元素強制可見 */
+                    #pdfOffscreenSlide svg [class] {
+                        opacity: 1 !important;
+                        transform: none !important;
+                    }
+                `;
+                document.head.appendChild(killAnimStyle);
+
                 const JsPDF = window.jspdf.jsPDF || window.jspdf.default || window.jsPDF;
                 if (!JsPDF) throw new Error('jsPDF 載入異常');
                 const pdf = new JsPDF({ orientation: 'landscape', unit: 'px', format: [960, 540], compress: true });
@@ -3199,6 +3222,9 @@
 
                     offscreen.innerHTML = '';
                     const slideDiv = document.createElement('div');
+                    slideDiv.id = 'pdfOffscreenSlide';
+                    // ★ 加上 student-slide + slide-canvas class 讓 CSS 規則正確套用
+                    slideDiv.className = 'student-slide slide-canvas';
                     slideDiv.style.cssText = 'width:960px;height:540px;position:relative;overflow:hidden;background:#fff;';
 
                     const slide = slides[i];
@@ -3247,6 +3273,7 @@
                 }
 
                 offscreen.remove();
+                killAnimStyle.remove();
 
                 const title = document.getElementById('displayTitle')?.textContent || '簡報';
                 pdf.save(`${title}.pdf`);
