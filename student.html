@@ -121,6 +121,9 @@
                     <span class="material-symbols-outlined"
                         style="font-size:14px;color:#80868b;margin-left:2px;">edit</span>
                 </div>
+                <button class="student-close-btn" id="downloadPdfBtn" title="下載簡報 PDF" style="position:relative;">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                </button>
                 <button class="student-close-btn" id="studentFullscreenBtn" title="全螢幕">
                     <span class="material-symbols-outlined">fullscreen</span>
                 </button>
@@ -353,6 +356,8 @@
         let slidesCache = []; // 儲存所有收到的投影片
         // 曝露給 DocumentViewer 用
         window._presenterApp = { get slides() { return slidesCache; } };
+        // 曝露給 PDF 下載用
+        Object.defineProperty(window, 'slidesCache', { get() { return slidesCache; } });
         let currentIndex = 0;
         let totalSlides = 0;
         let instructorIndex = 0; // 講師目前頁碼
@@ -2748,6 +2753,7 @@
 
             return el;
         }
+        window._pdfCreateElement = createElementNode; // PDF 下載用
 
         // ── 縮放投影片適應視窗 ──
         function scaleSlide() {
@@ -3109,6 +3115,122 @@
                 });
             }
         })();
+    </script>
+
+    <!-- PDF 下載 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script>
+    (function() {
+        const btn = document.getElementById('downloadPdfBtn');
+        if (!btn) return;
+
+        btn.addEventListener('click', async () => {
+            const slides = window.slidesCache;
+            if (!slides?.length) {
+                alert('投影片尚未載入');
+                return;
+            }
+            await generatePdf(slides);
+        });
+
+        async function generatePdf(slides) {
+            if (!slides?.length) { alert('沒有投影片資料'); return; }
+
+            // 進度 modal
+            const modal = document.createElement('div');
+            modal.id = 'pdfProgressModal';
+            modal.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);';
+            modal.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:32px 40px;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+                    <span class="material-symbols-outlined" style="font-size:40px;color:#1a73e8;margin-bottom:12px;display:block;">picture_as_pdf</span>
+                    <div style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:8px;">正在產生 PDF…</div>
+                    <div id="pdfProgressText" style="font-size:13px;color:#64748b;margin-bottom:16px;">準備中…</div>
+                    <div style="background:#e2e8f0;border-radius:8px;height:6px;overflow:hidden;">
+                        <div id="pdfProgressBar" style="height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);width:0%;transition:width 0.3s ease;border-radius:8px;"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const progressText = document.getElementById('pdfProgressText');
+            const progressBar = document.getElementById('pdfProgressBar');
+
+            try {
+                // 建立離屏渲染容器
+                const offscreen = document.createElement('div');
+                offscreen.style.cssText = 'position:fixed;left:-9999px;top:0;width:960px;height:540px;overflow:hidden;z-index:-1;';
+                document.body.appendChild(offscreen);
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [960, 540], compress: true });
+
+                for (let i = 0; i < slides.length; i++) {
+                    progressText.textContent = `正在處理第 ${i + 1} / ${slides.length} 頁…`;
+                    progressBar.style.width = Math.round(((i + 0.3) / slides.length) * 100) + '%';
+
+                    // 渲染投影片到離屏容器
+                    offscreen.innerHTML = '';
+                    const slideDiv = document.createElement('div');
+                    slideDiv.style.cssText = 'width:960px;height:540px;position:relative;overflow:hidden;background:#fff;';
+
+                    const slide = slides[i];
+                    // 背景
+                    if (typeof window._applyBackground === 'function') {
+                        window._applyBackground(slideDiv, slide.background);
+                    } else if (slide.background && slide.background !== '#ffffff') {
+                        slideDiv.style.background = slide.background;
+                    }
+
+                    // 元素
+                    (slide.elements || []).forEach(element => {
+                        const el = window._pdfCreateElement(element);
+                        if (el) {
+                            el.classList.add('presentation-element');
+                            slideDiv.appendChild(el);
+                        }
+                    });
+
+                    offscreen.appendChild(slideDiv);
+
+                    // 等待圖片和 SVG 載入
+                    await new Promise(r => setTimeout(r, 200));
+                    const images = slideDiv.querySelectorAll('img');
+                    await Promise.all([...images].map(img => {
+                        if (img.complete) return Promise.resolve();
+                        return new Promise(r => { img.onload = r; img.onerror = r; });
+                    }));
+
+                    // html2canvas 擷取
+                    const canvas = await html2canvas(slideDiv, {
+                        width: 960, height: 540, scale: 2,
+                        useCORS: true, allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                    });
+
+                    if (i > 0) pdf.addPage([960, 540], 'landscape');
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 960, 540);
+
+                    progressBar.style.width = Math.round(((i + 1) / slides.length) * 100) + '%';
+                }
+
+                offscreen.remove();
+
+                // 下載
+                const title = document.getElementById('displayTitle')?.textContent || '簡報';
+                pdf.save(`${title}.pdf`);
+
+                progressText.textContent = '✅ PDF 已下載！';
+                progressBar.style.width = '100%';
+                setTimeout(() => modal.remove(), 1500);
+            } catch (e) {
+                console.error('[PDF] error:', e);
+                modal.remove();
+                alert('PDF 產生失敗：' + (e.message || e));
+            }
+        }
+    })();
     </script>
 
 </body>
