@@ -3118,12 +3118,33 @@
     </script>
 
     <!-- PDF 下載 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
     <script>
     (function() {
         const btn = document.getElementById('downloadPdfBtn');
         if (!btn) return;
+
+        // 動態載入 script（避免 CDN 靜態 tag 載入失敗）
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.onload = resolve;
+                s.onerror = () => reject(new Error('載入失敗: ' + src));
+                document.head.appendChild(s);
+            });
+        }
+
+        let libsLoaded = false;
+        async function ensureLibs() {
+            if (libsLoaded) return;
+            if (!window.html2canvas) {
+                await loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+            }
+            if (!window.jspdf) {
+                await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js');
+            }
+            libsLoaded = true;
+        }
 
         btn.addEventListener('click', async () => {
             const slides = window.slidesCache;
@@ -3131,12 +3152,15 @@
                 alert('投影片尚未載入');
                 return;
             }
-            await generatePdf(slides);
+            btn.disabled = true;
+            try {
+                await generatePdf(slides);
+            } finally {
+                btn.disabled = false;
+            }
         });
 
         async function generatePdf(slides) {
-            if (!slides?.length) { alert('沒有投影片資料'); return; }
-
             // 進度 modal
             const modal = document.createElement('div');
             modal.id = 'pdfProgressModal';
@@ -3145,63 +3169,70 @@
                 <div style="background:#fff;border-radius:16px;padding:32px 40px;max-width:360px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
                     <span class="material-symbols-outlined" style="font-size:40px;color:#1a73e8;margin-bottom:12px;display:block;">picture_as_pdf</span>
                     <div style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:8px;">正在產生 PDF…</div>
-                    <div id="pdfProgressText" style="font-size:13px;color:#64748b;margin-bottom:16px;">準備中…</div>
+                    <div id="pdfProgressText" style="font-size:13px;color:#64748b;margin-bottom:16px;">載入元件中…</div>
                     <div style="background:#e2e8f0;border-radius:8px;height:6px;overflow:hidden;">
                         <div id="pdfProgressBar" style="height:100%;background:linear-gradient(90deg,#1a73e8,#4285f4);width:0%;transition:width 0.3s ease;border-radius:8px;"></div>
                     </div>
                 </div>
             `;
             document.body.appendChild(modal);
-
             const progressText = document.getElementById('pdfProgressText');
             const progressBar = document.getElementById('pdfProgressBar');
 
             try {
-                // 建立離屏渲染容器
+                // 動態載入 html2canvas + jsPDF
+                await ensureLibs();
+
+                progressText.textContent = '準備中…';
+
                 const offscreen = document.createElement('div');
                 offscreen.style.cssText = 'position:fixed;left:-9999px;top:0;width:960px;height:540px;overflow:hidden;z-index:-1;';
                 document.body.appendChild(offscreen);
 
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [960, 540], compress: true });
+                const JsPDF = window.jspdf.jsPDF || window.jspdf.default || window.jsPDF;
+                if (!JsPDF) throw new Error('jsPDF 載入異常');
+                const pdf = new JsPDF({ orientation: 'landscape', unit: 'px', format: [960, 540], compress: true });
 
                 for (let i = 0; i < slides.length; i++) {
                     progressText.textContent = `正在處理第 ${i + 1} / ${slides.length} 頁…`;
                     progressBar.style.width = Math.round(((i + 0.3) / slides.length) * 100) + '%';
 
-                    // 渲染投影片到離屏容器
                     offscreen.innerHTML = '';
                     const slideDiv = document.createElement('div');
                     slideDiv.style.cssText = 'width:960px;height:540px;position:relative;overflow:hidden;background:#fff;';
 
                     const slide = slides[i];
-                    // 背景
                     if (typeof window._applyBackground === 'function') {
                         window._applyBackground(slideDiv, slide.background);
                     } else if (slide.background && slide.background !== '#ffffff') {
                         slideDiv.style.background = slide.background;
                     }
 
-                    // 元素
                     (slide.elements || []).forEach(element => {
-                        const el = window._pdfCreateElement(element);
-                        if (el) {
-                            el.classList.add('presentation-element');
-                            slideDiv.appendChild(el);
-                        }
+                        try {
+                            const el = window._pdfCreateElement(element);
+                            if (el) {
+                                el.classList.add('presentation-element');
+                                // 確保有 animOrder 的元素顯示出來（PDF 不需要動畫隱藏）
+                                el.style.opacity = '1';
+                                el.style.transform = '';
+                                slideDiv.appendChild(el);
+                            }
+                        } catch (_) { /* skip broken elements */ }
                     });
 
                     offscreen.appendChild(slideDiv);
 
-                    // 等待圖片和 SVG 載入
-                    await new Promise(r => setTimeout(r, 200));
+                    // 等 DOM 渲染 + 圖片載入
+                    await new Promise(r => setTimeout(r, 300));
                     const images = slideDiv.querySelectorAll('img');
-                    await Promise.all([...images].map(img => {
-                        if (img.complete) return Promise.resolve();
-                        return new Promise(r => { img.onload = r; img.onerror = r; });
-                    }));
+                    if (images.length) {
+                        await Promise.all([...images].map(img => {
+                            if (img.complete) return Promise.resolve();
+                            return new Promise(r => { img.onload = r; img.onerror = r; });
+                        }));
+                    }
 
-                    // html2canvas 擷取
                     const canvas = await html2canvas(slideDiv, {
                         width: 960, height: 540, scale: 2,
                         useCORS: true, allowTaint: true,
@@ -3217,7 +3248,6 @@
 
                 offscreen.remove();
 
-                // 下載
                 const title = document.getElementById('displayTitle')?.textContent || '簡報';
                 pdf.save(`${title}.pdf`);
 
