@@ -46,43 +46,86 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         const sessionCode = sess.session_code || '';
         const sessionUUID = sess.id || sessionId; // submissions 用 UUID 查
 
+        // 取得專案 join_code（舊資料的 session_id 可能存的是 join_code）
+        let joinCode = '';
+        if (sess.project_id) {
+            try {
+                const { data: projRows } = await db.select('projects', {
+                    filter: { id: `eq.${sess.project_id}` }, select: 'join_code', limit: 1
+                });
+                joinCode = projRows?.[0]?.join_code || '';
+            } catch { /* ok */ }
+        }
+
         // 1. 學員名冊（students 用 session_code 存）
         const { data: studentsRaw } = await db.select('students', {
             filter: { session_code: `eq.${sessionCode}` },
             select: 'name,email,company,created_at'
         });
         const students = studentsRaw || [];
+        const studentEmails = new Set(students.map(s => s.email).filter(Boolean));
 
-        // 2. 作答紀錄 (submissions) — session_id 存的是 UUID
+        // 2. 作答紀錄 (submissions) — 多層 fallback
         const { data: subsRaw } = await db.select('submissions', {
             filter: { session_id: `eq.${sessionUUID}` },
             order: 'submitted_at.asc'
         });
         let submissions = subsRaw || [];
 
-        // fallback: 如果 UUID 查不到，用 session_code 再查一次（相容舊資料）
-        if (submissions.length === 0 && sessionCode) {
+        // fallback 1: 用 session_code 查
+        if (submissions.length < students.length && sessionCode) {
             const { data: subsFallback } = await db.select('submissions', {
                 filter: { session_id: `eq.${sessionCode}` },
                 order: 'submitted_at.asc'
             });
-            submissions = subsFallback || [];
+            if ((subsFallback || []).length > submissions.length) {
+                submissions = subsFallback;
+            }
         }
 
-        // 3. 投票紀錄 (poll_votes) — 同時查 session_code 和 UUID
+        // fallback 2: 用專案 join_code 查 + 用學員 email 交叉比對
+        if (submissions.length < students.length && joinCode && joinCode !== sessionCode) {
+            const { data: subsByJoinCode } = await db.select('submissions', {
+                filter: { session_id: `eq.${joinCode}` },
+                order: 'submitted_at.asc',
+                limit: 5000
+            });
+            if (subsByJoinCode && subsByJoinCode.length > 0) {
+                // 用學員 email 過濾，只保留此場次的學員
+                const filtered = studentEmails.size > 0
+                    ? subsByJoinCode.filter(s => studentEmails.has(s.student_email))
+                    : subsByJoinCode;
+                if (filtered.length > submissions.length) {
+                    submissions = filtered;
+                }
+            }
+        }
+
+        // 3. 投票紀錄 (poll_votes) — 多層 fallback
         let polls = [];
         const { data: pollsRaw } = await db.select('poll_votes', {
             filter: { session_code: `eq.${sessionCode}` },
             order: 'created_at.asc'
         });
         polls = pollsRaw || [];
-        // fallback: 用 UUID 查
         if (polls.length === 0 && sessionUUID) {
             const { data: pollsFallback } = await db.select('poll_votes', {
                 filter: { session_code: `eq.${sessionUUID}` },
                 order: 'created_at.asc'
             });
             polls = pollsFallback || [];
+        }
+        // fallback: 用 join_code + 學員 email
+        if (polls.length === 0 && joinCode) {
+            const { data: pollsByJC } = await db.select('poll_votes', {
+                filter: { session_code: `eq.${joinCode}` },
+                order: 'created_at.asc'
+            });
+            if (pollsByJC && pollsByJC.length > 0 && studentEmails.size > 0) {
+                polls = pollsByJC.filter(p => studentEmails.has(p.student_email));
+            } else {
+                polls = pollsByJC || [];
+            }
         }
 
         // 4. 作業定義

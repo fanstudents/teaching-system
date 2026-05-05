@@ -322,9 +322,6 @@
             async function loadAll() {
                 try {
                     // ── 過濾邏輯 ──
-                    // 場次模式：學員/checklist/survey 用 session_code
-                    //          submissions 用 joinCode（因為 stateManager 存的是 project join_code）
-                    // 專案模式：全用 joinCode
                     const _sessionCode = _sessionData?.session_code;
                     const jcFilter = _sessionCode
                         ? { session_code: `eq.${_sessionCode}` }
@@ -332,13 +329,19 @@
                     const studentFilter = _sessionCode
                         ? { session_code: `eq.${_sessionCode}` }
                         : (joinCode ? { project_id: `eq.${joinCode}` } : {});
-                    // submissions.session_id = URL ?code= 值 = project join_code
-                    const submissionFilter = joinCode
-                        ? { session_id: `eq.${joinCode}` }
-                        : {};
 
                     const emailDraftFilter = _sessionId ? { session_id: `eq.${_sessionId}` } : {};
                     const schedFilter = _sessionId ? { session_id: `eq.${_sessionId}` } : {};
+
+                    // submissions: 場次模式先用 UUID，再 fallback join_code + email
+                    const submissionSelect = 'id,student_email,student_name,element_id,assignment_title,type,content,file_url,is_correct,score,state,submitted_at,created_at,session_id';
+                    let submissionFilter = joinCode
+                        ? { session_id: `eq.${joinCode}` }
+                        : {};
+                    // 場次模式：優先用 UUID
+                    if (_sessionId) {
+                        submissionFilter = { session_id: `eq.${_sessionId}` };
+                    }
 
                     const results = await Promise.all([
                         db.select('students', { order: 'name.asc', filter: studentFilter }),
@@ -346,7 +349,7 @@
                         db.select('checklist_progress'),
                         db.select('survey_questions', { filter: jcFilter }),
                         db.select('survey_responses'),
-                        db.select('submissions', { select: 'id,student_email,student_name,element_id,assignment_title,type,content,file_url,is_correct,score,state,submitted_at,created_at,session_id', filter: submissionFilter }),
+                        db.select('submissions', { select: submissionSelect, filter: submissionFilter }),
                         db.select('email_drafts', { filter: emailDraftFilter }),
                         db.select('exam_responses'),
                         db.select('satisfaction_responses'),
@@ -365,6 +368,22 @@
                     satisfactionResponses = results[8].data || [];
                     scheduledEmails = results[9].data || [];
                     emailEvents = results[10].data || [];
+
+                    // ── 場次模式 fallback：UUID 查不夠，用 join_code + 學員 email 交叉比對 ──
+                    if (_sessionId && submissions.length < allStudents.length && joinCode) {
+                        const studentEmails = new Set(allStudents.map(s => s.email).filter(Boolean));
+                        const { data: subsByJC } = await db.select('submissions', {
+                            select: submissionSelect,
+                            filter: { session_id: `eq.${joinCode}` },
+                            limit: 5000
+                        });
+                        if (subsByJC && subsByJC.length > 0 && studentEmails.size > 0) {
+                            const filtered = subsByJC.filter(s => studentEmails.has(s.student_email));
+                            if (filtered.length > submissions.length) {
+                                submissions = filtered;
+                            }
+                        }
+                    }
 
                     updateStats();
                     populateFilters();
