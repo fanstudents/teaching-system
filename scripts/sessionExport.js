@@ -44,28 +44,46 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         });
         const sess = sessRows?.[0] || sessionMeta || {};
         const sessionCode = sess.session_code || '';
-        const queryId = sessionCode; // submissions 用 session_code 查
+        const sessionUUID = sess.id || sessionId; // submissions 用 UUID 查
 
-        // 1. 學員名冊
+        // 1. 學員名冊（students 用 session_code 存）
         const { data: studentsRaw } = await db.select('students', {
-            filter: { session_code: `eq.${queryId}` },
+            filter: { session_code: `eq.${sessionCode}` },
             select: 'name,email,company,created_at'
         });
         const students = studentsRaw || [];
 
-        // 2. 作答紀錄 (submissions)
+        // 2. 作答紀錄 (submissions) — session_id 存的是 UUID
         const { data: subsRaw } = await db.select('submissions', {
-            filter: { session_id: `eq.${queryId}` },
+            filter: { session_id: `eq.${sessionUUID}` },
             order: 'submitted_at.asc'
         });
-        const submissions = subsRaw || [];
+        let submissions = subsRaw || [];
 
-        // 3. 投票紀錄 (poll_votes)
+        // fallback: 如果 UUID 查不到，用 session_code 再查一次（相容舊資料）
+        if (submissions.length === 0 && sessionCode) {
+            const { data: subsFallback } = await db.select('submissions', {
+                filter: { session_id: `eq.${sessionCode}` },
+                order: 'submitted_at.asc'
+            });
+            submissions = subsFallback || [];
+        }
+
+        // 3. 投票紀錄 (poll_votes) — 同時查 session_code 和 UUID
+        let polls = [];
         const { data: pollsRaw } = await db.select('poll_votes', {
-            filter: { session_code: `eq.${queryId}` },
+            filter: { session_code: `eq.${sessionCode}` },
             order: 'created_at.asc'
         });
-        const polls = pollsRaw || [];
+        polls = pollsRaw || [];
+        // fallback: 用 UUID 查
+        if (polls.length === 0 && sessionUUID) {
+            const { data: pollsFallback } = await db.select('poll_votes', {
+                filter: { session_code: `eq.${sessionUUID}` },
+                order: 'created_at.asc'
+            });
+            polls = pollsFallback || [];
+        }
 
         // 4. 作業定義
         const { data: assignRaw } = await db.select('session_assignments', {
