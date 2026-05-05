@@ -98,13 +98,13 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         const csvDetail = buildDetailCSV(submissions);
         const csvPolls = buildPollsCSV(polls);
         const csvHomework = buildHomeworkCSV(submissions, assignments);
+        const csvPerStudent = buildPerStudentCSV(students, submissions, polls);
 
         // ── 產出 HTML 報告 ──
         const htmlReport = buildHTMLReport(projectName, sess, students, submissions, polls, assignments);
 
         // ── 打包 ZIP ──
         if (typeof JSZip === 'undefined') {
-            // 動態載入 JSZip
             await new Promise((resolve, reject) => {
                 const s = document.createElement('script');
                 s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
@@ -120,6 +120,7 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         zip.file('3_學員作答明細.csv', csvDetail);
         zip.file('4_投票紀錄.csv', csvPolls);
         zip.file('5_作業提交.csv', csvHomework);
+        zip.file('6_學員個別互動明細.csv', csvPerStudent);
         zip.file('報告總覽.html', htmlReport);
 
         const blob = await zip.generateAsync({ type: 'blob' });
@@ -220,6 +221,78 @@ function buildHomeworkCSV(submissions, assignments) {
             content, s.file_url || '', fmtTime(s.submitted_at)
         ];
     });
+    return toCSV(headers, rows);
+}
+
+function buildPerStudentCSV(students, submissions, polls) {
+    const headers = ['學員姓名', 'Email', '互動類型', '題目/作業名稱', '回答內容', '正確', '得分', '累計得分', '檔案連結', 'Prompt', '提交時間'];
+    const rows = [];
+
+    // 收集所有學員（合併 students 表 + submissions 中出現的學員）
+    const studentMap = new Map();
+    students.forEach(s => studentMap.set(s.email, s.name));
+    submissions.forEach(s => {
+        const key = s.student_email || s.student_name;
+        if (key && !studentMap.has(key)) studentMap.set(key, s.student_name || key);
+    });
+
+    for (const [email, name] of studentMap) {
+        const subs = submissions.filter(s => (s.student_email || s.student_name) === email);
+        const pVotes = polls.filter(p => p.student_email === email);
+
+        if (subs.length === 0 && pVotes.length === 0) {
+            rows.push([name, email, '（無互動紀錄）', '', '', '', '', '', '', '', '']);
+            continue;
+        }
+
+        // 計算累計得分
+        let totalAwarded = 0;
+
+        // submissions
+        subs.forEach(s => {
+            let st = s.state;
+            if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+            const awarded = parseFloat(st?._awarded) || 0;
+            totalAwarded += awarded;
+
+            const correct = s.is_correct === true || s.is_correct === 'true' ? '✓'
+                : s.is_correct === false || s.is_correct === 'false' ? '✗' : '';
+
+            // 提取 prompt（image_prompt 模式）
+            let prompt = '';
+            let content = s.content || '';
+            try {
+                const parsed = JSON.parse(content);
+                if (parsed?.prompt) { prompt = parsed.prompt; content = parsed.image || content; }
+            } catch { /* not JSON */ }
+            if (content.length > 500) content = content.slice(0, 500) + '…';
+
+            rows.push([
+                name, email,
+                TYPE_LABELS[s.type] || s.type || '',
+                s.assignment_title || '',
+                content,
+                correct,
+                awarded > 0 ? awarded : (s.score ?? ''),
+                totalAwarded,
+                s.file_url || '',
+                prompt,
+                fmtTime(s.submitted_at)
+            ]);
+        });
+
+        // poll_votes
+        pVotes.forEach(p => {
+            rows.push([
+                name, email,
+                '投票',
+                p.element_id || '',
+                p.option_text || `選項 ${(p.option_index || 0) + 1}`,
+                '', '', totalAwarded, '', '',
+                fmtTime(p.created_at)
+            ]);
+        });
+    }
     return toCSV(headers, rows);
 }
 
@@ -392,12 +465,112 @@ a{color:#2563eb;text-decoration:none}
 
     ${hwRows ? `<h2>📝 作業提交</h2><table><thead><tr><th>學員</th><th>作業</th><th>內容</th><th>時間</th></tr></thead><tbody>${hwRows}</tbody></table>` : ''}
 
+    ${buildStudentDetailHTML(students, submissions, polls)}
+
     <div class="footer">
         此報告由教學系統自動產出 · ${esc(projectName || '')}
     </div>
 </div>
 </body>
 </html>`;
+}
+
+function buildStudentDetailHTML(students, submissions, polls) {
+    // 收集所有學員
+    const studentMap = new Map();
+    students.forEach(s => studentMap.set(s.email, s.name));
+    submissions.forEach(s => {
+        const key = s.student_email || s.student_name;
+        if (key && !studentMap.has(key)) studentMap.set(key, s.student_name || key);
+    });
+
+    if (studentMap.size === 0) return '';
+
+    let html = '<h2 style="page-break-before:always">👤 學員個別互動清單</h2>';
+
+    for (const [email, name] of studentMap) {
+        const subs = submissions.filter(s => (s.student_email || s.student_name) === email);
+        const pVotes = polls.filter(p => p.student_email === email);
+        if (subs.length === 0 && pVotes.length === 0) continue;
+
+        // 計算總分
+        let totalScore = 0;
+        subs.forEach(s => {
+            let st = s.state;
+            if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+            totalScore += parseFloat(st?._awarded) || 0;
+        });
+
+        html += `<div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;border-bottom:1px solid #f1f5f9;padding-bottom:12px">
+                <div style="width:40px;height:40px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem">${esc(name.charAt(0))}</div>
+                <div>
+                    <div style="font-weight:700;font-size:1rem">${esc(name)}</div>
+                    <div style="font-size:.78rem;color:#64748b">${esc(email)} · 互動 ${subs.length} 次${pVotes.length > 0 ? ` · 投票 ${pVotes.length} 次` : ''}${totalScore > 0 ? ` · 累計 ${totalScore} 分` : ''}</div>
+                </div>
+            </div>`;
+
+        // 列出每個互動
+        subs.forEach(s => {
+            let st = s.state;
+            if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+            const awarded = parseFloat(st?._awarded) || 0;
+            const typeLabel = TYPE_LABELS[s.type] || s.type || '其他';
+            const correct = s.is_correct === true || s.is_correct === 'true' ? '✅'
+                : s.is_correct === false || s.is_correct === 'false' ? '❌' : '';
+
+            // 解析 content
+            let contentHtml = '';
+            let prompt = '';
+            let content = s.content || '';
+            try {
+                const parsed = JSON.parse(content);
+                if (parsed?.image) {
+                    contentHtml = `<img src="${esc(parsed.image)}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid #e2e8f0;margin-top:6px;display:block">`;
+                    if (parsed.prompt) prompt = parsed.prompt;
+                    content = '';
+                }
+            } catch { /* not JSON */ }
+
+            if (!contentHtml) {
+                if (s.file_url && /\.(jpg|jpeg|png|gif|webp)/i.test(s.file_url)) {
+                    contentHtml = `<img src="${esc(s.file_url)}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid #e2e8f0;margin-top:6px;display:block">`;
+                } else if (s.file_url) {
+                    contentHtml = `<a href="${esc(s.file_url)}" target="_blank">📎 查看檔案</a>`;
+                } else if (content && content !== '(image)') {
+                    const truncated = content.length > 300 ? content.slice(0, 300) + '…' : content;
+                    contentHtml = `<div style="color:#475569;font-size:.82rem;line-height:1.5;white-space:pre-wrap;word-break:break-word">${esc(truncated)}</div>`;
+                }
+            }
+
+            html += `<div style="padding:8px 0;border-bottom:1px solid #f8f9fa;display:flex;gap:12px;align-items:flex-start">
+                <div style="min-width:70px"><span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:600;background:#eff6ff;color:#2563eb">${esc(typeLabel)}</span></div>
+                <div style="flex:1">
+                    <div style="font-size:.85rem;font-weight:600;color:#1e293b">${esc(s.assignment_title || '')} ${correct}</div>
+                    ${contentHtml}
+                    ${prompt ? `<div style="margin-top:4px;padding:6px 10px;background:#f0f4ff;border-radius:6px;border:1px solid #c3d9fc;font-size:.78rem"><span style="color:#1a73e8;font-weight:600">💬 Prompt:</span> ${esc(prompt.length > 200 ? prompt.slice(0, 200) + '…' : prompt)}</div>` : ''}
+                </div>
+                <div style="min-width:60px;text-align:right;font-size:.82rem">
+                    ${awarded > 0 ? `<span style="font-weight:700;color:#059669">+${awarded}</span>` : (s.score != null && s.score !== '' ? `<span style="color:#64748b">${s.score}</span>` : '')}
+                    <div style="color:#94a3b8;font-size:.72rem;margin-top:2px">${fmtTime(s.submitted_at).split(' ').pop() || ''}</div>
+                </div>
+            </div>`;
+        });
+
+        // 投票
+        if (pVotes.length > 0) {
+            pVotes.forEach(p => {
+                html += `<div style="padding:8px 0;border-bottom:1px solid #f8f9fa;display:flex;gap:12px;align-items:center">
+                    <div style="min-width:70px"><span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:600;background:#fef3c7;color:#92400e">投票</span></div>
+                    <div style="flex:1;font-size:.85rem;color:#1e293b">${esc(p.option_text || `選項 ${(p.option_index || 0) + 1}`)}</div>
+                    <div style="min-width:60px;text-align:right;color:#94a3b8;font-size:.72rem">${fmtTime(p.created_at).split(' ').pop() || ''}</div>
+                </div>`;
+            });
+        }
+
+        html += '</div>';
+    }
+    return html;
 }
 
 function esc(str) {
