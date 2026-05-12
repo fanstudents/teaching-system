@@ -113,10 +113,6 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
             if (candidates.length > 0) {
                 candidates = filterByDateRange(candidates, dateRange, 'submitted_at');
             }
-            // 非 UUID key 額外用學員 email 過濾
-            if (key !== sessionUUID && candidates.length > 0 && studentEmails.size > 0) {
-                candidates = candidates.filter(s => studentEmails.has(s.student_email));
-            }
 
             const keyLabel = key === sessionUUID ? 'uuid'
                 : key === sessionCode ? 'session_code' : 'join_code';
@@ -154,10 +150,6 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
             // ★ 所有 key 都用場次日期過濾
             if (candidates.length > 0) {
                 candidates = filterByDateRange(candidates, dateRange, 'created_at');
-            }
-            // 非 UUID key 額外用學員 email 過濾
-            if (key !== sessionUUID && candidates.length > 0 && studentEmails.size > 0) {
-                candidates = candidates.filter(p => studentEmails.has(p.student_email));
             }
 
             const keyLabel = key === sessionUUID ? 'uuid'
