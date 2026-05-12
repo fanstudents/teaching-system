@@ -152,6 +152,9 @@ class App {
             const sessionId = urlParams.get('sid');
             if (sessionId) {
                 this.slideManager.currentSessionId = sessionId;
+                // ★ 讓 showcase / stateManager / 各互動模組知道當前場次
+                window._activeSessionUUID = sessionId;
+                this.showcase.setSessionCode(sessionId);
                 console.log('[Editor] bound to session:', sessionId);
             }
 
