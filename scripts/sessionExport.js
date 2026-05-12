@@ -33,15 +33,15 @@ function fmtTime(t) {
 }
 
 /**
- * 計算場次日期的時間範圍（前後各 1 天），用於 fallback 過濾
+ * 計算場次日期的嚴格時間範圍（當天 00:00 ~ 隔天 00:00，台灣時區）
  */
 function getSessionDateRange(sess) {
     if (!sess.date) return null;
     try {
         const d = new Date(sess.date + 'T00:00:00+08:00');
         if (isNaN(d.getTime())) return null;
-        const start = new Date(d.getTime() - 24 * 60 * 60 * 1000);
-        const end = new Date(d.getTime() + 2 * 24 * 60 * 60 * 1000); // +2 天涵蓋當天晚場
+        const start = d; // 當天 00:00
+        const end = new Date(d.getTime() + 24 * 60 * 60 * 1000); // 隔天 00:00
         return { start, end };
     } catch { return null; }
 }
@@ -109,12 +109,13 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
             });
             let candidates = subRows || [];
 
-            // 非 UUID key（session_code 或 join_code）可能跨場次，需過濾
-            if (key !== sessionUUID && candidates.length > 0) {
+            // ★ 所有 key 都用場次日期過濾（確保只匯出當天的互動）
+            if (candidates.length > 0) {
                 candidates = filterByDateRange(candidates, dateRange, 'submitted_at');
-                if (studentEmails.size > 0) {
-                    candidates = candidates.filter(s => studentEmails.has(s.student_email));
-                }
+            }
+            // 非 UUID key 額外用學員 email 過濾
+            if (key !== sessionUUID && candidates.length > 0 && studentEmails.size > 0) {
+                candidates = candidates.filter(s => studentEmails.has(s.student_email));
             }
 
             const keyLabel = key === sessionUUID ? 'uuid'
@@ -150,12 +151,13 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
             });
             let candidates = pollRows || [];
 
-            // 非 UUID key 做日期+email 過濾
-            if (key !== sessionUUID && candidates.length > 0) {
+            // ★ 所有 key 都用場次日期過濾
+            if (candidates.length > 0) {
                 candidates = filterByDateRange(candidates, dateRange, 'created_at');
-                if (studentEmails.size > 0) {
-                    candidates = candidates.filter(p => studentEmails.has(p.student_email));
-                }
+            }
+            // 非 UUID key 額外用學員 email 過濾
+            if (key !== sessionUUID && candidates.length > 0 && studentEmails.size > 0) {
+                candidates = candidates.filter(p => studentEmails.has(p.student_email));
             }
 
             const keyLabel = key === sessionUUID ? 'uuid'
