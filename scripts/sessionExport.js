@@ -93,15 +93,14 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         const students = studentsRaw || [];
         const studentEmails = new Set(students.map(s => s.email).filter(Boolean));
 
-        // 2. 作答紀錄 (submissions) — 多層 fallback
+        // 2. 作答紀錄 (submissions) — 多 key 合併去重
         //    stateManager.save() 存的 session_id 可能是：UUID、session_code、或 join_code
-        //    需要依序嘗試所有可能的 key，且對非精確 key 做日期+email 過濾
-        let submissionSource = 'uuid';
+        //    不同時期的資料可能用不同 key，需要全部撈出來合併
         const submissionKeys = [sessionUUID, sessionCode, joinCode].filter(Boolean);
-        // 去重 + 保持順序
         const uniqueSubKeys = [...new Set(submissionKeys)];
 
-        let submissions = [];
+        const submissionMap = new Map(); // id → submission record
+        const subSourceLog = [];
         for (const key of uniqueSubKeys) {
             const { data: subRows } = await db.select('submissions', {
                 filter: { session_id: `eq.${key}` },
@@ -118,21 +117,28 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
                 }
             }
 
-            if (candidates.length > submissions.length) {
-                submissions = candidates;
-                submissionSource = key === sessionUUID ? 'uuid'
-                    : key === sessionCode ? 'session_code'
-                    : 'join_code';
+            const keyLabel = key === sessionUUID ? 'uuid'
+                : key === sessionCode ? 'session_code' : 'join_code';
+            subSourceLog.push(`${keyLabel}:${candidates.length}`);
+
+            // 合併（用 id 去重，後來的不覆蓋）
+            for (const s of candidates) {
+                if (s.id && !submissionMap.has(s.id)) {
+                    submissionMap.set(s.id, s);
+                }
             }
         }
 
-        console.log(`[Export] submissions: ${submissions.length} 筆 (source: ${submissionSource}, key used)`);
+        const submissions = [...submissionMap.values()]
+            .sort((a, b) => (a.submitted_at || '').localeCompare(b.submitted_at || ''));
 
-        // 3. 投票紀錄 (poll_votes) — 多層 fallback
+        console.log(`[Export] submissions: ${submissions.length} 筆 (${subSourceLog.join(', ')})`);
+
+        // 3. 投票紀錄 (poll_votes) — 多 key 合併去重
         //    poll.js 存的 session_code 實際上是 stateManager.getSessionCode()，
         //    當有 override 時存的是 UUID，所以要用 UUID 優先查
-        let polls = [];
-        let pollSource = 'none';
+        const pollMap = new Map(); // id → poll record
+        const pollSourceLog = [];
         const pollKeys = [sessionUUID, sessionCode, joinCode].filter(Boolean);
         const uniquePollKeys = [...new Set(pollKeys)];
 
@@ -152,15 +158,21 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
                 }
             }
 
-            if (candidates.length > polls.length) {
-                polls = candidates;
-                pollSource = key === sessionUUID ? 'uuid'
-                    : key === sessionCode ? 'session_code'
-                    : 'join_code';
+            const keyLabel = key === sessionUUID ? 'uuid'
+                : key === sessionCode ? 'session_code' : 'join_code';
+            pollSourceLog.push(`${keyLabel}:${candidates.length}`);
+
+            for (const p of candidates) {
+                if (p.id && !pollMap.has(p.id)) {
+                    pollMap.set(p.id, p);
+                }
             }
         }
 
-        console.log(`[Export] polls: ${polls.length} 筆 (source: ${pollSource})`);
+        const polls = [...pollMap.values()]
+            .sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
+
+        console.log(`[Export] polls: ${polls.length} 筆 (${pollSourceLog.join(', ')})`);
 
         // 4. 作業定義
         const { data: assignRaw } = await db.select('session_assignments', {

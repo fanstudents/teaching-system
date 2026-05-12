@@ -113,41 +113,39 @@ export class Showcase {
                 ]);
             };
 
-            // ★ 查詢提交（含 session_id 優先 + fallback）
+            // ★ 查詢提交 — 多 key 遞迴（UUID → sessionCode → joinCode）
+            //   避免只用 title 撈到所有場次的資料
             let data = null;
             let error = null;
 
-            // 第一輪：帶 session_id 嚴格查詢
             if (this.sessionCode) {
-                const qid = window._activeSessionUUID || this.sessionCode;
-                try {
-                    const r = await fetchWithTimeout('submissions', {
-                        filter: {
-                            assignment_title: `eq.${assignmentTitle}`,
-                            session_id: `eq.${qid}`
-                        },
-                        order: 'submitted_at.asc'
-                    });
-                    data = r.data;
-                    error = r.error;
-                } catch (e) {
-                    console.warn('[Showcase] strict query failed:', e);
+                // 建立查詢 key 清單：UUID 優先、sessionCode 次之、joinCode 最後
+                const uuid = window._activeSessionUUID || '';
+                const keys = [uuid, this.sessionCode].filter(Boolean);
+                const uniqueKeys = [...new Set(keys)];
+
+                for (const qid of uniqueKeys) {
+                    try {
+                        const r = await fetchWithTimeout('submissions', {
+                            filter: {
+                                assignment_title: `eq.${assignmentTitle}`,
+                                session_id: `eq.${qid}`
+                            },
+                            order: 'submitted_at.asc'
+                        });
+                        if (r.data && r.data.length > 0) {
+                            data = r.data;
+                            error = r.error;
+                            break; // 找到就停
+                        }
+                    } catch (e) {
+                        console.warn(`[Showcase] query with key ${qid.substring(0,8)} failed:`, e);
+                    }
                 }
             }
 
-            // 第二輪：如果無結果，退回只用 assignment_title
-            if (!data || data.length === 0) {
-                try {
-                    const r = await fetchWithTimeout('submissions', {
-                        filter: { assignment_title: `eq.${assignmentTitle}` },
-                        order: 'submitted_at.asc'
-                    });
-                    data = r.data;
-                    error = r.error;
-                } catch (e) {
-                    console.warn('[Showcase] loose query failed:', e);
-                }
-            }
+            // ★ 無結果也不做 title-only fallback（防止跨場次混入）
+            if (!data) { data = []; }
 
             console.log('[Showcase] result for', assignmentTitle, ':', data?.length, 'rows');
             if (error || !data) {
