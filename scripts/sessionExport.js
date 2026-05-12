@@ -32,6 +32,31 @@ function fmtTime(t) {
     return new Date(t).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
 }
 
+/**
+ * 計算場次日期的時間範圍（前後各 1 天），用於 fallback 過濾
+ */
+function getSessionDateRange(sess) {
+    if (!sess.date) return null;
+    try {
+        const d = new Date(sess.date + 'T00:00:00+08:00');
+        if (isNaN(d.getTime())) return null;
+        const start = new Date(d.getTime() - 24 * 60 * 60 * 1000);
+        const end = new Date(d.getTime() + 2 * 24 * 60 * 60 * 1000); // +2 天涵蓋當天晚場
+        return { start, end };
+    } catch { return null; }
+}
+
+/**
+ * 依時間範圍過濾 submissions（用 submitted_at）
+ */
+function filterByDateRange(records, range, timeField = 'submitted_at') {
+    if (!range) return records;
+    return records.filter(r => {
+        const t = r[timeField] ? new Date(r[timeField]) : null;
+        return t && t >= range.start && t < range.end;
+    });
+}
+
 // ── 主匯出函數 ──
 export async function exportSession(sessionId, projectName, sessionMeta) {
     const btn = document.querySelector(`[data-export-sid="${sessionId}"]`);
@@ -57,6 +82,9 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
             } catch { /* ok */ }
         }
 
+        // ★ 計算場次日期範圍（用於 fallback 過濾，避免混入其他場次）
+        const dateRange = getSessionDateRange(sess);
+
         // 1. 學員名冊（students 用 session_code 存）
         const { data: studentsRaw } = await db.select('students', {
             filter: { session_code: `eq.${sessionCode}` },
@@ -66,6 +94,7 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         const studentEmails = new Set(students.map(s => s.email).filter(Boolean));
 
         // 2. 作答紀錄 (submissions) — 多層 fallback
+        let submissionSource = 'uuid';
         const { data: subsRaw } = await db.select('submissions', {
             filter: { session_id: `eq.${sessionUUID}` },
             order: 'submitted_at.asc'
@@ -73,60 +102,73 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         let submissions = subsRaw || [];
 
         // fallback 1: 用 session_code 查
-        if (submissions.length < students.length && sessionCode) {
+        if (submissions.length < students.length && sessionCode && sessionCode !== sessionUUID) {
             const { data: subsFallback } = await db.select('submissions', {
                 filter: { session_id: `eq.${sessionCode}` },
                 order: 'submitted_at.asc'
             });
             if ((subsFallback || []).length > submissions.length) {
                 submissions = subsFallback;
+                submissionSource = 'session_code';
             }
         }
 
-        // fallback 2: 用專案 join_code 查 + 用學員 email 交叉比對
-        if (submissions.length < students.length && joinCode && joinCode !== sessionCode) {
+        // fallback 2: 用專案 join_code 查 + 學員 email 交叉比對 + 日期範圍過濾
+        if (submissions.length < students.length && joinCode && joinCode !== sessionCode && joinCode !== sessionUUID) {
             const { data: subsByJoinCode } = await db.select('submissions', {
                 filter: { session_id: `eq.${joinCode}` },
                 order: 'submitted_at.asc',
                 limit: 5000
             });
             if (subsByJoinCode && subsByJoinCode.length > 0) {
-                // 用學員 email 過濾，只保留此場次的學員
-                const filtered = studentEmails.size > 0
-                    ? subsByJoinCode.filter(s => studentEmails.has(s.student_email))
-                    : subsByJoinCode;
+                // ★ 先用日期範圍過濾，再用學員 email 過濾
+                let filtered = filterByDateRange(subsByJoinCode, dateRange, 'submitted_at');
+                if (studentEmails.size > 0) {
+                    filtered = filtered.filter(s => studentEmails.has(s.student_email));
+                }
                 if (filtered.length > submissions.length) {
                     submissions = filtered;
+                    submissionSource = 'join_code+date_filter';
                 }
             }
         }
 
+        console.log(`[Export] submissions: ${submissions.length} 筆 (source: ${submissionSource})`);
+
         // 3. 投票紀錄 (poll_votes) — 多層 fallback
         let polls = [];
+        let pollSource = 'session_code';
         const { data: pollsRaw } = await db.select('poll_votes', {
             filter: { session_code: `eq.${sessionCode}` },
             order: 'created_at.asc'
         });
         polls = pollsRaw || [];
-        if (polls.length === 0 && sessionUUID) {
+        if (polls.length === 0 && sessionUUID && sessionUUID !== sessionCode) {
             const { data: pollsFallback } = await db.select('poll_votes', {
                 filter: { session_code: `eq.${sessionUUID}` },
                 order: 'created_at.asc'
             });
             polls = pollsFallback || [];
+            if (polls.length > 0) pollSource = 'uuid';
         }
-        // fallback: 用 join_code + 學員 email
-        if (polls.length === 0 && joinCode) {
+        // fallback: 用 join_code + 學員 email + 日期範圍
+        if (polls.length === 0 && joinCode && joinCode !== sessionCode && joinCode !== sessionUUID) {
             const { data: pollsByJC } = await db.select('poll_votes', {
                 filter: { session_code: `eq.${joinCode}` },
                 order: 'created_at.asc'
             });
-            if (pollsByJC && pollsByJC.length > 0 && studentEmails.size > 0) {
-                polls = pollsByJC.filter(p => studentEmails.has(p.student_email));
-            } else {
-                polls = pollsByJC || [];
+            if (pollsByJC && pollsByJC.length > 0) {
+                // ★ 先日期過濾，再 email 過濾
+                let filtered = filterByDateRange(pollsByJC, dateRange, 'created_at');
+                if (studentEmails.size > 0) {
+                    filtered = filtered.filter(p => studentEmails.has(p.student_email));
+                }
+                polls = filtered;
+                pollSource = 'join_code+date_filter';
             }
         }
+
+        console.log(`[Export] polls: ${polls.length} 筆 (source: ${pollSource})`);
 
         // 4. 作業定義
         const { data: assignRaw } = await db.select('session_assignments', {
