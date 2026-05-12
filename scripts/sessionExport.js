@@ -94,77 +94,69 @@ export async function exportSession(sessionId, projectName, sessionMeta) {
         const studentEmails = new Set(students.map(s => s.email).filter(Boolean));
 
         // 2. 作答紀錄 (submissions) — 多層 fallback
+        //    stateManager.save() 存的 session_id 可能是：UUID、session_code、或 join_code
+        //    需要依序嘗試所有可能的 key，且對非精確 key 做日期+email 過濾
         let submissionSource = 'uuid';
-        const { data: subsRaw } = await db.select('submissions', {
-            filter: { session_id: `eq.${sessionUUID}` },
-            order: 'submitted_at.asc'
-        });
-        let submissions = subsRaw || [];
+        const submissionKeys = [sessionUUID, sessionCode, joinCode].filter(Boolean);
+        // 去重 + 保持順序
+        const uniqueSubKeys = [...new Set(submissionKeys)];
 
-        // fallback 1: 用 session_code 查
-        if (submissions.length < students.length && sessionCode && sessionCode !== sessionUUID) {
-            const { data: subsFallback } = await db.select('submissions', {
-                filter: { session_id: `eq.${sessionCode}` },
-                order: 'submitted_at.asc'
-            });
-            if ((subsFallback || []).length > submissions.length) {
-                submissions = subsFallback;
-                submissionSource = 'session_code';
-            }
-        }
-
-        // fallback 2: 用專案 join_code 查 + 學員 email 交叉比對 + 日期範圍過濾
-        if (submissions.length < students.length && joinCode && joinCode !== sessionCode && joinCode !== sessionUUID) {
-            const { data: subsByJoinCode } = await db.select('submissions', {
-                filter: { session_id: `eq.${joinCode}` },
+        let submissions = [];
+        for (const key of uniqueSubKeys) {
+            const { data: subRows } = await db.select('submissions', {
+                filter: { session_id: `eq.${key}` },
                 order: 'submitted_at.asc',
                 limit: 5000
             });
-            if (subsByJoinCode && subsByJoinCode.length > 0) {
-                // ★ 先用日期範圍過濾，再用學員 email 過濾
-                let filtered = filterByDateRange(subsByJoinCode, dateRange, 'submitted_at');
+            let candidates = subRows || [];
+
+            // 非 UUID key（session_code 或 join_code）可能跨場次，需過濾
+            if (key !== sessionUUID && candidates.length > 0) {
+                candidates = filterByDateRange(candidates, dateRange, 'submitted_at');
                 if (studentEmails.size > 0) {
-                    filtered = filtered.filter(s => studentEmails.has(s.student_email));
+                    candidates = candidates.filter(s => studentEmails.has(s.student_email));
                 }
-                if (filtered.length > submissions.length) {
-                    submissions = filtered;
-                    submissionSource = 'join_code+date_filter';
-                }
+            }
+
+            if (candidates.length > submissions.length) {
+                submissions = candidates;
+                submissionSource = key === sessionUUID ? 'uuid'
+                    : key === sessionCode ? 'session_code'
+                    : 'join_code';
             }
         }
 
-        console.log(`[Export] submissions: ${submissions.length} 筆 (source: ${submissionSource})`);
+        console.log(`[Export] submissions: ${submissions.length} 筆 (source: ${submissionSource}, key used)`);
 
         // 3. 投票紀錄 (poll_votes) — 多層 fallback
+        //    poll.js 存的 session_code 實際上是 stateManager.getSessionCode()，
+        //    當有 override 時存的是 UUID，所以要用 UUID 優先查
         let polls = [];
-        let pollSource = 'session_code';
-        const { data: pollsRaw } = await db.select('poll_votes', {
-            filter: { session_code: `eq.${sessionCode}` },
-            order: 'created_at.asc'
-        });
-        polls = pollsRaw || [];
-        if (polls.length === 0 && sessionUUID && sessionUUID !== sessionCode) {
-            const { data: pollsFallback } = await db.select('poll_votes', {
-                filter: { session_code: `eq.${sessionUUID}` },
-                order: 'created_at.asc'
+        let pollSource = 'none';
+        const pollKeys = [sessionUUID, sessionCode, joinCode].filter(Boolean);
+        const uniquePollKeys = [...new Set(pollKeys)];
+
+        for (const key of uniquePollKeys) {
+            const { data: pollRows } = await db.select('poll_votes', {
+                filter: { session_code: `eq.${key}` },
+                order: 'created_at.asc',
+                limit: 5000
             });
-            polls = pollsFallback || [];
-            if (polls.length > 0) pollSource = 'uuid';
-        }
-        // fallback: 用 join_code + 學員 email + 日期範圍
-        if (polls.length === 0 && joinCode && joinCode !== sessionCode && joinCode !== sessionUUID) {
-            const { data: pollsByJC } = await db.select('poll_votes', {
-                filter: { session_code: `eq.${joinCode}` },
-                order: 'created_at.asc'
-            });
-            if (pollsByJC && pollsByJC.length > 0) {
-                // ★ 先日期過濾，再 email 過濾
-                let filtered = filterByDateRange(pollsByJC, dateRange, 'created_at');
+            let candidates = pollRows || [];
+
+            // 非 UUID key 做日期+email 過濾
+            if (key !== sessionUUID && candidates.length > 0) {
+                candidates = filterByDateRange(candidates, dateRange, 'created_at');
                 if (studentEmails.size > 0) {
-                    filtered = filtered.filter(p => studentEmails.has(p.student_email));
+                    candidates = candidates.filter(p => studentEmails.has(p.student_email));
                 }
-                polls = filtered;
-                pollSource = 'join_code+date_filter';
+            }
+
+            if (candidates.length > polls.length) {
+                polls = candidates;
+                pollSource = key === sessionUUID ? 'uuid'
+                    : key === sessionCode ? 'session_code'
+                    : 'join_code';
             }
         }
 

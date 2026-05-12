@@ -777,9 +777,10 @@
                         } catch { /* non-critical */ }
                     }
 
-                    // 設定 session override
+                    // 設定 session override + 全域變數
                     if (sessionUUID) {
                         stateManager.setSessionOverride(sessionUUID);
+                        window._activeSessionUUID = sessionUUID;
                         console.log('[Join] session override set to:', sessionUUID);
                     }
 
@@ -1191,6 +1192,7 @@
                             try {
                                 const { stateManager } = await import('./scripts/interactive/stateManager.js');
                                 stateManager.setSessionOverride(_projectSession.id);
+                                window._activeSessionUUID = _projectSession.id;
                                 console.log('[Student] session override set to:', _projectSession.id);
                             } catch (e) { console.warn('[Student] setSessionOverride failed:', e); }
                         }
