@@ -772,7 +772,9 @@
                             });
                             if (psRows && psRows.length > 0) {
                                 const todayS = psRows.find(s => s.date === today);
-                                sessionUUID = todayS?.id || psRows.find(s => s.date >= today)?.id || psRows[psRows.length - 1]?.id || '';
+                                // ★ 只匹配今天或未來場次，不 fallback 到過去場次
+                                //   （避免過期後的訪客汙染歷史場次資料）
+                                sessionUUID = todayS?.id || psRows.find(s => s.date >= today)?.id || '';
                             }
                         } catch { /* non-critical */ }
                     }
@@ -1173,9 +1175,10 @@
                                 order: 'date.asc'
                             });
                             if (allSess?.length > 0) {
+                                // ★ 只匹配今天或未來場次，不 fallback 到過去場次
                                 _projectSession = allSess.find(s => s.date === today)
                                     || allSess.find(s => s.date >= today)
-                                    || allSess[allSess.length - 1];
+                                    || null;  // 不 fallback 到 allSess[last]
                             }
                         }
 
