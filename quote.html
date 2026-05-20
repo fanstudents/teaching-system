@@ -208,6 +208,14 @@
                             <td colspan="3" class="q-total-label">合計（未稅）</td>
                             <td class="q-total-amount" id="totalAmount">$0</td>
                         </tr>
+                        <tr class="q-total-row q-tax-row">
+                            <td colspan="3" class="q-total-label" style="font-weight:500;color:var(--q-text-2)">營業稅 5%</td>
+                            <td class="q-total-amount" id="taxAmount" style="font-size:1rem;color:var(--q-text-2)">$0</td>
+                        </tr>
+                        <tr class="q-total-row q-grand-total-row" style="border-top:2px solid var(--q-border)">
+                            <td colspan="3" class="q-total-label" style="font-size:1.1rem;font-weight:800">總計（含稅）</td>
+                            <td class="q-total-amount" id="grandTotalAmount" style="font-size:1.25rem;font-weight:800;color:var(--q-accent)">$0</td>
+                        </tr>
                     </tfoot>
                 </table>
             </div>
@@ -698,17 +706,24 @@ window.switchVariant = function(idx) {
         });
         // Discount
         const discountTotal = variant.discount_total || 0;
+        let vFinalUntaxed = 0;
         if (discountTotal > 0 && discountTotal < calcTotal) {
             document.getElementById('subtotalRow').style.display = '';
             document.getElementById('subtotalAmount').textContent = fmt(calcTotal);
             document.getElementById('discountRow').style.display = '';
             document.getElementById('discountAmount').textContent = '-' + fmt(calcTotal - discountTotal);
             document.getElementById('totalAmount').textContent = fmt(discountTotal);
+            vFinalUntaxed = discountTotal;
         } else {
             document.getElementById('subtotalRow').style.display = 'none';
             document.getElementById('discountRow').style.display = 'none';
-            document.getElementById('totalAmount').textContent = fmt(variant.total || calcTotal);
+            vFinalUntaxed = variant.total || calcTotal;
+            document.getElementById('totalAmount').textContent = fmt(vFinalUntaxed);
         }
+        // Tax
+        const vTax = Math.round(vFinalUntaxed * 0.05);
+        document.getElementById('taxAmount').textContent = fmt(vTax);
+        document.getElementById('grandTotalAmount').textContent = fmt(vFinalUntaxed + vTax);
     }
 
     // Reset all optional sections first
@@ -1099,17 +1114,25 @@ function renderQuote(q) {
 
     // Discount support
     const discountTotal = q.discount_total || q.variants?.[0]?.discount_total || 0;
+    let finalUntaxed = 0;
     if (discountTotal > 0 && discountTotal < calcTotal) {
         document.getElementById('subtotalRow').style.display = '';
         document.getElementById('subtotalAmount').textContent = fmt(calcTotal);
         document.getElementById('discountRow').style.display = '';
         document.getElementById('discountAmount').textContent = '-' + fmt(calcTotal - discountTotal);
         document.getElementById('totalAmount').textContent = fmt(discountTotal);
+        finalUntaxed = discountTotal;
     } else {
         document.getElementById('subtotalRow').style.display = 'none';
         document.getElementById('discountRow').style.display = 'none';
-        document.getElementById('totalAmount').textContent = fmt(q.total_amount || calcTotal);
+        finalUntaxed = q.total_amount || calcTotal;
+        document.getElementById('totalAmount').textContent = fmt(finalUntaxed);
     }
+
+    // Tax calculation (5%)
+    const tax = Math.round(finalUntaxed * 0.05);
+    document.getElementById('taxAmount').textContent = fmt(tax);
+    document.getElementById('grandTotalAmount').textContent = fmt(finalUntaxed + tax);
 
     if (q.notes) { document.getElementById('notesSection').style.display = 'block'; document.getElementById('notesContent').textContent = q.notes; }
 
