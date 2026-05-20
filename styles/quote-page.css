@@ -607,7 +607,7 @@ body {
 .q-footer a { color: var(--q-text-2); text-decoration: none; }
 
 /* ── Print ── */
-@page { margin: 30mm 20mm 32mm 20mm; }
+@page { margin: 38mm 20mm 32mm 20mm; }
 @media print {
     body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     .q-topbar, .q-btn, .q-cta, .q-cta-buttons, .timeline-comment-btn, .q-comment-popover,
