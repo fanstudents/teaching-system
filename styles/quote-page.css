@@ -617,7 +617,10 @@ body {
     .q-container { padding: 8px 0 !important; max-width: 100% !important; }
     .q-page { display: block !important; padding-bottom: 8mm !important; }
     .q-section { border: 1px solid #ddd !important; margin-bottom: 14px !important; padding: 28px 32px !important; }
-    .q-section.print-page-break { break-before: page !important; page-break-before: always !important; }
+    .q-section.print-page-break {
+        break-before: page !important; page-break-before: always !important;
+        margin-top: 40px !important; /* built-in top spacing Chrome can't strip */
+    }
     .timeline-row.print-page-break,
     .timeline-day-header.print-page-break { break-before: page !important; page-break-before: always !important; }
     .q-footer { display: none !important; }
@@ -642,6 +645,7 @@ body {
     }
     .timeline-day-col + .timeline-day-col {
         break-before: page !important; page-break-before: always !important;
+        padding-top: 36px !important; /* top breathing room after page break */
     }
     .timeline-day-header {
         break-inside: avoid; page-break-inside: avoid;
