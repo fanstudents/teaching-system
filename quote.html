@@ -1732,8 +1732,8 @@ window.executePrint = function() {
     }
 
     // ── Dynamic page break insertion ──
-    // A4 at 96dpi ≈ 1123px height, minus @page margins (20mm top + 28mm bottom ≈ 182px) ≈ 941px usable
-    const PAGE_HEIGHT = 880; // conservative estimate with extra breathing room
+    // A4 at 96dpi ≈ 1123px height, minus @page margins (24mm top + 32mm bottom ≈ 213px) ≈ 910px usable
+    const PAGE_HEIGHT = 840; // conservative — leaves breathing room
     const LARGE_THRESHOLD = 0.55;
 
     // Gather all visible .q-section elements in DOM order
