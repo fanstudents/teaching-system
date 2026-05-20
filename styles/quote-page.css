@@ -617,6 +617,9 @@ body {
     .q-container { padding: 8px 2px !important; max-width: 100% !important; }
     .q-page { display: block !important; padding-bottom: 8mm !important; }
     .q-section { border: 1px solid #ddd !important; margin-bottom: 14px !important; padding: 24px 28px !important; }
+    .q-section.print-page-break { break-before: page !important; page-break-before: always !important; }
+    .timeline-row.print-page-break,
+    .timeline-day-header.print-page-break { break-before: page !important; page-break-before: always !important; }
     .q-footer { display: none !important; }
 
     /* ── Section headers: keep with following content ── */

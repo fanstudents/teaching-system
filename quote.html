@@ -1731,8 +1731,73 @@ window.executePrint = function() {
         compSection.classList.remove('print-include');
     }
 
+    // ── Dynamic page break insertion ──
+    // A4 at 96dpi ≈ 1123px height, minus @page margins (16mm top + 25mm bottom ≈ 155px) ≈ 968px usable
+    const PAGE_HEIGHT = 920; // conservative estimate
+    const LARGE_THRESHOLD = 0.55; // sections taking >55% of page get their own page
+
+    // Gather all visible .q-section elements in DOM order
+    const allSections = Array.from(document.querySelectorAll('.q-container .q-section'))
+        .filter(s => {
+            // Check section and its parent are visible
+            let el = s;
+            while (el && el !== document.body) {
+                if (el.style.display === 'none') return false;
+                el = el.parentElement;
+            }
+            return true;
+        });
+
+    // Clean previous markers
+    allSections.forEach(s => s.classList.remove('print-page-break'));
+    document.querySelectorAll('.timeline-row.print-page-break, .timeline-day-header.print-page-break').forEach(el => el.classList.remove('print-page-break'));
+
+    // Measure and assign breaks between sections
+    let accHeight = 0;
+    allSections.forEach((section, i) => {
+        const h = section.offsetHeight;
+
+        if (i === 0) {
+            accHeight = h;
+            return;
+        }
+
+        const isLarge = h > PAGE_HEIGHT * LARGE_THRESHOLD;
+
+        if (accHeight + h > PAGE_HEIGHT || isLarge) {
+            section.classList.add('print-page-break');
+            accHeight = h;
+        } else {
+            accHeight += h;
+        }
+    });
+
+    // ── Also paginate within the outline timeline ──
+    const outlineTimeline = document.getElementById('outlineTimeline');
+    if (outlineTimeline) {
+        const rows = Array.from(outlineTimeline.querySelectorAll('.timeline-row, .timeline-day-header'));
+        let tlAcc = 120; // account for the section header (~120px)
+        rows.forEach((row, i) => {
+            if (i === 0) { tlAcc += row.offsetHeight; return; }
+            const rh = row.offsetHeight;
+            if (tlAcc + rh > PAGE_HEIGHT) {
+                row.classList.add('print-page-break');
+                tlAcc = rh;
+            } else {
+                tlAcc += rh;
+            }
+        });
+    }
+
     closePrintOptions();
-    setTimeout(() => window.print(), 200);
+    setTimeout(() => {
+        window.print();
+        // Clean up after print dialog closes
+        setTimeout(() => {
+            allSections.forEach(s => s.classList.remove('print-page-break'));
+            document.querySelectorAll('.timeline-row.print-page-break, .timeline-day-header.print-page-break').forEach(el => el.classList.remove('print-page-break'));
+        }, 500);
+    }, 200);
 };
 
 function buildPrintComparison() {
