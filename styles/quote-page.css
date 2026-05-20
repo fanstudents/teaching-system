@@ -531,6 +531,17 @@ body {
    ═══════════════════════════════════ */
 .q-about-content { padding: 24px 0; }
 
+.q-about-intro {
+    margin-bottom: 28px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--q-border);
+}
+.q-about-intro p {
+    font-size: .95rem; color: var(--q-text-2); line-height: 1.85;
+    margin-bottom: 10px;
+}
+.q-about-intro p:last-child { margin-bottom: 0; }
+.q-about-intro strong { color: var(--q-text); font-weight: 700; }
+
 .q-about-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 32px; border: 1px solid var(--q-border); border-radius: var(--q-radius); overflow: hidden; }
 .q-about-stat { text-align: center; padding: 28px 12px; border-right: 1px solid var(--q-border); }
 .q-about-stat:last-child { border-right: none; }
@@ -604,7 +615,18 @@ body {
     .q-print-modal-overlay, .q-print-modal, #topbar, .q-header { display: none !important; }
     .q-container { padding: 0 !important; max-width: 100% !important; }
     .q-page { display: block !important; }
-    .q-section { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ddd !important; margin-bottom: 16px !important; }
+    .q-section { border: 1px solid #ddd !important; margin-bottom: 16px !important; }
+    /* Allow sections to break across pages, but keep atomic items together */
+    .q-section-header { break-inside: avoid; page-break-inside: avoid; break-after: avoid; page-break-after: avoid; }
+    .timeline-row { break-inside: avoid; page-break-inside: avoid; }
+    .timeline-day-header { break-inside: avoid; page-break-inside: avoid; break-after: avoid; page-break-after: avoid; }
+    .timeline-day-col .timeline-row { break-inside: avoid; page-break-inside: avoid; }
+    .q-tool-card { break-inside: avoid; page-break-inside: avoid; }
+    .q-equip-item { break-inside: avoid; page-break-inside: avoid; }
+    .q-instructor-card { break-inside: avoid; page-break-inside: avoid; }
+    .q-payment-card { break-inside: avoid; page-break-inside: avoid; }
+    .q-about-founder { break-inside: avoid; page-break-inside: avoid; }
+    .q-total-row { break-inside: avoid; page-break-inside: avoid; }
     .q-header { break-after: auto; }
     .q-footer { display: none !important; }
 
