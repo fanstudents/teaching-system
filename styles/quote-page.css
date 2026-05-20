@@ -729,8 +729,11 @@ body {
     /* ── Print footer on every page ── */
     .q-print-page-footer {
         display: flex !important; justify-content: space-between;
-        position: fixed; bottom: -26mm; left: -20mm; right: -20mm;
-        padding: 6px 20mm;
+        position: fixed;
+        bottom: 5mm;     /* 5mm from physical page bottom edge */
+        left: 20mm;      /* align with content area */
+        right: 20mm;
+        padding: 6px 0;
         font-size: .68rem; color: #aaa;
         border-top: 1px solid #e8e8e8;
     }
