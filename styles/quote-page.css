@@ -617,21 +617,92 @@ body {
     .q-container { padding: 8px 4px !important; max-width: 100% !important; }
     .q-page { display: block !important; }
     .q-section { border: 1px solid #ddd !important; margin-bottom: 14px !important; padding: 24px 28px !important; }
-    /* Allow sections to break across pages, but keep atomic items together */
-    .q-section-header { break-inside: avoid; page-break-inside: avoid; break-after: avoid; page-break-after: avoid; }
-    .timeline-row { break-inside: avoid; page-break-inside: avoid; }
-    .timeline-day-header { break-inside: avoid; page-break-inside: avoid; break-after: avoid; page-break-after: avoid; }
-    .timeline-day-col .timeline-row { break-inside: avoid; page-break-inside: avoid; }
-    .q-tool-card { break-inside: avoid; page-break-inside: avoid; }
-    .q-equip-item { break-inside: avoid; page-break-inside: avoid; }
-    .q-instructor-card { break-inside: avoid; page-break-inside: avoid; }
-    .q-payment-card { break-inside: avoid; page-break-inside: avoid; }
-    .q-about-founder { break-inside: avoid; page-break-inside: avoid; }
-    .q-total-row { break-inside: avoid; page-break-inside: avoid; }
-    .q-header { break-after: auto; }
     .q-footer { display: none !important; }
 
-    /* Cover page — print only (light design to save ink) */
+    /* ── Section headers: keep with following content ── */
+    .q-section-header {
+        break-inside: avoid; page-break-inside: avoid;
+        break-after: avoid; page-break-after: avoid;
+    }
+
+    /* ── Timeline: linearize multi-day grid to single column ── */
+    .timeline-grid,
+    .timeline-grid-2,
+    .timeline-grid-3,
+    .timeline-grid-4 {
+        display: block !important;
+        grid-template-columns: none !important;
+    }
+    .timeline-day-col {
+        break-inside: auto;
+        margin-bottom: 16px;
+    }
+    .timeline-day-header {
+        break-inside: avoid; page-break-inside: avoid;
+        break-after: avoid; page-break-after: avoid;
+        margin-top: 20px;
+    }
+    .timeline-day-col:first-child .timeline-day-header {
+        margin-top: 0;
+    }
+    .timeline-row {
+        break-inside: avoid; page-break-inside: avoid;
+    }
+    .timeline-day-col .timeline-row {
+        break-inside: avoid; page-break-inside: avoid;
+    }
+
+    /* ── Outcomes grid: single column ── */
+    #outcomesContent > div {
+        display: block !important;
+        grid-template-columns: none !important;
+    }
+    #outcomesContent > div > div {
+        break-inside: avoid; page-break-inside: avoid;
+        margin-bottom: 10px;
+    }
+
+    /* ── Tool grid: max 3 columns, each card unbreakable ── */
+    .q-tool-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+    .q-tool-card { break-inside: avoid; page-break-inside: avoid; }
+
+    /* ── Equipment grid: single column ── */
+    .q-equip-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .q-equip-item { break-inside: avoid; page-break-inside: avoid; }
+
+    /* ── Pricing: each card unbreakable ── */
+    .q-pricing-card { opacity: 1 !important; filter: none !important; transform: none !important; break-inside: avoid; page-break-inside: avoid; }
+    .q-pricing-card.dimmed { opacity: 1 !important; filter: none !important; transform: none !important; }
+    .q-total-row { break-inside: avoid; page-break-inside: avoid; }
+    .q-table-wrap { break-inside: auto; }
+
+    /* ── Payment section ── */
+    .q-payment-grid { display: block !important; }
+    .q-payment-card {
+        break-inside: avoid; page-break-inside: avoid;
+        padding-left: 0 !important; padding-right: 0 !important;
+    }
+    .q-payment-note { break-inside: avoid; page-break-inside: avoid; }
+
+    /* ── Instructor ── */
+    .q-instructor-card { break-inside: avoid; page-break-inside: avoid; }
+    .q-instructor-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .q-instructor-gallery-img { break-inside: avoid; }
+
+    /* ── About section ── */
+    .q-about-intro { break-inside: avoid; page-break-inside: avoid; }
+    .q-about-stats { break-inside: avoid; page-break-inside: avoid; }
+    .q-about-founder { break-inside: avoid; page-break-inside: avoid; }
+    .q-about-team-desc { break-inside: avoid; page-break-inside: avoid; }
+
+    /* ── Notes section ── */
+    .q-notes { break-inside: auto; orphans: 3; widows: 3; }
+
+    /* ── Cover page — print only ── */
     .q-print-cover {
         display: flex !important; flex-direction: column; align-items: center; justify-content: center;
         min-height: 100vh; text-align: center;
@@ -649,7 +720,7 @@ body {
     .q-print-cover-url { font-size: .9rem; color: #888 !important; }
     .q-print-cover-time { font-size: .78rem; color: #aaa !important; margin-top: 20px; }
 
-    /* Print footer on every page */
+    /* ── Print footer on every page ── */
     .q-print-page-footer {
         display: flex !important; justify-content: space-between;
         position: fixed; bottom: -12mm; left: -12mm; right: -12mm;
@@ -658,17 +729,13 @@ body {
         border-top: 1px solid #e8e8e8;
     }
 
-    /* Comparison section — print only when enabled */
+    /* ── Comparison section — print only when enabled ── */
     .q-print-comparison { display: none !important; }
     .q-print-comparison.print-include {
         display: block !important;
         page-break-before: always; break-before: page;
     }
     .q-print-comparison .q-section { break-inside: auto; }
-
-    /* Pricing cards in print: show all, no dimming */
-    .q-pricing-card { opacity: 1 !important; filter: none !important; transform: none !important; break-inside: avoid; }
-    .q-pricing-card.dimmed { opacity: 1 !important; filter: none !important; transform: none !important; }
 }
 
 /* ── Mobile — App-like experience ── */
