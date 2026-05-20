@@ -607,15 +607,16 @@ body {
 .q-footer a { color: var(--q-text-2); text-decoration: none; }
 
 /* ── Print ── */
+@page { margin: 15mm 12mm 18mm 12mm; }
 @media print {
     body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     .q-topbar, .q-btn, .q-cta, .q-cta-buttons, .timeline-comment-btn, .q-comment-popover,
     .suggest-topic-area, .q-confirm-section, .q-expiry-banner, .q-esign-overlay, .q-esign-modal,
     .q-variant-tabs, .q-invoice-section, .bottom-sheet, .bottom-sheet-overlay,
     .q-print-modal-overlay, .q-print-modal, #topbar, .q-header { display: none !important; }
-    .q-container { padding: 0 !important; max-width: 100% !important; }
+    .q-container { padding: 8px 4px !important; max-width: 100% !important; }
     .q-page { display: block !important; }
-    .q-section { border: 1px solid #ddd !important; margin-bottom: 16px !important; }
+    .q-section { border: 1px solid #ddd !important; margin-bottom: 14px !important; padding: 24px 28px !important; }
     /* Allow sections to break across pages, but keep atomic items together */
     .q-section-header { break-inside: avoid; page-break-inside: avoid; break-after: avoid; page-break-after: avoid; }
     .timeline-row { break-inside: avoid; page-break-inside: avoid; }
@@ -650,12 +651,11 @@ body {
 
     /* Print footer on every page */
     .q-print-page-footer {
-        display: block !important;
-        position: fixed; bottom: 0; left: 0; right: 0;
-        padding: 8px 24px;
-        font-size: .7rem; color: #999;
-        border-top: 1px solid #e8e8e8;
         display: flex !important; justify-content: space-between;
+        position: fixed; bottom: -12mm; left: -12mm; right: -12mm;
+        padding: 6px 12mm;
+        font-size: .68rem; color: #aaa;
+        border-top: 1px solid #e8e8e8;
     }
 
     /* Comparison section — print only when enabled */
