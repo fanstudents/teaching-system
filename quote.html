@@ -1019,7 +1019,9 @@ function renderQuote(q) {
     document.getElementById('quoteTitle').textContent = q.title || '課程報價';
 
     if (q.client_name) {
-        document.getElementById('clientNameDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">business</span> ${q.client_name}`;
+        const el = document.getElementById('clientNameDisplay');
+        el.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">business</span> ${q.client_name}`;
+        el.dataset.clientName = q.client_name;
     }
     if (q.client_logo) {
         const logo = document.getElementById('clientLogo');
@@ -1674,7 +1676,7 @@ window.submitEsign = async function() {
     try {
         // Get quote title for notification
         const quoteTitle = document.getElementById('quoteTitle')?.textContent || '課程報價';
-        const clientName = document.getElementById('clientNameDisplay')?.textContent || '';
+        const clientName = document.getElementById('clientNameDisplay')?.dataset?.clientName || '';
         const quoteSlug = new URLSearchParams(location.search).get('slug') || '';
 
         // Send notification to service@tbr.digital
@@ -1727,7 +1729,7 @@ window.executePrint = function() {
 
     // Populate cover page info
     const title = document.getElementById('quoteTitle')?.textContent || '課程報價';
-    const client = document.getElementById('clientNameDisplay')?.textContent || '';
+    const client = document.getElementById('clientNameDisplay')?.dataset?.clientName || '';
     document.getElementById('printCoverTitle').textContent = title;
     document.getElementById('printCoverClient').textContent = client;
     const now = new Date();
