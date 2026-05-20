@@ -1469,17 +1469,30 @@ function renderOutlineData(outline) {
     if (outline.timeline && outline.timeline.length > 0) {
         const container = document.getElementById('outlineTimeline');
         const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
+
+        // Build schedule topic lookup: { dayNum: topic }
+        const schedTopics = {};
+        if (outline.schedule) {
+            outline.schedule.forEach(s => {
+                if (s.topic) schedTopics[s.day || 1] = s.topic;
+            });
+        }
+
         if (hasDays) {
             const days = {};
             outline.timeline.forEach(b => {
                 const d = b.day || 1;
-                if (!days[d]) days[d] = { label: b.dayLabel || `Day ${d}`, info: b.dayInfo || '', blocks: [] };
+                if (!days[d]) {
+                    const topic = schedTopics[d] || '';
+                    const baseLabel = b.dayLabel || `Day ${d}`;
+                    const label = topic ? `${baseLabel} — ${topic}` : baseLabel;
+                    days[d] = { label, info: b.dayInfo || '', blocks: [] };
+                }
                 days[d].blocks.push(b);
             });
             const dayKeys = Object.keys(days);
             if (dayKeys.length === 1) {
                 const d = days[dayKeys[0]];
-                // 只有一天時不顯示 Day 標籤
                 container.innerHTML = d.blocks.map(block => renderTimelineBlock(block, false)).join('');
             } else {
                 const cols = dayKeys.length;
