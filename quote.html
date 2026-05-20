@@ -1485,7 +1485,12 @@ function renderOutlineData(outline) {
             outline.timeline.forEach(b => {
                 const d = b.day || 1;
                 if (!days[d]) {
-                    const topic = schedTopics[d] || '';
+                    let topic = schedTopics[d] || '';
+                    // Strip course name prefix: "課程名 - DayN 主題" → "主題"
+                    if (topic) {
+                        const m = topic.match(/[-–—]\s*[Dd]ay\s*\d+\s*[-–—]?\s*(.*)/);
+                        if (m && m[1]) topic = m[1].trim();
+                    }
                     const baseLabel = b.dayLabel || `Day ${d}`;
                     const label = topic ? `${baseLabel} — ${topic}` : baseLabel;
                     days[d] = { label, info: b.dayInfo || '', blocks: [] };
