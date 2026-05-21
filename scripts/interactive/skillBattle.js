@@ -469,6 +469,7 @@ ${output}
                 feedback = '評分解析失敗';
             }
             console.log(`[SkillBattle] ${studentName}: score=${score}, raw=`, judgeResult);
+            this._appendLog(logEl, `${mi('bug_report', 14)} Judge raw: ${esc(judgeResult.substring(0, 100))}`, 'info');
 
             // Step 3: 更新 DB（★ 修正參數順序：data 在前，filter 在後）
             const newState = { ...state, output, score, feedback, status: 'scored', executedAt: new Date().toISOString() };
@@ -542,19 +543,24 @@ export class SkillBattleBoardGame {
         el.classList.add('sb-board-container');
         el.innerHTML = `
             <div class="sb-board">
-                <div class="sb-board-header">
-                    ${mi('leaderboard', 24)} <span>Skill Battle 排行榜</span>
+                <div class="sb-board-title-bar">
+                    <div class="sb-board-title">
+                        ${mi('leaderboard', 26)}
+                        <span>Skill Battle 排行榜</span>
+                    </div>
+                    <div class="sb-board-subtitle">即時更新</div>
                 </div>
                 <div class="sb-board-list"></div>
-                <div class="sb-board-empty">${mi('pending', 20)} 等待評分結果...</div>
+                <div class="sb-board-empty">${mi('pending', 22)} 等待評分結果...</div>
             </div>`;
 
         const listEl = el.querySelector('.sb-board-list');
         const emptyEl = el.querySelector('.sb-board-empty');
 
         const load = async () => {
-            // 讀取同場次所有 skillBattle 的評分結果
-            const sessionId = window._activeSessionUUID || '';
+            const sessionId = window._activeSessionUUID
+                || sessionStorage.getItem('_session_code')
+                || new URLSearchParams(location.search).get('code') || '';
             let filter = { type: 'eq.skillBattle' };
             if (sessionId) filter.session_id = 'eq.' + sessionId;
 
@@ -569,7 +575,7 @@ export class SkillBattleBoardGame {
                 const state = JSON.parse(s.state || '{}');
                 return {
                     name: s.student_name || s.student_email?.split('@')[0] || '?',
-                    score: state.score || 0,
+                    score: state.score ?? 0,
                     feedback: state.feedback || '',
                 };
             }).sort((a, b) => b.score - a.score);
@@ -583,19 +589,31 @@ export class SkillBattleBoardGame {
             emptyEl.style.display = 'none';
             listEl.style.display = '';
 
-            const topScore = scored[0]?.score || 100;
+            const topScore = Math.max(scored[0]?.score || 1, 1);
             listEl.innerHTML = scored.map((s, i) => {
-                const medal = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-                const medalIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span class="sb-board-num">${i + 1}</span>`;
-                const barW = topScore > 0 ? Math.max(3, (s.score / topScore) * 100) : 5;
+                const rank = i + 1;
+                const isTop3 = rank <= 3;
+                const tierClass = rank === 1 ? 'sb-board-gold' : rank === 2 ? 'sb-board-silver' : rank === 3 ? 'sb-board-bronze' : '';
+                const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                const barW = Math.max(4, (s.score / topScore) * 100);
                 const barC = s.score >= 80 ? '#22c55e' : s.score >= 60 ? '#eab308' : s.score >= 40 ? '#f97316' : '#ef4444';
-                const delay = i * 0.08;
+                const delay = i * 0.1;
                 return `
-                    <div class="sb-board-row ${medal ? 'sb-board-' + medal : ''}" style="animation-delay:${delay}s">
-                        <div class="sb-board-medal">${medalIcon}</div>
-                        <div class="sb-board-name">${esc(s.name)}</div>
-                        <div class="sb-board-bar"><div class="sb-board-bar-fill" style="width:${barW}%;background:${barC};animation-delay:${delay + 0.3}s"></div></div>
-                        <div class="sb-board-score">${s.score}<span class="sb-board-score-unit">分</span></div>
+                    <div class="sb-board-row ${tierClass}" style="animation-delay:${delay}s">
+                        <div class="sb-board-rank ${isTop3 ? 'sb-board-rank-top' : ''}">
+                            ${medalEmoji ? `<span class="sb-board-medal-emoji">${medalEmoji}</span>` : `<span class="sb-board-rank-num">${rank}</span>`}
+                        </div>
+                        <div class="sb-board-info">
+                            <div class="sb-board-name">${esc(s.name)}</div>
+                            ${s.feedback ? `<div class="sb-board-feedback">${esc(s.feedback)}</div>` : ''}
+                        </div>
+                        <div class="sb-board-bar-wrap">
+                            <div class="sb-board-bar"><div class="sb-board-bar-fill" style="--bar-w:${barW}%;background:${barC};animation-delay:${delay + 0.3}s"></div></div>
+                        </div>
+                        <div class="sb-board-score-wrap">
+                            <span class="sb-board-score">${s.score}</span>
+                            <span class="sb-board-score-label">分</span>
+                        </div>
                     </div>`;
             }).join('');
         };
