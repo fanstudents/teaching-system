@@ -35,14 +35,16 @@ export class SkillBattleGame {
     }
 
     /* ── 簡報模式（學員 & 教師共用入口）── */
-    render(el, element) {
+    render(el, element, forceStudent = false) {
         const elementId = el.closest('[data-id]')?.dataset.id || el.dataset.elementId || '';
         el.dataset.elementId = elementId;
         el.classList.add('skill-battle-container');
 
         // 判斷角色：教師 or 學員
-        const isTeacher = !!el.closest('.presentation-slide');   // 簡報端 = 教師
-        const isStudent = !!el.closest('.aud-interaction-wrap'); // 觀眾端 = 學員
+        // student.html 會在 sessionStorage 設定 homework_user
+        const hwUser = sessionStorage.getItem('homework_user');
+        const isPresenter = !!el.closest('.presentation-slide');
+        const isStudent = forceStudent || (hwUser && !isPresenter);
 
         if (isStudent) {
             this._renderStudent(el, element, elementId);
