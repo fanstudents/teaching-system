@@ -519,6 +519,11 @@ class App {
             this.editor.addSkillBattle();
         });
 
+        // Skill Battle 排行榜
+        document.getElementById('addSkillBattleBoardBtn')?.addEventListener('click', () => {
+            this.editor.addSkillBattleBoard();
+        });
+
         // 課前/課後評量
         document.getElementById('addAssessmentPreBtn')?.addEventListener('click', () => {
             this.editor.addAssessment('pre');

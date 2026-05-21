@@ -567,6 +567,19 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    /**
+     * 新增 Skill Battle 排行榜（獨立元件）
+     */
+    addSkillBattleBoard() {
+        const element = {
+            type: 'skillBattleBoard',
+            x: 50, y: 30,
+            width: 860, height: 460,
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
 
     /**
      * 新增可複製文字卡片

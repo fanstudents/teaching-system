@@ -2758,6 +2758,15 @@
                     break;
                 }
 
+                case 'skillBattleBoard': {
+                    el.classList.add('interactive-element', 'skill-battle-board-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/skillBattle.js').then(({ SkillBattleBoardGame }) => {
+                        new SkillBattleBoardGame().render(el, element);
+                    });
+                    break;
+                }
+
                 default:
                     return null;
             }

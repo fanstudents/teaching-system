@@ -179,15 +179,10 @@ export class SkillBattleGame {
                     <span class="sb-stat">${mi('check_circle', 16)} 已評分：<b class="sb-count-scored">0</b></span>
                 </div>
                 <div class="sb-submissions-list"></div>
-                <div class="sb-leaderboard-section">
-                    <div class="sb-leaderboard-header">${mi('leaderboard', 20)} 排行榜</div>
-                    <div class="sb-leaderboard"></div>
-                </div>
                 <div class="sb-execution-log"></div>
             </div>`;
 
         const listEl = el.querySelector('.sb-submissions-list');
-        const leaderboardEl = el.querySelector('.sb-leaderboard');
         const logEl = el.querySelector('.sb-execution-log');
         const refreshBtn = el.querySelector('.sb-btn-refresh');
         const execAllBtn = el.querySelector('.sb-btn-execute-all');
@@ -206,7 +201,6 @@ export class SkillBattleGame {
                 try { return JSON.parse(s.state || '{}').status === 'scored'; } catch { return false; }
             }).length;
 
-            // 提交清單
             listEl.innerHTML = subs.length === 0
                 ? `<div class="sb-empty">${mi('inbox', 24)} 等待學員提交 Skill...</div>`
                 : subs.map((s, i) => {
@@ -217,55 +211,34 @@ export class SkillBattleGame {
                     const statusIcon = status === 'scored' ? mi('check_circle', 14) :
                         status === 'running' ? mi('progress_activity', 14) : mi('schedule', 14);
                     const statusClass = `sb-status-${status}`;
+                    const content = s.content || '';
+                    const isLong = content.length > 60;
+                    const preview = isLong ? content.substring(0, 60) + '...' : content;
+                    const scoreHtml = status === 'scored'
+                        ? `<span class="sb-sub-score-badge" style="color:${state.score >= 80 ? '#22c55e' : state.score >= 60 ? '#eab308' : '#f97316'}">${state.score} 分</span>`
+                        : '';
                     return `
-                        <div class="sb-submission-item ${statusClass}" data-id="${s.id}" data-email="${s.student_email}">
-                            <div class="sb-sub-info">
+                        <div class="sb-submission-item ${statusClass}" data-id="${s.id}">
+                            <div class="sb-sub-top">
                                 <span class="sb-sub-name">${esc(name)}</span>
-                                <span class="sb-sub-status">${statusIcon} ${status === 'scored' ? state.score + ' 分' : status === 'running' ? '執行中...' : '等待執行'}</span>
+                                <span class="sb-sub-status">${statusIcon} ${status === 'scored' ? scoreHtml : status === 'running' ? '執行中...' : '等待執行'}</span>
                             </div>
-                            <div class="sb-sub-skill">${esc((s.content || '').substring(0, 80))}${(s.content || '').length > 80 ? '...' : ''}</div>
+                            <div class="sb-sub-skill-wrap">
+                                <div class="sb-sub-skill-preview">${esc(preview)}</div>
+                                ${isLong ? `<details class="sb-sub-expand"><summary>展開全文</summary><div class="sb-sub-skill-full">${esc(content)}</div></details>` : ''}
+                            </div>
                             ${status === 'pending' ? `<button class="sb-btn sb-btn-execute-one" data-submission-id="${s.id}">${mi('play_arrow', 14)} 執行</button>` : ''}
+                            ${status === 'scored' && state.feedback ? `<div class="sb-sub-feedback">${mi('chat_bubble', 12)} ${esc(state.feedback)}</div>` : ''}
                         </div>`;
                 }).join('');
-
-            // 排行榜
-            const scored = subs.filter(s => {
-                try { return JSON.parse(s.state || '{}').status === 'scored'; } catch { return false; }
-            }).map(s => {
-                const state = JSON.parse(s.state || '{}');
-                return {
-                    name: s.student_name || s.student_email?.split('@')[0] || '?',
-                    score: state.score || 0,
-                    feedback: state.feedback || '',
-                };
-            }).sort((a, b) => b.score - a.score);
-
-            if (scored.length > 0) {
-                leaderboardEl.innerHTML = scored.map((s, i) => {
-                    const medal = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-                    const barW = Math.max(5, s.score);
-                    const barC = s.score >= 80 ? '#22c55e' : s.score >= 60 ? '#eab308' : '#f97316';
-                    return `
-                        <div class="sb-rank-item ${medal ? 'sb-rank-' + medal : ''}">
-                            <span class="sb-rank-num">${i + 1}</span>
-                            <span class="sb-rank-name">${esc(s.name)}</span>
-                            <div class="sb-rank-bar"><div style="width:${barW}%;background:${barC}"></div></div>
-                            <span class="sb-rank-score">${s.score}</span>
-                        </div>`;
-                }).join('');
-            } else {
-                leaderboardEl.innerHTML = `<div class="sb-empty-board">${mi('pending', 18)} 尚無評分結果</div>`;
-            }
 
             return subs;
         };
 
         await loadSubmissions();
 
-        // 綁定事件
         refreshBtn.addEventListener('click', () => loadSubmissions());
 
-        // 逐一執行
         listEl.addEventListener('click', async (e) => {
             const btn = e.target.closest('.sb-btn-execute-one');
             if (!btn) return;
@@ -276,7 +249,6 @@ export class SkillBattleGame {
             await loadSubmissions();
         });
 
-        // 全部執行
         execAllBtn.addEventListener('click', async () => {
             if (this._executing) return;
             this._executing = true;
@@ -291,12 +263,11 @@ export class SkillBattleGame {
 
             this._appendLog(logEl, `開始執行 ${pending.length} 個 Skill...`, 'info');
 
-            // 並發控制：一次 3 個
             const CONCURRENCY = 3;
             for (let i = 0; i < pending.length; i += CONCURRENCY) {
                 const batch = pending.slice(i, i + CONCURRENCY);
                 await Promise.all(batch.map(s => this._executeOne(s.id, element, logEl)));
-                await loadSubmissions(); // 即時更新 UI
+                await loadSubmissions();
             }
 
             this._appendLog(logEl, `全部完成！`, 'success');
@@ -305,7 +276,6 @@ export class SkillBattleGame {
             execAllBtn.innerHTML = `${mi('play_arrow', 16)} 全部執行`;
         });
 
-        // 自動刷新（每 8 秒）
         const tid = setInterval(() => loadSubmissions(), 8000);
         this._intervals.set(elementId + '_teacher', tid);
     }
@@ -417,5 +387,98 @@ ${output}
     destroy() {
         for (const [, id] of this._intervals) clearInterval(id);
         this._intervals.clear();
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  SkillBattleBoardGame — 獨立排行榜元件                       */
+/*  放在 Skill Battle 的下一頁，自動讀取同場次的評分資料            */
+/* ═══════════════════════════════════════════════════════════ */
+export class SkillBattleBoardGame {
+    constructor() { this._tid = null; }
+
+    renderPreview(el, element) {
+        el.innerHTML = `
+            <div class="sb-board-preview">
+                <div class="sb-board-preview-header">
+                    ${mi('leaderboard', 28)}
+                    <span>Skill Battle 排行榜</span>
+                </div>
+                <div class="sb-board-preview-body">
+                    <div class="sb-board-preview-row sb-rank-gold"><span>🥇</span><span>第 1 名</span><span>—</span></div>
+                    <div class="sb-board-preview-row sb-rank-silver"><span>🥈</span><span>第 2 名</span><span>—</span></div>
+                    <div class="sb-board-preview-row sb-rank-bronze"><span>🥉</span><span>第 3 名</span><span>—</span></div>
+                </div>
+            </div>`;
+    }
+
+    render(el, element) {
+        el.classList.add('sb-board-container');
+        el.innerHTML = `
+            <div class="sb-board">
+                <div class="sb-board-header">
+                    ${mi('leaderboard', 24)} <span>Skill Battle 排行榜</span>
+                </div>
+                <div class="sb-board-list"></div>
+                <div class="sb-board-empty">${mi('pending', 20)} 等待評分結果...</div>
+            </div>`;
+
+        const listEl = el.querySelector('.sb-board-list');
+        const emptyEl = el.querySelector('.sb-board-empty');
+
+        const load = async () => {
+            // 讀取同場次所有 skillBattle 的評分結果
+            const sessionId = window._activeSessionUUID || '';
+            let filter = { type: 'eq.skillBattle' };
+            if (sessionId) filter.session_id = 'eq.' + sessionId;
+
+            const { data } = await db.select('submissions', {
+                filter,
+                order: 'created_at.asc',
+            });
+
+            const scored = (data || []).filter(s => {
+                try { return JSON.parse(s.state || '{}').status === 'scored'; } catch { return false; }
+            }).map(s => {
+                const state = JSON.parse(s.state || '{}');
+                return {
+                    name: s.student_name || s.student_email?.split('@')[0] || '?',
+                    score: state.score || 0,
+                    feedback: state.feedback || '',
+                };
+            }).sort((a, b) => b.score - a.score);
+
+            if (scored.length === 0) {
+                listEl.style.display = 'none';
+                emptyEl.style.display = 'flex';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            listEl.style.display = '';
+
+            const topScore = scored[0]?.score || 100;
+            listEl.innerHTML = scored.map((s, i) => {
+                const medal = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                const medalIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span class="sb-board-num">${i + 1}</span>`;
+                const barW = topScore > 0 ? Math.max(3, (s.score / topScore) * 100) : 5;
+                const barC = s.score >= 80 ? '#22c55e' : s.score >= 60 ? '#eab308' : s.score >= 40 ? '#f97316' : '#ef4444';
+                const delay = i * 0.08;
+                return `
+                    <div class="sb-board-row ${medal ? 'sb-board-' + medal : ''}" style="animation-delay:${delay}s">
+                        <div class="sb-board-medal">${medalIcon}</div>
+                        <div class="sb-board-name">${esc(s.name)}</div>
+                        <div class="sb-board-bar"><div class="sb-board-bar-fill" style="width:${barW}%;background:${barC};animation-delay:${delay + 0.3}s"></div></div>
+                        <div class="sb-board-score">${s.score}<span class="sb-board-score-unit">分</span></div>
+                    </div>`;
+            }).join('');
+        };
+
+        load();
+        this._tid = setInterval(load, 6000);
+    }
+
+    destroy() {
+        if (this._tid) clearInterval(this._tid);
     }
 }

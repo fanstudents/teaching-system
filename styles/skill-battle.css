@@ -145,14 +145,15 @@
 /* ── 提交清單 ── */
 .sb-submissions-list {
     display: flex; flex-direction: column; gap: 6px;
-    max-height: 180px; overflow-y: auto;
+    max-height: 240px; overflow-y: auto;
+    padding-right: 4px;
 }
 .sb-empty, .sb-empty-board {
     text-align: center; padding: 20px; color: #94a3b8; font-size: 0.85rem;
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .sb-submission-item {
-    display: flex; flex-direction: column; gap: 6px;
+    display: flex; flex-direction: column; gap: 4px;
     padding: 10px 12px; border-radius: 10px;
     border: 1px solid #e2e8f0; background: #fff;
     transition: all 0.2s;
@@ -160,55 +161,36 @@
 .sb-submission-item.sb-status-scored { border-left: 3px solid #22c55e; }
 .sb-submission-item.sb-status-running { border-left: 3px solid #eab308; background: #fffbeb; }
 .sb-submission-item.sb-status-pending { border-left: 3px solid #cbd5e1; }
-.sb-sub-info { display: flex; justify-content: space-between; align-items: center; }
+.sb-sub-top { display: flex; justify-content: space-between; align-items: center; }
 .sb-sub-name { font-size: 0.82rem; font-weight: 600; color: #1e293b; }
 .sb-sub-status { font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 3px; }
-.sb-sub-skill {
+.sb-sub-score-badge { font-weight: 800; font-size: 0.82rem; }
+.sb-sub-skill-wrap { margin-top: 2px; }
+.sb-sub-skill-preview {
     font-size: 0.72rem; color: #64748b; line-height: 1.5;
     padding: 4px 8px; background: #f8fafc; border-radius: 6px;
     font-family: 'SF Mono', 'Fira Code', monospace;
 }
-
-/* ── 排行榜 ── */
-.sb-leaderboard-section { margin-top: 8px; }
-.sb-leaderboard-header {
-    font-size: 0.88rem; font-weight: 700; color: #0f172a;
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+.sb-sub-expand { margin-top: 4px; }
+.sb-sub-expand summary {
+    font-size: 0.7rem; color: #6366f1; cursor: pointer;
+    padding: 2px 0; user-select: none;
 }
-.sb-leaderboard { display: flex; flex-direction: column; gap: 4px; }
-.sb-rank-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 10px; border-radius: 8px;
-    background: #f8fafc; transition: all 0.3s;
-    animation: sb-slide-in 0.4s ease-out;
+.sb-sub-skill-full {
+    font-size: 0.72rem; color: #475569; line-height: 1.6;
+    padding: 8px; background: #f0f4f8; border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    white-space: pre-wrap; max-height: 120px; overflow-y: auto;
+    margin-top: 4px;
 }
-@keyframes sb-slide-in {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-.sb-rank-item.sb-rank-gold { background: linear-gradient(135deg, #fef3c7, #fde68a); }
-.sb-rank-item.sb-rank-silver { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
-.sb-rank-item.sb-rank-bronze { background: linear-gradient(135deg, #fed7aa, #fdba74); }
-.sb-rank-num {
-    width: 24px; height: 24px; border-radius: 12px;
-    background: #64748b; color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
-}
-.sb-rank-gold .sb-rank-num { background: #d97706; }
-.sb-rank-silver .sb-rank-num { background: #475569; }
-.sb-rank-bronze .sb-rank-num { background: #ea580c; }
-.sb-rank-name { font-size: 0.82rem; font-weight: 600; color: #1e293b; min-width: 60px; }
-.sb-rank-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; }
-.sb-rank-bar > div { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.22, 1, 0.36, 1); }
-.sb-rank-score {
-    font-size: 0.85rem; font-weight: 800; color: #1e293b; min-width: 32px;
-    text-align: right; font-family: 'Google Sans', sans-serif;
+.sb-sub-feedback {
+    font-size: 0.7rem; color: #475569; margin-top: 2px;
+    display: flex; align-items: center; gap: 4px;
 }
 
 /* ── 執行日誌 ── */
 .sb-execution-log {
-    max-height: 120px; overflow-y: auto;
+    max-height: 100px; overflow-y: auto;
     font-size: 0.72rem; line-height: 1.8;
     border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: 4px;
 }
@@ -217,3 +199,98 @@
 .sb-log-info { color: #475569; }
 .sb-log-success { color: #15803d; }
 .sb-log-error { color: #dc2626; }
+
+/* ═══════════════════════════════════════════════
+   獨立排行榜元件 — SkillBattleBoardGame
+   ═══════════════════════════════════════════════ */
+
+/* ── 編輯器預覽 ── */
+.sb-board-preview {
+    display: flex; flex-direction: column; gap: 16px;
+    padding: 24px; height: 100%;
+    background: linear-gradient(135deg, #0f172a, #1e1b4b);
+    border-radius: 12px; color: #fff;
+}
+.sb-board-preview-header {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.1rem; font-weight: 700; color: #a5b4fc;
+}
+.sb-board-preview-body { display: flex; flex-direction: column; gap: 8px; }
+.sb-board-preview-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.06); font-size: 0.88rem;
+}
+.sb-board-preview-row span:first-child { font-size: 1.2rem; }
+.sb-board-preview-row span:nth-child(2) { flex: 1; color: #cbd5e1; }
+.sb-board-preview-row span:last-child { color: #64748b; font-weight: 700; }
+
+/* ── Live 排行榜 ── */
+.sb-board-container {
+    font-family: 'Noto Sans TC', 'Google Sans', sans-serif;
+}
+.sb-board {
+    height: 100%; display: flex; flex-direction: column;
+    padding: 20px; gap: 14px;
+}
+.sb-board-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 1.05rem; font-weight: 700; color: #0f172a;
+}
+.sb-board-header .material-symbols-outlined { color: #6366f1; }
+.sb-board-list {
+    flex: 1; display: flex; flex-direction: column; gap: 6px;
+    overflow-y: auto;
+}
+.sb-board-empty {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: 8px; color: #94a3b8; font-size: 0.9rem;
+}
+
+/* 排行列 */
+.sb-board-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    animation: sb-board-enter 0.5s ease-out both;
+}
+@keyframes sb-board-enter {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.sb-board-gold { background: linear-gradient(135deg, #fef9c3, #fde68a); border-color: #fbbf24; }
+.sb-board-silver { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border-color: #cbd5e1; }
+.sb-board-bronze { background: linear-gradient(135deg, #ffedd5, #fed7aa); border-color: #fdba74; }
+.sb-board-medal {
+    width: 28px; text-align: center; font-size: 1.2rem; flex-shrink: 0;
+}
+.sb-board-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 12px;
+    background: #94a3b8; color: #fff;
+    font-size: 0.72rem; font-weight: 700;
+}
+.sb-board-name {
+    font-size: 0.88rem; font-weight: 600; color: #1e293b;
+    min-width: 72px; flex-shrink: 0;
+}
+.sb-board-bar {
+    flex: 1; height: 8px; background: rgba(0,0,0,0.05);
+    border-radius: 4px; overflow: hidden;
+}
+.sb-board-bar-fill {
+    height: 100%; border-radius: 4px; width: 0;
+    animation: sb-bar-grow 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes sb-bar-grow {
+    to { width: var(--sb-bar-w, 100%); }
+}
+.sb-board-score {
+    font-size: 1rem; font-weight: 800; color: #1e293b;
+    min-width: 40px; text-align: right;
+    font-family: 'Google Sans', sans-serif;
+}
+.sb-board-score-unit {
+    font-size: 0.7rem; font-weight: 500; color: #64748b; margin-left: 2px;
+}
+
