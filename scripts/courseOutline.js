@@ -1354,19 +1354,54 @@ function _collectBlocksFromDOM() {
 
 // ── Tool Block ──
 let _toolCounter = 0;
+
+// Build datalist HTML once (from registry)
+let _toolDatalistHtml = '';
+function _getToolDatalistHtml() {
+    if (!_toolDatalistHtml) {
+        _toolDatalistHtml = AI_TOOLS_REGISTRY.map(t =>
+            `<option value="${t.name}" data-url="${t.url || ''}" data-logo="${t.logo || ''}">`
+        ).join('');
+    }
+    return _toolDatalistHtml;
+}
+
+// Auto-fill URL/Logo when a known tool is selected
+function _onToolNameInput(input) {
+    const val = input.value.trim();
+    const info = AI_TOOLS_REGISTRY.find(t =>
+        t.name.toLowerCase() === val.toLowerCase() ||
+        t.slug === val.toLowerCase().replace(/[\s.\-]+/g, '')
+    );
+    if (!info) return;
+    const item = input.closest('.oe-list-item');
+    if (!item) return;
+    const urlInput = item.querySelector('[data-key="url"]');
+    const logoInput = item.querySelector('[data-key="logo"]');
+    // Only auto-fill if empty
+    if (urlInput && !urlInput.value) urlInput.value = info.url || '';
+    if (logoInput && !logoInput.value) logoInput.value = info.logo || '';
+}
+
 window.addToolBlock = function(data = {}, afterEl = null) {
     const list = document.getElementById('oeToolsList');
+    const listId = `oe-tools-datalist-${_toolCounter++}`;
     const div = document.createElement('div');
     div.className = 'oe-list-item';
     div.innerHTML = `
         <button class="oe-delete" onclick="this.closest('.oe-list-item').remove()"><span class="material-symbols-outlined">close</span></button>
         <div class="oe-row">
-            <div class="oe-field"><label>工具名稱</label><input type="text" data-key="name" value="${_esc(data.name || '')}" placeholder="ChatGPT"></div>
+            <div class="oe-field"><label>工具名稱</label><input type="text" data-key="name" value="${_esc(data.name || '')}" placeholder="輸入或選擇工具..." list="${listId}" autocomplete="off"><datalist id="${listId}">${_getToolDatalistHtml()}</datalist></div>
             <div class="oe-field"><label>網址</label><input type="text" data-key="url" value="${_esc(data.url || '')}" placeholder="https://chat.openai.com"></div>
         </div>
         <div class="oe-field" style="margin-top:8px"><label>用途</label><input type="text" data-key="purpose" value="${_esc(data.purpose || '')}" placeholder="文字生成、文件撰寫..."></div>
         <div class="oe-field" style="margin-top:8px"><label>Logo URL</label><input type="text" data-key="logo" value="${_esc(data.logo || '')}" placeholder="https://...svg"></div>
     `;
+    // Bind auto-fill on name input
+    const nameInput = div.querySelector('[data-key="name"]');
+    nameInput.addEventListener('input', () => _onToolNameInput(nameInput));
+    nameInput.addEventListener('change', () => _onToolNameInput(nameInput));
+
     if (afterEl && afterEl.parentNode === list) {
         list.insertBefore(div, afterEl.nextSibling);
     } else {
