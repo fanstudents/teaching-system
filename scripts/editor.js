@@ -548,6 +548,25 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    /**
+     * 新增 Skill Battle — Prompt 競技場
+     */
+    addSkillBattle() {
+        const element = {
+            type: 'skillBattle',
+            x: 50, y: 30,
+            width: 860, height: 460,
+            question: '請寫一個 Prompt 指令，讓 AI 產出一篇 200 字的產品介紹',
+            referenceAnswer: '',
+            model: 'gpt-4o',
+            maxTokens: 800,
+            judgePrompt: '',
+            systemPrompt: '',
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
 
     /**
      * 新增可複製文字卡片
@@ -1233,7 +1252,7 @@ export class Editor {
         }
 
         // 互動元件專屬
-        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot'];
+        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'skillBattle'];
         if (type === 'matching') {
             html += this.renderMatchingProperties(elementData);
         } else if (type === 'fillblank') {
@@ -1439,6 +1458,39 @@ export class Editor {
                             <span style="font-size:12px;">設定正確標註區域</span>
                         </label>
                         ${hasCorrectZone ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">綠色虛線圈 = 正確區域。點擊預覽圖可移動位置。</div>' : '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">未設定時為開放式標註，不判斷對錯。</div>'}
+                    </div>
+                </div>
+            `;
+        } else if (type === 'skillBattle') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#6366f1;">science</span>
+                        Skill Battle 設定
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">任務描述</label>
+                        <textarea class="form-input" id="sbQuestion" rows="3" style="resize:vertical;font-family:inherit;">${elementData.question || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">標準答案（用來評分比對）</label>
+                        <textarea class="form-input" id="sbReferenceAnswer" rows="4" placeholder="貼上標準輸出結果..." style="resize:vertical;font-family:inherit;">${elementData.referenceAnswer || ''}</textarea>
+                    </div>
+                    <div class="property-row">
+                        <label>模型</label>
+                        <select id="sbModel" style="flex:1;padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                            <option value="gpt-4o" ${elementData.model === 'gpt-4o' ? 'selected' : ''}>GPT-4o</option>
+                            <option value="gpt-4o-mini" ${elementData.model === 'gpt-4o-mini' ? 'selected' : ''}>GPT-4o Mini</option>
+                            <option value="claude-sonnet-4-5" ${elementData.model === 'claude-sonnet-4-5' ? 'selected' : ''}>Claude Sonnet</option>
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <label>Max Tokens</label>
+                        <input type="number" id="sbMaxTokens" value="${elementData.maxTokens || 800}" min="100" max="4096" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">自訂評分 Prompt（選填）</label>
+                        <textarea class="form-input" id="sbJudgePrompt" rows="2" placeholder="留空使用預設評分 prompt" style="resize:vertical;font-family:inherit;font-size:12px;">${elementData.judgePrompt || ''}</textarea>
                     </div>
                 </div>
             `;
@@ -2771,6 +2823,21 @@ ${truncated}
                     this.selectElementById(elementId);
                 });
             }
+        }
+
+        // Skill Battle 事件
+        if (elementData.type === 'skillBattle') {
+            bindSimple('sbQuestion', 'question');
+            bindSimple('sbReferenceAnswer', 'referenceAnswer');
+            bindSimple('sbJudgePrompt', 'judgePrompt');
+            const sbModel = document.getElementById('sbModel');
+            if (sbModel) {
+                sbModel.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { model: sbModel.value });
+                    this.slideManager.renderCurrentSlide();
+                });
+            }
+            bindSimple('sbMaxTokens', 'maxTokens', v => parseInt(v) || 800);
         }
 
         // 流動線條事件

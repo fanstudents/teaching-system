@@ -1,0 +1,219 @@
+/* ═══════════════════════════════════════════════
+   Skill Battle — Prompt 競技場 UI 樣式
+   ═══════════════════════════════════════════════ */
+
+/* ── 編輯器預覽 ── */
+.skill-battle-preview {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 20px; height: 100%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 12px; color: #fff;
+}
+.sb-preview-header {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.1rem; font-weight: 700;
+    color: #a5b4fc;
+}
+.sb-preview-header .material-symbols-outlined { color: #818cf8; }
+.sb-preview-task {
+    font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;
+    padding: 12px; background: rgba(255,255,255,0.06);
+    border-radius: 8px; border-left: 3px solid #6366f1;
+}
+.sb-preview-meta {
+    display: flex; gap: 16px; font-size: 0.75rem; color: #64748b;
+}
+
+/* ── 通用 ── */
+.skill-battle-container {
+    font-family: 'Noto Sans TC', 'Google Sans', sans-serif;
+    overflow-y: auto;
+}
+
+/* ── 學員端 ── */
+.sb-student { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.sb-task-section {
+    background: #f8fafc; border-radius: 12px; padding: 16px;
+    border-left: 3px solid #6366f1;
+}
+.sb-task-label {
+    font-size: 0.8rem; color: #6366f1; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.sb-task-text { font-size: 0.92rem; color: #334155; line-height: 1.7; }
+.sb-input-section { display: flex; flex-direction: column; gap: 8px; }
+.sb-input-label {
+    font-size: 0.8rem; color: #475569; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+}
+.sb-skill-input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 0.88rem; line-height: 1.6; resize: vertical;
+    transition: border-color 0.2s; font-family: inherit;
+    background: #fff;
+}
+.sb-skill-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.sb-skill-input:disabled { background: #f1f5f9; color: #64748b; }
+.sb-input-footer {
+    display: flex; justify-content: space-between; align-items: center;
+}
+.sb-char-count { font-size: 0.72rem; color: #94a3b8; }
+.sb-submit-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 8px; border: none;
+    background: #6366f1; color: #fff; font-size: 0.85rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.sb-submit-btn:hover:not(:disabled) { background: #4f46e5; transform: translateY(-1px); }
+.sb-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+.sb-waiting {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px; background: #fffbeb; border-radius: 10px;
+    font-size: 0.85rem; color: #92400e;
+}
+
+/* ── 學員結果卡片 ── */
+.sb-result-card {
+    background: #fff; border-radius: 14px; padding: 18px;
+    border: 1px solid #e2e8f0; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.sb-result-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.85rem; color: #6366f1; font-weight: 600; margin-bottom: 12px;
+}
+.sb-result-score {
+    font-size: 2.5rem; font-weight: 800; text-align: center;
+    font-family: 'Google Sans', sans-serif;
+}
+.sb-score-unit { font-size: 1rem; font-weight: 500; }
+.sb-result-bar {
+    width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px;
+    overflow: hidden; margin: 10px 0;
+}
+.sb-result-bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sb-result-feedback {
+    font-size: 0.82rem; color: #475569; padding: 10px;
+    background: #f8fafc; border-radius: 8px; margin-top: 8px;
+    display: flex; align-items: flex-start; gap: 6px;
+}
+.sb-result-output-toggle { margin-top: 10px; }
+.sb-result-output-toggle summary {
+    font-size: 0.78rem; color: #6366f1; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+}
+.sb-result-output {
+    margin-top: 8px; padding: 12px; background: #1e1e2e; color: #a6e3a1;
+    border-radius: 8px; font-size: 0.78rem; line-height: 1.7;
+    font-family: 'SF Mono', 'Fira Code', monospace; white-space: pre-wrap;
+    max-height: 150px; overflow-y: auto;
+}
+
+/* ── 教師端 ── */
+.sb-teacher { display: flex; flex-direction: column; gap: 12px; padding: 14px; }
+.sb-teacher-header {
+    display: flex; justify-content: space-between; align-items: center;
+}
+.sb-teacher-title {
+    font-size: 1rem; font-weight: 700; color: #0f172a;
+    display: flex; align-items: center; gap: 8px;
+}
+.sb-teacher-actions { display: flex; gap: 8px; }
+.sb-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 6px 12px; border-radius: 8px; border: none;
+    font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+}
+.sb-btn-refresh { background: #f1f5f9; color: #475569; }
+.sb-btn-refresh:hover { background: #e2e8f0; }
+.sb-btn-execute-all { background: #6366f1; color: #fff; }
+.sb-btn-execute-all:hover:not(:disabled) { background: #4f46e5; }
+.sb-btn-execute-all:disabled { background: #94a3b8; }
+.sb-btn-execute-one { background: #0d9488; color: #fff; padding: 4px 10px; font-size: 0.72rem; }
+.sb-btn-execute-one:hover:not(:disabled) { background: #0f766e; }
+.sb-btn-execute-one:disabled { background: #94a3b8; }
+.sb-teacher-stats {
+    display: flex; gap: 16px; font-size: 0.78rem; color: #64748b;
+}
+.sb-stat { display: flex; align-items: center; gap: 4px; }
+
+/* ── 提交清單 ── */
+.sb-submissions-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 180px; overflow-y: auto;
+}
+.sb-empty, .sb-empty-board {
+    text-align: center; padding: 20px; color: #94a3b8; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.sb-submission-item {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 12px; border-radius: 10px;
+    border: 1px solid #e2e8f0; background: #fff;
+    transition: all 0.2s;
+}
+.sb-submission-item.sb-status-scored { border-left: 3px solid #22c55e; }
+.sb-submission-item.sb-status-running { border-left: 3px solid #eab308; background: #fffbeb; }
+.sb-submission-item.sb-status-pending { border-left: 3px solid #cbd5e1; }
+.sb-sub-info { display: flex; justify-content: space-between; align-items: center; }
+.sb-sub-name { font-size: 0.82rem; font-weight: 600; color: #1e293b; }
+.sb-sub-status { font-size: 0.72rem; color: #64748b; display: flex; align-items: center; gap: 3px; }
+.sb-sub-skill {
+    font-size: 0.72rem; color: #64748b; line-height: 1.5;
+    padding: 4px 8px; background: #f8fafc; border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ── 排行榜 ── */
+.sb-leaderboard-section { margin-top: 8px; }
+.sb-leaderboard-header {
+    font-size: 0.88rem; font-weight: 700; color: #0f172a;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.sb-leaderboard { display: flex; flex-direction: column; gap: 4px; }
+.sb-rank-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    background: #f8fafc; transition: all 0.3s;
+    animation: sb-slide-in 0.4s ease-out;
+}
+@keyframes sb-slide-in {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.sb-rank-item.sb-rank-gold { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+.sb-rank-item.sb-rank-silver { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
+.sb-rank-item.sb-rank-bronze { background: linear-gradient(135deg, #fed7aa, #fdba74); }
+.sb-rank-num {
+    width: 24px; height: 24px; border-radius: 12px;
+    background: #64748b; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+}
+.sb-rank-gold .sb-rank-num { background: #d97706; }
+.sb-rank-silver .sb-rank-num { background: #475569; }
+.sb-rank-bronze .sb-rank-num { background: #ea580c; }
+.sb-rank-name { font-size: 0.82rem; font-weight: 600; color: #1e293b; min-width: 60px; }
+.sb-rank-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.06); border-radius: 3px; overflow: hidden; }
+.sb-rank-bar > div { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.22, 1, 0.36, 1); }
+.sb-rank-score {
+    font-size: 0.85rem; font-weight: 800; color: #1e293b; min-width: 32px;
+    text-align: right; font-family: 'Google Sans', sans-serif;
+}
+
+/* ── 執行日誌 ── */
+.sb-execution-log {
+    max-height: 120px; overflow-y: auto;
+    font-size: 0.72rem; line-height: 1.8;
+    border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: 4px;
+}
+.sb-log-line { display: flex; align-items: flex-start; gap: 6px; padding: 2px 0; }
+.sb-log-time { color: #94a3b8; flex-shrink: 0; font-family: 'SF Mono', monospace; font-size: 0.68rem; }
+.sb-log-info { color: #475569; }
+.sb-log-success { color: #15803d; }
+.sb-log-error { color: #dc2626; }

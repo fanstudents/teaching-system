@@ -1247,6 +1247,24 @@ export class SlideManager {
                 break;
             }
 
+            case 'skillBattle': {
+                el.classList.add('interactive-element', 'skill-battle-element');
+                el.style.overflow = 'hidden';
+                this._applyInteractiveStyles(el, element);
+                this._addScoreBadge(el, element);
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                    import('./interactive/skillBattle.js').then(({ SkillBattleGame }) => {
+                        if (isLive) {
+                            new SkillBattleGame().render(el, element);
+                        } else {
+                            new SkillBattleGame().renderPreview(el, element);
+                        }
+                    });
+                });
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);

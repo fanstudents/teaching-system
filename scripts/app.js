@@ -514,6 +514,11 @@ class App {
             this.editor.addHotspot();
         });
 
+        // Skill Battle — Prompt 競技場
+        document.getElementById('addSkillBattleBtn')?.addEventListener('click', () => {
+            this.editor.addSkillBattle();
+        });
+
         // 課前/課後評量
         document.getElementById('addAssessmentPreBtn')?.addEventListener('click', () => {
             this.editor.addAssessment('pre');
