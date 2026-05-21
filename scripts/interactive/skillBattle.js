@@ -161,94 +161,149 @@ export class SkillBattleGame {
             </div>`;
     }
 
-    /* ═══════════════════════════════════════════════ */
     /*               教 師 端                          */
     /* ═══════════════════════════════════════════════ */
     async _renderTeacher(el, element, elementId) {
+        // 取得 session code（用於 filter + realtime）
+        const sessionCode = sessionStorage.getItem('_session_code')
+            || new URLSearchParams(location.search).get('code') || '';
+
         el.innerHTML = `
             <div class="sb-teacher">
                 <div class="sb-teacher-header">
                     <div class="sb-teacher-title">${mi('science', 22)} Skill Battle</div>
                     <div class="sb-teacher-actions">
-                        <button class="sb-btn sb-btn-refresh">${mi('refresh', 16)} 重新整理</button>
+                        <button class="sb-btn sb-btn-refresh">${mi('refresh', 16)} 刷新</button>
+                        <button class="sb-btn sb-btn-reset-all">${mi('restart_alt', 16)} 重置全部</button>
                         <button class="sb-btn sb-btn-execute-all">${mi('play_arrow', 16)} 全部執行</button>
                     </div>
                 </div>
                 <div class="sb-teacher-stats">
                     <span class="sb-stat">${mi('people', 16)} 提交：<b class="sb-count-submitted">0</b></span>
-                    <span class="sb-stat">${mi('check_circle', 16)} 已評分：<b class="sb-count-scored">0</b></span>
+                    <span class="sb-stat">${mi('check_circle', 16)} 已評：<b class="sb-count-scored">0</b></span>
+                    <span class="sb-stat">${mi('schedule', 16)} 待執行：<b class="sb-count-pending">0</b></span>
                 </div>
-                <div class="sb-submissions-list"></div>
+                <div class="sb-grid"></div>
                 <div class="sb-execution-log"></div>
             </div>`;
 
-        const listEl = el.querySelector('.sb-submissions-list');
+        const gridEl = el.querySelector('.sb-grid');
         const logEl = el.querySelector('.sb-execution-log');
         const refreshBtn = el.querySelector('.sb-btn-refresh');
+        const resetAllBtn = el.querySelector('.sb-btn-reset-all');
         const execAllBtn = el.querySelector('.sb-btn-execute-all');
         const countSubmitted = el.querySelector('.sb-count-submitted');
         const countScored = el.querySelector('.sb-count-scored');
+        const countPending = el.querySelector('.sb-count-pending');
 
-        // 載入提交記錄
+        // ── 載入提交記錄 ──
         const loadSubmissions = async () => {
+            const filter = { element_id: 'eq.' + elementId, type: 'eq.skillBattle' };
+            if (sessionCode) filter.session_id = 'eq.' + sessionCode;
+
             const { data } = await db.select('submissions', {
-                filter: { element_id: 'eq.' + elementId, type: 'eq.skillBattle' },
+                filter,
                 order: 'created_at.asc',
             });
             const subs = data || [];
-            countSubmitted.textContent = subs.length;
-            countScored.textContent = subs.filter(s => {
-                try { return JSON.parse(s.state || '{}').status === 'scored'; } catch { return false; }
-            }).length;
 
-            listEl.innerHTML = subs.length === 0
-                ? `<div class="sb-empty">${mi('inbox', 24)} 等待學員提交 Skill...</div>`
-                : subs.map((s, i) => {
+            // 統計
+            let scoredCount = 0, pendingCount = 0;
+            subs.forEach(s => {
+                let st = {};
+                try { st = JSON.parse(s.state || '{}'); } catch {}
+                if (st.status === 'scored') scoredCount++;
+                else pendingCount++;
+            });
+            countSubmitted.textContent = subs.length;
+            countScored.textContent = scoredCount;
+            countPending.textContent = pendingCount;
+
+            // ── 網格卡片 ──
+            if (subs.length === 0) {
+                gridEl.innerHTML = `<div class="sb-empty">${mi('inbox', 24)} 等待學員提交 Skill...</div>`;
+            } else {
+                gridEl.innerHTML = subs.map((s, i) => {
                     let state = {};
                     try { state = JSON.parse(s.state || '{}'); } catch {}
                     const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
                     const status = state.status || 'pending';
-                    const statusIcon = status === 'scored' ? mi('check_circle', 14) :
-                        status === 'running' ? mi('progress_activity', 14) : mi('schedule', 14);
-                    const statusClass = `sb-status-${status}`;
+                    const score = state.score ?? null;
                     const content = s.content || '';
-                    const isLong = content.length > 60;
-                    const preview = isLong ? content.substring(0, 60) + '...' : content;
-                    const scoreHtml = status === 'scored'
-                        ? `<span class="sb-sub-score-badge" style="color:${state.score >= 80 ? '#22c55e' : state.score >= 60 ? '#eab308' : '#f97316'}">${state.score} 分</span>`
-                        : '';
+                    const shortPreview = content.length > 40 ? content.substring(0, 40) + '…' : content;
+
+                    // 分數顏色
+                    const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
+
                     return `
-                        <div class="sb-submission-item ${statusClass}" data-id="${s.id}">
-                            <div class="sb-sub-top">
-                                <span class="sb-sub-name">${esc(name)}</span>
-                                <span class="sb-sub-status">${statusIcon} ${status === 'scored' ? scoreHtml : status === 'running' ? '執行中...' : '等待執行'}</span>
+                        <div class="sb-card sb-card-${status}" data-id="${s.id}" data-status="${status}">
+                            <div class="sb-card-header">
+                                <span class="sb-card-name">${esc(name)}</span>
+                                ${status === 'scored'
+                                    ? `<span class="sb-card-score" style="color:${scoreColor}">${score}</span>`
+                                    : `<span class="sb-card-status-icon">${status === 'running' ? mi('progress_activity', 16) : mi('schedule', 16)}</span>`
+                                }
                             </div>
-                            <div class="sb-sub-skill-wrap">
-                                <div class="sb-sub-skill-preview">${esc(preview)}</div>
-                                ${isLong ? `<details class="sb-sub-expand"><summary>展開全文</summary><div class="sb-sub-skill-full">${esc(content)}</div></details>` : ''}
-                            </div>
-                            ${status === 'pending' ? `<button class="sb-btn sb-btn-execute-one" data-submission-id="${s.id}">${mi('play_arrow', 14)} 執行</button>` : ''}
-                            ${status === 'scored' && state.feedback ? `<div class="sb-sub-feedback">${mi('chat_bubble', 12)} ${esc(state.feedback)}</div>` : ''}
+                            <div class="sb-card-preview" title="${esc(content)}">${esc(shortPreview)}</div>
+                            ${status === 'scored' && state.feedback
+                                ? `<div class="sb-card-feedback">${esc(state.feedback)}</div>`
+                                : ''}
+                            ${status === 'scored' && state.output
+                                ? `<details class="sb-card-output-details"><summary>${mi('visibility', 12)} AI 輸出</summary><div class="sb-card-output">${esc(state.output)}</div></details>`
+                                : ''}
+                            ${status === 'pending'
+                                ? `<button class="sb-card-exec-btn" data-submission-id="${s.id}">${mi('play_arrow', 14)} 執行</button>`
+                                : ''}
                         </div>`;
                 }).join('');
+            }
 
             return subs;
         };
 
         await loadSubmissions();
 
+        // ── 刷新 ──
         refreshBtn.addEventListener('click', () => loadSubmissions());
 
-        listEl.addEventListener('click', async (e) => {
-            const btn = e.target.closest('.sb-btn-execute-one');
+        // ── 重置全部（把 scored 改回 pending）──
+        resetAllBtn.addEventListener('click', async () => {
+            if (!confirm('確定要重置所有評分結果嗎？')) return;
+            const filter = { element_id: 'eq.' + elementId, type: 'eq.skillBattle' };
+            if (sessionCode) filter.session_id = 'eq.' + sessionCode;
+            const { data } = await db.select('submissions', { filter });
+            for (const s of (data || [])) {
+                let st = {};
+                try { st = JSON.parse(s.state || '{}'); } catch {}
+                st.status = 'pending';
+                st.score = null;
+                st.output = '';
+                st.feedback = '';
+                await db.update('submissions', {
+                    state: JSON.stringify(st),
+                    score: null,
+                    is_correct: null,
+                }, { id: 'eq.' + s.id });
+            }
+            logEl.innerHTML = '';
+            this._appendLog(logEl, '已重置所有評分結果', 'info');
+            await loadSubmissions();
+        });
+
+        // ── 逐一執行（點卡片按鈕）──
+        gridEl.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.sb-card-exec-btn');
             if (!btn) return;
             const subId = btn.dataset.submissionId;
+            const card = btn.closest('.sb-card');
+            if (card) card.classList.add('sb-card-running');
             btn.disabled = true;
-            btn.innerHTML = `${mi('progress_activity', 14)} 執行中...`;
+            btn.innerHTML = `${mi('progress_activity', 14)} ...`;
             await this._executeOne(subId, element, logEl);
             await loadSubmissions();
         });
 
+        // ── 全部執行 ──
         execAllBtn.addEventListener('click', async () => {
             if (this._executing) return;
             this._executing = true;
@@ -258,24 +313,36 @@ export class SkillBattleGame {
 
             const subs = await loadSubmissions();
             const pending = subs.filter(s => {
-                try { return JSON.parse(s.state || '{}').status === 'pending'; } catch { return false; }
+                try { return JSON.parse(s.state || '{}').status !== 'scored'; } catch { return true; }
             });
 
-            this._appendLog(logEl, `開始執行 ${pending.length} 個 Skill...`, 'info');
+            if (pending.length === 0) {
+                this._appendLog(logEl, '沒有待執行的 Skill（全部已評分）', 'info');
+            } else {
+                this._appendLog(logEl, `開始執行 ${pending.length} 個 Skill...`, 'info');
 
-            const CONCURRENCY = 3;
-            for (let i = 0; i < pending.length; i += CONCURRENCY) {
-                const batch = pending.slice(i, i + CONCURRENCY);
-                await Promise.all(batch.map(s => this._executeOne(s.id, element, logEl)));
-                await loadSubmissions();
+                // 標記所有 pending 卡片為 running 動畫
+                pending.forEach(s => {
+                    const card = gridEl.querySelector(`[data-id="${s.id}"]`);
+                    if (card) card.classList.add('sb-card-running');
+                });
+
+                const CONCURRENCY = 3;
+                for (let i = 0; i < pending.length; i += CONCURRENCY) {
+                    const batch = pending.slice(i, i + CONCURRENCY);
+                    await Promise.all(batch.map(s => this._executeOne(s.id, element, logEl)));
+                    await loadSubmissions();
+                }
+
+                this._appendLog(logEl, `全部完成！`, 'success');
             }
 
-            this._appendLog(logEl, `全部完成！`, 'success');
             this._executing = false;
             execAllBtn.disabled = false;
             execAllBtn.innerHTML = `${mi('play_arrow', 16)} 全部執行`;
         });
 
+        // 自動刷新
         const tid = setInterval(() => loadSubmissions(), 8000);
         this._intervals.set(elementId + '_teacher', tid);
     }
@@ -346,19 +413,21 @@ ${output}
                 feedback = '評分解析失敗';
             }
 
-            // Step 3: 更新 DB
+            // Step 3: 更新 DB（★ 修正參數順序：data 在前，filter 在後）
             const newState = { ...state, output, score, feedback, status: 'scored', executedAt: new Date().toISOString() };
-            await db.update('submissions', { id: submissionId }, {
+            await db.update('submissions', {
                 state: JSON.stringify(newState),
                 score: String(score),
                 is_correct: score >= 60,
+            }, {
+                id: 'eq.' + submissionId,
             });
 
             this._appendLog(logEl, `${mi('emoji_events', 14)} ${esc(studentName)} — <b>${score} 分</b>　${esc(feedback)}`, 'success');
 
             // Realtime 通知
             try {
-                const sessionCode = stateManager._sessionCode || sessionStorage.getItem('_session_code') || '';
+                const sessionCode = sessionStorage.getItem('_session_code') || '';
                 if (sessionCode) {
                     realtime.publish(`session:${sessionCode}`, 'skill_battle_scored', {
                         element_id: sub.element_id,
