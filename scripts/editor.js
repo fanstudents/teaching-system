@@ -1482,6 +1482,15 @@ export class Editor {
                         Skill Battle 設定
                     </div>
                     <div class="form-group">
+                        <label class="form-label">快速出題（選擇預設或自訂）</label>
+                        <select id="sbPreset" style="width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;background:#fff;">
+                            <option value="">— 自訂題目 —</option>
+                            <option value="email">📧 Email 撰寫挑戰</option>
+                            <option value="summary">📝 文章摘要挑戰</option>
+                            <option value="translate">🌐 翻譯精準度挑戰</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">任務描述</label>
                         <textarea class="form-input" id="sbQuestion" rows="3" style="resize:vertical;font-family:inherit;">${elementData.question || ''}</textarea>
                     </div>
@@ -2851,6 +2860,82 @@ ${truncated}
                 });
             }
             bindSimple('sbMaxTokens', 'maxTokens', v => parseInt(v) || 800);
+
+            // ── 預設題目模板 ──
+            const sbPresets = {
+                email: {
+                    question: `你是一位行銷經理，需要寫一封 Email 給客戶，說明以下事項：
+
+1. 公司將於下個月推出新產品「SmartDesk Pro」智慧辦公桌
+2. 產品特色：自動升降、健康提醒、無線充電
+3. 希望邀請客戶參加 6/15 的產品體驗會
+4. 請客戶回覆是否出席
+
+請寫出一封完整、專業、有說服力的商業 Email。`,
+                    referenceAnswer: `Subject: 誠摯邀請｜SmartDesk Pro 新品體驗會（6/15）
+
+親愛的 [客戶姓名] 您好：
+
+感謝您一直以來對我們的支持與信任。
+
+我們很高興地宣布，公司即將於下個月正式推出全新產品 ── SmartDesk Pro 智慧辦公桌。這款產品結合了三大核心功能：
+
+• 自動升降系統：一鍵調整高度，坐站交替更健康
+• 智慧健康提醒：內建感測器，定時提醒您起身活動
+• 無線充電面板：桌面即充電板，告別線材困擾
+
+為了讓您搶先體驗 SmartDesk Pro 的魅力，我們將於 6 月 15 日（週日）下午 2:00 舉辦專屬體驗會，届時將有產品實機展示與專人導覽。
+
+期待您的蒞臨！煩請回覆此信告知是否方便出席，我們將為您保留席位。
+
+祝 商祺
+
+[您的姓名]
+行銷經理`,
+                },
+                summary: {
+                    question: `請閱讀以下文章，並產出一份精準的摘要：
+
+人工智慧（AI）正在深刻改變教育領域。從個人化學習路徑到自動化評估，AI 技術為教師和學生帶來了前所未有的可能性。然而，這場變革也伴隨著挑戰。首先，教師需要學習如何有效運用 AI 工具，這需要持續的專業發展。其次，數據隱私和倫理問題日益突出，學校必須制定明確的使用政策。第三，AI 可能加劇教育不平等，因為並非所有學校都有資源導入先進技術。
+
+儘管如此，許多成功案例表明 AI 可以顯著提升學習成效。例如，自適應學習平台可以根據每位學生的程度提供客製化內容，使學習效率提升 30%。智慧批改系統則能在數秒內完成作文評分，讓教師有更多時間進行個別指導。
+
+展望未來，AI 在教育中的角色將從輔助工具演變為核心基礎設施。但成功的關鍵在於：技術必須以人為本，服務於教學目標，而非取代教師的專業判斷。
+
+請產出一份 100 字以內的摘要，涵蓋：主要論點、關鍵數據、結論。`,
+                    referenceAnswer: `AI 正改變教育，帶來個人化學習與自動評估等益處，但也面臨教師培訓、數據隱私與教育不平等三大挑戰。研究顯示，自適應學習平台可提升學習效率 30%，智慧批改系統大幅節省教師時間。未來 AI 將成為教育核心基礎設施，但必須以人為本，輔助而非取代教師專業判斷。`,
+                },
+                translate: {
+                    question: `請將以下中文翻譯成道地的英文：
+
+「在這個資訊爆炸的時代，批判性思考比以往任何時候都更加重要。我們不僅要學會快速獲取資訊，更要培養辨別資訊真偽的能力。教育的目標不應只是傳授知識，而是點燃學生對學習的熱情，讓他們成為終身學習者。唯有如此，我們才能在瞬息萬變的世界中保持競爭力。」
+
+要求：
+1. 翻譯要自然流暢，不能有翻譯腔
+2. 保留原文的修辭力度
+3. 專有名詞使用正確的英文表達`,
+                    referenceAnswer: `In this age of information overload, critical thinking is more important than ever. We must not only learn to access information quickly, but also develop the ability to distinguish fact from fiction. The goal of education should not merely be to impart knowledge, but to ignite a passion for learning in students, empowering them to become lifelong learners. Only then can we remain competitive in an ever-changing world.`,
+                },
+            };
+
+            const sbPresetEl = document.getElementById('sbPreset');
+            if (sbPresetEl) {
+                sbPresetEl.addEventListener('change', () => {
+                    const key = sbPresetEl.value;
+                    if (!key || !sbPresets[key]) return;
+                    const preset = sbPresets[key];
+                    const qEl = document.getElementById('sbQuestion');
+                    const rEl = document.getElementById('sbReferenceAnswer');
+                    if (qEl) qEl.value = preset.question;
+                    if (rEl) rEl.value = preset.referenceAnswer;
+                    this.slideManager.updateElement(elementId, {
+                        question: preset.question,
+                        referenceAnswer: preset.referenceAnswer,
+                    });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
         }
 
         // 流動線條事件
