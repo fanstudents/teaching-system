@@ -344,7 +344,7 @@
         const documentViewer = new DocumentViewer();
 
         // 預設分數對照表
-        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, homework: 5, survey: 2, assessment: 15 };
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, homework: 5, survey: 2, assessment: 15, skillBattle: 10 };
         let lbTimer = null;
 
         let sessionCode = '';
@@ -1597,7 +1597,7 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall', 'skillBattle'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
             const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
@@ -1652,7 +1652,7 @@
             if (element.zIndex) el.style.zIndex = element.zIndex;
 
             // 設定分數並加入分數徽章
-            const interactiveTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework', 'assessment'];
+            const interactiveTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework', 'assessment', 'skillBattle'];
             if (interactiveTypes.includes(element.type)) {
                 const pts = parseInt(element.points) || defaultPts[element.type] || 0;
                 el.dataset.points = pts;
@@ -2744,6 +2744,16 @@
                     el.style.overflow = 'hidden';
                     import('./scripts/interactive/assessmentWall.js').then(({ AssessmentWallGame }) => {
                         new AssessmentWallGame().render(el, element);
+                    });
+                    break;
+                }
+
+                case 'skillBattle': {
+                    el.classList.add('interactive-element', 'skill-battle-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/skillBattle.js').then(({ SkillBattleGame }) => {
+                        const isLive = true; // student page is always live
+                        new SkillBattleGame().render(el, element, isLive);
                     });
                     break;
                 }
