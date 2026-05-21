@@ -85,27 +85,8 @@ export class SkillBattleGame {
             charCount.textContent = `${textarea.value.length} 字`;
         });
 
-        // 載入歷史
-        if (elementId) {
-            const prev = await stateManager.load(elementId);
-            if (prev?.state?.skill) {
-                textarea.value = prev.state.skill;
-                textarea.disabled = true;
-                submitBtn.disabled = true;
-                submitted = true;
-                charCount.textContent = `${prev.state.skill.length} 字`;
-
-                if (prev.state.status === 'scored') {
-                    this._showStudentResult(resultEl, prev.state);
-                } else {
-                    resultEl.innerHTML = `<div class="sb-waiting">${mi('hourglass_top', 20)} 已提交，等待教師執行評分...</div>`;
-                }
-            }
-        }
-
-        // 提交
-        submitBtn.addEventListener('click', async () => {
-            if (submitted) return;
+        // 提交函式（可重用）
+        const doSubmit = async () => {
             const skill = textarea.value.trim();
             if (!skill) { textarea.focus(); return; }
             if (skill.length < 5) { alert('Skill 內容太短，至少 5 個字'); return; }
@@ -117,28 +98,91 @@ export class SkillBattleGame {
             resultEl.innerHTML = `<div class="sb-waiting">${mi('hourglass_top', 20)} 已提交，等待教師執行評分...</div>`;
 
             const title = element.question?.substring(0, 50) || 'Skill Battle';
+
+            // 先清除舊快取再存
+            await stateManager.clear(elementId);
             await stateManager.save(elementId, {
                 type: 'skillBattle', title, content: skill,
                 isCorrect: null, score: null, points: 0, participated: true,
                 state: { skill, output: '', score: null, feedback: '', status: 'pending' },
             });
-        });
+        };
 
-        // 監聽分數更新（Realtime）
+        // 載入歷史
         if (elementId) {
+            const prev = await stateManager.load(elementId);
+            if (prev?.state?.skill) {
+                textarea.value = prev.state.skill;
+                charCount.textContent = `${prev.state.skill.length} 字`;
+
+                if (prev.state.status === 'scored') {
+                    submitted = true;
+                    textarea.disabled = true;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
+                    this._showStudentResult(resultEl, prev.state, () => {
+                        // 重新編輯 callback
+                        submitted = false;
+                        textarea.disabled = false;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `${mi('send', 16)} 重新提交`;
+                        resultEl.innerHTML = '';
+                        textarea.focus();
+                    });
+                } else {
+                    submitted = true;
+                    textarea.disabled = true;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
+                    resultEl.innerHTML = `<div class="sb-waiting">${mi('hourglass_top', 20)} 已提交，等待教師執行評分...</div>`;
+                }
+            }
+        }
+
+        // 提交按鈕
+        submitBtn.addEventListener('click', () => doSubmit());
+
+        // 監聽分數更新 — 直接查 DB，不走 stateManager 快取
+        if (elementId) {
+            const user = stateManager.getUser();
+            const sessionId = stateManager.getSessionCode();
+            const email = user?.email || 'guest';
+
             const tid = setInterval(async () => {
                 if (!submitted) return;
-                const latest = await stateManager.load(elementId);
-                if (latest?.state?.status === 'scored') {
-                    this._showStudentResult(resultEl, latest.state);
-                    clearInterval(tid);
-                }
-            }, 5000);
+                try {
+                    const { data } = await db.select('submissions', {
+                        filter: {
+                            session_id: 'eq.' + (sessionId || ''),
+                            element_id: 'eq.' + elementId,
+                            student_email: 'eq.' + email,
+                        },
+                        limit: 1,
+                    });
+                    if (!data?.length) return;
+                    const row = data[0];
+                    let state = row.state;
+                    if (typeof state === 'string') {
+                        try { state = JSON.parse(state); } catch { state = {}; }
+                    }
+                    if (state.status === 'scored') {
+                        this._showStudentResult(resultEl, state, () => {
+                            submitted = false;
+                            textarea.disabled = false;
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = `${mi('send', 16)} 重新提交`;
+                            resultEl.innerHTML = '';
+                            textarea.focus();
+                        });
+                        clearInterval(tid);
+                    }
+                } catch { /* ignore */ }
+            }, 4000);
             this._intervals.set(elementId + '_student', tid);
         }
     }
 
-    _showStudentResult(resultEl, state) {
+    _showStudentResult(resultEl, state, onResubmit) {
         const score = state.score ?? 0;
         const barWidth = Math.max(5, score);
         const barColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
@@ -152,13 +196,19 @@ export class SkillBattleGame {
                     <div class="sb-result-bar-fill" style="width:${barWidth}%;background:${barColor}"></div>
                 </div>
                 ${state.feedback ? `<div class="sb-result-feedback">${mi('chat_bubble', 14)} ${esc(state.feedback)}</div>` : ''}
-                ${state.output ? `<div class="sb-result-output-toggle">
-                    <details>
-                        <summary>${mi('visibility', 14)} 查看 AI 輸出</summary>
+                ${state.output ? `
+                    <div class="sb-result-output-section">
+                        <div class="sb-result-output-label">${mi('smart_toy', 14)} AI 根據你的 Skill 產出的結果：</div>
                         <div class="sb-result-output">${esc(state.output)}</div>
-                    </details>
-                </div>` : ''}
+                    </div>` : ''}
+                <button class="sb-resubmit-btn">${mi('edit', 16)} 重新編輯並提交</button>
             </div>`;
+
+        // 綁定重新提交按鈕
+        const resubmitBtn = resultEl.querySelector('.sb-resubmit-btn');
+        if (resubmitBtn && onResubmit) {
+            resubmitBtn.addEventListener('click', onResubmit);
+        }
     }
 
     /*               教 師 端                          */
@@ -375,24 +425,28 @@ export class SkillBattleGame {
             this._appendLog(logEl, `${mi('smart_toy', 14)} ${esc(studentName)} — AI 輸出完成（${output.length} 字）`, 'info');
 
             // Step 2: LLM-as-Judge 評分
-            const judgePrompt = element.judgePrompt || `你是一位嚴格但公正的評審。
+            const judgePrompt = element.judgePrompt || `你是一位嚴格但公正的評審，負責評估學員撰寫的 AI 提示詞（Prompt）品質。
 
 【任務描述】
 ${task}
 
-【標準答案】
-${reference}
+${reference ? `【參考標準答案】\n${reference}\n` : '（無標準答案，請根據輸出品質綜合判斷）'}
 
-【學員的 AI 輸出】
+【學員提交的 Prompt（Skill）】
+${skill}
+
+【使用該 Prompt 後 AI 實際產出的結果】
 ${output}
 
-請根據以下標準評分（0-100）：
-1. 內容正確性與完整度（40%）
-2. 格式與結構（30%）
-3. 表達清晰度（30%）
+請根據以下標準嚴格評分（0-100 分），不同學員的 prompt 品質應有明顯分數差異：
+1. Prompt 是否精確引導 AI 完成任務（40%）
+2. AI 輸出的內容品質與完整度（35%）
+3. Prompt 的創意與技巧性（25%）
 
-請只回傳 JSON 格式，不要有其他文字：
-{"score": <整數0-100>, "feedback": "<20字以內的評語>"}`;
+評分參考：90+ 極優秀、70-89 良好、50-69 一般、30-49 待改進、<30 不合格
+
+你必須只回傳以下 JSON 格式，不要有任何其他文字：
+{"score": <整數0到100>, "feedback": "<20字以內的中文評語>"}`;
 
             const judgeResult = await ai.chat([
                 { role: 'user', content: judgePrompt },
@@ -405,13 +459,16 @@ ${output}
                 const jsonMatch = judgeResult.match(/\{[\s\S]*?\}/);
                 if (jsonMatch) {
                     const parsed = JSON.parse(jsonMatch[0]);
-                    score = Math.min(100, Math.max(0, parseInt(parsed.score) || 50));
+                    // 用 Number 而非 parseInt || 50，避免 0 分被 fallback
+                    const rawScore = Number(parsed.score);
+                    score = isNaN(rawScore) ? 50 : Math.min(100, Math.max(0, Math.round(rawScore)));
                     feedback = parsed.feedback || '';
                 }
             } catch (e) {
                 console.warn('Judge parse error:', e, judgeResult);
                 feedback = '評分解析失敗';
             }
+            console.log(`[SkillBattle] ${studentName}: score=${score}, raw=`, judgeResult);
 
             // Step 3: 更新 DB（★ 修正參數順序：data 在前，filter 在後）
             const newState = { ...state, output, score, feedback, status: 'scored', executedAt: new Date().toISOString() };

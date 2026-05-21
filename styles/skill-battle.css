@@ -101,17 +101,25 @@
     background: #f8fafc; border-radius: 8px; margin-top: 8px;
     display: flex; align-items: flex-start; gap: 6px;
 }
-.sb-result-output-toggle { margin-top: 10px; }
-.sb-result-output-toggle summary {
-    font-size: 0.78rem; color: #6366f1; cursor: pointer;
-    display: flex; align-items: center; gap: 4px;
+.sb-result-output-section { margin-top: 10px; }
+.sb-result-output-label {
+    font-size: 0.78rem; color: #6366f1; font-weight: 600;
+    display: flex; align-items: center; gap: 4px; margin-bottom: 6px;
 }
 .sb-result-output {
-    margin-top: 8px; padding: 12px; background: #1e1e2e; color: #a6e3a1;
-    border-radius: 8px; font-size: 0.78rem; line-height: 1.7;
+    padding: 12px; background: #1e1e2e; color: #a6e3a1;
+    border-radius: 8px; font-size: 0.82rem; line-height: 1.7;
     font-family: 'SF Mono', 'Fira Code', monospace; white-space: pre-wrap;
-    max-height: 150px; overflow-y: auto;
+    max-height: 180px; overflow-y: auto;
 }
+.sb-resubmit-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid #6366f1;
+    background: transparent; color: #6366f1;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; margin-top: 12px;
+}
+.sb-resubmit-btn:hover { background: #6366f1; color: #fff; }
 
 /* ── 教師端 ── */
 .sb-teacher { display: flex; flex-direction: column; gap: 12px; padding: 14px; }
