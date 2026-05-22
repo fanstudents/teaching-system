@@ -556,6 +556,7 @@ export class SkillBattleBoardGame {
 
         const listEl = el.querySelector('.sb-board-list');
         const emptyEl = el.querySelector('.sb-board-empty');
+        let lastHash = '';
 
         const load = async () => {
             const sessionId = window._activeSessionUUID
@@ -579,6 +580,11 @@ export class SkillBattleBoardGame {
                     feedback: state.feedback || '',
                 };
             }).sort((a, b) => b.score - a.score);
+
+            // 比對資料是否有變化，沒變就不動 DOM（避免動畫重跑）
+            const hash = JSON.stringify(scored);
+            if (hash === lastHash) return;
+            lastHash = hash;
 
             if (scored.length === 0) {
                 listEl.style.display = 'none';
