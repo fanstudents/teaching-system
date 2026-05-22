@@ -514,12 +514,12 @@ class App {
             this.editor.addHotspot();
         });
 
-        // Skill Battle — Prompt 競技場
+        // Prompt 競技場
         document.getElementById('addSkillBattleBtn')?.addEventListener('click', () => {
             this.editor.addSkillBattle();
         });
 
-        // Skill Battle 排行榜
+        // 競技場排行榜
         document.getElementById('addSkillBattleBoardBtn')?.addEventListener('click', () => {
             this.editor.addSkillBattleBoard();
         });

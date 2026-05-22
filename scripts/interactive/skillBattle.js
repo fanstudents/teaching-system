@@ -1,5 +1,5 @@
 /**
- * Skill Battle 互動模組 — Prompt 競技場
+ * 競技場 互動模組 — Prompt 競技場
  *
  * 學員上傳 Skill（prompt），教師統一執行 LLM，
  * 比對標準答案後即時排行。
@@ -24,7 +24,7 @@ export class SkillBattleGame {
             <div class="skill-battle-preview">
                 <div class="sb-preview-header">
                     ${mi('science', 28)}
-                    <span>Skill Battle — Prompt 競技場</span>
+                    <span>Prompt 競技場</span>
                 </div>
                 <div class="sb-preview-task">${esc(element.question || '（尚未設定任務描述）')}</div>
                 <div class="sb-preview-meta">
@@ -97,7 +97,7 @@ export class SkillBattleGame {
             submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
             resultEl.innerHTML = `<div class="sb-waiting">${mi('hourglass_top', 20)} 已提交，等待教師執行評分...</div>`;
 
-            const title = element.question?.substring(0, 50) || 'Skill Battle';
+            const title = element.question?.substring(0, 50) || '競技場';
 
             // 先清除舊快取再存
             await stateManager.clear(elementId);
@@ -221,7 +221,7 @@ export class SkillBattleGame {
         el.innerHTML = `
             <div class="sb-teacher">
                 <div class="sb-teacher-header">
-                    <div class="sb-teacher-title">${mi('science', 22)} Skill Battle</div>
+                    <div class="sb-teacher-title">${mi('science', 22)} 競技場</div>
                     <div class="sb-teacher-actions">
                         <button class="sb-btn sb-btn-refresh">${mi('refresh', 16)} 刷新</button>
                         <button class="sb-btn sb-btn-reset-all">${mi('restart_alt', 16)} 重置全部</button>
@@ -424,33 +424,60 @@ export class SkillBattleGame {
 
             this._appendLog(logEl, `${mi('smart_toy', 14)} ${esc(studentName)} — AI 輸出完成（${output.length} 字）`, 'info');
 
-            // Step 2: LLM-as-Judge 評分
-            const judgePrompt = element.judgePrompt || `你是一位嚴格但公正的評審，負責評估學員撰寫的 AI 提示詞（Prompt）品質。
+            // Step 2: LLM-as-Judge 評分（細緻版）
+            const judgePrompt = element.judgePrompt || `你是一位嚴格的 Prompt 品質評審。請仔細分析學員的提示詞並嚴格打分。
+
+═══ 評分資料 ═══
 
 【任務描述】
 ${task}
 
-${reference ? `【參考標準答案】\n${reference}\n` : '（無標準答案，請根據輸出品質綜合判斷）'}
+${reference ? `【理想標準輸出】\n${reference}\n` : '（無標準答案，請根據輸出品質綜合判斷）'}
 
-【學員提交的 Prompt（Skill）】
+【學員撰寫的 Prompt】
 ${skill}
 
-【使用該 Prompt 後 AI 實際產出的結果】
+【AI 使用該 Prompt 後的實際輸出】
 ${output}
 
-請根據以下標準嚴格評分（0-100 分），不同學員的 prompt 品質應有明顯分數差異：
-1. Prompt 是否精確引導 AI 完成任務（40%）
-2. AI 輸出的內容品質與完整度（35%）
-3. Prompt 的創意與技巧性（25%）
+═══ 評分規則（滿分 100）═══
 
-評分參考：90+ 極優秀、70-89 良好、50-69 一般、30-49 待改進、<30 不合格
+A. Prompt 工程技巧（30 分）
+- 是否有明確角色設定（+5）
+- 是否有具體輸出格式要求（+5）
+- 是否有約束條件或限制（+5）
+- 是否有分步驟或結構化指令（+5）
+- 語意是否精確無歧義（+5）
+- 是否善用少樣本或範例引導（+5）
 
-你必須只回傳以下 JSON 格式，不要有任何其他文字：
-{"score": <整數0到100>, "feedback": "<20字以內的中文評語>"}`;
+B. 輸出與任務的匹配度（35 分）
+- 輸出是否完整回應所有任務要求（+15）
+- 輸出的專業度與深度（+10）
+- 輸出的格式與結構是否清晰（+10）
+
+C. 與標準答案的相似度（25 分）
+- 關鍵資訊覆蓋率（+10）
+- 論述邏輯與層次（+8）
+- 細節準確度（+7）
+
+D. 差異化加分/扣分（10 分）
+- 有創意的 prompt 技巧（如 CoT、few-shot）+5~+10
+- Prompt 過於簡短或敷衍 -5~-10
+- 輸出有明顯錯誤或離題 -5~-10
+
+═══ 重要 ═══
+1. 滿分極難得到，90+ 只給真正出色的 prompt
+2. 普通直覺式 prompt（如「請幫我寫...」）應在 40-55 分
+3. 有基本結構但缺乏技巧的 prompt 應在 55-70 分
+4. 有進階技巧（角色、格式、約束）的 prompt 應在 70-85 分
+5. 不同品質的 prompt 分數差距應該明顯（至少 10-15 分）
+
+只回傳 JSON，不要有任何其他文字：
+{"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>"}`;
 
             const judgeResult = await ai.chat([
                 { role: 'user', content: judgePrompt },
-            ], { model, maxTokens: 200, temperature: 0.3 });
+            ], { model, maxTokens: 300, temperature: 0.5 });
 
             // 解析分數
             let score = 50;
@@ -519,7 +546,7 @@ ${output}
 
 /* ═══════════════════════════════════════════════════════════ */
 /*  SkillBattleBoardGame — 獨立排行榜元件                       */
-/*  放在 Skill Battle 的下一頁，自動讀取同場次的評分資料            */
+/*  放在 競技場 的下一頁，自動讀取同場次的評分資料            */
 /* ═══════════════════════════════════════════════════════════ */
 export class SkillBattleBoardGame {
     constructor() { this._tid = null; }
@@ -529,7 +556,7 @@ export class SkillBattleBoardGame {
             <div class="sb-board-preview">
                 <div class="sb-board-preview-header">
                     ${mi('leaderboard', 28)}
-                    <span>Skill Battle 排行榜</span>
+                    <span>Prompt 競技場排行榜</span>
                 </div>
                 <div class="sb-board-preview-body">
                     <div class="sb-board-preview-row sb-rank-gold"><span>🥇</span><span>第 1 名</span><span>—</span></div>
@@ -546,7 +573,7 @@ export class SkillBattleBoardGame {
                 <div class="sb-board-title-bar">
                     <div class="sb-board-title">
                         ${mi('leaderboard', 26)}
-                        <span>Skill Battle 排行榜</span>
+                        <span>競技場排行榜</span>
                     </div>
                     <div class="sb-board-subtitle">即時更新</div>
                 </div>
