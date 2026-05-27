@@ -562,6 +562,7 @@ export class Editor {
             maxTokens: 800,
             judgePrompt: '',
             systemPrompt: '',
+            battleMode: 'prompt',
         };
         this.slideManager.addElement(element);
         this.selectElementById(element.id);
@@ -1494,6 +1495,20 @@ export class Editor {
                     <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
                         <span class="material-symbols-outlined" style="font-size:16px;color:#6366f1;">science</span>
                         競技場設定
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label class="form-label">出題模式</label>
+                        <div style="display:flex;gap:8px;">
+                            <label style="flex:1;display:flex;align-items:center;gap:6px;padding:8px 12px;border:2px solid ${elementData.battleMode === 'skill' ? '#e2e8f0' : '#6366f1'};border-radius:8px;cursor:pointer;background:${elementData.battleMode === 'skill' ? '#fff' : '#eef2ff'};transition:all .2s;">
+                                <input type="radio" name="sbBattleMode" value="prompt" ${elementData.battleMode !== 'skill' ? 'checked' : ''} style="accent-color:#6366f1;">
+                                <span style="font-size:13px;font-weight:600;">📝 提示詞模式</span>
+                            </label>
+                            <label style="flex:1;display:flex;align-items:center;gap:6px;padding:8px 12px;border:2px solid ${elementData.battleMode === 'skill' ? '#6366f1' : '#e2e8f0'};border-radius:8px;cursor:pointer;background:${elementData.battleMode === 'skill' ? '#eef2ff' : '#fff'};transition:all .2s;">
+                                <input type="radio" name="sbBattleMode" value="skill" ${elementData.battleMode === 'skill' ? 'checked' : ''} style="accent-color:#6366f1;">
+                                <span style="font-size:13px;font-weight:600;">🧩 Skill 設計模式</span>
+                            </label>
+                        </div>
+                        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">提示詞：學員寫 prompt　|　Skill：學員填寫名稱、描述、執行細節</div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">快速出題（選擇預設或自訂）</label>
@@ -2870,6 +2885,14 @@ ${truncated}
 
         // Skill Battle 事件
         if (elementData.type === 'skillBattle') {
+            // 出題模式切換
+            document.querySelectorAll('input[name="sbBattleMode"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                    this.slideManager.updateElement(elementId, { battleMode: radio.value });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            });
             bindSimple('sbQuestion', 'question');
             bindSimple('sbReferenceAnswer', 'referenceAnswer');
             bindSimple('sbJudgePrompt', 'judgePrompt');

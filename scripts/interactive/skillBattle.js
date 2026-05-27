@@ -29,6 +29,7 @@ export class SkillBattleGame {
                 <div class="sb-preview-task">${esc(element.question || '（尚未設定任務描述）')}</div>
                 <div class="sb-preview-meta">
                     <span>${mi('smart_toy', 14)} ${element.model || 'gpt-4o'}</span>
+                    <span>${mi('tune', 14)} ${element.battleMode === 'skill' ? 'Skill 設計模式' : '提示詞模式'}</span>
                     <span>${mi('description', 14)} 標準答案：${element.referenceAnswer ? '已設定' : '未設定'}</span>
                 </div>
             </div>`;
@@ -57,42 +58,93 @@ export class SkillBattleGame {
     /*               學 員 端                          */
     /* ═══════════════════════════════════════════════ */
     async _renderStudent(el, element, elementId) {
+        const mode = element.battleMode || 'prompt';
+        const isSkillMode = mode === 'skill';
+
+        const inputSection = isSkillMode ? `
+            <div class="sb-field-group">
+                <label class="sb-field-label">${mi('badge', 16)} Skill 名稱</label>
+                <input type="text" class="sb-skill-name-input" placeholder="例：Email 撰寫助手">
+            </div>
+            <div class="sb-field-group">
+                <label class="sb-field-label">${mi('description', 16)} Skill 描述</label>
+                <textarea class="sb-skill-desc-input" rows="3" placeholder="描述這個 Skill 的用途與目標..."></textarea>
+            </div>
+            <div class="sb-field-group">
+                <label class="sb-field-label">${mi('checklist', 16)} Skill 執行細節</label>
+                <textarea class="sb-skill-detail-input" rows="4" placeholder="詳細描述 Skill 的執行步驟、格式要求、約束條件..."></textarea>
+            </div>
+        ` : `
+            <label class="sb-input-label">${mi('edit_note', 18)} 你的提示詞 (Prompt)</label>
+            <textarea class="sb-skill-input" placeholder="在此輸入你的 prompt 指令..." rows="6"></textarea>
+        `;
+
         el.innerHTML = `
             <div class="sb-student">
-                <div class="sb-task-section">
-                    <div class="sb-task-label">${mi('assignment', 18)} 任務說明</div>
-                    <div class="sb-task-text">${esc(element.question || '')}</div>
-                </div>
-                <div class="sb-input-section">
-                    <label class="sb-input-label">${mi('edit_note', 18)} 你的 Skill（Prompt 指令）</label>
-                    <textarea class="sb-skill-input" placeholder="在此輸入你的 prompt 指令..." rows="6"></textarea>
-                    <div class="sb-input-footer">
-                        <span class="sb-char-count">0 字</span>
-                        <button class="sb-submit-btn">${mi('send', 16)} 提交 Skill</button>
+                <div class="sb-student-layout">
+                    <div class="sb-student-left">
+                        <div class="sb-task-section">
+                            <div class="sb-task-label">${mi('assignment', 18)} 任務說明</div>
+                            <div class="sb-task-text">${esc(element.question || '')}</div>
+                        </div>
+                    </div>
+                    <div class="sb-student-right">
+                        <div class="sb-input-section">
+                            ${inputSection}
+                            <div class="sb-input-footer">
+                                <span class="sb-char-count">0 字</span>
+                                <button class="sb-submit-btn">${mi('send', 16)} 提交${isSkillMode ? ' Skill' : ''}</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="sb-student-result"></div>
             </div>`;
 
-        const textarea = el.querySelector('.sb-skill-input');
         const submitBtn = el.querySelector('.sb-submit-btn');
         const charCount = el.querySelector('.sb-char-count');
         const resultEl = el.querySelector('.sb-student-result');
         let submitted = false;
 
-        // 字數計數
-        textarea.addEventListener('input', () => {
-            charCount.textContent = `${textarea.value.length} 字`;
-        });
+        // 字數計數 — prompt mode only
+        const textarea = el.querySelector('.sb-skill-input');
+        if (textarea) {
+            textarea.addEventListener('input', () => {
+                charCount.textContent = `${textarea.value.length} 字`;
+            });
+        }
+
+        // skill mode refs
+        const nameInput = el.querySelector('.sb-skill-name-input');
+        const descInput = el.querySelector('.sb-skill-desc-input');
+        const detailInput = el.querySelector('.sb-skill-detail-input');
+
+        // helper: disable / enable all inputs
+        const setInputsDisabled = (disabled) => {
+            if (textarea) textarea.disabled = disabled;
+            if (nameInput) nameInput.disabled = disabled;
+            if (descInput) descInput.disabled = disabled;
+            if (detailInput) detailInput.disabled = disabled;
+        };
 
         // 提交函式（可重用）
         const doSubmit = async () => {
-            const skill = textarea.value.trim();
-            if (!skill) { textarea.focus(); return; }
-            if (skill.length < 5) { alert('Skill 內容太短，至少 5 個字'); return; }
+            let skill;
+            if (isSkillMode) {
+                const skillName = nameInput.value.trim();
+                const skillDesc = descInput.value.trim();
+                const skillDetail = detailInput.value.trim();
+                if (!skillName || !skillDesc || !skillDetail) { alert('請填寫所有 Skill 欄位'); return; }
+                if (skillName.length < 2 || skillDesc.length < 2 || skillDetail.length < 2) { alert('每個欄位至少 2 個字'); return; }
+                skill = `## Skill 名稱\n${skillName}\n\n## Skill 描述\n${skillDesc}\n\n## Skill 執行細節\n${skillDetail}`;
+            } else {
+                skill = textarea.value.trim();
+                if (!skill) { textarea.focus(); return; }
+                if (skill.length < 5) { alert('Skill 內容太短，至少 5 個字'); return; }
+            }
 
             submitted = true;
-            textarea.disabled = true;
+            setInputsDisabled(true);
             submitBtn.disabled = true;
             submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
             resultEl.innerHTML = `<div class="sb-waiting">${mi('hourglass_top', 20)} 已提交，等待教師執行評分...</div>`;
@@ -108,30 +160,59 @@ export class SkillBattleGame {
             });
         };
 
+        // helper: 從結構化 skill 字串解析回三個欄位
+        const parseSkillFields = (raw) => {
+            const m = raw.match(/## Skill 名稱\n([\s\S]*?)\n\n## Skill 描述\n([\s\S]*?)\n\n## Skill 執行細節\n([\s\S]*)/);
+            return m ? { name: m[1], desc: m[2], detail: m[3] } : null;
+        };
+
+        // helper: 填入 skill mode 欄位
+        const fillSkillFields = (raw) => {
+            if (!isSkillMode) return;
+            const parsed = parseSkillFields(raw);
+            if (parsed) {
+                nameInput.value = parsed.name;
+                descInput.value = parsed.desc;
+                detailInput.value = parsed.detail;
+            } else {
+                // fallback: 放第一個欄位
+                if (nameInput) nameInput.value = raw;
+            }
+        };
+
+        // resubmit callback
+        const onResubmit = () => {
+            submitted = false;
+            setInputsDisabled(false);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `${mi('send', 16)} 重新提交`;
+            resultEl.innerHTML = '';
+            if (textarea) textarea.focus();
+            else if (nameInput) nameInput.focus();
+        };
+
         // 載入歷史
         if (elementId) {
             const prev = await stateManager.load(elementId);
             if (prev?.state?.skill) {
-                textarea.value = prev.state.skill;
-                charCount.textContent = `${prev.state.skill.length} 字`;
+                if (isSkillMode) {
+                    fillSkillFields(prev.state.skill);
+                } else {
+                    if (textarea) {
+                        textarea.value = prev.state.skill;
+                        charCount.textContent = `${prev.state.skill.length} 字`;
+                    }
+                }
 
                 if (prev.state.status === 'scored') {
                     submitted = true;
-                    textarea.disabled = true;
+                    setInputsDisabled(true);
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
-                    this._showStudentResult(resultEl, prev.state, () => {
-                        // 重新編輯 callback
-                        submitted = false;
-                        textarea.disabled = false;
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = `${mi('send', 16)} 重新提交`;
-                        resultEl.innerHTML = '';
-                        textarea.focus();
-                    });
+                    this._showStudentResult(resultEl, prev.state, onResubmit);
                 } else {
                     submitted = true;
-                    textarea.disabled = true;
+                    setInputsDisabled(true);
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
                     resultEl.innerHTML = `<div class="sb-waiting">${mi('hourglass_top', 20)} 已提交，等待教師執行評分...</div>`;
@@ -431,7 +512,55 @@ export class SkillBattleGame {
             this._appendLog(logEl, `${mi('smart_toy', 14)} ${esc(studentName)} — AI 輸出完成（${output.length} 字）`, 'info');
 
             // Step 2: LLM-as-Judge 評分（細緻版）
-            const judgePrompt = element.judgePrompt || `你是一位嚴格的 Prompt 品質評審。請仔細分析學員的提示詞並嚴格打分。
+            let judgePrompt;
+            if (element.judgePrompt) {
+                judgePrompt = element.judgePrompt;
+            } else if (element.battleMode === 'skill') {
+                judgePrompt = `你是一位嚴格的 AI Skill 設計評審。請根據學員設計的 Skill 進行全面評估。
+
+═══ 評分資料 ═══
+
+【任務描述】
+${task}
+
+${reference ? `【標準 Skill 設計（參考答案）】\n${reference}\n` : '（無標準答案，請根據 Skill 設計品質綜合判斷）'}
+
+【學員設計的 Skill】
+${skill}
+
+【AI 使用該 Skill 後的實際輸出】
+${output}
+
+═══ 評分規則（滿分 100）═══
+
+A. Skill 名稱與描述（25 分）
+- 名稱是否清晰、精確描述功能（+10）
+- 描述是否完整說明用途與目標（+15）
+
+B. 執行細節的完整性（35 分）
+- 是否有明確的步驟流程（+10）
+- 是否有輸出格式要求（+10）
+- 是否有約束條件或品質標準（+10）
+- 是否考慮邊界情況或例外處理（+5）
+
+C. 與標準答案的接近程度（30 分）
+- 核心邏輯是否與標準答案一致（+15）
+- 執行細節是否涵蓋標準答案的關鍵步驟（+15）
+
+D. AI 輸出品質（10 分）
+- 使用該 Skill 後 AI 輸出是否符合任務要求（+10）
+
+═══ 重要 ═══
+1. 重點評估 Skill 描述的精確度和執行細節的完整性
+2. 只有名稱沒有細節的 Skill 應在 30-45 分
+3. 有結構但細節不足的 Skill 應在 50-65 分
+4. 執行細節完整且接近標準答案的 Skill 應在 70-85 分
+5. 嚴格對比標準答案的關鍵步驟是否被涵蓋
+
+只回傳 JSON，不要有任何其他文字：
+{"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>", "suggestions": "<80字以內的改進建議，具體說明如何修改 Skill 可以得到更好的結果>"}`;
+            } else {
+                judgePrompt = `你是一位嚴格的 Prompt 品質評審。請仔細分析學員的提示詞並嚴格打分。
 
 ═══ 評分資料 ═══
 
@@ -480,6 +609,7 @@ D. 差異化加分/扣分（10 分）
 
 只回傳 JSON，不要有任何其他文字：
 {"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>", "suggestions": "<80字以內的改進建議，具體說明如何修改 prompt 可以得到更好的結果>"}`;
+            }
 
             const judgeResult = await ai.chat([
                 { role: 'user', content: judgePrompt },

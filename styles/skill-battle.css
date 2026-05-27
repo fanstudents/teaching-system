@@ -31,17 +31,33 @@
 }
 
 /* ── 學員端 ── */
-.sb-student { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.sb-student { display: flex; flex-direction: column; gap: 14px; padding: 16px; height: 100%; }
+
+/* 左右分割版面 */
+.sb-student-layout {
+    display: flex; gap: 20px; flex: 1; min-height: 0;
+}
+.sb-student-left {
+    flex: 0 0 42%; display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto;
+}
+.sb-student-right {
+    flex: 1; display: flex; flex-direction: column; gap: 10px;
+}
+
 .sb-task-section {
     background: #f8fafc; border-radius: 12px; padding: 16px;
-    border-left: 3px solid #6366f1;
+    border-left: 3px solid #6366f1; flex: 1;
 }
 .sb-task-label {
     font-size: 0.8rem; color: #6366f1; font-weight: 600;
     display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
 }
-.sb-task-text { font-size: 0.92rem; color: #334155; line-height: 1.7; }
-.sb-input-section { display: flex; flex-direction: column; gap: 8px; }
+.sb-task-text {
+    font-size: 0.88rem; color: #334155; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+}
+.sb-input-section { display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .sb-input-label {
     font-size: 0.8rem; color: #475569; font-weight: 600;
     display: flex; align-items: center; gap: 6px;
@@ -51,7 +67,7 @@
     border: 1.5px solid #e2e8f0; border-radius: 10px;
     font-size: 0.88rem; line-height: 1.6; resize: vertical;
     transition: border-color 0.2s; font-family: inherit;
-    background: #fff;
+    background: #fff; flex: 1;
 }
 .sb-skill-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
 .sb-skill-input:disabled { background: #f1f5f9; color: #64748b; }
@@ -67,6 +83,38 @@
 }
 .sb-submit-btn:hover:not(:disabled) { background: #4f46e5; transform: translateY(-1px); }
 .sb-submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* ── Skill 模式欄位 ── */
+.sb-field-group {
+    display: flex; flex-direction: column; gap: 4px;
+}
+.sb-field-label {
+    font-size: 0.75rem; font-weight: 600; color: #6366f1;
+    display: flex; align-items: center; gap: 5px;
+}
+.sb-skill-name-input {
+    width: 100%; padding: 8px 12px;
+    border: 1.5px solid #e2e8f0; border-radius: 8px;
+    font-size: 0.88rem; font-family: inherit;
+    transition: border-color 0.2s; background: #fff;
+}
+.sb-skill-name-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.sb-skill-name-input:disabled { background: #f1f5f9; color: #64748b; }
+.sb-skill-desc-input,
+.sb-skill-detail-input {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid #e2e8f0; border-radius: 8px;
+    font-size: 0.82rem; line-height: 1.6; resize: vertical;
+    font-family: inherit; transition: border-color 0.2s;
+    background: #fff;
+}
+.sb-skill-desc-input:focus,
+.sb-skill-detail-input:focus {
+    border-color: #6366f1; outline: none;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+.sb-skill-desc-input:disabled,
+.sb-skill-detail-input:disabled { background: #f1f5f9; color: #64748b; }
 
 .sb-waiting {
     display: flex; align-items: center; gap: 8px;
