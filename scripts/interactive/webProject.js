@@ -72,37 +72,41 @@ export class WebProjectGame {
         const studentName = user.name || sess.studentName || '';
         const studentEmail = user.email || sess.studentEmail || '';
 
-        const supabaseUrl = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
-        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+        const SUPA_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
 
-        const apiPrompt = `請幫我將上面的網頁程式碼提交到教學系統。
+        // 產生給 AI 的完整提示詞（含 fetch 指令）
+        const buildApiPrompt = () => {
+            const task = element.question || '請幫我建立一個網頁';
+            return `${task}
 
-請先將 HTML、CSS、JS 合併成一個完整的 HTML 檔案（CSS 放 <style>，JS 放 <script>），然後用以下 API 提交：
+請將所有 HTML、CSS、JS 合併成一個完整的 HTML 檔案（CSS 放 <style>，JS 放 <script>）。
 
-fetch('${supabaseUrl}/rest/v1/submissions', {
+產生完程式碼後，請直接執行以下 fetch 提交到教學系統：
+
+fetch('${SUPA_URL}/rest/v1/submissions', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'apikey': '${anonKey}',
-    'Authorization': 'Bearer ${anonKey}',
+    'apikey': '${SUPA_KEY}',
+    'Authorization': 'Bearer ${SUPA_KEY}',
     'Prefer': 'return=representation'
   },
   body: JSON.stringify([{
     session_id: '${sessionCode}',
     element_id: '${elementId}',
-    student_name: '${studentName || '（你的名字）'}',
-    student_email: '${studentEmail || '（你的 Email）'}',
+    student_name: '${studentName || '名字'}',
+    student_email: '${studentEmail || 'email'}',
     type: 'webProject',
-    content: '（合併後的完整 HTML 放這裡）',
-    state: JSON.stringify({ mode: 'api', status: 'submitted', prompt: '（你下給 AI 的提示詞）' }),
+    assignment_title: '網頁作品',
+    content: 「合併後的完整 HTML 放這裡」,
+    state: JSON.stringify({ mode: 'api', status: 'submitted', prompt: 「你剛才下給 AI 的提示詞放這裡」 }),
     submitted_at: new Date().toISOString()
   }])
-})
-.then(r => r.json())
-.then(d => console.log('✅ 提交成功', d))
-.catch(e => console.error('❌ 提交失敗', e));
+}).then(r => r.json()).then(d => console.log('✅ 提交成功', d)).catch(e => console.error('❌', e));
 
-請直接執行這段 fetch，把合併後的 HTML 放到 content 欄位，提示詞放到 state 中的 prompt。`;
+請將 content 欄位替換為你產生的完整 HTML，然後執行 fetch。`;
+        };
 
         el.innerHTML = `
         <div class="wp-student">
@@ -144,9 +148,13 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
                 <div class="wp-card-method wp-card-ai">
                     <div class="wp-card-emoji">🤖</div>
                     <div class="wp-card-title">AI 提交</div>
-                    <div class="wp-card-desc">複製提示貼到 Claude / ChatGPT</div>
-                    <pre class="wp-api-prompt">${esc(apiPrompt)}</pre>
-                    <button class="wp-card-action-btn wp-api-copy-btn">${mi('content_copy', 16)} 複製提示</button>
+                    <div class="wp-card-desc">複製提示詞貼到 Claude / ChatGPT，AI 會自動提交</div>
+                    <div class="wp-ai-steps">
+                        <div class="wp-ai-step">??? 複製下方提示詞</div>
+                        <div class="wp-ai-step">??? 貼到 Claude / ChatGPT</div>
+                        <div class="wp-ai-step">??? AI 產生網頁並自動提交</div>
+                    </div>
+                    <button class="wp-card-action-btn wp-ai-copy-prompt">${mi('content_copy', 16)} 一鍵複製提示詞</button>
                 </div>
             </div>
 
@@ -175,13 +183,13 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
             });
         });
 
-        // ── 複製 API 提示 ──
-        el.querySelector('.wp-api-copy-btn')?.addEventListener('click', e => {
+        // ── 複製 AI 提示詞（含 fetch 指令） ──
+        el.querySelector('.wp-ai-copy-prompt')?.addEventListener('click', e => {
             e.stopPropagation();
-            navigator.clipboard.writeText(apiPrompt).then(() => {
-                const btn = el.querySelector('.wp-api-copy-btn');
-                btn.innerHTML = `${mi('check', 16)} 已複製！`;
-                setTimeout(() => btn.innerHTML = `${mi('content_copy', 16)} 複製提示`, 2000);
+            navigator.clipboard.writeText(buildApiPrompt()).then(() => {
+                const btn = el.querySelector('.wp-ai-copy-prompt');
+                btn.innerHTML = `${mi('check', 16)} 已複製！貼到 AI 對話即可`;
+                setTimeout(() => btn.innerHTML = `${mi('content_copy', 16)} 一鍵複製提示詞`, 3000);
             });
         });
 

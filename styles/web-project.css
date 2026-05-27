@@ -155,6 +155,24 @@
 }
 .wp-api-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.25); }
 
+/* AI 步驟 */
+.wp-ai-steps {
+    width: 100%; display: flex; flex-direction: column; gap: 3px;
+    margin: 4px 0;
+}
+.wp-ai-step {
+    font-size: 0.68rem; color: #475569; line-height: 1.4;
+}
+.wp-ai-copy-prompt {
+    padding: 8px 14px; width: 100%;
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    color: #fff; border: none; border-radius: 8px;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: all 0.2s;
+}
+.wp-ai-copy-prompt:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.25); }
+
 /* ═══════════════════════════════════════════════
    Mini 預覽
    ═══════════════════════════════════════════════ */
