@@ -40,7 +40,7 @@ module.exports = async function (request) {
 
     try {
         const body = await request.json();
-        const { session_id, student_name, student_email, html, css, js, title } = body;
+        const { session_id, student_name, student_email, html, css, js, title, prompt } = body;
         let { element_id } = body;
 
         // 驗證必填欄位
@@ -110,6 +110,7 @@ module.exports = async function (request) {
                 status: 'submitted',
                 combinedSize: combined.length,
                 files: ['index.html', ...(css ? ['style.css'] : []), ...(js ? ['script.js'] : [])],
+                prompt: prompt || '',
             }),
             submitted_at: new Date().toISOString(),
         };
