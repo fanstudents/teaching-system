@@ -1,8 +1,8 @@
 /**
  * 網頁作品展示 互動模組
  *
- * 學員上傳 HTML/CSS/JS 檔案，自動合併為單一 HTML，
- * 教師可即時預覽每位學員的網頁作品。
+ * 學員三種方式提交：上傳資料夾、貼上連結、透過 AI 工具 API 提交
+ * 教師即時預覽每位學員的網頁作品
  */
 import { stateManager } from './stateManager.js';
 import { db } from '../supabase.js';
@@ -10,100 +10,43 @@ import { db } from '../supabase.js';
 /* ── helpers ── */
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
-
-const MAX_TOTAL_SIZE = 5 * 1024 * 1024; // 5 MB
-
-const TEXT_EXTS = new Set(['html', 'htm', 'css', 'js', 'json', 'svg']);
+const MAX_TOTAL_SIZE = 5 * 1024 * 1024;
+const TEXT_EXTS = new Set(['html', 'htm', 'css', 'js', 'json', 'svg', 'txt']);
 const ALLOWED_EXTS = new Set([...TEXT_EXTS, 'png', 'jpg', 'jpeg', 'gif', 'webp']);
+function getExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
+function fmtSize(b) { return b < 1024 ? `${b} B` : b < 1048576 ? `${(b / 1024).toFixed(1)} KB` : `${(b / 1048576).toFixed(1)} MB`; }
 
-function getExt(name) {
-    return (name.split('.').pop() || '').toLowerCase();
-}
-
-function fmtSize(bytes) {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-/** 將多檔合併為單一自包含 HTML */
 function combineProject(files) {
-    // files: Map<filename, {name, type, content}>
-    // content: text string for text files, data URL for images
     let htmlFile = null;
-    let htmlName = null;
-
-    // 優先找 index.html
     for (const [name, f] of files) {
-        const lower = name.toLowerCase();
-        if (lower === 'index.html' || lower === 'index.htm') {
-            htmlFile = f.content; htmlName = name; break;
-        }
+        if (/^index\.html?$/i.test(name)) { htmlFile = f.content; break; }
     }
-    // 沒有 index.html → 用第一個 .html
     if (!htmlFile) {
-        for (const [name, f] of files) {
-            const ext = getExt(name);
-            if (ext === 'html' || ext === 'htm') {
-                htmlFile = f.content; htmlName = name; break;
-            }
+        for (const [, f] of files) {
+            if (/\.(html?)$/i.test(f.name)) { htmlFile = f.content; break; }
         }
     }
     if (!htmlFile) return null;
-
     let html = htmlFile;
-
-    // helper: 用 filename 取得內容
     const get = (href) => {
-        const stripped = href.replace(/^\.\//, '');
-        // 嘗試精確匹配，再試不帶路徑
-        const f = files.get(stripped) || files.get(stripped.split('/').pop());
+        const s = href.replace(/^\.\//, '');
+        const f = files.get(s) || files.get(s.split('/').pop());
         return f ? f.content : null;
     };
-
-    // Inline CSS: <link rel="stylesheet" href="X">
-    html = html.replace(/<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*\/?>/gi, (match, href) => {
-        const css = get(href);
-        return css ? `<style>/* ${esc(href)} */\n${css}</style>` : match;
-    });
-    // <link href="X" rel="stylesheet">
-    html = html.replace(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["']stylesheet["'][^>]*\/?>/gi, (match, href) => {
-        const css = get(href);
-        return css ? `<style>/* ${esc(href)} */\n${css}</style>` : match;
-    });
-
-    // Inline JS: <script src="X"></script>
-    html = html.replace(/<script[^>]*src=["']([^"']+)["'][^>]*><\/script>/gi, (match, src) => {
-        const js = get(src);
-        return js ? `<script>/* ${src} */\n${js}<\/script>` : match;
-    });
-
-    // Inline images in <img src="">
-    html = html.replace(/(<img[^>]*src=["'])([^"']+)(["'][^>]*>)/gi, (match, pre, src, post) => {
-        const dataUrl = get(src);
-        if (dataUrl && dataUrl.startsWith('data:')) return pre + dataUrl + post;
-        return match;
-    });
-
-    // Inline CSS url() references
-    html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (match, ref) => {
-        const dataUrl = get(ref);
-        if (dataUrl && dataUrl.startsWith('data:')) return `url(${dataUrl})`;
-        return match;
-    });
-
+    html = html.replace(/<link[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*\/?>/gi, (m, h) => { const c = get(h); return c ? `<style>/* ${h} */\n${c}</style>` : m; });
+    html = html.replace(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["']stylesheet["'][^>]*\/?>/gi, (m, h) => { const c = get(h); return c ? `<style>/* ${h} */\n${c}</style>` : m; });
+    html = html.replace(/<script[^>]*src=["']([^"']+)["'][^>]*><\/script>/gi, (m, s) => { const c = get(s); return c ? `<script>/* ${s} */\n${c}<\/script>` : m; });
+    html = html.replace(/(<img[^>]*src=["'])([^"']+)(["'][^>]*>)/gi, (m, a, s, b) => { const d = get(s); return d?.startsWith('data:') ? a + d + b : m; });
+    html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (m, r) => { const d = get(r); return d?.startsWith('data:') ? `url(${d})` : m; });
     return html;
 }
 
-/** 讀取單一 File 物件 → Promise<{name, type, content}> */
 function readFile(file) {
     return new Promise((resolve, reject) => {
         const ext = getExt(file.name);
         if (!ALLOWED_EXTS.has(ext)) { resolve(null); return; }
-
         const reader = new FileReader();
         reader.onerror = () => reject(new Error(`無法讀取 ${file.name}`));
-
         if (TEXT_EXTS.has(ext)) {
             reader.onload = () => resolve({ name: file.name, type: 'text', content: reader.result });
             reader.readAsText(file);
@@ -116,36 +59,24 @@ function readFile(file) {
 
 /* ═══════════════════════════════════════════════ */
 export class WebProjectGame {
-    constructor() {
-        this._intervals = new Map();
-    }
+    constructor() { this._intervals = new Map(); }
 
-    /* ── 編輯器預覽 ── */
     renderPreview(el, element) {
         el.innerHTML = `
-            <div class="wp-preview-card">
-                <div class="wp-preview-header">
-                    ${mi('web', 28)}
-                    <span>網頁作品展示</span>
-                </div>
+            <div class="wp-preview">
+                <div class="wp-preview-header">${mi('web', 28)}<span>網頁作品展示</span></div>
                 <div class="wp-preview-task">${esc(element.question || '（尚未設定任務描述）')}</div>
-                <div class="wp-preview-meta">
-                    <span>${mi('upload_file', 14)} .html .css .js .json .svg .png .jpg .gif</span>
-                </div>
+                <div class="wp-preview-meta"><span>${mi('upload_file', 14)} 上傳資料夾 / 貼連結 / AI 提交</span></div>
             </div>`;
     }
 
-    /* ── 簡報模式（學員 & 教師共用入口）── */
     render(el, element) {
         const elementId = el.closest('[data-id]')?.dataset.id || el.dataset.elementId || '';
         el.dataset.elementId = elementId;
         el.classList.add('web-project-container');
-
         const hwUser = sessionStorage.getItem('homework_user');
         const isPresenter = !!el.closest('.presentation-slide');
-        const isStudent = (hwUser && !isPresenter);
-
-        if (isStudent) this._renderStudent(el, element, elementId);
+        if (hwUser && !isPresenter) this._renderStudent(el, element, elementId);
         else this._renderTeacher(el, element, elementId);
     }
 
@@ -153,6 +84,36 @@ export class WebProjectGame {
     /*               學 員 端                          */
     /* ═══════════════════════════════════════════════ */
     async _renderStudent(el, element, elementId) {
+        // 取學員資訊
+        let user = {};
+        try { user = JSON.parse(sessionStorage.getItem('homework_user') || '{}'); } catch {}
+        const sess = (() => { try { return JSON.parse(sessionStorage.getItem('ix_student_session') || '{}'); } catch { return {}; } })();
+        const sessionCode = sess.sessionCode || sessionStorage.getItem('_session_code') || '';
+        const studentName = user.name || sess.studentName || '';
+        const studentEmail = user.email || sess.studentEmail || '';
+
+        // API prompt
+        const apiEndpoint = 'https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/submit-web-project';
+        const apiPrompt = `請幫我將上面的網頁程式碼提交到教學系統。
+
+使用以下 API：
+
+POST ${apiEndpoint}
+Content-Type: application/json
+
+{
+  "session_id": "${sessionCode}",
+  "element_id": "${elementId}",
+  "student_name": "${studentName || '（請填你的名字）'}",
+  "student_email": "${studentEmail || '（請填你的 Email）'}",
+  "html": "（把你的 HTML 放這裡）",
+  "css": "（把你的 CSS 放這裡，沒有就填空字串）",
+  "js": "（把你的 JS 放這裡，沒有就填空字串）",
+  "title": "我的網頁作品"
+}
+
+請用 fetch 發送 POST 請求，把 HTML、CSS、JS 分別放到對應的欄位。系統會自動合併。`;
+
         el.innerHTML = `
             <div class="wp-student">
                 <div class="wp-student-layout">
@@ -166,18 +127,48 @@ export class WebProjectGame {
                         </div>
                     </div>
                     <div class="wp-student-right">
-                        <div class="wp-upload-zone" id="wpDropZone">
-                            <div class="wp-upload-icon">${mi('cloud_upload', 48)}</div>
-                            <div class="wp-upload-text">拖放檔案到這裡，或點擊選擇</div>
-                            <div class="wp-upload-hint">支援 .html, .css, .js, .json, .svg, .png, .jpg, .gif</div>
-                            <input type="file" class="wp-file-input" multiple accept=".html,.htm,.css,.js,.json,.svg,.png,.jpg,.jpeg,.gif,.webp">
-                            <button class="wp-folder-btn">${mi('folder_open', 16)} 選擇資料夾</button>
-                            <input type="file" class="wp-folder-input" webkitdirectory style="display:none">
+                        <!-- 模式切換 -->
+                        <div class="wp-mode-tabs">
+                            <button class="wp-mode-tab active" data-mode="upload">${mi('folder_open', 15)} 上傳檔案</button>
+                            <button class="wp-mode-tab" data-mode="url">${mi('link', 15)} 貼連結</button>
+                            <button class="wp-mode-tab" data-mode="api">${mi('smart_toy', 15)} AI 提交</button>
                         </div>
-                        <div class="wp-file-list"></div>
+
+                        <!-- ① 上傳模式 -->
+                        <div class="wp-mode-panel" data-panel="upload">
+                            <div class="wp-upload-zone">
+                                <div class="wp-upload-icon">${mi('cloud_upload', 40)}</div>
+                                <div class="wp-upload-text">拖放檔案或點擊選擇</div>
+                                <div class="wp-upload-hint">.html .css .js .json .svg .png .jpg .gif</div>
+                                <input type="file" class="wp-file-input" multiple accept=".html,.htm,.css,.js,.json,.svg,.png,.jpg,.jpeg,.gif,.webp">
+                                <button class="wp-folder-btn">${mi('folder_open', 14)} 選擇資料夾</button>
+                                <input type="file" class="wp-folder-input" webkitdirectory style="display:none">
+                            </div>
+                            <div class="wp-file-list"></div>
+                        </div>
+
+                        <!-- ② 連結模式 -->
+                        <div class="wp-mode-panel" data-panel="url" style="display:none">
+                            <div class="wp-url-section">
+                                <label class="wp-url-label">${mi('link', 16)} 已部署的網頁連結</label>
+                                <input type="url" class="wp-url-input" placeholder="https://your-project.vercel.app">
+                                <div class="wp-url-hint">GitHub Pages、Vercel、Netlify 等</div>
+                            </div>
+                        </div>
+
+                        <!-- ③ AI 提交模式 -->
+                        <div class="wp-mode-panel" data-panel="api" style="display:none">
+                            <div class="wp-api-section">
+                                <div class="wp-api-title">${mi('smart_toy', 18)} 透過 AI 工具提交</div>
+                                <div class="wp-api-desc">在 Claude / ChatGPT 產生網頁後，複製以下提示貼到對話中，AI 會自動幫你提交：</div>
+                                <pre class="wp-api-prompt">${esc(apiPrompt)}</pre>
+                                <button class="wp-api-copy-btn">${mi('content_copy', 16)} 一鍵複製提示</button>
+                            </div>
+                        </div>
+
                         <div class="wp-preview-mini"></div>
                         <div class="wp-submit-bar">
-                            <span class="wp-file-count">尚未選擇檔案</span>
+                            <span class="wp-file-count">選擇上方的提交方式</span>
                             <button class="wp-submit-btn" disabled>${mi('send', 16)} 提交作品</button>
                         </div>
                     </div>
@@ -185,17 +176,40 @@ export class WebProjectGame {
             </div>`;
 
         // ── refs ──
+        const modeTabs = el.querySelectorAll('.wp-mode-tab');
+        const panels = el.querySelectorAll('.wp-mode-panel');
         const dropZone = el.querySelector('.wp-upload-zone');
         const fileInput = el.querySelector('.wp-file-input');
         const folderBtn = el.querySelector('.wp-folder-btn');
         const folderInput = el.querySelector('.wp-folder-input');
         const fileListEl = el.querySelector('.wp-file-list');
+        const urlInput = el.querySelector('.wp-url-input');
         const previewMini = el.querySelector('.wp-preview-mini');
         const submitBtn = el.querySelector('.wp-submit-btn');
         const fileCountEl = el.querySelector('.wp-file-count');
 
-        /** @type {Map<string, {name: string, type: string, content: string, size: number}>} */
+        let currentMode = 'upload';
         const projectFiles = new Map();
+
+        // ── 複製 API Prompt ──
+        el.querySelector('.wp-api-copy-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(apiPrompt).then(() => {
+                const btn = el.querySelector('.wp-api-copy-btn');
+                btn.innerHTML = `${mi('check', 16)} 已複製！`;
+                setTimeout(() => { btn.innerHTML = `${mi('content_copy', 16)} 一鍵複製提示`; }, 2000);
+            });
+        });
+
+        // ── 模式切換 ──
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                currentMode = tab.dataset.mode;
+                modeTabs.forEach(t => t.classList.toggle('active', t === tab));
+                panels.forEach(p => p.style.display = p.dataset.panel === currentMode ? '' : 'none');
+                updateSubmitState();
+            });
+        });
 
         // ── 複製題目 ──
         el.querySelector('.wp-copy-task-btn')?.addEventListener('click', (e) => {
@@ -209,157 +223,115 @@ export class WebProjectGame {
                 const ta = document.createElement('textarea');
                 ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
                 document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-                const btn = el.querySelector('.wp-copy-task-btn');
-                btn.innerHTML = `${mi('check', 14)} 已複製`;
-                setTimeout(() => { btn.innerHTML = `${mi('content_copy', 14)} 複製`; }, 1500);
             });
         });
 
-        // ── 更新檔案列表 UI ──
-        const renderFileList = () => {
-            if (projectFiles.size === 0) {
-                fileListEl.innerHTML = '';
-                fileCountEl.textContent = '尚未選擇檔案';
-                submitBtn.disabled = true;
+        // ── 提交狀態 ──
+        const updateSubmitState = () => {
+            if (currentMode === 'api') {
+                submitBtn.style.display = 'none';
+                fileCountEl.textContent = '複製提示後貼到 AI 對話中即可';
                 return;
             }
-
-            let totalSize = 0;
-            const rows = [];
-            for (const [name, f] of projectFiles) {
-                totalSize += f.size;
-                const icon = f.type === 'image' ? 'image' : getExt(name) === 'html' || getExt(name) === 'htm' ? 'html' : getExt(name) === 'css' ? 'css' : getExt(name) === 'js' ? 'javascript' : 'description';
-                rows.push(`
-                    <div class="wp-file-row" data-name="${esc(name)}">
-                        <span class="wp-file-icon">${mi(icon === 'html' ? 'code' : icon === 'css' ? 'palette' : icon === 'javascript' ? 'data_object' : icon === 'image' ? 'image' : 'description', 14)}</span>
-                        <span class="wp-file-name" title="${esc(name)}">${esc(name)}</span>
-                        <span class="wp-file-size">${fmtSize(f.size)}</span>
-                        <button class="wp-file-remove" data-name="${esc(name)}" title="移除">${mi('close', 14)}</button>
-                    </div>`);
+            submitBtn.style.display = '';
+            if (currentMode === 'url') {
+                const url = urlInput.value.trim();
+                const valid = url && /^https?:\/\//i.test(url);
+                submitBtn.disabled = !valid;
+                fileCountEl.textContent = valid ? '已輸入連結' : '請輸入 https:// 連結';
+            } else {
+                const hasHtml = [...projectFiles.keys()].some(n => /\.(html?)$/i.test(n));
+                let total = 0; projectFiles.forEach(f => total += f.size);
+                const over = total > MAX_TOTAL_SIZE;
+                submitBtn.disabled = !hasHtml || over;
+                if (projectFiles.size === 0) fileCountEl.textContent = '尚未選擇檔案';
+                else fileCountEl.innerHTML = `${projectFiles.size} 個檔案，${fmtSize(total)}` +
+                    (over ? ' <span style="color:#ef4444">（超過 5MB！）</span>' : '') +
+                    (!hasHtml ? ' <span style="color:#f97316">（需要 .html 檔）</span>' : '');
             }
+        };
+        urlInput.addEventListener('input', updateSubmitState);
 
-            fileListEl.innerHTML = rows.join('');
-
-            const hasHtml = [...projectFiles.keys()].some(n => getExt(n) === 'html' || getExt(n) === 'htm');
-            const overSize = totalSize > MAX_TOTAL_SIZE;
-
-            fileCountEl.innerHTML = `${projectFiles.size} 個檔案，共 ${fmtSize(totalSize)}` +
-                (overSize ? ` <span style="color:#ef4444">（超過 5MB 限制！）</span>` : '') +
-                (!hasHtml ? ` <span style="color:#f97316">（需要至少一個 .html 檔）</span>` : '');
-            submitBtn.disabled = !hasHtml || overSize;
-
-            // 綁定移除按鈕
-            fileListEl.querySelectorAll('.wp-file-remove').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    projectFiles.delete(btn.dataset.name);
-                    renderFileList();
-                });
-            });
+        // ── 檔案列表 ──
+        const renderFileList = () => {
+            if (!projectFiles.size) { fileListEl.innerHTML = ''; updateSubmitState(); return; }
+            fileListEl.innerHTML = [...projectFiles].map(([name, f]) => {
+                const ic = f.type === 'image' ? 'image' : /\.html?$/i.test(name) ? 'code' : /\.css$/i.test(name) ? 'palette' : /\.js$/i.test(name) ? 'data_object' : 'description';
+                return `<div class="wp-file-item"><div class="wp-file-item-left">${mi(ic, 14)}<span title="${esc(name)}">${esc(name)}</span></div><div class="wp-file-item-right"><span class="wp-file-size">${fmtSize(f.size)}</span><button class="wp-file-remove" data-name="${esc(name)}">${mi('close', 14)}</button></div></div>`;
+            }).join('');
+            updateSubmitState();
+            fileListEl.querySelectorAll('.wp-file-remove').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); projectFiles.delete(b.dataset.name); renderFileList(); }));
         };
 
         // ── 加入檔案 ──
         const addFiles = async (fileList) => {
-            const promises = [];
+            const tasks = [];
             for (const file of fileList) {
-                const ext = getExt(file.name);
-                if (!ALLOWED_EXTS.has(ext)) continue;
-                // 從資料夾上傳時取相對路徑，否則只取檔名
-                const relPath = file.webkitRelativePath
-                    ? file.webkitRelativePath.split('/').slice(1).join('/')  // 去掉第一層資料夾名
-                    : file.name;
-                promises.push(
-                    readFile(file).then(result => {
-                        if (result) {
-                            result.name = relPath || file.name;
-                            result.size = file.size;
-                            projectFiles.set(result.name, result);
-                        }
-                    }).catch(err => console.warn('讀取檔案失敗:', err))
-                );
+                if (!ALLOWED_EXTS.has(getExt(file.name))) continue;
+                const rel = file.webkitRelativePath ? file.webkitRelativePath.split('/').slice(1).join('/') : file.name;
+                tasks.push(readFile(file).then(r => { if (r) { r.name = rel || file.name; r.size = file.size; projectFiles.set(r.name, r); } }).catch(() => {}));
             }
-            await Promise.all(promises);
+            await Promise.all(tasks);
             renderFileList();
         };
 
-        // ── 事件綁定 ──
-        // 點擊 drop zone → 觸發 file input
-        dropZone.addEventListener('click', (e) => {
-            if (e.target.closest('.wp-folder-btn')) return;
-            fileInput.click();
-        });
+        dropZone.addEventListener('click', e => { if (!e.target.closest('.wp-folder-btn')) fileInput.click(); });
         fileInput.addEventListener('change', () => { if (fileInput.files.length) addFiles(fileInput.files); });
-
-        // 資料夾
-        folderBtn.addEventListener('click', (e) => { e.stopPropagation(); folderInput.click(); });
+        folderBtn.addEventListener('click', e => { e.stopPropagation(); folderInput.click(); });
         folderInput.addEventListener('change', () => { if (folderInput.files.length) addFiles(folderInput.files); });
-
-        // Drag & Drop
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('wp-drag-over'); });
-        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('wp-drag-over'); });
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('wp-drag-over');
-            if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
-        });
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
 
         // ── 提交 ──
-        const doSubmit = async () => {
-            const hasHtml = [...projectFiles.keys()].some(n => getExt(n) === 'html' || getExt(n) === 'htm');
-            if (!hasHtml) { alert('需要至少一個 .html 檔案'); return; }
-
-            const combined = combineProject(projectFiles);
-            if (!combined) { alert('合併失敗：無法解析 HTML 檔案'); return; }
-
+        submitBtn.addEventListener('click', async () => {
             submitBtn.disabled = true;
             submitBtn.innerHTML = `${mi('hourglass_top', 16)} 提交中...`;
-
             const title = element.question?.substring(0, 50) || '網頁作品';
-            const filenames = [...projectFiles.keys()];
+            let content, stateData;
+
+            if (currentMode === 'url') {
+                content = urlInput.value.trim();
+                stateData = { mode: 'url', url: content, status: 'submitted' };
+            } else {
+                const combined = combineProject(projectFiles);
+                if (!combined) { alert('合併失敗：找不到 HTML 檔案'); submitBtn.disabled = false; submitBtn.innerHTML = `${mi('send', 16)} 提交作品`; return; }
+                content = combined;
+                stateData = { mode: 'upload', files: [...projectFiles.keys()], status: 'submitted', combinedSize: combined.length };
+            }
 
             await stateManager.clear(elementId);
-            await stateManager.save(elementId, {
-                type: 'webProject',
-                title,
-                content: combined,
-                isCorrect: null,
-                score: null,
-                points: 0,
-                participated: true,
-                state: {
-                    files: filenames,
-                    status: 'submitted',
-                    combinedSize: combined.length,
-                },
-            });
-
+            await stateManager.save(elementId, { type: 'webProject', title, content, isCorrect: null, score: null, points: 0, participated: true, state: stateData });
             submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
-            showMiniPreview(combined);
-        };
+            showPreview(content, stateData.mode);
+        });
 
-        submitBtn.addEventListener('click', () => doSubmit());
-
-        // ── Mini Preview ──
-        const showMiniPreview = (html) => {
-            const escaped = html.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-            previewMini.innerHTML = `
-                <div class="wp-mini-preview-wrapper">
-                    <div class="wp-mini-preview-label">${mi('visibility', 14)} 作品預覽</div>
+        // ── Preview ──
+        const showPreview = (content, mode) => {
+            previewMini.style.display = 'block';
+            if (mode === 'url') {
+                previewMini.innerHTML = `
+                    <div class="wp-preview-mini-label">${mi('visibility', 14)} 作品預覽</div>
+                    <iframe class="wp-mini-iframe" src="${esc(content)}" sandbox="allow-scripts allow-same-origin"></iframe>
+                    <button class="wp-resubmit-btn">${mi('upload', 16)} 重新提交</button>`;
+            } else {
+                const escaped = content.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+                previewMini.innerHTML = `
+                    <div class="wp-preview-mini-label">${mi('visibility', 14)} 作品預覽</div>
                     <iframe class="wp-mini-iframe" sandbox="allow-scripts" srcdoc="${escaped}"></iframe>
-                    <button class="wp-reupload-btn">${mi('upload', 16)} 重新上傳</button>
-                </div>`;
-            previewMini.querySelector('.wp-reupload-btn')?.addEventListener('click', () => {
-                previewMini.innerHTML = '';
-                projectFiles.clear();
-                renderFileList();
-                submitBtn.disabled = true;
+                    <button class="wp-resubmit-btn">${mi('upload', 16)} 重新提交</button>`;
+            }
+            el.querySelectorAll('.wp-mode-panel').forEach(p => p.style.display = 'none');
+            el.querySelector('.wp-mode-tabs').style.display = 'none';
+
+            previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', () => {
+                previewMini.style.display = 'none'; previewMini.innerHTML = '';
+                projectFiles.clear(); renderFileList(); urlInput.value = '';
                 submitBtn.innerHTML = `${mi('send', 16)} 提交作品`;
-                dropZone.style.display = '';
-                fileListEl.style.display = '';
+                el.querySelector('.wp-mode-tabs').style.display = '';
+                panels.forEach(p => p.style.display = p.dataset.panel === currentMode ? '' : 'none');
+                updateSubmitState();
             });
-            // 隱藏上傳區
-            dropZone.style.display = 'none';
-            fileListEl.style.display = 'none';
         };
 
         // ── 載入歷史 ──
@@ -368,7 +340,7 @@ export class WebProjectGame {
             if (prev?.content && prev?.state?.status === 'submitted') {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `${mi('check', 16)} 已提交`;
-                showMiniPreview(prev.content);
+                showPreview(prev.content, prev.state.mode || 'upload');
             }
         }
     }
@@ -377,18 +349,16 @@ export class WebProjectGame {
     /*               教 師 端                          */
     /* ═══════════════════════════════════════════════ */
     async _renderTeacher(el, element, elementId) {
-        const sessionCode = sessionStorage.getItem('_session_code')
+        const sessionCode = window._activeSessionUUID
+            || sessionStorage.getItem('_session_code')
             || new URLSearchParams(location.search).get('code') || '';
 
         el.innerHTML = `
             <div class="wp-teacher">
                 <div class="wp-teacher-header">
                     <div class="wp-teacher-title">${mi('web', 22)} 網頁作品展示</div>
-                    <div class="wp-teacher-actions">
-                        <button class="wp-btn wp-btn-refresh">${mi('refresh', 16)} 刷新</button>
-                    </div>
+                    <div class="wp-teacher-count">共 0 份作品</div>
                 </div>
-                <div class="wp-teacher-count">共 0 份作品</div>
                 <div class="wp-teacher-grid"></div>
                 <div class="wp-teacher-empty">${mi('pending', 22)} 等待學員提交作品...</div>
             </div>`;
@@ -396,95 +366,79 @@ export class WebProjectGame {
         const gridEl = el.querySelector('.wp-teacher-grid');
         const emptyEl = el.querySelector('.wp-teacher-empty');
         const countEl = el.querySelector('.wp-teacher-count');
-        const refreshBtn = el.querySelector('.wp-btn-refresh');
-
         let lastHash = '';
 
         const loadSubmissions = async () => {
-            const filter = { element_id: 'eq.' + elementId, type: 'eq.webProject' };
+            const filter = { type: 'eq.webProject' };
+            if (elementId) filter.element_id = 'eq.' + elementId;
             if (sessionCode) filter.session_id = 'eq.' + sessionCode;
-
             const { data } = await db.select('submissions', { filter, order: 'created_at.asc' });
             const subs = data || [];
-
-            // Hash check — 避免無謂 DOM 重建
-            const hash = subs.map(s => s.id + (s.submitted_at || '')).join('|');
+            const hash = subs.map(s => s.id + (s.submitted_at || s.created_at || '')).join('|');
             if (hash === lastHash) return;
             lastHash = hash;
-
             countEl.textContent = `共 ${subs.length} 份作品`;
 
-            if (subs.length === 0) {
-                gridEl.innerHTML = '';
-                emptyEl.style.display = '';
-            } else {
-                emptyEl.style.display = 'none';
-                gridEl.innerHTML = subs.map((s, i) => {
-                    let state = {};
-                    try { state = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch { state = {}; }
-                    const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
-                    const files = state.files || [];
-                    const size = state.combinedSize || 0;
-
-                    return `
-                        <div class="wp-card" data-id="${s.id}">
-                            <div class="wp-card-header">
-                                <span class="wp-card-name">${mi('person', 16)} ${esc(name)}</span>
-                            </div>
-                            <div class="wp-card-info">
-                                <span>${mi('description', 12)} ${files.length} 個檔案</span>
-                                <span>${mi('data_usage', 12)} ${fmtSize(size)}</span>
-                            </div>
-                            <div class="wp-card-files" title="${esc(files.join(', '))}">${files.slice(0, 5).map(f => esc(f)).join(', ')}${files.length > 5 ? '…' : ''}</div>
-                            <button class="wp-card-preview-btn" data-submission-id="${s.id}">${mi('visibility', 14)} 預覽</button>
-                        </div>`;
-                }).join('');
-            }
+            if (!subs.length) { gridEl.innerHTML = ''; emptyEl.style.display = ''; return; }
+            emptyEl.style.display = 'none';
+            gridEl.innerHTML = subs.map((s, i) => {
+                let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
+                const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
+                const mode = st.mode || 'upload';
+                const files = st.files || [];
+                const size = st.combinedSize || 0;
+                const modeIcon = mode === 'url' ? '🔗' : mode === 'api' ? '🤖' : `${files.length}`;
+                const modeLabel = mode === 'url' ? '外部連結' : mode === 'api' ? 'AI 提交' : `${files.length} 個檔案 · ${fmtSize(size)}`;
+                return `
+                    <div class="wp-grid-card" style="animation-delay:${i * 0.06}s">
+                        <div class="wp-grid-card-header">
+                            <span class="wp-grid-card-name">${mi('person', 16)} ${esc(name)}</span>
+                            <span class="wp-grid-card-badge">${modeIcon}</span>
+                        </div>
+                        <div class="wp-grid-card-meta">${mi(mode === 'url' ? 'link' : mode === 'api' ? 'smart_toy' : 'description', 12)} ${modeLabel}</div>
+                        <div class="wp-grid-card-actions">
+                            <button class="wp-preview-btn" data-sid="${s.id}" data-mode="${mode}">${mi('visibility', 14)} 預覽</button>
+                        </div>
+                    </div>`;
+            }).join('');
         };
 
         await loadSubmissions();
 
-        // ── 刷新 ──
-        refreshBtn.addEventListener('click', () => { lastHash = ''; loadSubmissions(); });
-
-        // ── 預覽 Modal ──
-        gridEl.addEventListener('click', async (e) => {
-            const btn = e.target.closest('.wp-card-preview-btn');
+        gridEl.addEventListener('click', async e => {
+            const btn = e.target.closest('.wp-preview-btn');
             if (!btn) return;
-            const subId = btn.dataset.submissionId;
-
-            // 從 DB 讀取完整 content
-            const { data } = await db.select('submissions', { filter: { id: 'eq.' + subId }, limit: 1 });
+            const { data } = await db.select('submissions', { filter: { id: 'eq.' + btn.dataset.sid }, limit: 1 });
             if (!data?.length) return;
-            const sub = data[0];
+            const sub = data[0], mode = btn.dataset.mode;
             const name = sub.student_name || sub.student_email?.split('@')[0] || '學員';
-            const html = sub.content || '';
-            const escaped = html.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-
+            const content = sub.content || '';
             const modal = document.createElement('div');
             modal.className = 'wp-preview-modal';
-            modal.innerHTML = `
-                <div class="wp-modal-header">
-                    <span>${mi('web', 20)} ${esc(name)} 的作品</span>
-                    <button class="wp-modal-close">${mi('close', 22)}</button>
-                </div>
-                <iframe class="wp-modal-iframe" sandbox="allow-scripts allow-same-origin" srcdoc="${escaped}"></iframe>`;
-            document.body.appendChild(modal);
 
-            // 關閉
+            const modeTag = mode === 'url' ? ' <span style="font-size:0.72rem;color:#94a3b8;margin-left:8px">🔗 外部連結</span>'
+                : mode === 'api' ? ' <span style="font-size:0.72rem;color:#94a3b8;margin-left:8px">🤖 AI 提交</span>' : '';
+
+            if (mode === 'url') {
+                modal.innerHTML = `<div class="wp-modal-header"><span>${mi('web', 20)} ${esc(name)} 的作品${modeTag}</span><button class="wp-modal-close">${mi('close', 22)}</button></div>
+                    <iframe class="wp-modal-iframe" src="${esc(content)}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>`;
+            } else {
+                const escaped = content.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+                modal.innerHTML = `<div class="wp-modal-header"><span>${mi('web', 20)} ${esc(name)} 的作品${modeTag}</span><button class="wp-modal-close">${mi('close', 22)}</button></div>
+                    <iframe class="wp-modal-iframe" sandbox="allow-scripts allow-same-origin" srcdoc="${escaped}"></iframe>`;
+            }
+            document.body.appendChild(modal);
             const close = () => { modal.remove(); document.removeEventListener('keydown', onEsc); };
             modal.querySelector('.wp-modal-close').addEventListener('click', close);
-            modal.addEventListener('click', (ev) => { if (ev.target === modal) close(); });
-            const onEsc = (ev) => { if (ev.key === 'Escape') close(); };
+            modal.addEventListener('click', ev => { if (ev.target === modal) close(); });
+            const onEsc = ev => { if (ev.key === 'Escape') close(); };
             document.addEventListener('keydown', onEsc);
         });
 
-        // ── 自動刷新 ──
         const tid = setInterval(() => loadSubmissions(), 6000);
         this._intervals.set(elementId + '_teacher', tid);
     }
 
-    /* ── 清理 ── */
     destroy() {
         for (const [, id] of this._intervals) clearInterval(id);
         this._intervals.clear();
