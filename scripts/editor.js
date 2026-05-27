@@ -1532,6 +1532,37 @@ export class Editor {
                     </div>
                 </div>
             `;
+        } else if (type === 'groupPick') {
+            const gpCount = elementData.groupCount || 4;
+            const gpNames = elementData.groupNames || Array.from({length: gpCount}, (_, i) => `第 ${i+1} 組`);
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#7c3aed;">groups</span>
+                        分組設定
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">組數 <span id="gpCountDisplay" style="color:#7c3aed;font-weight:700;">${gpCount}</span></label>
+                        <input type="range" id="gpGroupCount" min="2" max="10" value="${gpCount}"
+                            style="width:100%;accent-color:#7c3aed;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">組別名稱</label>
+                        <div id="gpNameList" style="display:flex;flex-direction:column;gap:4px;">
+                            ${gpNames.map((name, i) => `
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span style="width:10px;height:10px;border-radius:50%;background:${(elementData.groupColors || [])[i] || ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'][i]};flex-shrink:0;"></span>
+                                    <input class="form-input gp-name-input" data-idx="${i}" value="${name}"
+                                        style="padding:4px 8px;font-size:12px;">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
+                        在預覽中點「排列座位」可拖曳排列組別位置，模擬教室桌位。
+                    </div>
+                </div>
+            `;
         } else if (type === 'skillBattle') {
             html += `
                 <div class="property-section">
@@ -2929,6 +2960,37 @@ ${truncated}
         // Web Project 事件
         if (elementData.type === 'webProject') {
             bindSimple('wpQuestion', 'question');
+        }
+
+        // Group Pick 事件
+        if (elementData.type === 'groupPick') {
+            const gpSlider = document.getElementById('gpGroupCount');
+            const gpCountDisplay = document.getElementById('gpCountDisplay');
+            if (gpSlider) {
+                gpSlider.addEventListener('input', () => {
+                    const newCount = parseInt(gpSlider.value);
+                    gpCountDisplay.textContent = newCount;
+                    // 擴展或縮減 names
+                    const oldNames = elementData.groupNames || [];
+                    const newNames = Array.from({length: newCount}, (_, i) => oldNames[i] || `第 ${i+1} 組`);
+                    this.slideManager.updateElement(elementId, {
+                        groupCount: newCount,
+                        groupNames: newNames,
+                        groupPositions: null // 重設位置
+                    });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
+            document.querySelectorAll('.gp-name-input').forEach(input => {
+                input.addEventListener('change', () => {
+                    const idx = parseInt(input.dataset.idx);
+                    const names = [...(elementData.groupNames || [])];
+                    names[idx] = input.value;
+                    this.slideManager.updateElement(elementId, { groupNames: names });
+                    this.slideManager.renderCurrentSlide();
+                });
+            });
         }
 
         // Skill Battle 事件

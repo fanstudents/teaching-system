@@ -13,7 +13,7 @@ const GROUP_COLORS = [
     '#14b8a6', '#6366f1'
 ];
 
-/** 預設 grid 位置（%），4 組為例 */
+/** 預設 grid 位置（%） */
 function defaultPositions(n) {
     const cols = Math.min(n, 4);
     const rows = Math.ceil(n / cols);
@@ -21,20 +21,54 @@ function defaultPositions(n) {
     for (let i = 0; i < n; i++) {
         const r = Math.floor(i / cols);
         const c = i % cols;
+        const xSpacing = cols <= 1 ? 0 : 70 / (cols - 1);
+        const ySpacing = rows <= 1 ? 0 : 50 / (rows - 1);
         result.push({
-            x: 10 + c * (80 / Math.max(cols - 1, 1)),
-            y: 15 + r * (70 / Math.max(rows - 1, 1))
+            x: 15 + c * xSpacing,
+            y: 25 + r * ySpacing
         });
     }
-    // 只有 1 行時置中偏上
-    if (rows === 1) result.forEach(p => p.y = 35);
+    if (rows === 1) result.forEach(p => p.y = 40);
     return result;
 }
 
 export class GroupPickGame {
 
-    /* ─── 編輯器預覽（可拖曳卡片位置）─── */
+    /* ─── 編輯器預覽 ─── */
     renderPreview(el, element) {
+        const n = element.groupCount || 4;
+        const names = element.groupNames || Array.from({length: n}, (_, i) => `第 ${i+1} 組`);
+        const colors = element.groupColors || GROUP_COLORS.slice(0, n);
+        const pos = element.groupPositions || defaultPositions(n);
+
+        el.innerHTML = `
+        <div class="gp-canvas gp-canvas--editor">
+            <div class="gp-canvas-header">
+                <span>👥 現場分組 · ${n} 組</span>
+            </div>
+            ${pos.slice(0, n).map((p, i) => `
+                <div class="gp-drag-card" style="--gp-color:${colors[i] || GROUP_COLORS[i]};left:${p.x}%;top:${p.y}%">
+                    <div class="gp-drag-card-name">${esc(names[i] || '第'+(i+1)+'組')}</div>
+                </div>
+            `).join('')}
+            <button class="gp-arrange-btn" title="排列座位">
+                ${mi('open_with', 18)} 排列座位
+            </button>
+        </div>`;
+
+        // 排列座位 → 開彈窗
+        el.querySelector('.gp-arrange-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            this._openArrangeModal(element);
+        });
+    }
+
+    /* ─── 排列座位彈窗 ─── */
+    _openArrangeModal(element) {
+        // 移除舊彈窗
+        document.getElementById('gpArrangeOverlay')?.remove();
+
         const n = element.groupCount || 4;
         const names = element.groupNames || Array.from({length: n}, (_, i) => `第 ${i+1} 組`);
         const colors = element.groupColors || GROUP_COLORS.slice(0, n);
@@ -43,22 +77,62 @@ export class GroupPickGame {
         }
         const pos = element.groupPositions;
 
-        el.innerHTML = `
-        <div class="gp-canvas">
-            <div class="gp-canvas-hint">${mi('open_with', 14)} 拖曳卡片排列教室座位</div>
-            ${pos.map((p, i) => `
-                <div class="gp-drag-card" data-idx="${i}"
-                     style="--gp-color:${colors[i]};left:${p.x}%;top:${p.y}%">
-                    <div class="gp-drag-card-name">${esc(names[i])}</div>
+        const overlay = document.createElement('div');
+        overlay.id = 'gpArrangeOverlay';
+        overlay.className = 'gp-modal-overlay';
+        overlay.innerHTML = `
+            <div class="gp-modal">
+                <div class="gp-modal-header">
+                    <div class="gp-modal-title">${mi('open_with', 22)} 拖曳排列教室座位</div>
+                    <button class="gp-modal-close">${mi('close', 22)}</button>
                 </div>
-            `).join('')}
-        </div>`;
+                <div class="gp-modal-canvas" id="gpModalCanvas">
+                    <div class="gp-modal-canvas-label">講台</div>
+                    ${pos.slice(0, n).map((p, i) => `
+                        <div class="gp-drag-card" data-idx="${i}"
+                             style="--gp-color:${colors[i] || GROUP_COLORS[i]};left:${p.x}%;top:${p.y}%">
+                            <div class="gp-drag-card-name">${esc(names[i] || '第'+(i+1)+'組')}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="gp-modal-footer">
+                    <button class="gp-modal-reset">${mi('restart_alt', 16)} 重設位置</button>
+                    <button class="gp-modal-save">${mi('check', 18)} 完成</button>
+                </div>
+            </div>`;
 
-        // 拖曳邏輯
-        this._enableDrag(el.querySelector('.gp-canvas'), pos, () => {
+        document.body.appendChild(overlay);
+
+        // 拖曳
+        const canvas = document.getElementById('gpModalCanvas');
+        this._enableDrag(canvas, pos);
+
+        // 重設
+        overlay.querySelector('.gp-modal-reset').addEventListener('click', () => {
+            const newPos = defaultPositions(n);
+            newPos.forEach((p, i) => { pos[i] = p; });
+            canvas.querySelectorAll('.gp-drag-card').forEach((card, i) => {
+                card.style.left = pos[i].x + '%';
+                card.style.top = pos[i].y + '%';
+            });
+        });
+
+        // 完成
+        const closeModal = () => {
             element.groupPositions = [...pos];
             window.dispatchEvent(new Event('slideContentChanged'));
-        });
+            overlay.remove();
+            // 重新渲染預覽
+            const editorEl = document.querySelector(`[data-element-id="${element.id}"]`);
+            if (editorEl) {
+                const inner = editorEl.querySelector('.element-content') || editorEl;
+                this.renderPreview(inner, element);
+            }
+        };
+
+        overlay.querySelector('.gp-modal-close').addEventListener('click', closeModal);
+        overlay.querySelector('.gp-modal-save').addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
     }
 
     /* ─── 即時模式入口 ─── */
@@ -110,7 +184,7 @@ export class GroupPickGame {
                     const sel = myGroup === idx;
                     const cnt = counts[idx] || 0;
                     return `<button class="gp-pos-btn ${sel ? 'selected' : ''}" data-group="${idx}"
-                        style="--gp-color:${color};left:${p.x}%;top:${p.y}%;border-color:${sel ? color : '#e2e8f0'}">
+                        style="--gp-color:${color};left:${p.x}%;top:${p.y}%">
                         <div class="gp-pos-btn-name">${esc(groupNames[i])}</div>
                         <div class="gp-pos-btn-count">${cnt} 人</div>
                         ${sel ? `<div class="gp-pos-btn-check">${mi('check_circle', 16)}</div>` : ''}
@@ -201,15 +275,14 @@ export class GroupPickGame {
         const canvas = el.querySelector('.gp-canvas');
         const statsEl = el.querySelector('.gp-teacher-stats');
         let lastHash = '';
+        let cardsCreated = false;
 
         const load = async () => {
-            // 1. 讀取分組
             const pickFilter = { type: 'eq.groupPick', element_id: 'eq.' + elementId };
             if (sessionCode) pickFilter.session_id = 'eq.' + sessionCode;
             const { data: picks } = await db.select('submissions', { filter: pickFilter });
             const pickList = picks || [];
 
-            // 2. 組別 → 成員
             const groups = {};
             pickList.forEach(p => {
                 const g = p.content;
@@ -220,7 +293,6 @@ export class GroupPickGame {
                 });
             });
 
-            // 3. 分數
             const scoreFilter = { session_id: 'eq.' + sessionCode };
             const { data: allSubs } = await db.select('submissions', {
                 filter: scoreFilter,
@@ -238,91 +310,105 @@ export class GroupPickGame {
 
             statsEl.textContent = `${pickList.length} 人已分組`;
 
-            // 移除舊卡片（保留 header + hint）
-            canvas.querySelectorAll('.gp-team-card').forEach(c => c.remove());
+            // 首次建立卡片 or 更新內容
+            if (!cardsCreated) {
+                for (let i = 0; i < groupCount; i++) {
+                    const idx = String(i + 1);
+                    const color = groupColors[i] || GROUP_COLORS[i];
+                    const name = groupNames[i] || `第 ${idx} 組`;
+                    const members = groups[idx] || [];
+                    const score = Math.round(groupScores[idx] || 0);
+                    const p = pos[i] || { x: 10, y: 10 };
 
-            // 渲染卡片（絕對定位）
-            for (let i = 0; i < groupCount; i++) {
-                const idx = String(i + 1);
-                const color = groupColors[i] || GROUP_COLORS[i];
-                const name = groupNames[i] || `第 ${idx} 組`;
-                const members = groups[idx] || [];
-                const score = Math.round(groupScores[idx] || 0);
-                const p = pos[i] || { x: 10, y: 10 };
-
-                const card = document.createElement('div');
-                card.className = 'gp-team-card gp-team-card--abs';
-                card.dataset.idx = String(i);
-                card.style.cssText = `--gp-color:${color};left:${p.x}%;top:${p.y}%`;
-                card.innerHTML = `
-                    <div class="gp-team-card-header">
-                        <div class="gp-team-card-name">${esc(name)}</div>
-                        <div class="gp-team-card-score">${score}</div>
-                    </div>
-                    <div class="gp-team-card-count">${mi('person', 14)} ${members.length} 人</div>
-                    <div class="gp-team-card-members">
-                        ${members.map(m => `<span class="gp-member-chip">${esc(m.name)}</span>`).join('')}
-                    </div>`;
-                canvas.appendChild(card);
+                    const card = document.createElement('div');
+                    card.className = 'gp-team-card gp-team-card--abs';
+                    card.dataset.idx = String(i);
+                    card.style.cssText = `--gp-color:${color};left:${p.x}%;top:${p.y}%`;
+                    card.innerHTML = this._teamCardHTML(name, score, members);
+                    canvas.appendChild(card);
+                }
+                cardsCreated = true;
+                this._enableDrag(canvas, pos, () => {
+                    element.groupPositions = [...pos];
+                    try { window.dispatchEvent(new Event('slideContentChanged')); } catch {}
+                });
+            } else {
+                // 只更新內容，不重建 DOM（保留拖曳位置）
+                canvas.querySelectorAll('.gp-team-card').forEach(card => {
+                    const i = parseInt(card.dataset.idx);
+                    const idx = String(i + 1);
+                    const name = groupNames[i] || `第 ${idx} 組`;
+                    const members = groups[idx] || [];
+                    const score = Math.round(groupScores[idx] || 0);
+                    card.innerHTML = this._teamCardHTML(name, score, members);
+                });
             }
-
-            // 啟用拖曳
-            this._enableDrag(canvas, pos, () => {
-                element.groupPositions = [...pos];
-                // 講師端 presentation mode 通常不能直接存，但位置會保留在記憶體
-                try { window.dispatchEvent(new Event('slideContentChanged')); } catch {}
-            });
         };
 
         await load();
         this._teacherTimer = setInterval(load, 5000);
     }
 
+    _teamCardHTML(name, score, members) {
+        return `
+            <div class="gp-team-card-header">
+                <div class="gp-team-card-name">${esc(name)}</div>
+                <div class="gp-team-card-score">${score}</div>
+            </div>
+            <div class="gp-team-card-count">${mi('person', 14)} ${members.length} 人</div>
+            <div class="gp-team-card-members">
+                ${members.map(m => `<span class="gp-member-chip">${esc(m.name)}</span>`).join('')}
+            </div>`;
+    }
+
     /* ═══════════════════════════════════════
-       拖曳引擎（共用）
+       拖曳引擎（pointer events）
        ═══════════════════════════════════════ */
     _enableDrag(canvas, positions, onEnd) {
         if (!canvas) return;
         const cards = canvas.querySelectorAll('[data-idx]');
+
         cards.forEach(card => {
-            // 避免重複綁定
             if (card._gpDragBound) return;
             card._gpDragBound = true;
 
-            let startX, startY, origX, origY, dragging = false;
+            let dragging = false, startX, startY, origX, origY;
 
-            const onPointerDown = (e) => {
+            card.addEventListener('pointerdown', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
                 dragging = true;
+
                 const rect = canvas.getBoundingClientRect();
-                startX = (e.touches ? e.touches[0].clientX : e.clientX);
-                startY = (e.touches ? e.touches[0].clientY : e.clientY);
+                startX = e.clientX;
+                startY = e.clientY;
                 const idx = parseInt(card.dataset.idx);
                 origX = positions[idx]?.x ?? 0;
                 origY = positions[idx]?.y ?? 0;
-                card.style.zIndex = '10';
+
+                card.setPointerCapture(e.pointerId);
+                card.style.zIndex = '20';
                 card.style.transition = 'none';
                 card.classList.add('gp-dragging');
-            };
+            });
 
-            const onPointerMove = (e) => {
+            card.addEventListener('pointermove', (e) => {
                 if (!dragging) return;
                 e.preventDefault();
                 const rect = canvas.getBoundingClientRect();
-                const cx = (e.touches ? e.touches[0].clientX : e.clientX);
-                const cy = (e.touches ? e.touches[0].clientY : e.clientY);
-                const dx = ((cx - startX) / rect.width) * 100;
-                const dy = ((cy - startY) / rect.height) * 100;
-                const nx = Math.max(0, Math.min(85, origX + dx));
-                const ny = Math.max(0, Math.min(85, origY + dy));
+                const dx = ((e.clientX - startX) / rect.width) * 100;
+                const dy = ((e.clientY - startY) / rect.height) * 100;
+                const nx = Math.max(2, Math.min(90, origX + dx));
+                const ny = Math.max(2, Math.min(90, origY + dy));
                 card.style.left = nx + '%';
                 card.style.top = ny + '%';
-            };
+            });
 
-            const onPointerUp = () => {
+            card.addEventListener('pointerup', (e) => {
                 if (!dragging) return;
                 dragging = false;
+                card.releasePointerCapture(e.pointerId);
                 card.style.zIndex = '';
                 card.style.transition = '';
                 card.classList.remove('gp-dragging');
@@ -332,14 +418,13 @@ export class GroupPickGame {
                     y: parseFloat(card.style.top)
                 };
                 if (onEnd) onEnd();
-            };
+            });
 
-            card.addEventListener('mousedown', onPointerDown);
-            card.addEventListener('touchstart', onPointerDown, { passive: false });
-            document.addEventListener('mousemove', onPointerMove);
-            document.addEventListener('touchmove', onPointerMove, { passive: false });
-            document.addEventListener('mouseup', onPointerUp);
-            document.addEventListener('touchend', onPointerUp);
+            // 防止編輯器攔截
+            card.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            });
         });
     }
 }

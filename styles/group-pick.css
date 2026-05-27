@@ -2,7 +2,7 @@
    分組選擇器 — Group Pick
    ═══════════════════════════════════════════════ */
 
-/* ── 共用畫布（自由擺放）── */
+/* ── 共用畫布 ── */
 .gp-canvas {
     width: 100%; height: 100%;
     position: relative;
@@ -14,7 +14,17 @@
         #fafbfc;
     border-radius: 10px;
 }
-
+.gp-canvas--editor {
+    background:
+        radial-gradient(circle at 50% 50%, rgba(124,58,237,0.05) 0%, transparent 50%),
+        linear-gradient(135deg, #f0f9ff, #ede9fe);
+}
+.gp-canvas-header {
+    position: absolute; top: 10px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.82rem; font-weight: 700; color: #334155;
+    z-index: 5; white-space: nowrap;
+}
 .gp-canvas-hint {
     position: absolute; bottom: 8px; left: 50%;
     transform: translateX(-50%);
@@ -26,32 +36,144 @@
     backdrop-filter: blur(4px);
 }
 
-/* ── 編輯器拖曳卡片 ── */
+/* ── 排列座位按鈕（編輯器預覽） ── */
+.gp-arrange-btn {
+    position: absolute; bottom: 12px; right: 12px;
+    z-index: 10;
+    display: flex; align-items: center; gap: 4px;
+    padding: 6px 14px;
+    background: rgba(124,58,237,0.9);
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 0.72rem; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 2px 10px rgba(124,58,237,0.3);
+    transition: all 0.2s;
+}
+.gp-arrange-btn:hover {
+    background: rgba(124,58,237,1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+}
+
+/* ── 拖曳卡片 ── */
 .gp-drag-card {
     position: absolute;
     transform: translate(-50%, -50%);
-    padding: 12px 18px;
-    border-radius: 14px;
+    padding: 10px 16px;
+    border-radius: 12px;
     background: #fff;
     border: 2.5px solid var(--gp-color);
     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     cursor: grab; user-select: none;
+    touch-action: none;
     transition: box-shadow 0.2s, transform 0.15s;
     z-index: 2;
-    min-width: 80px; text-align: center;
+    min-width: 72px; text-align: center;
 }
 .gp-drag-card:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,0.1);
 }
 .gp-drag-card.gp-dragging {
     cursor: grabbing;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    transform: translate(-50%, -50%) scale(1.06);
-    z-index: 20;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+    transform: translate(-50%, -50%) scale(1.08);
+    z-index: 20 !important;
 }
 .gp-drag-card-name {
-    font-size: 0.85rem; font-weight: 700;
+    font-size: 0.82rem; font-weight: 700;
     color: var(--gp-color);
+}
+
+/* ═══════════════════════════════════════════════
+   排列座位彈窗
+   ═══════════════════════════════════════════════ */
+.gp-modal-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    animation: gpFadeIn 0.2s ease;
+}
+@keyframes gpFadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+}
+.gp-modal {
+    width: 90vw; max-width: 800px;
+    background: #fff; border-radius: 20px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    animation: gpSlideUp 0.3s ease;
+}
+@keyframes gpSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.gp-modal-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.gp-modal-title {
+    font-size: 1rem; font-weight: 700; color: #0f172a;
+    display: flex; align-items: center; gap: 8px;
+}
+.gp-modal-close {
+    background: none; border: none;
+    cursor: pointer; color: #94a3b8;
+    padding: 4px; border-radius: 8px;
+    transition: background 0.2s;
+}
+.gp-modal-close:hover { background: #f1f5f9; color: #475569; }
+
+.gp-modal-canvas {
+    position: relative;
+    width: 100%; height: 400px;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(99,102,241,0.06) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, #f1f5f940 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, #f1f5f940 40px),
+        #fafbfc;
+    overflow: hidden;
+}
+.gp-modal-canvas-label {
+    position: absolute; top: 10px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem; font-weight: 600;
+    color: #94a3b8; letter-spacing: 4px;
+    border-bottom: 2px dashed #cbd5e1;
+    padding: 0 30px 6px;
+}
+.gp-modal-footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid #f1f5f9;
+}
+.gp-modal-reset {
+    display: flex; align-items: center; gap: 4px;
+    background: none; border: 1px solid #e2e8f0;
+    border-radius: 8px; padding: 6px 14px;
+    font-size: 0.75rem; color: #64748b;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.2s;
+}
+.gp-modal-reset:hover { background: #f8fafc; color: #334155; }
+
+.gp-modal-save {
+    display: flex; align-items: center; gap: 4px;
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    border: none; border-radius: 10px;
+    padding: 8px 20px;
+    font-size: 0.82rem; font-weight: 600;
+    color: #fff; cursor: pointer; font-family: inherit;
+    box-shadow: 0 2px 10px rgba(99,102,241,0.3);
+    transition: all 0.2s;
+}
+.gp-modal-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.4);
 }
 
 /* ── 講師端 ── */
@@ -76,28 +198,27 @@
 .gp-teacher-stats {
     font-size: 0.78rem; color: #64748b;
 }
-
-/* 講師端絕對定位卡片 */
 .gp-team-card--abs {
     position: absolute;
     transform: translate(-50%, -50%);
     cursor: grab; user-select: none;
+    touch-action: none;
     z-index: 2;
-    width: auto; min-width: 140px; max-width: 200px;
+    width: auto; min-width: 130px; max-width: 200px;
 }
 .gp-team-card--abs.gp-dragging {
     cursor: grabbing;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.18) !important;
-    transform: translate(-50%, -50%) scale(1.05);
-    z-index: 20;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.18) !important;
+    transform: translate(-50%, -50%) scale(1.06);
+    z-index: 20 !important;
 }
 
 .gp-team-card {
     background: #fff;
     border: 2px solid #e2e8f0;
     border-radius: 14px;
-    padding: 12px 14px;
-    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 5px;
     transition: box-shadow 0.3s, transform 0.2s;
     position: relative; overflow: hidden;
 }
@@ -110,30 +231,29 @@
 .gp-team-card:hover {
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-
 .gp-team-card-header {
     display: flex; align-items: center;
     justify-content: space-between;
 }
 .gp-team-card-name {
-    font-size: 0.88rem; font-weight: 700;
+    font-size: 0.85rem; font-weight: 700;
     color: var(--gp-color);
 }
 .gp-team-card-score {
-    font-size: 1.2rem; font-weight: 800;
+    font-size: 1.1rem; font-weight: 800;
     color: var(--gp-color);
 }
 .gp-team-card-members {
     display: flex; flex-wrap: wrap; gap: 3px;
 }
 .gp-member-chip {
-    font-size: 0.6rem; font-weight: 500;
-    padding: 1px 7px; border-radius: 10px;
+    font-size: 0.58rem; font-weight: 500;
+    padding: 1px 6px; border-radius: 8px;
     background: #f1f5f9; color: #475569;
     white-space: nowrap;
 }
 .gp-team-card-count {
-    font-size: 0.65rem; color: #94a3b8;
+    font-size: 0.62rem; color: #94a3b8;
     display: flex; align-items: center; gap: 3px;
 }
 
@@ -143,30 +263,28 @@
         radial-gradient(circle at 50% 50%, rgba(59,130,246,0.04) 0%, transparent 60%),
         #fafbfc;
 }
-
 .gp-student-title {
     position: absolute; top: 8px; left: 50%;
     transform: translateX(-50%);
-    font-size: 0.88rem; font-weight: 700; color: #0f172a;
+    font-size: 0.85rem; font-weight: 700; color: #0f172a;
     display: flex; align-items: center; gap: 6px;
     z-index: 5; white-space: nowrap;
     background: rgba(255,255,255,0.8);
     padding: 4px 14px; border-radius: 10px;
     backdrop-filter: blur(4px);
 }
-
 .gp-pos-btn {
     position: absolute;
     transform: translate(-50%, -50%);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 14px 18px; gap: 4px;
+    padding: 12px 16px; gap: 4px;
     border: 2.5px solid #e2e8f0;
     border-radius: 14px;
     background: #fff;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    min-width: 90px; min-height: 70px;
+    min-width: 85px; min-height: 60px;
     z-index: 2;
 }
 .gp-pos-btn:hover {
@@ -180,36 +298,23 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 .gp-pos-btn-name {
-    font-size: 0.88rem; font-weight: 700;
+    font-size: 0.85rem; font-weight: 700;
     color: var(--gp-color, #475569);
 }
 .gp-pos-btn-count {
-    font-size: 0.65rem; color: #94a3b8;
+    font-size: 0.62rem; color: #94a3b8;
 }
 .gp-pos-btn-check {
     position: absolute; top: 4px; right: 6px;
     color: var(--gp-color);
 }
-
 .gp-float-info {
-    position: absolute; bottom: 32px; left: 50%;
+    position: absolute; bottom: 10px; left: 50%;
     transform: translateX(-50%);
-    font-size: 0.75rem; color: #475569;
+    font-size: 0.72rem; color: #475569;
     background: rgba(255,255,255,0.9);
-    padding: 6px 16px; border-radius: 10px;
+    padding: 5px 14px; border-radius: 10px;
     border: 1px solid #e2e8f0;
     z-index: 5; white-space: nowrap;
     backdrop-filter: blur(4px);
 }
-
-/* ── 編輯器預覽 ── */
-.gp-preview {
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #f0f9ff, #ede9fe);
-    border-radius: 14px; gap: 8px;
-}
-.gp-preview-icon { font-size: 2.5rem; }
-.gp-preview-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
-.gp-preview-sub { font-size: 0.78rem; color: #64748b; }
