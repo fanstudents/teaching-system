@@ -609,6 +609,22 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    /**
+     * 新增分組選擇器
+     */
+    addGroupPick() {
+        const element = {
+            type: 'groupPick',
+            x: 50, y: 30,
+            width: 860, height: 460,
+            groupCount: 4,
+            groupNames: ['第 1 組', '第 2 組', '第 3 組', '第 4 組'],
+            groupColors: ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b'],
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
 
     /**
      * 新增可複製文字卡片

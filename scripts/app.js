@@ -534,6 +534,11 @@ class App {
             this.editor.addWebProject();
         });
 
+        // 分組選擇器
+        document.getElementById('addGroupPickBtn')?.addEventListener('click', () => {
+            this.editor.addGroupPick();
+        });
+
         // 課前/課後評量
         document.getElementById('addAssessmentPreBtn')?.addEventListener('click', () => {
             this.editor.addAssessment('pre');

@@ -1313,6 +1313,18 @@ export class SlideManager {
                 break;
             }
 
+            case 'groupPick': {
+                el.classList.add('interactive-element', 'group-pick-element');
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                    import('./interactive/groupPick.js').then(({ GroupPickGame }) => {
+                        if (isLive) new GroupPickGame().render(el, element);
+                        else new GroupPickGame().renderPreview(el, element);
+                    });
+                });
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
