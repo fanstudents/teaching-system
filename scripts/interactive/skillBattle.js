@@ -896,7 +896,12 @@ export class SkillBattleReviewGame {
                     <div class="sb-review-title">
                         📝 提示詞檢討牆
                     </div>
-                    <div class="sb-review-subtitle"><span class="sb-review-count">共 0 筆提交</span></div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <select class="sb-review-filter" title="選擇競技場">
+                            <option value="">全部競技場</option>
+                        </select>
+                        <div class="sb-review-subtitle"><span class="sb-review-count">共 0 筆提交</span></div>
+                    </div>
                 </div>
                 <div class="sb-review-list"></div>
                 <div class="sb-review-empty">${mi('pending', 22)} 等待提交資料...</div>
@@ -905,7 +910,15 @@ export class SkillBattleReviewGame {
         const listEl = el.querySelector('.sb-review-list');
         const emptyEl = el.querySelector('.sb-review-empty');
         const countEl = el.querySelector('.sb-review-count');
+        const filterEl = el.querySelector('.sb-review-filter');
         let lastHash = '';
+        let selectedElementId = ''; // '' = all
+
+        filterEl.addEventListener('change', () => {
+            selectedElementId = filterEl.value;
+            lastHash = ''; // force refresh
+            load();
+        });
 
         const load = async () => {
             const sessionId = window._activeSessionUUID
@@ -919,10 +932,40 @@ export class SkillBattleReviewGame {
                 order: 'created_at.asc',
             });
 
-            const subs = data || [];
+            const allSubs = data || [];
+
+            // 動態更新下拉選單（用 element_id + assignment_title 區分）
+            const elementMap = new Map();
+            allSubs.forEach(s => {
+                const eid = s.element_id || '';
+                if (eid && !elementMap.has(eid)) {
+                    elementMap.set(eid, s.assignment_title || `競技場 ${elementMap.size + 1}`);
+                }
+            });
+
+            // 只在選項數量變化時更新下拉選單
+            const optKeys = [...elementMap.keys()].join(',');
+            if (filterEl.dataset.keys !== optKeys) {
+                filterEl.dataset.keys = optKeys;
+                const currentVal = filterEl.value;
+                filterEl.innerHTML = '<option value="">📋 全部競技場</option>';
+                let idx = 1;
+                elementMap.forEach((title, eid) => {
+                    const opt = document.createElement('option');
+                    opt.value = eid;
+                    opt.textContent = `#${idx++} ${title}`;
+                    filterEl.appendChild(opt);
+                });
+                filterEl.value = currentVal || '';
+            }
+
+            // 依據選擇篩選
+            const subs = selectedElementId
+                ? allSubs.filter(s => s.element_id === selectedElementId)
+                : allSubs;
 
             // hash 比對避免不必要的 DOM 重建
-            const hash = JSON.stringify(subs.map(s => s.id + (s.state || '')));
+            const hash = JSON.stringify(subs.map(s => s.id + (s.state || ''))) + selectedElementId;
             if (hash === lastHash) return;
             lastHash = hash;
 

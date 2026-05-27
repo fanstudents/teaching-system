@@ -514,6 +514,12 @@
     content: ''; width: 6px; height: 6px; border-radius: 50%;
     background: #a78bfa; animation: sb-dot-pulse 2s ease-in-out infinite;
 }
+.sb-review-filter {
+    padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 6px;
+    font-size: 0.72rem; font-weight: 600; color: #475569;
+    background: #fff; cursor: pointer; max-width: 180px;
+}
+.sb-review-filter:focus { border-color: #6366f1; outline: none; }
 .sb-review-list {
     flex: 1; display: flex; flex-direction: column; gap: 10px;
     overflow-y: auto; padding-right: 4px;
