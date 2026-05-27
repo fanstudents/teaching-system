@@ -2767,6 +2767,15 @@
                     break;
                 }
 
+                case 'skillBattleReview': {
+                    el.classList.add('interactive-element', 'skill-battle-review-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/skillBattle.js').then(({ SkillBattleReviewGame }) => {
+                        new SkillBattleReviewGame().render(el, element);
+                    });
+                    break;
+                }
+
                 default:
                     return null;
             }

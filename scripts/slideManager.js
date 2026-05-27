@@ -1281,6 +1281,22 @@ export class SlideManager {
                 break;
             }
 
+            case 'skillBattleReview': {
+                el.classList.add('interactive-element', 'skill-battle-review-element');
+                el.style.overflow = 'hidden';
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                    import('./interactive/skillBattle.js').then(({ SkillBattleReviewGame }) => {
+                        if (isLive) {
+                            new SkillBattleReviewGame().render(el, element);
+                        } else {
+                            new SkillBattleReviewGame().renderPreview(el, element);
+                        }
+                    });
+                });
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);

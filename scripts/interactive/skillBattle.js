@@ -186,21 +186,27 @@ export class SkillBattleGame {
         const score = state.score ?? 0;
         const barWidth = Math.max(5, score);
         const barColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
+        const scoreEmoji = score >= 80 ? '🎉' : score >= 60 ? '👍' : score >= 40 ? '💪' : '💡';
         resultEl.innerHTML = `
             <div class="sb-result-card">
                 <div class="sb-result-header">
-                    ${mi('emoji_events', 22)} 你的成績
+                    ${mi('emoji_events', 22)} 你的成績 ${scoreEmoji}
                 </div>
                 <div class="sb-result-score" style="color:${barColor}">${score}<span class="sb-score-unit"> 分</span></div>
                 <div class="sb-result-bar">
                     <div class="sb-result-bar-fill" style="width:${barWidth}%;background:${barColor}"></div>
                 </div>
                 ${state.feedback ? `<div class="sb-result-feedback">${mi('chat_bubble', 14)} ${esc(state.feedback)}</div>` : ''}
-                ${state.output ? `
-                    <div class="sb-result-output-section">
-                        <div class="sb-result-output-label">${mi('smart_toy', 14)} AI 根據你的 Skill 產出的結果：</div>
-                        <div class="sb-result-output">${esc(state.output)}</div>
+                ${state.suggestions ? `
+                    <div class="sb-result-suggestions">
+                        <div class="sb-result-suggestions-title">${mi('lightbulb', 16)} 改進建議</div>
+                        <div class="sb-result-suggestions-body">${esc(state.suggestions)}</div>
                     </div>` : ''}
+                ${state.output ? `
+                    <details class="sb-result-output-section">
+                        <summary class="sb-result-output-label">${mi('smart_toy', 14)} AI 根據你的 Skill 產出的結果</summary>
+                        <div class="sb-result-output">${esc(state.output)}</div>
+                    </details>` : ''}
                 <button class="sb-resubmit-btn">${mi('edit', 16)} 重新編輯並提交</button>
             </div>`;
 
@@ -473,23 +479,25 @@ D. 差異化加分/扣分（10 分）
 5. 不同品質的 prompt 分數差距應該明顯（至少 10-15 分）
 
 只回傳 JSON，不要有任何其他文字：
-{"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>"}`;
+{"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>", "suggestions": "<80字以內的改進建議，具體說明如何修改 prompt 可以得到更好的結果>"}`;
 
             const judgeResult = await ai.chat([
                 { role: 'user', content: judgePrompt },
-            ], { model, maxTokens: 300, temperature: 0.5 });
+            ], { model, maxTokens: 500, temperature: 0.5 });
 
             // 解析分數
             let score = 50;
             let feedback = '';
+            let suggestions = '';
             try {
-                const jsonMatch = judgeResult.match(/\{[\s\S]*?\}/);
+                const jsonMatch = judgeResult.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
                     const parsed = JSON.parse(jsonMatch[0]);
                     // 用 Number 而非 parseInt || 50，避免 0 分被 fallback
                     const rawScore = Number(parsed.score);
                     score = isNaN(rawScore) ? 50 : Math.min(100, Math.max(0, Math.round(rawScore)));
                     feedback = parsed.feedback || '';
+                    suggestions = parsed.suggestions || '';
                 }
             } catch (e) {
                 console.warn('Judge parse error:', e, judgeResult);
@@ -499,7 +507,7 @@ D. 差異化加分/扣分（10 分）
             this._appendLog(logEl, `${mi('bug_report', 14)} Judge raw: ${esc(judgeResult.substring(0, 100))}`, 'info');
 
             // Step 3: 更新 DB（★ 修正參數順序：data 在前，filter 在後）
-            const newState = { ...state, output, score, feedback, status: 'scored', executedAt: new Date().toISOString() };
+            const newState = { ...state, output, score, feedback, suggestions, status: 'scored', executedAt: new Date().toISOString() };
             await db.update('submissions', {
                 state: JSON.stringify(newState),
                 score: String(score),
@@ -568,6 +576,9 @@ export class SkillBattleBoardGame {
 
     render(el, element) {
         el.classList.add('sb-board-container');
+        // 累積模式預設值（element 屬性 or true）
+        let cumulative = element.cumulativeScore !== false;
+
         el.innerHTML = `
             <div class="sb-board">
                 <div class="sb-board-title-bar">
@@ -575,7 +586,14 @@ export class SkillBattleBoardGame {
                         ${mi('leaderboard', 26)}
                         <span>競技場排行榜</span>
                     </div>
-                    <div class="sb-board-subtitle">即時更新</div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <label class="sb-board-toggle" title="累積所有競技場分數 vs 單題分數">
+                            <input type="checkbox" class="sb-cumulative-cb" ${cumulative ? 'checked' : ''}>
+                            <span class="sb-toggle-slider"></span>
+                            <span class="sb-toggle-label">累積計分</span>
+                        </label>
+                        <div class="sb-board-subtitle">即時更新</div>
+                    </div>
                 </div>
                 <div class="sb-board-list"></div>
                 <div class="sb-board-empty">${mi('pending', 22)} 等待評分結果...</div>
@@ -583,7 +601,15 @@ export class SkillBattleBoardGame {
 
         const listEl = el.querySelector('.sb-board-list');
         const emptyEl = el.querySelector('.sb-board-empty');
+        const toggleCb = el.querySelector('.sb-cumulative-cb');
         let lastHash = '';
+
+        // 切換累積/單題模式
+        toggleCb.addEventListener('change', () => {
+            cumulative = toggleCb.checked;
+            lastHash = ''; // force refresh
+            load();
+        });
 
         const load = async () => {
             const sessionId = window._activeSessionUUID
@@ -597,19 +623,45 @@ export class SkillBattleBoardGame {
                 order: 'created_at.asc',
             });
 
-            const scored = (data || []).filter(s => {
+            const allScored = (data || []).filter(s => {
                 try { return JSON.parse(s.state || '{}').status === 'scored'; } catch { return false; }
             }).map(s => {
                 const state = JSON.parse(s.state || '{}');
                 return {
                     name: s.student_name || s.student_email?.split('@')[0] || '?',
+                    email: s.student_email || s.student_name || '?',
                     score: state.score ?? 0,
                     feedback: state.feedback || '',
+                    elementId: s.element_id || '',
                 };
-            }).sort((a, b) => b.score - a.score);
+            });
 
-            // 比對資料是否有變化，沒變就不動 DOM（避免動畫重跑）
-            const hash = JSON.stringify(scored);
+            let scored;
+            if (cumulative) {
+                // 累積模式：按學員 group，加總分數
+                const grouped = new Map();
+                allScored.forEach(s => {
+                    const key = s.email;
+                    if (!grouped.has(key)) {
+                        grouped.set(key, { name: s.name, totalScore: 0, count: 0, feedbacks: [] });
+                    }
+                    const g = grouped.get(key);
+                    g.totalScore += s.score;
+                    g.count++;
+                    if (s.feedback) g.feedbacks.push(s.feedback);
+                });
+                scored = [...grouped.values()].map(g => ({
+                    name: g.name,
+                    score: g.totalScore,
+                    feedback: g.count > 1 ? `${g.count} 題累積` : (g.feedbacks[0] || ''),
+                })).sort((a, b) => b.score - a.score);
+            } else {
+                // 單題模式：每筆提交獨立顯示
+                scored = allScored.sort((a, b) => b.score - a.score);
+            }
+
+            // 比對資料是否有變化
+            const hash = JSON.stringify(scored) + cumulative;
             if (hash === lastHash) return;
             lastHash = hash;
 
@@ -647,6 +699,139 @@ export class SkillBattleBoardGame {
                             <span class="sb-board-score">${s.score}</span>
                             <span class="sb-board-score-label">分</span>
                         </div>
+                    </div>`;
+            }).join('');
+        };
+
+        load();
+        this._tid = setInterval(load, 6000);
+    }
+
+    destroy() {
+        if (this._tid) clearInterval(this._tid);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+/*  SkillBattleReviewGame — 提示詞檢討牆                        */
+/*  顯示所有學員提交的 prompt 及 AI 評分回饋                    */
+/* ═══════════════════════════════════════════════════════════ */
+export class SkillBattleReviewGame {
+    constructor() { this._tid = null; }
+
+    renderPreview(el, element) {
+        el.innerHTML = `
+            <div class="sb-review-preview">
+                <div class="sb-review-preview-header">
+                    ${mi('rate_review', 28)}
+                    <span>提示詞檢討牆</span>
+                </div>
+                <div class="sb-review-preview-body">
+                    <div class="sb-review-preview-row">
+                        <div class="sb-review-preview-left"><span class="sb-review-preview-badge">#1</span><span>學員 A</span></div>
+                        <div class="sb-review-preview-score" style="color:#22c55e">85</div>
+                    </div>
+                    <div class="sb-review-preview-row">
+                        <div class="sb-review-preview-left"><span class="sb-review-preview-badge">#2</span><span>學員 B</span></div>
+                        <div class="sb-review-preview-score" style="color:#eab308">62</div>
+                    </div>
+                    <div class="sb-review-preview-row">
+                        <div class="sb-review-preview-left"><span class="sb-review-preview-badge">#3</span><span>學員 C</span></div>
+                        <div class="sb-review-preview-score" style="color:#f97316">45</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    render(el, element) {
+        el.classList.add('sb-review-container');
+        el.innerHTML = `
+            <div class="sb-review">
+                <div class="sb-review-title-bar">
+                    <div class="sb-review-title">
+                        📝 提示詞檢討牆
+                    </div>
+                    <div class="sb-review-subtitle"><span class="sb-review-count">共 0 筆提交</span></div>
+                </div>
+                <div class="sb-review-list"></div>
+                <div class="sb-review-empty">${mi('pending', 22)} 等待提交資料...</div>
+            </div>`;
+
+        const listEl = el.querySelector('.sb-review-list');
+        const emptyEl = el.querySelector('.sb-review-empty');
+        const countEl = el.querySelector('.sb-review-count');
+        let lastHash = '';
+
+        const load = async () => {
+            const sessionId = window._activeSessionUUID
+                || sessionStorage.getItem('_session_code')
+                || new URLSearchParams(location.search).get('code') || '';
+            let filter = { type: 'eq.skillBattle' };
+            if (sessionId) filter.session_id = 'eq.' + sessionId;
+
+            const { data } = await db.select('submissions', {
+                filter,
+                order: 'created_at.asc',
+            });
+
+            const subs = data || [];
+
+            // hash 比對避免不必要的 DOM 重建
+            const hash = JSON.stringify(subs.map(s => s.id + (s.state || '')));
+            if (hash === lastHash) return;
+            lastHash = hash;
+
+            countEl.textContent = `共 ${subs.length} 筆提交`;
+
+            if (subs.length === 0) {
+                listEl.style.display = 'none';
+                emptyEl.style.display = 'flex';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            listEl.style.display = '';
+
+            listEl.innerHTML = subs.map((s, i) => {
+                let state = {};
+                try { state = JSON.parse(s.state || '{}'); } catch {}
+                const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
+                const status = state.status || 'pending';
+                const score = state.score ?? null;
+                const prompt = s.content || state.skill || '';
+                const feedback = state.feedback || '';
+                const output = state.output || '';
+                const delay = i * 0.08;
+
+                // 分數顏色
+                const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
+                // 左邊框顏色
+                const borderColor = status === 'scored' ? scoreColor : '#94a3b8';
+
+                return `
+                    <div class="sb-review-row" style="animation-delay:${delay}s;--row-border-color:${borderColor}">
+                        <div class="sb-review-row-header">
+                            <div class="sb-review-row-left">
+                                <span class="sb-review-num">#${i + 1}</span>
+                                <span class="sb-review-name">${esc(name)}</span>
+                            </div>
+                            <div class="sb-review-row-right">
+                                ${status === 'scored'
+                                    ? `<span class="sb-review-score" style="color:${scoreColor}">${score}<span class="sb-review-score-unit"> 分</span></span>`
+                                    : `<span class="sb-review-pending">⏳ 待評分</span>`
+                                }
+                            </div>
+                        </div>
+                        <div class="sb-review-prompt">${esc(prompt)}</div>
+                        ${status === 'scored' && feedback
+                            ? `<div class="sb-review-feedback">💬 AI 評分建議：${esc(feedback)}</div>`
+                            : ''}
+                        ${status === 'scored' && state.suggestions
+                            ? `<div class="sb-review-suggestions">💡 改進建議：${esc(state.suggestions)}</div>`
+                            : ''}
+                        ${status === 'scored' && output
+                            ? `<details class="sb-review-output-details"><summary>📄 AI 輸出結果</summary><div class="sb-review-output">${esc(output)}</div></details>`
+                            : ''}
                     </div>`;
             }).join('');
         };

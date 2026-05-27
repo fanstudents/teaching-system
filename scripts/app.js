@@ -524,6 +524,11 @@ class App {
             this.editor.addSkillBattleBoard();
         });
 
+        // 競技場檢討牆
+        document.getElementById('addSkillBattleReviewBtn')?.addEventListener('click', () => {
+            this.editor.addSkillBattleReview();
+        });
+
         // 課前/課後評量
         document.getElementById('addAssessmentPreBtn')?.addEventListener('click', () => {
             this.editor.addAssessment('pre');
