@@ -247,14 +247,7 @@ export class SkillBattleGame {
                         try { state = JSON.parse(state); } catch { state = {}; }
                     }
                     if (state.status === 'scored') {
-                        this._showStudentResult(resultEl, state, () => {
-                            submitted = false;
-                            textarea.disabled = false;
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = `${mi('send', 16)} 重新提交`;
-                            resultEl.innerHTML = '';
-                            textarea.focus();
-                        });
+                        this._showStudentResult(resultEl, state, onResubmit);
                         clearInterval(tid);
                     }
                 } catch { /* ignore */ }
