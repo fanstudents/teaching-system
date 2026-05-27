@@ -72,40 +72,17 @@ export class WebProjectGame {
         const studentName = user.name || sess.studentName || '';
         const studentEmail = user.email || sess.studentEmail || '';
 
-        const SUPA_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
-        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+        const SUPA = 'https://wsaknnhjgiqmkendeyrj.supabase.co/rest/v1/submissions';
+        const AK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
 
-        // 產生給 AI 的完整提示詞（含 fetch 指令）
         const buildApiPrompt = () => {
             const task = element.question || '請幫我建立一個網頁';
             return `${task}
 
-請將所有 HTML、CSS、JS 合併成一個完整的 HTML 檔案（CSS 放 <style>，JS 放 <script>）。
+請將 HTML/CSS/JS 合併為一個完整 HTML（CSS 放 <style>，JS 放 <script>）。
+完成後執行以下指令提交：
 
-產生完程式碼後，請直接執行以下 fetch 提交到教學系統：
-
-fetch('${SUPA_URL}/rest/v1/submissions', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'apikey': '${SUPA_KEY}',
-    'Authorization': 'Bearer ${SUPA_KEY}',
-    'Prefer': 'return=representation'
-  },
-  body: JSON.stringify([{
-    session_id: '${sessionCode}',
-    element_id: '${elementId}',
-    student_name: '${studentName || '名字'}',
-    student_email: '${studentEmail || 'email'}',
-    type: 'webProject',
-    assignment_title: '網頁作品',
-    content: 「合併後的完整 HTML 放這裡」,
-    state: JSON.stringify({ mode: 'api', status: 'submitted', prompt: 「你剛才下給 AI 的提示詞放這裡」 }),
-    submitted_at: new Date().toISOString()
-  }])
-}).then(r => r.json()).then(d => console.log('✅ 提交成功', d)).catch(e => console.error('❌', e));
-
-請將 content 欄位替換為你產生的完整 HTML，然後執行 fetch。`;
+fetch('${SUPA}',{method:'POST',headers:{'Content-Type':'application/json','apikey':'${AK}','Authorization':'Bearer ${AK}','Prefer':'return=representation'},body:JSON.stringify([{session_id:'${sessionCode}',element_id:'${elementId}',student_name:'${studentName}',student_email:'${studentEmail}',type:'webProject',content:「你的完整HTML」,state:JSON.stringify({mode:'api',status:'submitted',prompt:「你的提示詞」}),submitted_at:new Date().toISOString()}])}).then(r=>r.json()).then(d=>console.log('✅ 提交成功',d))`;
         };
 
         el.innerHTML = `
@@ -348,6 +325,7 @@ fetch('${SUPA_URL}/rest/v1/submissions', {
         const emptyEl = el.querySelector('.wp-teacher-empty');
         const statsEl = el.querySelector('.wp-teacher-stats');
         let lastHash = '';
+        const contentCache = new Map();
 
         const load = async () => {
             const filter = { type: 'eq.webProject' };
@@ -414,9 +392,6 @@ fetch('${SUPA_URL}/rest/v1/submissions', {
             }).join('');
         };
         await load();
-
-        // 快取 content，點擊時同步開窗（避免被 popup blocker 擋）
-        const contentCache = new Map();
 
         gridEl.addEventListener('click', e => {
             const card = e.target.closest('.wp-grid-card');
