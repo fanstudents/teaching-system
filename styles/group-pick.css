@@ -2,12 +2,204 @@
    分組選擇器 — Group Pick
    ═══════════════════════════════════════════════ */
 
-/* ── 共用 ── */
-.gp-wrap {
+/* ── 共用畫布（自由擺放）── */
+.gp-canvas {
     width: 100%; height: 100%;
+    position: relative;
     font-family: 'Noto Sans TC', 'Google Sans', sans-serif;
-    display: flex; flex-direction: column;
     overflow: hidden;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(99,102,241,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(59,130,246,0.04) 0%, transparent 50%),
+        #fafbfc;
+    border-radius: 10px;
+}
+
+.gp-canvas-hint {
+    position: absolute; bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem; color: #94a3b8;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255,255,255,0.8);
+    padding: 3px 10px; border-radius: 8px;
+    pointer-events: none; z-index: 5;
+    backdrop-filter: blur(4px);
+}
+
+/* ── 編輯器拖曳卡片 ── */
+.gp-drag-card {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    padding: 12px 18px;
+    border-radius: 14px;
+    background: #fff;
+    border: 2.5px solid var(--gp-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    cursor: grab; user-select: none;
+    transition: box-shadow 0.2s, transform 0.15s;
+    z-index: 2;
+    min-width: 80px; text-align: center;
+}
+.gp-drag-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+.gp-drag-card.gp-dragging {
+    cursor: grabbing;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translate(-50%, -50%) scale(1.06);
+    z-index: 20;
+}
+.gp-drag-card-name {
+    font-size: 0.85rem; font-weight: 700;
+    color: var(--gp-color);
+}
+
+/* ── 講師端 ── */
+.gp-canvas--teacher {
+    background:
+        radial-gradient(circle at 20% 80%, rgba(99,102,241,0.03) 0%, transparent 50%),
+        linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+.gp-teacher-header {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px; z-index: 5;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.gp-teacher-title {
+    font-size: 1rem; font-weight: 800; color: #0f172a;
+    display: flex; align-items: center; gap: 8px;
+}
+.gp-teacher-stats {
+    font-size: 0.78rem; color: #64748b;
+}
+
+/* 講師端絕對定位卡片 */
+.gp-team-card--abs {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: grab; user-select: none;
+    z-index: 2;
+    width: auto; min-width: 140px; max-width: 200px;
+}
+.gp-team-card--abs.gp-dragging {
+    cursor: grabbing;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18) !important;
+    transform: translate(-50%, -50%) scale(1.05);
+    z-index: 20;
+}
+
+.gp-team-card {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: box-shadow 0.3s, transform 0.2s;
+    position: relative; overflow: hidden;
+}
+.gp-team-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--gp-color);
+}
+.gp-team-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.gp-team-card-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+}
+.gp-team-card-name {
+    font-size: 0.88rem; font-weight: 700;
+    color: var(--gp-color);
+}
+.gp-team-card-score {
+    font-size: 1.2rem; font-weight: 800;
+    color: var(--gp-color);
+}
+.gp-team-card-members {
+    display: flex; flex-wrap: wrap; gap: 3px;
+}
+.gp-member-chip {
+    font-size: 0.6rem; font-weight: 500;
+    padding: 1px 7px; border-radius: 10px;
+    background: #f1f5f9; color: #475569;
+    white-space: nowrap;
+}
+.gp-team-card-count {
+    font-size: 0.65rem; color: #94a3b8;
+    display: flex; align-items: center; gap: 3px;
+}
+
+/* ── 學員端 ── */
+.gp-canvas--student {
+    background:
+        radial-gradient(circle at 50% 50%, rgba(59,130,246,0.04) 0%, transparent 60%),
+        #fafbfc;
+}
+
+.gp-student-title {
+    position: absolute; top: 8px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.88rem; font-weight: 700; color: #0f172a;
+    display: flex; align-items: center; gap: 6px;
+    z-index: 5; white-space: nowrap;
+    background: rgba(255,255,255,0.8);
+    padding: 4px 14px; border-radius: 10px;
+    backdrop-filter: blur(4px);
+}
+
+.gp-pos-btn {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 14px 18px; gap: 4px;
+    border: 2.5px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    min-width: 90px; min-height: 70px;
+    z-index: 2;
+}
+.gp-pos-btn:hover {
+    transform: translate(-50%, -50%) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+.gp-pos-btn.selected {
+    border-color: var(--gp-color);
+    border-width: 3px;
+    transform: translate(-50%, -50%) scale(1.06);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+.gp-pos-btn-name {
+    font-size: 0.88rem; font-weight: 700;
+    color: var(--gp-color, #475569);
+}
+.gp-pos-btn-count {
+    font-size: 0.65rem; color: #94a3b8;
+}
+.gp-pos-btn-check {
+    position: absolute; top: 4px; right: 6px;
+    color: var(--gp-color);
+}
+
+.gp-float-info {
+    position: absolute; bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem; color: #475569;
+    background: rgba(255,255,255,0.9);
+    padding: 6px 16px; border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    z-index: 5; white-space: nowrap;
+    backdrop-filter: blur(4px);
 }
 
 /* ── 編輯器預覽 ── */
@@ -21,165 +213,3 @@
 .gp-preview-icon { font-size: 2.5rem; }
 .gp-preview-title { font-size: 1rem; font-weight: 700; color: #1e293b; }
 .gp-preview-sub { font-size: 0.78rem; color: #64748b; }
-
-/* ═══════════════════════════════════════════════
-   學員端
-   ═══════════════════════════════════════════════ */
-.gp-student {
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    align-items: center; padding: 16px;
-    gap: 12px;
-}
-
-.gp-student-title {
-    font-size: 1rem; font-weight: 700; color: #0f172a;
-    display: flex; align-items: center; gap: 6px;
-}
-
-/* 選組按鈕 grid */
-.gp-group-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px; width: 100%; max-width: 600px;
-}
-
-.gp-group-btn {
-    position: relative;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 16px 10px; gap: 6px;
-    border: 2.5px solid #e2e8f0;
-    border-radius: 14px;
-    background: #fff;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    min-height: 90px;
-}
-.gp-group-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-.gp-group-btn.selected {
-    border-width: 3px;
-    transform: scale(1.04);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-}
-.gp-group-btn.selected::after {
-    content: '✓';
-    position: absolute; top: 6px; right: 8px;
-    font-size: 0.7rem; font-weight: 800;
-    color: #fff; background: currentColor;
-    width: 18px; height: 18px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-}
-.gp-group-btn.selected::after {
-    background: var(--gp-color);
-    color: #fff;
-}
-
-.gp-group-btn-name {
-    font-size: 0.92rem; font-weight: 700;
-    color: var(--gp-color, #475569);
-}
-.gp-group-btn-count {
-    font-size: 0.68rem; color: #94a3b8;
-}
-
-/* 已選狀態 */
-.gp-selected-info {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 4px;
-    padding: 10px 20px;
-    background: #f8fafc; border-radius: 12px;
-    border: 1px solid #e2e8f0;
-}
-.gp-selected-label {
-    font-size: 0.82rem; font-weight: 600; color: #334155;
-}
-.gp-selected-score {
-    font-size: 1.5rem; font-weight: 800;
-}
-
-/* ═══════════════════════════════════════════════
-   講師端
-   ═══════════════════════════════════════════════ */
-.gp-teacher {
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    padding: 12px 16px; gap: 10px;
-}
-
-.gp-teacher-header {
-    display: flex; align-items: center;
-    justify-content: space-between;
-}
-.gp-teacher-title {
-    font-size: 1.1rem; font-weight: 800; color: #0f172a;
-    display: flex; align-items: center; gap: 8px;
-}
-.gp-teacher-stats {
-    font-size: 0.78rem; color: #64748b;
-    display: flex; align-items: center; gap: 6px;
-}
-
-/* 組別卡片 grid */
-.gp-team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px; flex: 1; overflow-y: auto;
-    align-content: start;
-}
-
-.gp-team-card {
-    background: #fff;
-    border: 2px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 14px;
-    display: flex; flex-direction: column; gap: 8px;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-}
-.gp-team-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 4px;
-    background: var(--gp-color);
-}
-
-.gp-team-card-header {
-    display: flex; align-items: center;
-    justify-content: space-between;
-}
-.gp-team-card-name {
-    font-size: 0.95rem; font-weight: 700;
-    color: var(--gp-color);
-}
-.gp-team-card-score {
-    font-size: 1.3rem; font-weight: 800;
-    color: var(--gp-color);
-}
-
-.gp-team-card-members {
-    display: flex; flex-wrap: wrap; gap: 4px;
-}
-.gp-member-chip {
-    font-size: 0.65rem; font-weight: 500;
-    padding: 2px 8px; border-radius: 10px;
-    background: #f1f5f9; color: #475569;
-    white-space: nowrap;
-}
-
-.gp-team-card-count {
-    font-size: 0.68rem; color: #94a3b8;
-    display: flex; align-items: center; gap: 3px;
-}
-
-/* 排行動畫 */
-@keyframes gp-score-bump {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
-}
-.gp-score-bump { animation: gp-score-bump 0.4s ease; }
