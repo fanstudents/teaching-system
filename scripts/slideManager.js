@@ -1297,6 +1297,22 @@ export class SlideManager {
                 break;
             }
 
+            case 'webProject': {
+                el.classList.add('interactive-element', 'web-project-element');
+                el.style.overflow = 'hidden';
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                    import('./interactive/webProject.js').then(({ WebProjectGame }) => {
+                        if (isLive) {
+                            new WebProjectGame().render(el, element);
+                        } else {
+                            new WebProjectGame().renderPreview(el, element);
+                        }
+                    });
+                });
+                break;
+            }
+
             case 'matching':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);

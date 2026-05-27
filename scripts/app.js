@@ -529,6 +529,11 @@ class App {
             this.editor.addSkillBattleReview();
         });
 
+        // 網頁作品展示
+        document.getElementById('addWebProjectBtn')?.addEventListener('click', () => {
+            this.editor.addWebProject();
+        });
+
         // 課前/課後評量
         document.getElementById('addAssessmentPreBtn')?.addEventListener('click', () => {
             this.editor.addAssessment('pre');

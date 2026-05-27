@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="styles/icebreaker.css?v=20260329">
     <link rel="stylesheet" href="styles/assessmentWall.css?v=20260329">
     <link rel="stylesheet" href="styles/skill-battle.css?v=20260521">
+    <link rel="stylesheet" href="styles/web-project.css?v=20260527">
 </head>
 
 <body>
@@ -2772,6 +2773,15 @@
                     el.style.overflow = 'hidden';
                     import('./scripts/interactive/skillBattle.js').then(({ SkillBattleReviewGame }) => {
                         new SkillBattleReviewGame().render(el, element);
+                    });
+                    break;
+                }
+
+                case 'webProject': {
+                    el.classList.add('web-project-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/webProject.js').then(({ WebProjectGame }) => {
+                        new WebProjectGame().render(el, element);
                     });
                     break;
                 }

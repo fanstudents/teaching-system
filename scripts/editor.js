@@ -595,6 +595,20 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    /**
+     * 新增網頁作品展示模組
+     */
+    addWebProject() {
+        const element = {
+            type: 'webProject',
+            x: 50, y: 30,
+            width: 860, height: 460,
+            question: '請上傳你的網頁作品（HTML + CSS + JS）',
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
 
     /**
      * 新增可複製文字卡片
@@ -1486,6 +1500,19 @@ export class Editor {
                             <span style="font-size:12px;">設定正確標註區域</span>
                         </label>
                         ${hasCorrectZone ? '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">綠色虛線圈 = 正確區域。點擊預覽圖可移動位置。</div>' : '<div style="font-size:11px;color:#94a3b8;margin-top:4px;">未設定時為開放式標註，不判斷對錯。</div>'}
+                    </div>
+                </div>
+            `;
+        } else if (type === 'webProject') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#059669;">web</span>
+                        網頁作品設定
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">任務描述</label>
+                        <textarea class="form-input" id="wpQuestion" rows="3" style="resize:vertical;font-family:inherit;">${elementData.question || ''}</textarea>
                     </div>
                 </div>
             `;
@@ -2881,6 +2908,11 @@ ${truncated}
                     this.selectElementById(elementId);
                 });
             }
+        }
+
+        // Web Project 事件
+        if (elementData.type === 'webProject') {
+            bindSimple('wpQuestion', 'question');
         }
 
         // Skill Battle 事件
