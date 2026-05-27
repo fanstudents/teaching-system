@@ -2787,6 +2787,14 @@
                     break;
                 }
 
+                case 'groupPick': {
+                    el.classList.add('group-pick-element');
+                    import('./scripts/interactive/groupPick.js').then(({ GroupPickGame }) => {
+                        new GroupPickGame().render(el, element);
+                    });
+                    break;
+                }
+
                 default:
                     return null;
             }
