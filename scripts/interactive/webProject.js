@@ -352,7 +352,7 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
                     thumbAttr = `sandbox="allow-scripts" srcdoc="${content.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
                 }
 
-                const promptPreview = prompt ? `<div class="wp-grid-card-prompt" title="${esc(prompt)}">${mi('chat', 11)} ${esc(prompt.length > 40 ? prompt.slice(0, 37) + '…' : prompt)}</div>` : '';
+                const promptPreview = prompt ? `<div class="wp-grid-card-prompt" title="${esc(prompt)}">${mi('chat', 11)} ${esc(prompt)}</div>` : '';
 
                 return `<div class="wp-grid-card" style="animation-delay:${i * 0.06}s">
                     <div class="wp-thumb-wrapper">
