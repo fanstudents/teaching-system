@@ -203,14 +203,11 @@
     font-size: 1.1rem; font-weight: 800; color: #0f172a;
     display: flex; align-items: center; gap: 8px;
 }
-.wp-teacher-count {
-    font-size: 0.72rem; color: #94a3b8;
-    display: flex; align-items: center; gap: 4px;
+.wp-teacher-stats {
+    font-size: 0.78rem; color: #64748b;
+    display: flex; align-items: center; gap: 6px;
 }
-.wp-teacher-count::before {
-    content: ''; width: 6px; height: 6px; border-radius: 50%;
-    background: #22c55e; animation: wp-dot-pulse 2s ease-in-out infinite;
-}
+.wp-stats-sep { color: #cbd5e1; font-weight: 700; }
 @keyframes wp-dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
 .wp-teacher-grid {

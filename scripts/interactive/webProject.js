@@ -293,11 +293,34 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
         };
 
         // ── 載入歷史 ──
+        let shown = false;
         if (elementId) {
             const prev = await stateManager.load(elementId);
             if (prev?.content && prev?.state?.status === 'submitted') {
                 showPreview(prev.content, prev.state.mode || 'upload');
+                shown = true;
             }
+        }
+
+        // ── 輪詢偵測 API 提交 ──
+        if (!shown && elementId && studentEmail) {
+            const pollApi = async () => {
+                try {
+                    const filter = { type: 'eq.webProject', element_id: 'eq.' + elementId, student_email: 'eq.' + studentEmail };
+                    if (sessionCode) filter.session_id = 'eq.' + sessionCode;
+                    const { data } = await db.select('submissions', { filter, limit: 1, order: 'created_at.desc' });
+                    if (data?.length) {
+                        const sub = data[0];
+                        let st = {}; try { st = typeof sub.state === 'string' ? JSON.parse(sub.state) : (sub.state || {}); } catch {}
+                        if (st.mode === 'api' && sub.content) {
+                            clearInterval(apiPollId);
+                            showPreview(sub.content, 'api');
+                        }
+                    }
+                } catch {}
+            };
+            const apiPollId = setInterval(pollApi, 5000);
+            this._intervals.set(elementId + '_api_poll', apiPollId);
         }
     }
 
@@ -307,7 +330,7 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
         el.innerHTML = `<div class="wp-teacher">
             <div class="wp-teacher-header">
                 <div class="wp-teacher-title">${mi('web', 22)} 網頁作品展示</div>
-                <div class="wp-teacher-count">共 0 份作品</div>
+                <div class="wp-teacher-stats"></div>
             </div>
             <div class="wp-teacher-grid"></div>
             <div class="wp-teacher-empty">${mi('pending', 22)} 等待學員提交作品...</div>
@@ -315,7 +338,7 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
 
         const gridEl = el.querySelector('.wp-teacher-grid');
         const emptyEl = el.querySelector('.wp-teacher-empty');
-        const countEl = el.querySelector('.wp-teacher-count');
+        const statsEl = el.querySelector('.wp-teacher-stats');
         let lastHash = '';
 
         const load = async () => {
@@ -327,7 +350,18 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
             const hash = subs.map(s => s.id + (s.submitted_at || s.created_at || '')).join('|');
             if (hash === lastHash) return;
             lastHash = hash;
-            countEl.textContent = `共 ${subs.length} 份作品`;
+            // 統計模式
+            const modes = { upload: 0, url: 0, api: 0 };
+            subs.forEach(s => {
+                contentCache.set(s.id, s.content || '');
+                let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
+                modes[st.mode || 'upload']++;
+            });
+            const statsParts = [`共 ${subs.length} 份`];
+            if (modes.upload) statsParts.push(`📁 ${modes.upload}`);
+            if (modes.url) statsParts.push(`🔗 ${modes.url}`);
+            if (modes.api) statsParts.push(`🤖 ${modes.api}`);
+            statsEl.innerHTML = statsParts.join('<span class="wp-stats-sep">·</span>');
             if (!subs.length) { gridEl.innerHTML = ''; emptyEl.style.display = ''; return; }
             emptyEl.style.display = 'none';
             gridEl.innerHTML = subs.map((s, i) => {
@@ -373,21 +407,24 @@ fetch('${supabaseUrl}/rest/v1/submissions', {
         };
         await load();
 
-        gridEl.addEventListener('click', async e => {
+        // 快取 content，點擊時同步開窗（避免被 popup blocker 擋）
+        const contentCache = new Map();
+
+        gridEl.addEventListener('click', e => {
             const card = e.target.closest('.wp-grid-card');
             if (!card) return;
             const btn = card.querySelector('.wp-preview-btn');
             if (!btn) return;
-            const { data } = await db.select('submissions', { filter: { id: 'eq.' + btn.dataset.sid }, limit: 1 });
-            if (!data?.length) return;
-            const sub = data[0], mode = btn.dataset.mode, content = sub.content || '';
+            const sid = btn.dataset.sid, mode = btn.dataset.mode;
+            const cached = contentCache.get(sid);
+            if (!cached) return;
 
-            // 用新分頁開啟
+            const winFeatures = 'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no';
             if (mode === 'url') {
-                window.open(content, '_blank');
+                window.open(cached, '_blank', winFeatures);
             } else {
-                const blob = new Blob([content], { type: 'text/html' });
-                window.open(URL.createObjectURL(blob), '_blank');
+                const blob = new Blob([cached], { type: 'text/html;charset=utf-8' });
+                window.open(URL.createObjectURL(blob), '_blank', winFeatures);
             }
         });
 
