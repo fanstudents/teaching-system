@@ -10,6 +10,8 @@ export class PollGame {
         this._voteNames = {};    // elementId → [[name1, name2], [name3], ...]
         this._voted = new Set(); // 已投票的 elementId
         this._revealed = new Set(); // 已開票的 elementId
+        this._realtimeBuffer = {};  // elementId → [{optionIndex, studentName, ts}] — 講師端 realtime 增量
+        this._lastDBLoadTs = {};    // elementId → timestamp — 上次 DB 載入時間
         this.setupEventListeners();
     }
 
@@ -293,37 +295,55 @@ export class PollGame {
      */
     handleVoteEvent(payload) {
         const { elementId, optionIndex, studentName } = payload;
+
+        // ★ 永遠記錄到 realtimeBuffer（不管 DOM 有沒有）
+        if (!this._realtimeBuffer[elementId]) this._realtimeBuffer[elementId] = [];
+        this._realtimeBuffer[elementId].push({
+            optionIndex,
+            studentName: studentName || '匿名',
+            ts: Date.now()
+        });
+
+        // 初始化 _voteCounts（如果還沒被任何來源建立）
         if (!this._voteCounts[elementId]) {
+            // 嘗試從 DOM 取得選項數量
             const containers = document.querySelectorAll('.poll-container');
+            let optLen = 0;
             containers.forEach(c => {
                 const eid = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
-                if (!this._voteCounts[eid]) {
-                    const opts = c.querySelectorAll('.poll-option');
-                    this._voteCounts[eid] = new Array(opts.length).fill(0);
-                    this._voteNames[eid] = Array.from({ length: opts.length }, () => []);
-                }
+                if (eid === elementId) optLen = c.querySelectorAll('.poll-option').length;
             });
+            // 如果 DOM 上沒有（講師在其他頁），用 max(optionIndex+1, 6) 預估
+            if (!optLen) optLen = Math.max((optionIndex || 0) + 1, 6);
+            this._voteCounts[elementId] = new Array(optLen).fill(0);
+            this._voteNames[elementId] = Array.from({ length: optLen }, () => []);
         }
 
-        if (this._voteCounts[elementId]) {
-            this._voteCounts[elementId][optionIndex]++;
-            if (!this._voteNames[elementId]) this._voteNames[elementId] = this._voteCounts[elementId].map(() => []);
-            if (!this._voteNames[elementId][optionIndex]) this._voteNames[elementId][optionIndex] = [];
-            this._voteNames[elementId][optionIndex].push(studentName || '匿名');
-
-            const containers = document.querySelectorAll('.poll-container');
-            containers.forEach(c => {
-                const eid = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
-                if (eid === elementId) {
-                    const optionEls = c.querySelectorAll('.poll-option');
-                    if (this._revealed.has(elementId)) {
-                        this._renderBarsWithNames(c, optionEls, this._voteCounts[elementId], this._voteNames[elementId]);
-                    } else {
-                        this._renderBars(c, optionEls, this._voteCounts[elementId]);
-                    }
-                }
-            });
+        // 確保 array 夠大
+        while (this._voteCounts[elementId].length <= optionIndex) {
+            this._voteCounts[elementId].push(0);
+            this._voteNames[elementId].push([]);
         }
+
+        // 更新內存計數
+        this._voteCounts[elementId][optionIndex]++;
+        if (!this._voteNames[elementId]) this._voteNames[elementId] = this._voteCounts[elementId].map(() => []);
+        if (!this._voteNames[elementId][optionIndex]) this._voteNames[elementId][optionIndex] = [];
+        this._voteNames[elementId][optionIndex].push(studentName || '匿名');
+
+        // 嘗試更新 DOM（如果目前頁面有對應的 poll container）
+        const containers = document.querySelectorAll('.poll-container');
+        containers.forEach(c => {
+            const eid = c.closest('[data-id]')?.dataset.id || c.dataset.elementId || '';
+            if (eid === elementId) {
+                const optionEls = c.querySelectorAll('.poll-option');
+                if (this._revealed.has(elementId)) {
+                    this._renderBarsWithNames(c, optionEls, this._voteCounts[elementId], this._voteNames[elementId]);
+                } else {
+                    this._renderBars(c, optionEls, this._voteCounts[elementId]);
+                }
+            }
+        });
     }
 
     /**
@@ -336,6 +356,7 @@ export class PollGame {
             const optionEls = c.querySelectorAll('.poll-option');
             const counts = new Array(optionEls.length).fill(0);
             const names = Array.from({ length: optionEls.length }, () => []);
+            const loadTs = Date.now();
             try {
                 const sid = window._activeSessionUUID || sessionCode || 'free';
                 const rows = await db.select('poll_votes', {
@@ -354,18 +375,44 @@ export class PollGame {
                     });
                 }
             } catch (e) { /* ignore */ }
+
+            // ★ 合併 DB 載入後、尚未反映在 DB 中的 realtime 增量
+            const prevLoadTs = this._lastDBLoadTs[elementId] || 0;
+            const buffered = (this._realtimeBuffer[elementId] || []).filter(ev => ev.ts > prevLoadTs);
+            buffered.forEach(ev => {
+                if (ev.optionIndex >= 0 && ev.optionIndex < counts.length) {
+                    counts[ev.optionIndex]++;
+                    names[ev.optionIndex].push(ev.studentName || '匿名');
+                }
+            });
+            this._lastDBLoadTs[elementId] = loadTs;
+
             this._voteCounts[elementId] = counts;
             this._voteNames[elementId] = names;
-            this._renderBars(c, optionEls, counts);
 
-            // 新增「公布結果」按鈕
-            if (!c.querySelector('.poll-reveal-btn')) {
+            // ★ 根據是否已公布結果選擇渲染方式
+            if (this._revealed.has(elementId)) {
+                this._renderBarsWithNames(c, optionEls, counts, names);
+            } else {
+                this._renderBars(c, optionEls, counts);
+            }
+
+            // 新增「公布結果」按鈕（未公布時才顯示）
+            if (!c.querySelector('.poll-reveal-btn') && !this._revealed.has(elementId)) {
                 const revealBtn = document.createElement('button');
                 revealBtn.className = 'poll-reveal-btn';
                 revealBtn.style.cssText = 'display:block;margin:10px auto 0;padding:8px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#1a73e8,#4285f4);color:white;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;';
                 revealBtn.textContent = '📊 公布結果';
                 revealBtn.addEventListener('click', () => this.revealResults(elementId, sessionCode));
                 c.appendChild(revealBtn);
+            }
+            // 已公布 → 顯示已開票標記
+            if (this._revealed.has(elementId) && !c.querySelector('.poll-revealed-tag')) {
+                const tag = document.createElement('div');
+                tag.className = 'poll-revealed-tag';
+                tag.style.cssText = 'text-align:center;padding:6px;font-size:12px;color:#10b981;font-weight:600;margin-top:8px;';
+                tag.textContent = '✓ 已公布結果';
+                c.appendChild(tag);
             }
 
             // 新增「重置投票」按鈕
@@ -481,6 +528,8 @@ export class PollGame {
         // 清除內存
         this._voteCounts[elementId] = [];
         this._voteNames[elementId] = [];
+        this._realtimeBuffer[elementId] = [];  // ★ 清 realtime buffer
+        this._lastDBLoadTs[elementId] = 0;
         this._voted.delete(elementId);
         this._revealed.delete(elementId);
         this._clearVotedLocal(elementId); // ★ 清 localStorage
