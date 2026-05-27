@@ -158,23 +158,35 @@
 /* ═══════════════════════════════════════════════
    Mini 預覽
    ═══════════════════════════════════════════════ */
-.wp-preview-mini { margin-top: 8px; display: none; }
+.wp-preview-mini { margin-top: 6px; display: none; flex: 1; display: none; flex-direction: column; }
+.wp-preview-mini-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+}
 .wp-mini-iframe {
-    width: 100%; height: 200px;
+    width: 100%; flex: 1; min-height: 250px;
     border: 1px solid #e2e8f0; border-radius: 8px; background: #fff;
 }
 .wp-preview-mini-label {
     font-size: 0.75rem; color: #6366f1; font-weight: 600;
-    margin-bottom: 4px; display: flex; align-items: center; gap: 4px;
-}
-.wp-resubmit-btn {
-    margin-top: 8px; padding: 6px 14px; border-radius: 6px;
-    border: 1px solid #c7d2fe; background: transparent;
-    color: #6366f1; font-size: 0.78rem; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
     display: flex; align-items: center; gap: 4px;
 }
-.wp-resubmit-btn:hover { background: #6366f1; color: #fff; }
+.wp-open-new-btn {
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid #c7d2fe; background: #eef2ff;
+    color: #6366f1; font-size: 0.7rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 3px;
+}
+.wp-open-new-btn:hover { background: #6366f1; color: #fff; }
+.wp-resubmit-btn {
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid #fecaca; background: #fff5f5;
+    color: #ef4444; font-size: 0.7rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 3px;
+}
+.wp-resubmit-btn:hover { background: #ef4444; color: #fff; }
 
 /* ═══════════════════════════════════════════════
    教師端
@@ -217,7 +229,7 @@
    ═══════════════════════════════════════════════ */
 .wp-grid-card {
     background: #fff; border: 1px solid #e2e8f0;
-    border-radius: 12px; overflow: hidden;
+    border-radius: 12px; overflow: hidden; cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     animation: wp-card-enter 0.4s ease-out both;
 }

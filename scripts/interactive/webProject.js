@@ -72,27 +72,37 @@ export class WebProjectGame {
         const studentName = user.name || sess.studentName || '';
         const studentEmail = user.email || sess.studentEmail || '';
 
-        const apiEndpoint = 'https://y36ditim.functions.insforge.app';
+        const supabaseUrl = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+
         const apiPrompt = `請幫我將上面的網頁程式碼提交到教學系統。
 
-使用以下 API：
+請先將 HTML、CSS、JS 合併成一個完整的 HTML 檔案（CSS 放 <style>，JS 放 <script>），然後用以下 API 提交：
 
-POST ${apiEndpoint}
-Content-Type: application/json
+fetch('${supabaseUrl}/rest/v1/submissions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'apikey': '${anonKey}',
+    'Authorization': 'Bearer ${anonKey}',
+    'Prefer': 'return=representation'
+  },
+  body: JSON.stringify([{
+    session_id: '${sessionCode}',
+    element_id: '${elementId}',
+    student_name: '${studentName || '（你的名字）'}',
+    student_email: '${studentEmail || '（你的 Email）'}',
+    type: 'webProject',
+    content: '（合併後的完整 HTML 放這裡）',
+    state: JSON.stringify({ mode: 'api', status: 'submitted', prompt: '（你下給 AI 的提示詞）' }),
+    submitted_at: new Date().toISOString()
+  }])
+})
+.then(r => r.json())
+.then(d => console.log('✅ 提交成功', d))
+.catch(e => console.error('❌ 提交失敗', e));
 
-{
-  "session_id": "${sessionCode}",
-  "element_id": "${elementId}",
-  "student_name": "${studentName || '（你的名字）'}",
-  "student_email": "${studentEmail || '（你的 Email）'}",
-  "html": "（把 HTML 放這裡）",
-  "css": "（把 CSS 放這裡，沒有就留空字串）",
-  "js": "（把 JS 放這裡，沒有就留空字串）",
-  "title": "我的網頁作品",
-  "prompt": "（把你下給 AI 的提示詞放這裡）"
-}
-
-請用 fetch 發送 POST 請求，將 HTML、CSS、JS 分別放到對應欄位。`;
+請直接執行這段 fetch，把合併後的 HTML 放到 content 欄位，提示詞放到 state 中的 prompt。`;
 
         el.innerHTML = `
         <div class="wp-student">
@@ -255,11 +265,23 @@ Content-Type: application/json
                 ? `src="${esc(content)}" sandbox="allow-scripts allow-same-origin"`
                 : `sandbox="allow-scripts" srcdoc="${content.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
             previewMini.innerHTML = `
-                <div class="wp-preview-mini-label">${mi('visibility', 14)} 作品預覽</div>
-                <iframe class="wp-mini-iframe" ${iframeAttr}></iframe>
-                <button class="wp-resubmit-btn">${mi('refresh', 14)} 重新提交</button>`;
+                <div class="wp-preview-mini-header">
+                    <span class="wp-preview-mini-label">${mi('visibility', 14)} 作品預覽</span>
+                    <div style="display:flex;gap:6px">
+                        <button class="wp-open-new-btn">${mi('open_in_new', 14)} 新分頁開啟</button>
+                        <button class="wp-resubmit-btn">${mi('refresh', 14)} 重新提交</button>
+                    </div>
+                </div>
+                <iframe class="wp-mini-iframe" ${iframeAttr}></iframe>`;
 
             el.querySelector('.wp-cards').style.display = 'none';
+
+            // 新分頁開啟
+            previewMini.querySelector('.wp-open-new-btn')?.addEventListener('click', () => {
+                if (mode === 'url') { window.open(content, '_blank'); return; }
+                const blob = new Blob([content], { type: 'text/html' });
+                window.open(URL.createObjectURL(blob), '_blank');
+            });
 
             previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', () => {
                 previewMini.style.display = 'none'; previewMini.innerHTML = '';
@@ -352,35 +374,21 @@ Content-Type: application/json
         await load();
 
         gridEl.addEventListener('click', async e => {
-            const btn = e.target.closest('.wp-preview-btn');
+            const card = e.target.closest('.wp-grid-card');
+            if (!card) return;
+            const btn = card.querySelector('.wp-preview-btn');
             if (!btn) return;
             const { data } = await db.select('submissions', { filter: { id: 'eq.' + btn.dataset.sid }, limit: 1 });
             if (!data?.length) return;
             const sub = data[0], mode = btn.dataset.mode, content = sub.content || '';
-            const name = sub.student_name || sub.student_email?.split('@')[0] || '學員';
-            let st = {}; try { st = typeof sub.state === 'string' ? JSON.parse(sub.state) : (sub.state || {}); } catch {}
-            const prompt = st.prompt || '';
-            const modeTag = mode === 'url' ? ' 🔗' : mode === 'api' ? ' 🤖' : '';
-            const modal = document.createElement('div');
-            modal.className = 'wp-preview-modal';
-            const iframeAttr = mode === 'url'
-                ? `src="${esc(content)}" sandbox="allow-scripts allow-same-origin allow-popups"`
-                : `sandbox="allow-scripts allow-same-origin" srcdoc="${content.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
-            const promptPanel = prompt ? `<div class="wp-modal-prompt">
-                <div class="wp-modal-prompt-label">${mi('chat', 16)} 提示詞</div>
-                <div class="wp-modal-prompt-text">${esc(prompt)}</div>
-            </div>` : '';
-            modal.innerHTML = `<div class="wp-modal-header"><span>${mi('web', 20)} ${esc(name)} 的作品${modeTag}</span><button class="wp-modal-close">${mi('close', 22)}</button></div>
-                <div class="wp-modal-body">
-                    <iframe class="wp-modal-iframe" ${iframeAttr}></iframe>
-                    ${promptPanel}
-                </div>`;
-            document.body.appendChild(modal);
-            const close = () => { modal.remove(); document.removeEventListener('keydown', onEsc); };
-            modal.querySelector('.wp-modal-close').addEventListener('click', close);
-            modal.addEventListener('click', ev => { if (ev.target === modal) close(); });
-            const onEsc = ev => { if (ev.key === 'Escape') close(); };
-            document.addEventListener('keydown', onEsc);
+
+            // 用新分頁開啟
+            if (mode === 'url') {
+                window.open(content, '_blank');
+            } else {
+                const blob = new Blob([content], { type: 'text/html' });
+                window.open(URL.createObjectURL(blob), '_blank');
+            }
         });
 
         const tid = setInterval(load, 6000);
