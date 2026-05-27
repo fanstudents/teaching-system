@@ -84,7 +84,10 @@ export class SkillBattleGame {
                 <div class="sb-student-layout">
                     <div class="sb-student-left">
                         <div class="sb-task-section">
-                            <div class="sb-task-label">${mi('assignment', 18)} 任務說明</div>
+                            <div class="sb-task-label">
+                                ${mi('assignment', 18)} 任務說明
+                                <button class="sb-copy-task-btn" title="複製題目">${mi('content_copy', 14)} 複製</button>
+                            </div>
                             <div class="sb-task-text">${esc(element.question || '')}</div>
                         </div>
                     </div>
@@ -100,6 +103,25 @@ export class SkillBattleGame {
                 </div>
                 <div class="sb-student-result"></div>
             </div>`;
+
+        // 複製題目按鈕
+        el.querySelector('.sb-copy-task-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const text = element.question || '';
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = el.querySelector('.sb-copy-task-btn');
+                btn.innerHTML = `${mi('check', 14)} 已複製`;
+                setTimeout(() => { btn.innerHTML = `${mi('content_copy', 14)} 複製`; }, 1500);
+            }).catch(() => {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+                const btn = el.querySelector('.sb-copy-task-btn');
+                btn.innerHTML = `${mi('check', 14)} 已複製`;
+                setTimeout(() => { btn.innerHTML = `${mi('content_copy', 14)} 複製`; }, 1500);
+            });
+        });
 
         const submitBtn = el.querySelector('.sb-submit-btn');
         const charCount = el.querySelector('.sb-char-count');
