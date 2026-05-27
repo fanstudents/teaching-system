@@ -72,7 +72,7 @@ export class WebProjectGame {
         const studentName = user.name || sess.studentName || '';
         const studentEmail = user.email || sess.studentEmail || '';
 
-        const apiEndpoint = 'https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/submit-web-project';
+        const apiEndpoint = 'https://y36ditim.functions.insforge.app';
         const apiPrompt = `請幫我將上面的網頁程式碼提交到教學系統。
 
 使用以下 API：
