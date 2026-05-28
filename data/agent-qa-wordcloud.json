@@ -1,0 +1,84 @@
+{
+  "slides": [
+    {
+      "id": "el_wc01_qa1",
+      "background": "#f8fafc",
+      "elements": [
+        { "id": "el_wc01_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "content": "<b style=\"font-size:30px;color:#1e293b;\">💬 Q&A：你覺得 AI Agent 最先改變什麼？</b>", "fontSize": 30 },
+        { "id": "el_wc01_s1", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 78, "width": 50, "height": 3, "background": "#7c3aed" },
+        { "id": "el_wc01_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 28, "content": "<span style=\"font-size:15px;color:#64748b;\">請輸入 1~3 個你認為 AI Agent 最先改變的領域或工作</span>", "fontSize": 15 },
+        { "id": "el_wc01_wc", "type": "wordcloud", "x": 60, "y": 130, "width": 840, "height": 350, "question": "你覺得 AI Agent 最先改變什麼領域？", "maxWords": 3 }
+      ]
+    },
+    {
+      "id": "el_wc02_explain1",
+      "background": "#ffffff",
+      "elements": [
+        { "id": "el_wc02_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "content": "<b style=\"font-size:30px;color:#1e293b;\">🔍 解說：AI Agent 最先改變的領域</b>", "fontSize": 30 },
+        { "id": "el_wc02_s1", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 78, "width": 50, "height": 3, "background": "#7c3aed" },
+        { "id": "el_wc02_s2", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 110, "width": 260, "height": 110, "background": "#faf5ff", "borderRadius": 12 },
+        { "id": "el_wc02_t2", "type": "text", "x": 78, "y": 118, "width": 224, "height": 90, "content": "<div style=\"font-size:15px;line-height:1.8;color:#6d28d9;\"><b style=\"font-size:18px;\">📝 行政工作</b><br>報告、信件、排程<br>最容易被自動化</div>", "fontSize": 15 },
+        { "id": "el_wc02_s3", "type": "shape", "shapeType": "rectangle", "x": 340, "y": 110, "width": 260, "height": 110, "background": "#f0f9ff", "borderRadius": 12 },
+        { "id": "el_wc02_t3", "type": "text", "x": 358, "y": 118, "width": 224, "height": 90, "content": "<div style=\"font-size:15px;line-height:1.8;color:#0369a1;\"><b style=\"font-size:18px;\">💻 軟體開發</b><br>Vibe Coding 已開始<br>寫程式門檻快速降低</div>", "fontSize": 15 },
+        { "id": "el_wc02_s4", "type": "shape", "shapeType": "rectangle", "x": 620, "y": 110, "width": 260, "height": 110, "background": "#f0fdf4", "borderRadius": 12 },
+        { "id": "el_wc02_t4", "type": "text", "x": 638, "y": 118, "width": 224, "height": 90, "content": "<div style=\"font-size:15px;line-height:1.8;color:#166534;\"><b style=\"font-size:18px;\">📊 資料分析</b><br>搜尋、整理、報表<br>Agent 天生擅長</div>", "fontSize": 15 },
+        { "id": "el_wc02_s5", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 245, "width": 840, "height": 1, "background": "#e2e8f0" },
+        { "id": "el_wc02_t5", "type": "text", "x": 60, "y": 270, "width": 840, "height": 90, "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\">AI Agent 最先改變的，是那些<b style=\"color:#7c3aed;\">「重複性高、規則明確、可拆解成步驟」</b>的工作。<br><br>這不代表取代人類，而是<b style=\"color:#0284c7;\">讓人類從雜事中解放，去做更重要的事</b>。</div>", "fontSize": 16 },
+        { "id": "el_wc02_t6", "type": "text", "x": 60, "y": 400, "width": 840, "height": 40, "content": "<div style=\"font-size:22px;color:#1e293b;\"><b>🎯 關鍵洞察：</b>未來最有價值的能力 = <b style=\"color:#7c3aed;\">拆解任務 + 指揮 AI</b></div>", "fontSize": 22 }
+      ]
+    },
+    {
+      "id": "el_wc03_qa2",
+      "background": "#f8fafc",
+      "elements": [
+        { "id": "el_wc03_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "content": "<b style=\"font-size:30px;color:#1e293b;\">💬 Q&A：你最想讓 AI Agent 幫你做什麼？</b>", "fontSize": 30 },
+        { "id": "el_wc03_s1", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 78, "width": 50, "height": 3, "background": "#0284c7" },
+        { "id": "el_wc03_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 28, "content": "<span style=\"font-size:15px;color:#64748b;\">請輸入 1~3 個你最想讓 AI 幫你完成的事情</span>", "fontSize": 15 },
+        { "id": "el_wc03_wc", "type": "wordcloud", "x": 60, "y": 130, "width": 840, "height": 350, "question": "你最想讓 AI Agent 幫你做什麼？", "maxWords": 3 }
+      ]
+    },
+    {
+      "id": "el_wc04_explain2",
+      "background": "#ffffff",
+      "elements": [
+        { "id": "el_wc04_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "content": "<b style=\"font-size:30px;color:#1e293b;\">🔍 解說：如何開始讓 AI 幫你工作？</b>", "fontSize": 30 },
+        { "id": "el_wc04_s1", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 78, "width": 50, "height": 3, "background": "#0284c7" },
+        { "id": "el_wc04_s2", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 110, "width": 840, "height": 65, "background": "#0f172a", "borderRadius": 12 },
+        { "id": "el_wc04_t2", "type": "text", "x": 80, "y": 120, "width": 800, "height": 44, "content": "<div style=\"font-size:18px;color:#38bdf8;font-weight:700;\">🚀 三步驟開始使用 AI Agent</div>", "fontSize": 18 },
+        { "id": "el_wc04_s3", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 200, "width": 260, "height": 140, "background": "#f0f9ff", "borderRadius": 12 },
+        { "id": "el_wc04_t3", "type": "text", "x": 78, "y": 210, "width": 224, "height": 120, "content": "<div style=\"font-size:15px;line-height:1.8;color:#0369a1;\"><b style=\"font-size:28px;\">1️⃣</b><br><b>拆解你的需求</b><br>把大任務拆成<br>小步驟清單</div>", "fontSize": 15 },
+        { "id": "el_wc04_s4", "type": "shape", "shapeType": "rectangle", "x": 340, "y": 200, "width": 260, "height": 140, "background": "#faf5ff", "borderRadius": 12 },
+        { "id": "el_wc04_t4", "type": "text", "x": 358, "y": 210, "width": 224, "height": 120, "content": "<div style=\"font-size:15px;line-height:1.8;color:#6d28d9;\"><b style=\"font-size:28px;\">2️⃣</b><br><b>選擇對的工具</b><br>ChatGPT / Claude<br>各有所長</div>", "fontSize": 15 },
+        { "id": "el_wc04_s5", "type": "shape", "shapeType": "rectangle", "x": 620, "y": 200, "width": 260, "height": 140, "background": "#f0fdf4", "borderRadius": 12 },
+        { "id": "el_wc04_t5", "type": "text", "x": 638, "y": 210, "width": 224, "height": 120, "content": "<div style=\"font-size:15px;line-height:1.8;color:#166534;\"><b style=\"font-size:28px;\">3️⃣</b><br><b>給出清楚指令</b><br>Prompt 是你<br>指揮 AI 的語言</div>", "fontSize": 15 },
+        { "id": "el_wc04_t6", "type": "text", "x": 60, "y": 380, "width": 840, "height": 60, "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\">💡 重點不是「AI 能做什麼」，而是<b style=\"color:#0284c7;\">「你能想到要 AI 做什麼」</b><br>能定義問題的人，就是能指揮 AI 的人。</div>", "fontSize": 16 }
+      ]
+    },
+    {
+      "id": "el_wc05_qa3",
+      "background": "#f8fafc",
+      "elements": [
+        { "id": "el_wc05_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "content": "<b style=\"font-size:30px;color:#1e293b;\">💬 Q&A：你對 AI Agent 最大的擔憂是什麼？</b>", "fontSize": 30 },
+        { "id": "el_wc05_s1", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 78, "width": 50, "height": 3, "background": "#dc2626" },
+        { "id": "el_wc05_t2", "type": "text", "x": 60, "y": 90, "width": 840, "height": 28, "content": "<span style=\"font-size:15px;color:#64748b;\">請輸入 1~3 個你對 AI Agent 發展最擔心的事</span>", "fontSize": 15 },
+        { "id": "el_wc05_wc", "type": "wordcloud", "x": 60, "y": 130, "width": 840, "height": 350, "question": "你對 AI Agent 最大的擔憂是什麼？", "maxWords": 3 }
+      ]
+    },
+    {
+      "id": "el_wc06_explain3",
+      "background": "#ffffff",
+      "elements": [
+        { "id": "el_wc06_t1", "type": "text", "x": 60, "y": 30, "width": 700, "height": 50, "content": "<b style=\"font-size:30px;color:#1e293b;\">🔍 解說：AI Agent 的風險與應對</b>", "fontSize": 30 },
+        { "id": "el_wc06_s1", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 78, "width": 50, "height": 3, "background": "#dc2626" },
+        { "id": "el_wc06_s2", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 110, "width": 410, "height": 120, "background": "#fef2f2", "borderRadius": 12 },
+        { "id": "el_wc06_t2", "type": "text", "x": 78, "y": 118, "width": 374, "height": 100, "content": "<div style=\"font-size:15px;line-height:1.9;color:#991b1b;\"><b style=\"font-size:17px;\">⚠️ 常見擔憂</b><br>• 隱私洩露 — AI 能存取你的資料<br>• 取代工作 — 自動化衝擊就業<br>• 錯誤決策 — AI 判斷不一定正確</div>", "fontSize": 15 },
+        { "id": "el_wc06_s3", "type": "shape", "shapeType": "rectangle", "x": 490, "y": 110, "width": 410, "height": 120, "background": "#f0fdf4", "borderRadius": 12 },
+        { "id": "el_wc06_t3", "type": "text", "x": 508, "y": 118, "width": 374, "height": 100, "content": "<div style=\"font-size:15px;line-height:1.9;color:#166534;\"><b style=\"font-size:17px;\">✅ 正確心態</b><br>• 了解 AI 的邊界，不盲目信任<br>• 把 AI 當工具，不是老闆<br>• 持續學習，讓自己不可被取代</div>", "fontSize": 15 },
+        { "id": "el_wc06_s4", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 255, "width": 840, "height": 1, "background": "#e2e8f0" },
+        { "id": "el_wc06_s5", "type": "shape", "shapeType": "rectangle", "x": 60, "y": 280, "width": 840, "height": 70, "background": "#0f172a", "borderRadius": 12 },
+        { "id": "el_wc06_t4", "type": "text", "x": 80, "y": 290, "width": 800, "height": 50, "content": "<div style=\"font-size:20px;color:#fbbf24;font-weight:700;line-height:2;\">🎯 真正的威脅不是 AI 取代你<br>而是「會用 AI 的人」取代你</div>", "fontSize": 20 },
+        { "id": "el_wc06_t5", "type": "text", "x": 60, "y": 390, "width": 840, "height": 60, "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\">AI Agent 會出錯，所以更需要<b style=\"color:#dc2626;\">有判斷力的人來監督</b>。<br>未來最值錢的能力：<b style=\"color:#0284c7;\">人類判斷力 × AI 執行力</b></div>", "fontSize": 16 }
+      ]
+    }
+  ]
+}
