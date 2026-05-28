@@ -1,0 +1,869 @@
+{
+  "slides": [
+    {
+      "id": "el_s1a0v9x3k",
+      "elements": [
+        {
+          "id": "el_s1bg0grad",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s1sh0left",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 55,
+          "width": 4,
+          "height": 120,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s1tt0titl",
+          "type": "text",
+          "x": 80,
+          "y": 50,
+          "width": 600,
+          "height": 55,
+          "content": "<b style=\"font-size:38px;color:#f1f5f9;\">AI Agent 實際會怎麼影響學生？</b>",
+          "fontSize": 38,
+          "bold": true
+        },
+        {
+          "id": "el_s1tt0subt",
+          "type": "text",
+          "x": 80,
+          "y": 120,
+          "width": 500,
+          "height": 35,
+          "content": "<span style=\"font-size:22px;color:#94a3b8;\">8 個未來可能的 AI Agent 場景</span>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s1sh0accl",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 170,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s1sh0tg01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 220,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg01",
+          "type": "text",
+          "x": 80,
+          "y": 228,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">📚 做報告</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 292,
+          "y": 220,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg02",
+          "type": "text",
+          "x": 292,
+          "y": 228,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">💼 找實習</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 504,
+          "y": 220,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg03",
+          "type": "text",
+          "x": 504,
+          "y": 228,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">📖 管課業</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 716,
+          "y": 220,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg04",
+          "type": "text",
+          "x": 716,
+          "y": 228,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">📱 自媒體</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg05",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 274,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg05",
+          "type": "text",
+          "x": 80,
+          "y": 282,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">💰 做副業</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg06",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 292,
+          "y": 274,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg06",
+          "type": "text",
+          "x": 292,
+          "y": 282,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">🎯 規劃人生</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg07",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 504,
+          "y": 274,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg07",
+          "type": "text",
+          "x": 504,
+          "y": 282,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">💻 寫程式</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1sh0tg08",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 716,
+          "y": 274,
+          "width": 200,
+          "height": 42,
+          "background": "rgba(56,189,248,0.12)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_s1tt0tg08",
+          "type": "text",
+          "x": 716,
+          "y": 282,
+          "width": 200,
+          "height": 28,
+          "content": "<b style=\"font-size:14px;color:#38bdf8;\">🚀 超級個人</b>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s1tt0botm",
+          "type": "text",
+          "x": 80,
+          "y": 460,
+          "width": 500,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">這些不是科幻，而是正在發生的事</span>",
+          "fontSize": 15
+        }
+      ],
+      "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"
+    },
+    {
+      "id": "el_s2b4f7r2m",
+      "elements": [
+        {
+          "id": "el_s2tt0titl",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">場景 1｜AI 幫你做報告</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_s2sh0accl",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s2tt0subt",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 200,
+          "height": 35,
+          "content": "<b style=\"font-size:22px;color:#ef4444;\">😩 以前</b>",
+          "fontSize": 22,
+          "bold": true
+        },
+        {
+          "id": "el_s2sh0card",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 145,
+          "width": 400,
+          "height": 180,
+          "background": "#fef2f2",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_s2tt0list",
+          "type": "text",
+          "x": 80,
+          "y": 155,
+          "width": 360,
+          "height": 120,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#991b1b;\">• 自己查資料<br>• 自己整理 PPT<br>• 自己做摘要</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s2sh0time",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 350,
+          "width": 400,
+          "height": 50,
+          "background": "#fee2e2",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s2tt0time",
+          "type": "text",
+          "x": 80,
+          "y": 357,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:18px;color:#dc2626;\">⬜ 可能花：6~8 小時</b>",
+          "fontSize": 18,
+          "bold": true
+        },
+        {
+          "id": "el_s2tt0emoj",
+          "type": "text",
+          "x": 600,
+          "y": 160,
+          "width": 200,
+          "height": 100,
+          "content": "<span style=\"font-size:80px;\">😫</span>",
+          "fontSize": 80
+        },
+        {
+          "id": "el_s2tt0dail",
+          "type": "text",
+          "x": 620,
+          "y": 270,
+          "width": 160,
+          "height": 25,
+          "content": "<span style=\"font-size:16px;color:#94a3b8;\">學生的日常</span>",
+          "fontSize": 16
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s3c7k2p5q",
+      "elements": [
+        {
+          "id": "el_s3tt0titl",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">場景 1｜AI 幫你做報告</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0accl",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#22c55e"
+        },
+        {
+          "id": "el_s3tt0subt",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 200,
+          "height": 35,
+          "content": "<b style=\"font-size:22px;color:#16a34a;\">✨ 未來</b>",
+          "fontSize": 22,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0prom",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 145,
+          "width": 520,
+          "height": 70,
+          "background": "#0f172a",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_s3tt0prom",
+          "type": "text",
+          "x": 80,
+          "y": 158,
+          "width": 480,
+          "height": 44,
+          "content": "<span style=\"font-size:16px;color:#38bdf8;\">「幫我做一份 Tesla 簡報，要有市場分析、競爭者、財務數據」</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s3sh0cd01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 240,
+          "width": 200,
+          "height": 55,
+          "background": "#f0fdf4",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s3tt0cd01",
+          "type": "text",
+          "x": 60,
+          "y": 250,
+          "width": 200,
+          "height": 36,
+          "content": "<b style=\"font-size:15px;color:#16a34a;\">🔍 自動搜尋資料</b>",
+          "fontSize": 15,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0cd02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 272,
+          "y": 240,
+          "width": 200,
+          "height": 55,
+          "background": "#f0fdf4",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s3tt0cd02",
+          "type": "text",
+          "x": 272,
+          "y": 250,
+          "width": 200,
+          "height": 36,
+          "content": "<b style=\"font-size:15px;color:#16a34a;\">📋 整理內容</b>",
+          "fontSize": 15,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0cd03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 484,
+          "y": 240,
+          "width": 200,
+          "height": 55,
+          "background": "#f0fdf4",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s3tt0cd03",
+          "type": "text",
+          "x": 484,
+          "y": 250,
+          "width": 200,
+          "height": 36,
+          "content": "<b style=\"font-size:15px;color:#16a34a;\">🎨 製作簡報</b>",
+          "fontSize": 15,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0cd04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 696,
+          "y": 240,
+          "width": 200,
+          "height": 55,
+          "background": "#f0fdf4",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s3tt0cd04",
+          "type": "text",
+          "x": 696,
+          "y": 250,
+          "width": 200,
+          "height": 36,
+          "content": "<b style=\"font-size:15px;color:#16a34a;\">✨ 自動排版</b>",
+          "fontSize": 15,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0emph",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 340,
+          "width": 840,
+          "height": 50,
+          "background": "#ecfdf5",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s3tt0emph",
+          "type": "text",
+          "x": 80,
+          "y": 350,
+          "width": 800,
+          "height": 30,
+          "content": "<b style=\"font-size:18px;color:#059669;\">甚至：直接生成 PPT → 從 8 小時變 8 分鐘</b>",
+          "fontSize": 18,
+          "bold": true
+        },
+        {
+          "id": "el_s3sh0tmok",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 600,
+          "y": 420,
+          "width": 300,
+          "height": 45,
+          "background": "#dcfce7",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s3tt0tmok",
+          "type": "text",
+          "x": 620,
+          "y": 428,
+          "width": 260,
+          "height": 30,
+          "content": "<b style=\"font-size:18px;color:#16a34a;\">✅ 只要 8 分鐘</b>",
+          "fontSize": 18,
+          "bold": true
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s4d9n3w8f",
+      "elements": [
+        {
+          "id": "el_s4tt0titl",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">場景 2｜AI 幫你找實習</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_s4sh0accl",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_s4sh0cd01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 400,
+          "height": 65,
+          "background": "#faf5ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s4tt0cd01",
+          "type": "text",
+          "x": 80,
+          "y": 122,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#7c3aed;\">📝 幫你分析履歷</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s4sh0cd02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 480,
+          "y": 110,
+          "width": 400,
+          "height": 65,
+          "background": "#faf5ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s4tt0cd02",
+          "type": "text",
+          "x": 500,
+          "y": 122,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#7c3aed;\">✍️ 幫你修改自傳</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s4sh0cd03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 187,
+          "width": 400,
+          "height": 65,
+          "background": "#faf5ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s4tt0cd03",
+          "type": "text",
+          "x": 80,
+          "y": 199,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#7c3aed;\">📨 幫你投遞職缺</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s4sh0cd04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 480,
+          "y": 187,
+          "width": 400,
+          "height": 65,
+          "background": "#faf5ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s4tt0cd04",
+          "type": "text",
+          "x": 500,
+          "y": 199,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#7c3aed;\">📅 幫你追蹤面試</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s4sh0emph",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 280,
+          "width": 840,
+          "height": 55,
+          "background": "#f5f3ff",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_s4tt0emph",
+          "type": "text",
+          "x": 80,
+          "y": 294,
+          "width": 800,
+          "height": 28,
+          "content": "<b style=\"font-size:17px;color:#6d28d9;\">甚至：每天自動幫你找新的工作機會</b>",
+          "fontSize": 17,
+          "bold": true
+        },
+        {
+          "id": "el_s4sh0divd",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 360,
+          "width": 840,
+          "height": 1,
+          "background": "#e2e8f0"
+        },
+        {
+          "id": "el_s4sh0dark",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 385,
+          "width": 840,
+          "height": 65,
+          "background": "#1e1b4b",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_s4tt0dark",
+          "type": "text",
+          "x": 80,
+          "y": 400,
+          "width": 800,
+          "height": 36,
+          "content": "<b style=\"font-size:22px;color:#c4b5fd;\">未來：每個人都有自己的 AI 獵頭顧問</b>",
+          "fontSize": 22,
+          "bold": true
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s5e2m6j1h",
+      "elements": [
+        {
+          "id": "el_s5tt0titl",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">場景 3｜AI 幫你管理課業</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_s5sh0accl",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#0284c7"
+        },
+        {
+          "id": "el_s5sh0cd01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 400,
+          "height": 65,
+          "background": "#f0f9ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s5tt0cd01",
+          "type": "text",
+          "x": 80,
+          "y": 122,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#0284c7;\">📝 整理課程重點</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s5sh0cd02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 480,
+          "y": 110,
+          "width": 400,
+          "height": 65,
+          "background": "#f0f9ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s5tt0cd02",
+          "type": "text",
+          "x": 500,
+          "y": 122,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#0284c7;\">📖 考前摘要</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s5sh0cd03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 187,
+          "width": 400,
+          "height": 65,
+          "background": "#f0f9ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s5tt0cd03",
+          "type": "text",
+          "x": 80,
+          "y": 199,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#0284c7;\">📅 規劃讀書計畫</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s5sh0cd04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 480,
+          "y": 187,
+          "width": 400,
+          "height": 65,
+          "background": "#f0f9ff",
+          "borderRadius": 10
+        },
+        {
+          "id": "el_s5tt0cd04",
+          "type": "text",
+          "x": 500,
+          "y": 199,
+          "width": 360,
+          "height": 36,
+          "content": "<b style=\"font-size:16px;color:#0284c7;\">⏰ 提醒作業截止</b>",
+          "fontSize": 16,
+          "bold": true
+        },
+        {
+          "id": "el_s5sh0emph",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 280,
+          "width": 840,
+          "height": 55,
+          "background": "#e0f2fe",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_s5tt0emph",
+          "type": "text",
+          "x": 80,
+          "y": 294,
+          "width": 800,
+          "height": 28,
+          "content": "<b style=\"font-size:17px;color:#0369a1;\">甚至：知道你哪科比較弱</b>",
+          "fontSize": 17,
+          "bold": true
+        },
+        {
+          "id": "el_s5sh0divd",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 360,
+          "width": 840,
+          "height": 1,
+          "background": "#e2e8f0"
+        },
+        {
+          "id": "el_s5sh0dark",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 385,
+          "width": 840,
+          "height": 65,
+          "background": "#0c4a6e",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_s5tt0dark",
+          "type": "text",
+          "x": 80,
+          "y": 400,
+          "width": 800,
+          "height": 36,
+          "content": "<b style=\"font-size:22px;color:#7dd3fc;\">未來：AI 比你更了解你的學習狀況</b>",
+          "fontSize": 22,
+          "bold": true
+        }
+      ],
+      "background": "#ffffff"
+    }
+  ]
+}
