@@ -355,6 +355,62 @@ class InteractionState {
     }
 
     /**
+     * 取得組別排行榜
+     * @param {string} sessionId
+     * @returns {Promise<Array<{group: string, groupName: string, totalPoints: number, memberCount: number}>>}
+     */
+    async getGroupLeaderboard(sessionId) {
+        if (!sessionId) return [];
+        try {
+            const raw = await db.select('submissions', {
+                filter: {
+                    session_id: `eq.${sessionId}`,
+                    student_email: 'neq.guest',
+                },
+                limit: 1000,
+            });
+            const rows = this._unwrap(raw);
+
+            const groupNameMap = {};
+            const groupMembers = {};
+            const groupScores = {};
+
+            for (const r of rows) {
+                const g = r.student_group;
+                if (!g) continue;
+
+                // 組名（來自 groupPick submission）
+                if (r.type === 'groupPick') {
+                    let st = r.state;
+                    if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                    if (st?.groupName) groupNameMap[g] = st.groupName;
+                }
+
+                // 累計分數（與個人排行一致，用 _awarded）
+                let st = r.state;
+                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                groupScores[g] = (groupScores[g] || 0) + (parseFloat(st?._awarded) || 0);
+
+                // 成員去重
+                if (!groupMembers[g]) groupMembers[g] = new Set();
+                if (r.student_email) groupMembers[g].add(r.student_email);
+            }
+
+            return Object.keys(groupScores)
+                .map(g => ({
+                    group: g,
+                    groupName: groupNameMap[g] || `第 ${g} 組`,
+                    totalPoints: Math.round(groupScores[g]),
+                    memberCount: groupMembers[g]?.size || 0
+                }))
+                .sort((a, b) => b.totalPoints - a.totalPoints);
+        } catch (e) {
+            console.warn('[stateManager] getGroupLeaderboard failed:', e);
+            return [];
+        }
+    }
+
+    /**
      * 計算百分比（贏過幾 % 的同學）
      */
     async getPercentile(sessionId, elementId, currentScoreStr) {

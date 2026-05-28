@@ -224,6 +224,10 @@
         <div class="pres-leaderboard" id="studentLeaderboard">
             <div class="lb-header">
                 <span class="lb-title">🏆 排行榜</span>
+                <div class="lb-tabs" style="display:flex;gap:3px;margin-left:8px;">
+                    <button class="lb-tab active" data-lb-mode="personal" style="padding:2px 8px;border-radius:5px;font-size:11px;border:1px solid transparent;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;transition:all .2s;">👤 個人</button>
+                    <button class="lb-tab" data-lb-mode="group" style="padding:2px 8px;border-radius:5px;font-size:11px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-weight:600;font-family:inherit;transition:all .2s;">👥 組別</button>
+                </div>
                 <button id="studentLbClose" style="
                     background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.5);
                     padding:4px;display:flex;align-items:center;margin-left:auto;
@@ -1385,13 +1389,50 @@
                 }
 
                 // 排行榜輪詢
+                let _studentLbMode = 'personal';
+                // Tab 切換
+                document.querySelectorAll('#studentLeaderboard .lb-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        _studentLbMode = tab.dataset.lbMode;
+                        document.querySelectorAll('#studentLeaderboard .lb-tab').forEach(t => {
+                            const active = t.dataset.lbMode === _studentLbMode;
+                            t.classList.toggle('active', active);
+                            t.style.background = active ? 'rgba(255,255,255,0.15)' : 'transparent';
+                            t.style.color = active ? '#fff' : 'rgba(255,255,255,0.4)';
+                        });
+                        updateStudentLeaderboard();
+                    });
+                });
+
                 async function updateStudentLeaderboard() {
                     if (!sessionCode) return;
                     try {
                         const effectiveSession = stateManager.getSessionCode() || sessionCode;
-                        const board = await stateManager.getLeaderboard(effectiveSession, project?.id || '');
                         const list = document.getElementById('studentLbList');
                         if (!list) return;
+                        const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+                        // ★ 組別模式
+                        if (_studentLbMode === 'group') {
+                            const groupBoard = await stateManager.getGroupLeaderboard(effectiveSession);
+                            if (!groupBoard.length) {
+                                if (!list.querySelector('.lb-empty'))
+                                    list.innerHTML = '<div class="lb-empty">尚無學員分組</div>';
+                                return;
+                            }
+                            const GC = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
+                            const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
+                            list.innerHTML = groupBoard.map((g, i) => {
+                                const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                                const barPct = Math.round((g.totalPoints / maxPts) * 100);
+                                const color = GC[(parseInt(g.group) - 1) % GC.length] || '#6366f1';
+                                return `<div class="lb-row"><div class="lb-row-top"><div class="lb-rank ${rc}">${i+1}</div><div class="lb-name">${esc(g.groupName)} <span style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:400;">${g.memberCount}人</span></div><div class="lb-pts">${g.totalPoints}</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div></div>`;
+                            }).join('');
+                            return;
+                        }
+
+                        // ★ 個人模式
+                        const board = await stateManager.getLeaderboard(effectiveSession, project?.id || '');
                         if (!board.length) {
                             if (!list.querySelector('.lb-empty'))
                                 list.innerHTML = '<div class="lb-empty">尚無學員互動</div>';
@@ -1402,7 +1443,7 @@
                         list.innerHTML = board.map((s, i) => {
                             const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
                             const barPct = Math.round((s.totalPoints / maxPts) * 100);
-                            const safeName = String(s.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                            const safeName = esc(s.name);
                             return `<div class="lb-row"><div class="lb-row-top"><div class="lb-rank ${rc}">${i + 1}</div><div class="lb-name">${safeName}</div><div class="lb-pts">${s.totalPoints}</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%"></div></div></div>`;
                         }).join('');
                     } catch (e) { console.warn('[LB]', e); }

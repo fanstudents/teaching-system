@@ -3830,6 +3830,23 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     // ─── 排行榜輪詢 ───
     startLeaderboardPolling() {
         this.stopLeaderboardPolling();
+        if (!this._lbMode) this._lbMode = 'personal';
+
+        // Tab 切換
+        document.querySelectorAll('#presLeaderboard .lb-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this._lbMode = tab.dataset.lbMode;
+                document.querySelectorAll('#presLeaderboard .lb-tab').forEach(t => {
+                    const active = t.dataset.lbMode === this._lbMode;
+                    t.classList.toggle('active', active);
+                    t.style.background = active ? 'rgba(26,115,232,0.1)' : 'transparent';
+                    t.style.color = active ? '#1a73e8' : '#9ca3af';
+                });
+                this._lbScoreCache = new Map();
+                this.updateLeaderboard();
+            });
+        });
+
         this.updateLeaderboard(); // 立即更新一次
         this._lbTimer = setInterval(() => this.updateLeaderboard(), 5000);
     }
@@ -3840,14 +3857,41 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
 
     async updateLeaderboard() {
         if (!this.sessionCode) return;
-        if (!this._lbScoreCache) this._lbScoreCache = new Map(); // email → { pts, rank }
+        if (!this._lbScoreCache) this._lbScoreCache = new Map();
         try {
             const { stateManager } = await import('./interactive/stateManager.js');
-            // 使用 stateManager 的 session override（場次 UUID）優先
             const effectiveSessionId = stateManager.getSessionCode() || this.sessionCode;
-            const board = await stateManager.getLeaderboard(effectiveSessionId, this.slideManager.currentProjectId);
             const list = document.getElementById('lbList');
             if (!list) return;
+
+            // ★ 組別模式
+            if (this._lbMode === 'group') {
+                const groupBoard = await stateManager.getGroupLeaderboard(effectiveSessionId);
+                if (!groupBoard.length) {
+                    if (!list.querySelector('.lb-empty'))
+                        list.innerHTML = '<div class="lb-empty">尚無學員分組</div>';
+                    return;
+                }
+                const GROUP_COLORS = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
+                const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
+                list.innerHTML = groupBoard.map((g, i) => {
+                    const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+                    const barPct = Math.round((g.totalPoints / maxPts) * 100);
+                    const color = GROUP_COLORS[(parseInt(g.group) - 1) % GROUP_COLORS.length] || '#6366f1';
+                    return `<div class="lb-row" style="--gp-color:${color}">
+                        <div class="lb-row-top">
+                            <div class="lb-rank ${rc}">${i + 1}</div>
+                            <div class="lb-name">${this._escHtml(g.groupName)} <span style="font-size:10px;color:#9ca3af;font-weight:400;">${g.memberCount}人</span></div>
+                            <div class="lb-pts">${g.totalPoints}</div>
+                        </div>
+                        <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
+                    </div>`;
+                }).join('');
+                return;
+            }
+
+            // ★ 個人模式（原有邏輯）
+            const board = await stateManager.getLeaderboard(effectiveSessionId, this.slideManager.currentProjectId);
 
             if (!board.length) {
                 if (!list.querySelector('.lb-empty')) {
