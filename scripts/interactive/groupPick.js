@@ -56,7 +56,6 @@ export class GroupPickGame {
             </button>
         </div>`;
 
-        // 排列座位 → 開彈窗
         el.querySelector('.gp-arrange-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -66,7 +65,6 @@ export class GroupPickGame {
 
     /* ─── 排列座位彈窗 ─── */
     _openArrangeModal(element) {
-        // 移除舊彈窗
         document.getElementById('gpArrangeOverlay')?.remove();
 
         const n = element.groupCount || 4;
@@ -103,11 +101,9 @@ export class GroupPickGame {
 
         document.body.appendChild(overlay);
 
-        // 拖曳
         const canvas = document.getElementById('gpModalCanvas');
         this._enableDrag(canvas, pos);
 
-        // 重設
         overlay.querySelector('.gp-modal-reset').addEventListener('click', () => {
             const newPos = defaultPositions(n);
             newPos.forEach((p, i) => { pos[i] = p; });
@@ -117,12 +113,10 @@ export class GroupPickGame {
             });
         });
 
-        // 完成
         const closeModal = () => {
             element.groupPositions = [...pos];
             window.dispatchEvent(new Event('slideContentChanged'));
             overlay.remove();
-            // 重新渲染預覽
             const editorEl = document.querySelector(`[data-element-id="${element.id}"]`);
             if (editorEl) {
                 const inner = editorEl.querySelector('.element-content') || editorEl;
@@ -247,7 +241,7 @@ export class GroupPickGame {
     }
 
     /* ═══════════════════════════════════════
-       講師端（可拖曳）
+       講師端（位置與學員同步，不可拖曳）
        ═══════════════════════════════════════ */
     async _renderTeacher(el, element) {
         const { db } = await import('../supabase.js');
@@ -258,10 +252,7 @@ export class GroupPickGame {
         const groupCount = element.groupCount || 4;
         const groupNames = element.groupNames || Array.from({length: groupCount}, (_, i) => `第 ${i+1} 組`);
         const groupColors = element.groupColors || GROUP_COLORS.slice(0, groupCount);
-        if (!element.groupPositions || element.groupPositions.length !== groupCount) {
-            element.groupPositions = defaultPositions(groupCount);
-        }
-        const pos = element.groupPositions;
+        const pos = element.groupPositions || defaultPositions(groupCount);
 
         el.innerHTML = `
         <div class="gp-canvas gp-canvas--teacher">
@@ -269,7 +260,6 @@ export class GroupPickGame {
                 <div class="gp-teacher-title">${mi('groups', 22)} 現場分組</div>
                 <div class="gp-teacher-stats"></div>
             </div>
-            <div class="gp-canvas-hint">${mi('open_with', 14)} 可拖曳調整桌位</div>
         </div>`;
 
         const canvas = el.querySelector('.gp-canvas');
@@ -310,7 +300,6 @@ export class GroupPickGame {
 
             statsEl.textContent = `${pickList.length} 人已分組`;
 
-            // 首次建立卡片 or 更新內容
             if (!cardsCreated) {
                 for (let i = 0; i < groupCount; i++) {
                     const idx = String(i + 1);
@@ -328,12 +317,7 @@ export class GroupPickGame {
                     canvas.appendChild(card);
                 }
                 cardsCreated = true;
-                this._enableDrag(canvas, pos, () => {
-                    element.groupPositions = [...pos];
-                    try { window.dispatchEvent(new Event('slideContentChanged')); } catch {}
-                });
             } else {
-                // 只更新內容，不重建 DOM（保留拖曳位置）
                 canvas.querySelectorAll('.gp-team-card').forEach(card => {
                     const i = parseInt(card.dataset.idx);
                     const idx = String(i + 1);
@@ -362,7 +346,7 @@ export class GroupPickGame {
     }
 
     /* ═══════════════════════════════════════
-       拖曳引擎（pointer events）
+       拖曳引擎（僅用於排列彈窗）
        ═══════════════════════════════════════ */
     _enableDrag(canvas, positions, onEnd) {
         if (!canvas) return;
@@ -380,7 +364,6 @@ export class GroupPickGame {
                 e.stopImmediatePropagation();
                 dragging = true;
 
-                const rect = canvas.getBoundingClientRect();
                 startX = e.clientX;
                 startY = e.clientY;
                 const idx = parseInt(card.dataset.idx);
@@ -420,7 +403,6 @@ export class GroupPickGame {
                 if (onEnd) onEnd();
             });
 
-            // 防止編輯器攔截
             card.addEventListener('mousedown', (e) => {
                 e.stopPropagation();
                 e.stopImmediatePropagation();
