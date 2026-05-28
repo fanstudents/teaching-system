@@ -1,0 +1,816 @@
+{
+  "slides": [
+    {
+      "id": "el_s3_openclaw_boom",
+      "elements": [
+        {
+          "id": "el_s3_title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">OpenClaw 做了什麼？</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s3_line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s3_subtitle",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 500,
+          "height": 30,
+          "content": "<span style=\"font-size:16px;color:#64748b;\">不是單純聊天 AI，而是⋯</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s3_card1_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 145,
+          "width": 280,
+          "height": 170,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_s3_card1_text",
+          "type": "text",
+          "x": 55,
+          "y": 155,
+          "width": 250,
+          "height": 150,
+          "content": "<div style=\"font-size:15px;line-height:2.2;color:#0284c7;\"><b style=\"font-size:17px;\">🖥️ 能操作電腦</b><br><b style=\"font-size:17px;\">🌐 能操作瀏覽器</b><br><b style=\"font-size:17px;\">🔧 能使用工具</b></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s3_card2_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 145,
+          "width": 280,
+          "height": 170,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s3_card2_text",
+          "type": "text",
+          "x": 355,
+          "y": 160,
+          "width": 250,
+          "height": 140,
+          "content": "<div style=\"font-size:15px;line-height:2.2;color:#7c3aed;\"><b style=\"font-size:17px;\">⏱️ 能長時間執行任務</b><br><span style=\"font-size:13px;color:#9333ea;\">不是聊完就結束<br>會持續工作到完成</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s3_card3_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 640,
+          "y": 145,
+          "width": 280,
+          "height": 170,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s3_card3_text",
+          "type": "text",
+          "x": 655,
+          "y": 160,
+          "width": 250,
+          "height": 140,
+          "content": "<div style=\"font-size:15px;line-height:2.2;color:#16a34a;\"><b style=\"font-size:17px;\">📱 用 Telegram 就能控制</b><br><span style=\"font-size:13px;color:#15803d;\">不需要寫程式<br>傳訊息就能指揮 AI</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s3_emphasis",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 340,
+          "width": 880,
+          "height": 70,
+          "background": "#1e293b"
+        },
+        {
+          "id": "el_s3_emphasis_text",
+          "type": "text",
+          "x": 60,
+          "y": 348,
+          "width": 840,
+          "height": 55,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:22px;color:#38bdf8;\">💡 這不再是「工具」，而是一個「數位員工」</b></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s3_divider_bottom",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 338,
+          "width": 880,
+          "height": 3,
+          "background": "#38bdf8"
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s4_core_value",
+      "elements": [
+        {
+          "id": "el_s4_title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">OpenClaw 的核心價值</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s4_line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s4_before_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 120,
+          "width": 400,
+          "height": 280,
+          "background": "#1e293b"
+        },
+        {
+          "id": "el_s4_before_label",
+          "type": "text",
+          "x": 80,
+          "y": 130,
+          "width": 360,
+          "height": 35,
+          "content": "<span style=\"font-size:14px;color:#94a3b8;letter-spacing:2px;\">❌ 以前</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s4_before_title",
+          "type": "text",
+          "x": 80,
+          "y": 170,
+          "width": 360,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#f1f5f9;\">AI Agent 很「工程師」</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_s4_before_list",
+          "type": "text",
+          "x": 80,
+          "y": 225,
+          "width": 360,
+          "height": 160,
+          "content": "<div style=\"font-size:15px;line-height:2.2;color:#94a3b8;\">• 要會寫 Python<br>• 要懂 API 串接<br>• 要自己架伺服器<br>• 門檻高、只有工程師能玩</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s4_after_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 120,
+          "width": 400,
+          "height": 280,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s4_after_accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 120,
+          "width": 400,
+          "height": 5,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_s4_after_label",
+          "type": "text",
+          "x": 520,
+          "y": 135,
+          "width": 360,
+          "height": 35,
+          "content": "<span style=\"font-size:14px;color:#16a34a;letter-spacing:2px;\">✅ 現在</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s4_after_title",
+          "type": "text",
+          "x": 520,
+          "y": 175,
+          "width": 360,
+          "height": 45,
+          "content": "<b style=\"font-size:26px;color:#15803d;\">一般人也能用 Agent</b>",
+          "fontSize": 26
+        },
+        {
+          "id": "el_s4_after_list",
+          "type": "text",
+          "x": 520,
+          "y": 230,
+          "width": 360,
+          "height": 160,
+          "content": "<div style=\"font-size:15px;line-height:2.2;color:#334155;\">• 用 Telegram 對話就好<br>• 不需要寫任何程式碼<br>• 自然語言指揮 AI 工作<br>• <b style=\"color:#16a34a;\">人人都是 AI 指揮官</b></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s4_arrow",
+          "type": "text",
+          "x": 440,
+          "y": 230,
+          "width": 80,
+          "height": 50,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:36px;color:#38bdf8;\">→</b></div>",
+          "fontSize": 36
+        },
+        {
+          "id": "el_s4_bottom_text",
+          "type": "text",
+          "x": 60,
+          "y": 420,
+          "width": 840,
+          "height": 40,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:18px;color:#64748b;\">OpenClaw 的意義：<b style=\"color:#0284c7;\">把 AI Agent 從實驗室帶到每個人手中</b></span></div>",
+          "fontSize": 18
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s5_agent_vs_chatbot",
+      "elements": [
+        {
+          "id": "el_s5_title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">AI Agent ≠ Chatbot</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s5_line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s5_left_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 410,
+          "height": 330,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_s5_left_accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 410,
+          "height": 5,
+          "background": "#dc2626"
+        },
+        {
+          "id": "el_s5_left_icon",
+          "type": "text",
+          "x": 80,
+          "y": 125,
+          "width": 370,
+          "height": 40,
+          "content": "<span style=\"font-size:28px;\">💬</span> <b style=\"font-size:24px;color:#dc2626;\">Chatbot</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_s5_left_content",
+          "type": "text",
+          "x": 80,
+          "y": 175,
+          "width": 370,
+          "height": 250,
+          "content": "<div style=\"font-size:16px;line-height:2.4;color:#991b1b;\">❌ 回答問題<br>❌ 單次互動<br>❌ 被動等待指令<br>❌ 不能操作外部工具<br>❌ 對話結束就結束</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s5_right_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 110,
+          "width": 410,
+          "height": 330,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s5_right_accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 110,
+          "width": 410,
+          "height": 5,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_s5_right_icon",
+          "type": "text",
+          "x": 510,
+          "y": 125,
+          "width": 370,
+          "height": 40,
+          "content": "<span style=\"font-size:28px;\">🤖</span> <b style=\"font-size:24px;color:#16a34a;\">AI Agent</b>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_s5_right_content",
+          "type": "text",
+          "x": 510,
+          "y": 175,
+          "width": 370,
+          "height": 250,
+          "content": "<div style=\"font-size:16px;line-height:2.4;color:#166534;\">✅ 執行任務<br>✅ 長時間持續運作<br>✅ 主動完成目標<br>✅ 使用外部工具<br>✅ 自主決策下一步</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s5_vs",
+          "type": "text",
+          "x": 440,
+          "y": 230,
+          "width": 80,
+          "height": 50,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:28px;color:#475569;\">VS</b></div>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s5_bottom",
+          "type": "text",
+          "x": 60,
+          "y": 460,
+          "width": 840,
+          "height": 30,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:15px;color:#64748b;\">Chatbot 是<b style=\"color:#dc2626;\">回答機器</b>，Agent 是<b style=\"color:#16a34a;\">執行引擎</b></span></div>",
+          "fontSize": 15
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s6_agent_core",
+      "elements": [
+        {
+          "id": "el_s6_title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">Agent 的核心能力</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s6_line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s6_step1_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 140,
+          "width": 140,
+          "height": 100,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_s6_step1_text",
+          "type": "text",
+          "x": 45,
+          "y": 150,
+          "width": 130,
+          "height": 80,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">📥</span><br><b style=\"font-size:15px;color:#0284c7;\">Input</b><br><span style=\"font-size:12px;color:#64748b;\">接收指令</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s6_arrow1",
+          "type": "text",
+          "x": 180,
+          "y": 168,
+          "width": 40,
+          "height": 40,
+          "content": "<b style=\"font-size:28px;color:#38bdf8;\">→</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s6_step2_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 220,
+          "y": 140,
+          "width": 140,
+          "height": 100,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s6_step2_text",
+          "type": "text",
+          "x": 225,
+          "y": 150,
+          "width": 130,
+          "height": 80,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">🧠</span><br><b style=\"font-size:15px;color:#7c3aed;\">Planning</b><br><span style=\"font-size:12px;color:#64748b;\">拆解任務</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s6_arrow2",
+          "type": "text",
+          "x": 360,
+          "y": 168,
+          "width": 40,
+          "height": 40,
+          "content": "<b style=\"font-size:28px;color:#38bdf8;\">→</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s6_step3_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 400,
+          "y": 140,
+          "width": 140,
+          "height": 100,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_s6_step3_text",
+          "type": "text",
+          "x": 405,
+          "y": 150,
+          "width": 130,
+          "height": 80,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">🔧</span><br><b style=\"font-size:15px;color:#d97706;\">Tool Use</b><br><span style=\"font-size:12px;color:#64748b;\">使用工具</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s6_arrow3",
+          "type": "text",
+          "x": 540,
+          "y": 168,
+          "width": 40,
+          "height": 40,
+          "content": "<b style=\"font-size:28px;color:#38bdf8;\">→</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s6_step4_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 580,
+          "y": 140,
+          "width": 140,
+          "height": 100,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s6_step4_text",
+          "type": "text",
+          "x": 585,
+          "y": 150,
+          "width": 130,
+          "height": 80,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">💾</span><br><b style=\"font-size:15px;color:#16a34a;\">Memory</b><br><span style=\"font-size:12px;color:#64748b;\">記住脈絡</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s6_arrow4",
+          "type": "text",
+          "x": 720,
+          "y": 168,
+          "width": 40,
+          "height": 40,
+          "content": "<b style=\"font-size:28px;color:#38bdf8;\">→</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s6_step5_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 760,
+          "y": 140,
+          "width": 160,
+          "height": 100,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_s6_step5_text",
+          "type": "text",
+          "x": 765,
+          "y": 150,
+          "width": 150,
+          "height": 80,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">⚡</span><br><b style=\"font-size:15px;color:#dc2626;\">Action</b><br><span style=\"font-size:12px;color:#64748b;\">執行動作</span></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s6_detail_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 40,
+          "y": 270,
+          "width": 880,
+          "height": 200,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_s6_detail_title",
+          "type": "text",
+          "x": 60,
+          "y": 280,
+          "width": 840,
+          "height": 35,
+          "content": "<b style=\"font-size:18px;color:#1e293b;\">📋 生活化比喻：Agent 就像你的私人助理</b>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_s6_detail_content",
+          "type": "text",
+          "x": 60,
+          "y": 315,
+          "width": 840,
+          "height": 145,
+          "content": "<div style=\"font-size:14px;line-height:2.2;color:#334155;\">📥 <b>Input</b>：你說「幫我訂明天高雄的高鐵票」<br>🧠 <b>Planning</b>：助理思考要查班次、比價、確認座位<br>🔧 <b>Tool Use</b>：打開訂票網站、輸入資料<br>💾 <b>Memory</b>：記得你偏好靠窗、早班車<br>⚡ <b>Action</b>：完成訂票，把確認信寄給你</div>",
+          "fontSize": 14
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s7_quiz",
+      "elements": [
+        {
+          "id": "el_s7_title",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🧠 概念檢驗</b>",
+          "fontSize": 30
+        },
+        {
+          "id": "el_s7_line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_s7_desc",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">選出最正確的答案</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s7_quiz",
+          "type": "quiz",
+          "x": 60,
+          "y": 130,
+          "width": 840,
+          "height": 340,
+          "question": "以下哪個最符合 AI Agent 的特性？",
+          "multiple": false,
+          "options": [
+            { "text": "回答使用者的問題後等待下一個問題", "correct": false },
+            { "text": "主動執行多步驟任務並使用外部工具", "correct": true },
+            { "text": "只能處理文字對話", "correct": false },
+            { "text": "需要人類逐步指導每一個動作", "correct": false }
+          ]
+        }
+      ],
+      "background": "#f8fafc"
+    },
+    {
+      "id": "el_s8_2026_battlefield",
+      "elements": [
+        {
+          "id": "el_s8_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s8_accent_line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 60,
+          "width": 4,
+          "height": 60,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s8_title",
+          "type": "text",
+          "x": 80,
+          "y": 35,
+          "width": 500,
+          "height": 50,
+          "content": "<b style=\"font-size:36px;color:#f1f5f9;\">2026 的真正戰場</b>",
+          "fontSize": 36
+        },
+        {
+          "id": "el_s8_subtitle",
+          "type": "text",
+          "x": 80,
+          "y": 85,
+          "width": 700,
+          "height": 35,
+          "content": "<span style=\"font-size:18px;color:#94a3b8;\">現在競爭的不是「誰比較會聊天」</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_s8_divider",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 130,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s8_card1_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 160,
+          "width": 270,
+          "height": 180,
+          "background": "rgba(56,189,248,0.1)"
+        },
+        {
+          "id": "el_s8_card1_accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 160,
+          "width": 270,
+          "height": 4,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s8_card1_text",
+          "type": "text",
+          "x": 75,
+          "y": 175,
+          "width": 240,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">💼</span><br><br><b style=\"font-size:20px;color:#38bdf8;\">誰能幫你<br>完成工作</b></div>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s8_card2_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 160,
+          "width": 270,
+          "height": 180,
+          "background": "rgba(124,58,237,0.1)"
+        },
+        {
+          "id": "el_s8_card2_accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 160,
+          "width": 270,
+          "height": 4,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_s8_card2_text",
+          "type": "text",
+          "x": 360,
+          "y": 175,
+          "width": 240,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">🌍</span><br><br><b style=\"font-size:20px;color:#a78bfa;\">誰能操作<br>真實世界</b></div>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s8_card3_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 160,
+          "width": 270,
+          "height": 180,
+          "background": "rgba(22,163,106,0.1)"
+        },
+        {
+          "id": "el_s8_card3_accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 160,
+          "width": 270,
+          "height": 4,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_s8_card3_text",
+          "type": "text",
+          "x": 645,
+          "y": 175,
+          "width": 240,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">⏱️</span><br><br><b style=\"font-size:20px;color:#4ade80;\">誰能長時間<br>自主運作</b></div>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s8_bottom_divider",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 380,
+          "width": 840,
+          "height": 1,
+          "background": "rgba(148,163,184,0.3)"
+        },
+        {
+          "id": "el_s8_bottom_emphasis_bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 160,
+          "y": 410,
+          "width": 640,
+          "height": 65,
+          "background": "rgba(56,189,248,0.08)"
+        },
+        {
+          "id": "el_s8_bottom_text",
+          "type": "text",
+          "x": 60,
+          "y": 418,
+          "width": 840,
+          "height": 50,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:24px;color:#f1f5f9;\">AI 正從「<span style=\"color:#94a3b8;text-decoration:line-through;\">回答問題</span>」進化成「<span style=\"color:#38bdf8;\">實際工作</span>」</b></div>",
+          "fontSize": 24
+        }
+      ],
+      "background": "#0f172a"
+    }
+  ]
+}

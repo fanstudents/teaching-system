@@ -1,0 +1,854 @@
+{
+  "slides": [
+    {
+      "id": "el_s17_m4a1b",
+      "elements": [
+        {
+          "id": "el_s17_t1a",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🎯 配對練習：大廠 Agent 方向</b>",
+          "fontSize": 30
+        },
+        {
+          "id": "el_s17_sh1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_s17_t2a",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">將左側公司拖曳到右側對應的 Agent 策略方向</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s17_match",
+          "type": "matching",
+          "x": 60,
+          "y": 130,
+          "width": 840,
+          "height": 340,
+          "pairs": [
+            { "left": "OpenAI", "right": "ChatGPT Agent" },
+            { "left": "Anthropic", "right": "Computer Use" },
+            { "left": "Google", "right": "Gemini Spark" },
+            { "left": "NVIDIA", "right": "Agent Infrastructure" },
+            { "left": "Meta", "right": "Wearable Agent" }
+          ]
+        }
+      ],
+      "background": "#f8fafc"
+    },
+    {
+      "id": "el_s18_c2b3x",
+      "elements": [
+        {
+          "id": "el_s18_t1",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">各大廠真正差在哪？</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s18_sh1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s18_card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 840,
+          "height": 62,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_s18_card1txt",
+          "type": "text",
+          "x": 80,
+          "y": 118,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:17px;color:#1e293b;display:flex;\"><b style=\"color:#0284c7;min-width:120px;\">OpenAI</b><span style=\"margin:0 16px;color:#94a3b8;\">│</span>ChatGPT Agent<span style=\"margin:0 16px;color:#94a3b8;\">│</span><b style=\"color:#0284c7;\">🎯 消費者</b></div>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_s18_card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 182,
+          "width": 840,
+          "height": 62,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s18_card2txt",
+          "type": "text",
+          "x": 80,
+          "y": 190,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:17px;color:#1e293b;\"><b style=\"color:#7c3aed;min-width:120px;\">Anthropic</b><span style=\"margin:0 16px;color:#94a3b8;\">│</span>Computer Use<span style=\"margin:0 16px;color:#94a3b8;\">│</span><b style=\"color:#7c3aed;\">🛠️ 開發者</b></div>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_s18_card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 254,
+          "width": 840,
+          "height": 62,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s18_card3txt",
+          "type": "text",
+          "x": 80,
+          "y": 262,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:17px;color:#1e293b;\"><b style=\"color:#16a34a;min-width:120px;\">Google</b><span style=\"margin:0 16px;color:#94a3b8;\">│</span>Gemini Spark<span style=\"margin:0 16px;color:#94a3b8;\">│</span><b style=\"color:#16a34a;\">💼 Workspace</b></div>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_s18_card4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 326,
+          "width": 840,
+          "height": 62,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_s18_card4txt",
+          "type": "text",
+          "x": 80,
+          "y": 334,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:17px;color:#1e293b;\"><b style=\"color:#d97706;min-width:120px;\">NVIDIA</b><span style=\"margin:0 16px;color:#94a3b8;\">│</span>Agent Infrastructure<span style=\"margin:0 16px;color:#94a3b8;\">│</span><b style=\"color:#d97706;\">🏢 企業</b></div>",
+          "fontSize": 17
+        },
+        {
+          "id": "el_s18_card5bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 398,
+          "width": 840,
+          "height": 62,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_s18_card5txt",
+          "type": "text",
+          "x": 80,
+          "y": 406,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:17px;color:#1e293b;\"><b style=\"color:#dc2626;min-width:120px;\">Meta</b><span style=\"margin:0 16px;color:#94a3b8;\">│</span>Wearable Agent<span style=\"margin:0 16px;color:#94a3b8;\">│</span><b style=\"color:#dc2626;\">📱 下一代裝置</b></div>",
+          "fontSize": 17
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s19_d3f4k",
+      "elements": [
+        {
+          "id": "el_s19_bgshape",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s19_deco",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 40,
+          "width": 4,
+          "height": 60,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s19_t1",
+          "type": "text",
+          "x": 80,
+          "y": 35,
+          "width": 700,
+          "height": 55,
+          "content": "<b style=\"font-size:36px;color:#f1f5f9;letter-spacing:1px;\">真正的未來：AI 作業系統</b>",
+          "fontSize": 36
+        },
+        {
+          "id": "el_s19_sh1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 100,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s19_c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 140,
+          "width": 840,
+          "height": 90,
+          "background": "rgba(56,189,248,0.10)"
+        },
+        {
+          "id": "el_s19_c1txt",
+          "type": "text",
+          "x": 90,
+          "y": 155,
+          "width": 780,
+          "height": 60,
+          "content": "<div><b style=\"font-size:28px;color:#38bdf8;\">🔧 誰能控制工具</b><br><span style=\"font-size:16px;color:#94a3b8;\">能呼叫 API、操作瀏覽器、控制電腦的 Agent 才有主導權</span></div>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s19_c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 250,
+          "width": 840,
+          "height": 90,
+          "background": "rgba(124,58,237,0.10)"
+        },
+        {
+          "id": "el_s19_c2txt",
+          "type": "text",
+          "x": 90,
+          "y": 265,
+          "width": 780,
+          "height": 60,
+          "content": "<div><b style=\"font-size:28px;color:#a78bfa;\">⏱️ 誰能長時間工作</b><br><span style=\"font-size:16px;color:#94a3b8;\">不是一問一答，而是持續數小時自主運作</span></div>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s19_c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 360,
+          "width": 840,
+          "height": 90,
+          "background": "rgba(22,163,106,0.10)"
+        },
+        {
+          "id": "el_s19_c3txt",
+          "type": "text",
+          "x": 90,
+          "y": 375,
+          "width": 780,
+          "height": 60,
+          "content": "<div><b style=\"font-size:28px;color:#4ade80;\">🌍 誰能整合真實世界</b><br><span style=\"font-size:16px;color:#94a3b8;\">連接硬體、感測器、IoT，從數位走向物理世界</span></div>",
+          "fontSize": 28
+        }
+      ],
+      "background": "#0f172a"
+    },
+    {
+      "id": "el_s20_e5g6m",
+      "elements": [
+        {
+          "id": "el_s20_t1",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">下一階段可能出現</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s20_sh1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s20_c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 115,
+          "width": 200,
+          "height": 180,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_s20_c1txt",
+          "type": "text",
+          "x": 75,
+          "y": 130,
+          "width": 170,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:48px;\">🌐</span><br><b style=\"font-size:22px;color:#0284c7;\">AI Browser</b><br><span style=\"font-size:13px;color:#64748b;line-height:1.6;\">自主瀏覽網頁<br>完成搜尋與操作</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s20_c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 280,
+          "y": 115,
+          "width": 200,
+          "height": 180,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s20_c2txt",
+          "type": "text",
+          "x": 295,
+          "y": 130,
+          "width": 170,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:48px;\">👔</span><br><b style=\"font-size:22px;color:#7c3aed;\">AI Employee</b><br><span style=\"font-size:13px;color:#64748b;line-height:1.6;\">AI 全職員工<br>獨立完成專案任務</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s20_c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 115,
+          "width": 200,
+          "height": 180,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s20_c3txt",
+          "type": "text",
+          "x": 515,
+          "y": 130,
+          "width": 170,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:48px;\">🖥️</span><br><b style=\"font-size:22px;color:#16a34a;\">AI OS</b><br><span style=\"font-size:13px;color:#64748b;line-height:1.6;\">AI 原生作業系統<br>取代傳統 GUI 操作</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s20_c4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 720,
+          "y": 115,
+          "width": 200,
+          "height": 180,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_s20_c4txt",
+          "type": "text",
+          "x": 735,
+          "y": 130,
+          "width": 170,
+          "height": 150,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:48px;\">⚙️</span><br><b style=\"font-size:22px;color:#d97706;\">AI Workflow</b><br><span style=\"font-size:13px;color:#64748b;line-height:1.6;\">AI 工作流平台<br>串接所有企業系統</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s20_divider",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 340,
+          "width": 840,
+          "height": 1,
+          "background": "#e2e8f0"
+        },
+        {
+          "id": "el_s20_bottom",
+          "type": "text",
+          "x": 60,
+          "y": 370,
+          "width": 840,
+          "height": 80,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:24px;color:#1e293b;\">未來人類不再<b style=\"color:#dc2626;\">「操作軟體」</b></span><br><span style=\"font-size:28px;color:#1e293b;\">而是<b style=\"color:#0284c7;\">「指揮 AI」</b></span></div>",
+          "fontSize": 24
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s21_h7j8n",
+      "elements": [
+        {
+          "id": "el_s21_t1",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">OpenClaw 改變的不是模型</b>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_s21_sh1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s21_sub",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 50,
+          "content": "<span style=\"font-size:24px;color:#7c3aed;\">而是<b style=\"font-size:28px;\">「AI Agent 的使用門檻」</b></span>",
+          "fontSize": 24
+        },
+        {
+          "id": "el_s21_c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 180,
+          "width": 260,
+          "height": 240,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_s21_c1txt",
+          "type": "text",
+          "x": 75,
+          "y": 200,
+          "width": 230,
+          "height": 200,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:42px;\">🌐</span><br><b style=\"font-size:22px;color:#0284c7;\">WordPress</b><br><span style=\"font-size:15px;color:#64748b;line-height:1.8;\">降低架站門檻</span><br><br><span style=\"font-size:13px;color:#94a3b8;\">以前：寫 HTML/CSS/PHP<br>現在：拖拉就能建站</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s21_c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 350,
+          "y": 180,
+          "width": 260,
+          "height": 240,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s21_c2txt",
+          "type": "text",
+          "x": 365,
+          "y": 200,
+          "width": 230,
+          "height": 200,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:42px;\">🐳</span><br><b style=\"font-size:22px;color:#7c3aed;\">Docker</b><br><span style=\"font-size:15px;color:#64748b;line-height:1.8;\">降低部署門檻</span><br><br><span style=\"font-size:13px;color:#94a3b8;\">以前：環境配置地獄<br>現在：一行指令啟動</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s21_c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 640,
+          "y": 180,
+          "width": 260,
+          "height": 240,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s21_c3txt",
+          "type": "text",
+          "x": 655,
+          "y": 200,
+          "width": 230,
+          "height": 200,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:42px;\">🤖</span><br><b style=\"font-size:22px;color:#16a34a;\">OpenClaw</b><br><span style=\"font-size:15px;color:#64748b;line-height:1.8;\">降低 Agent 門檻</span><br><br><span style=\"font-size:13px;color:#94a3b8;\">以前：寫程式串接 API<br>現在：自然語言指揮</span></div>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s21_arrow1",
+          "type": "text",
+          "x": 320,
+          "y": 280,
+          "width": 30,
+          "height": 40,
+          "content": "<span style=\"font-size:28px;color:#94a3b8;\">→</span>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s21_arrow2",
+          "type": "text",
+          "x": 610,
+          "y": 280,
+          "width": 30,
+          "height": 40,
+          "content": "<span style=\"font-size:28px;color:#94a3b8;\">→</span>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s21_bottom",
+          "type": "text",
+          "x": 60,
+          "y": 450,
+          "width": 840,
+          "height": 40,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:16px;color:#94a3b8;\">每一次門檻降低，都帶來一波新的產業革命</span></div>",
+          "fontSize": 16
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s22_p9k0q",
+      "elements": [
+        {
+          "id": "el_s22_t1",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">📊 你覺得哪家最有潛力？</b>",
+          "fontSize": 30
+        },
+        {
+          "id": "el_s22_sh1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_s22_t2",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">投票選出你認為最有前景的 AI Agent 策略</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s22_poll",
+          "type": "poll",
+          "x": 60,
+          "y": 130,
+          "width": 840,
+          "height": 340,
+          "question": "你認為哪家公司的 AI Agent 策略最有前景？",
+          "options": [
+            { "text": "OpenAI" },
+            { "text": "Anthropic" },
+            { "text": "Google" },
+            { "text": "NVIDIA" },
+            { "text": "Meta" }
+          ]
+        }
+      ],
+      "background": "#f8fafc"
+    },
+    {
+      "id": "el_s23_r1s2t",
+      "elements": [
+        {
+          "id": "el_s23_bgshape",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s23_deco",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 50,
+          "width": 4,
+          "height": 80,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s23_t1",
+          "type": "text",
+          "x": 80,
+          "y": 50,
+          "width": 800,
+          "height": 55,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;letter-spacing:1px;\">2026 不是 Chatbot 時代</b>",
+          "fontSize": 40
+        },
+        {
+          "id": "el_s23_t2",
+          "type": "text",
+          "x": 80,
+          "y": 110,
+          "width": 800,
+          "height": 50,
+          "content": "<b style=\"font-size:36px;color:#38bdf8;\">而是 AI Agent 時代</b>",
+          "fontSize": 36
+        },
+        {
+          "id": "el_s23_sh2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 175,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s23_tag1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 210,
+          "width": 250,
+          "height": 55,
+          "background": "rgba(56,189,248,0.12)"
+        },
+        {
+          "id": "el_s23_tag1",
+          "type": "text",
+          "x": 90,
+          "y": 220,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#38bdf8;\">Agent Workflow</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s23_tag2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 350,
+          "y": 210,
+          "width": 250,
+          "height": 55,
+          "background": "rgba(124,58,237,0.12)"
+        },
+        {
+          "id": "el_s23_tag2",
+          "type": "text",
+          "x": 360,
+          "y": 220,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#a78bfa;\">MCP</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s23_tag3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 620,
+          "y": 210,
+          "width": 250,
+          "height": 55,
+          "background": "rgba(74,222,128,0.12)"
+        },
+        {
+          "id": "el_s23_tag3",
+          "type": "text",
+          "x": 630,
+          "y": 220,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#4ade80;\">AI Tool Use</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s23_tag4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 285,
+          "width": 250,
+          "height": 55,
+          "background": "rgba(251,191,36,0.12)"
+        },
+        {
+          "id": "el_s23_tag4",
+          "type": "text",
+          "x": 90,
+          "y": 295,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#fbbf24;\">Multi-Agent</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s23_tag5bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 350,
+          "y": 285,
+          "width": 250,
+          "height": 55,
+          "background": "rgba(248,113,113,0.12)"
+        },
+        {
+          "id": "el_s23_tag5",
+          "type": "text",
+          "x": 360,
+          "y": 295,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#f87171;\">Vibe Coding</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s23_tag6bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 620,
+          "y": 285,
+          "width": 250,
+          "height": 55,
+          "background": "rgba(56,189,248,0.12)"
+        },
+        {
+          "id": "el_s23_tag6",
+          "type": "text",
+          "x": 630,
+          "y": 295,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#38bdf8;\">AI Automation</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s23_bottom",
+          "type": "text",
+          "x": 80,
+          "y": 400,
+          "width": 800,
+          "height": 60,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:18px;color:#64748b;\">從對話介面 → 到自主工作的智能體系統<br>這是 AI 產業最大的一次典範轉移</span></div>",
+          "fontSize": 18
+        }
+      ],
+      "background": "#0f172a"
+    },
+    {
+      "id": "el_s24_u3v4w",
+      "elements": [
+        {
+          "id": "el_s24_bgshape",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s24_decoline",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 380,
+          "y": 140,
+          "width": 200,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s24_qa",
+          "type": "text",
+          "x": 80,
+          "y": 160,
+          "width": 800,
+          "height": 90,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:64px;color:#ffffff;letter-spacing:4px;\">Q & A</b></div>",
+          "fontSize": 64,
+          "bold": true
+        },
+        {
+          "id": "el_s24_decoline2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 380,
+          "y": 265,
+          "width": 200,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_s24_sub",
+          "type": "text",
+          "x": 80,
+          "y": 290,
+          "width": 800,
+          "height": 40,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:20px;color:#94a3b8;letter-spacing:2px;\">Claude × MCP × Agent × Vibe Coding</span></div>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s24_closing",
+          "type": "text",
+          "x": 80,
+          "y": 380,
+          "width": 800,
+          "height": 40,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:18px;color:#64748b;\">下一代 AI 工作流正在形成。</span></div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_s24_speaker",
+          "type": "text",
+          "x": 80,
+          "y": 470,
+          "width": 800,
+          "height": 40,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:16px;color:#475569;\">Dennis 樊松蒲｜數位簡報室</span></div>",
+          "fontSize": 16
+        }
+      ],
+      "background": "#0f172a"
+    }
+  ]
+}

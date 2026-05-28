@@ -1,0 +1,1380 @@
+{
+  "slides": [
+    {
+      "id": "el_s9a1k7m3x",
+      "elements": [
+        {
+          "id": "el_s9bg0f1a2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a2744 50%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s9bg0f1a3",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 60,
+          "width": 4,
+          "height": 120,
+          "background": "#10b981"
+        },
+        {
+          "id": "el_s9bg0f1a4",
+          "type": "text",
+          "x": 80,
+          "y": 35,
+          "width": 200,
+          "height": 50,
+          "content": "<span style=\"font-size:48px;\">🤖</span>",
+          "fontSize": 48
+        },
+        {
+          "id": "el_s9bg0f1a5",
+          "type": "text",
+          "x": 80,
+          "y": 85,
+          "width": 600,
+          "height": 60,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;letter-spacing:1px;\">OpenAI：ChatGPT Agent</b>",
+          "fontSize": 40,
+          "bold": true
+        },
+        {
+          "id": "el_s9bg0f1a6",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 155,
+          "width": 50,
+          "height": 3,
+          "background": "#10b981"
+        },
+        {
+          "id": "el_s9bg0f1a7",
+          "type": "text",
+          "x": 80,
+          "y": 175,
+          "width": 500,
+          "height": 35,
+          "content": "<span style=\"font-size:20px;color:#94a3b8;\">從聊天工具 → AI 秘書</span>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s9c1tag01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 240,
+          "width": 250,
+          "height": 90,
+          "background": "rgba(16,185,129,0.12)"
+        },
+        {
+          "id": "el_s9c1tag02",
+          "type": "text",
+          "x": 95,
+          "y": 252,
+          "width": 220,
+          "height": 66,
+          "content": "<b style=\"font-size:18px;color:#10b981;\">Agent Mode</b><br><span style=\"font-size:14px;color:#94a3b8;\">ChatGPT 自主行動模式<br>可瀏覽、操作、完成任務</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s9c1tag03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 355,
+          "y": 240,
+          "width": 250,
+          "height": 90,
+          "background": "rgba(56,189,248,0.12)"
+        },
+        {
+          "id": "el_s9c1tag04",
+          "type": "text",
+          "x": 370,
+          "y": 252,
+          "width": 220,
+          "height": 66,
+          "content": "<b style=\"font-size:18px;color:#38bdf8;\">CUA</b><br><span style=\"font-size:14px;color:#94a3b8;\">Computer Use Agent<br>像人一樣操作電腦介面</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s9c1tag05",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 240,
+          "width": 250,
+          "height": 90,
+          "background": "rgba(124,58,237,0.12)"
+        },
+        {
+          "id": "el_s9c1tag06",
+          "type": "text",
+          "x": 645,
+          "y": 252,
+          "width": 220,
+          "height": 66,
+          "content": "<b style=\"font-size:18px;color:#a78bfa;\">AI 秘書化</b><br><span style=\"font-size:14px;color:#94a3b8;\">不只回答問題<br>而是幫你把事情做完</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s9c1tag07",
+          "type": "text",
+          "x": 80,
+          "y": 370,
+          "width": 800,
+          "height": 90,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#cbd5e1;\">• 2025 年 ChatGPT 新增 <b style=\"color:#10b981;\">Agent Mode</b>，可自動瀏覽網頁、操作介面<br>• 不再需要你一步步指令，AI 會<b style=\"color:#38bdf8;\">自己規劃、執行、驗證結果</b><br>• 從「你問 AI 答」→「你說目標，AI 幫你完成」</div>",
+          "fontSize": 16
+        }
+      ],
+      "background": "#0f172a"
+    },
+    {
+      "id": "el_s10a2k8n4y",
+      "elements": [
+        {
+          "id": "el_s10b01f1a1",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">🤖 ChatGPT Agent 能做什麼？</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_s10b01f1a2",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#10b981"
+        },
+        {
+          "id": "el_s10r1c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 115,
+          "width": 270,
+          "height": 150,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s10r1c1tx",
+          "type": "text",
+          "x": 75,
+          "y": 130,
+          "width": 240,
+          "height": 120,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">🌐</span><br><b style=\"font-size:20px;color:#1e293b;\">開瀏覽器</b><br><span style=\"font-size:14px;color:#64748b;\">自動打開網站<br>搜尋資訊</span></div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s10r1c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 115,
+          "width": 270,
+          "height": 150,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_s10r1c2tx",
+          "type": "text",
+          "x": 360,
+          "y": 130,
+          "width": 240,
+          "height": 120,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">🖱️</span><br><b style=\"font-size:20px;color:#1e293b;\">點按鈕</b><br><span style=\"font-size:14px;color:#64748b;\">操作網頁上的<br>按鈕和連結</span></div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s10r1c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 115,
+          "width": 270,
+          "height": 150,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s10r1c3tx",
+          "type": "text",
+          "x": 645,
+          "y": 130,
+          "width": 240,
+          "height": 120,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">📝</span><br><b style=\"font-size:20px;color:#1e293b;\">填表單</b><br><span style=\"font-size:14px;color:#64748b;\">自動輸入資料<br>提交表單</span></div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s10r2c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 285,
+          "width": 270,
+          "height": 150,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_s10r2c1tx",
+          "type": "text",
+          "x": 75,
+          "y": 300,
+          "width": 240,
+          "height": 120,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">🌍</span><br><b style=\"font-size:20px;color:#1e293b;\">操作網站</b><br><span style=\"font-size:14px;color:#64748b;\">在各種網站上<br>執行複雜操作</span></div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s10r2c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 285,
+          "width": 270,
+          "height": 150,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_s10r2c2tx",
+          "type": "text",
+          "x": 360,
+          "y": 300,
+          "width": 240,
+          "height": 120,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">🔄</span><br><b style=\"font-size:20px;color:#1e293b;\">多步驟工作</b><br><span style=\"font-size:14px;color:#64748b;\">串連多個動作<br>完成複雜任務</span></div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s10r2c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 285,
+          "width": 270,
+          "height": 150,
+          "background": "#f1f5f9"
+        },
+        {
+          "id": "el_s10r2c3tx",
+          "type": "text",
+          "x": 645,
+          "y": 300,
+          "width": 240,
+          "height": 120,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:36px;\">📋</span><br><b style=\"font-size:20px;color:#1e293b;\">行政工作</b><br><span style=\"font-size:14px;color:#64748b;\">訂票、填報表<br>日常瑣事交給 AI</span></div>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s10bottom",
+          "type": "text",
+          "x": 60,
+          "y": 465,
+          "width": 840,
+          "height": 35,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:15px;color:#64748b;\">💡 你不需要寫程式，只要<b style=\"color:#10b981;\">用自然語言說出你要做什麼</b>，Agent 幫你搞定</span></div>",
+          "fontSize": 15
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s11a3k9o5z",
+      "elements": [
+        {
+          "id": "el_s11bg01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1e1338 50%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s11deco01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 60,
+          "width": 4,
+          "height": 120,
+          "background": "#d4a574"
+        },
+        {
+          "id": "el_s11icon",
+          "type": "text",
+          "x": 80,
+          "y": 35,
+          "width": 200,
+          "height": 50,
+          "content": "<span style=\"font-size:48px;\">🧠</span>",
+          "fontSize": 48
+        },
+        {
+          "id": "el_s11title",
+          "type": "text",
+          "x": 80,
+          "y": 85,
+          "width": 700,
+          "height": 60,
+          "content": "<b style=\"font-size:38px;color:#f1f5f9;letter-spacing:1px;\">Anthropic：Claude Computer Use</b>",
+          "fontSize": 38,
+          "bold": true
+        },
+        {
+          "id": "el_s11line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 155,
+          "width": 50,
+          "height": 3,
+          "background": "#d4a574"
+        },
+        {
+          "id": "el_s11sub",
+          "type": "text",
+          "x": 80,
+          "y": 175,
+          "width": 600,
+          "height": 35,
+          "content": "<span style=\"font-size:20px;color:#d4a574;\">目前最像 OpenClaw 的方向</span>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s11card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 240,
+          "width": 260,
+          "height": 100,
+          "background": "rgba(212,165,116,0.12)"
+        },
+        {
+          "id": "el_s11card1tx",
+          "type": "text",
+          "x": 95,
+          "y": 252,
+          "width": 230,
+          "height": 76,
+          "content": "<b style=\"font-size:18px;color:#d4a574;\">🖥️ 螢幕操控</b><br><span style=\"font-size:14px;color:#94a3b8;\">看螢幕、移滑鼠、打字<br>像真人一樣操作電腦</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s11card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 355,
+          "y": 240,
+          "width": 260,
+          "height": 100,
+          "background": "rgba(124,58,237,0.12)"
+        },
+        {
+          "id": "el_s11card2tx",
+          "type": "text",
+          "x": 370,
+          "y": 252,
+          "width": 230,
+          "height": 76,
+          "content": "<b style=\"font-size:18px;color:#a78bfa;\">🔧 工具整合</b><br><span style=\"font-size:14px;color:#94a3b8;\">Tool Use 能力業界最強<br>API 呼叫精準度高</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s11card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 240,
+          "width": 260,
+          "height": 100,
+          "background": "rgba(56,189,248,0.12)"
+        },
+        {
+          "id": "el_s11card3tx",
+          "type": "text",
+          "x": 645,
+          "y": 252,
+          "width": 230,
+          "height": 76,
+          "content": "<b style=\"font-size:18px;color:#38bdf8;\">📐 推理穩定</b><br><span style=\"font-size:14px;color:#94a3b8;\">長任務不會「走偏」<br>多步驟執行最穩定</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s11bottom",
+          "type": "text",
+          "x": 80,
+          "y": 380,
+          "width": 800,
+          "height": 90,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#cbd5e1;\">• Claude 是最早開放 <b style=\"color:#d4a574;\">Computer Use API</b> 的模型公司<br>• 開發者可以讓 AI 直接操作桌面應用程式<br>• 在 Agent 任務中的穩定度和工具使用能力<b style=\"color:#a78bfa;\">被公認業界頂尖</b></div>",
+          "fontSize": 16
+        }
+      ],
+      "background": "#0f172a"
+    },
+    {
+      "id": "el_s12a4l0p6a",
+      "elements": [
+        {
+          "id": "el_s12title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 800,
+          "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🧠 很多 Agent 專案底層都偏向 Claude</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_s12line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#d4a574"
+        },
+        {
+          "id": "el_s12sub",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">這些知名 Agent 專案，底層都在用 Claude 作為推理引擎</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s12p1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 140,
+          "width": 200,
+          "height": 100,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s12p1tx",
+          "type": "text",
+          "x": 75,
+          "y": 152,
+          "width": 170,
+          "height": 76,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">🦀</span><br><b style=\"font-size:18px;color:#7c3aed;\">OpenClaw</b><br><span style=\"font-size:13px;color:#64748b;\">開源電腦操控</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s12p2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 275,
+          "y": 140,
+          "width": 200,
+          "height": 100,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_s12p2tx",
+          "type": "text",
+          "x": 290,
+          "y": 152,
+          "width": 170,
+          "height": 76,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">🌐</span><br><b style=\"font-size:18px;color:#0284c7;\">Browser Use</b><br><span style=\"font-size:13px;color:#64748b;\">瀏覽器自動化</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s12p3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490,
+          "y": 140,
+          "width": 200,
+          "height": 100,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s12p3tx",
+          "type": "text",
+          "x": 505,
+          "y": 152,
+          "width": 170,
+          "height": 76,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">🎭</span><br><b style=\"font-size:18px;color:#16a34a;\">Stagehand</b><br><span style=\"font-size:13px;color:#64748b;\">網頁測試自動化</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s12p4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 705,
+          "y": 140,
+          "width": 200,
+          "height": 100,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_s12p4tx",
+          "type": "text",
+          "x": 720,
+          "y": 152,
+          "width": 170,
+          "height": 76,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:28px;\">🤚</span><br><b style=\"font-size:18px;color:#d97706;\">Manus</b><br><span style=\"font-size:13px;color:#64748b;\">通用 AI Agent</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s12whybg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 265,
+          "width": 840,
+          "height": 80,
+          "background": "#f8fafc"
+        },
+        {
+          "id": "el_s12whytx",
+          "type": "text",
+          "x": 80,
+          "y": 275,
+          "width": 800,
+          "height": 60,
+          "content": "<b style=\"font-size:18px;color:#1e293b;\">為什麼？</b><br><span style=\"font-size:15px;color:#334155;\">✅ 推理穩定不亂跑 &nbsp;&nbsp; ✅ 工具使用能力強 &nbsp;&nbsp; ✅ 長任務執行不崩潰 &nbsp;&nbsp; ✅ 結構化輸出精準</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s12divider",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 370,
+          "width": 840,
+          "height": 1,
+          "background": "#e2e8f0"
+        },
+        {
+          "id": "el_s12focus",
+          "type": "text",
+          "x": 60,
+          "y": 385,
+          "width": 840,
+          "height": 35,
+          "content": "<b style=\"font-size:18px;color:#1e293b;\">📅 2026 年重點方向</b>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_s12f1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 425,
+          "width": 260,
+          "height": 70,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s12f1tx",
+          "type": "text",
+          "x": 75,
+          "y": 435,
+          "width": 230,
+          "height": 50,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:16px;color:#7c3aed;\">🔗 MCP 協議</b><br><span style=\"font-size:13px;color:#64748b;\">統一 Agent 工具介面</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s12f2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 340,
+          "y": 425,
+          "width": 260,
+          "height": 70,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_s12f2tx",
+          "type": "text",
+          "x": 355,
+          "y": 435,
+          "width": 230,
+          "height": 50,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:16px;color:#0284c7;\">🤝 Multi-Agent</b><br><span style=\"font-size:13px;color:#64748b;\">多個 Agent 協作</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s12f3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 620,
+          "y": 425,
+          "width": 280,
+          "height": 70,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s12f3tx",
+          "type": "text",
+          "x": 635,
+          "y": 435,
+          "width": 250,
+          "height": 50,
+          "content": "<div style=\"text-align:center;\"><b style=\"font-size:16px;color:#16a34a;\">💻 Claude Code</b><br><span style=\"font-size:13px;color:#64748b;\">終端機 AI 開發助手</span></div>",
+          "fontSize": 13
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s13a5m1q7b",
+      "elements": [
+        {
+          "id": "el_s13bg01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0c1220 0%, #162032 50%, #0c1220 100%)"
+        },
+        {
+          "id": "el_s13deco",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 60,
+          "width": 4,
+          "height": 120,
+          "background": "#4285f4"
+        },
+        {
+          "id": "el_s13icon",
+          "type": "text",
+          "x": 80,
+          "y": 35,
+          "width": 200,
+          "height": 50,
+          "content": "<span style=\"font-size:48px;\">✨</span>",
+          "fontSize": 48
+        },
+        {
+          "id": "el_s13title",
+          "type": "text",
+          "x": 80,
+          "y": 85,
+          "width": 600,
+          "height": 60,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;letter-spacing:1px;\">Google：Gemini Spark</b>",
+          "fontSize": 40,
+          "bold": true
+        },
+        {
+          "id": "el_s13line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 155,
+          "width": 50,
+          "height": 3,
+          "background": "#4285f4"
+        },
+        {
+          "id": "el_s13sub",
+          "type": "text",
+          "x": 80,
+          "y": 175,
+          "width": 500,
+          "height": 35,
+          "content": "<span style=\"font-size:22px;color:#4285f4;\">24 小時 AI Agent</span>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_s13card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 240,
+          "width": 260,
+          "height": 100,
+          "background": "rgba(66,133,244,0.12)"
+        },
+        {
+          "id": "el_s13card1tx",
+          "type": "text",
+          "x": 95,
+          "y": 252,
+          "width": 230,
+          "height": 76,
+          "content": "<b style=\"font-size:18px;color:#4285f4;\">⏰ Always-on</b><br><span style=\"font-size:14px;color:#94a3b8;\">24 小時不間斷運作<br>不用開著 ChatGPT 等</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s13card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 355,
+          "y": 240,
+          "width": 260,
+          "height": 100,
+          "background": "rgba(52,211,153,0.12)"
+        },
+        {
+          "id": "el_s13card2tx",
+          "type": "text",
+          "x": 370,
+          "y": 252,
+          "width": 230,
+          "height": 76,
+          "content": "<b style=\"font-size:18px;color:#34d399;\">🌙 離線執行</b><br><span style=\"font-size:14px;color:#94a3b8;\">你關掉瀏覽器後<br>Agent 仍持續工作</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s13card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 240,
+          "width": 260,
+          "height": 100,
+          "background": "rgba(251,191,36,0.12)"
+        },
+        {
+          "id": "el_s13card3tx",
+          "type": "text",
+          "x": 645,
+          "y": 252,
+          "width": 230,
+          "height": 76,
+          "content": "<b style=\"font-size:18px;color:#fbbf24;\">🔔 主動回報</b><br><span style=\"font-size:14px;color:#94a3b8;\">任務完成後通知你<br>不需要你盯著看</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_s13body",
+          "type": "text",
+          "x": 80,
+          "y": 375,
+          "width": 800,
+          "height": 90,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#cbd5e1;\">• 深度整合 Google Workspace（Gmail、日曆、文件、雲端硬碟）<br>• 概念：你交代任務後可以<b style=\"color:#4285f4;\">關掉電腦去睡覺</b>，AI 持續執行<br>• 從「問 AI」→「<b style=\"color:#34d399;\">委託 AI 工作</b>」的典範轉移</div>",
+          "fontSize": 16
+        }
+      ],
+      "background": "#0c1220"
+    },
+    {
+      "id": "el_s14a6n2r8c",
+      "elements": [
+        {
+          "id": "el_s14title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">✨ Gemini Spark 能做什麼？</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_s14line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#4285f4"
+        },
+        {
+          "id": "el_s14c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 270,
+          "height": 130,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_s14c1tx",
+          "type": "text",
+          "x": 75,
+          "y": 120,
+          "width": 240,
+          "height": 110,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:32px;\">📧</span><br><b style=\"font-size:18px;color:#1e293b;\">Gmail</b><br><span style=\"font-size:13px;color:#64748b;\">自動讀信、回信<br>整理收件匣</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s14c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 110,
+          "width": 270,
+          "height": 130,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s14c2tx",
+          "type": "text",
+          "x": 360,
+          "y": 120,
+          "width": 240,
+          "height": 110,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:32px;\">📅</span><br><b style=\"font-size:18px;color:#1e293b;\">Calendar</b><br><span style=\"font-size:13px;color:#64748b;\">安排會議、協調時間<br>自動發邀請</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s14c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 110,
+          "width": 270,
+          "height": 130,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_s14c3tx",
+          "type": "text",
+          "x": 645,
+          "y": 120,
+          "width": 240,
+          "height": 110,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:32px;\">📄</span><br><b style=\"font-size:18px;color:#1e293b;\">Docs</b><br><span style=\"font-size:13px;color:#64748b;\">自動撰寫文件<br>整理會議紀錄</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s14c4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 260,
+          "width": 270,
+          "height": 130,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_s14c4tx",
+          "type": "text",
+          "x": 75,
+          "y": 270,
+          "width": 240,
+          "height": 110,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:32px;\">💾</span><br><b style=\"font-size:18px;color:#1e293b;\">Drive</b><br><span style=\"font-size:13px;color:#64748b;\">搜尋檔案、整理資料夾<br>自動歸檔</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s14c5bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 260,
+          "width": 270,
+          "height": 130,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_s14c5tx",
+          "type": "text",
+          "x": 360,
+          "y": 270,
+          "width": 240,
+          "height": 110,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:32px;\">🌐</span><br><b style=\"font-size:18px;color:#1e293b;\">Chrome</b><br><span style=\"font-size:13px;color:#64748b;\">瀏覽網頁、蒐集資料<br>填寫線上表單</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s14c6bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 260,
+          "width": 270,
+          "height": 130,
+          "background": "#f1f5f9"
+        },
+        {
+          "id": "el_s14c6tx",
+          "type": "text",
+          "x": 645,
+          "y": 270,
+          "width": 240,
+          "height": 110,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:32px;\">🔄</span><br><b style=\"font-size:18px;color:#1e293b;\">多步驟任務</b><br><span style=\"font-size:13px;color:#64748b;\">串連以上工具<br>完成複雜工作流</span></div>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_s14emphbg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 420,
+          "width": 840,
+          "height": 65,
+          "background": "linear-gradient(90deg, #eff6ff 0%, #faf5ff 100%)"
+        },
+        {
+          "id": "el_s14emphtx",
+          "type": "text",
+          "x": 80,
+          "y": 432,
+          "width": 800,
+          "height": 40,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:20px;color:#334155;\">從「<b style=\"color:#64748b;\">問 AI</b>」→「<b style=\"color:#4285f4;\">委託 AI 工作</b>」— 這就是 Agent 的核心轉變</span></div>",
+          "fontSize": 20
+        }
+      ],
+      "background": "#ffffff"
+    },
+    {
+      "id": "el_s15a7o3s9d",
+      "elements": [
+        {
+          "id": "el_s15bg01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a2218 50%, #0f172a 100%)"
+        },
+        {
+          "id": "el_s15deco",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 60,
+          "width": 4,
+          "height": 120,
+          "background": "#76b900"
+        },
+        {
+          "id": "el_s15icon",
+          "type": "text",
+          "x": 80,
+          "y": 35,
+          "width": 200,
+          "height": 50,
+          "content": "<span style=\"font-size:48px;\">⚡</span>",
+          "fontSize": 48
+        },
+        {
+          "id": "el_s15title",
+          "type": "text",
+          "x": 80,
+          "y": 85,
+          "width": 650,
+          "height": 60,
+          "content": "<b style=\"font-size:38px;color:#f1f5f9;letter-spacing:1px;\">NVIDIA：Agent 基礎建設</b>",
+          "fontSize": 38,
+          "bold": true
+        },
+        {
+          "id": "el_s15line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 155,
+          "width": 50,
+          "height": 3,
+          "background": "#76b900"
+        },
+        {
+          "id": "el_s15sub",
+          "type": "text",
+          "x": 80,
+          "y": 175,
+          "width": 600,
+          "height": 35,
+          "content": "<span style=\"font-size:20px;color:#76b900;\">成為 AI 員工時代的 AWS</span>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s15c1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 235,
+          "width": 400,
+          "height": 110,
+          "background": "rgba(118,185,0,0.12)"
+        },
+        {
+          "id": "el_s15c1tx",
+          "type": "text",
+          "x": 95,
+          "y": 247,
+          "width": 370,
+          "height": 86,
+          "content": "<b style=\"font-size:20px;color:#76b900;\">🏗️ Agent 平台</b><br><span style=\"font-size:15px;color:#94a3b8;\">提供企業級 Agent 開發框架<br>從 GPU → Agent Infrastructure</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s15c2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 235,
+          "width": 400,
+          "height": 110,
+          "background": "rgba(56,189,248,0.12)"
+        },
+        {
+          "id": "el_s15c2tx",
+          "type": "text",
+          "x": 515,
+          "y": 247,
+          "width": 370,
+          "height": 86,
+          "content": "<b style=\"font-size:20px;color:#38bdf8;\">📊 Agent 管理</b><br><span style=\"font-size:15px;color:#94a3b8;\">監控 Agent 運行狀態<br>效能追蹤、成本管理</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s15c3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 360,
+          "width": 400,
+          "height": 110,
+          "background": "rgba(124,58,237,0.12)"
+        },
+        {
+          "id": "el_s15c3tx",
+          "type": "text",
+          "x": 95,
+          "y": 372,
+          "width": 370,
+          "height": 86,
+          "content": "<b style=\"font-size:20px;color:#a78bfa;\">🤝 多 Agent 協作</b><br><span style=\"font-size:15px;color:#94a3b8;\">讓多個 AI Agent 分工合作<br>像管理一個 AI 團隊</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s15c4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 360,
+          "width": 400,
+          "height": 110,
+          "background": "rgba(251,191,36,0.12)"
+        },
+        {
+          "id": "el_s15c4tx",
+          "type": "text",
+          "x": 515,
+          "y": 372,
+          "width": 370,
+          "height": 86,
+          "content": "<b style=\"font-size:20px;color:#fbbf24;\">🏢 Enterprise AI</b><br><span style=\"font-size:15px;color:#94a3b8;\">針對企業需求的安全性<br>合規、部署、整合方案</span>",
+          "fontSize": 15
+        }
+      ],
+      "background": "#0f172a"
+    },
+    {
+      "id": "el_s16a8p4t0e",
+      "elements": [
+        {
+          "id": "el_s16bggrad",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 540,
+          "background": "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)"
+        },
+        {
+          "id": "el_s16title",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">👓 Meta：下一代 Agent 介面</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_s16line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#0284c7"
+        },
+        {
+          "id": "el_s16sub",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">Meta 的 Agent 不在螢幕裡，而是在你的眼鏡上</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_s16leftbg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 145,
+          "width": 410,
+          "height": 280,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_s16lefthead",
+          "type": "text",
+          "x": 80,
+          "y": 158,
+          "width": 370,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#0284c7;\">👁️ 你看到的</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s16lefti1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 200,
+          "width": 370,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16lefti1tx",
+          "type": "text",
+          "x": 95,
+          "y": 208,
+          "width": 340,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">🛍️ 看到一件喜歡的商品</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16lefti2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 255,
+          "width": 370,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16lefti2tx",
+          "type": "text",
+          "x": 95,
+          "y": 263,
+          "width": 340,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">📄 看到一份外文文件</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16lefti3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 310,
+          "width": 370,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16lefti3tx",
+          "type": "text",
+          "x": 95,
+          "y": 318,
+          "width": 340,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">🎉 看到一個活動海報</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16lefti4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 365,
+          "width": 370,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16lefti4tx",
+          "type": "text",
+          "x": 95,
+          "y": 373,
+          "width": 340,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">🗺️ 看到一條陌生路線</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16arrowbg",
+          "type": "text",
+          "x": 475,
+          "y": 260,
+          "width": 30,
+          "height": 40,
+          "content": "<span style=\"font-size:28px;color:#94a3b8;\">→</span>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_s16rightbg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 510,
+          "y": 145,
+          "width": 400,
+          "height": 280,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_s16righthead",
+          "type": "text",
+          "x": 530,
+          "y": 158,
+          "width": 360,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#16a34a;\">🤖 AI 幫你做</b>",
+          "fontSize": 20
+        },
+        {
+          "id": "el_s16ri1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 530,
+          "y": 200,
+          "width": 360,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16ri1tx",
+          "type": "text",
+          "x": 545,
+          "y": 208,
+          "width": 330,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">🔍 搜尋比價、幫你下單</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16ri2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 530,
+          "y": 255,
+          "width": 360,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16ri2tx",
+          "type": "text",
+          "x": 545,
+          "y": 263,
+          "width": 330,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">🌐 即時翻譯、摘要重點</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16ri3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 530,
+          "y": 310,
+          "width": 360,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16ri3tx",
+          "type": "text",
+          "x": 545,
+          "y": 318,
+          "width": 330,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">📅 整理資訊、加入行程</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16ri4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 530,
+          "y": 365,
+          "width": 360,
+          "height": 48,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_s16ri4tx",
+          "type": "text",
+          "x": 545,
+          "y": 373,
+          "width": 330,
+          "height": 32,
+          "content": "<span style=\"font-size:16px;color:#334155;\">🧭 導航規劃、推薦景點</span>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_s16bottombg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 450,
+          "width": 840,
+          "height": 60,
+          "background": "linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%)"
+        },
+        {
+          "id": "el_s16bottomtx",
+          "type": "text",
+          "x": 80,
+          "y": 462,
+          "width": 800,
+          "height": 36,
+          "content": "<div style=\"text-align:center;\"><span style=\"font-size:18px;color:#334155;\">💡 AI 不再只存在聊天室，而是<b style=\"color:#0284c7;\">存在你的視野裡</b></span></div>",
+          "fontSize": 18
+        }
+      ],
+      "background": "#ffffff"
+    }
+  ]
+}
