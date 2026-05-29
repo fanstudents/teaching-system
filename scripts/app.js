@@ -1882,20 +1882,117 @@ ${slideContents}
 
         title.textContent = '嵌入影片';
         body.innerHTML = `
-            <div class="form-group">
-                <label class="form-label">影片網址</label>
-                <input type="text" class="form-input" id="videoUrl" placeholder="輸入 YouTube 或其他影片網址">
+            <div style="display:flex;gap:8px;margin-bottom:16px;">
+                <button class="btn btn-primary" id="vidTabUpload" style="flex:1;font-size:13px;padding:7px 0;">📁 上傳影片</button>
+                <button class="btn btn-secondary" id="vidTabUrl" style="flex:1;font-size:13px;padding:7px 0;">🔗 貼上網址</button>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
-                支援 YouTube、Vimeo 等影片平台
-            </p>
+            <div id="vidPanelUpload">
+                <div id="vidDropZone" style="border:2px dashed #cbd5e1;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#f8fafc;">
+                    <span class="material-symbols-outlined" style="font-size:36px;color:#94a3b8;">cloud_upload</span>
+                    <div style="margin-top:8px;font-size:14px;color:#475569;font-weight:500;">點擊或拖曳影片檔案到這裡</div>
+                    <div style="font-size:12px;color:#94a3b8;margin-top:4px;">支援 MP4、WebM、OGG（上限 100MB）</div>
+                </div>
+                <div id="vidProgress" style="display:none;margin-top:12px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <span id="vidFileName" style="font-size:13px;color:#334155;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+                        <span id="vidFileSize" style="font-size:12px;color:#94a3b8;"></span>
+                    </div>
+                    <div style="height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+                        <div id="vidProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#06b6d4);border-radius:3px;transition:width .3s;"></div>
+                    </div>
+                    <div id="vidStatus" style="font-size:12px;color:#64748b;margin-top:6px;"></div>
+                </div>
+            </div>
+            <div id="vidPanelUrl" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label">影片網址</label>
+                    <input type="text" class="form-input" id="videoUrl" placeholder="輸入 YouTube 或其他影片網址">
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
+                    支援 YouTube、Vimeo、或直接 MP4 連結
+                </p>
+            </div>
         `;
 
         overlay.classList.add('active');
 
+        // Tab 切換
+        const tabUpload = document.getElementById('vidTabUpload');
+        const tabUrl = document.getElementById('vidTabUrl');
+        const panelUpload = document.getElementById('vidPanelUpload');
+        const panelUrl = document.getElementById('vidPanelUrl');
+        tabUpload.onclick = () => {
+            tabUpload.className = 'btn btn-primary'; tabUrl.className = 'btn btn-secondary';
+            panelUpload.style.display = ''; panelUrl.style.display = 'none';
+        };
+        tabUrl.onclick = () => {
+            tabUrl.className = 'btn btn-primary'; tabUpload.className = 'btn btn-secondary';
+            panelUrl.style.display = ''; panelUpload.style.display = 'none';
+        };
+
+        // 上傳狀態
+        let uploadedSrc = null;
+        const fileInput = document.getElementById('videoUpload');
+        const dropZone = document.getElementById('vidDropZone');
+
+        const handleFile = async (file) => {
+            if (!file) return;
+            if (file.size > 100 * 1024 * 1024) {
+                alert('影片檔案超過 100MB 上限');
+                return;
+            }
+            const progress = document.getElementById('vidProgress');
+            const bar = document.getElementById('vidProgressBar');
+            const status = document.getElementById('vidStatus');
+            document.getElementById('vidFileName').textContent = file.name;
+            document.getElementById('vidFileSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+            progress.style.display = '';
+            dropZone.style.display = 'none';
+            bar.style.width = '30%';
+            status.textContent = '上傳中...';
+
+            try {
+                const { storage } = await import('./supabase.js');
+                const ext = file.name.split('.').pop() || 'mp4';
+                const projectId = this.slideManager?.currentProjectId || 'default';
+                const key = `videos/${projectId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+                bar.style.width = '60%';
+                const result = await storage.upload('slides', key, file);
+                if (result.error) throw new Error(result.error.message || '上傳失敗');
+                bar.style.width = '100%';
+                status.innerHTML = '<span style="color:#16a34a;">✅ 上傳完成！</span>';
+                uploadedSrc = result.data?.url || storage.getPublicUrl('slides', key);
+            } catch (e) {
+                bar.style.width = '100%';
+                bar.style.background = '#ef4444';
+                status.innerHTML = `<span style="color:#ef4444;">❌ ${e.message}</span>`;
+                console.error('[video upload]', e);
+            }
+        };
+
+        // 點擊上傳
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.onchange = (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); e.target.value = ''; };
+
+        // 拖放上傳
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#3b82f6'; dropZone.style.background = '#eff6ff'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#cbd5e1'; dropZone.style.background = '#f8fafc'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#cbd5e1'; dropZone.style.background = '#f8fafc';
+            if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        });
+
+        // 確認按鈕
         document.getElementById('modalConfirm').onclick = () => {
-            const url = document.getElementById('videoUrl').value.trim();
-            if (url) this.editor.addVideo(url);
+            if (uploadedSrc) {
+                // 上傳模式 → 用 src 直接播放
+                this.editor.addVideo(uploadedSrc, true);
+            } else {
+                // URL 模式
+                const url = document.getElementById('videoUrl')?.value?.trim();
+                if (url) this.editor.addVideo(url, false);
+            }
             this.hideModal();
         };
     }

@@ -316,25 +316,37 @@ export class Editor {
     }
 
     /**
-     * 新增影片 (顯示對話框輸入 URL)
+     * 新增影片 (支援 URL embed 或直接 src 播放)
+     * @param {string} url - 影片 URL
+     * @param {boolean} isDirectSrc - true 時用 <video src> 直接播放（上傳的 MP4）
      */
-    addVideo(url) {
-        // 處理 YouTube URL
-        let embedUrl = url;
-        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-        if (youtubeMatch) {
-            embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-        }
-
+    addVideo(url, isDirectSrc = false) {
         const element = {
             type: 'video',
             x: 100,
             y: 100,
             width: 480,
             height: 270,
-            embedUrl: embedUrl,
-            originalUrl: url
         };
+
+        if (isDirectSrc) {
+            // 上傳的 MP4 → 用 <video> 原生播放
+            element.src = url;
+        } else {
+            // YouTube / Vimeo / 其他 → 用 iframe embed
+            let embedUrl = url;
+            const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+            if (youtubeMatch) {
+                embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+            }
+            // 偵測直接 mp4/webm/ogg 連結 → 也走 src 模式
+            if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+                element.src = url;
+            } else {
+                element.embedUrl = embedUrl;
+                element.originalUrl = url;
+            }
+        }
 
         this.slideManager.addElement(element);
         this.selectElementById(element.id);
