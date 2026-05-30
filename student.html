@@ -1773,7 +1773,7 @@
                     if (element.embedUrl) {
                         el.innerHTML = `<iframe src="${element.embedUrl}" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
                     } else if (element.src) {
-                        el.innerHTML = `<video src="${element.src}" controls style="width:100%;height:100%;"></video>`;
+                        el.innerHTML = `<video src="${element.src}" controls autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
                     }
                     break;
 

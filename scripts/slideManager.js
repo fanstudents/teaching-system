@@ -1007,7 +1007,10 @@ export class SlideManager {
                 if (element.embedUrl) {
                     el.innerHTML = `<iframe src="${element.embedUrl}" allowfullscreen></iframe>`;
                 } else if (element.src) {
-                    el.innerHTML = `<video src="${element.src}" controls></video>`;
+                    // 簡報模式自動播放（靜音，瀏覽器政策要求）
+                    const isLive = el.closest('.presentation-slide');
+                    const autoAttrs = isLive ? 'autoplay muted playsinline' : '';
+                    el.innerHTML = `<video src="${element.src}" controls ${autoAttrs} style="width:100%;height:100%;object-fit:contain;"></video>`;
                 } else {
                     el.innerHTML = `
                         <div class="video-placeholder">
