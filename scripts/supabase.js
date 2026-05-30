@@ -762,6 +762,18 @@ export const ai = {
         localStorage.setItem('_ai_api_key', apiKey || '');
         localStorage.setItem('_ai_base_url', baseUrl || '');
         console.log(`[AI] Provider set to: ${provider || 'supabase'}${baseUrl ? ` (${baseUrl})` : ''}`);
+
+        // ★ 同步到 Supabase user_profiles（換電腦自動還原）
+        auth.getSession().then(session => {
+            if (!session?.user?.id) return;
+            db.update('user_profiles',
+                { ai_settings: JSON.stringify({ provider, apiKey: apiKey || '', baseUrl: baseUrl || '' }) },
+                { id: `eq.${session.user.id}` }
+            ).then(({ error }) => {
+                if (error) console.warn('[AI] 無法儲存到 user_profiles（可能需新增 ai_settings 欄位）:', error);
+                else console.log('[AI] 設定已同步到雲端');
+            });
+        }).catch(() => {});
     },
 
     /** 取得目前設定 */
@@ -806,6 +818,27 @@ export async function getUserProfile() {
         limit: 1
     });
     _cachedProfile = data?.[0] || null;
+
+    // ★ 自動從雲端還原 AI 設定（localStorage 為空時）
+    if (_cachedProfile?.ai_settings && !localStorage.getItem('_ai_api_key')) {
+        try {
+            const s = typeof _cachedProfile.ai_settings === 'string'
+                ? JSON.parse(_cachedProfile.ai_settings)
+                : _cachedProfile.ai_settings;
+            if (s?.provider && s?.apiKey) {
+                _aiConfig.provider = s.provider;
+                _aiConfig.apiKey = s.apiKey;
+                _aiConfig.baseUrl = s.baseUrl || '';
+                localStorage.setItem('_ai_provider', s.provider);
+                localStorage.setItem('_ai_api_key', s.apiKey);
+                localStorage.setItem('_ai_base_url', s.baseUrl || '');
+                console.log(`[AI] 已從雲端還原設定: ${s.provider}${s.baseUrl ? ` (${s.baseUrl})` : ''}`);
+            }
+        } catch (e) {
+            console.warn('[AI] 解析雲端 AI 設定失敗:', e);
+        }
+    }
+
     return _cachedProfile;
 }
 
