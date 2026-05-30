@@ -1384,6 +1384,13 @@ export class SlideManager {
                 this._addScoreBadge(el, element);
                 break;
 
+            case 'multiChoice':
+                el.classList.add('interactive-element');
+                this._applyInteractiveStyles(el, element);
+                this.renderMultiChoiceElement(el, element);
+                this._addScoreBadge(el, element);
+                break;
+
             case 'opentext':
                 el.classList.add('interactive-element');
                 this._applyInteractiveStyles(el, element);
@@ -2335,7 +2342,7 @@ export class SlideManager {
         el.style.setProperty('--ia-padding', pad + 'px');
 
         // 計分分數 (供互動模組讀取)
-        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, assessment: 15 };
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, assessment: 15, multiChoice: 1 };
         const pts = element.points ?? defaultPts[element.type] ?? 0;
         el.dataset.points = pts;
 
@@ -2734,6 +2741,26 @@ export class SlideManager {
                 <div class="tf-result"></div>
                 <div class="tf-reveal-area"></div>
                 <div class="tf-stats-area"></div>
+            </div>
+        `;
+    }
+
+    renderMultiChoiceElement(el, element) {
+        const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const choices = element.choices || ['選項 A', '選項 B', '選項 C'];
+        const buttonsHtml = choices.map((c, i) => `
+            <button class="mc-choice-btn" data-index="${i}">${esc(c)}</button>
+        `).join('');
+        el.innerHTML = `
+            <div class="interactive-label">多選一</div>
+            <div class="multichoice-container" data-element-id="${element.id || ''}">
+                <div class="mc-question">${element.question || '請選擇一個選項'}</div>
+                <div class="mc-choices">
+                    ${buttonsHtml}
+                </div>
+                <div class="mc-result"></div>
+                <div class="mc-reveal-area"></div>
+                <div class="mc-stats-area"></div>
             </div>
         `;
     }

@@ -322,6 +322,7 @@
         import { QuizGame } from './scripts/interactive/quiz.js';
         import { PollGame } from './scripts/interactive/poll.js';
         import { TrueFalseGame } from './scripts/interactive/truefalse.js';
+        import { MultiChoiceGame } from './scripts/interactive/multiChoice.js';
         import { OpenTextGame } from './scripts/interactive/opentext.js';
         import { ScaleGame } from './scripts/interactive/scale.js';
         import { BuzzerGame } from './scripts/interactive/buzzer.js';
@@ -339,6 +340,7 @@
         const quizGame = new QuizGame();
         const pollGame = new PollGame();
         const trueFalse = new TrueFalseGame();
+        const multiChoice = new MultiChoiceGame();
         const openText = new OpenTextGame();
         const scale = new ScaleGame();
         const buzzer = new BuzzerGame();
@@ -350,7 +352,7 @@
         const documentViewer = new DocumentViewer();
 
         // 預設分數對照表
-        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, homework: 5, survey: 2, assessment: 15, skillBattle: 10 };
+        const defaultPts = { quiz: 5, truefalse: 5, buzzer: 10, matching: 10, fillblank: 10, ordering: 10, hotspot: 5, poll: 1, opentext: 1, scale: 1, wordcloud: 1, copycard: 1, document: 5, homework: 5, survey: 2, assessment: 15, skillBattle: 10, multiChoice: 1 };
         let lbTimer = null;
 
         let sessionCode = '';
@@ -1640,7 +1642,7 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall', 'skillBattle'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'multiChoice', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall', 'skillBattle'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
             const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
@@ -1695,7 +1697,7 @@
             if (element.zIndex) el.style.zIndex = element.zIndex;
 
             // 設定分數並加入分數徽章
-            const interactiveTypes = ['quiz', 'truefalse', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework', 'assessment', 'skillBattle'];
+            const interactiveTypes = ['quiz', 'truefalse', 'multiChoice', 'buzzer', 'matching', 'fillblank', 'ordering', 'hotspot', 'poll', 'opentext', 'scale', 'wordcloud', 'copycard', 'document', 'homework', 'assessment', 'skillBattle'];
             if (interactiveTypes.includes(element.type)) {
                 const pts = parseInt(element.points) || defaultPts[element.type] || 0;
                 el.dataset.points = pts;
@@ -2648,6 +2650,26 @@
                             <div class="tf-result"></div>
                             <div class="tf-reveal-area"></div>
                             <div class="tf-stats-area"></div>
+                        </div>`;
+                    break;
+                }
+
+                case 'multiChoice': {
+                    el.classList.add('interactive-element');
+                    const choices = element.choices || ['選項 A', '選項 B', '選項 C'];
+                    const mcTitleFs = element.interactiveTitleFontSize || '1.1rem';
+                    const buttonsHtml = choices.map((c, i) => `
+                        <button class="mc-choice-btn" data-index="${i}">${c}</button>
+                    `).join('');
+                    el.innerHTML = `
+                        <div class="multichoice-container" data-element-id="${element.id || ''}">
+                            <div class="mc-question" style="font-size:${mcTitleFs}">${element.question || '請選擇一個選項'}</div>
+                            <div class="mc-choices">
+                                ${buttonsHtml}
+                            </div>
+                            <div class="mc-result"></div>
+                            <div class="mc-reveal-area"></div>
+                            <div class="mc-stats-area"></div>
                         </div>`;
                     break;
                 }

@@ -497,6 +497,18 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    addMultiChoice() {
+        const element = {
+            type: 'multiChoice',
+            x: 50, y: 50,
+            width: 650, height: 380,
+            question: '你認為 AI 最大的優勢是？',
+            choices: ['效率提升', '創意發想', '資料分析'],
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
     addOpenText() {
         const element = {
             type: 'opentext',
@@ -1322,7 +1334,7 @@ export class Editor {
         }
 
         // 互動元件專屬
-        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'skillBattle'];
+        const interactiveTypes = ['matching', 'fillblank', 'ordering', 'quiz', 'poll', 'truefalse', 'multiChoice', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'skillBattle'];
         if (type === 'matching') {
             html += this.renderMatchingProperties(elementData);
         } else if (type === 'fillblank') {
@@ -1424,6 +1436,31 @@ export class Editor {
                         <label>行高</label>
                         <input type="range" id="tfLineHeight" min="1" max="2.5" step="0.1" value="${elementData.tfLineHeight || 1.4}" style="flex:1;">
                         <span style="font-size:11px;color:#64748b;min-width:28px;text-align:right;">${elementData.tfLineHeight || 1.4}</span>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'multiChoice') {
+            const choices = elementData.choices || ['選項 A', '選項 B', '選項 C'];
+            const choicesHtml = choices.map((c, i) => `
+                <div class="property-row" style="gap:8px;">
+                    <span style="min-width:20px;font-weight:700;color:${['#3b82f6','#ef4444','#22c55e','#f59e0b'][i] || '#94a3b8'};">${i + 1}.</span>
+                    <input type="text" class="form-input mc-choice-input" data-idx="${i}" value="${c}" style="flex:1;">
+                    ${choices.length > 2 ? `<button class="mc-remove-choice" data-idx="${i}" style="border:none;background:none;cursor:pointer;color:#ef4444;font-size:18px;padding:2px;" title="刪除">&times;</button>` : ''}
+                </div>
+            `).join('');
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title">多選一設定</div>
+                    <div class="form-group">
+                        <label class="form-label">題目</label>
+                        <input type="text" class="form-input" id="mcQuestion" value="${elementData.question || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">選項</label>
+                        <div id="mcChoicesList" style="display:flex;flex-direction:column;gap:6px;">
+                            ${choicesHtml}
+                        </div>
+                        ${choices.length < 4 ? `<button id="mcAddChoice" style="margin-top:6px;padding:6px;border:1px dashed #d1d5db;border-radius:6px;background:transparent;color:#64748b;cursor:pointer;font-size:12px;width:100%;transition:all .15s;">+ 新增選項</button>` : ''}
                     </div>
                 </div>
             `;
@@ -2209,6 +2246,39 @@ export class Editor {
                     if (span) span.textContent = lhSlider.value;
                 });
             }
+        } else if (elementData.type === 'multiChoice') {
+            bindSimple('mcQuestion', 'question');
+            // 選項輸入
+            document.querySelectorAll('.mc-choice-input').forEach(inp => {
+                inp.addEventListener('change', () => {
+                    const idx = parseInt(inp.dataset.idx);
+                    const choices = [...(elementData.choices || [])];
+                    choices[idx] = inp.value;
+                    this.slideManager.updateElement(elementId, { choices });
+                    rerender();
+                });
+            });
+            // 刪除選項
+            document.querySelectorAll('.mc-remove-choice').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.idx);
+                    const choices = [...(elementData.choices || [])];
+                    choices.splice(idx, 1);
+                    this.slideManager.updateElement(elementId, { choices });
+                    rerender();
+                    this.selectElementById(elementId);
+                });
+            });
+            // 新增選項
+            document.getElementById('mcAddChoice')?.addEventListener('click', () => {
+                const choices = [...(elementData.choices || [])];
+                if (choices.length < 4) {
+                    choices.push(`選項 ${String.fromCharCode(65 + choices.length)}`);
+                    this.slideManager.updateElement(elementId, { choices });
+                    rerender();
+                    this.selectElementById(elementId);
+                }
+            });
         } else if (elementData.type === 'opentext') {
             bindSimple('otQuestion', 'question');
             bindSimple('otPlaceholder', 'placeholder');

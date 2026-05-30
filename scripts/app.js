@@ -60,6 +60,7 @@ import { QuizGame } from './interactive/quiz.js?v=20260304b';
 import { PollGame } from './interactive/poll.js?v=20260304b';
 import { CountdownTimer } from './interactive/countdown.js?v=20260304b';
 import { TrueFalseGame } from './interactive/truefalse.js?v=20260304b';
+import { MultiChoiceGame } from './interactive/multiChoice.js?v=20260530';
 import { OpenTextGame } from './interactive/opentext.js?v=20260304b';
 import { ScaleGame } from './interactive/scale.js?v=20260304b';
 import { BuzzerGame } from './interactive/buzzer.js?v=20260304b';
@@ -91,6 +92,7 @@ class App {
         this.poll = new PollGame();
         this.countdown = new CountdownTimer();
         this.trueFalse = new TrueFalseGame();
+        this.multiChoice = new MultiChoiceGame();
         this.openText = new OpenTextGame();
         this.scale = new ScaleGame();
         this.buzzer = new BuzzerGame();
@@ -487,6 +489,11 @@ class App {
         // 是非題
         document.getElementById('addTrueFalseBtn')?.addEventListener('click', () => {
             this.editor.addTrueFalse();
+        });
+
+        // 多選一
+        document.getElementById('addMultiChoiceBtn')?.addEventListener('click', () => {
+            this.editor.addMultiChoice();
         });
 
         // 開放問答
@@ -4703,6 +4710,42 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 初始顯示一下
         this._presMouseHandler();
 
+        // ── 滑鼠點擊翻頁（左30%=上一頁, 右30%=下一頁, 中間不觸發）──
+        if (!this._presClickNavBound) {
+            this._presClickNavBound = true;
+            presentationMode.addEventListener('click', (e) => {
+                if (!presentationMode.classList.contains('active')) return;
+                // 如果點在互動元件、按鈕、輸入框、連結上 → 不翻頁
+                const tag = e.target.tagName;
+                if (['BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'A', 'LABEL', 'IFRAME'].includes(tag)) return;
+                // 如果點在 interactive-element 內 → 不翻頁
+                if (e.target.closest('.interactive-element, .pres-top-bar, .pres-leaderboard, #presNavPanel, .pres-annotation-canvas, button, a, input, textarea, select, iframe')) return;
+                // 如果正在使用標記工具 → 不翻頁
+                if (this._annotationMode) return;
+
+                const rect = presentationMode.getBoundingClientRect();
+                const clickX = (e.clientX - rect.left) / rect.width;
+
+                if (clickX < 0.3) {
+                    // 左側 30%：上一頁
+                    if (this.presentationIndex > 0) {
+                        this.presentationIndex--;
+                        this.renderPresentationSlide();
+                        this.broadcastSlideData(this.presentationIndex);
+                    }
+                } else if (clickX > 0.7) {
+                    // 右側 30%：下一頁（先處理動畫步驟）
+                    if (this._maxBuildStep > 0 && this._currentBuildStep < this._maxBuildStep) {
+                        this.revealNextBuildStep();
+                    } else if (this.presentationIndex < this.slideManager.slides.length - 1) {
+                        this.presentationIndex++;
+                        this.renderPresentationSlide();
+                        this.broadcastSlideData(this.presentationIndex);
+                    }
+                }
+            });
+        }
+
         // 請求全螢幕
         const el = presentationMode;
         if (el.requestFullscreen) {
@@ -5725,6 +5768,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             this.quiz.init();
             this.poll.init();
             if (this.trueFalse) this.trueFalse.init();
+            if (this.multiChoice) this.multiChoice.init();
             if (this.openText) this.openText.init();
             if (this.scale) this.scale.init();
             if (this.buzzer) this.buzzer.init();
