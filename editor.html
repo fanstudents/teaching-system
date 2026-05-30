@@ -1376,34 +1376,6 @@
                     停止廣播
                 </button>
                 <span id="presCounterTop" class="pres-info-text" style="cursor:pointer;" title="點擊跳頁"></span>
-                <!-- 跳頁導航面板 -->
-                <div id="presNavPanel" style="
-                    display:none;position:fixed;bottom:56px;right:16px;z-index:9999;
-                    background:rgba(15,23,42,0.95);backdrop-filter:blur(12px);
-                    border-radius:14px;border:1px solid rgba(255,255,255,0.12);
-                    box-shadow:0 20px 60px rgba(0,0,0,0.5);
-                    width:360px;max-height:420px;overflow:hidden;
-                    font-family:'Noto Sans TC',sans-serif;
-                ">
-                    <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:8px;">
-                        <span class="material-symbols-outlined" style="font-size:18px;color:#38bdf8;">grid_view</span>
-                        <span style="color:#e2e8f0;font-size:13px;font-weight:600;flex:1;">跳頁導航</span>
-                        <input type="number" id="presNavInput" min="1" placeholder="頁碼" style="
-                            width:60px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);
-                            background:rgba(255,255,255,0.1);color:white;font-size:13px;text-align:center;
-                            font-family:inherit;outline:none;
-                        ">
-                        <button id="presNavGoBtn" style="
-                            padding:5px 12px;border-radius:6px;border:none;
-                            background:#3b82f6;color:white;font-size:12px;font-weight:600;
-                            cursor:pointer;font-family:inherit;white-space:nowrap;
-                        ">跳轉</button>
-                    </div>
-                    <div id="presNavThumbs" style="
-                        padding:10px;overflow-y:auto;max-height:340px;
-                        display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
-                    "></div>
-                </div>
                 <button class="pres-icon-btn" id="presForceSync" title="強制同步所有學員">
                     <span class="material-symbols-outlined">cell_tower</span>
                 </button>
@@ -1414,6 +1386,35 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
+        </div>
+
+        <!-- 跳頁導航面板（獨立於 top bar 避免 stacking context 問題） -->
+        <div id="presNavPanel" style="
+            display:none;position:fixed;top:50px;right:16px;z-index:9999;
+            background:rgba(15,23,42,0.96);backdrop-filter:blur(14px);
+            border-radius:14px;border:1px solid rgba(255,255,255,0.12);
+            box-shadow:0 20px 60px rgba(0,0,0,0.5);
+            width:380px;max-height:460px;overflow:hidden;
+            font-family:'Noto Sans TC',sans-serif;
+        ">
+            <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:8px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#38bdf8;">grid_view</span>
+                <span style="color:#e2e8f0;font-size:13px;font-weight:600;flex:1;">跳頁導航</span>
+                <input type="number" id="presNavInput" min="1" placeholder="頁碼" style="
+                    width:60px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);
+                    background:rgba(255,255,255,0.1);color:white;font-size:13px;text-align:center;
+                    font-family:inherit;outline:none;
+                ">
+                <button id="presNavGoBtn" style="
+                    padding:5px 12px;border-radius:6px;border:none;
+                    background:#3b82f6;color:white;font-size:12px;font-weight:600;
+                    cursor:pointer;font-family:inherit;white-space:nowrap;
+                ">跳轉</button>
+            </div>
+            <div id="presNavThumbs" style="
+                padding:10px;overflow-y:auto;max-height:380px;
+                display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+            "></div>
         </div>
 
         <!-- 分組進度條 -->

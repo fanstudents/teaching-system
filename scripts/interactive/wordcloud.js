@@ -62,7 +62,7 @@ export class WordCloudGame {
                 aiPanel = document.createElement('div');
                 aiPanel.className = 'wc-ai-panel';
                 aiPanel.innerHTML = `
-                    <button class="wc-ai-btn">🤖 AI 分類</button>
+                    <button class="wc-ai-btn">📊 分類統計</button>
                     <div class="wc-ai-result"></div>
                 `;
                 bodyEl.appendChild(aiPanel);
@@ -258,7 +258,7 @@ export class WordCloudGame {
     async _runAICategorize(elementId, btn, resultEl) {
         btn.disabled = true;
         btn.textContent = '⏳ 分析中...';
-        resultEl.innerHTML = '<div style="color:#94a3b8;font-size:12px;">正在請 AI 分類...</div>';
+        resultEl.innerHTML = '<div style="color:#94a3b8;font-size:12px;">統計分類中...</div>';
 
         try {
             const { data } = await db.select('submissions', {
@@ -268,11 +268,10 @@ export class WordCloudGame {
             if (!data?.length) {
                 resultEl.innerHTML = '<div style="color:#94a3b8;font-size:12px;">尚無資料</div>';
                 btn.disabled = false;
-                btn.textContent = '🤖 AI 分類';
+                btn.textContent = '📊 分類統計';
                 return;
             }
 
-            // 彙整所有詞
             const allWords = [];
             data.forEach(s => {
                 if (!s.content) return;
@@ -282,51 +281,58 @@ export class WordCloudGame {
                 });
             });
 
-            const prompt = `以下是學員在文字雲中提交的關鍵字（共 ${allWords.length} 個）：
+            const prompt = `以下是學員提交的關鍵字（共 ${allWords.length} 個）：
 
 ${allWords.join('、')}
 
-請將這些關鍵字分成 3~6 個類別，每個類別給出：
-1. 類別名稱（簡短，2-4 個字）
-2. 代表 emoji
-3. 包含的關鍵字
-4. 佔比百分比（該類別的詞數 / 總詞數）
+請將這些關鍵字歸納為最多 5 個主要類別，無法歸類的放入「其他」。
+每個類別給出：
+1. 類別名稱（2-4 字）
+2. 包含的關鍵字列表
+3. 佔比百分比（四捨五入到整數，所有類別加總 = 100）
 
-請用 JSON 格式回覆，格式如下：
-{"categories":[{"name":"類別名","emoji":"🔥","words":["詞1","詞2"],"percent":35}]}
+規則：
+- 最多 5 個主類別 + 1 個「其他」，共不超過 6 個
+- 「其他」一定要有，即使只有 0%
+- 百分比加總必須 = 100
 
-只回覆 JSON，不要其他文字。`;
+JSON 格式回覆：
+{"categories":[{"name":"類別名","words":["詞1"],"percent":35}]}
+只回覆 JSON。`;
 
             const response = await ai.chat([
-                { role: 'system', content: '你是一個文字分類助手，擅長將關鍵字分群。只回覆 JSON。' },
+                { role: 'system', content: '你是資料分類助手。只回覆 JSON。' },
                 { role: 'user', content: prompt }
             ], { temperature: 0.3, maxTokens: 1024 });
 
-            // 解析 JSON
             const jsonMatch = response.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) throw new Error('AI 回傳格式錯誤');
+            if (!jsonMatch) throw new Error('分類格式錯誤');
             const result = JSON.parse(jsonMatch[0]);
-            const categories = result.categories || [];
+            let categories = (result.categories || []).slice(0, 7);
 
-            // 渲染分類結果
-            const catColors = ['#3b82f6','#ef4444','#22c55e','#f59e0b','#8b5cf6','#06b6d4'];
+            // 確保有「其他」
+            if (!categories.find(c => c.name === '其他')) {
+                categories.push({ name: '其他', words: [], percent: 0 });
+            }
+
+            const catColors = ['#3b82f6','#ef4444','#22c55e','#f59e0b','#8b5cf6','#94a3b8'];
             resultEl.innerHTML = categories.map((cat, i) => {
                 const color = catColors[i % catColors.length];
+                const isOther = cat.name === '其他';
                 return `
                     <div class="wc-ai-cat">
                         <div class="wc-ai-cat-header">
-                            <span>${cat.emoji || '📌'} ${this.esc(cat.name)}</span>
+                            <span style="${isOther ? 'opacity:0.6;' : ''}">${this.esc(cat.name)}</span>
                             <span class="wc-ai-pct" style="color:${color};">${cat.percent}%</span>
                         </div>
                         <div class="wc-ai-bar"><div class="wc-ai-bar-fill" style="width:${cat.percent}%;background:${color};"></div></div>
-                        <div class="wc-ai-words">${(cat.words || []).map(w => this.esc(w)).join('、')}</div>
                     </div>`;
             }).join('');
         } catch (e) {
-            console.error('[wordcloud AI]', e);
+            console.error('[wordcloud categorize]', e);
             resultEl.innerHTML = `<div style="color:#ef4444;font-size:12px;">❌ ${e.message}</div>`;
         }
         btn.disabled = false;
-        btn.textContent = '🤖 重新分類';
+        btn.textContent = '🔄 重新統計';
     }
 }

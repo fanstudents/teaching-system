@@ -3307,31 +3307,31 @@
 
 /* ── AI 分類面板（講師端右側）── */
 .wc-ai-panel {
-    width: 220px;
-    min-width: 180px;
+    width: 200px;
+    min-width: 160px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    overflow-y: auto;
+    gap: 6px;
+    overflow: hidden;
 }
 
 .wc-ai-btn {
-    padding: 8px 14px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    padding: 6px 12px;
+    background: #475569;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     color: white;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
     transition: all .2s;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 .wc-ai-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+    background: #334155;
 }
 .wc-ai-btn:disabled {
     opacity: 0.7;
@@ -3341,47 +3341,37 @@
 .wc-ai-result {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .wc-ai-cat {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 8px 10px;
+    padding: 4px 6px;
 }
 .wc-ai-cat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #1e293b;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 .wc-ai-pct {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
 }
 .wc-ai-bar {
-    height: 5px;
+    height: 4px;
     background: #e2e8f0;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
-    margin-bottom: 4px;
 }
 .wc-ai-bar-fill {
     height: 100%;
-    border-radius: 3px;
+    border-radius: 2px;
     transition: width .5s ease;
-}
-.wc-ai-words {
-    font-size: 11px;
-    color: #64748b;
-    line-height: 1.5;
-    word-break: break-all;
 }
 
 /* ========================================
