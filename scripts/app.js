@@ -5883,6 +5883,117 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             setTimeout(() => { btn.style.opacity = '0.5'; btn.style.color = '#fff'; }, 1200);
         });
 
+        // ── 跳頁導航 ──
+        const counter = document.getElementById('presCounterTop');
+        const navPanel = document.getElementById('presNavPanel');
+        const navInput = document.getElementById('presNavInput');
+        const navGoBtn = document.getElementById('presNavGoBtn');
+        const navThumbs = document.getElementById('presNavThumbs');
+
+        const goToPresPage = (idx) => {
+            if (idx < 0 || idx >= this.slideManager.slides.length) return;
+            this.presentationIndex = idx;
+            this.renderPresentationSlide();
+            this.broadcastSlideData(this.presentationIndex);
+            if (navPanel) navPanel.style.display = 'none';
+        };
+
+        const renderNavThumbs = () => {
+            if (!navThumbs) return;
+            navThumbs.innerHTML = '';
+            const slides = this.slideManager.slides;
+            slides.forEach((slide, i) => {
+                const thumb = document.createElement('div');
+                const isCurrent = i === this.presentationIndex;
+                thumb.style.cssText = `
+                    cursor:pointer;border-radius:6px;overflow:hidden;aspect-ratio:16/9;
+                    border:2px solid ${isCurrent ? '#3b82f6' : 'rgba(255,255,255,0.1)'};
+                    background:${slide.background || '#fff'};position:relative;
+                    transition:border-color .2s;
+                `;
+                // 頁碼標籤
+                const badge = document.createElement('div');
+                badge.style.cssText = `
+                    position:absolute;top:2px;left:2px;padding:1px 5px;border-radius:3px;
+                    font-size:10px;font-weight:700;z-index:2;
+                    background:${isCurrent ? '#3b82f6' : 'rgba(0,0,0,0.5)'};color:white;
+                `;
+                badge.textContent = i + 1;
+                thumb.appendChild(badge);
+
+                // 迷你預覽
+                const preview = document.createElement('div');
+                preview.style.cssText = 'width:100%;height:100%;position:relative;overflow:hidden;';
+                if (slide.elements?.length) {
+                    const texts = slide.elements.filter(e => e.type === 'text').slice(0, 2);
+                    const hasInteractive = slide.elements.some(e => ['quiz','poll','wordcloud','homework','assessment','skillBattle','groupPick'].includes(e.type));
+                    let inner = '';
+                    if (hasInteractive) {
+                        const intEl = slide.elements.find(e => ['quiz','poll','wordcloud','homework','assessment','skillBattle','groupPick'].includes(e.type));
+                        inner += `<div style="position:absolute;bottom:2px;right:2px;font-size:8px;background:rgba(99,102,241,0.8);color:white;padding:1px 4px;border-radius:2px;">${intEl.type}</div>`;
+                    }
+                    texts.forEach(t => {
+                        const txt = (t.content || '').replace(/<[^>]*>/g, '').slice(0, 20);
+                        if (txt.trim()) inner += `<div style="font-size:7px;color:#475569;padding:2px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${txt}</div>`;
+                    });
+                    preview.innerHTML = inner;
+                }
+                thumb.appendChild(preview);
+
+                thumb.addEventListener('mouseenter', () => { if (!isCurrent) thumb.style.borderColor = 'rgba(59,130,246,0.5)'; });
+                thumb.addEventListener('mouseleave', () => { if (!isCurrent) thumb.style.borderColor = 'rgba(255,255,255,0.1)'; });
+                thumb.addEventListener('click', (e) => { e.stopPropagation(); goToPresPage(i); });
+                navThumbs.appendChild(thumb);
+            });
+            // 滾動到當前頁
+            const currentThumb = navThumbs.children[this.presentationIndex];
+            if (currentThumb) currentThumb.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        };
+
+        if (counter) {
+            counter.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (navPanel.style.display === 'none' || !navPanel.style.display) {
+                    navInput.max = this.slideManager.slides.length;
+                    navInput.value = this.presentationIndex + 1;
+                    renderNavThumbs();
+                    navPanel.style.display = '';
+                    navInput.focus();
+                    navInput.select();
+                } else {
+                    navPanel.style.display = 'none';
+                }
+            });
+        }
+
+        // 跳轉按鈕
+        navGoBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const num = parseInt(navInput.value, 10);
+            if (num >= 1 && num <= this.slideManager.slides.length) {
+                goToPresPage(num - 1);
+            }
+        });
+
+        // Enter 跳轉
+        navInput?.addEventListener('keydown', (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter') {
+                const num = parseInt(navInput.value, 10);
+                if (num >= 1 && num <= this.slideManager.slides.length) {
+                    goToPresPage(num - 1);
+                }
+            }
+        });
+
+        // 點擊其他地方關閉面板
+        document.addEventListener('click', (e) => {
+            if (navPanel && navPanel.style.display !== 'none' && !navPanel.contains(e.target) && e.target !== counter) {
+                navPanel.style.display = 'none';
+            }
+        });
+        navPanel?.addEventListener('click', (e) => e.stopPropagation());
+
         // 全螢幕切換
         if (fsToggle) {
             fsToggle.addEventListener('click', () => {

@@ -1,8 +1,8 @@
 /**
- * 文字雲互動模組（多詞輸入 + 重新作答 + 提交後展示文字雲）
+ * 文字雲互動模組（多詞輸入 + 重新作答 + 提交後展示文字雲 + AI 分類）
  */
 import { stateManager } from './stateManager.js';
-import { db } from '../supabase.js';
+import { db, ai } from '../supabase.js';
 
 export class WordCloudGame {
     constructor() {
@@ -40,7 +40,7 @@ export class WordCloudGame {
             cloudEl.className = 'wordcloud-cloud';
         }
 
-        // ── 講師端：純顯示文字雲，不顯示輸入區 ──
+        // ── 講師端：純顯示文字雲 + AI 分類按鈕 ──
         if (isPresenter) {
             // 移除舊的輸入區（如果有）
             const oldInputArea = container.querySelector('.wordcloud-multi-input');
@@ -54,14 +54,30 @@ export class WordCloudGame {
             }
             bodyEl.innerHTML = '';
             bodyEl.appendChild(cloudEl);
-            // 講師端文字雲全寬展示
             cloudEl.classList.add('wc-cloud-expanded');
+
+            // ★ AI 分類面板（右側）
+            let aiPanel = container.querySelector('.wc-ai-panel');
+            if (!aiPanel) {
+                aiPanel = document.createElement('div');
+                aiPanel.className = 'wc-ai-panel';
+                aiPanel.innerHTML = `
+                    <button class="wc-ai-btn">🤖 AI 分類</button>
+                    <div class="wc-ai-result"></div>
+                `;
+                bodyEl.appendChild(aiPanel);
+            }
+
+            // AI 分類按鈕
+            const aiBtn = aiPanel.querySelector('.wc-ai-btn');
+            const aiResult = aiPanel.querySelector('.wc-ai-result');
+            aiBtn.addEventListener('click', () => this._runAICategorize(elementId, aiBtn, aiResult));
 
             // 載入 + 定時刷新文字雲
             this.renderCloud(elementId, cloudEl);
             const intervalId = setInterval(() => this.renderCloud(elementId, cloudEl), 4000);
             this._cloudIntervals.push(intervalId);
-            return; // 講師端到此結束，不建立輸入相關 UI
+            return;
         }
 
         // ── 學員端：完整輸入 + 文字雲 ──
@@ -222,7 +238,7 @@ export class WordCloudGame {
             const colors = ['#0969da', '#cf222e', '#1a7f37', '#9a6700', '#1a73e8', '#0e7490', '#bf5600', '#6e40c9', '#0550ae', '#953800'];
 
             cloudEl.innerHTML = entries.map(([word, count], i) => {
-                const size = 0.85 + (count / maxFreq) * 2.2;
+                const size = Math.min(0.85 + (count / maxFreq) * 2.2, 2.8);
                 const color = colors[i % colors.length];
                 const opacity = 0.7 + (count / maxFreq) * 0.3;
                 return `<span class="wordcloud-word" style="font-size:${size}rem;color:${color};opacity:${opacity};" title="${count} 次">${this.esc(word)}</span>`;
@@ -234,5 +250,83 @@ export class WordCloudGame {
 
     esc(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /**
+     * AI 分類：將文字雲內容發送給 AI，回傳分類 + 百分比
+     */
+    async _runAICategorize(elementId, btn, resultEl) {
+        btn.disabled = true;
+        btn.textContent = '⏳ 分析中...';
+        resultEl.innerHTML = '<div style="color:#94a3b8;font-size:12px;">正在請 AI 分類...</div>';
+
+        try {
+            const { data } = await db.select('submissions', {
+                filter: { element_id: 'eq.' + elementId },
+                select: 'content',
+            });
+            if (!data?.length) {
+                resultEl.innerHTML = '<div style="color:#94a3b8;font-size:12px;">尚無資料</div>';
+                btn.disabled = false;
+                btn.textContent = '🤖 AI 分類';
+                return;
+            }
+
+            // 彙整所有詞
+            const allWords = [];
+            data.forEach(s => {
+                if (!s.content) return;
+                s.content.split(/[,\s、，]+/).forEach(w => {
+                    w = w.trim();
+                    if (w) allWords.push(w);
+                });
+            });
+
+            const prompt = `以下是學員在文字雲中提交的關鍵字（共 ${allWords.length} 個）：
+
+${allWords.join('、')}
+
+請將這些關鍵字分成 3~6 個類別，每個類別給出：
+1. 類別名稱（簡短，2-4 個字）
+2. 代表 emoji
+3. 包含的關鍵字
+4. 佔比百分比（該類別的詞數 / 總詞數）
+
+請用 JSON 格式回覆，格式如下：
+{"categories":[{"name":"類別名","emoji":"🔥","words":["詞1","詞2"],"percent":35}]}
+
+只回覆 JSON，不要其他文字。`;
+
+            const response = await ai.chat([
+                { role: 'system', content: '你是一個文字分類助手，擅長將關鍵字分群。只回覆 JSON。' },
+                { role: 'user', content: prompt }
+            ], { temperature: 0.3, maxTokens: 1024 });
+
+            // 解析 JSON
+            const jsonMatch = response.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error('AI 回傳格式錯誤');
+            const result = JSON.parse(jsonMatch[0]);
+            const categories = result.categories || [];
+
+            // 渲染分類結果
+            const catColors = ['#3b82f6','#ef4444','#22c55e','#f59e0b','#8b5cf6','#06b6d4'];
+            resultEl.innerHTML = categories.map((cat, i) => {
+                const color = catColors[i % catColors.length];
+                return `
+                    <div class="wc-ai-cat">
+                        <div class="wc-ai-cat-header">
+                            <span>${cat.emoji || '📌'} ${this.esc(cat.name)}</span>
+                            <span class="wc-ai-pct" style="color:${color};">${cat.percent}%</span>
+                        </div>
+                        <div class="wc-ai-bar"><div class="wc-ai-bar-fill" style="width:${cat.percent}%;background:${color};"></div></div>
+                        <div class="wc-ai-words">${(cat.words || []).map(w => this.esc(w)).join('、')}</div>
+                    </div>`;
+            }).join('');
+        } catch (e) {
+            console.error('[wordcloud AI]', e);
+            resultEl.innerHTML = `<div style="color:#ef4444;font-size:12px;">❌ ${e.message}</div>`;
+        }
+        btn.disabled = false;
+        btn.textContent = '🤖 重新分類';
     }
 }

@@ -3295,6 +3295,95 @@
     padding: 16px;
 }
 
+/* ── 文字雲 overflow 修正 ── */
+.wordcloud-cloud {
+    overflow: hidden;
+}
+.wordcloud-word {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── AI 分類面板（講師端右側）── */
+.wc-ai-panel {
+    width: 220px;
+    min-width: 180px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+}
+
+.wc-ai-btn {
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+    white-space: nowrap;
+}
+.wc-ai-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+}
+.wc-ai-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.wc-ai-result {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.wc-ai-cat {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+.wc-ai-cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+.wc-ai-pct {
+    font-size: 14px;
+    font-weight: 700;
+}
+.wc-ai-bar {
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+.wc-ai-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .5s ease;
+}
+.wc-ai-words {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.5;
+    word-break: break-all;
+}
+
 /* ========================================
    圖片標註 - Hotspot (區域標註 + 熱點圖)
    ======================================== */
