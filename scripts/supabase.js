@@ -766,12 +766,23 @@ export const ai = {
         // ★ 同步到 Supabase user_profiles（換電腦自動還原）
         auth.getSession().then(session => {
             if (!session?.user?.id) return;
-            db.update('user_profiles',
-                { ai_settings: JSON.stringify({ provider, apiKey: apiKey || '', baseUrl: baseUrl || '' }) },
-                { id: `eq.${session.user.id}` }
-            ).then(({ error }) => {
-                if (error) console.warn('[AI] 無法儲存到 user_profiles（可能需新增 ai_settings 欄位）:', error);
-                else console.log('[AI] 設定已同步到雲端');
+            const aiData = JSON.stringify({ provider, apiKey: apiKey || '', baseUrl: baseUrl || '' });
+            // PostgREST upsert: INSERT ... ON CONFLICT(id) DO UPDATE
+            fetch(`${SUPABASE_URL}/rest/v1/user_profiles`, {
+                method: 'POST',
+                headers: {
+                    ...getHeaders(),
+                    'Content-Type': 'application/json',
+                    'Prefer': 'resolution=merge-duplicates'
+                },
+                body: JSON.stringify({
+                    id: session.user.id,
+                    ai_settings: aiData,
+                    updated_at: new Date().toISOString()
+                })
+            }).then(r => {
+                if (r.ok) console.log('[AI] 設定已同步到雲端');
+                else r.text().then(t => console.warn('[AI] 雲端同步失敗:', t));
             });
         }).catch(() => {});
     },
