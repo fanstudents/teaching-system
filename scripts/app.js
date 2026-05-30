@@ -4779,6 +4779,39 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             });
         }
 
+        // ── 滑鼠滾輪翻頁 ──
+        if (!this._presWheelBound) {
+            this._presWheelBound = true;
+            let wheelCooldown = false;
+            presentationMode.addEventListener('wheel', (e) => {
+                if (!presentationMode.classList.contains('active')) return;
+                // 在可捲動的互動元件/面板內不攔截
+                if (e.target.closest('.interactive-element, .pres-leaderboard, #presNavPanel, .pres-top-bar, textarea, select')) return;
+                if (wheelCooldown) return;
+                wheelCooldown = true;
+                setTimeout(() => { wheelCooldown = false; }, 300);
+
+                e.preventDefault();
+                if (e.deltaY > 0) {
+                    // 向下滾 → 下一頁
+                    if (this._maxBuildStep > 0 && this._currentBuildStep < this._maxBuildStep) {
+                        this.revealNextBuildStep();
+                    } else if (this.presentationIndex < this.slideManager.slides.length - 1) {
+                        this.presentationIndex++;
+                        this.renderPresentationSlide();
+                        this.broadcastSlideData(this.presentationIndex);
+                    }
+                } else if (e.deltaY < 0) {
+                    // 向上滾 → 上一頁
+                    if (this.presentationIndex > 0) {
+                        this.presentationIndex--;
+                        this.renderPresentationSlide();
+                        this.broadcastSlideData(this.presentationIndex);
+                    }
+                }
+            }, { passive: false });
+        }
+
         // 請求全螢幕
         const el = presentationMode;
         if (el.requestFullscreen) {
