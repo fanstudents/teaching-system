@@ -1860,6 +1860,39 @@ ${slideContents}
             }
         });
 
+        // ── AI 設定 Modal ──
+        const aiModal = document.getElementById('aiSettingsModal');
+        const aiProviderSel = document.getElementById('aiProviderSelect');
+        const aiKeyIn = document.getElementById('aiKeyInput');
+        const aiBaseIn = document.getElementById('aiBaseUrlInput');
+        const aiStatus = document.getElementById('aiSettingsStatus');
+
+        document.getElementById('aiSettingsBtn')?.addEventListener('click', () => {
+            // 載入目前設定
+            aiProviderSel.value = localStorage.getItem('_ai_provider') || '';
+            aiKeyIn.value = localStorage.getItem('_ai_api_key') || '';
+            aiBaseIn.value = localStorage.getItem('_ai_base_url') || '';
+            aiStatus.textContent = '';
+            aiModal.style.display = 'flex';
+        });
+
+        document.getElementById('aiSettingsClose')?.addEventListener('click', () => {
+            aiModal.style.display = 'none';
+        });
+        aiModal?.addEventListener('click', (e) => {
+            if (e.target === aiModal) aiModal.style.display = 'none';
+        });
+
+        document.getElementById('aiSettingsSave')?.addEventListener('click', () => {
+            const provider = aiProviderSel.value;
+            const apiKey = aiKeyIn.value.trim();
+            const baseUrl = aiBaseIn.value.trim();
+            ai.setProvider(provider, apiKey, baseUrl);
+            aiStatus.innerHTML = '✅ 已儲存！設定已同步到雲端。';
+            aiStatus.style.color = '#16a34a';
+            setTimeout(() => { aiModal.style.display = 'none'; }, 1500);
+        });
+
         // 模態框事件
         this.bindModalEvents();
 

@@ -106,9 +106,59 @@
                     <span class="material-symbols-outlined icon-sm" id="broadcastBtnIcon">cell_tower</span>
                     <span id="broadcastBtnLabel">廣播</span>
                 </button>
+                <button class="btn btn-ghost btn-sm" id="aiSettingsBtn" title="AI 設定" style="padding:4px 8px;gap:3px;">
+                    <span class="material-symbols-outlined icon-sm">smart_toy</span>
+                </button>
                 <button class="btn btn-primary btn-sm" id="playBtn" title="播放簡報（F5）" style="padding:4px 10px;gap:3px;">
                     <span class="material-symbols-outlined icon-sm">play_arrow</span> 播放
                 </button>
+            </div>
+        </div>
+
+        <!-- AI 設定 Modal -->
+        <div id="aiSettingsModal" style="
+            display:none;position:fixed;inset:0;z-index:9999;
+            background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+            display:none;align-items:center;justify-content:center;
+        ">
+            <div style="
+                background:white;border-radius:14px;width:420px;
+                box-shadow:0 20px 60px rgba(0,0,0,0.25);
+                font-family:'Noto Sans TC',sans-serif;overflow:hidden;
+            ">
+                <div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:8px;">
+                    <span class="material-symbols-outlined" style="color:#6366f1;">smart_toy</span>
+                    <span style="font-weight:700;font-size:15px;flex:1;">AI 設定</span>
+                    <button id="aiSettingsClose" style="background:none;border:none;cursor:pointer;padding:4px;">
+                        <span class="material-symbols-outlined" style="font-size:20px;color:#9ca3af;">close</span>
+                    </button>
+                </div>
+                <div style="padding:20px;">
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Provider</label>
+                        <select id="aiProviderSelect" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+                            <option value="openai">OpenAI / Zeabur</option>
+                            <option value="anthropic">Anthropic</option>
+                            <option value="">Supabase Proxy（預設）</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">API Key</label>
+                        <input type="password" id="aiKeyInput" placeholder="sk-..." style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+                    </div>
+                    <div style="margin-bottom:18px;">
+                        <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Base URL <span style="color:#9ca3af;font-weight:400;">（選填）</span></label>
+                        <input type="text" id="aiBaseUrlInput" placeholder="https://hub.zeabur.com" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+                    </div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end;">
+                        <button id="aiSettingsSave" style="
+                            padding:8px 20px;border-radius:8px;border:none;
+                            background:#6366f1;color:white;font-size:13px;font-weight:600;
+                            cursor:pointer;font-family:inherit;transition:background .15s;
+                        ">儲存</button>
+                    </div>
+                    <div id="aiSettingsStatus" style="margin-top:10px;font-size:12px;color:#6b7280;"></div>
+                </div>
             </div>
         </div>
 
