@@ -4743,6 +4743,22 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // 初始顯示一下
         this._presMouseHandler();
 
+        // ── 禁用右鍵選單（防止點擊失效）──
+        if (!this._presContextMenuBound) {
+            this._presContextMenuBound = true;
+            presentationMode.addEventListener('contextmenu', (e) => {
+                if (!presentationMode.classList.contains('active')) return;
+                if (e.target.closest('.interactive-element, .pres-top-bar, #presNavPanel')) return;
+                e.preventDefault();
+                // 右鍵 = 上一頁
+                if (this.presentationIndex > 0) {
+                    this.presentationIndex--;
+                    this.renderPresentationSlide();
+                    this.broadcastSlideData(this.presentationIndex);
+                }
+            });
+        }
+
         // ── 滑鼠點擊翻頁（左30%=上一頁, 右30%=下一頁, 中間不觸發）──
         if (!this._presClickNavBound) {
             this._presClickNavBound = true;
