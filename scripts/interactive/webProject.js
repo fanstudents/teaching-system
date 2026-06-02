@@ -96,40 +96,41 @@ Body: {"session_id":"${sessionCode}","student_name":"${studentName}","student_em
             <div class="wp-cards">
                 <!-- ① 上傳資料夾 -->
                 <div class="wp-card-method wp-card-upload">
-                    <div class="wp-card-emoji">📁</div>
-                    <div class="wp-card-title">上傳資料夾</div>
-                    <div class="wp-card-desc">選擇包含 HTML/CSS/JS 的資料夾</div>
+                    <div class="wp-card-icon-wrap wp-icon-blue">${mi('folder_zip', 28)}</div>
+                    <div class="wp-card-title">上傳檔案</div>
+                    <div class="wp-card-desc">選擇包含 HTML/CSS/JS 的資料夾或檔案</div>
                     <input type="file" class="wp-folder-input" webkitdirectory style="display:none">
                     <input type="file" class="wp-file-input" multiple accept=".html,.htm,.css,.js,.json,.svg,.png,.jpg,.jpeg,.gif,.webp" style="display:none">
-                    <button class="wp-card-action-btn wp-folder-select-btn">${mi('folder_open', 18)} 選擇資料夾</button>
+                    <button class="wp-card-action-btn wp-folder-select-btn">${mi('folder_open', 16)} 選擇資料夾</button>
                     <button class="wp-card-action-btn wp-file-select-btn wp-card-action-secondary">${mi('upload_file', 14)} 或選擇檔案</button>
                     <div class="wp-file-list"></div>
                     <div class="wp-file-status"></div>
                     <textarea class="wp-prompt-input" data-for="upload" placeholder="貼上你下給 AI 的提示詞（選填）" rows="2"></textarea>
-                    <button class="wp-card-submit-btn wp-upload-submit" disabled>${mi('send', 14)} 提交</button>
+                    <button class="wp-card-submit-btn wp-upload-submit" disabled>${mi('send', 14)} 提交作品</button>
                 </div>
 
                 <!-- ② 貼上連結 -->
                 <div class="wp-card-method wp-card-link">
-                    <div class="wp-card-emoji">🔗</div>
+                    <div class="wp-card-icon-wrap wp-icon-green">${mi('link', 28)}</div>
                     <div class="wp-card-title">貼上連結</div>
-                    <div class="wp-card-desc">已部署到 Vercel / GitHub Pages 等</div>
-                    <input type="url" class="wp-url-input" placeholder="https://...">
+                    <div class="wp-card-desc">已部署到 Vercel / GitHub Pages 等平台</div>
+                    <input type="url" class="wp-url-input" placeholder="https://your-project.vercel.app">
                     <textarea class="wp-prompt-input" data-for="url" placeholder="貼上你下給 AI 的提示詞（選填）" rows="2"></textarea>
-                    <button class="wp-card-submit-btn wp-url-submit" disabled>${mi('send', 14)} 提交</button>
+                    <button class="wp-card-submit-btn wp-url-submit" disabled>${mi('send', 14)} 提交作品</button>
                 </div>
 
                 <!-- ③ AI 提交 -->
                 <div class="wp-card-method wp-card-ai">
-                    <div class="wp-card-emoji">🤖</div>
-                    <div class="wp-card-title">AI 提交</div>
-                    <div class="wp-card-desc">複製提示詞貼到 Claude / ChatGPT，AI 會自動提交</div>
+                    <div class="wp-card-icon-wrap wp-icon-purple">${mi('smart_toy', 28)}</div>
+                    <div class="wp-card-title">AI 自動提交</div>
+                    <div class="wp-card-desc">讓 AI 幫你產生作品並提交到講師端</div>
                     <div class="wp-ai-steps">
-                        <div class="wp-ai-step">??? 複製下方提示詞</div>
-                        <div class="wp-ai-step">??? 貼到 Claude / ChatGPT</div>
-                        <div class="wp-ai-step">??? AI 產生網頁並自動提交</div>
+                        <div class="wp-ai-step"><span class="wp-step-num">1</span> 點擊下方複製提示詞</div>
+                        <div class="wp-ai-step"><span class="wp-step-num">2</span> 貼到 Claude / ChatGPT 對話</div>
+                        <div class="wp-ai-step"><span class="wp-step-num">3</span> AI 完成後會自動提交作品</div>
                     </div>
                     <button class="wp-card-action-btn wp-ai-copy-prompt">${mi('content_copy', 16)} 一鍵複製提示詞</button>
+                    <div class="wp-ai-hint">${mi('info', 12)} 提交後此頁會自動顯示預覽</div>
                 </div>
             </div>
 
