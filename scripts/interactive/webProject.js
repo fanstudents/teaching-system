@@ -219,10 +219,13 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
         });
 
         // ── 提交共用 ──
+        let submitCount = 0;
         const doSubmit = async (content, stateData, btn) => {
             btn.disabled = true;
             btn.innerHTML = `${mi('hourglass_top', 14)} 提交中...`;
             const title = element.question?.substring(0, 50) || '網頁作品';
+            submitCount++;
+            stateData._version = submitCount;
             await stateManager.clear(elementId);
             await stateManager.save(elementId, { type: 'webProject', title, content, isCorrect: null, score: null, points: 0, participated: true, state: stateData });
             btn.innerHTML = `${mi('check', 14)} 已提交！`;
@@ -324,6 +327,9 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                     const ttm = c.match(/<title[^>]*>([^<]*)<\/title>/i);
                     if (ttm) pt = ttm[1].trim();
 
+                    const ver = st._version || 1;
+                    const vb = ver > 1 ? `<span class="wp-thumb-version">第${ver}版</span>` : '';
+
                     return `<div class="wp-grid-card${isMe ? ' wp-grid-card-me' : ''}" style="animation-delay:${i * 0.05}s">
                         <div class="wp-thumb-wrapper">
                             ${ta ? `<iframe class="wp-thumb-iframe" ${ta} loading="lazy" tabindex="-1"></iframe>` : `<div class="wp-thumb-placeholder">${mi('web', 32)}</div>`}
@@ -332,6 +338,7 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                             </div>
                             <span class="wp-thumb-badge">${me}</span>
                             ${isMe ? '<span class="wp-thumb-me">我</span>' : ''}
+                            ${vb}
                         </div>
                         <div class="wp-grid-card-body">
                             <div class="wp-grid-card-name">${esc(name)}</div>
@@ -430,7 +437,7 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
 
     /* ═══════════════════════════════════════════════ */
     async _renderTeacher(el, element, elementId) {
-        const sessionCode = window._activeSessionUUID || sessionStorage.getItem('_session_code') || new URLSearchParams(location.search).get('code') || '';
+        const sessionCode = window.app?.sessionCode || sessionStorage.getItem('_session_code') || new URLSearchParams(location.search).get('code') || window._activeSessionUUID || '';
         el.innerHTML = `<div class="wp-teacher">
             <div class="wp-teacher-header">
                 <div class="wp-teacher-title">${mi('web', 22)} 網頁作品展示</div>
@@ -492,6 +499,8 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 }
 
                 const promptPreview = prompt ? `<div class="wp-grid-card-prompt" title="${esc(prompt)}">${mi('chat', 11)} ${esc(prompt)}</div>` : '';
+                const version = st._version || 1;
+                const versionBadge = version > 1 ? `<span class="wp-thumb-version">第${version}版</span>` : '';
 
                 return `<div class="wp-grid-card" style="animation-delay:${i * 0.06}s">
                     <div class="wp-thumb-wrapper">
@@ -500,6 +509,7 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                             <button class="wp-preview-btn" data-sid="${s.id}" data-mode="${mode}">${mi('open_in_full', 16)}</button>
                         </div>
                         <span class="wp-thumb-badge">${modeEmoji}</span>
+                        ${versionBadge}
                     </div>
                     <div class="wp-grid-card-body">
                         <div class="wp-grid-card-name">${esc(name)}</div>
