@@ -78,20 +78,9 @@ export class WebProjectGame {
             const task = element.question || '請幫我建立一個網頁';
             return `${task}
 
-完成後，用以下指令提交作品（HTML/CSS/JS 可分開傳）：
-
-fetch('${SUBMIT_URL}', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    session_id: '${sessionCode}',
-    student_name: '${studentName}',
-    student_email: '${studentEmail}',
-    html: '你的完整 HTML',
-    css: '你的 CSS（選填）',
-    js: '你的 JS（選填）'
-  })
-}).then(r => r.json()).then(d => console.log(d))`;
+完成後用此 API 提交作品：
+POST ${SUBMIT_URL}
+Body: {"session_id":"${sessionCode}","student_name":"${studentName}","student_email":"${studentEmail}","html":"完整HTML","css":"CSS內容","js":"JS內容"}`;
         };
 
         el.innerHTML = `
