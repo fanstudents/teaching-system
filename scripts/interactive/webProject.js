@@ -437,7 +437,18 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
 
     /* ═══════════════════════════════════════════════ */
     async _renderTeacher(el, element, elementId) {
-        const sessionCode = window.app?.sessionCode || sessionStorage.getItem('_session_code') || new URLSearchParams(location.search).get('code') || window._activeSessionUUID || '';
+        // 解析 session code：優先用 join_code，若只有 UUID 則查 project_sessions 轉換
+        let sessionCode = window.app?.sessionCode || '';
+        if (!sessionCode) {
+            const uuid = window._activeSessionUUID || sessionStorage.getItem('_session_code') || new URLSearchParams(location.search).get('sid') || '';
+            if (uuid) {
+                // 嘗試當 join_code 用；同時查 project_sessions 取真正的 join_code
+                try {
+                    const { data } = await db.select('project_sessions', { filter: { id: `eq.${uuid}` }, select: 'join_code', limit: 1 });
+                    sessionCode = data?.[0]?.join_code || uuid;
+                } catch { sessionCode = uuid; }
+            }
+        }
         el.innerHTML = `<div class="wp-teacher">
             <div class="wp-teacher-header">
                 <div class="wp-teacher-title">${mi('web', 22)} 網頁作品展示</div>

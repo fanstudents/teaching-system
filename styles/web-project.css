@@ -302,9 +302,12 @@
 
 .wp-teacher-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 12px; flex: 1; overflow-y: auto; padding: 2px;
     align-content: start;
+}
+.wp-student-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 220px));
 }
 .wp-teacher-empty {
     flex: 1; display: flex; align-items: center; justify-content: center;
@@ -387,9 +390,12 @@
 }
 
 /* 卡片內文 */
-.wp-grid-card-body { padding: 6px 10px 8px; }
+.wp-grid-card-body {
+    padding: 6px 10px 8px;
+    overflow: hidden;
+}
 .wp-grid-card-name {
-    font-size: 0.82rem; font-weight: 700; color: #1e293b;
+    font-size: 0.78rem; font-weight: 700; color: #1e293b;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .wp-grid-card-title {
