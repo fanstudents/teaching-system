@@ -242,24 +242,105 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
             doSubmit(url, { mode: 'url', url, status: 'submitted', prompt }, urlSubmitBtn);
         });
 
-        // ── Preview ──
+        // ── 提交後顯示作品牆 ──
         const showPreview = (content, mode) => {
-            previewMini.style.display = 'block';
             const modeLabel = mode === 'api' ? '🤖 AI 提交成功！' : mode === 'url' ? '🔗 連結已提交！' : '📁 檔案已提交！';
-            const iframeAttr = mode === 'url'
-                ? `src="${esc(content)}" sandbox="allow-scripts allow-same-origin"`
-                : `sandbox="allow-scripts" srcdoc="${content.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
+            el.querySelector('.wp-cards').style.display = 'none';
+            previewMini.style.display = 'flex';
+            previewMini.style.flexDirection = 'column';
+            previewMini.style.flex = '1';
+            previewMini.style.minHeight = '0';
+
             previewMini.innerHTML = `
                 <div class="wp-preview-mini-header">
-                    <span class="wp-preview-mini-label">${mi('check_circle', 14)} <b>${modeLabel}</b> 作品預覽</span>
-                    <div style="display:flex;gap:6px">
-                        <button class="wp-open-new-btn">${mi('open_in_new', 14)} 新分頁開啟</button>
+                    <span class="wp-preview-mini-label">${mi('check_circle', 14)} <b>${modeLabel}</b></span>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <span class="wp-gallery-stats" style="font-size:0.72rem;color:#64748b;"></span>
                         <button class="wp-resubmit-btn">${mi('refresh', 14)} 重新提交</button>
                     </div>
                 </div>
-                <iframe class="wp-mini-iframe" ${iframeAttr}></iframe>`;
+                <div class="wp-teacher-grid wp-student-gallery" style="flex:1;overflow-y:auto;min-height:0;"></div>`;
 
-            el.querySelector('.wp-cards').style.display = 'none';
+            const galleryGrid = previewMini.querySelector('.wp-student-gallery');
+            const galleryStats = previewMini.querySelector('.wp-gallery-stats');
+            const galleryCache = new Map();
+            let galleryHash = '';
+
+            const loadGallery = async () => {
+                const filter = { type: 'eq.webProject' };
+                if (elementId) filter.element_id = 'eq.' + elementId;
+                if (sessionCode) filter.session_id = 'eq.' + sessionCode;
+                const { data } = await db.select('submissions', { filter, order: 'created_at.asc' });
+                const subs = data || [];
+                const hash = subs.map(s => s.id + (s.submitted_at || s.created_at || '')).join('|');
+                if (hash === galleryHash) return;
+                galleryHash = hash;
+
+                subs.forEach(s => galleryCache.set(s.id, s.content || ''));
+                galleryStats.textContent = `共 ${subs.length} 份作品`;
+
+                galleryGrid.innerHTML = subs.map((s, i) => {
+                    let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
+                    const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
+                    const md = st.mode || 'upload';
+                    const modeEmoji = md === 'url' ? '🔗' : md === 'api' ? '🤖' : '📁';
+                    const isMe = s.student_email === studentEmail;
+                    const c = s.content || '';
+                    let thumbAttr = '';
+                    if (md === 'url' && c.startsWith('http')) {
+                        thumbAttr = `src="${esc(c)}" sandbox="allow-scripts allow-same-origin"`;
+                    } else if (c) {
+                        thumbAttr = `sandbox="allow-scripts" srcdoc="${c.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
+                    }
+                    let pageTitle = '';
+                    const tm = c.match(/<title[^>]*>([^<]*)<\/title>/i);
+                    if (tm) pageTitle = tm[1].trim();
+
+                    return `<div class="wp-grid-card${isMe ? ' wp-grid-card-me' : ''}" style="animation-delay:${i * 0.05}s">
+                        <div class="wp-thumb-wrapper">
+                            ${thumbAttr ? `<iframe class="wp-thumb-iframe" ${thumbAttr} loading="lazy" tabindex="-1"></iframe>` : `<div class="wp-thumb-placeholder">${mi('web', 32)}</div>`}
+                            <div class="wp-thumb-overlay">
+                                <button class="wp-preview-btn" data-sid="${s.id}" data-mode="${md}">${mi('open_in_full', 16)}</button>
+                            </div>
+                            <span class="wp-thumb-badge">${modeEmoji}</span>
+                            ${isMe ? '<span class="wp-thumb-me">我</span>' : ''}
+                        </div>
+                        <div class="wp-grid-card-body">
+                            <div class="wp-grid-card-name">${esc(name)}</div>
+                            ${pageTitle ? `<div class="wp-grid-card-title">${esc(pageTitle)}</div>` : ''}
+                            <div class="wp-grid-card-meta">${md === 'url' ? '外部連結' : md === 'api' ? 'AI 提交' : '檔案上傳'}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            };
+
+            loadGallery();
+            const galleryPollId = setInterval(loadGallery, 6000);
+            this._intervals.set(elementId + '_gallery', galleryPollId);
+
+            // 點擊卡片 → 新分頁
+            galleryGrid.addEventListener('click', e => {
+                const card = e.target.closest('.wp-grid-card');
+                if (!card) return;
+                const btn = card.querySelector('.wp-preview-btn');
+                if (!btn) return;
+                const cached = galleryCache.get(btn.dataset.sid);
+                if (!cached) return;
+                if (btn.dataset.mode === 'url') { window.open(cached, '_blank'); return; }
+                const blob = new Blob([cached], { type: 'text/html;charset=utf-8' });
+                window.open(URL.createObjectURL(blob), '_blank');
+            });
+
+            // 重新提交
+            previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', () => {
+                clearInterval(galleryPollId);
+                this._intervals.delete(elementId + '_gallery');
+                previewMini.style.display = 'none'; previewMini.innerHTML = '';
+                el.querySelector('.wp-cards').style.display = '';
+                projectFiles.clear(); renderFileList(); urlInput.value = '';
+                uploadSubmitBtn.disabled = true; uploadSubmitBtn.innerHTML = `${mi('send', 14)} 提交作品`;
+                urlSubmitBtn.disabled = true; urlSubmitBtn.innerHTML = `${mi('send', 14)} 提交作品`;
+            });
 
             // 成功 toast
             const toast = document.createElement('div');
@@ -272,21 +353,6 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
             });
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
-
-            // 新分頁開啟
-            previewMini.querySelector('.wp-open-new-btn')?.addEventListener('click', () => {
-                if (mode === 'url') { window.open(content, '_blank'); return; }
-                const blob = new Blob([content], { type: 'text/html' });
-                window.open(URL.createObjectURL(blob), '_blank');
-            });
-
-            previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', () => {
-                previewMini.style.display = 'none'; previewMini.innerHTML = '';
-                el.querySelector('.wp-cards').style.display = '';
-                projectFiles.clear(); renderFileList(); urlInput.value = '';
-                uploadSubmitBtn.disabled = true; uploadSubmitBtn.innerHTML = `${mi('send', 14)} 提交`;
-                urlSubmitBtn.disabled = true; urlSubmitBtn.innerHTML = `${mi('send', 14)} 提交`;
-            });
         };
 
         // ── 載入歷史 ──
