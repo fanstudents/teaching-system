@@ -72,18 +72,26 @@ export class WebProjectGame {
         const studentName = user.name || sess.studentName || '';
         const studentEmail = user.email || sess.studentEmail || '';
 
-        const SUPA = 'https://wsaknnhjgiqmkendeyrj.supabase.co/rest/v1/submissions';
-        const AK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
+        const SUBMIT_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/submit-web-project';
 
         const buildApiPrompt = () => {
             const task = element.question || '請幫我建立一個網頁';
-            const escapedTask = task.replace(/'/g, "\\'");
             return `${task}
 
-請將 HTML/CSS/JS 合併為一個完整 HTML（CSS 放 <style>，JS 放 <script>）。
-完成後執行以下指令提交：
+完成後，用以下指令提交作品（HTML/CSS/JS 可分開傳）：
 
-fetch('${SUPA}',{method:'POST',headers:{'Content-Type':'application/json','apikey':'${AK}','Authorization':'Bearer ${AK}','Prefer':'return=representation'},body:JSON.stringify([{session_id:'${sessionCode}',element_id:'${elementId}',student_name:'${studentName}',student_email:'${studentEmail}',type:'webProject',assignment_title:'${escapedTask}',content:「你的完整HTML」,state:JSON.stringify({mode:'api',status:'submitted',prompt:「你的提示詞」}),submitted_at:new Date().toISOString()}])}).then(r=>r.json()).then(d=>console.log('✅ 提交成功',d))`;
+fetch('${SUBMIT_URL}', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    session_id: '${sessionCode}',
+    student_name: '${studentName}',
+    student_email: '${studentEmail}',
+    html: '你的完整 HTML',
+    css: '你的 CSS（選填）',
+    js: '你的 JS（選填）'
+  })
+}).then(r => r.json()).then(d => console.log(d))`;
         };
 
         el.innerHTML = `
