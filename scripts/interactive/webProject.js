@@ -80,7 +80,7 @@ export class WebProjectGame {
 
 完成後用此 API 提交作品：
 POST ${SUBMIT_URL}
-Body: {"session_id":"${sessionCode}","student_name":"${studentName}","student_email":"${studentEmail}","html":"完整HTML","css":"CSS內容","js":"JS內容"}`;
+Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":"${studentName}","student_email":"${studentEmail}","html":"完整HTML","css":"CSS內容","js":"JS內容"}`;
         };
 
         el.innerHTML = `
