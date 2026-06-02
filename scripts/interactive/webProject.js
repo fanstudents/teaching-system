@@ -244,12 +244,13 @@ Body: {"session_id":"${sessionCode}","student_name":"${studentName}","student_em
         // ── Preview ──
         const showPreview = (content, mode) => {
             previewMini.style.display = 'block';
+            const modeLabel = mode === 'api' ? '🤖 AI 提交成功！' : mode === 'url' ? '🔗 連結已提交！' : '📁 檔案已提交！';
             const iframeAttr = mode === 'url'
                 ? `src="${esc(content)}" sandbox="allow-scripts allow-same-origin"`
                 : `sandbox="allow-scripts" srcdoc="${content.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
             previewMini.innerHTML = `
                 <div class="wp-preview-mini-header">
-                    <span class="wp-preview-mini-label">${mi('visibility', 14)} 作品預覽</span>
+                    <span class="wp-preview-mini-label">${mi('check_circle', 14)} <b>${modeLabel}</b> 作品預覽</span>
                     <div style="display:flex;gap:6px">
                         <button class="wp-open-new-btn">${mi('open_in_new', 14)} 新分頁開啟</button>
                         <button class="wp-resubmit-btn">${mi('refresh', 14)} 重新提交</button>
@@ -258,6 +259,18 @@ Body: {"session_id":"${sessionCode}","student_name":"${studentName}","student_em
                 <iframe class="wp-mini-iframe" ${iframeAttr}></iframe>`;
 
             el.querySelector('.wp-cards').style.display = 'none';
+
+            // 成功 toast
+            const toast = document.createElement('div');
+            toast.textContent = modeLabel;
+            Object.assign(toast.style, {
+                position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                background: '#16a34a', color: '#fff', padding: '10px 24px', borderRadius: '10px',
+                fontSize: '14px', fontWeight: '600', zIndex: '99999', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                animation: 'fadeIn .3s ease',
+            });
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
 
             // 新分頁開啟
             previewMini.querySelector('.wp-open-new-btn')?.addEventListener('click', () => {
