@@ -183,14 +183,79 @@
 /* ═══════════════════════════════════════════════
    Mini 預覽
    ═══════════════════════════════════════════════ */
-.wp-preview-mini { margin-top: 6px; display: none; flex: 1; display: none; flex-direction: column; }
+.wp-preview-mini { margin-top: 6px; display: none; flex-direction: column; }
+
+/* ── 我的作品卡片 ── */
+.wp-my-card {
+    display: flex; gap: 12px; padding: 10px;
+    background: linear-gradient(135deg, #f0f9ff, #ede9fe);
+    border: 2px solid #818cf8; border-radius: 14px;
+    flex-shrink: 0; overflow: hidden;
+}
+.wp-my-card-thumb {
+    position: relative; width: 160px; min-width: 160px;
+    aspect-ratio: 16 / 10; border-radius: 8px;
+    overflow: hidden; background: #f1f5f9;
+}
+.wp-my-card-thumb .wp-thumb-iframe {
+    position: absolute; top: 0; left: 0;
+    width: 400%; height: 400%;
+    transform: scale(0.25); transform-origin: top left;
+    border: none; pointer-events: none;
+}
+.wp-my-card-thumb .wp-thumb-overlay {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    background: transparent; transition: background 0.2s; cursor: pointer;
+}
+.wp-my-card-thumb:hover .wp-thumb-overlay { background: rgba(0,0,0,0.35); }
+.wp-my-card-thumb .wp-my-open-btn {
+    opacity: 0; transition: all 0.2s;
+    padding: 6px 10px; background: #fff; color: #1e293b;
+    border: none; border-radius: 6px; font-size: 0.75rem;
+    font-weight: 600; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.wp-my-card-thumb:hover .wp-my-open-btn { opacity: 1; }
+
+.wp-my-card-info {
+    display: flex; flex-direction: column; gap: 4px;
+    flex: 1; min-width: 0; justify-content: center;
+}
+.wp-my-card-status {
+    font-size: 0.78rem; color: #16a34a; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+}
+.wp-my-card-title {
+    font-size: 0.75rem; font-weight: 700; color: #1e293b;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wp-my-card-prompt {
+    font-size: 0.68rem; color: #7c3aed; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; word-break: break-word;
+    background: rgba(124,58,237,0.06); padding: 4px 8px; border-radius: 6px;
+}
+.wp-my-card-actions {
+    display: flex; gap: 6px; margin-top: 2px;
+}
+.wp-my-open-new, .wp-my-card-actions .wp-resubmit-btn {
+    padding: 4px 10px; border-radius: 6px; font-size: 0.68rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 3px; border: none;
+}
+.wp-my-open-new {
+    background: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe;
+}
+.wp-my-open-new:hover { background: #6366f1; color: #fff; }
+.wp-my-card-actions .wp-resubmit-btn {
+    background: #fff5f5; color: #ef4444; border: 1px solid #fecaca;
+}
+.wp-my-card-actions .wp-resubmit-btn:hover { background: #ef4444; color: #fff; }
+
 .wp-preview-mini-header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 6px;
-}
-.wp-mini-iframe {
-    width: 100%; flex: 1; min-height: 250px;
-    border: 1px solid #e2e8f0; border-radius: 8px; background: #fff;
+    margin-bottom: 4px;
 }
 .wp-preview-mini-label {
     font-size: 0.75rem; color: #6366f1; font-weight: 600;

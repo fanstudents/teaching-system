@@ -243,21 +243,49 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
         });
 
         // ── 提交後顯示作品牆 ──
-        const showPreview = (content, mode) => {
+        const showPreview = (content, mode, silent = false) => {
             const modeLabel = mode === 'api' ? '🤖 AI 提交成功！' : mode === 'url' ? '🔗 連結已提交！' : '📁 檔案已提交！';
+            const modeEmoji = mode === 'url' ? '🔗' : mode === 'api' ? '🤖' : '📁';
             el.querySelector('.wp-cards').style.display = 'none';
             previewMini.style.display = 'flex';
             previewMini.style.flexDirection = 'column';
             previewMini.style.flex = '1';
             previewMini.style.minHeight = '0';
+            previewMini.style.gap = '10px';
+
+            // 我的作品 thumb
+            const myThumbAttr = mode === 'url'
+                ? `src="${esc(content)}" sandbox="allow-scripts allow-same-origin"`
+                : `sandbox="allow-scripts" srcdoc="${content.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
+            let myTitle = '';
+            const tm = content.match(/<title[^>]*>([^<]*)<\/title>/i);
+            if (tm) myTitle = tm[1].trim();
+            // 抓提示詞
+            const myPrompt = el.querySelector('.wp-prompt-input[data-for="upload"]')?.value.trim()
+                || el.querySelector('.wp-prompt-input[data-for="url"]')?.value.trim() || '';
 
             previewMini.innerHTML = `
-                <div class="wp-preview-mini-header">
-                    <span class="wp-preview-mini-label">${mi('check_circle', 14)} <b>${modeLabel}</b></span>
-                    <div style="display:flex;gap:6px;align-items:center;">
-                        <span class="wp-gallery-stats" style="font-size:0.72rem;color:#64748b;"></span>
-                        <button class="wp-resubmit-btn">${mi('refresh', 14)} 重新提交</button>
+                <div class="wp-my-card">
+                    <div class="wp-my-card-thumb">
+                        <iframe class="wp-thumb-iframe" ${myThumbAttr} loading="lazy" tabindex="-1"></iframe>
+                        <span class="wp-thumb-badge">${modeEmoji}</span>
+                        <div class="wp-thumb-overlay">
+                            <button class="wp-my-open-btn">${mi('open_in_full', 14)}</button>
+                        </div>
                     </div>
+                    <div class="wp-my-card-info">
+                        <div class="wp-my-card-status">${mi('check_circle', 14)} <b>${modeLabel}</b></div>
+                        ${myTitle ? `<div class="wp-my-card-title">${esc(myTitle)}</div>` : ''}
+                        ${myPrompt ? `<div class="wp-my-card-prompt">${mi('chat', 11)} ${esc(myPrompt)}</div>` : ''}
+                        <div class="wp-my-card-actions">
+                            <button class="wp-my-open-new">${mi('open_in_new', 13)} 新分頁</button>
+                            <button class="wp-resubmit-btn">${mi('refresh', 13)} 重新提交</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="wp-preview-mini-header" style="padding:0;">
+                    <span class="wp-preview-mini-label">${mi('group', 14)} 全班作品</span>
+                    <span class="wp-gallery-stats" style="font-size:0.72rem;color:#64748b;"></span>
                 </div>
                 <div class="wp-teacher-grid wp-student-gallery" style="flex:1;overflow-y:auto;min-height:0;"></div>`;
 
@@ -283,32 +311,31 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                     let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
                     const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
                     const md = st.mode || 'upload';
-                    const modeEmoji = md === 'url' ? '🔗' : md === 'api' ? '🤖' : '📁';
+                    const me = md === 'url' ? '🔗' : md === 'api' ? '🤖' : '📁';
                     const isMe = s.student_email === studentEmail;
                     const c = s.content || '';
-                    let thumbAttr = '';
+                    let ta = '';
                     if (md === 'url' && c.startsWith('http')) {
-                        thumbAttr = `src="${esc(c)}" sandbox="allow-scripts allow-same-origin"`;
+                        ta = `src="${esc(c)}" sandbox="allow-scripts allow-same-origin"`;
                     } else if (c) {
-                        thumbAttr = `sandbox="allow-scripts" srcdoc="${c.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
+                        ta = `sandbox="allow-scripts" srcdoc="${c.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"`;
                     }
-                    let pageTitle = '';
-                    const tm = c.match(/<title[^>]*>([^<]*)<\/title>/i);
-                    if (tm) pageTitle = tm[1].trim();
+                    let pt = '';
+                    const ttm = c.match(/<title[^>]*>([^<]*)<\/title>/i);
+                    if (ttm) pt = ttm[1].trim();
 
                     return `<div class="wp-grid-card${isMe ? ' wp-grid-card-me' : ''}" style="animation-delay:${i * 0.05}s">
                         <div class="wp-thumb-wrapper">
-                            ${thumbAttr ? `<iframe class="wp-thumb-iframe" ${thumbAttr} loading="lazy" tabindex="-1"></iframe>` : `<div class="wp-thumb-placeholder">${mi('web', 32)}</div>`}
+                            ${ta ? `<iframe class="wp-thumb-iframe" ${ta} loading="lazy" tabindex="-1"></iframe>` : `<div class="wp-thumb-placeholder">${mi('web', 32)}</div>`}
                             <div class="wp-thumb-overlay">
                                 <button class="wp-preview-btn" data-sid="${s.id}" data-mode="${md}">${mi('open_in_full', 16)}</button>
                             </div>
-                            <span class="wp-thumb-badge">${modeEmoji}</span>
+                            <span class="wp-thumb-badge">${me}</span>
                             ${isMe ? '<span class="wp-thumb-me">我</span>' : ''}
                         </div>
                         <div class="wp-grid-card-body">
                             <div class="wp-grid-card-name">${esc(name)}</div>
-                            ${pageTitle ? `<div class="wp-grid-card-title">${esc(pageTitle)}</div>` : ''}
-                            <div class="wp-grid-card-meta">${md === 'url' ? '外部連結' : md === 'api' ? 'AI 提交' : '檔案上傳'}</div>
+                            ${pt ? `<div class="wp-grid-card-title">${esc(pt)}</div>` : ''}
                         </div>
                     </div>`;
                 }).join('');
@@ -331,6 +358,18 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 window.open(URL.createObjectURL(blob), '_blank');
             });
 
+            // 我的卡片：新分頁
+            previewMini.querySelector('.wp-my-open-btn')?.addEventListener('click', () => {
+                if (mode === 'url') { window.open(content, '_blank'); return; }
+                const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+                window.open(URL.createObjectURL(blob), '_blank');
+            });
+            previewMini.querySelector('.wp-my-open-new')?.addEventListener('click', () => {
+                if (mode === 'url') { window.open(content, '_blank'); return; }
+                const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+                window.open(URL.createObjectURL(blob), '_blank');
+            });
+
             // 重新提交
             previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', () => {
                 clearInterval(galleryPollId);
@@ -342,17 +381,19 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 urlSubmitBtn.disabled = true; urlSubmitBtn.innerHTML = `${mi('send', 14)} 提交作品`;
             });
 
-            // 成功 toast
-            const toast = document.createElement('div');
-            toast.textContent = modeLabel;
-            Object.assign(toast.style, {
-                position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
-                background: '#16a34a', color: '#fff', padding: '10px 24px', borderRadius: '10px',
-                fontSize: '14px', fontWeight: '600', zIndex: '99999', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                animation: 'fadeIn .3s ease',
-            });
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            // toast（僅首次提交顯示）
+            if (!silent) {
+                const toast = document.createElement('div');
+                toast.textContent = modeLabel;
+                Object.assign(toast.style, {
+                    position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+                    background: '#16a34a', color: '#fff', padding: '10px 24px', borderRadius: '10px',
+                    fontSize: '14px', fontWeight: '600', zIndex: '99999', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                    animation: 'fadeIn .3s ease',
+                });
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
         };
 
         // ── 載入歷史 ──
@@ -360,7 +401,7 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
         if (elementId) {
             const prev = await stateManager.load(elementId);
             if (prev?.content && prev?.state?.status === 'submitted') {
-                showPreview(prev.content, prev.state.mode || 'upload');
+                showPreview(prev.content, prev.state.mode || 'upload', true);
                 shown = true;
             }
         }
