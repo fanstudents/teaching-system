@@ -77,12 +77,13 @@ export class WebProjectGame {
 
         const buildApiPrompt = () => {
             const task = element.question || '請幫我建立一個網頁';
+            const escapedTask = task.replace(/'/g, "\\'");
             return `${task}
 
 請將 HTML/CSS/JS 合併為一個完整 HTML（CSS 放 <style>，JS 放 <script>）。
 完成後執行以下指令提交：
 
-fetch('${SUPA}',{method:'POST',headers:{'Content-Type':'application/json','apikey':'${AK}','Authorization':'Bearer ${AK}','Prefer':'return=representation'},body:JSON.stringify([{session_id:'${sessionCode}',element_id:'${elementId}',student_name:'${studentName}',student_email:'${studentEmail}',type:'webProject',content:「你的完整HTML」,state:JSON.stringify({mode:'api',status:'submitted',prompt:「你的提示詞」}),submitted_at:new Date().toISOString()}])}).then(r=>r.json()).then(d=>console.log('✅ 提交成功',d))`;
+fetch('${SUPA}',{method:'POST',headers:{'Content-Type':'application/json','apikey':'${AK}','Authorization':'Bearer ${AK}','Prefer':'return=representation'},body:JSON.stringify([{session_id:'${sessionCode}',element_id:'${elementId}',student_name:'${studentName}',student_email:'${studentEmail}',type:'webProject',assignment_title:'${escapedTask}',content:「你的完整HTML」,state:JSON.stringify({mode:'api',status:'submitted',prompt:「你的提示詞」}),submitted_at:new Date().toISOString()}])}).then(r=>r.json()).then(d=>console.log('✅ 提交成功',d))`;
         };
 
         el.innerHTML = `
