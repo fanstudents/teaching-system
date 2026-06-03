@@ -241,7 +241,7 @@ export class GroupPickGame {
     }
 
     /* ═══════════════════════════════════════
-       講師端（位置與學員同步，不可拖曳）
+       講師端 — 破冰牆模式
        ═══════════════════════════════════════ */
     async _renderTeacher(el, element) {
         const { db } = await import('../supabase.js');
@@ -252,13 +252,12 @@ export class GroupPickGame {
         const groupCount = element.groupCount || 4;
         const groupNames = element.groupNames || Array.from({length: groupCount}, (_, i) => `第 ${i+1} 組`);
         const groupColors = element.groupColors || GROUP_COLORS.slice(0, groupCount);
-        const pos = element.groupPositions || defaultPositions(groupCount);
 
-        let scoreMode = 'total'; // 'total' | 'avg'
+        let scoreMode = 'total';
 
         el.innerHTML = `
-        <div class="gp-canvas gp-canvas--teacher">
-            <div class="gp-teacher-header">
+        <div class="gp-canvas gp-canvas--teacher" style="overflow-y:auto;display:flex;flex-direction:column;">
+            <div class="gp-teacher-header" style="position:relative;">
                 <div class="gp-teacher-title">${mi('groups', 22)} 現場分組</div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <div class="gp-score-toggle" style="display:flex;gap:2px;background:rgba(0,0,0,.06);border-radius:6px;padding:2px;">
@@ -268,12 +267,12 @@ export class GroupPickGame {
                     <div class="gp-teacher-stats"></div>
                 </div>
             </div>
+            <div class="gp-wall" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:12px 8px 16px;flex:1;align-content:start;"></div>
         </div>`;
 
-        const canvas = el.querySelector('.gp-canvas');
+        const wallEl = el.querySelector('.gp-wall');
         const statsEl = el.querySelector('.gp-teacher-stats');
         let lastHash = '';
-        let cardsCreated = false;
 
         // 切換總分/平均
         el.querySelectorAll('.gp-mode-btn').forEach(btn => {
@@ -286,7 +285,7 @@ export class GroupPickGame {
                     b.style.color = isActive ? '#1a73e8' : '#80868b';
                     b.style.boxShadow = isActive ? '0 1px 3px rgba(0,0,0,.1)' : 'none';
                 });
-                lastHash = ''; // force refresh
+                lastHash = '';
                 load();
             });
         });
@@ -310,71 +309,62 @@ export class GroupPickGame {
             const scoreFilter = { session_id: 'eq.' + sessionCode };
             const { data: allSubs } = await db.select('submissions', {
                 filter: scoreFilter,
-                select: 'student_email,score,student_group'
+                select: 'student_email,state,student_group'
             });
             const groupScores = {};
             (allSubs || []).forEach(s => {
                 const g = s.student_group;
-                if (g) groupScores[g] = (groupScores[g] || 0) + (parseFloat(s.score) || 0);
+                if (!g) return;
+                let st = s.state;
+                if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
+                groupScores[g] = (groupScores[g] || 0) + (parseFloat(st?._awarded) || 0);
             });
 
-            const hash = JSON.stringify({ groups, groupScores });
+            const hash = JSON.stringify({ groups, groupScores, scoreMode });
             if (hash === lastHash) return;
             lastHash = hash;
 
             statsEl.textContent = `${pickList.length} 人已分組`;
 
             const calcScore = (total, memberCount) => {
-                if (scoreMode === 'avg' && memberCount > 0) {
-                    return (total / memberCount).toFixed(2);
-                }
+                if (scoreMode === 'avg' && memberCount > 0) return (total / memberCount).toFixed(2);
                 return Math.round(total);
             };
 
-            if (!cardsCreated) {
-                for (let i = 0; i < groupCount; i++) {
-                    const idx = String(i + 1);
-                    const color = groupColors[i] || GROUP_COLORS[i];
-                    const name = groupNames[i] || `第 ${idx} 組`;
-                    const members = groups[idx] || [];
-                    const score = calcScore(groupScores[idx] || 0, members.length);
-                    const p = pos[i] || { x: 10, y: 10 };
+            wallEl.innerHTML = Array.from({length: groupCount}, (_, i) => {
+                const idx = String(i + 1);
+                const color = groupColors[i] || GROUP_COLORS[i];
+                const name = groupNames[i] || `第 ${idx} 組`;
+                const members = groups[idx] || [];
+                const totalScore = groupScores[idx] || 0;
+                const score = calcScore(totalScore, members.length);
+                const scoreLabel = scoreMode === 'avg' ? '平均' : '總分';
 
-                    const card = document.createElement('div');
-                    card.className = 'gp-team-card gp-team-card--abs';
-                    card.dataset.idx = String(i);
-                    card.style.cssText = `--gp-color:${color};left:${p.x}%;top:${p.y}%`;
-                    card.innerHTML = this._teamCardHTML(name, score, members, scoreMode);
-                    canvas.appendChild(card);
-                }
-                cardsCreated = true;
-            } else {
-                canvas.querySelectorAll('.gp-team-card').forEach(card => {
-                    const i = parseInt(card.dataset.idx);
-                    const idx = String(i + 1);
-                    const name = groupNames[i] || `第 ${idx} 組`;
-                    const members = groups[idx] || [];
-                    const score = calcScore(groupScores[idx] || 0, members.length);
-                    card.innerHTML = this._teamCardHTML(name, score, members, scoreMode);
-                });
-            }
+                return `<div class="gp-wall-card" style="--gp-color:${color};">
+                    <div class="gp-wall-card-top">
+                        <div class="gp-wall-card-color" style="background:${color};"></div>
+                        <div class="gp-wall-card-info">
+                            <div class="gp-wall-card-name">${esc(name)}</div>
+                            <div class="gp-wall-card-meta">
+                                ${mi('person', 14)} <b>${members.length}</b> 人
+                                <span style="margin-left:8px;">${scoreLabel} <b>${score}</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gp-wall-members">
+                        ${members.length ? members.map(m =>
+                            `<div class="gp-wall-member">
+                                <div class="gp-wall-avatar" style="background:${color};">${esc(m.name.charAt(0))}</div>
+                                <span class="gp-wall-member-name">${esc(m.name)}</span>
+                            </div>`
+                        ).join('') : `<div class="gp-wall-empty">等待學員加入…</div>`}
+                    </div>
+                </div>`;
+            }).join('');
         };
 
         await load();
         this._teacherTimer = setInterval(load, 5000);
-    }
-
-    _teamCardHTML(name, score, members, mode = 'total') {
-        const label = mode === 'avg' ? '平均' : '總分';
-        return `
-            <div class="gp-team-card-header">
-                <div class="gp-team-card-name">${esc(name)}</div>
-                <div class="gp-team-card-score" title="${label}">${score}</div>
-            </div>
-            <div class="gp-team-card-count">${mi('person', 14)} ${members.length} 人</div>
-            <div class="gp-team-card-members">
-                ${members.map(m => `<span class="gp-member-chip">${esc(m.name)}</span>`).join('')}
-            </div>`;
     }
 
     /* ═══════════════════════════════════════

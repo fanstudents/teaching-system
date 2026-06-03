@@ -257,7 +257,93 @@
     display: flex; align-items: center; gap: 3px;
 }
 
-/* ── 學員端 ── */
+/* ── 破冰牆卡片 ── */
+.gp-wall-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.gp-wall-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+.gp-wall-card-top {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+}
+.gp-wall-card-color {
+    width: 6px;
+    flex-shrink: 0;
+}
+.gp-wall-card-info {
+    flex: 1;
+    padding: 10px 14px;
+    min-width: 0;
+}
+.gp-wall-card-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--gp-color);
+    margin-bottom: 2px;
+}
+.gp-wall-card-meta {
+    font-size: 0.7rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.gp-wall-card-meta b {
+    color: #1e293b;
+}
+.gp-wall-members {
+    padding: 6px 14px 12px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 32px;
+}
+.gp-wall-member {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: gpMemberIn 0.3s ease-out both;
+}
+.gp-wall-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.gp-wall-member-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+}
+.gp-wall-empty {
+    font-size: 0.72rem;
+    color: #cbd5e1;
+    font-style: italic;
+    padding: 4px 0;
+}
+@keyframes gpMemberIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 .gp-canvas--student {
     background:
         radial-gradient(circle at 50% 50%, rgba(59,130,246,0.04) 0%, transparent 60%),

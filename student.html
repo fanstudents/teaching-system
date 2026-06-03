@@ -1498,6 +1498,94 @@
                             totalSlides = slides.length;
                             slidesCache = slides;
 
+                            // ★ 遲到學員：檢查是否有分組但尚未選組
+                            const _gpElement = slides.flatMap(s => (s.elements || []))
+                                .find(e => e.type === 'groupPick');
+                            let _hwUser = {};
+                            try { _hwUser = JSON.parse(sessionStorage.getItem('homework_user') || '{}'); } catch {}
+
+                            if (_gpElement && !_hwUser.group) {
+                                // 查 DB 是否已選過
+                                let existingGroup = null;
+                                try {
+                                    const { stateManager: sm } = await import('./scripts/interactive/stateManager.js');
+                                    const _sid = sm.getSessionCode();
+                                    const { data: gpRows } = await db.select('submissions', {
+                                        filter: {
+                                            type: 'eq.groupPick',
+                                            element_id: `eq.${_gpElement.id}`,
+                                            student_email: `eq.${_hwUser.email || ''}`,
+                                            session_id: `eq.${_sid}`
+                                        },
+                                        limit: 1
+                                    });
+                                    if (gpRows?.[0]?.content) existingGroup = gpRows[0].content;
+                                } catch {}
+
+                                if (existingGroup) {
+                                    _hwUser.group = existingGroup;
+                                    sessionStorage.setItem('homework_user', JSON.stringify(_hwUser));
+                                } else {
+                                    // 顯示選組 overlay
+                                    await new Promise(resolve => {
+                                        const gpCount = _gpElement.groupCount || 4;
+                                        const gpNames = _gpElement.groupNames || Array.from({length: gpCount}, (_, i) => `第 ${i+1} 組`);
+                                        const gpColors = _gpElement.groupColors || ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'].slice(0, gpCount);
+
+                                        const overlay = document.createElement('div');
+                                        overlay.id = 'gpForceOverlay';
+                                        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-family:"Noto Sans TC","Google Sans",sans-serif;animation:gpOverlayIn .4s ease;';
+                                        overlay.innerHTML = `
+                                            <style>
+                                                @keyframes gpOverlayIn { from { opacity:0; } to { opacity:1; } }
+                                                @keyframes gpCardPop { from { opacity:0;transform:translateY(20px) scale(.9); } to { opacity:1;transform:translateY(0) scale(1); } }
+                                                .gp-force-card { display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 28px;border-radius:16px;border:2.5px solid;cursor:pointer;transition:all .25s;min-width:100px;background:rgba(255,255,255,.06);backdrop-filter:blur(8px);animation:gpCardPop .4s ease both; }
+                                                .gp-force-card:hover { transform:translateY(-4px) scale(1.05);box-shadow:0 12px 40px rgba(0,0,0,.3); }
+                                            </style>
+                                            <div style="display:flex;align-items:center;gap:10px;">
+                                                <span class="material-symbols-outlined" style="font-size:32px;color:#60a5fa;">groups</span>
+                                                <span style="font-size:1.3rem;font-weight:800;color:#e2e8f0;">請先選擇你的組別</span>
+                                            </div>
+                                            <div style="font-size:0.85rem;color:#94a3b8;">選擇組別後才能進入簡報</div>
+                                            <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;padding:8px;">
+                                                ${gpNames.map((name, i) => `
+                                                    <div class="gp-force-card" data-gidx="${i+1}" style="border-color:${gpColors[i]};animation-delay:${i*0.08}s;">
+                                                        <span style="font-size:1.5rem;font-weight:900;color:${gpColors[i]};">${name.replace(/[<>&"]/g, '')}</span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        `;
+                                        document.body.appendChild(overlay);
+
+                                        overlay.querySelectorAll('.gp-force-card').forEach(card => {
+                                            card.addEventListener('click', async () => {
+                                                const gIdx = card.dataset.gidx;
+                                                _hwUser.group = gIdx;
+                                                sessionStorage.setItem('homework_user', JSON.stringify(_hwUser));
+
+                                                // 寫入 DB
+                                                try {
+                                                    const { stateManager: sm2 } = await import('./scripts/interactive/stateManager.js');
+                                                    await db.insert('submissions', {
+                                                        session_id: sm2.getSessionCode(),
+                                                        element_id: _gpElement.id,
+                                                        student_name: _hwUser.name || '',
+                                                        student_email: _hwUser.email || '',
+                                                        type: 'groupPick',
+                                                        content: gIdx,
+                                                        state: JSON.stringify({ group: gIdx, groupName: gpNames[parseInt(gIdx)-1] }),
+                                                        submitted_at: new Date().toISOString()
+                                                    }, { onConflict: 'session_id,element_id,student_email' });
+                                                } catch (e) { console.warn('[GroupForce] save failed:', e); }
+
+                                                overlay.style.animation = 'gpOverlayIn .3s ease reverse forwards';
+                                                setTimeout(() => { overlay.remove(); resolve(); }, 300);
+                                            });
+                                        });
+                                    });
+                                }
+                            }
+
                             if (session) {
                                 // 有廣播 session → 跟隨模式，跳到講師目前頁面
                                 const startIdx = parseInt(session.current_slide || '0', 10);
