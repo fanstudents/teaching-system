@@ -150,7 +150,7 @@ export class GroupPickGame {
         const { stateManager } = await import('./stateManager.js');
         let user = {};
         try { user = JSON.parse(sessionStorage.getItem('homework_user') || '{}'); } catch {}
-        const sessionCode = stateManager.getSessionCode();
+        const sessionCode = window._activeSessionUUID || stateManager.getSessionCode() || '';
         const elementId = element.id;
         const studentEmail = user.email || '';
         const studentName = user.name || '';
