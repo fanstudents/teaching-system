@@ -741,8 +741,10 @@
                     return;
                 }
 
-                // 儲存學員資訊到 sessionStorage
+                // 儲存學員資訊到 sessionStorage（保留已選組別）
+                const _existingHw = JSON.parse(sessionStorage.getItem('homework_user') || '{}');
                 sessionStorage.setItem('homework_user', JSON.stringify({
+                    ..._existingHw,
                     name: studentName,
                     email: studentEmail,
                     joinedAt: new Date().toISOString()
@@ -1235,11 +1237,10 @@
                     document.getElementById('displayAvatar').textContent = studentName.charAt(0);
                     // 更新 sessionStorage
                     sessionStorage.setItem('student_name', studentName);
-                    sessionStorage.setItem('homework_user', JSON.stringify({
-                        name: studentName,
-                        email: studentEmail,
-                        joinedAt: new Date().toISOString()
-                    }));
+                    const _hwForRename = JSON.parse(sessionStorage.getItem('homework_user') || '{}');
+                    _hwForRename.name = studentName;
+                    _hwForRename.email = studentEmail;
+                    sessionStorage.setItem('homework_user', JSON.stringify(_hwForRename));
                     // 更新 stateManager
                     try {
                         const { stateManager } = await import('./scripts/interactive/stateManager.js');
@@ -1566,8 +1567,9 @@
                                                 // 寫入 DB
                                                 try {
                                                     const { stateManager: sm2 } = await import('./scripts/interactive/stateManager.js');
+                                                    const _overlaySessionId = sm2.getSessionCode();
                                                     await db.insert('submissions', {
-                                                        session_id: sm2.getSessionCode(),
+                                                        session_id: _overlaySessionId,
                                                         element_id: _gpElement.id,
                                                         student_name: _hwUser.name || '',
                                                         student_email: _hwUser.email || '',
@@ -1577,6 +1579,14 @@
                                                         state: JSON.stringify({ group: gIdx, groupName: gpNames[parseInt(gIdx)-1] }),
                                                         submitted_at: new Date().toISOString()
                                                     }, { onConflict: 'session_id,element_id,student_email' });
+
+                                                    // ★ 回頭更新所有已有 submissions 的 student_group
+                                                    if (_overlaySessionId && _hwUser.email) {
+                                                        db.update('submissions',
+                                                            { student_group: gIdx },
+                                                            { student_email: `eq.${_hwUser.email}`, session_id: `eq.${_overlaySessionId}` }
+                                                        ).catch(() => {});
+                                                    }
                                                 } catch (e) { console.warn('[GroupForce] save failed:', e); }
 
                                                 overlay.style.animation = 'gpOverlayIn .3s ease reverse forwards';

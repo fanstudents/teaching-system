@@ -333,7 +333,7 @@ class InteractionState {
                     session_id: `eq.${sessionId}`,
                     student_email: 'neq.guest',
                 },
-                limit: 500,
+                limit: 2000,
             });
             const rows = this._unwrap(raw);
             const map = new Map();
@@ -367,7 +367,7 @@ class InteractionState {
                     session_id: `eq.${sessionId}`,
                     student_email: 'neq.guest',
                 },
-                limit: 1000,
+                limit: 5000,
             });
             const rows = this._unwrap(raw);
 
@@ -398,7 +398,7 @@ class InteractionState {
                 if (r.student_email) groupMembers[g].add(r.student_email);
 
                 // 成員個人分數
-                if (r.student_email && awarded) {
+                if (r.student_email) {
                     if (!memberScores[g]) memberScores[g] = {};
                     if (!memberScores[g][r.student_email]) {
                         memberScores[g][r.student_email] = {
@@ -408,7 +408,6 @@ class InteractionState {
                         };
                     }
                     memberScores[g][r.student_email].pts += awarded;
-                    // 更新名字（取最新的）
                     if (r.student_name) memberScores[g][r.student_email].name = r.student_name;
                 }
             }

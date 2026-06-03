@@ -197,22 +197,39 @@ export class GroupPickGame {
         };
 
         const selectGroup = async (groupIdx) => {
+            // 防止快速連點
+            if (this._selectingGroup) return;
+            this._selectingGroup = true;
+
             myGroup = groupIdx;
             user.group = groupIdx;
             sessionStorage.setItem('homework_user', JSON.stringify(user));
 
-            await db.insert('submissions', {
-                session_id: sessionCode,
-                element_id: elementId,
-                student_name: studentName,
-                student_email: studentEmail,
-                student_group: groupIdx,
-                type: 'groupPick',
-                content: groupIdx,
-                state: JSON.stringify({ group: groupIdx, groupName: groupNames[parseInt(groupIdx)-1] }),
-                submitted_at: new Date().toISOString()
-            }, { onConflict: 'session_id,element_id,student_email' });
+            try {
+                await db.insert('submissions', {
+                    session_id: sessionCode,
+                    element_id: elementId,
+                    student_name: studentName,
+                    student_email: studentEmail,
+                    student_group: groupIdx,
+                    type: 'groupPick',
+                    content: groupIdx,
+                    state: JSON.stringify({ group: groupIdx, groupName: groupNames[parseInt(groupIdx)-1] }),
+                    submitted_at: new Date().toISOString()
+                }, { onConflict: 'session_id,element_id,student_email' });
 
+                // ★ 回頭更新所有已有 submissions 的 student_group
+                if (sessionCode && studentEmail) {
+                    db.update('submissions',
+                        { student_group: groupIdx },
+                        { student_email: `eq.${studentEmail}`, session_id: `eq.${sessionCode}` }
+                    ).catch(e => console.warn('[groupPick] batch update student_group failed:', e));
+                }
+            } catch (e) {
+                console.warn('[groupPick] selectGroup failed:', e);
+            }
+
+            this._selectingGroup = false;
             await loadAndRender();
         };
 
