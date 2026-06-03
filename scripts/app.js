@@ -47,32 +47,32 @@ const audioStore = {
     }
 };
 
-import { SlideManager } from './slideManager.js?v=20260304b';
-import { Editor } from './editor.js?v=20260304b';
-import { DragDrop } from './dragDrop.js?v=20260304b';
-import { showToast, showConfirm, showInput } from './ui.js?v=20260304b';
-import { MatchingGame } from './interactive/matching.js?v=20260304b';
-import { FillBlank } from './interactive/fillBlank.js?v=20260304b';
-import { CardCopy } from './interactive/cardCopy.js?v=20260304b';
-import { Showcase } from './interactive/showcase.js?v=20260304b';
-import { OrderingGame } from './interactive/ordering.js?v=20260304b';
-import { QuizGame } from './interactive/quiz.js?v=20260304b';
-import { PollGame } from './interactive/poll.js?v=20260304b';
-import { CountdownTimer } from './interactive/countdown.js?v=20260304b';
-import { TrueFalseGame } from './interactive/truefalse.js?v=20260304b';
-import { MultiChoiceGame } from './interactive/multiChoice.js?v=20260530';
-import { OpenTextGame } from './interactive/opentext.js?v=20260304b';
-import { ScaleGame } from './interactive/scale.js?v=20260304b';
-import { BuzzerGame } from './interactive/buzzer.js?v=20260304b';
-import { WordCloudGame } from './interactive/wordcloud.js?v=20260304b';
-import { HotspotGame } from './interactive/hotspot.js?v=20260304b';
-import { DocumentViewer } from './interactive/documentViewer.js?v=20260304b';
+import { SlideManager } from './slideManager.js?v=20260604';
+import { Editor } from './editor.js?v=20260604';
+import { DragDrop } from './dragDrop.js?v=20260604';
+import { showToast, showConfirm, showInput } from './ui.js?v=20260604';
+import { MatchingGame } from './interactive/matching.js?v=20260604';
+import { FillBlank } from './interactive/fillBlank.js?v=20260604';
+import { CardCopy } from './interactive/cardCopy.js?v=20260604';
+import { Showcase } from './interactive/showcase.js?v=20260604';
+import { OrderingGame } from './interactive/ordering.js?v=20260604';
+import { QuizGame } from './interactive/quiz.js?v=20260604';
+import { PollGame } from './interactive/poll.js?v=20260604';
+import { CountdownTimer } from './interactive/countdown.js?v=20260604';
+import { TrueFalseGame } from './interactive/truefalse.js?v=20260604';
+import { MultiChoiceGame } from './interactive/multiChoice.js?v=20260604';
+import { OpenTextGame } from './interactive/opentext.js?v=20260604';
+import { ScaleGame } from './interactive/scale.js?v=20260604';
+import { BuzzerGame } from './interactive/buzzer.js?v=20260604';
+import { WordCloudGame } from './interactive/wordcloud.js?v=20260604';
+import { HotspotGame } from './interactive/hotspot.js?v=20260604';
+import { DocumentViewer } from './interactive/documentViewer.js?v=20260604';
 
-import { HomeworkSubmission } from './homework.js?v=20260304b';
+import { HomeworkSubmission } from './homework.js?v=20260604';
 import { db, realtime, generateSessionCode, ai } from './supabase.js';
-import { SLIDE_TEMPLATES } from './templates.js?v=20260304b';
-import { IconLibrary } from './iconLibrary.js?v=20260304b';
-import { SlideExporter } from './exportSlides.js?v=20260304b';
+import { SLIDE_TEMPLATES } from './templates.js?v=20260604';
+import { IconLibrary } from './iconLibrary.js?v=20260604';
+import { SlideExporter } from './exportSlides.js?v=20260604';
 
 class App {
     constructor() {
@@ -3851,7 +3851,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const sessionUUID = this.slideManager.currentSessionId || null;
             window._activeSessionUUID = sessionUUID;
             if (sessionUUID) {
-                import('./interactive/stateManager.js').then(({ stateManager }) => {
+                import('./interactive/stateManager.js?v=20260604').then(({ stateManager }) => {
                     stateManager.setSessionOverride(sessionUUID);
                     console.log('[Broadcast] session UUID:', sessionUUID);
                 }).catch(() => {});
@@ -3958,7 +3958,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // ★ 解除場次級簡報綁定，回到專案模式
         this.slideManager.currentSessionId = null;
         window._activeSessionUUID = null;
-        import('./interactive/stateManager.js').then(({ stateManager }) => {
+        import('./interactive/stateManager.js?v=20260604').then(({ stateManager }) => {
             stateManager.setSessionOverride(null);
         }).catch(() => {});
         await this.slideManager.load();
@@ -3996,7 +3996,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!this.sessionCode) return;
         if (!this._lbScoreCache) this._lbScoreCache = new Map();
         try {
-            const { stateManager } = await import('./interactive/stateManager.js');
+            const { stateManager } = await import('./interactive/stateManager.js?v=20260604');
             const effectiveSessionId = stateManager.getSessionCode() || this.sessionCode;
             const list = document.getElementById('lbList');
             if (!list) return;

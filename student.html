@@ -331,7 +331,7 @@
         import { CountdownTimer } from './scripts/interactive/countdown.js';
         import { Showcase } from './scripts/interactive/showcase.js';
         import { HomeworkSubmission } from './scripts/homework.js';
-        import { stateManager } from './scripts/interactive/stateManager.js';
+        import { stateManager } from './scripts/interactive/stateManager.js?v=20260604';
         import { DocumentViewer } from './scripts/interactive/documentViewer.js';
 
         const matchingGame = new MatchingGame();
@@ -753,7 +753,7 @@
                 // ★ 場次隔離：在存 _join_bonus 之前，先找到場次 UUID 並設 override
                 // 確保 _join_bonus 的 session_id 存的是 UUID 而非 join_code
                 try {
-                    const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                    const { stateManager } = await import('./scripts/interactive/stateManager.js?v=20260604');
 
                     // 嘗試從 URL 的 sid 或 session 參數取得場次 UUID
                     let sessionUUID = urlParams.get('sid') || urlParams.get('session') || '';
@@ -1108,7 +1108,7 @@
                     if (!myEmail || p.studentEmail !== myEmail) return;
                     const score = p.score || 0;
                     try {
-                        const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                        const { stateManager } = await import('./scripts/interactive/stateManager.js?v=20260604');
                         stateManager.showScorePopup(score);
                     } catch (e) { console.warn('[hw_scored] popup failed:', e); }
                 });
@@ -1204,7 +1204,7 @@
                         // 避免跨場次共用 join_code 導致排行榜、submissions 混在一起
                         if (_projectSession?.id) {
                             try {
-                                const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                                const { stateManager } = await import('./scripts/interactive/stateManager.js?v=20260604');
                                 stateManager.setSessionOverride(_projectSession.id);
                                 window._activeSessionUUID = _projectSession.id;
                                 console.log('[Student] session override set to:', _projectSession.id);
@@ -1243,7 +1243,7 @@
                     sessionStorage.setItem('homework_user', JSON.stringify(_hwForRename));
                     // 更新 stateManager
                     try {
-                        const { stateManager } = await import('./scripts/interactive/stateManager.js');
+                        const { stateManager } = await import('./scripts/interactive/stateManager.js?v=20260604');
                         if (stateManager.studentName) stateManager.studentName = studentName;
                     } catch { }
                     // 通知講師
@@ -1508,7 +1508,7 @@
                                 // 查 DB 是否已選過
                                 let existingGroup = null;
                                 try {
-                                    const { stateManager: sm } = await import('./scripts/interactive/stateManager.js');
+                                    const { stateManager: sm } = await import('./scripts/interactive/stateManager.js?v=20260604');
                                     const _sid = sm.getSessionCode();
                                     console.log('[GroupCheck] querying DB for existing group pick, email:', _hwUser.email, 'sid:', _sid);
                                     const { data: gpRows } = await db.select('submissions', {
@@ -1566,7 +1566,7 @@
 
                                                 // 寫入 DB
                                                 try {
-                                                    const { stateManager: sm2 } = await import('./scripts/interactive/stateManager.js');
+                                                    const { stateManager: sm2 } = await import('./scripts/interactive/stateManager.js?v=20260604');
                                                     const _overlaySessionId = sm2.getSessionCode();
                                                     await db.insert('submissions', {
                                                         session_id: _overlaySessionId,
@@ -2130,7 +2130,7 @@
                     };
                     renderLB([]);
                     // 載入真實資料（使用 session UUID，與側欄排行榜一致）
-                    import('./scripts/interactive/stateManager.js').then(({ stateManager }) => {
+                    import('./scripts/interactive/stateManager.js?v=20260604').then(({ stateManager }) => {
                         const sc = stateManager.getSessionCode() || new URLSearchParams(location.search).get('code') || '';
                         if (sc) {
                             stateManager.getLeaderboard(sc).then(d => renderLB(d));
@@ -2979,7 +2979,7 @@
 
                 case 'groupPick': {
                     el.classList.add('group-pick-element');
-                    import('./scripts/interactive/groupPick.js').then(({ GroupPickGame }) => {
+                    import('./scripts/interactive/groupPick.js?v=20260604').then(({ GroupPickGame }) => {
                         new GroupPickGame().render(el, element);
                     });
                     break;
