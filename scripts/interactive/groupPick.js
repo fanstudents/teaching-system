@@ -206,6 +206,17 @@ export class GroupPickGame {
             sessionStorage.setItem('homework_user', JSON.stringify(user));
 
             try {
+                // 先刪除舊的 groupPick（避免重複）
+                if (sessionCode && studentEmail) {
+                    await db.delete('submissions', {
+                        session_id: `eq.${sessionCode}`,
+                        element_id: `eq.${elementId}`,
+                        student_email: `eq.${studentEmail}`,
+                        type: 'eq.groupPick'
+                    }).catch(() => {});
+                }
+
+                // 寫入新的 groupPick
                 await db.insert('submissions', {
                     session_id: sessionCode,
                     element_id: elementId,
@@ -216,7 +227,7 @@ export class GroupPickGame {
                     content: groupIdx,
                     state: JSON.stringify({ group: groupIdx, groupName: groupNames[parseInt(groupIdx)-1] }),
                     submitted_at: new Date().toISOString()
-                }, { onConflict: 'session_id,element_id,student_email' });
+                });
 
                 // ★ 回頭更新所有已有 submissions 的 student_group
                 if (sessionCode && studentEmail) {

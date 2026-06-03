@@ -1568,6 +1568,15 @@
                                                 try {
                                                     const { stateManager: sm2 } = await import('./scripts/interactive/stateManager.js?v=20260604');
                                                     const _overlaySessionId = sm2.getSessionCode();
+                                                    // 先刪除舊的
+                                                    if (_overlaySessionId && _hwUser.email) {
+                                                        await db.delete('submissions', {
+                                                            session_id: `eq.${_overlaySessionId}`,
+                                                            element_id: `eq.${_gpElement.id}`,
+                                                            student_email: `eq.${_hwUser.email}`,
+                                                            type: 'eq.groupPick'
+                                                        }).catch(() => {});
+                                                    }
                                                     await db.insert('submissions', {
                                                         session_id: _overlaySessionId,
                                                         element_id: _gpElement.id,
@@ -1578,7 +1587,7 @@
                                                         content: gIdx,
                                                         state: JSON.stringify({ group: gIdx, groupName: gpNames[parseInt(gIdx)-1] }),
                                                         submitted_at: new Date().toISOString()
-                                                    }, { onConflict: 'session_id,element_id,student_email' });
+                                                    });
 
                                                     // ★ 回頭更新所有已有 submissions 的 student_group
                                                     if (_overlaySessionId && _hwUser.email) {
@@ -2979,7 +2988,7 @@
 
                 case 'groupPick': {
                     el.classList.add('group-pick-element');
-                    import('./scripts/interactive/groupPick.js?v=20260604c').then(({ GroupPickGame }) => {
+                    import('./scripts/interactive/groupPick.js?v=20260604d').then(({ GroupPickGame }) => {
                         new GroupPickGame().render(el, element);
                     });
                     break;
