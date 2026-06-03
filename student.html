@@ -225,8 +225,8 @@
             <div class="lb-header">
                 <span class="lb-title">🏆 排行榜</span>
                 <div class="lb-tabs" style="display:flex;gap:3px;margin-left:8px;">
-                    <button class="lb-tab active" data-lb-mode="personal" style="padding:2px 8px;border-radius:5px;font-size:11px;border:1px solid transparent;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;transition:all .2s;"><span class="material-symbols-outlined" style="font-size:12px;vertical-align:-2px;">person</span> 個人</button>
-                    <button class="lb-tab" data-lb-mode="group" style="padding:2px 8px;border-radius:5px;font-size:11px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-weight:600;font-family:inherit;transition:all .2s;"><span class="material-symbols-outlined" style="font-size:12px;vertical-align:-2px;">groups</span> 組別</button>
+                    <button class="lb-tab" data-lb-mode="personal" style="padding:2px 8px;border-radius:5px;font-size:11px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-weight:600;font-family:inherit;transition:all .2s;"><span class="material-symbols-outlined" style="font-size:12px;vertical-align:-2px;">person</span> 個人</button>
+                    <button class="lb-tab active" data-lb-mode="group" style="padding:2px 8px;border-radius:5px;font-size:11px;border:1px solid transparent;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-weight:600;font-family:inherit;transition:all .2s;"><span class="material-symbols-outlined" style="font-size:12px;vertical-align:-2px;">groups</span> 組別</button>
                 </div>
                 <button id="studentLbClose" style="
                     background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.5);
@@ -1391,7 +1391,7 @@
                 }
 
                 // 排行榜輪詢
-                let _studentLbMode = 'personal';
+                let _studentLbMode = 'group';
                 // Tab 切換
                 document.querySelectorAll('#studentLeaderboard .lb-tab').forEach(tab => {
                     tab.addEventListener('click', () => {
@@ -1448,14 +1448,14 @@
                                         <div class="lb-pts">${g.totalPoints}</div>
                                     </div>
                                     <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
-                                    ${membersHtml ? `<div class="lb-group-members" style="padding:2px 6px 4px 28px;display:none;border-top:1px solid rgba(255,255,255,.06);">${membersHtml}</div>` : ''}
+                                    ${membersHtml ? `<div class="lb-group-members" style="padding:2px 6px 4px 28px;border-top:1px solid rgba(255,255,255,.06);">${membersHtml}</div>` : ''}
                                 </div>`;
                             }).join('');
                             // 點組別展開/收起
                             list.querySelectorAll('.lb-row-top[data-group-idx]').forEach(row => {
                                 row.addEventListener('click', () => {
                                     const mem = row.closest('.lb-group-row')?.querySelector('.lb-group-members');
-                                    if (mem) mem.style.display = mem.style.display === 'none' ? 'block' : 'none';
+                                    if (mem) mem.style.display = mem.style.display === 'none' ? '' : 'none';
                                 });
                             });
                             return;

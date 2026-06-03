@@ -283,7 +283,7 @@
    ═══════════════════════════════════════════════ */
 .wp-teacher {
     padding: 16px 20px; display: flex; flex-direction: column;
-    gap: 12px; height: 100%;
+    gap: 12px; min-height: 100%;
 }
 .wp-teacher-header {
     display: flex; justify-content: space-between; align-items: baseline;
@@ -303,7 +303,7 @@
 .wp-teacher-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px; flex: 1; overflow-y: auto; padding: 2px;
+    gap: 12px; padding: 2px;
     align-content: start;
 }
 .wp-student-gallery {

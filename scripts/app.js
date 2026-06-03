@@ -3967,7 +3967,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     // ─── 排行榜輪詢 ───
     startLeaderboardPolling() {
         this.stopLeaderboardPolling();
-        if (!this._lbMode) this._lbMode = 'personal';
+        if (!this._lbMode) this._lbMode = 'group';
 
         // Tab 切換
         document.querySelectorAll('#presLeaderboard .lb-tab').forEach(tab => {
@@ -4054,7 +4054,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                             <div class="lb-pts">${g.totalPoints}</div>
                         </div>
                         <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
-                        ${membersHtml ? `<div class="lb-group-members" style="padding:2px 8px 6px 32px;display:none;border-top:1px solid rgba(0,0,0,.04);">${membersHtml}</div>` : ''}
+                        ${membersHtml ? `<div class="lb-group-members" style="padding:2px 8px 6px 32px;border-top:1px solid rgba(0,0,0,.04);">${membersHtml}</div>` : ''}
                     </div>`;
                 }).join('');
 
@@ -4064,7 +4064,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         const members = row.closest('.lb-group-row')?.querySelector('.lb-group-members');
                         if (members) {
                             const show = members.style.display === 'none';
-                            members.style.display = show ? 'block' : 'none';
+                            members.style.display = show ? '' : 'none';
                         }
                     });
                 });
