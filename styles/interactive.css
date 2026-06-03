@@ -888,13 +888,13 @@
     gap: 6px;
 }
 
-/* 分數徽章 — 固定在互動元件右上角（框內） */
+/* 分數徽章 — 固定在互動元件右上角（框內）— 目前隱藏避免遮擋內容 */
 .element-score-badge {
     position: absolute;
     top: 6px;
     right: 6px;
     z-index: 10;
-    display: flex;
+    display: none; /* 隱藏分數提示，分數機制仍正常運作 */
     align-items: center;
     gap: 3px;
     padding: 2px 8px 2px 6px;
