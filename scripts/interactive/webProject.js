@@ -68,7 +68,7 @@ export class WebProjectGame {
     async _renderStudent(el, element, elementId) {
         let user = {}; try { user = JSON.parse(sessionStorage.getItem('homework_user') || '{}'); } catch {}
         const sess = (() => { try { return JSON.parse(sessionStorage.getItem('ix_student_session') || '{}'); } catch { return {}; } })();
-        const sessionCode = sess.sessionCode || sessionStorage.getItem('_session_code') || '';
+        const sessionCode = window._activeSessionUUID || sess.sessionCode || sessionStorage.getItem('_session_code') || '';
         const studentName = user.name || sess.studentName || '';
         const studentEmail = user.email || sess.studentEmail || '';
 
@@ -441,18 +441,23 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
         // 所以講師端查詢也必須用 UUID，而非 join_code
         let sessionCode = '';
 
-        // 1) 優先用 stateManager 的 override（與學員端一致）
-        try {
-            const { stateManager: sm } = await import('./stateManager.js');
-            sessionCode = sm.getSessionCode() || '';
-        } catch { /* ignore */ }
+        // 1) 優先用 _activeSessionUUID（講師初始化/廣播時設定，一定是 UUID）
+        sessionCode = window._activeSessionUUID || '';
 
-        // 2) fallback: _activeSessionUUID（講師廣播時設定）
+        // 2) fallback: slideManager.currentSessionId
         if (!sessionCode) {
-            sessionCode = window._activeSessionUUID || '';
+            sessionCode = window.app?.slideManager?.currentSessionId || '';
         }
 
-        // 3) 最後 fallback: join_code（舊行為，向下相容）
+        // 3) fallback: stateManager（注意：可能是不同實例，需用 URL params）
+        if (!sessionCode) {
+            try {
+                const { stateManager: sm } = await import('./stateManager.js');
+                sessionCode = sm.getSessionCode() || '';
+            } catch { /* ignore */ }
+        }
+
+        // 4) 最後 fallback: join_code
         if (!sessionCode) {
             sessionCode = window.app?.sessionCode || '';
         }

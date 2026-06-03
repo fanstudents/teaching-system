@@ -33,6 +33,8 @@ class InteractionState {
     /** 取得 session code（優先使用場次覆蓋值） */
     getSessionCode() {
         if (this._sessionOverride) return this._sessionOverride;
+        // fallback: 全域變數（避免雙實例問題）
+        if (typeof window !== 'undefined' && window._activeSessionUUID) return window._activeSessionUUID;
         return new URLSearchParams(location.search).get('code')
             || new URLSearchParams(location.search).get('session')
             || '';
