@@ -1320,7 +1320,7 @@ export class SlideManager {
                 el.classList.add('interactive-element', 'group-pick-element');
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/groupPick.js?v=20260604e').then(({ GroupPickGame }) => {
+                    import('./interactive/groupPick.js?v=20260604f').then(({ GroupPickGame }) => {
                         if (isLive) new GroupPickGame().render(el, element);
                         else new GroupPickGame().renderPreview(el, element);
                     });

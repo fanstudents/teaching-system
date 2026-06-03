@@ -313,7 +313,12 @@ export class GroupPickGame {
         <div class="gp-canvas gp-canvas--teacher" style="overflow:hidden;display:flex;flex-direction:column;height:100%;">
             <div class="gp-teacher-header" style="position:relative;flex-shrink:0;">
                 <div class="gp-teacher-title">${mi('groups', 22)} 現場分組</div>
-                <div style="display:flex;align-items:center;gap:8px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="gp-zoom-ctrl" style="display:flex;align-items:center;gap:2px;background:rgba(0,0,0,.05);border-radius:6px;padding:2px;">
+                        <button class="gp-zoom-btn" data-zoom="out" style="width:24px;height:24px;border:none;border-radius:4px;background:transparent;cursor:pointer;font-size:16px;color:#64748b;display:flex;align-items:center;justify-content:center;">−</button>
+                        <span class="gp-zoom-label" style="font-size:10px;color:#64748b;min-width:32px;text-align:center;font-weight:600;">100%</span>
+                        <button class="gp-zoom-btn" data-zoom="in" style="width:24px;height:24px;border:none;border-radius:4px;background:transparent;cursor:pointer;font-size:16px;color:#64748b;display:flex;align-items:center;justify-content:center;">+</button>
+                    </div>
                     <button class="gp-reset-pos-btn" title="重置位置" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:11px;background:#fff;cursor:pointer;color:#64748b;font-family:inherit;">${mi('grid_view', 13)} 重排</button>
                     <div class="gp-score-toggle" style="display:flex;gap:2px;background:rgba(0,0,0,.06);border-radius:6px;padding:2px;">
                         <button class="gp-mode-btn active" data-mode="total" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:#fff;color:#1a73e8;box-shadow:0 1px 3px rgba(0,0,0,.1);">${mi('functions', 14)} 總分</button>
@@ -322,12 +327,40 @@ export class GroupPickGame {
                     <div class="gp-teacher-stats"></div>
                 </div>
             </div>
-            <div class="gp-wall" style="position:relative;flex:1;min-height:0;overflow:hidden;"></div>
+            <div class="gp-wall-viewport" style="position:relative;flex:1;min-height:0;overflow:auto;">
+                <div class="gp-wall" style="position:relative;transform-origin:top left;transition:transform .15s ease;min-width:100%;min-height:100%;"></div>
+            </div>
         </div>`;
 
+        const viewport = el.querySelector('.gp-wall-viewport');
         const wallEl = el.querySelector('.gp-wall');
         const statsEl = el.querySelector('.gp-teacher-stats');
+        const zoomLabel = el.querySelector('.gp-zoom-label');
         let lastHash = '';
+
+        // ── 縮放 ──
+        const zoomKey = `gp_zoom_${elementId}`;
+        let zoomLevel = parseFloat(localStorage.getItem(zoomKey)) || 1;
+        const applyZoom = () => {
+            wallEl.style.transform = `scale(${zoomLevel})`;
+            zoomLabel.textContent = Math.round(zoomLevel * 100) + '%';
+            localStorage.setItem(zoomKey, zoomLevel);
+        };
+        applyZoom();
+
+        el.querySelectorAll('.gp-zoom-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                zoomLevel = Math.max(0.3, Math.min(2, zoomLevel + (btn.dataset.zoom === 'in' ? 0.1 : -0.1)));
+                applyZoom();
+            });
+        });
+
+        viewport.addEventListener('wheel', (e) => {
+            if (!e.ctrlKey && !e.metaKey) return;
+            e.preventDefault();
+            zoomLevel = Math.max(0.3, Math.min(2, zoomLevel + (e.deltaY < 0 ? 0.05 : -0.05)));
+            applyZoom();
+        }, { passive: false });
 
         // ── 位置管理 ──
         const posKey = `gp_pos_${elementId}`;
