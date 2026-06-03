@@ -4048,16 +4048,26 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                             </div>
                         </div>
                         <div style="height:3px;background:#f1f5f9;margin:0 10px 4px;border-radius:2px;overflow:hidden;"><div style="height:100%;width:${barPct}%;background:${color};opacity:.6;border-radius:2px;transition:width .5s;"></div></div>
-                        ${members.length ? `<div class="_gm" style="padding:4px 10px 8px 34px;display:flex;flex-wrap:wrap;gap:5px 14px;">${members.map(m =>
-                            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#334155;white-space:nowrap;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;"></span>${this._escHtml(m.name)}<span style="color:${color};font-size:13px;font-weight:700;margin-left:2px;">${m.pts}</span></span>`
+                        ${members.length ? `<div class="_gm" style="padding:4px 10px 8px 34px;display:flex;flex-direction:column;gap:3px;">${members.map(m =>
+                            `<div class="_gm-row" data-email="${this._escHtml(m.email || '')}" style="display:flex;align-items:center;gap:5px;font-size:13px;color:#334155;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;"></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this._escHtml(m.name)}</span><span style="color:${color};font-size:13px;font-weight:700;flex-shrink:0;">${m.pts}</span><button class="_gm-del" title="刪除" style="background:none;border:none;color:#cbd5e1;cursor:pointer;padding:1px 3px;border-radius:3px;font-size:12px;line-height:1;margin-left:2px;transition:all .15s;flex-shrink:0;" onmouseenter="this.style.color='#ef4444';this.style.background='rgba(239,68,68,0.08)'" onmouseleave="this.style.color='#cbd5e1';this.style.background='none'"><span class="material-symbols-outlined" style="font-size:14px;">close</span></button></div>`
                         ).join('')}</div>` : ''}
                     </div>`;
                 }).join('');
 
                 list.querySelectorAll('[data-gi]').forEach(row => {
-                    row.addEventListener('click', () => {
+                    row.addEventListener('click', (e) => {
+                        if (e.target.closest('._gm-del')) return;
                         const mem = row.querySelector('._gm');
                         if (mem) mem.style.display = mem.style.display === 'none' ? '' : 'none';
+                    });
+                });
+                list.querySelectorAll('._gm-del').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const row = btn.closest('._gm-row');
+                        const email = row?.dataset.email;
+                        const name = row?.querySelector('span:nth-child(2)')?.textContent || '';
+                        if (email) this._deleteLeaderboardStudent(email, name);
                     });
                 });
                 return;
