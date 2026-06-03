@@ -4021,52 +4021,39 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 });
             }
 
-            // ★ 組別模式 — 精緻卡片排行
+            // ★ 組別模式
             if (this._lbMode === 'group' && hasGroups) {
                 const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
                 list.innerHTML = groupBoard.map((g, i) => {
                     const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
                     const barPct = Math.round((g.totalPoints / maxPts) * 100);
                     const color = GROUP_COLORS[(parseInt(g.group) - 1) % GROUP_COLORS.length] || '#6366f1';
+                    const members = g.members || [];
 
-                    const membersHtml = g.members?.length ? g.members.map(m =>
-                        `<div class="lb-member-row">
-                            <span class="lb-member-dot" style="background:${color};"></span>
-                            <span class="lb-member-name">${this._escHtml(m.name)}</span>
-                            <span class="lb-member-pts">${m.pts}</span>
-                        </div>`
-                    ).join('') : '';
-
-                    return `<div class="lb-row lb-group-row expanded" style="--gp-color:${color}">
-                        <div class="lb-row-top" style="cursor:pointer;" data-group-idx="${i}">
+                    return `<div class="lb-row lb-group-row" style="--gp-color:${color}" data-group-idx="${i}">
+                        <div class="lb-row-top">
                             <div class="lb-rank ${rc}">${i + 1}</div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="lb-group-name">${this._escHtml(g.groupName)}</div>
-                                <div class="lb-group-meta">
-                                    ${mi('person', 12)} ${g.memberCount}人
-                                </div>
+                            <div class="lb-group-info">
+                                <span class="lb-group-info-name">${this._escHtml(g.groupName)}</span>
+                                <span class="lb-group-info-count">${g.memberCount}人</span>
                             </div>
-                            <div class="lb-group-score-area">
-                                <div class="lb-group-total">${g.totalPoints}</div>
-                                <div class="lb-group-avg">均 ${g.avgPoints}</div>
+                            <div>
+                                <div class="lb-group-score">${g.totalPoints}</div>
+                                <div class="lb-group-avg-label">均${g.avgPoints}</div>
                             </div>
-                            <span class="material-symbols-outlined lb-group-toggle">expand_more</span>
                         </div>
-                        <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
-                        ${membersHtml ? `<div class="lb-group-members">${membersHtml}</div>` : ''}
+                        <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:.6;"></div></div>
+                        ${members.length ? `<div class="lb-group-members">${members.map(m =>
+                            `<span class="lb-gm"><span class="lb-gm-dot" style="background:${color}"></span>${this._escHtml(m.name)}<span class="lb-gm-pts">${m.pts}</span></span>`
+                        ).join('')}</div>` : ''}
                     </div>`;
                 }).join('');
 
-                // 點組別展開/收起成員
-                list.querySelectorAll('.lb-row-top[data-group-idx]').forEach(row => {
+                // 點組別收合/展開
+                list.querySelectorAll('.lb-group-row').forEach(row => {
                     row.addEventListener('click', () => {
-                        const card = row.closest('.lb-group-row');
-                        const members = card?.querySelector('.lb-group-members');
-                        if (members) {
-                            const isOpen = card.classList.contains('expanded');
-                            card.classList.toggle('expanded', !isOpen);
-                            members.style.display = isOpen ? 'none' : '';
-                        }
+                        const mem = row.querySelector('.lb-group-members');
+                        if (mem) mem.style.display = mem.style.display === 'none' ? '' : 'none';
                     });
                 });
                 return;

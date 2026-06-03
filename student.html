@@ -1414,7 +1414,7 @@
                         if (!list) return;
                         const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-                        // ★ 組別模式 — 精緻卡片排行
+                        // ★ 組別模式
                         if (_studentLbMode === 'group') {
                             const groupBoard = await stateManager.getGroupLeaderboard(effectiveSession);
                             if (!groupBoard.length) {
@@ -1424,47 +1424,33 @@
                             }
                             const GC = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
                             const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
-                            const mi = (n, sz=14) => `<span class="material-symbols-outlined" style="font-size:${sz}px">${n}</span>`;
                             list.innerHTML = groupBoard.map((g, i) => {
                                 const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
                                 const barPct = Math.round((g.totalPoints / maxPts) * 100);
                                 const color = GC[(parseInt(g.group) - 1) % GC.length] || '#6366f1';
-                                const membersHtml = g.members?.length ? g.members.map(m =>
-                                    `<div class="lb-member-row">
-                                        <span class="lb-member-dot" style="background:${color};"></span>
-                                        <span class="lb-member-name" style="color:rgba(255,255,255,.7);">${esc(m.name)}</span>
-                                        <span class="lb-member-pts" style="color:rgba(255,255,255,.35);">${m.pts}</span>
-                                    </div>`
-                                ).join('') : '';
-                                return `<div class="lb-row lb-group-row expanded" style="--gp-color:${color}">
-                                    <div class="lb-row-top" style="cursor:pointer;" data-group-idx="${i}">
+                                const members = g.members || [];
+                                return `<div class="lb-row lb-group-row" style="--gp-color:${color}" data-group-idx="${i}">
+                                    <div class="lb-row-top">
                                         <div class="lb-rank ${rc}">${i+1}</div>
-                                        <div style="flex:1;min-width:0;">
-                                            <div class="lb-group-name">${esc(g.groupName)}</div>
-                                            <div class="lb-group-meta" style="color:rgba(255,255,255,.35);">
-                                                ${mi('person', 12)} ${g.memberCount}人
-                                            </div>
+                                        <div class="lb-group-info">
+                                            <span class="lb-group-info-name" style="color:rgba(255,255,255,.9);">${esc(g.groupName)}</span>
+                                            <span class="lb-group-info-count" style="color:rgba(255,255,255,.3);">${g.memberCount}人</span>
                                         </div>
-                                        <div class="lb-group-score-area">
-                                            <div class="lb-group-total" style="color:rgba(255,255,255,.9);">${g.totalPoints}</div>
-                                            <div class="lb-group-avg" style="color:rgba(255,255,255,.3);">均 ${g.avgPoints}</div>
+                                        <div>
+                                            <div class="lb-group-score" style="color:rgba(255,255,255,.9);">${g.totalPoints}</div>
+                                            <div class="lb-group-avg-label" style="color:rgba(255,255,255,.3);">均${g.avgPoints}</div>
                                         </div>
-                                        <span class="material-symbols-outlined lb-group-toggle" style="color:rgba(255,255,255,.25);">expand_more</span>
                                     </div>
-                                    <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
-                                    ${membersHtml ? `<div class="lb-group-members" style="border-top-color:rgba(255,255,255,.06);">${membersHtml}</div>` : ''}
+                                    <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:.6;"></div></div>
+                                    ${members.length ? `<div class="lb-group-members">${members.map(m =>
+                                        `<span class="lb-gm"><span class="lb-gm-dot" style="background:${color}"></span><span style="color:rgba(255,255,255,.65);">${esc(m.name)}</span><span class="lb-gm-pts" style="color:rgba(255,255,255,.3);">${m.pts}</span></span>`
+                                    ).join('')}</div>` : ''}
                                 </div>`;
                             }).join('');
-                            // 點組別展開/收起
-                            list.querySelectorAll('.lb-row-top[data-group-idx]').forEach(row => {
+                            list.querySelectorAll('.lb-group-row').forEach(row => {
                                 row.addEventListener('click', () => {
-                                    const card = row.closest('.lb-group-row');
-                                    const mem = card?.querySelector('.lb-group-members');
-                                    if (mem) {
-                                        const isOpen = card.classList.contains('expanded');
-                                        card.classList.toggle('expanded', !isOpen);
-                                        mem.style.display = isOpen ? 'none' : '';
-                                    }
+                                    const mem = row.querySelector('.lb-group-members');
+                                    if (mem) mem.style.display = mem.style.display === 'none' ? '' : 'none';
                                 });
                             });
                             return;
@@ -1580,6 +1566,7 @@
                                                         element_id: _gpElement.id,
                                                         student_name: _hwUser.name || '',
                                                         student_email: _hwUser.email || '',
+                                                        student_group: gIdx,
                                                         type: 'groupPick',
                                                         content: gIdx,
                                                         state: JSON.stringify({ group: gIdx, groupName: gpNames[parseInt(gIdx)-1] }),

@@ -206,6 +206,7 @@ export class GroupPickGame {
                 element_id: elementId,
                 student_name: studentName,
                 student_email: studentEmail,
+                student_group: groupIdx,
                 type: 'groupPick',
                 content: groupIdx,
                 state: JSON.stringify({ group: groupIdx, groupName: groupNames[parseInt(groupIdx)-1] }),
