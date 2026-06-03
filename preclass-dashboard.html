@@ -626,6 +626,89 @@
                 justify-content: center;
             }
         }
+
+        /* ── Presentation Card View ── */
+        .pres-mode-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px; margin-bottom: 20px;
+            background: #fff; border: 1px solid #dadce0; border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.04);
+        }
+        .pres-mode-bar .pres-title {
+            font-size: .92rem; font-weight: 600; color: #1f1f1f;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pres-mode-bar .pres-title .material-symbols-rounded { font-size: 20px; color: #1a73e8; }
+        .pres-mode-bar .pres-nav {
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pres-nav-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: 1px solid #dadce0;
+            background: #fff; color: #444; font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all .15s; font-family: inherit;
+        }
+        .pres-nav-btn:hover { background: #f1f3f4; border-color: #bbb; }
+        .pres-nav-btn:disabled { opacity: .3; cursor: default; }
+        .pres-counter { font-size: .82rem; color: #80868b; min-width: 60px; text-align: center; }
+        .pres-cards-grid {
+            display: grid; grid-template-columns: 1fr;
+            gap: 16px; max-width: 720px; margin: 0 auto;
+        }
+        .pres-student-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+            overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.05);
+            animation: fadeSlideUp .4s ease-out;
+        }
+        @keyframes fadeSlideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        .pres-card-header {
+            padding: 20px 24px; display: flex; align-items: center; gap: 14px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .pres-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, #1a73e8, #8ab4f8);
+            color: #fff; font-size: 1.2rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .pres-card-name { font-size: 1.1rem; font-weight: 700; color: #1f1f1f; }
+        .pres-card-meta { font-size: .78rem; color: #80868b; margin-top: 2px; }
+        .pres-card-body { padding: 20px 24px; }
+        .pres-qa-item { margin-bottom: 16px; }
+        .pres-qa-item:last-child { margin-bottom: 0; }
+        .pres-qa-q {
+            font-size: .78rem; font-weight: 600; color: #80868b;
+            margin-bottom: 5px; display: flex; align-items: center; gap: 6px;
+        }
+        .pres-qa-q .q-num {
+            background: #e8f0fe; color: #1a73e8; padding: 1px 7px;
+            border-radius: 4px; font-size: .68rem; font-weight: 700;
+        }
+        .pres-qa-a {
+            font-size: .95rem; color: #1f1f1f; line-height: 1.6;
+            padding: 10px 14px; background: #f8f9fb; border-radius: 10px;
+            border-left: 3px solid #1a73e8;
+        }
+        .pres-qa-a.empty { color: #bbb; font-style: italic; border-left-color: #e2e8f0; }
+        .pres-card-footer {
+            padding: 12px 24px; background: #fafbfc; border-top: 1px solid #f1f3f4;
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .pres-tag {
+            font-size: .7rem; font-weight: 600; padding: 3px 10px;
+            border-radius: 10px;
+        }
+        .pres-tag.done { background: #e6f4ea; color: #1e8e3e; }
+        .pres-tag.partial { background: #fef7e0; color: #e37400; }
+        .pres-tag.none { background: #f1f3f4; color: #80868b; }
+
+        #presSection { display: none; }
+        #presSection.active { display: block; }
+        .dash-sections-wrap { }
+        .dash-sections-wrap.hidden-for-pres .dash-section { display: none; }
+        .dash-sections-wrap.hidden-for-pres .stat-grid { display: none; }
+        .dash-sections-wrap.hidden-for-pres .overview-summary { display: none; }
     </style>
 </head>
 
@@ -654,6 +737,9 @@
             <div class="course-name" id="courseName"></div>
         </div>
         <div class="dash-topbar-right">
+            <button class="btn-refresh" id="btnPresMode" onclick="togglePresMode()" style="background:#e8f0fe;border-color:#a8c7fa;color:#1a73e8;font-weight:600;">
+                <span class="material-symbols-rounded" style="font-size:16px;">slideshow</span> 簡報模式
+            </button>
             <button class="btn-share" id="btnShare" onclick="copyShareLink()">
                 <span class="material-symbols-rounded" style="font-size:16px;">link</span> 複製分享連結
             </button>
@@ -666,7 +752,21 @@
         </div>
     </div>
 
-    <div class="dash-container">
+    <div class="dash-container dash-sections-wrap" id="dashMain">
+        <!-- Presentation Card View -->
+        <div id="presSection">
+            <div class="pres-mode-bar">
+                <div class="pres-title"><span class="material-symbols-rounded">person</span> 學員填答卡片</div>
+                <div class="pres-nav">
+                    <button class="pres-nav-btn" id="presPrev" onclick="presNav(-1)"><span class="material-symbols-rounded" style="font-size:18px;">chevron_left</span></button>
+                    <span class="pres-counter" id="presCounter">1 / 1</span>
+                    <button class="pres-nav-btn" id="presNext" onclick="presNav(1)"><span class="material-symbols-rounded" style="font-size:18px;">chevron_right</span></button>
+                    <button class="pres-nav-btn" id="presAll" onclick="presShowAll()" title="顯示全部" style="margin-left:6px;"><span class="material-symbols-rounded" style="font-size:18px;">grid_view</span></button>
+                </div>
+            </div>
+            <div class="pres-cards-grid" id="presCardsGrid"></div>
+        </div>
+
         <!-- Overview Summary -->
         <div class="overview-summary" id="overviewSummary" style="display:none;">
             <div class="overview-left">
@@ -1194,9 +1294,131 @@
         };
 
         window.loadAll = loadAll;
-        // 直接載入（不需驗證碼）
-        document.getElementById('pinOverlay')?.remove();
-        loadAll();
+
+        // ── Presentation Card Mode ──
+        let _presMode = false;
+        let _presIdx = 0;
+        let _presShowAll = false;
+
+        window.togglePresMode = function() {
+            _presMode = !_presMode;
+            const btn = document.getElementById('btnPresMode');
+            const presSection = document.getElementById('presSection');
+            const dashMain = document.getElementById('dashMain');
+            if (_presMode) {
+                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px;">bar_chart</span> 統計模式';
+                btn.style.background = '#1a73e8'; btn.style.color = '#fff'; btn.style.borderColor = '#1a73e8';
+                presSection.classList.add('active');
+                dashMain.classList.add('hidden-for-pres');
+                _presIdx = 0; _presShowAll = false;
+                renderPresCards();
+            } else {
+                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px;">slideshow</span> 簡報模式';
+                btn.style.background = '#e8f0fe'; btn.style.color = '#1a73e8'; btn.style.borderColor = '#a8c7fa';
+                presSection.classList.remove('active');
+                dashMain.classList.remove('hidden-for-pres');
+            }
+        };
+
+        function maskEmail(email) {
+            if (!email) return '匿名';
+            const [local, domain] = email.split('@');
+            if (!domain) return email[0] + '***';
+            return local[0] + '***@' + domain;
+        }
+
+        function buildStudentCard(s, idx) {
+            const initial = (s.name || s.email || '?')[0].toUpperCase();
+            const ciIds = new Set(checklistItems.map(c => c.id));
+            const myChecked = checklistProgress.filter(cp =>
+                cp.student_email === s.email && ciIds.has(cp.checklist_item_id) && cp.completed
+            ).length;
+            const totalItems = checklistItems.length;
+            const surveyEmails = new Set(surveyResponses.map(r => r.student_email));
+            const hasSurvey = surveyEmails.has(s.email);
+
+            // 此人的問卷回覆
+            const myResponses = surveyResponses.filter(r => r.student_email === s.email);
+            const respMap = {};
+            myResponses.forEach(r => { respMap[r.question_id] = r.answer; });
+
+            let qaHtml = '';
+            surveyQuestions.forEach((q, qi) => {
+                const ans = respMap[q.id];
+                qaHtml += `<div class="pres-qa-item">
+                    <div class="pres-qa-q"><span class="q-num">Q${qi+1}</span>${q.question_text}</div>
+                    <div class="pres-qa-a${ans ? '' : ' empty'}">${ans || '未填寫'}</div>
+                </div>`;
+            });
+
+            // Checklist & Survey tags
+            let checkTag = '';
+            if (totalItems > 0) {
+                if (myChecked >= totalItems) checkTag = '<span class="pres-tag done">✓ 事項全完成</span>';
+                else if (myChecked > 0) checkTag = `<span class="pres-tag partial">事項 ${myChecked}/${totalItems}</span>`;
+                else checkTag = '<span class="pres-tag none">事項未開始</span>';
+            }
+            const surveyTag = surveyQuestions.length > 0
+                ? (hasSurvey ? '<span class="pres-tag done">✓ 問卷已填</span>' : '<span class="pres-tag none">問卷未填</span>')
+                : '';
+
+            return `<div class="pres-student-card">
+                <div class="pres-card-header">
+                    <div class="pres-avatar">${initial}</div>
+                    <div>
+                        <div class="pres-card-name">${s.name || '匿名學員'}</div>
+                        <div class="pres-card-meta">${maskEmail(s.email)}</div>
+                    </div>
+                </div>
+                ${qaHtml ? `<div class="pres-card-body">${qaHtml}</div>` : ''}
+                <div class="pres-card-footer">${checkTag}${surveyTag}</div>
+            </div>`;
+        }
+
+        function renderPresCards() {
+            const grid = document.getElementById('presCardsGrid');
+            const counter = document.getElementById('presCounter');
+            if (students.length === 0) {
+                grid.innerHTML = '<div class="empty-state">尚無學員資料</div>';
+                counter.textContent = '0 / 0';
+                return;
+            }
+            if (_presShowAll) {
+                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(340px, 1fr))';
+                grid.innerHTML = students.map((s, i) => buildStudentCard(s, i)).join('');
+                counter.textContent = `全部 ${students.length} 人`;
+                document.getElementById('presPrev').disabled = true;
+                document.getElementById('presNext').disabled = true;
+            } else {
+                grid.style.gridTemplateColumns = '1fr';
+                _presIdx = Math.max(0, Math.min(_presIdx, students.length - 1));
+                grid.innerHTML = buildStudentCard(students[_presIdx], _presIdx);
+                counter.textContent = `${_presIdx + 1} / ${students.length}`;
+                document.getElementById('presPrev').disabled = _presIdx <= 0;
+                document.getElementById('presNext').disabled = _presIdx >= students.length - 1;
+            }
+        }
+
+        window.presNav = function(dir) {
+            _presShowAll = false;
+            _presIdx += dir;
+            renderPresCards();
+        };
+        window.presShowAll = function() {
+            _presShowAll = !_presShowAll;
+            renderPresCards();
+        };
+
+        // PIN gate: wait for PIN before loading data
+        function tryLoad() {
+            const overlay = document.getElementById('pinOverlay');
+            if (!overlay || overlay.classList.contains('hidden')) {
+                loadAll();
+            } else {
+                setTimeout(tryLoad, 500);
+            }
+        }
+        tryLoad();
     </script>
 </body>
 
