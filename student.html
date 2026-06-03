@@ -2980,7 +2980,7 @@
                 case 'webProject': {
                     el.classList.add('web-project-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/webProject.js').then(({ WebProjectGame }) => {
+                    import('./scripts/interactive/webProject.js?v=20260604').then(({ WebProjectGame }) => {
                         new WebProjectGame().render(el, element);
                     });
                     break;

@@ -466,15 +466,25 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
         el.innerHTML = `<div class="wp-teacher">
             <div class="wp-teacher-header">
                 <div class="wp-teacher-title">${mi('web', 22)} 網頁作品展示</div>
-                <div class="wp-teacher-stats"></div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="wp-teacher-stats"></div>
+                    <button class="wp-btn wp-btn-refresh" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;color:#64748b;font-family:inherit;">${mi('refresh', 14)} 刷新</button>
+                    <button class="wp-btn wp-btn-score-all" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;color:#1a73e8;font-family:inherit;font-weight:600;">${mi('play_arrow', 14)} 全部跑分</button>
+                    <button class="wp-btn wp-btn-rank-score" style="padding:4px 10px;border:none;border-radius:6px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;cursor:pointer;font-family:inherit;font-weight:700;">${mi('emoji_events', 14)} 排名加分</button>
+                </div>
             </div>
             <div class="wp-teacher-grid"></div>
             <div class="wp-teacher-empty">${mi('pending', 22)} 等待學員提交作品...</div>
+            <div class="wp-execution-log" style="max-height:150px;overflow-y:auto;font-size:11px;padding:4px 8px;"></div>
         </div>`;
 
         const gridEl = el.querySelector('.wp-teacher-grid');
         const emptyEl = el.querySelector('.wp-teacher-empty');
         const statsEl = el.querySelector('.wp-teacher-stats');
+        const logEl = el.querySelector('.wp-execution-log');
+        const refreshBtn = el.querySelector('.wp-btn-refresh');
+        const scoreAllBtn = el.querySelector('.wp-btn-score-all');
+        const rankScoreBtn = el.querySelector('.wp-btn-rank-score');
         let lastHash = '';
         const contentCache = new Map();
 
@@ -542,6 +552,9 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 const promptPreview = prompt ? `<div class="wp-grid-card-prompt" title="${esc(prompt)}">${mi('chat', 11)} ${esc(prompt)}</div>` : '';
                 const version = st._version || 1;
                 const versionBadge = version > 1 ? `<span class="wp-thumb-version">第${version}版</span>` : '';
+                const wpScore = st.wpScore ?? null;
+                const wpScoreColor = wpScore >= 80 ? '#22c55e' : wpScore >= 60 ? '#eab308' : wpScore >= 40 ? '#f97316' : '#ef4444';
+                const rankBadge = st._rank ? `<span style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.65);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;z-index:2;">#${st._rank}</span>` : '';
 
                 return `<div class="wp-grid-card" style="animation-delay:${i * 0.06}s">
                     <div class="wp-thumb-wrapper">
@@ -551,6 +564,8 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                         </div>
                         <span class="wp-thumb-badge">${modeEmoji}</span>
                         ${versionBadge}
+                        ${rankBadge}
+                        ${wpScore != null ? `<span style="position:absolute;bottom:4px;right:4px;background:${wpScoreColor};color:#fff;border-radius:8px;padding:1px 7px;font-size:11px;font-weight:700;z-index:2;">${wpScore}</span>` : ''}
                     </div>
                     <div class="wp-grid-card-body">
                         <div class="wp-grid-card-name">${esc(name)}</div>
@@ -584,6 +599,10 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
         };
         await load();
 
+        // ── 刷新 ──
+        refreshBtn.addEventListener('click', () => { lastHash = ''; load(); });
+
+        // ── 預覽 ──
         gridEl.addEventListener('click', e => {
             const card = e.target.closest('.wp-grid-card');
             if (!card) return;
@@ -602,8 +621,218 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
             }
         });
 
+        // ── helper: log ──
+        const appendLog = (html, type = 'info') => {
+            const line = document.createElement('div');
+            line.style.cssText = `padding:2px 0;color:${type === 'error' ? '#ef4444' : type === 'success' ? '#16a34a' : '#64748b'};`;
+            line.innerHTML = `<span style="color:#94a3b8;margin-right:4px;">${new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit', second:'2-digit' })}</span> ${html}`;
+            logEl.appendChild(line);
+            logEl.scrollTop = logEl.scrollHeight;
+        };
+
+        // ── 全部跑分（LLM 評分）──
+        let executing = false;
+        scoreAllBtn.addEventListener('click', async () => {
+            if (executing) return;
+            executing = true;
+            scoreAllBtn.disabled = true;
+            scoreAllBtn.innerHTML = `${mi('progress_activity', 14)} 跑分中...`;
+            logEl.innerHTML = '';
+
+            const filter = { type: 'eq.webProject' };
+            if (elementId) filter.element_id = 'eq.' + elementId;
+            if (sessionCode) filter.session_id = 'eq.' + sessionCode;
+            const { data: subs } = await db.select('submissions', { filter, order: 'created_at.asc' });
+            if (!subs?.length) {
+                appendLog('沒有提交', 'error');
+                executing = false;
+                scoreAllBtn.disabled = false;
+                scoreAllBtn.innerHTML = `${mi('play_arrow', 14)} 全部跑分`;
+                return;
+            }
+
+            // 只跑尚未評分的
+            const pending = subs.filter(s => {
+                let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
+                return st.wpScore == null;
+            });
+
+            if (!pending.length) {
+                appendLog('所有作品都已評分', 'info');
+            } else {
+                appendLog(`開始跑分（${pending.length} 份）...`, 'info');
+                const CONCURRENCY = 3;
+                const task = element.question || '請建立一個網頁';
+                const reference = element.referenceAnswer || '';
+                const model = element.model || 'gpt-4o';
+
+                for (let i = 0; i < pending.length; i += CONCURRENCY) {
+                    const batch = pending.slice(i, i + CONCURRENCY);
+                    await Promise.all(batch.map(s => this._scoreOneWebProject(s, task, reference, model, appendLog)));
+                }
+                appendLog('全部跑分完成！', 'success');
+            }
+
+            executing = false;
+            scoreAllBtn.disabled = false;
+            scoreAllBtn.innerHTML = `${mi('play_arrow', 14)} 全部跑分`;
+            lastHash = '';
+            await load();
+        });
+
+        // ── 排名加分 ──
+        const RANK_POINTS = [10, 7, 5, 3];
+        rankScoreBtn.addEventListener('click', async () => {
+            const filter = { type: 'eq.webProject' };
+            if (elementId) filter.element_id = 'eq.' + elementId;
+            if (sessionCode) filter.session_id = 'eq.' + sessionCode;
+            const { data: subs } = await db.select('submissions', { filter });
+
+            const scored = (subs || []).filter(s => {
+                let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
+                return st.wpScore != null;
+            });
+
+            if (!scored.length) {
+                appendLog('沒有已評分的作品，請先跑分', 'error');
+                return;
+            }
+
+            scored.sort((a, b) => {
+                let sa = {}, sb2 = {};
+                try { sa = typeof a.state === 'string' ? JSON.parse(a.state) : (a.state || {}); } catch {}
+                try { sb2 = typeof b.state === 'string' ? JSON.parse(b.state) : (b.state || {}); } catch {}
+                const diff = (sb2.wpScore || 0) - (sa.wpScore || 0);
+                if (diff !== 0) return diff;
+                return new Date(a.submitted_at || a.created_at) - new Date(b.submitted_at || b.created_at);
+            });
+
+            rankScoreBtn.disabled = true;
+            rankScoreBtn.innerHTML = `${mi('progress_activity', 14)} 計算中...`;
+            appendLog(`排名加分（${scored.length} 人）`, 'info');
+
+            for (let i = 0; i < scored.length; i++) {
+                const pts = i < RANK_POINTS.length ? RANK_POINTS[i] : 1;
+                const s = scored[i];
+                let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
+                st._awarded = pts;
+                st._rankPoints = pts;
+                st._rank = i + 1;
+
+                await db.update('submissions', {
+                    state: JSON.stringify(st),
+                    awarded_points: pts,
+                }, { id: 'eq.' + s.id });
+
+                const name = s.student_name || s.student_email?.split('@')[0] || '?';
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+                appendLog(`${medal} ${esc(name)} — ${st.wpScore}分 → <b style="color:#f59e0b;">+${pts} 排名分</b>`, 'success');
+            }
+
+            rankScoreBtn.disabled = false;
+            rankScoreBtn.innerHTML = `${mi('emoji_events', 14)} 排名加分`;
+            appendLog('排名加分完成！已寫入排行榜', 'success');
+            lastHash = '';
+            await load();
+        });
+
         const tid = setInterval(load, 6000);
         this._intervals.set(elementId + '_teacher', tid);
+    }
+
+    /* ── 單一 WebProject LLM 跑分 ── */
+    async _scoreOneWebProject(sub, task, reference, model, appendLog) {
+        const { ai } = await import('../supabase.js');
+        const { db } = await import('../supabase.js');
+        const name = sub.student_name || sub.student_email?.split('@')[0] || '?';
+        const content = sub.content || '';
+        let st = {};
+        try { st = typeof sub.state === 'string' ? JSON.parse(sub.state) : (sub.state || {}); } catch {}
+
+        appendLog(`${mi('person', 14)} ${esc(name)} — 評分中...`, 'info');
+
+        // 截取 HTML 前 3000 字（避免 token 爆）
+        const htmlSnippet = content.length > 3000 ? content.substring(0, 3000) + '\n...(截斷)' : content;
+        const prompt = st.prompt || '';
+
+        const judgePrompt = `你是一位嚴格的網頁作品評審。請根據學員提交的 HTML 網頁進行評估。
+
+═══ 評分資料 ═══
+
+【任務描述】
+${task}
+
+${reference ? `【參考標準】\n${reference}\n` : '（無標準答案，請根據作品品質綜合判斷）'}
+
+${prompt ? `【學員使用的 Prompt】\n${prompt}\n` : ''}
+
+【學員提交的 HTML 原始碼】
+${htmlSnippet}
+
+═══ 評分規則（滿分 100）═══
+
+A. 功能完整性（35 分）
+- 是否完成任務描述的所有要求（+20）
+- 功能是否正常運作、無明顯 bug（+15）
+
+B. 程式碼品質（25 分）
+- HTML 結構是否語意化、合理（+10）
+- CSS 樣式是否美觀、排版得當（+10）
+- JavaScript 邏輯是否清晰（+5）
+
+C. 視覺設計（25 分）
+- 版面配置是否合理、易閱讀（+10）
+- 色彩搭配、字體選擇是否協調（+10）
+- 有無使用動畫或互動增強體驗（+5）
+
+D. 創意與用心程度（15 分）
+- 是否有超出基本要求的額外功能（+8）
+- 整體完成度與細節打磨（+7）
+
+═══ 重要 ═══
+1. 只有基本 HTML 結構、沒有 CSS 的作品應在 30-45 分
+2. 有基本樣式但功能不完整的作品應在 45-60 分
+3. 功能完整且樣式合理的作品應在 60-80 分
+4. 優秀的作品（功能、設計、創意皆佳）才能 80+
+
+只回傳 JSON，不要有任何其他文字：
+{"score": <整數0到100>, "feedback": "<30字以內的中文評語>"}`;
+
+        try {
+            const result = await ai.chat([
+                { role: 'user', content: judgePrompt },
+            ], { model, maxTokens: 300, temperature: 0.5 });
+
+            let score = 50, feedback = '';
+            try {
+                const jsonMatch = result.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    const raw = Number(parsed.score);
+                    score = isNaN(raw) ? 50 : Math.min(100, Math.max(0, Math.round(raw)));
+                    feedback = parsed.feedback || '';
+                }
+            } catch (e) {
+                console.warn('[WebProject] Judge parse error:', e);
+                feedback = '評分解析失敗';
+            }
+
+            st.wpScore = score;
+            st.wpFeedback = feedback;
+            st.wpScoredAt = new Date().toISOString();
+
+            await db.update('submissions', {
+                state: JSON.stringify(st),
+                score: String(score),
+                is_correct: score >= 60,
+            }, { id: 'eq.' + sub.id });
+
+            const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : '#ef4444';
+            appendLog(`${mi('emoji_events', 14)} ${esc(name)} — <b style="color:${scoreColor};">${score} 分</b>　${esc(feedback)}`, 'success');
+        } catch (err) {
+            console.error('[WebProject] Score error:', err);
+            appendLog(`${mi('error', 14)} ${esc(name)} 評分失敗：${esc(err.message)}`, 'error');
+        }
     }
 
     destroy() { for (const [, id] of this._intervals) clearInterval(id); this._intervals.clear(); }

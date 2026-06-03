@@ -1305,7 +1305,7 @@ export class SlideManager {
                 el.style.overflow = 'hidden';
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/webProject.js').then(({ WebProjectGame }) => {
+                    import('./interactive/webProject.js?v=20260604').then(({ WebProjectGame }) => {
                         if (isLive) {
                             new WebProjectGame().render(el, element);
                         } else {
