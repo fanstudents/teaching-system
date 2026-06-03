@@ -2952,7 +2952,7 @@
                 case 'skillBattle': {
                     el.classList.add('interactive-element', 'skill-battle-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/skillBattle.js').then(({ SkillBattleGame }) => {
+                    import('./scripts/interactive/skillBattle.js?v=20260604').then(({ SkillBattleGame }) => {
                         const isLive = true; // student page is always live
                         new SkillBattleGame().render(el, element, isLive);
                     });
@@ -2962,7 +2962,7 @@
                 case 'skillBattleBoard': {
                     el.classList.add('interactive-element', 'skill-battle-board-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/skillBattle.js').then(({ SkillBattleBoardGame }) => {
+                    import('./scripts/interactive/skillBattle.js?v=20260604').then(({ SkillBattleBoardGame }) => {
                         new SkillBattleBoardGame().render(el, element);
                     });
                     break;
@@ -2971,7 +2971,7 @@
                 case 'skillBattleReview': {
                     el.classList.add('interactive-element', 'skill-battle-review-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/skillBattle.js').then(({ SkillBattleReviewGame }) => {
+                    import('./scripts/interactive/skillBattle.js?v=20260604').then(({ SkillBattleReviewGame }) => {
                         new SkillBattleReviewGame().render(el, element);
                     });
                     break;

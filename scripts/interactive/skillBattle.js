@@ -317,7 +317,8 @@ export class SkillBattleGame {
     /* ═══════════════════════════════════════════════ */
     async _renderTeacher(el, element, elementId) {
         // 取得 session code（用於 filter + realtime）
-        const sessionCode = sessionStorage.getItem('_session_code')
+        const sessionCode = window._activeSessionUUID
+            || sessionStorage.getItem('_session_code')
             || new URLSearchParams(location.search).get('code') || '';
 
         el.innerHTML = `
@@ -328,6 +329,7 @@ export class SkillBattleGame {
                         <button class="sb-btn sb-btn-refresh">${mi('refresh', 16)} 刷新</button>
                         <button class="sb-btn sb-btn-reset-all">${mi('restart_alt', 16)} 重置全部</button>
                         <button class="sb-btn sb-btn-execute-all">${mi('play_arrow', 16)} 全部執行</button>
+                        <button class="sb-btn sb-btn-rank-score" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;font-weight:700;">${mi('emoji_events', 16)} 排名加分</button>
                     </div>
                 </div>
                 <div class="sb-teacher-stats">
@@ -344,6 +346,7 @@ export class SkillBattleGame {
         const refreshBtn = el.querySelector('.sb-btn-refresh');
         const resetAllBtn = el.querySelector('.sb-btn-reset-all');
         const execAllBtn = el.querySelector('.sb-btn-execute-all');
+        const rankScoreBtn = el.querySelector('.sb-btn-rank-score');
         const countSubmitted = el.querySelector('.sb-count-submitted');
         const countScored = el.querySelector('.sb-count-scored');
         const countPending = el.querySelector('.sb-count-pending');
@@ -528,6 +531,60 @@ export class SkillBattleGame {
             this._executing = false;
             execAllBtn.disabled = false;
             execAllBtn.innerHTML = `${mi('play_arrow', 16)} 全部執行`;
+        });
+
+        // ── 排名加分 ──
+        const RANK_POINTS = [10, 7, 5, 3]; // 5th+ = 1
+        rankScoreBtn.addEventListener('click', async () => {
+            const subs = await loadSubmissions();
+            const scored = subs.filter(s => {
+                let st = {};
+                try { st = JSON.parse(s.state || '{}'); } catch {}
+                return st.status === 'scored' && st.score != null;
+            });
+
+            if (scored.length === 0) {
+                this._appendLog(logEl, `${mi('warning', 14)} 沒有已評分的提交，請先執行全部`, 'error');
+                return;
+            }
+
+            // 排名：分數 desc → 時間 asc
+            scored.sort((a, b) => {
+                let sa = {}, sb2 = {};
+                try { sa = JSON.parse(a.state || '{}'); } catch {}
+                try { sb2 = JSON.parse(b.state || '{}'); } catch {}
+                const scoreDiff = (sb2.score || 0) - (sa.score || 0);
+                if (scoreDiff !== 0) return scoreDiff;
+                return new Date(a.submitted_at || a.created_at) - new Date(b.submitted_at || b.created_at);
+            });
+
+            rankScoreBtn.disabled = true;
+            rankScoreBtn.innerHTML = `${mi('progress_activity', 16)} 計算中...`;
+            this._appendLog(logEl, `${mi('emoji_events', 14)} 開始排名加分（${scored.length} 人）`, 'info');
+
+            for (let i = 0; i < scored.length; i++) {
+                const pts = i < RANK_POINTS.length ? RANK_POINTS[i] : 1;
+                const s = scored[i];
+                let st = {};
+                try { st = JSON.parse(s.state || '{}'); } catch {}
+                st._awarded = pts;
+                st._rankPoints = pts;
+                st._rank = i + 1;
+
+                await db.update('submissions', {
+                    state: JSON.stringify(st),
+                    awarded_points: pts,
+                }, { id: 'eq.' + s.id });
+
+                const name = s.student_name || s.student_email?.split('@')[0] || '?';
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+                this._appendLog(logEl, `${medal} ${esc(name)} — ${st.score}分 → <b style="color:#f59e0b;">+${pts} 排名分</b>`, 'success');
+            }
+
+            rankScoreBtn.disabled = false;
+            rankScoreBtn.innerHTML = `${mi('emoji_events', 16)} 排名加分`;
+            this._appendLog(logEl, `${mi('check_circle', 14)} 排名加分完成！已寫入排行榜`, 'success');
+            await loadSubmissions();
         });
 
         // 自動刷新

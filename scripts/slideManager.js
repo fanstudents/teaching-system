@@ -1257,7 +1257,7 @@ export class SlideManager {
                 this._addScoreBadge(el, element);
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/skillBattle.js').then(({ SkillBattleGame }) => {
+                    import('./interactive/skillBattle.js?v=20260604').then(({ SkillBattleGame }) => {
                         if (isLive) {
                             new SkillBattleGame().render(el, element);
                         } else {
@@ -1273,7 +1273,7 @@ export class SlideManager {
                 el.style.overflow = 'hidden';
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/skillBattle.js').then(({ SkillBattleBoardGame }) => {
+                    import('./interactive/skillBattle.js?v=20260604').then(({ SkillBattleBoardGame }) => {
                         if (isLive) {
                             new SkillBattleBoardGame().render(el, element);
                         } else {
@@ -1289,7 +1289,7 @@ export class SlideManager {
                 el.style.overflow = 'hidden';
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/skillBattle.js').then(({ SkillBattleReviewGame }) => {
+                    import('./interactive/skillBattle.js?v=20260604').then(({ SkillBattleReviewGame }) => {
                         if (isLive) {
                             new SkillBattleReviewGame().render(el, element);
                         } else {
