@@ -409,4 +409,10 @@ export class GroupPickGame {
             });
         });
     }
+
+    /* ─── 清理 ─── */
+    destroy() {
+        if (this._studentTimer) { clearInterval(this._studentTimer); this._studentTimer = null; }
+        if (this._teacherTimer) { clearInterval(this._teacherTimer); this._teacherTimer = null; }
+    }
 }
