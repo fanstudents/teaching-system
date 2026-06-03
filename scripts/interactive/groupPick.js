@@ -290,6 +290,7 @@ export class GroupPickGame {
         let scoreMode = 'total';
 
         el.innerHTML = `
+        <style>@keyframes gpSeatPop { from { opacity:0;transform:scale(.6); } to { opacity:1;transform:scale(1); } }</style>
         <div class="gp-canvas gp-canvas--teacher" style="overflow-y:auto;display:flex;flex-direction:column;">
             <div class="gp-teacher-header" style="position:relative;">
                 <div class="gp-teacher-title">${mi('groups', 22)} 現場分組</div>
@@ -384,25 +385,60 @@ export class GroupPickGame {
                 const score = calcScore(totalScore, members.length);
                 const scoreLabel = scoreMode === 'avg' ? '平均' : '總分';
 
-                return `<div class="gp-wall-card" style="--gp-color:${color};">
-                    <div class="gp-wall-card-top">
-                        <div class="gp-wall-card-color" style="background:${color};"></div>
-                        <div class="gp-wall-card-info">
-                            <div class="gp-wall-card-name">${esc(name)}</div>
-                            <div class="gp-wall-card-meta">
-                                ${mi('person', 14)} <b>${members.length}</b> 人
-                                <span style="margin-left:8px;">${scoreLabel} <b>${score}</b></span>
-                            </div>
+                // 6 seat positions: top(3) + bottom(3)
+                const maxSeats = 6;
+                const seatMembers = members.slice(0, maxSeats);
+                const overflow = members.slice(maxSeats);
+                // Pad to 6
+                while (seatMembers.length < maxSeats) seatMembers.push(null);
+                const topSeats = seatMembers.slice(0, 3);
+                const bottomSeats = [seatMembers[5], seatMembers[4], seatMembers[3]]; // reverse for visual symmetry
+
+                const seatHtml = (m) => {
+                    if (!m) return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:48px;">
+                        <div style="width:38px;height:38px;border-radius:50%;border:2px dashed ${color}40;
+                            display:flex;align-items:center;justify-content:center;
+                            color:${color}50;font-size:16px;">
+                            ${mi('person', 16)}
+                        </div>
+                        <span style="font-size:10px;color:#cbd5e1;">空位</span>
+                    </div>`;
+                    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:48px;animation:gpSeatPop .3s ease;">
+                        <div style="width:38px;height:38px;border-radius:50%;background:${color};color:#fff;
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:15px;font-weight:700;box-shadow:0 3px 10px ${color}50;
+                            border:2.5px solid #fff;letter-spacing:-0.5px;">${esc(m.name.charAt(0))}</div>
+                        <span style="font-size:10px;color:#334155;font-weight:500;max-width:60px;text-align:center;
+                            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.name)}</span>
+                    </div>`;
+                };
+
+                return `<div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px 14px;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #f1f5f9;">
+                    <!-- Top seats -->
+                    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px;">
+                        ${topSeats.map(seatHtml).join('')}
+                    </div>
+                    <!-- Table -->
+                    <div style="background:linear-gradient(135deg, ${color}12, ${color}22);
+                        border:2.5px solid ${color}35;border-radius:18px;
+                        padding:14px 24px;min-width:160px;text-align:center;position:relative;
+                        box-shadow:inset 0 1px 3px ${color}10;">
+                        <div style="font-size:15px;font-weight:800;color:${color};letter-spacing:.5px;">${esc(name)}</div>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:5px;font-size:12px;color:#64748b;">
+                            <span style="display:inline-flex;align-items:center;gap:2px;">${mi('person', 13)} <b>${members.length}</b></span>
+                            <span style="color:#e2e8f0;">|</span>
+                            <span>${scoreLabel} <b style="color:${color};font-size:14px;">${score}</b></span>
                         </div>
                     </div>
-                    <div class="gp-wall-members">
-                        ${members.length ? members.map(m =>
-                            `<div class="gp-wall-member">
-                                <div class="gp-wall-avatar" style="background:${color};">${esc(m.name.charAt(0))}</div>
-                                <span class="gp-wall-member-name">${esc(m.name)}</span>
-                            </div>`
-                        ).join('') : `<div class="gp-wall-empty">等待學員加入…</div>`}
+                    <!-- Bottom seats -->
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;">
+                        ${bottomSeats.map(seatHtml).join('')}
                     </div>
+                    ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;">
+                        ${overflow.map(m => `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;background:#f8fafc;padding:2px 8px;border-radius:10px;">
+                            <span style="width:5px;height:5px;border-radius:50%;background:${color};"></span>${esc(m.name)}
+                        </span>`).join('')}
+                    </div>` : ''}
                 </div>`;
             }).join('');
         };
