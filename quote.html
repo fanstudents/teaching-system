@@ -1,1900 +1,785 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>報價與課程規劃 — 數位簡報室</title>
-    <meta name="description" content="數位簡報室課程報價與教學規劃">
-    <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-    <link rel="stylesheet" href="styles/quote-page.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>課程報價試算 — 數位簡報室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #0b0f1a;
+    --surface: rgba(255,255,255,0.04);
+    --surface-2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --text: #e2e8f0;
+    --text-2: #94a3b8;
+    --accent: #818cf8;
+    --accent-2: #6366f1;
+    --gold: #fbbf24;
+    --green: #34d399;
+    --font: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+    font-family: var(--font); background: var(--bg); color: var(--text);
+    min-height: 100vh; line-height: 1.6;
+    background-image:
+        radial-gradient(ellipse 80% 60% at 50% -20%, rgba(99,102,241,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(251,191,36,0.06) 0%, transparent 50%);
+}
+
+/* ── Layout ── */
+.page { max-width: 960px; margin: 0 auto; padding: 32px 24px 60px; }
+
+/* ── Header ── */
+.header {
+    text-align: center; padding: 48px 0 36px;
+}
+.header-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 20px;
+    background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2);
+    color: var(--accent); font-size: 0.75rem; font-weight: 600;
+    margin-bottom: 16px; letter-spacing: 1px;
+}
+.header h1 {
+    font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #e2e8f0, #818cf8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header p { color: var(--text-2); font-size: 0.9rem; margin-top: 8px; }
+
+/* ── Card ── */
+.card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; margin-bottom: 20px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: border-color 0.3s;
+}
+.card:hover { border-color: rgba(255,255,255,0.12); }
+.card-title {
+    font-size: 0.8rem; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+}
+.card-title .material-symbols-outlined { font-size: 18px; }
+
+/* ── Form Controls ── */
+.form-group { margin-bottom: 22px; }
+.form-label {
+    font-size: 0.82rem; font-weight: 600; color: var(--text-2);
+    margin-bottom: 10px; display: block;
+}
+
+/* Radio Pills */
+.pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill-input { display: none; }
+.pill-label {
+    padding: 10px 18px; border-radius: 12px;
+    background: var(--surface-2); border: 1.5px solid var(--border);
+    color: var(--text-2); font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: all 0.25s; user-select: none;
+    display: flex; align-items: center; gap: 6px;
+}
+.pill-label:hover { border-color: var(--accent); color: var(--text); }
+.pill-input:checked + .pill-label {
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(129,140,248,0.1));
+    border-color: var(--accent); color: #fff;
+    box-shadow: 0 0 16px rgba(99,102,241,0.15);
+}
+.pill-sub { font-size: 0.65rem; color: var(--text-2); font-weight: 400; }
+.pill-input:checked + .pill-label .pill-sub { color: rgba(255,255,255,0.6); }
+
+/* Slider */
+.slider-wrap { position: relative; }
+.slider-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+}
+.slider-value {
+    font-size: 1.6rem; font-weight: 900; color: var(--gold);
+    font-variant-numeric: tabular-nums;
+}
+.slider-value span { font-size: 0.8rem; font-weight: 500; color: var(--text-2); }
+input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 6px;
+    border-radius: 3px; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--accent-2) 0%, var(--accent-2) var(--pct, 50%), rgba(255,255,255,0.08) var(--pct, 50%));
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; border: 3px solid var(--accent);
+    background: var(--bg); cursor: grab;
+    box-shadow: 0 0 12px rgba(99,102,241,0.4);
+    transition: box-shadow 0.2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 20px rgba(99,102,241,0.6);
+}
+.slider-ticks {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; padding: 0 2px;
+}
+.slider-tick {
+    font-size: 0.62rem; color: var(--text-2); cursor: pointer;
+    transition: color 0.2s;
+}
+.slider-tick:hover { color: var(--accent); }
+
+/* ── Price Display ── */
+.price-display {
+    text-align: center; padding: 32px 0;
+}
+.price-tag {
+    font-size: 0.75rem; color: var(--text-2); font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
+}
+.price-amount {
+    font-size: 3.2rem; font-weight: 900; letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.3s;
+}
+.price-per {
+    font-size: 0.85rem; color: var(--text-2); margin-top: 4px;
+}
+.price-per b { color: var(--green); }
+.price-breakdown {
+    display: flex; justify-content: center; gap: 24px; margin-top: 18px;
+    flex-wrap: wrap;
+}
+.price-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 12px 20px; border-radius: 12px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    min-width: 120px;
+}
+.price-item-label { font-size: 0.68rem; color: var(--text-2); }
+.price-item-value { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+/* ── Actions ── */
+.actions {
+    display: flex; gap: 12px; justify-content: center;
+    margin-top: 16px; flex-wrap: wrap;
+}
+.btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 12px 28px; border-radius: 12px; border: none;
+    font-size: 0.88rem; font-weight: 700; cursor: pointer;
+    font-family: var(--font); transition: all 0.25s;
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    color: #fff; box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(99,102,241,0.4); }
+.btn-secondary {
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--accent); }
+.btn .material-symbols-outlined { font-size: 18px; }
+
+/* ── Custom Topic Input ── */
+.custom-topic-input {
+    display: none; margin-top: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    background: var(--surface-2); border: 1.5px solid var(--border);
+    color: var(--text); font-size: 0.85rem; font-family: var(--font);
+    width: 100%; transition: border-color 0.2s; outline: none;
+}
+.custom-topic-input:focus { border-color: var(--accent); }
+.custom-topic-input.visible { display: block; }
+
+/* ── Duration Stepper ── */
+.stepper {
+    display: inline-flex; align-items: center; gap: 0;
+    border-radius: 12px; overflow: hidden;
+    border: 1.5px solid var(--border);
+}
+.stepper-btn {
+    width: 40px; height: 40px; border: none;
+    background: var(--surface-2); color: var(--text);
+    font-size: 1.2rem; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s; font-family: var(--font);
+}
+.stepper-btn:hover { background: rgba(99,102,241,0.15); color: var(--accent); }
+.stepper-val {
+    width: 60px; text-align: center; font-size: 1rem;
+    font-weight: 700; color: var(--gold); background: transparent;
+    border: none; font-family: var(--font);
+}
+.stepper-unit { font-size: 0.82rem; color: var(--text-2); margin-left: 10px; font-weight: 500; }
+
+/* ── Preview Table ── */
+.preview-section { display: none; }
+.preview-section.visible { display: block; }
+.quote-preview {
+    background: #fff; color: #1e293b; border-radius: 16px;
+    overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+}
+.qp-header {
+    padding: 32px 36px 20px; border-bottom: 2px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+}
+.qp-brand { display: flex; flex-direction: column; gap: 4px; }
+.qp-brand-name { font-size: 1.2rem; font-weight: 800; color: #1e293b; }
+.qp-brand-sub { font-size: 0.72rem; color: #64748b; }
+.qp-meta { text-align: right; font-size: 0.75rem; color: #64748b; line-height: 1.8; }
+.qp-meta b { color: #1e293b; }
+
+.qp-body { padding: 24px 36px; }
+.qp-section-title {
+    font-size: 0.72rem; font-weight: 700; color: #6366f1;
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;
+}
+.qp-table {
+    width: 100%; border-collapse: collapse; margin-bottom: 24px;
+    font-size: 0.82rem;
+}
+.qp-table th {
+    text-align: left; padding: 10px 12px; font-weight: 600;
+    color: #64748b; border-bottom: 2px solid #e2e8f0;
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px;
+}
+.qp-table td {
+    padding: 12px; border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+.qp-table tr:last-child td { border-bottom: none; }
+.qp-table .text-right { text-align: right; }
+.qp-table .total-row td {
+    font-weight: 800; font-size: 0.95rem; color: #1e293b;
+    border-top: 2px solid #1e293b; border-bottom: none;
+    padding-top: 14px;
+}
+
+.qp-notes {
+    background: #f8fafc; border-radius: 10px; padding: 16px 20px;
+    margin-bottom: 20px;
+}
+.qp-notes-title {
+    font-size: 0.72rem; font-weight: 700; color: #6366f1;
+    margin-bottom: 8px;
+}
+.qp-notes ul {
+    padding-left: 18px; font-size: 0.78rem; color: #475569;
+    line-height: 1.8;
+}
+
+.qp-footer {
+    padding: 20px 36px; background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+}
+.qp-footer-brand {
+    font-size: 0.78rem; font-weight: 700; color: #1e293b;
+}
+.qp-footer-info {
+    font-size: 0.68rem; color: #94a3b8; text-align: right; line-height: 1.8;
+}
+
+/* ── Comparison Table ── */
+.compare-section { margin-top: 28px; }
+.compare-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin-top: 16px;
+}
+.compare-card {
+    background: var(--surface-2); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 20px; text-align: center;
+    transition: all 0.3s; cursor: pointer;
+}
+.compare-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.compare-card.active {
+    border-color: var(--gold); background: rgba(251,191,36,0.06);
+}
+.compare-card-people {
+    font-size: 1.6rem; font-weight: 900; color: var(--gold);
+}
+.compare-card-people span { font-size: 0.75rem; color: var(--text-2); font-weight: 500; }
+.compare-card-price {
+    font-size: 1.1rem; font-weight: 700; color: var(--text); margin-top: 6px;
+}
+.compare-card-per {
+    font-size: 0.7rem; color: var(--green); margin-top: 2px;
+}
+.compare-card-discount {
+    display: inline-block; margin-top: 8px;
+    padding: 3px 10px; border-radius: 8px; font-size: 0.65rem;
+    font-weight: 700; background: rgba(52,211,153,0.1);
+    color: var(--green); border: 1px solid rgba(52,211,153,0.2);
+}
+
+/* ── Footer ── */
+.site-footer {
+    margin-top: 60px; padding: 36px 0;
+    border-top: 1px solid var(--border); text-align: center;
+}
+.footer-brand { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.footer-desc { font-size: 0.78rem; color: var(--text-2); max-width: 500px; margin: 0 auto 16px; line-height: 1.7; }
+.footer-links {
+    display: flex; justify-content: center; gap: 20px;
+    flex-wrap: wrap; margin-bottom: 16px;
+}
+.footer-link {
+    font-size: 0.72rem; color: var(--text-2);
+    display: flex; align-items: center; gap: 4px;
+}
+.footer-link .material-symbols-outlined { font-size: 14px; }
+.footer-copy { font-size: 0.65rem; color: rgba(255,255,255,0.2); }
+
+/* ── Print ── */
+@media print {
+    body { background: #fff; color: #000; }
+    .page { max-width: none; padding: 0; }
+    .header, .card, .actions, .compare-section, .site-footer { display: none !important; }
+    .preview-section { display: block !important; }
+    .quote-preview { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .page { padding: 20px 16px 40px; }
+    .header h1 { font-size: 1.6rem; }
+    .card { padding: 20px; }
+    .pill-label { padding: 8px 14px; font-size: 0.78rem; }
+    .price-amount { font-size: 2.4rem; }
+    .qp-header, .qp-body, .qp-footer { padding-left: 20px; padding-right: 20px; }
+}
+
+/* ── Animations ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.card { animation: fadeUp 0.5s ease-out both; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.2s; }
+</style>
 </head>
 <body>
+<div class="page">
 
-<!-- Loading -->
-<div class="q-loading" id="loadingScreen">
-    <div class="q-loading-inner">
-        <img src="assets/images/tbrlogo.png" alt="Logo" style="width:48px;height:48px;margin-bottom:16px;border-radius:8px">
-        <div class="q-loading-spinner"></div>
-        <p>載入報價資料中…</p>
-    </div>
-</div>
-
-<!-- Error -->
-<div class="q-error" id="errorScreen" style="display:none">
-    <div class="q-error-inner">
-        <span class="material-symbols-outlined" style="font-size:48px;color:#ef4444;margin-bottom:16px">error</span>
-        <h2>無法載入報價單</h2>
-        <p id="errorMsg">找不到此報價單，請確認連結是否正確。</p>
-    </div>
-</div>
-
-<!-- Main Content -->
-<div class="q-page" id="mainContent" style="display:none">
-    <!-- Print-only Cover Page (first child for print order) -->
-    <div class="q-print-cover" id="printCover">
-        <img src="assets/images/tbrlogo.png" alt="TBR" class="q-print-cover-logo">
-        <div class="q-print-cover-title" id="printCoverTitle">課程報價</div>
-        <div class="q-print-cover-client" id="printCoverClient"></div>
-        <div class="q-print-cover-date" id="printCoverDate"></div>
-        <div class="q-print-cover-divider"></div>
-        <div class="q-print-cover-brand">數位簡報室 TBR.Digital</div>
-        <div class="q-print-cover-url">https://tbr.digital</div>
-        <div class="q-print-cover-time" id="printCoverTime"></div>
-    </div>
-
-    <!-- Print Header -->
-    <header class="q-topbar" id="topbar">
-        <div class="q-topbar-left">
-            <img src="assets/images/tbrlogo.png" alt="TBR" class="q-topbar-logo">
-            <span class="q-topbar-brand">數位簡報室 TBR.Digital</span>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-badge">
+            <span class="material-symbols-outlined" style="font-size:14px;">calculate</span>
+            QUOTE CALCULATOR
         </div>
-        <div class="q-topbar-right">
-            <button class="q-btn q-btn-outline" onclick="openEsign()">
-                <span class="material-symbols-outlined" style="font-size:16px">draw</span> 電子簽核
+        <h1>課程報價試算</h1>
+        <p>根據人數、主題與授課對象，即時計算最適合的方案</p>
+    </div>
+
+    <!-- 課程主題 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="material-symbols-outlined">school</span>
+            課程主題
+        </div>
+        <div class="form-group">
+            <div class="pill-group" id="topicGroup">
+                <input type="radio" name="topic" value="ai_intro" id="t1" class="pill-input" checked>
+                <label for="t1" class="pill-label">AI 基礎入門<span class="pill-sub">· 半天/全天</span></label>
+
+                <input type="radio" name="topic" value="ai_app" id="t2" class="pill-input">
+                <label for="t2" class="pill-label">ChatGPT / Claude 實戰<span class="pill-sub">· 進階應用</span></label>
+
+                <input type="radio" name="topic" value="ai_ppt" id="t3" class="pill-input">
+                <label for="t3" class="pill-label">AI 簡報製作<span class="pill-sub">· 企業簡報</span></label>
+
+                <input type="radio" name="topic" value="ai_dev" id="t4" class="pill-input">
+                <label for="t4" class="pill-label">AI 程式開發<span class="pill-sub">· Coding</span></label>
+
+                <input type="radio" name="topic" value="ai_data" id="t5" class="pill-input">
+                <label for="t5" class="pill-label">AI 數據分析<span class="pill-sub">· BI / 報表</span></label>
+
+                <input type="radio" name="topic" value="custom" id="t6" class="pill-input">
+                <label for="t6" class="pill-label">🎯 自訂主題</label>
+            </div>
+            <input type="text" class="custom-topic-input" id="customTopic" placeholder="請輸入自訂課程主題…">
+        </div>
+    </div>
+
+    <!-- 授課對象 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="material-symbols-outlined">groups</span>
+            授課對象
+        </div>
+        <div class="form-group">
+            <div class="pill-group" id="audienceGroup">
+                <input type="radio" name="audience" value="general" id="a1" class="pill-input" checked>
+                <label for="a1" class="pill-label">🏢 一般部門<span class="pill-sub">· 標準方案</span></label>
+
+                <input type="radio" name="audience" value="management" id="a2" class="pill-input">
+                <label for="a2" class="pill-label">👔 管理層<span class="pill-sub">· 高階主管</span></label>
+
+                <input type="radio" name="audience" value="engineering" id="a3" class="pill-input">
+                <label for="a3" class="pill-label">💻 工程團隊<span class="pill-sub">· 技術深度</span></label>
+
+                <input type="radio" name="audience" value="special" id="a4" class="pill-input">
+                <label for="a4" class="pill-label">✨ 特殊場景<span class="pill-sub">· 客製化</span></label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人數 + 時數 -->
+    <div class="card">
+        <div class="card-title">
+            <span class="material-symbols-outlined">tune</span>
+            人數與時數
+        </div>
+
+        <div class="form-group">
+            <div class="slider-header">
+                <span class="form-label" style="margin:0;">參加人數</span>
+                <div class="slider-value"><span id="peopleVal">30</span> <span>人</span></div>
+            </div>
+            <input type="range" id="peopleSlider" min="5" max="200" value="30" step="5">
+            <div class="slider-ticks">
+                <span class="slider-tick" data-v="5">5</span>
+                <span class="slider-tick" data-v="20">20</span>
+                <span class="slider-tick" data-v="50">50</span>
+                <span class="slider-tick" data-v="100">100</span>
+                <span class="slider-tick" data-v="150">150</span>
+                <span class="slider-tick" data-v="200">200</span>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span class="form-label" style="margin:0;">授課時數</span>
+                <div style="display:flex;align-items:center;">
+                    <div class="stepper">
+                        <button class="stepper-btn" id="hourMinus">−</button>
+                        <input type="text" class="stepper-val" id="hourVal" value="6" readonly>
+                        <button class="stepper-btn" id="hourPlus">+</button>
+                    </div>
+                    <span class="stepper-unit">小時</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Display -->
+    <div class="card">
+        <div class="price-display">
+            <div class="price-tag">估算總價</div>
+            <div class="price-amount" id="totalPrice">NT$ 0</div>
+            <div class="price-per">每人約 <b id="perPersonPrice">NT$ 0</b></div>
+            <div class="price-breakdown" id="priceBreakdown"></div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="previewBtn">
+                <span class="material-symbols-outlined">preview</span>
+                產生報價單預覽
             </button>
-            <button class="q-btn q-btn-outline" onclick="openPrintOptions()">
-                <span class="material-symbols-outlined" style="font-size:16px">print</span> 列印 / 匯出
+            <button class="btn btn-secondary" id="printBtn" style="display:none;">
+                <span class="material-symbols-outlined">print</span>
+                列印 / PDF
+            </button>
+            <button class="btn btn-secondary" id="copyBtn" style="display:none;">
+                <span class="material-symbols-outlined">content_copy</span>
+                複製連結
             </button>
         </div>
-    </header>
-
-    <!-- Expiry Banner -->
-    <div class="q-expiry-banner" id="expiryBanner" style="display:none">
-        <span class="material-symbols-outlined" style="font-size:18px">timer</span>
-        <span id="expiryBannerText"></span>
     </div>
 
-    <div class="q-container">
-        <!-- Quote Header -->
-        <section class="q-header">
-            <div class="q-header-logos">
-                <img id="clientLogo" src="" alt="" class="q-header-client-logo" style="display:none">
-            </div>
-            <div class="q-header-info">
-                <div class="q-badge" id="statusBadge">報價單</div>
-                <h1 id="quoteTitle">課程報價</h1>
-                <div class="q-header-meta">
-                    <span id="clientNameDisplay"></span>
-                    <span id="quoteDateDisplay"></span>
-                    <span id="validUntilDisplay"></span>
-                </div>
-            </div>
-        </section>
-        <!-- Variant Tabs (only shown when variants exist) -->
-        <div class="q-variant-tabs" id="variantTabs" style="display:none">
-            <div class="q-variant-tabs-inner" id="variantTabsInner"></div>
-            <button class="q-compare-btn" id="compareBtn" onclick="compareVersions()" style="display:none">
-                <span class="material-symbols-outlined" style="font-size:16px">compare_arrows</span>
-                版本比較
-            </button>
+    <!-- Comparison Cards -->
+    <div class="card compare-section">
+        <div class="card-title">
+            <span class="material-symbols-outlined">compare_arrows</span>
+            不同人數方案對照
         </div>
-
-        <!-- Course Outline (loaded from project) -->
-        <div id="outlineSection" style="display:none">
-            <section class="q-section">
-                <div class="q-section-header">
-                    <div class="q-section-icon"><span class="material-symbols-outlined">view_timeline</span></div>
-                    <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
-                </div>
-                <div class="q-timeline timeline" id="outlineTimeline"></div>
-                <div class="suggest-topic-area" style="padding:28px 12px;border-top:1px dashed #ddd;margin-top:8px">
-                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-                        <span class="material-symbols-outlined" style="font-size:20px;color:var(--q-accent)">lightbulb</span>
-                        <div>
-                            <div style="font-size:1rem;font-weight:700;color:var(--q-text)">課綱建議</div>
-                            <div style="font-size:.82rem;color:var(--q-text-3)">歡迎提出您希望加入的主題或調整方向</div>
-                        </div>
-                    </div>
-                    <div class="suggested-list" id="suggestedList"></div>
-                    <button style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:var(--q-radius);background:none;border:1.5px dashed #ccc;color:var(--q-text-2);font-size:.95rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s" onclick="openSuggestSheet()" type="button" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)';this.style.background='var(--q-accent-light)'" onmouseout="this.style.borderColor='#ccc';this.style.color='var(--q-text-2)';this.style.background='none'">
-                        <span class="material-symbols-outlined" style="font-size:22px">add_circle_outline</span>
-                        建議新增主題
-                    </button>
-                </div>
-            </section>
-
-            <!-- Tools -->
-            <section class="q-section" id="toolsSection" style="display:none">
-                <div class="q-section-header">
-                    <div class="q-section-icon"><span class="material-symbols-outlined">build</span></div>
-                    <div><div class="q-section-title">使用工具清單</div><div class="q-section-desc">課程中會使用到的 AI 應用工具</div></div>
-                </div>
-                <div class="q-tool-grid" id="toolGrid"></div>
-            </section>
-
-            <!-- Equipment -->
-            <section class="q-section" id="equipSection" style="display:none">
-                <div class="q-section-header">
-                    <div class="q-section-icon"><span class="material-symbols-outlined">devices</span></div>
-                    <div><div class="q-section-title">設備需求</div><div class="q-section-desc">場地與設備準備清單</div></div>
-                </div>
-                <div class="q-equip-grid" id="equipGrid"></div>
-            </section>
-
-            <!-- Instructor (inside outline block so it toggles per variant) -->
-            <section class="q-section" id="instructorSection" style="display:none">
-                <div class="q-section-header">
-                    <div class="q-section-icon"><span class="material-symbols-outlined">school</span></div>
-                    <div><div class="q-section-title">講師介紹</div><div class="q-section-desc">本課程授課講師團隊</div></div>
-                </div>
-                <div id="instructorContent"></div>
-            </section>
-        </div>
-
-        <!-- Learning Outcomes -->
-        <section class="q-section" id="outcomesSection">
-            <div class="q-section-header">
-                <div class="q-section-icon"><span class="material-symbols-outlined">emoji_events</span></div>
-                <div><div class="q-section-title">預計培訓成果</div><div class="q-section-desc">完成培訓後，學員將能夠達成以下成果</div></div>
-            </div>
-            <div id="outcomesContent" style="padding:20px 0">
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
-                    <div style="display:flex;gap:12px;padding:18px;border:1px solid var(--q-border);border-radius:10px;align-items:flex-start;transition:background .1s">
-                        <div style="width:36px;height:36px;border-radius:8px;background:#ecfdf5;color:#10b981;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:18px">check_circle</span></div>
-                        <div><div style="font-weight:700;font-size:.92rem;margin-bottom:3px">獨立運用 AI 工具</div><div style="font-size:.82rem;color:var(--q-text-2);line-height:1.6">能獨立使用至少 3 種以上 AI 工具完成工作任務，提升日常辦公效率</div></div>
-                    </div>
-                    <div style="display:flex;gap:12px;padding:18px;border:1px solid var(--q-border);border-radius:10px;align-items:flex-start;transition:background .1s">
-                        <div style="width:36px;height:36px;border-radius:8px;background:#eff6ff;color:#3b82f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:18px">psychology</span></div>
-                        <div><div style="font-weight:700;font-size:.92rem;margin-bottom:3px">掌握 Prompt 設計技巧</div><div style="font-size:.82rem;color:var(--q-text-2);line-height:1.6">學會結構化的 Prompt 設計方法，有效引導 AI 產出高品質內容</div></div>
-                    </div>
-                    <div style="display:flex;gap:12px;padding:18px;border:1px solid var(--q-border);border-radius:10px;align-items:flex-start;transition:background .1s">
-                        <div style="width:36px;height:36px;border-radius:8px;background:#fef3c7;color:#f59e0b;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:18px">speed</span></div>
-                        <div><div style="font-weight:700;font-size:.92rem;margin-bottom:3px">工作效率顯著提升</div><div style="font-size:.82rem;color:var(--q-text-2);line-height:1.6">透過 AI 自動化重複工作，預估可節省 30-50% 的作業時間</div></div>
-                    </div>
-                    <div style="display:flex;gap:12px;padding:18px;border:1px solid var(--q-border);border-radius:10px;align-items:flex-start;transition:background .1s">
-                        <div style="width:36px;height:36px;border-radius:8px;background:#fce7f3;color:#ec4899;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:18px">auto_awesome</span></div>
-                        <div><div style="font-weight:700;font-size:.92rem;margin-bottom:3px">建立 AI 應用思維</div><div style="font-size:.82rem;color:var(--q-text-2);line-height:1.6">具備將 AI 融入工作流程的思維模式，持續探索新的應用場景</div></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quote Table -->
-        <section class="q-section" id="pricingSectionWrap">
-            <div class="q-section-header">
-                <div class="q-section-icon"><span class="material-symbols-outlined">receipt_long</span></div>
-                <div><div class="q-section-title">費用明細</div><div class="q-section-desc">以下費用皆為未稅價格</div></div>
-            </div>
-            <!-- Multi-variant pricing cards (populated by JS) -->
-            <div class="q-pricing-cards" id="pricingCards" style="display:none"></div>
-            <!-- Fallback: single table -->
-            <div class="q-table-wrap" id="singlePricingWrap">
-                <table class="q-table" id="quoteTable">
-                    <thead>
-                        <tr>
-                            <th class="q-th-item">項目</th>
-                            <th class="q-th-price">單價</th>
-                            <th class="q-th-qty">數量</th>
-                            <th class="q-th-amount">總價</th>
-                        </tr>
-                    </thead>
-                    <tbody id="quoteTableBody">
-                    </tbody>
-                    <tfoot>
-                        <tr class="q-total-row q-subtotal-row" id="subtotalRow" style="display:none">
-                            <td colspan="3" class="q-total-label">小計</td>
-                            <td class="q-total-amount" id="subtotalAmount" style="font-size:1.05rem;color:var(--q-text-2)"></td>
-                        </tr>
-                        <tr class="q-discount-row" id="discountRow" style="display:none">
-                            <td colspan="3" class="q-total-label" style="color:#10b981">折扣優惠</td>
-                            <td class="q-total-amount" id="discountAmount" style="font-size:1.05rem;color:#10b981"></td>
-                        </tr>
-                        <tr class="q-total-row">
-                            <td colspan="3" class="q-total-label">合計（未稅）</td>
-                            <td class="q-total-amount" id="totalAmount">$0</td>
-                        </tr>
-                        <tr class="q-total-row q-tax-row">
-                            <td colspan="3" class="q-total-label" style="font-weight:500;color:var(--q-text-2)">營業稅 5%</td>
-                            <td class="q-total-amount" id="taxAmount" style="font-size:1rem;color:var(--q-text-2)">$0</td>
-                        </tr>
-                        <tr class="q-total-row q-grand-total-row" style="border-top:2px solid var(--q-border)">
-                            <td colspan="3" class="q-total-label" style="font-size:1.1rem;font-weight:800">總計（含稅）</td>
-                            <td class="q-total-amount" id="grandTotalAmount" style="font-size:1.25rem;font-weight:800;color:var(--q-accent)">$0</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </section>
-
-        <!-- Notes -->
-        <div id="notesSection" style="display:none">
-            <section class="q-section">
-                <div class="q-section-header">
-                    <div class="q-section-icon"><span class="material-symbols-outlined">sticky_note_2</span></div>
-                    <div><div class="q-section-title">備註說明</div></div>
-                </div>
-                <div class="q-notes" id="notesContent"></div>
-            </section>
-        </div>
-
-        <!-- Payment Info -->
-        <section class="q-section">
-            <div class="q-section-header">
-                <div class="q-section-icon"><span class="material-symbols-outlined">account_balance</span></div>
-                <div><div class="q-section-title">付款資訊</div><div class="q-section-desc">匯款方式與收款帳號</div></div>
-            </div>
-            <div class="q-payment-note">
-                <span class="material-symbols-outlined">info</span>
-                為保留講師時段，請依付款時間完成匯款，我們將開立電子發票。
-            </div>
-            <div class="q-payment-grid">
-                <div class="q-payment-card">
-                    <div class="q-payment-label">付款方式</div>
-                    <div class="q-payment-value" id="paymentMethod">銀行匯款</div>
-                </div>
-                <div class="q-payment-card">
-                    <div class="q-payment-label">收款時間</div>
-                    <div class="q-payment-value" id="paymentTerms">為保留老師的時間，請於開課前五天前支付款項</div>
-                </div>
-                <div class="q-payment-card q-payment-bank" id="bankInfoCard">
-                    <div class="q-payment-label">匯款帳號</div>
-                    <div class="q-bank-details" id="bankDetails">
-                        <!-- 動態填入 -->
-                    </div>
-                </div>
-            </div>
-            <div class="q-invoice-section">
-                <div class="q-invoice-label">
-                    <span class="material-symbols-outlined">mail</span>
-                    發票收件 Email
-                </div>
-                <div class="q-invoice-form">
-                    <input type="email" id="invoiceEmail" class="q-invoice-input" placeholder="請輸入收取發票的 Email 地址">
-                    <button class="q-invoice-submit" id="invoiceSubmitBtn" onclick="submitInvoiceEmail()" type="button">確認</button>
-                </div>
-                <div class="q-invoice-saved" id="invoiceSaved" style="display:none">
-                    <span class="material-symbols-outlined">check_circle</span>
-                    <span id="invoiceSavedText"></span>
-                </div>
-            </div>
-        </section>
-
-
-
-        <!-- About -->
-        <section class="q-section" id="aboutSection">
-            <div class="q-section-header">
-                <div class="q-section-icon"><span class="material-symbols-outlined">apartment</span></div>
-                <div><div class="q-section-title">關於數位簡報室</div><div class="q-section-desc">台灣 AI 企業內訓的第一品牌</div></div>
-            </div>
-            <div class="q-about-content">
-                <!-- Company Intro -->
-                <div class="q-about-intro">
-                    <p>原騰數位科技（數位簡報室）自 2014 年起深耕公開課程與企業培訓，主要營業項目涵蓋<strong>數位行銷、AI 科技、數據分析</strong>等專業領域，是市面上極少數針對垂直領域深耕的培訓單位。</p>
-                    <p>創辦人憑藉豐富的業界實戰經驗與獨家師資團隊，打造出台灣少數的<strong>專業型培訓公司</strong>——從課程設計到客製化服務，乃至真實企業導入的全鏈路服務，都擁有豐富的實戰經驗。</p>
-                </div>
-
-                <!-- Stats -->
-                <div class="q-about-stats">
-                    <div class="q-about-stat"><div class="q-about-stat-num">30+</div><div class="q-about-stat-label">企業培訓實績</div></div>
-                    <div class="q-about-stat"><div class="q-about-stat-num">10+</div><div class="q-about-stat-label">年培訓經驗</div></div>
-                    <div class="q-about-stat"><div class="q-about-stat-num">7+</div><div class="q-about-stat-label">橫跨產業</div></div>
-                    <div class="q-about-stat"><div class="q-about-stat-num">5,000+</div><div class="q-about-stat-label">培訓學員</div></div>
-                </div>
-
-                <!-- Founder -->
-                <div class="q-about-founder">
-                    <img src="assets/images/fan-songpu.jpg" alt="樊松蒲" class="q-about-founder-photo" onerror="this.style.display='none'">
-                    <div class="q-about-founder-info">
-                        <div class="q-about-founder-name">樊松蒲 <span>負責人 / 首席顧問</span></div>
-                        <p class="q-about-founder-bio">擁有超過十年的企業培訓與顧問實戰經驗，同時是資深 AI 企業顧問。專注於將 AI 技術轉化為企業可操作的解決方案，協助各行業導入 AI 應用提升營運效率。</p>
-                        <div class="q-about-founder-industries">
-                            <span class="q-about-industry">汽車業</span>
-                            <span class="q-about-industry">製造業</span>
-                            <span class="q-about-industry">旅遊業</span>
-                            <span class="q-about-industry">管顧業</span>
-                            <span class="q-about-industry">餐飲業</span>
-                            <span class="q-about-industry">電商行業</span>
-                            <span class="q-about-industry">女裝女鞋</span>
-                            <span class="q-about-industry">非營利組織</span>
-                            <span class="q-about-industry">SaaS 軟體</span>
-                            <span class="q-about-industry">物流業</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Service Highlights -->
-                <div class="q-about-team-desc">
-                    <div class="q-about-team-item">
-                        <span class="material-symbols-outlined">edit_note</span>
-                        <div><strong>課程設計</strong><br>每一堂課程皆由負責人親自設計，確保內容貼合產業需求與學員程度</div>
-                    </div>
-                    <div class="q-about-team-item">
-                        <span class="material-symbols-outlined">groups</span>
-                        <div><strong>專業師資團隊</strong><br>講師群皆具備企業實戰與 AI 工具應用經驗，不只教，更帶著你做</div>
-                    </div>
-                </div>
-                <div class="q-about-team-desc" style="margin-top:-1px">
-                    <div class="q-about-team-item">
-                        <span class="material-symbols-outlined">hub</span>
-                        <div><strong>全鏈路服務</strong><br>從課程設計、客製化內容、到真實企業導入，提供完整的培訓解決方案</div>
-                    </div>
-                    <div class="q-about-team-item">
-                        <span class="material-symbols-outlined">verified</span>
-                        <div><strong>垂直領域深耕</strong><br>專注於數位行銷、AI 科技、數據分析三大核心領域，提供最前沿的培訓內容</div>
-                    </div>
-                </div>
-
-                <a href="https://tbr.digital" target="_blank" class="q-about-link">
-                    <span class="material-symbols-outlined">arrow_forward</span>
-                    前往數位簡報室官方網站，瞭解更多服務與公開課程
-                </a>
-            </div>
-        </section>
-
-
-
-        <!-- CTA -->
-        <div class="q-cta">
-            <h2>對課程有任何問題？</h2>
-            <p>歡迎來信或透過 LINE 官方帳號討論課程客製化需求</p>
-            <div class="q-cta-buttons">
-                <a href="https://lin.ee/wAi3y4P" target="_blank" class="q-cta-btn q-cta-line">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-                    LINE 即時諮詢
-                </a>
-                <a href="mailto:service@tbr.digital" class="q-cta-btn q-cta-email">
-                    <span class="material-symbols-outlined" style="font-size:18px">mail</span> service@tbr.digital
-                </a>
-            </div>
-        </div>
-
-        <footer class="q-footer">
-            由 <a href="https://tbr.digital" target="_blank">數位簡報室 TBR.Digital</a> 製作 · 本報價單僅供授權對象閱覽
-        </footer>
+        <div class="compare-grid" id="compareGrid"></div>
     </div>
 
-    <!-- Print-only Page Footer (fixed bottom in print) -->
-    <div class="q-print-page-footer" id="printFooter">
-        <span>數位簡報室 TBR.Digital — https://tbr.digital</span>
-        <span id="printFooterTime"></span>
+    <!-- Preview -->
+    <div class="preview-section" id="previewSection">
+        <div class="card" style="padding:0;overflow:hidden;border-radius:16px;">
+            <div class="quote-preview" id="quotePreview"></div>
+        </div>
     </div>
 
-    <!-- Print-only Comparison Section (last page if included) -->
-    <div class="q-print-comparison" id="printComparison">
-        <section class="q-section">
-            <div class="q-section-header">
-                <div class="q-section-icon"><span class="material-symbols-outlined">compare_arrows</span></div>
-                <div><div class="q-section-title">版本差異比較</div><div class="q-section-desc">各方案內容對照</div></div>
-            </div>
-            <div id="printComparisonContent" style="padding:20px 0"></div>
-        </section>
+    <!-- Footer -->
+    <div class="site-footer">
+        <div class="footer-brand">數位簡報室 Digital Presentation Lab</div>
+        <div class="footer-desc">
+            專注於 AI 教學、企業內訓與數位轉型培訓。透過互動式教學系統，讓每一場培訓都成為改變的起點。
+        </div>
+        <div class="footer-links">
+            <span class="footer-link"><span class="material-symbols-outlined">language</span> digitalpresentation.lab</span>
+            <span class="footer-link"><span class="material-symbols-outlined">mail</span> contact@dpl.com</span>
+            <span class="footer-link"><span class="material-symbols-outlined">phone</span> 聯繫報價</span>
+        </div>
+        <div class="footer-copy">© 2024–2026 數位簡報室. All rights reserved.</div>
     </div>
+
 </div>
 
-<!-- Bottom Sheet: Suggest Topic -->
-<div class="bottom-sheet-overlay" id="suggestOverlay" onclick="closeSuggestSheet()"></div>
-<div class="bottom-sheet" id="suggestSheet">
-    <div class="bottom-sheet-handle"></div>
-    <div class="bottom-sheet-title">
-        <span>💡 建議新增主題</span>
-        <button class="bottom-sheet-close" onclick="closeSuggestSheet()">
-            <span class="material-symbols-outlined" style="font-size:18px">close</span>
-        </button>
-    </div>
-    <div class="suggest-topic-form" style="display:block">
-        <input id="suggestTitle" placeholder="建議主題名稱" style="font-size:1rem">
-        <textarea id="suggestDesc" placeholder="簡短說明為什麼需要這個主題（選填）" rows="4" style="font-size:1rem"></textarea>
-        <div class="suggest-topic-form-actions">
-            <button class="suggest-submit" onclick="submitSuggestion()" type="button">送出建議</button>
-            <button class="suggest-cancel" onclick="closeSuggestSheet()" type="button">取消</button>
-        </div>
-    </div>
-</div>
-
-<!-- Bottom Sheet: Comment -->
-<div class="bottom-sheet-overlay" id="commentOverlay" onclick="closeCommentSheet()"></div>
-<div class="bottom-sheet" id="commentSheet">
-    <div class="bottom-sheet-handle"></div>
-    <div class="bottom-sheet-title">
-        <span>💬 <span id="commentSheetTitle">課綱建議</span></span>
-        <button class="bottom-sheet-close" onclick="closeCommentSheet()">
-            <span class="material-symbols-outlined" style="font-size:18px">close</span>
-        </button>
-    </div>
-    <div id="commentSheetList" style="max-height:40vh;overflow-y:auto;margin-bottom:16px"></div>
-    <div class="suggest-topic-form" style="display:block">
-        <textarea id="commentSheetInput" placeholder="對此單元有任何建議或問題…" rows="3" style="font-size:1rem"></textarea>
-        <div class="suggest-topic-form-actions">
-            <button class="suggest-submit" id="commentSheetSubmit" type="button">送出</button>
-            <button class="suggest-cancel" onclick="closeCommentSheet()" type="button">取消</button>
-        </div>
-    </div>
-</div>
-
-<!-- Bottom Sheet: Compare Versions -->
-<div class="bottom-sheet-overlay" id="compareOverlay" onclick="closeCompareSheet()"></div>
-<div class="bottom-sheet" id="compareSheet" style="max-height:92vh">
-    <div class="bottom-sheet-handle"></div>
-    <div class="bottom-sheet-title">
-        <span style="display:flex;align-items:center;gap:8px"><span class="material-symbols-outlined" style="font-size:20px;color:var(--q-accent)">compare_arrows</span>版本差異比較</span>
-        <button class="bottom-sheet-close" onclick="closeCompareSheet()">
-            <span class="material-symbols-outlined" style="font-size:18px">close</span>
-        </button>
-    </div>
-    <div id="compareContent" style="font-size:.92rem;line-height:1.6;color:var(--q-text);overflow-y:auto;max-height:78vh;padding-bottom:20px">
-        <div style="text-align:center;padding:40px;color:var(--q-text-3)">
-            <span class="material-symbols-outlined" style="font-size:36px;display:block;margin-bottom:8px">hourglass_top</span>
-            載入中…
-        </div>
-    </div>
-</div>
-
-<!-- E-Sign Modal -->
-<div class="q-esign-overlay" id="esignOverlay" onclick="if(event.target===this)closeEsign()"></div>
-<div class="q-esign-modal" id="esignModal">
-    <!-- Step 1: Email input -->
-    <div id="esignStep1">
-        <div style="text-align:center;margin-bottom:24px">
-            <div class="q-esign-icon-wrap">
-                <span class="material-symbols-outlined">draw</span>
-            </div>
-            <h3 style="margin:0 0 4px;font-size:1.15rem;font-weight:700;color:var(--q-text)">接收電子報價單</h3>
-            <p style="margin:0;font-size:.85rem;color:var(--q-text-3)">輸入 Email 以接收正式電子報價單</p>
-        </div>
-        <div style="margin-bottom:16px">
-            <label style="font-size:.78rem;font-weight:600;color:var(--q-text-2);display:block;margin-bottom:6px">Email 地址</label>
-            <input type="email" id="esignEmail" class="q-esign-input" placeholder="your@company.com">
-        </div>
-        <div style="margin-bottom:16px">
-            <label style="font-size:.78rem;font-weight:600;color:var(--q-text-2);display:block;margin-bottom:6px">聯絡人姓名 <span style="color:var(--q-text-3);font-weight:400">（選填）</span></label>
-            <input type="text" id="esignName" class="q-esign-input" placeholder="您的姓名">
-        </div>
-        <button onclick="submitEsign()" id="esignSubmitBtn" class="q-esign-btn">
-            <span class="material-symbols-outlined" style="font-size:18px">send</span> 請求電子報價單
-        </button>
-        <p id="esignError" style="margin:8px 0 0;font-size:.82rem;color:#ef4444;text-align:center;display:none"></p>
-    </div>
-    <!-- Step 2: Success -->
-    <div id="esignStep2" style="display:none;text-align:center">
-        <div style="width:56px;height:56px;border-radius:50%;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px">
-            <span class="material-symbols-outlined" style="font-size:28px;color:#16a34a">check_circle</span>
-        </div>
-        <h3 style="margin:0 0 8px;font-size:1.15rem;font-weight:700;color:var(--q-text)">申請已送出！</h3>
-        <p style="margin:0 0 4px;font-size:.92rem;color:var(--q-text-2);line-height:1.6">我們將在 <strong>一個工作天內</strong> 將正式電子報價單寄送至：</p>
-        <p id="esignConfirmEmail" style="margin:8px 0 20px;font-size:1rem;font-weight:700;color:var(--q-accent)"></p>
-        <button onclick="closeEsign()" style="padding:10px 28px;background:#f2f2f2;color:var(--q-text);border:none;border-radius:var(--q-radius);font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit">關閉</button>
-    </div>
-    <button class="q-esign-close" onclick="closeEsign()">
-        <span class="material-symbols-outlined" style="font-size:18px">close</span>
-    </button>
-</div>
-
-<!-- Print Options Modal -->
-<div class="q-print-modal-overlay" id="printModalOverlay" onclick="if(event.target===this)closePrintOptions()"></div>
-<div class="q-print-modal" id="printModal">
-    <div style="text-align:center;margin-bottom:24px">
-        <div class="q-esign-icon-wrap">
-            <span class="material-symbols-outlined">print</span>
-        </div>
-        <h3 style="margin:0 0 4px;font-size:1.15rem;font-weight:700;color:var(--q-text)">列印 / 匯出 PDF</h3>
-        <p style="margin:0;font-size:.85rem;color:var(--q-text-3)">選擇要包含的內容後進行列印</p>
-    </div>
-    <label class="q-print-option" id="printOptionCompare" style="display:none">
-        <input type="checkbox" id="printIncludeCompare">
-        <div class="q-print-option-text">
-            <div class="q-print-option-title">包含版本比較</div>
-            <div class="q-print-option-desc">將各方案差異比較表匯出至報價單最後</div>
-        </div>
-    </label>
-    <div class="q-print-actions">
-        <button class="q-print-cancel" onclick="closePrintOptions()">取消</button>
-        <button class="q-print-go" onclick="executePrint()">
-            <span class="material-symbols-outlined" style="font-size:18px">print</span> 開始列印
-        </button>
-    </div>
-    <button class="q-print-modal-close" onclick="closePrintOptions()">
-        <span class="material-symbols-outlined" style="font-size:18px">close</span>
-    </button>
-</div>
-
-<script type="module">
-import { db, ai } from './scripts/supabase.js';
-
-const params = new URLSearchParams(location.search);
-const slug = params.get('slug') || location.pathname.split('/').pop()?.replace('.html','');
-let currentQuotationId = null;
-let currentQuotation = null;
-let commentsCache = {};
-let _commentTimestamps = []; // rate limiter
-
-async function init() {
-    if (!slug || slug === 'quote') { showError('請提供報價單代碼'); return; }
-
-    try {
-        const { data: quotes, error } = await db.select('quotations', {
-            select: '*',
-            filter: { slug: `eq.${slug}` },
-            limit: 1
-        });
-        if (error || !quotes || quotes.length === 0) { showError('找不到此報價單，請確認連結是否正確。'); return; }
-
-        const q = quotes[0];
-        currentQuotationId = q.id;
-        currentQuotation = q;
-        renderQuote(q);
-
-        // Build variants from live outline_versions (always fresh)
-        if (q.project_id) {
-            try {
-                const { data: projArr } = await db.select('projects', {
-                    select: 'outline_versions',
-                    filter: { id: `eq.${q.project_id}` },
-                    limit: 1
-                });
-                const versions = projArr?.[0]?.outline_versions || [];
-                if (versions.length > 0) {
-                    q.variants = versions.map(v => {
-                        const od = v.data || {};
-                        const pricing = od.pricing || [];
-                        let vTotal = 0;
-                        const items = pricing.map(p => {
-                            let item = { label: p.label, type: p.type };
-                            if (p.type === 'hourly') { item.hours = p.hours||0; item.rate = p.rate||0; vTotal += item.hours * item.rate; }
-                            else if (p.type === 'perhead') { item.count = p.count||0; item.rate = p.rate||0; vTotal += item.count * item.rate; }
-                            else { item.amount = p.amount||0; vTotal += item.amount; }
-                            return item;
-                        });
-                        return {
-                            name: v.name || '版本',
-                            items: items.length > 0 ? items : (q.items || []),
-                            total: items.length > 0 ? vTotal : (q.total_amount || 0),
-                            outline_data: od
-                        };
-                    });
-                }
-            } catch(e) { console.warn('Failed to load live outline_versions:', e); }
-        }
-
-        if (q.variants && q.variants.length > 0) {
-            // Multi-variant mode
-            renderVariantTabs(q.variants);
-            switchVariant(0);
-        } else {
-            // Single mode (backward compatible)
-            if (q.include_outline && q.project_id) {
-                await loadOutline(q.project_id);
-            }
-        }
-
-        if (q.project_id) await loadPaymentDate(q.project_id);
-        await loadComments();
-        await loadSuggestions();
-        await loadInvoiceEmail();
-
-        document.getElementById('loadingScreen').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-        document.title = `${q.title || '課程報價'} — 數位簡報室`;
-
-        // Apply section visibility
-        applySectionVisibility(q.section_visibility);
-    } catch (err) {
-        console.error(err);
-        showError('載入失敗：' + err.message);
-    }
-}
-
-// ── Variant Tabs ──
-let _allVariants = [];
-
-function renderVariantTabs(variants) {
-    _allVariants = variants;
-    const container = document.getElementById('variantTabsInner');
-    container.innerHTML = variants.map((v, i) =>
-        `<button class="q-variant-tab${i === 0 ? ' active' : ''}" data-idx="${i}" onclick="switchVariant(${i})" type="button">${v.name || '方案 ' + (i+1)}</button>`
-    ).join('');
-    // 只有 2+ 版本才顯示 tabs 和比較按鈕
-    if (variants.length >= 2) {
-        document.getElementById('variantTabs').style.display = 'flex';
-        document.getElementById('compareBtn').style.display = 'flex';
-    } else {
-        document.getElementById('variantTabs').style.display = 'none';
-    }
-
-    // Render multi-pricing cards
-    renderPricingCards(variants);
-}
-
-function renderPricingCards(variants) {
-    if (variants.length < 2) return; // single variant uses fallback table
-    const cards = document.getElementById('pricingCards');
-    const singleWrap = document.getElementById('singlePricingWrap');
-    singleWrap.style.display = 'none';
-    cards.style.display = 'flex';
-
-    cards.innerHTML = variants.map((v, i) => {
-        const isActive = i === 0;
-        const items = v.items || [];
-        let total = 0;
-        const rowsHtml = items.map(item => {
-            let unitPrice = 0, qty = 0, qtyUnit = '', amount = 0;
-            if (item.type === 'hourly') { unitPrice = item.rate||0; qty = item.hours||0; qtyUnit = '時'; amount = qty * unitPrice; }
-            else if (item.type === 'perhead') { unitPrice = item.rate||0; qty = item.count||0; qtyUnit = '人'; amount = qty * unitPrice; }
-            else { unitPrice = item.amount||0; qty = 1; qtyUnit = '式'; amount = unitPrice; }
-            total += amount;
-            if (amount === 0) return '';
-            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.88rem">
-                <span style="flex:1">${item.label}</span>
-                <span style="color:var(--q-text-3);font-size:.78rem;min-width:80px;text-align:center">${fmt(unitPrice)}/${qtyUnit}</span>
-                <span style="color:var(--q-text-3);font-size:.78rem;min-width:50px;text-align:center">${qty}${qtyUnit}</span>
-                <span style="font-weight:600;min-width:80px;text-align:right">${fmt(amount)}</span>
-            </div>`;
-        }).filter(Boolean).join('');
-
-        const discountTotal = v.discount_total || 0;
-        const finalTotal = (discountTotal > 0 && discountTotal < total) ? discountTotal : (v.total || total);
-        const discountHtml = (discountTotal > 0 && discountTotal < total)
-            ? `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.82rem;color:var(--q-text-3)"><span>小計</span><span>${fmt(total)}</span></div>
-               <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.82rem;color:#10b981;font-weight:600"><span>折扣優惠</span><span>-${fmt(total - discountTotal)}</span></div>` : '';
-
-        return `<div class="q-pricing-card ${isActive ? 'active-card' : 'dimmed'}" data-vidx="${i}" onclick="switchVariant(${i})">
-            <div class="q-pricing-card-label"><span class="material-symbols-outlined" style="font-size:16px">${isActive ? 'check_circle' : 'radio_button_unchecked'}</span> ${v.name || '方案 ' + (i+1)}</div>
-            ${rowsHtml}
-            ${discountHtml}
-            <div class="q-pricing-card-total">${fmt(finalTotal)}</div>
-        </div>`;
-    }).join('');
-}
-
-window.switchVariant = function(idx) {
-    const q = currentQuotation;
-    if (!q || !q.variants || !q.variants[idx]) return;
-    const variant = q.variants[idx];
-
-    // Update tab active
-    document.querySelectorAll('.q-variant-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.q-variant-tab[data-idx="${idx}"]`)?.classList.add('active');
-
-    // Update pricing cards highlighting
-    document.querySelectorAll('.q-pricing-card').forEach(card => {
-        const cardIdx = parseInt(card.dataset.vidx);
-        if (cardIdx === idx) {
-            card.classList.remove('dimmed');
-            card.classList.add('active-card');
-            card.querySelector('.q-pricing-card-label .material-symbols-outlined').textContent = 'check_circle';
-        } else {
-            card.classList.remove('active-card');
-            card.classList.add('dimmed');
-            card.querySelector('.q-pricing-card-label .material-symbols-outlined').textContent = 'radio_button_unchecked';
-        }
-    });
-
-    // Render single table as well (for fallback / visibility toggle)
-    if (variant.items) {
-        const tbody = document.getElementById('quoteTableBody');
-        tbody.innerHTML = '';
-        let calcTotal = 0;
-        variant.items.forEach(item => {
-            const tr = document.createElement('tr');
-            let unitPrice = 0, qty = 0, qtyUnit = '', amount = 0;
-            if (item.type === 'hourly') { unitPrice = item.rate||0; qty = item.hours||0; qtyUnit = '時'; amount = qty * unitPrice; }
-            else if (item.type === 'perhead') { unitPrice = item.rate||0; qty = item.count||0; qtyUnit = '人'; amount = qty * unitPrice; }
-            else { unitPrice = item.amount||0; qty = 1; qtyUnit = '式'; amount = unitPrice; }
-            calcTotal += amount;
-            if (amount === 0) {
-                tr.classList.add('q-row-zero');
-                tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">—</td><td class="q-td-qty">—</td><td class="q-td-amount">—</td>`;
-            } else {
-                tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">${fmt(unitPrice)}/${qtyUnit}</td><td class="q-td-qty">${qty} ${qtyUnit}</td><td class="q-td-amount">${fmt(amount)}</td>`;
-            }
-            tbody.appendChild(tr);
-        });
-        // Discount
-        const discountTotal = variant.discount_total || 0;
-        let vFinalUntaxed = 0;
-        if (discountTotal > 0 && discountTotal < calcTotal) {
-            document.getElementById('subtotalRow').style.display = '';
-            document.getElementById('subtotalAmount').textContent = fmt(calcTotal);
-            document.getElementById('discountRow').style.display = '';
-            document.getElementById('discountAmount').textContent = '-' + fmt(calcTotal - discountTotal);
-            document.getElementById('totalAmount').textContent = fmt(discountTotal);
-            vFinalUntaxed = discountTotal;
-        } else {
-            document.getElementById('subtotalRow').style.display = 'none';
-            document.getElementById('discountRow').style.display = 'none';
-            vFinalUntaxed = variant.total || calcTotal;
-            document.getElementById('totalAmount').textContent = fmt(vFinalUntaxed);
-        }
-        // Tax
-        const vTax = Math.round(vFinalUntaxed * 0.05);
-        document.getElementById('taxAmount').textContent = fmt(vTax);
-        document.getElementById('grandTotalAmount').textContent = fmt(vFinalUntaxed + vTax);
-    }
-
-    // Reset all optional sections first
-    document.getElementById('toolsSection').style.display = 'none';
-    document.getElementById('equipSection').style.display = 'none';
-    document.getElementById('instructorSection').style.display = 'none';
-
-    // Render outline (includes tools, equipment, instructor)
-    if (variant.outline_data) {
-        blockCounter = 0;
-        renderOutlineData(variant.outline_data);
-        document.getElementById('outlineSection').style.display = 'block';
-    } else {
-        document.getElementById('outlineSection').style.display = 'none';
-    }
-};
-
-// ── Compare Versions (Apple-style) ──
-window.compareVersions = function() {
-    const overlay = document.getElementById('compareOverlay');
-    const sheet = document.getElementById('compareSheet');
-    const content = document.getElementById('compareContent');
-
-    content.innerHTML = `<div style="text-align:center;padding:40px;color:var(--q-text-3)">
-        <div style="width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:var(--q-accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
-        分析版本差異中…
-    </div><style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>`;
-
-    overlay.classList.add('open');
-    requestAnimationFrame(() => sheet.classList.add('open'));
-
-    setTimeout(() => {
-        const n = _allVariants.length;
-        const gridCols = `minmax(100px,130px) repeat(${n}, minmax(90px,1fr))`;
-
-        const calcAmt = (item) => {
-            if (!item) return 0;
-            if (item.type === 'hourly') return (item.hours||0) * (item.rate||0);
-            if (item.type === 'perhead') return (item.count||0) * (item.rate||0);
-            return item.amount || 0;
-        };
-
-        const vData = _allVariants.map(v => {
-            const od = v.outline_data || {};
-            const sched = od.schedule || [];
-            const topics = (od.timeline||[]).map(t => t.title);
-            const tools = (od.tools||[]).map(t => t.name);
-            const equip = (od.equipment||[]).map(e => e.label || e.name || '');
-            const days = sched.length;
-            const hours = sched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
-            const tags = [];
-            if (days > 0) tags.push(`${days} 天 ${hours}h`);
-            if (topics.length) tags.push(`${topics.length} 個主題`);
-            if (tools.length) tags.push(`${tools.length} 種工具`);
-            if (equip.length) tags.push(`需 ${equip.length} 項設備`);
-            return { name: v.name, total: v.total||0, days, hours, topics, tools, equip, items: v.items||[], tags,
-                groupSize: od.heroGroupSize||'', location: od.heroLocation||'', subtitle: od.heroSubtitle||'' };
-        });
-
-        let html = '';
-
-        // ── AI 差異分析（置頂，自動載入） ──
-        html += `<div id="aiCompareSection" style="margin-bottom:20px;padding:20px;background:linear-gradient(135deg,#f8f7ff,#f0f4ff);border-radius:14px;border:1px solid #e0e7ff">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-weight:700;font-size:.95rem;color:#4f46e5">
-                <span class="material-symbols-outlined" style="font-size:20px">psychology</span> AI 差異分析
-            </div>
-            <div id="aiCompareBody" style="font-size:.88rem;line-height:1.7;color:#374151">
-                <div style="display:flex;align-items:center;gap:8px;color:#9ca3af">
-                    <div style="width:18px;height:18px;border:2px solid #e5e7eb;border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite"></div>
-                    AI 正在分析版本差異…
-                </div>
-            </div>
-        </div>`;
-
-        // ── Hero Cards ──
-        html += `<div class="cmp-hero">`;
-        vData.forEach((v, i) => {
-            html += `<div class="cmp-card">
-                <div class="cmp-card-name">${v.name || '方案'+(i+1)}</div>
-                <div class="cmp-card-price">${fmt(v.total)}<span style="font-size:.6rem;font-weight:500;color:var(--q-text-3);margin-left:4px">未稅</span></div>
-                ${v.subtitle ? `<div class="cmp-card-sub">${v.subtitle}</div>` : ''}
-                <div class="cmp-tags">${v.tags.map(t => `<span class="cmp-tag">${t}</span>`).join('')}</div>
-            </div>`;
-        });
-        html += `</div>`;
-
-        // ── Grid comparison ──
-        let rowIdx = 0;
-        function row(label, values, opts = {}) {
-            const allSame = values.every(v => v === values[0]);
-            const cls = opts.highlight ? 'cmp-row highlight' : 'cmp-row';
-            let h = `<div class="${cls}" style="grid-template-columns:${gridCols};${rowIdx%2===0?'':'background:#fafbfc'}">`;
-            h += `<div class="cmp-row-label">${label}</div>`;
-            values.forEach(val => {
-                h += `<div class="cmp-row-val${!allSame?' diff':''}">${val}</div>`;
-            });
-            h += `</div>`;
-            rowIdx++;
-            return h;
-        }
-
-        function checkRows(arraysPerVersion) {
-            const allItems = [...new Set(arraysPerVersion.flat())];
-            if (!allItems.length) return '';
-            return allItems.map(item => {
-                const vals = arraysPerVersion.map(arr =>
-                    arr.includes(item)
-                        ? '<span class="material-symbols-outlined" style="font-size:18px;color:#10b981">check_circle</span>'
-                        : '<span class="material-symbols-outlined" style="font-size:18px;color:#e5e7eb">cancel</span>'
-                );
-                return row(`<span style="font-size:.78rem;font-weight:500">${item}</span>`, vals);
-            }).join('');
-        }
-
-        let grid = '';
-        grid += `<div class="cmp-section-label">基本資訊</div>`;
-        grid += row('授課天數', vData.map(v => `${v.days} 天`));
-        grid += row('總時數', vData.map(v => `${v.hours} 小時`));
-        if (vData.some(v => v.groupSize)) grid += row('人數', vData.map(v => v.groupSize || '—'));
-        if (vData.some(v => v.location)) grid += row('授課方式', vData.map(v => v.location || '—'));
-
-        const allLabels = [...new Set(vData.flatMap(v => v.items.map(i => i.label)))];
-        if (allLabels.length) {
-            grid += `<div class="cmp-section-label">費用明細</div>`;
-            allLabels.forEach(label => {
-                const vals = vData.map(v => {
-                    const item = v.items.find(i => i.label === label);
-                    const amt = calcAmt(item);
-                    if (!item) return '<span style="color:#d1d5db">—</span>';
-                    let detail = '';
-                    if (item.type === 'hourly') detail = `<div style="font-size:.7rem;color:#9ca3af">${item.hours||0}h × ${(item.rate||0).toLocaleString()}</div>`;
-                    else if (item.type === 'perhead') detail = `<div style="font-size:.7rem;color:#9ca3af">${item.count||0}人 × ${(item.rate||0).toLocaleString()}</div>`;
-                    return `<div style="font-weight:700">${amt > 0 ? fmt(amt) : '—'}</div>${detail}`;
-                });
-                grid += row(label, vals);
-            });
-            grid += row('<span style="font-weight:800">合計（未稅）</span>', vData.map(v =>
-                `<span style="font-size:1.05rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}</span>`
-            ), { highlight: true });
-        }
-
-        const allTopics = [...new Set(vData.flatMap(v => v.topics))];
-        if (allTopics.length) {
-            grid += `<div class="cmp-section-label">課程主題</div>`;
-            grid += row('主題數', vData.map(v => `${v.topics.length} 個`));
-            grid += checkRows(vData.map(v => v.topics));
-        }
-
-        const allTools = [...new Set(vData.flatMap(v => v.tools))];
-        if (allTools.length) {
-            grid += `<div class="cmp-section-label">教學工具</div>`;
-            grid += checkRows(vData.map(v => v.tools));
-        }
-
-        const allEquip = [...new Set(vData.flatMap(v => v.equip))];
-        if (allEquip.length) {
-            grid += `<div class="cmp-section-label">設備需求</div>`;
-            grid += checkRows(vData.map(v => v.equip));
-        }
-
-        html += `<div class="cmp-grid">${grid}</div>`;
-        content.innerHTML = html;
-
-        // 自動觸發 AI 摘要
-        generateAICompare(vData);
-    }, 300);
-};
-
-window.closeCompareSheet = function() {
-    document.getElementById('compareSheet').classList.remove('open');
-    setTimeout(() => document.getElementById('compareOverlay').classList.remove('open'), 300);
-};
-
-// ── AI Compare Summary ──
-async function generateAICompare(vData) {
-    const body = document.getElementById('aiCompareBody');
-    if (!body) return;
-
-    // 構建版本摘要給 AI
-    const summaries = vData.map((v, i) => {
-        const lines = [`## ${v.name || '方案' + (i + 1)}`];
-        lines.push(`- 價格：$${(v.total || 0).toLocaleString()}`);
-        lines.push(`- 天數：${v.days} 天 / ${v.hours} 小時`);
-        if (v.groupSize) lines.push(`- 人數：${v.groupSize}`);
-        if (v.location) lines.push(`- 授課方式：${v.location}`);
-        if (v.topics.length) lines.push(`- 課程主題（${v.topics.length} 個）：${v.topics.join('、')}`);
-        if (v.tools.length) lines.push(`- 教學工具（${v.tools.length} 種）：${v.tools.join('、')}`);
-        if (v.equip.length) lines.push(`- 設備需求：${v.equip.join('、')}`);
-        // 費用明細
-        const itemLines = v.items.filter(it => {
-            if (it.type === 'hourly') return (it.hours || 0) * (it.rate || 0) > 0;
-            if (it.type === 'perhead') return (it.count || 0) * (it.rate || 0) > 0;
-            return (it.amount || 0) > 0;
-        }).map(it => `  - ${it.label}`);
-        if (itemLines.length) lines.push(`- 費用項目：\n${itemLines.join('\n')}`);
-        return lines.join('\n');
-    }).join('\n\n');
-
-    const prompt = `你是一位企業培訓顧問。以下是同一個課程的 ${vData.length} 個報價版本，請用繁體中文：
-
-${summaries}
-
-請完成以下分析：
-
-1. **核心差異摘要**：用 2-3 句話總結各版本的主要差異（不要逐項列舉，要提煉出核心差別）
-
-2. **適合族群**：每個版本各用 1-2 句話說明最適合什麼類型的企業/團隊/需求。格式：
-   - 【版本名稱】→ 適合…
-
-3. **選擇建議**：一句話給出選擇建議
-
-請直接輸出分析，不要重複版本資料。語氣專業但親切，像是顧問在跟客戶解說。`;
-
-    try {
-        const result = await ai.chat([
-            { role: 'system', content: '你是專業的企業培訓顧問，善於分析課程方案差異並給出客觀建議。回覆請用繁體中文，簡潔有力。' },
-            { role: 'user', content: prompt }
-        ], { model: 'claude-haiku-4-5', temperature: 0.4, maxTokens: 1024 });
-
-        // 簡單 markdown → HTML
-        const html = result
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-            .replace(/【(.+?)】/g, '<strong style="color:#4f46e5">【$1】</strong>')
-            .replace(/^### (.+)$/gm, '<div style="font-weight:700;font-size:.95rem;margin:16px 0 8px;color:#1f2937">$1</div>')
-            .replace(/^## (.+)$/gm, '<div style="font-weight:700;font-size:1rem;margin:16px 0 8px;color:#1f2937">$1</div>')
-            .replace(/^- /gm, '• ')
-            .replace(/\n{2,}/g, '<br><br>')
-            .replace(/\n/g, '<br>');
-
-        body.innerHTML = html;
-    } catch (err) {
-        console.error('[AI Compare]', err);
-        body.innerHTML = `<div style="color:#9ca3af;font-size:.85rem">
-            <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle">info</span>
-            AI 分析暫時無法使用：${err.message || '請稍後再試'}
-        </div>`;
-    }
-}
-
-window.copyBankAccount = function(e, account) {
-    const btn = e.currentTarget || e.target.closest('button');
-    navigator.clipboard.writeText(account).then(() => {
-        const orig = btn.innerHTML;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;color:#10b981">check</span>已複製';
-        btn.style.borderColor = '#10b981';
-        btn.style.color = '#10b981';
-        setTimeout(() => { btn.innerHTML = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1500);
-    }).catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = account; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
-    });
-};
-
-function showError(msg) {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('errorMsg').textContent = msg;
-    document.getElementById('errorScreen').style.display = 'flex';
-}
-
-function fmt(n) { return '$' + (n || 0).toLocaleString('zh-TW'); }
-
-function applySectionVisibility(sv) {
-    if (!sv) return; // default: show all
-    // Pricing section
-    const pricingSection = document.getElementById('pricingSectionWrap');
-    if (pricingSection && sv.pricing === false) pricingSection.style.display = 'none';
-    // Payment/Invoice section
-    const paymentSection = document.getElementById('bankInfoCard')?.closest('.q-section');
-    if (paymentSection && sv.payment === false) paymentSection.style.display = 'none';
-    // Instructor section
-    if (sv.instructor === false) {
-        document.getElementById('instructorSection').style.display = 'none';
-        // Also hide in outline block by flagging
-        window._hideInstructor = true;
-    }
-}
-
-// Calculate business days before a date (skip weekends)
-function businessDaysBefore(dateStr, days) {
-    const d = new Date(dateStr + 'T00:00:00');
-    let count = 0;
-    while (count < days) {
-        d.setDate(d.getDate() - 1);
-        const dow = d.getDay();
-        if (dow !== 0 && dow !== 6) count++;
-    }
-    return d;
-}
-
-async function loadPaymentDate(projectId) {
-    try {
-        const { data: sessions } = await db.select('project_sessions', {
-            select: 'date',
-            filter: { project_id: `eq.${projectId}` },
-            order: 'date.asc',
-            limit: 1
-        });
-        if (sessions && sessions.length > 0 && sessions[0].date) {
-            const firstDate = sessions[0].date;
-            const payDate = businessDaysBefore(firstDate, 5);
-            const formatted = payDate.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('paymentTerms').innerHTML = `為保留老師的時間，請於開課前五天前支付款項<br><strong style="color:var(--q-accent);font-size:.95rem">請於 ${formatted}（含）前完成匯款</strong>`;
-        }
-    } catch (e) { console.warn('loadPaymentDate:', e); }
-}
-
-function renderQuote(q) {
-    document.getElementById('quoteTitle').textContent = q.title || '課程報價';
-
-    if (q.client_name) {
-        const el = document.getElementById('clientNameDisplay');
-        el.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">business</span> ${q.client_name}`;
-        el.dataset.clientName = q.client_name;
-    }
-    if (q.client_logo) {
-        const logo = document.getElementById('clientLogo');
-        logo.src = q.client_logo;
-        logo.style.display = 'block';
-    }
-
-    // Show course date from outline schedule, fallback to created_at
-    const schedule = q.variants?.[0]?.outline_data?.schedule || [];
-    if (schedule.length > 0 && schedule[0].date) {
-        const dates = schedule.map(s => s.date).filter(Boolean).sort();
-        const firstDate = new Date(dates[0] + 'T00:00:00');
-        if (dates.length === 1) {
-            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> 預定日期：${firstDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
-        } else {
-            const lastDate = new Date(dates[dates.length - 1] + 'T00:00:00');
-            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${firstDate.toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' })} — ${lastDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
-        }
-    } else {
-        const created = new Date(q.created_at);
-        document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
-    }
-    if (q.valid_until) {
-        const validDate = new Date(q.valid_until);
-        document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${validDate.toLocaleDateString('zh-TW')}`;
-
-        // Expiry banner logic
-        const now = new Date();
-        const diffMs = validDate.getTime() - now.getTime();
-        const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-        const banner = document.getElementById('expiryBanner');
-        const bannerText = document.getElementById('expiryBannerText');
-
-        if (daysLeft < 0) {
-            banner.style.display = 'flex';
-            banner.className = 'q-expiry-banner expired';
-            bannerText.textContent = '此報價已過期，如需重新報價請聯繫我們';
-        } else if (daysLeft <= 3) {
-            banner.style.display = 'flex';
-            banner.className = 'q-expiry-banner urgent';
-            bannerText.textContent = `此報價將在 ${daysLeft === 0 ? '今天' : daysLeft + ' 天內'}到期`;
-        } else if (daysLeft <= 7) {
-            banner.style.display = 'flex';
-            banner.className = 'q-expiry-banner';
-            bannerText.textContent = `此報價有效期限剩餘 ${daysLeft} 天（至 ${validDate.toLocaleDateString('zh-TW')}）`;
-        }
-    }
-
-
-
-
-    const badge = document.getElementById('statusBadge');
-    const statusMap = { draft: '草稿', sent: '已送出', accepted: '已接受', expired: '已過期' };
-    badge.textContent = statusMap[q.status] || '報價單';
-
-    const items = q.items || [];
-    const tbody = document.getElementById('quoteTableBody');
-    tbody.innerHTML = '';
-    let calcTotal = 0;
-    items.forEach(item => {
-        const tr = document.createElement('tr');
-        let unitPrice = 0, qty = 0, qtyUnit = '', amount = 0;
-        if (item.type === 'hourly') { unitPrice = item.rate||0; qty = item.hours||0; qtyUnit = '時'; amount = qty * unitPrice; }
-        else if (item.type === 'perhead') { unitPrice = item.rate||0; qty = item.count||0; qtyUnit = '人'; amount = qty * unitPrice; }
-        else { unitPrice = item.amount||0; qty = 1; qtyUnit = '式'; amount = unitPrice; }
-        calcTotal += amount;
-        if (amount === 0) {
-            tr.classList.add('q-row-zero');
-            tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">—</td><td class="q-td-qty">—</td><td class="q-td-amount">—</td>`;
-        } else {
-            tr.innerHTML = `<td class="q-td-item">${item.label||''}</td><td class="q-td-price">${fmt(unitPrice)}/${qtyUnit}</td><td class="q-td-qty">${qty} ${qtyUnit}</td><td class="q-td-amount">${fmt(amount)}</td>`;
-        }
-        tbody.appendChild(tr);
-    });
-
-    // Discount support
-    const discountTotal = q.discount_total || q.variants?.[0]?.discount_total || 0;
-    let finalUntaxed = 0;
-    if (discountTotal > 0 && discountTotal < calcTotal) {
-        document.getElementById('subtotalRow').style.display = '';
-        document.getElementById('subtotalAmount').textContent = fmt(calcTotal);
-        document.getElementById('discountRow').style.display = '';
-        document.getElementById('discountAmount').textContent = '-' + fmt(calcTotal - discountTotal);
-        document.getElementById('totalAmount').textContent = fmt(discountTotal);
-        finalUntaxed = discountTotal;
-    } else {
-        document.getElementById('subtotalRow').style.display = 'none';
-        document.getElementById('discountRow').style.display = 'none';
-        finalUntaxed = q.total_amount || calcTotal;
-        document.getElementById('totalAmount').textContent = fmt(finalUntaxed);
-    }
-
-    // Tax calculation (5%)
-    const tax = Math.round(finalUntaxed * 0.05);
-    document.getElementById('taxAmount').textContent = fmt(tax);
-    document.getElementById('grandTotalAmount').textContent = fmt(finalUntaxed + tax);
-
-    if (q.notes) { document.getElementById('notesSection').style.display = 'block'; document.getElementById('notesContent').textContent = q.notes; }
-
-    document.getElementById('paymentMethod').textContent = q.payment_method || '銀行匯款';
-    document.getElementById('paymentTerms').textContent = q.payment_terms || '為保留老師的時間，請於開課前五天前支付款項';
-
-    const bank = q.bank_info && (q.bank_info.bank || q.bank_info.account) ? q.bank_info : null;
-    const bankEl = document.getElementById('bankDetails');
-    if (bank && (bank.bank || bank.account)) {
-        bankEl.innerHTML = `
-            ${bank.bank ? `<div class="q-bank-row"><span class="q-bank-label">銀行</span><span>${bank.bank}${bank.branch ? ' ' + bank.branch : ''}</span></div>` : ''}
-            ${bank.account ? `<div class="q-bank-row"><span class="q-bank-label">帳號</span><span style="display:flex;align-items:center;gap:8px"><span class="q-bank-account">${bank.account}</span><button onclick="copyBankAccount(event,'${bank.account}')" style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border:1px solid var(--q-border);border-radius:6px;background:#f8fafc;color:var(--q-text-2);font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='var(--q-accent)';this.style.color='var(--q-accent)'" onmouseout="this.style.borderColor='var(--q-border)';this.style.color='var(--q-text-2)'"><span class="material-symbols-outlined" style="font-size:14px">content_copy</span>複製</button></span></div>` : ''}
-            ${bank.name ? `<div class="q-bank-row"><span class="q-bank-label">戶名</span><span>${bank.name}</span></div>` : ''}
-        `;
-    } else { document.getElementById('bankInfoCard').style.display = 'none'; }
-}
-
-// --- Timeline ---
-let blockCounter = 0;
-
-function renderTimelineBlock(block, isGrid) {
-    const idx = blockCounter++;
-    const breakClass = block.isBreak ? 'break-block' : '';
-    const topicsHtml = (block.topics && block.topics.length > 0)
-        ? `<div class="timeline-topics">${block.topics.map(t => `<span class="topic-tag${(t.highlight ? ' highlight' : '')}">${t.name || t}</span>`).join('')}</div>`
-        : '';
-    const escapedTitle = (block.title||'').replace(/'/g,"\\'");
-    return `<div class="timeline-row ${breakClass}" data-block-idx="${idx}">
-        <div class="timeline-dot-col">
-            <div class="timeline-dot"></div>
-            <div class="timeline-dot-line"></div>
-        </div>
-        <div class="timeline-content">
-            <div class="timeline-header">
-                ${block.time ? `<span class="timeline-time">${block.time}</span>` : ''}
-                <span class="timeline-title">${block.title || ''}</span>
-            </div>
-            ${block.desc ? `<div class="timeline-desc">${block.desc}</div>` : ''}
-            ${topicsHtml}
-        </div>
-        <button class="timeline-comment-btn" id="commentBtn${idx}" onclick="event.stopPropagation(); openComment(${idx})" type="button">
-            <span class="material-symbols-outlined">mode_comment</span>
-            <span class="cb-count" id="commentBadge${idx}">0</span>
-        </button>
-        <div class="q-comment-popover" id="commentPopover${idx}">
-            <div class="pop-header">
-                <span>課綱建議</span>
-                <button class="pop-close" onclick="event.stopPropagation(); openComment(${idx})" type="button"><span class="material-symbols-outlined">close</span></button>
-            </div>
-            <div class="pop-list" id="commentList${idx}"></div>
-            <div class="pop-form">
-                <textarea class="pop-input" id="commentInput${idx}" placeholder="對此單元有任何建議或問題…" rows="1"></textarea>
-                <button class="pop-submit" onclick="event.stopPropagation(); submitComment(${idx}, '${escapedTitle}')" type="button">送出</button>
-            </div>
-        </div>
-    </div>`;
-}
-
-let _activeCommentIdx = null;
-
-window.openComment = function(idx) {
-    const isMobile = window.innerWidth <= 640;
-
-    if (isMobile) {
-        // Use bottom sheet on mobile
-        _activeCommentIdx = idx;
-        const blockTitle = document.querySelector(`#commentBtn${idx}`)?.closest('.timeline-row')?.querySelector('.timeline-title')?.textContent || '此單元';
-        document.getElementById('commentSheetTitle').textContent = blockTitle;
-        // Copy existing comments to sheet
-        const existingList = document.getElementById(`commentList${idx}`)?.innerHTML || '';
-        document.getElementById('commentSheetList').innerHTML = existingList;
-        document.getElementById('commentSheetInput').value = '';
-        document.getElementById('commentSheetSubmit').onclick = () => submitCommentFromSheet(idx, blockTitle);
-        document.getElementById('commentOverlay').classList.add('open');
-        requestAnimationFrame(() => document.getElementById('commentSheet').classList.add('open'));
-        setTimeout(() => document.getElementById('commentSheetInput')?.focus(), 300);
-    } else {
-        // Desktop: toggle popover
-        document.querySelectorAll('.q-comment-popover.open').forEach(el => {
-            if (el.id !== `commentPopover${idx}`) el.classList.remove('open');
-        });
-        const pop = document.getElementById(`commentPopover${idx}`);
-        pop.classList.toggle('open');
-        if (pop.classList.contains('open')) {
-            document.getElementById(`commentInput${idx}`)?.focus();
-        }
-    }
-};
-
-window.closeCommentSheet = function() {
-    document.getElementById('commentSheet').classList.remove('open');
-    setTimeout(() => document.getElementById('commentOverlay').classList.remove('open'), 300);
-    _activeCommentIdx = null;
-};
-
-async function submitCommentFromSheet(idx, blockTitle) {
-    const inputEl = document.getElementById('commentSheetInput');
-    const text = inputEl.value.trim();
-    if (!text) return;
-
-    // Rate limit: max 3 comments per 30 seconds
-    const now = Date.now();
-    _commentTimestamps = _commentTimestamps.filter(t => now - t < 30000);
-    if (_commentTimestamps.length >= 3) {
-        alert('操作過於頻繁，請稍後再試');
-        return;
-    }
-    _commentTimestamps.push(now);
-
-    try {
-        await db.insert('quote_comments', {
-            quotation_id: currentQuotationId,
-            block_index: idx,
-            block_title: blockTitle,
-            comment_text: text,
-            commenter_name: '客戶'
-        });
-        inputEl.value = '';
-        const { data } = await db.select('quote_comments', {
-            select: '*',
-            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${idx}` },
-            order: 'created_at.asc'
-        });
-        renderComments(idx, data || []);
-        // Update sheet list too
-        const existingList = document.getElementById(`commentList${idx}`)?.innerHTML || '';
-        document.getElementById('commentSheetList').innerHTML = existingList;
-    } catch (e) {
-        console.error('submitComment:', e);
-        alert('送出失敗，請稍後再試');
-    }
-}
-
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.q-comment-popover') && !e.target.closest('.timeline-comment-btn')) {
-        document.querySelectorAll('.q-comment-popover.open').forEach(el => el.classList.remove('open'));
-    }
-});
-
-window.submitComment = async function(idx, blockTitle) {
-    const inputEl = document.getElementById(`commentInput${idx}`);
-    const text = inputEl.value.trim();
-    if (!text) return;
-
-    const now = Date.now();
-    _commentTimestamps = _commentTimestamps.filter(t => now - t < 30000);
-    if (_commentTimestamps.length >= 3) { alert('操作過於頻繁，請稍後再試'); return; }
-    _commentTimestamps.push(now);
-
-    try {
-        await db.insert('quote_comments', {
-            quotation_id: currentQuotationId,
-            block_index: idx,
-            block_title: blockTitle,
-            comment_text: text,
-            commenter_name: '客戶'
-        });
-        inputEl.value = '';
-
-        const { data } = await db.select('quote_comments', {
-            select: '*',
-            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${idx}` },
-            order: 'created_at.asc'
-        });
-        renderComments(idx, data || []);
-    } catch (e) {
-        console.error('submitComment:', e);
-        alert('送出失敗，請稍後再試');
-    }
-};
-
-async function loadComments() {
-    if (!currentQuotationId) return;
-    try {
-        const { data } = await db.select('quote_comments', {
-            select: '*',
-            filter: { quotation_id: `eq.${currentQuotationId}` },
-            order: 'created_at.asc'
-        });
-        if (!data) return;
-        const grouped = {};
-        data.forEach(c => {
-            if (!grouped[c.block_index]) grouped[c.block_index] = [];
-            grouped[c.block_index].push(c);
-        });
-        Object.entries(grouped).forEach(([idx, comments]) => {
-            renderComments(parseInt(idx), comments);
-        });
-    } catch (e) { console.warn('loadComments:', e); }
-}
-
-function renderComments(idx, comments) {
-    const list = document.getElementById(`commentList${idx}`);
-    const badge = document.getElementById(`commentBadge${idx}`);
-    const btn = document.getElementById(`commentBtn${idx}`);
-    if (!list) return;
-
-    if (comments.length > 0) {
-        list.innerHTML = comments.map(c => {
-            const t = new Date(c.created_at);
-            const timeStr = t.toLocaleDateString('zh-TW');
-            return `<div class="pop-item" style="position:relative;padding-right:28px">
-                ${c.comment_text}<time>${timeStr}</time>
-                <button onclick="event.stopPropagation(); deleteComment('${c.id}', ${idx})" title="刪除" style="position:absolute;top:6px;right:4px;background:none;border:none;cursor:pointer;color:#d1d5db;padding:2px;display:flex;align-items:center;transition:color .15s" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'"><span class="material-symbols-outlined" style="font-size:16px">delete</span></button>
-            </div>`;
-        }).join('');
-        badge.textContent = comments.length;
-        btn.classList.add('has-count');
-    } else {
-        list.innerHTML = '';
-        badge.textContent = '0';
-        btn.classList.remove('has-count');
-    }
-}
-
-window.deleteComment = async function(commentId, blockIdx) {
-    try {
-        await db.delete('quote_comments', { id: `eq.${commentId}` });
-        // 重新載入該 block 的留言
-        const { data } = await db.select('quote_comments', {
-            select: '*',
-            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: `eq.${blockIdx}` },
-            order: 'created_at.asc'
-        });
-        renderComments(blockIdx, data || []);
-        // 同步更新 mobile bottom sheet
-        const sheetList = document.getElementById('commentSheetList');
-        if (sheetList && _activeCommentIdx === blockIdx) {
-            sheetList.innerHTML = document.getElementById(`commentList${blockIdx}`)?.innerHTML || '';
-        }
-    } catch (e) {
-        console.error('deleteComment:', e);
-        alert('刪除失敗：' + e.message);
-    }
-};
-
-// ── Suggest new topic (Bottom Sheet) ──
-window.openSuggestSheet = function() {
-    document.getElementById('suggestOverlay').classList.add('open');
-    // Slight delay for CSS transition
-    requestAnimationFrame(() => {
-        document.getElementById('suggestSheet').classList.add('open');
-    });
-    setTimeout(() => document.getElementById('suggestTitle')?.focus(), 300);
-};
-
-window.closeSuggestSheet = function() {
-    document.getElementById('suggestSheet').classList.remove('open');
-    setTimeout(() => {
-        document.getElementById('suggestOverlay').classList.remove('open');
-    }, 300);
-};
-
-window.submitSuggestion = async function() {
-    const title = document.getElementById('suggestTitle').value.trim();
-    if (!title) { document.getElementById('suggestTitle').focus(); return; }
-    const desc = document.getElementById('suggestDesc').value.trim();
-
-    try {
-        await db.insert('quote_comments', {
-            quotation_id: currentQuotationId,
-            block_index: -1,
-            block_title: '【建議新增】' + title,
-            comment_text: desc || title,
-            commenter_name: '客戶'
-        });
-        document.getElementById('suggestTitle').value = '';
-        document.getElementById('suggestDesc').value = '';
-        closeSuggestSheet();
-        loadSuggestions();
-    } catch (e) {
-        console.error('submitSuggestion:', e);
-        alert('送出失敗，請稍後再試');
-    }
-};
-
-async function loadSuggestions() {
-    if (!currentQuotationId) return;
-    try {
-        const { data } = await db.select('quote_comments', {
-            select: '*',
-            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: 'eq.-1' },
-            order: 'created_at.asc'
-        });
-        if (!data || data.length === 0) return;
-        const list = document.getElementById('suggestedList');
-        list.innerHTML = data.map(s => {
-            const t = new Date(s.created_at);
-            const timeStr = t.toLocaleDateString('zh-TW');
-            const title = s.block_title.replace('【建議新增】', '');
-            return `<div class="suggested-item" style="position:relative"><div><strong>${title}</strong><span>${s.comment_text !== title ? s.comment_text : ''}</span></div><time>${timeStr}</time><button onclick="deleteSuggestion('${s.id}')" title="刪除" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#d1d5db;padding:4px;display:flex;align-items:center;transition:color .15s" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#d1d5db'"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button></div>`;
-        }).join('');
-    } catch (e) { console.warn('loadSuggestions:', e); }
-}
-
-window.deleteSuggestion = async function(id) {
-    try {
-        await db.delete('quote_comments', { id: `eq.${id}` });
-        loadSuggestions();
-    } catch (e) {
-        console.error('deleteSuggestion:', e);
-        alert('刪除失敗：' + e.message);
-    }
-};
-
-// ── Invoice Email ──
-window.submitInvoiceEmail = async function() {
-    const input = document.getElementById('invoiceEmail');
-    const email = input.value.trim();
-    if (!email || !email.includes('@')) { input.focus(); return; }
-
-    const btn = document.getElementById('invoiceSubmitBtn');
-    btn.disabled = true; btn.textContent = '送出中…';
-
-    try {
-        // Store as a special comment with block_index = -2
-        await db.insert('quote_comments', {
-            quotation_id: currentQuotationId,
-            block_index: -2,
-            block_title: '【發票Email】',
-            comment_text: email,
-            commenter_name: '客戶'
-        });
-        // Show saved state
-        document.querySelector('.q-invoice-form').style.display = 'none';
-        const saved = document.getElementById('invoiceSaved');
-        document.getElementById('invoiceSavedText').textContent = '已送出：' + email;
-        saved.style.display = 'flex';
-    } catch (e) {
-        console.error('submitInvoiceEmail:', e);
-        alert('送出失敗，請稍後再試');
-        btn.disabled = false; btn.textContent = '確認';
-    }
-};
-
-async function loadInvoiceEmail() {
-    if (!currentQuotationId) return;
-    try {
-        const { data } = await db.select('quote_comments', {
-            select: '*',
-            filter: { quotation_id: `eq.${currentQuotationId}`, block_index: 'eq.-2' },
-            order: 'created_at.desc',
-            limit: 1
-        });
-        if (data && data.length > 0) {
-            document.querySelector('.q-invoice-form').style.display = 'none';
-            const saved = document.getElementById('invoiceSaved');
-            document.getElementById('invoiceSavedText').textContent = '已送出：' + data[0].comment_text;
-            saved.style.display = 'flex';
-        }
-    } catch (e) { console.warn('loadInvoiceEmail:', e); }
-}
-
-// Render outline data (reusable for variants and project outlines)
-function renderOutlineData(outline) {
-    if (!outline) return;
-    document.getElementById('outlineSection').style.display = 'block';
-
-    if (outline.timeline && outline.timeline.length > 0) {
-        const container = document.getElementById('outlineTimeline');
-        const hasDays = outline.timeline.some(b => b.day || b.dayLabel);
-
-        // Build schedule topic lookup: { dayNum: topic }
-        const schedTopics = {};
-        if (outline.schedule) {
-            outline.schedule.forEach(s => {
-                if (s.topic) schedTopics[s.day || 1] = s.topic;
-            });
-        }
-
-        if (hasDays) {
-            const days = {};
-            outline.timeline.forEach(b => {
-                const d = b.day || 1;
-                if (!days[d]) {
-                    let topic = schedTopics[d] || '';
-                    // Strip course name prefix: "課程名 - DayN 主題" → "主題"
-                    if (topic) {
-                        const m = topic.match(/[-–—]\s*[Dd]ay\s*\d+\s*[-–—]?\s*(.*)/);
-                        if (m && m[1]) topic = m[1].trim();
-                    }
-                    const baseLabel = b.dayLabel || `Day ${d}`;
-                    const label = topic ? `${baseLabel} — ${topic}` : baseLabel;
-                    days[d] = { label, info: b.dayInfo || '', blocks: [] };
-                }
-                days[d].blocks.push(b);
-            });
-            const dayKeys = Object.keys(days);
-            if (dayKeys.length === 1) {
-                const d = days[dayKeys[0]];
-                container.innerHTML = d.blocks.map(block => renderTimelineBlock(block, false)).join('');
-            } else {
-                const cols = dayKeys.length;
-                const gridClass = cols >= 4 ? 'timeline-grid-4' : cols === 3 ? 'timeline-grid-3' : 'timeline-grid-2';
-                container.innerHTML = `<div class="timeline-grid ${gridClass}">${dayKeys.map(k => {
-                    const d = days[k];
-                    return `<div class="timeline-day-col">
-                        <div class="timeline-day-header"><span class="timeline-day-badge">${d.label}</span>${d.info ? `<span class="timeline-day-info">${d.info}</span>` : ''}</div>
-                        ${d.blocks.map(block => renderTimelineBlock(block, true)).join('')}
-                    </div>`;
-                }).join('')}</div>`;
-            }
-        } else {
-            container.innerHTML = outline.timeline.map(block => renderTimelineBlock(block, false)).join('');
-        }
-    }
-
-    if (outline.tools && outline.tools.length > 0) {
-        document.getElementById('toolsSection').style.display = 'block';
-        document.getElementById('toolGrid').innerHTML = outline.tools.map(t => `
-            <div class="q-tool-card">
-                ${t.logo ? `<img src="${t.logo}" alt="${t.name}" class="q-tool-logo" onerror="this.style.display='none'">` : ''}
-                <div class="q-tool-name">${t.name || ''}</div>
-                <div class="q-tool-purpose">${t.purpose || ''}</div>
-            </div>
-        `).join('');
-    }
-
-    if (outline.equipment && outline.equipment.length > 0) {
-        document.getElementById('equipSection').style.display = 'block';
-        document.getElementById('equipGrid').innerHTML = outline.equipment.map(e => `
-            <div class="q-equip-item">
-                <div class="q-equip-icon"><span class="material-symbols-outlined">${e.icon || 'check_circle'}</span></div>
-                <div><div class="q-equip-label">${e.label || ''}</div><div class="q-equip-detail">${e.detail || ''}</div></div>
-            </div>
-        `).join('');
-    }
-
-
-    if (window._hideInstructor) {
-        // Admin toggled instructor off
-    } else if (outline.instructors && outline.instructors.length > 0) {
-        renderInstructorCards(outline.instructors);
-    } else if (outline.instructorIds && outline.instructorIds.length > 0) {
-        resolveInstructorIds(outline.instructorIds);
-    } else {
-        document.getElementById('instructorSection').style.display = 'none';
-    }
-}
-
-function renderInstructorCards(instructors) {
-    document.getElementById('instructorSection').style.display = 'block';
-    document.getElementById('instructorContent').innerHTML = instructors.map(ins => {
-        const exp = (ins.experience || []).map(e => e.replace(/^-\s*/, ''));
-        const specs = ins.tags || ins.specialties || [];
-        const photos = ins.photos || [];
-
-        const expHtml = exp.length > 0
-            ? `<div style="margin-top:14px">
-                <div style="font-size:.78rem;font-weight:700;color:var(--q-text);margin-bottom:8px;display:flex;align-items:center;gap:5px">
-                    <span class="material-symbols-outlined" style="font-size:15px;color:var(--q-accent)">apartment</span> 授課企業與機構
-                </div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                    ${exp.map(e => `<span style="display:inline-block;padding:4px 12px;background:var(--q-bg-soft,#f5f5f5);border:1px solid var(--q-border);border-radius:20px;font-size:.78rem;color:var(--q-text-2);white-space:nowrap">${e}</span>`).join('')}
-                </div>
-              </div>` : '';
-
-        const specHtml = specs.length > 0
-            ? `<div style="margin-top:12px">
-                <div style="font-size:.78rem;font-weight:700;color:var(--q-text);margin-bottom:8px;display:flex;align-items:center;gap:5px">
-                    <span class="material-symbols-outlined" style="font-size:15px;color:var(--q-accent)">stars</span> 專長領域
-                </div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                    ${specs.map(s => `<span style="display:inline-block;padding:4px 12px;background:rgba(var(--q-accent-rgb,66,99,235),.08);border:1px solid rgba(var(--q-accent-rgb,66,99,235),.2);border-radius:20px;font-size:.78rem;color:var(--q-accent);font-weight:600;white-space:nowrap">${s}</span>`).join('')}
-                </div>
-              </div>` : '';
-
-        const galleryHtml = photos.length > 0
-            ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--q-border)">
-                <div style="font-size:.78rem;font-weight:700;color:var(--q-text);margin-bottom:10px;display:flex;align-items:center;gap:5px">
-                    <span class="material-symbols-outlined" style="font-size:15px;color:var(--q-accent)">photo_camera</span> 課程實況
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(${photos.length}, 1fr);gap:10px;">
-                    ${photos.slice(0, 2).map(p => `<img src="${p}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;border:1px solid var(--q-border);" alt="課程實況" onerror="this.style.display='none'">`).join('')}
-                </div>
-              </div>` : '';
-
-        return `
-        <div class="q-instructor-card">
-            <div class="q-instructor-main">
-                ${ins.photoUrl || ins.photo_url ? `<img src="${ins.photoUrl || ins.photo_url}" class="q-instructor-photo" alt="${ins.name}">` : `<div class="q-instructor-placeholder"><span class="material-symbols-outlined">person</span></div>`}
-                <div style="flex:1">
-                    <div class="q-instructor-name">${ins.name || ''}</div>
-                    <div class="q-instructor-title">${ins.title || ''}</div>
-                    ${ins.bio ? (() => {
-                        const parts = ins.bio.split(/\s*[-–]\s*/).filter(Boolean);
-                        if (parts.length > 1) {
-                            return `<ul style="margin:8px 0 0;padding-left:18px;font-size:.88rem;color:var(--q-text-2);line-height:1.8">${parts.map(p => `<li>${p.trim()}</li>`).join('')}</ul>`;
-                        }
-                        return `<div class="q-instructor-bio">${ins.bio}</div>`;
-                    })() : ''}
-                </div>
-            </div>
-            ${expHtml}
-            ${specHtml}
-            ${galleryHtml}
-        </div>`;
-    }).join('');
-}
-
-async function resolveInstructorIds(ids) {
-    try {
-        const { data } = await db.select('instructors');
-        if (!data) return;
-        const matched = ids.map(id => data.find(i => i.id === id)).filter(Boolean);
-        if (matched.length > 0) {
-            renderInstructorCards(matched.map(i => ({
-                name: i.name,
-                photoUrl: i.photo_url,
-                title: i.title,
-                bio: i.bio,
-                experience: i.experience || [],
-                tags: i.specialties || [],
-                photos: i.photos || []
-            })));
-        }
-    } catch (e) { console.warn('resolveInstructorIds:', e); }
-}
-
-async function loadOutline(projectId) {
-    try {
-        const { data: projects } = await db.select('projects', {
-            select: 'id,name,outline_data',
-            filter: { id: `eq.${projectId}` },
-            limit: 1
-        });
-        if (!projects || projects.length === 0) return;
-        const outline = projects[0].outline_data;
-        if (!outline) return;
-        renderOutlineData(outline);
-    } catch (err) { console.warn('Failed to load outline:', err); }
-}
-
-
-// ── E-Sign Modal ──
-const SUPA_URL = 'https://wsaknnhjgiqmkendeyrj.supabase.co';
-const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzYWtubmhqZ2lxbWtlbmRleXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMTI4MTIsImV4cCI6MjA4NzY4ODgxMn0.1j-4D9Kw0vqhVcTWgU7ABTJ_mO6aN4IB72Ojof8Yfko';
-
-window.openEsign = function() {
-    document.getElementById('esignOverlay').classList.add('active');
-    document.getElementById('esignModal').classList.add('active');
-    document.getElementById('esignStep1').style.display = '';
-    document.getElementById('esignStep2').style.display = 'none';
-    document.getElementById('esignError').style.display = 'none';
-    document.getElementById('esignEmail').value = '';
-    document.getElementById('esignName').value = '';
-    setTimeout(() => document.getElementById('esignEmail').focus(), 200);
-};
-
-window.closeEsign = function() {
-    document.getElementById('esignOverlay').classList.remove('active');
-    document.getElementById('esignModal').classList.remove('active');
-};
-
-window.submitEsign = async function() {
-    const email = document.getElementById('esignEmail').value.trim();
-    const name = document.getElementById('esignName').value.trim();
-    const errEl = document.getElementById('esignError');
-    if (!email || !email.includes('@')) {
-        errEl.textContent = '請輸入有效的 Email 地址';
-        errEl.style.display = 'block';
-        return;
-    }
-    const btn = document.getElementById('esignSubmitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">hourglass_top</span> 處理中…';
-    errEl.style.display = 'none';
-
-    try {
-        // Get quote title for notification
-        const quoteTitle = document.getElementById('quoteTitle')?.textContent || '課程報價';
-        const clientName = document.getElementById('clientNameDisplay')?.dataset?.clientName || '';
-        const quoteSlug = new URLSearchParams(location.search).get('slug') || '';
-
-        // Send notification to service@tbr.digital
-        await fetch(`${SUPA_URL}/functions/v1/send-email`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPA_ANON,
-                'Authorization': `Bearer ${SUPA_ANON}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                to: 'service@tbr.digital',
-                subject: `📋 電子簽核申請 — ${clientName || quoteTitle}`,
-                body: `收到一筆電子報價單申請：\n\n報價單：${quoteTitle}\n客戶：${clientName || '（未填寫）'}\n申請人：${name || '（未填寫）'}\nEmail：${email}\n報價單連結：${location.href}\n時間：${new Date().toLocaleString('zh-TW')}\n\n請於一個工作天內將電子報價單寄送給對方。`,
-                footerText: '此信件由數位簡報室報價系統自動發送'
-            })
-        });
-
-        // Show success
-        document.getElementById('esignStep1').style.display = 'none';
-        document.getElementById('esignStep2').style.display = '';
-        document.getElementById('esignConfirmEmail').textContent = email;
-    } catch (e) {
-        errEl.textContent = '發送失敗，請稍後再試';
-        errEl.style.display = 'block';
-        console.error('E-sign error:', e);
-    }
-    btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">send</span> 請求電子報價單';
-};
-
-// ── Print Options Modal ──
-window.openPrintOptions = function() {
-    // Show compare option only if there are 2+ variants
-    const hasVariants = _allVariants && _allVariants.length >= 2;
-    document.getElementById('printOptionCompare').style.display = hasVariants ? 'flex' : 'none';
-    document.getElementById('printIncludeCompare').checked = false;
-    document.getElementById('printModalOverlay').classList.add('active');
-    document.getElementById('printModal').classList.add('active');
-};
-
-window.closePrintOptions = function() {
-    document.getElementById('printModalOverlay').classList.remove('active');
-    document.getElementById('printModal').classList.remove('active');
-};
-
-window.executePrint = function() {
-    const includeCompare = document.getElementById('printIncludeCompare').checked;
-    const compSection = document.getElementById('printComparison');
-
-    // Populate cover page info
-    const title = document.getElementById('quoteTitle')?.textContent || '課程報價';
-    const client = document.getElementById('clientNameDisplay')?.dataset?.clientName || '';
-    document.getElementById('printCoverTitle').textContent = title;
-    document.getElementById('printCoverClient').textContent = client;
-    const now = new Date();
-    document.getElementById('printCoverDate').textContent = now.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = now.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-    document.getElementById('printCoverTime').textContent = '列印時間：' + timeStr;
-    document.getElementById('printFooterTime').textContent = '列印時間：' + timeStr;
-
-    // Handle comparison section
-    if (includeCompare && _allVariants && _allVariants.length >= 2) {
-        compSection.classList.add('print-include');
-        buildPrintComparison();
-    } else {
-        compSection.classList.remove('print-include');
-    }
-
-    // ── Dynamic page break insertion ──
-    // A4 at 96dpi ≈ 1123px height, minus @page margins (24mm top + 32mm bottom ≈ 213px) ≈ 910px usable
-    const PAGE_HEIGHT = 840; // conservative — leaves breathing room
-    const LARGE_THRESHOLD = 0.55;
-
-    // Gather all visible .q-section elements in DOM order
-    const allSections = Array.from(document.querySelectorAll('.q-container .q-section'))
-        .filter(s => {
-            let el = s;
-            while (el && el !== document.body) {
-                if (el.style.display === 'none') return false;
-                el = el.parentElement;
-            }
-            return true;
-        });
-
-    // Clean previous markers
-    allSections.forEach(s => s.classList.remove('print-page-break'));
-
-    // Measure and assign breaks between sections
-    let accHeight = 0;
-    allSections.forEach((section, i) => {
-        const h = section.offsetHeight;
-
-        if (i === 0) {
-            accHeight = h;
-            return;
-        }
-
-        const isLarge = h > PAGE_HEIGHT * LARGE_THRESHOLD;
-
-        if (accHeight + h > PAGE_HEIGHT || isLarge) {
-            section.classList.add('print-page-break');
-            accHeight = h;
-        } else {
-            accHeight += h;
-        }
-    });
-
-    // Note: timeline day-level page breaks are handled by CSS
-    // (.timeline-day-col + .timeline-day-col { break-before: page })
-
-    closePrintOptions();
-    setTimeout(() => {
-        window.print();
-        setTimeout(() => {
-            allSections.forEach(s => s.classList.remove('print-page-break'));
-        }, 500);
-    }, 200);
-};
-
-function buildPrintComparison() {
-    const n = _allVariants.length;
-    const calcAmt = (item) => {
-        if (!item) return 0;
-        if (item.type === 'hourly') return (item.hours||0) * (item.rate||0);
-        if (item.type === 'perhead') return (item.count||0) * (item.rate||0);
-        return item.amount || 0;
+<script>
+(() => {
+    // ── 價格參數 ──
+    const TOPIC_CONFIG = {
+        ai_intro:  { name: 'AI 基礎入門',          base: 3000 },
+        ai_app:    { name: 'ChatGPT / Claude 實戰', base: 3500 },
+        ai_ppt:    { name: 'AI 簡報製作',           base: 3200 },
+        ai_dev:    { name: 'AI 程式開發',           base: 4000 },
+        ai_data:   { name: 'AI 數據分析',           base: 3800 },
+        custom:    { name: '自訂主題',              base: 3500 },
     };
 
-    const vData = _allVariants.map(v => {
-        const od = v.outline_data || {};
-        const sched = od.schedule || [];
-        const topics = (od.timeline||[]).map(t => t.title);
-        const tools = (od.tools||[]).map(t => t.name);
-        const days = sched.length;
-        const hours = sched.reduce((s,d) => s + (parseFloat(d.hours)||0), 0);
-        return { name: v.name, total: v.total||0, days, hours, topics, tools, items: v.items||[] };
+    const AUDIENCE_CONFIG = {
+        general:     { name: '一般部門', multiplier: 1.0 },
+        management:  { name: '管理層',   multiplier: 1.5 },
+        engineering: { name: '工程團隊', multiplier: 1.3 },
+        special:     { name: '特殊場景', multiplier: 1.4 },
+    };
+
+    // 人數 → 折扣
+    const getDiscount = (n) => {
+        if (n >= 150) return { rate: 0.25, label: '75 折' };
+        if (n >= 100) return { rate: 0.20, label: '8 折' };
+        if (n >= 50)  return { rate: 0.15, label: '85 折' };
+        if (n >= 30)  return { rate: 0.10, label: '9 折' };
+        return { rate: 0, label: '原價' };
+    };
+
+    const fmt = n => 'NT$ ' + Math.round(n).toLocaleString();
+
+    // ── DOM ──
+    const slider = document.getElementById('peopleSlider');
+    const peopleVal = document.getElementById('peopleVal');
+    const hourVal = document.getElementById('hourVal');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const perPersonEl = document.getElementById('perPersonPrice');
+    const breakdownEl = document.getElementById('priceBreakdown');
+    const compareGrid = document.getElementById('compareGrid');
+    const customInput = document.getElementById('customTopic');
+
+    let currentHours = 6;
+
+    // ── Getters ──
+    const getTopic = () => document.querySelector('input[name="topic"]:checked')?.value || 'ai_intro';
+    const getAudience = () => document.querySelector('input[name="audience"]:checked')?.value || 'general';
+    const getPeople = () => parseInt(slider.value);
+
+    // ── 計算 ──
+    const calcPrice = (people, topicKey, audienceKey, hours) => {
+        const topic = TOPIC_CONFIG[topicKey] || TOPIC_CONFIG.ai_intro;
+        const audience = AUDIENCE_CONFIG[audienceKey] || AUDIENCE_CONFIG.general;
+        const hourRate = topic.base * audience.multiplier;
+        const subtotal = hourRate * hours;
+        const discount = getDiscount(people);
+        const total = subtotal * (1 - discount.rate);
+        return { hourRate, subtotal, total, discount, topicName: topic.name, audienceName: audience.name };
+    };
+
+    // ── 更新 UI ──
+    const update = () => {
+        const people = getPeople();
+        const topic = getTopic();
+        const audience = getAudience();
+        const hours = currentHours;
+
+        const pct = ((people - 5) / (200 - 5)) * 100;
+        slider.style.setProperty('--pct', pct + '%');
+        peopleVal.textContent = people;
+
+        const result = calcPrice(people, topic, audience, hours);
+
+        totalPriceEl.textContent = fmt(result.total);
+        perPersonEl.textContent = fmt(result.total / people);
+
+        breakdownEl.innerHTML = `
+            <div class="price-item">
+                <span class="price-item-label">時薪單價</span>
+                <span class="price-item-value">${fmt(result.hourRate)}</span>
+            </div>
+            <div class="price-item">
+                <span class="price-item-label">小計 (${hours}h)</span>
+                <span class="price-item-value">${fmt(result.subtotal)}</span>
+            </div>
+            <div class="price-item">
+                <span class="price-item-label">人數折扣</span>
+                <span class="price-item-value" style="color:var(--green)">${result.discount.label}</span>
+            </div>
+        `;
+
+        // ── 對照卡片 ──
+        const presets = [10, 20, 30, 50, 80, 100];
+        compareGrid.innerHTML = presets.map(n => {
+            const r = calcPrice(n, topic, audience, hours);
+            const isActive = n === people;
+            return `<div class="compare-card${isActive ? ' active' : ''}" data-people="${n}">
+                <div class="compare-card-people">${n} <span>人</span></div>
+                <div class="compare-card-price">${fmt(r.total)}</div>
+                <div class="compare-card-per">每人 ${fmt(r.total / n)}</div>
+                ${r.discount.rate > 0 ? `<div class="compare-card-discount">${r.discount.label}</div>` : ''}
+            </div>`;
+        }).join('');
+
+        // 自訂主題
+        customInput.classList.toggle('visible', topic === 'custom');
+    };
+
+    // ── Events ──
+    slider.addEventListener('input', update);
+    document.querySelectorAll('input[name="topic"], input[name="audience"]').forEach(r => r.addEventListener('change', update));
+    document.querySelectorAll('.slider-tick').forEach(t => t.addEventListener('click', () => {
+        slider.value = t.dataset.v;
+        update();
+    }));
+
+    // Compare cards click
+    compareGrid.addEventListener('click', e => {
+        const card = e.target.closest('.compare-card');
+        if (!card) return;
+        slider.value = card.dataset.people;
+        update();
     });
 
-    const gridCols = `minmax(120px,160px) repeat(${n}, 1fr)`;
-    let html = '';
-
-    // Summary cards
-    html += `<div style="display:flex;gap:12px;margin-bottom:20px">`;
-    vData.forEach((v, i) => {
-        html += `<div style="flex:1;padding:18px;border:1.5px solid var(--q-border);border-radius:var(--q-radius);text-align:center">
-            <div style="font-weight:700;margin-bottom:4px">${v.name || '方案'+(i+1)}</div>
-            <div style="font-size:1.3rem;font-weight:800;color:var(--q-accent)">${fmt(v.total)}<span style="font-size:.65rem;font-weight:500;color:var(--q-text-3);margin-left:4px">未稅</span></div>
-            <div style="font-size:.78rem;color:var(--q-text-3);margin-top:4px">${v.days} 天 / ${v.hours} 小時</div>
-        </div>`;
+    // Hours stepper
+    document.getElementById('hourPlus').addEventListener('click', () => {
+        if (currentHours < 24) { currentHours++; hourVal.value = currentHours; update(); }
     });
-    html += `</div>`;
+    document.getElementById('hourMinus').addEventListener('click', () => {
+        if (currentHours > 1) { currentHours--; hourVal.value = currentHours; update(); }
+    });
 
-    // Grid table
-    let grid = `<div style="border:1px solid var(--q-border);border-radius:10px;overflow:hidden">`;
-    function row(label, vals, bold) {
-        let r = `<div style="display:grid;grid-template-columns:${gridCols};border-bottom:1px solid #f0f1f3">`;
-        r += `<div style="padding:10px 14px;font-size:.82rem;font-weight:600;color:var(--q-text-2)">${label}</div>`;
-        vals.forEach(v => r += `<div style="padding:10px;text-align:center;font-size:.88rem;${bold?'font-weight:800;color:var(--q-accent)':''}">${v}</div>`);
-        r += `</div>`;
-        return r;
-    }
+    // ── Preview ──
+    document.getElementById('previewBtn').addEventListener('click', () => {
+        const people = getPeople();
+        const topicKey = getTopic();
+        const audienceKey = getAudience();
+        const hours = currentHours;
+        const result = calcPrice(people, topicKey, audienceKey, hours);
+        const topicName = topicKey === 'custom' ? (customInput.value || '自訂主題') : result.topicName;
+        const today = new Date();
+        const dateStr = `${today.getFullYear()} / ${String(today.getMonth() + 1).padStart(2, '0')} / ${String(today.getDate()).padStart(2, '0')}`;
+        const validDate = new Date(today.getTime() + 30 * 86400000);
+        const validStr = `${validDate.getFullYear()} / ${String(validDate.getMonth() + 1).padStart(2, '0')} / ${String(validDate.getDate()).padStart(2, '0')}`;
 
-    grid += `<div style="padding:10px 14px;font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--q-accent);background:#f8f9ff;border-bottom:1px solid var(--q-border)">基本資訊</div>`;
-    grid += row('授課天數', vData.map(v => `${v.days} 天`));
-    grid += row('總時數', vData.map(v => `${v.hours} 小時`));
-    grid += row('主題數', vData.map(v => `${v.topics.length} 個`));
+        document.getElementById('quotePreview').innerHTML = `
+            <div class="qp-header">
+                <div class="qp-brand">
+                    <div class="qp-brand-name">📊 數位簡報室</div>
+                    <div class="qp-brand-sub">Digital Presentation Lab — 企業培訓報價單</div>
+                </div>
+                <div class="qp-meta">
+                    <div>報價日期：<b>${dateStr}</b></div>
+                    <div>有效期限：<b>${validStr}</b></div>
+                    <div>報價編號：<b>Q-${Date.now().toString(36).toUpperCase()}</b></div>
+                </div>
+            </div>
+            <div class="qp-body">
+                <div class="qp-section-title">課程方案</div>
+                <table class="qp-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40%;">項目</th>
+                            <th>說明</th>
+                            <th class="text-right">金額</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>${topicName}</b></td>
+                            <td>${result.audienceName} · ${people} 人 · ${hours} 小時</td>
+                            <td class="text-right">${fmt(result.subtotal)}</td>
+                        </tr>
+                        <tr>
+                            <td>互動教學系統授權</td>
+                            <td>即時互動、排行榜、作品展示</td>
+                            <td class="text-right">含於報價</td>
+                        </tr>
+                        <tr>
+                            <td>課前客製化調整</td>
+                            <td>依學員背景調整教材內容</td>
+                            <td class="text-right">含於報價</td>
+                        </tr>
+                        ${result.discount.rate > 0 ? `<tr>
+                            <td style="color:#16a34a;">人數優惠（${result.discount.label}）</td>
+                            <td>${people} 人以上適用</td>
+                            <td class="text-right" style="color:#16a34a;">- ${fmt(result.subtotal * result.discount.rate)}</td>
+                        </tr>` : ''}
+                        <tr class="total-row">
+                            <td colspan="2">總　計</td>
+                            <td class="text-right">${fmt(result.total)}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    const allLabels = [...new Set(vData.flatMap(v => v.items.map(i => i.label)))];
-    if (allLabels.length) {
-        grid += `<div style="padding:10px 14px;font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--q-accent);background:#f8f9ff;border-bottom:1px solid var(--q-border)">費用明細</div>`;
-        allLabels.forEach(label => {
-            const vals = vData.map(v => {
-                const item = v.items.find(i => i.label === label);
-                const amt = calcAmt(item);
-                return amt > 0 ? fmt(amt) : '—';
-            });
-            grid += row(label, vals);
+                <div class="qp-section-title">不同人數方案參考</div>
+                <table class="qp-table">
+                    <thead>
+                        <tr>
+                            <th>人數</th>
+                            <th>總價</th>
+                            <th>每人費用</th>
+                            <th>優惠</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${[10, 20, 30, 50, 80, 100].map(n => {
+                            const r = calcPrice(n, topicKey, audienceKey, hours);
+                            const isCurrent = n === people;
+                            return `<tr${isCurrent ? ' style="background:#f0f9ff;font-weight:600;"' : ''}>
+                                <td>${n} 人${isCurrent ? ' ★' : ''}</td>
+                                <td>${fmt(r.total)}</td>
+                                <td>${fmt(r.total / n)}</td>
+                                <td>${r.discount.rate > 0 ? r.discount.label : '—'}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+
+                <div class="qp-notes">
+                    <div class="qp-notes-title">備註</div>
+                    <ul>
+                        <li>以上報價含講師費、教材費與互動系統授權，不含場地及交通費用</li>
+                        <li>課程可依企業需求客製化調整，歡迎進一步洽談</li>
+                        <li>如需課後輔導或額外諮詢，可加購延伸服務</li>
+                        <li>本報價單有效期限 30 天，逾期請重新報價</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="qp-footer">
+                <div class="qp-footer-brand">📊 數位簡報室 Digital Presentation Lab</div>
+                <div class="qp-footer-info">
+                    專注 AI 教學 × 企業內訓 × 互動簡報系統<br>
+                    讓每一場培訓都成為改變的起點
+                </div>
+            </div>
+        `;
+
+        const preview = document.getElementById('previewSection');
+        preview.classList.add('visible');
+        preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('printBtn').style.display = '';
+        document.getElementById('copyBtn').style.display = '';
+    });
+
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const url = location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.innerHTML = '<span class="material-symbols-outlined">check</span> 已複製';
+            setTimeout(() => { btn.innerHTML = '<span class="material-symbols-outlined">content_copy</span> 複製連結'; }, 2000);
         });
-        grid += row('合計（未稅）', vData.map(v => fmt(v.total)), true);
-    }
+    });
 
-    grid += `</div>`;
-    html += grid;
-
-    document.getElementById('printComparisonContent').innerHTML = html;
-}
-
-init();
+    // Init
+    update();
+})();
 </script>
 </body>
 </html>
-
