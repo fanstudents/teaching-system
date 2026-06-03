@@ -3459,7 +3459,10 @@
     padding: 4px 10px;
     transition: transform 0.2s;
     font-weight: 600;
-    white-space: nowrap;
+    max-width: 45%;
+    word-break: break-word;
+    text-align: center;
+    line-height: 1.3;
 }
 
 .wordcloud-word:hover {
@@ -3504,12 +3507,13 @@
 
 /* ── 文字雲 overflow 修正 ── */
 .wordcloud-cloud {
-    overflow: hidden;
+    overflow-y: auto;
 }
 .wordcloud-word {
-    max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 /* ── AI 分類面板（講師端右側）── */

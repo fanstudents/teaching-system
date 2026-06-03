@@ -238,10 +238,15 @@ export class WordCloudGame {
             const colors = ['#0969da', '#cf222e', '#1a7f37', '#9a6700', '#1a73e8', '#0e7490', '#bf5600', '#6e40c9', '#0550ae', '#953800'];
 
             cloudEl.innerHTML = entries.map(([word, count], i) => {
-                const size = Math.min(0.85 + (count / maxFreq) * 2.2, 2.8);
+                const len = word.length;
+                // 長文字降低字體大小
+                const baseCeil = len > 15 ? 1.6 : len > 8 ? 2.0 : 2.8;
+                const size = Math.min(0.85 + (count / maxFreq) * 2.2, baseCeil);
                 const color = colors[i % colors.length];
                 const opacity = 0.7 + (count / maxFreq) * 0.3;
-                return `<span class="wordcloud-word" style="font-size:${size}rem;color:${color};opacity:${opacity};" title="${count} 次">${this.esc(word)}</span>`;
+                const display = len > 30 ? this.esc(word.slice(0, 28)) + '…' : this.esc(word);
+                const tip = `${this.esc(word)} (${count} 次)`;
+                return `<span class="wordcloud-word" style="font-size:${size}rem;color:${color};opacity:${opacity};" title="${tip}">${display}</span>`;
             }).join(' ');
         } catch (e) {
             console.warn('wordcloud render error:', e);
