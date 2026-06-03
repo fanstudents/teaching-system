@@ -773,6 +773,23 @@
     </div>
     </div>
 
+    <script>
+        function verifyPin() {
+            const input = document.getElementById('pinInput');
+            if (input.value === 'tbrclass') {
+                sessionStorage.setItem('dash_pin', '1');
+                document.getElementById('pinOverlay').classList.add('hidden');
+            } else {
+                input.classList.add('error');
+                document.getElementById('pinError').textContent = '驗證碼錯誤';
+                setTimeout(() => { input.classList.remove('error'); document.getElementById('pinError').textContent = ''; }, 1500);
+            }
+        }
+        if (sessionStorage.getItem('dash_pin') === '1') {
+            document.getElementById('pinOverlay').classList.add('hidden');
+        }
+    </script>
+
     <script type="module">
         import { db, requireAuth } from './scripts/supabase.js';
         const _authCheck = await requireAuth(); if (!_authCheck) throw new Error('unauthorized');
