@@ -566,7 +566,7 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 for (const [gKey, gData] of sortedGroups) {
                     const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
                     html += `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:8px 0 4px;margin-top:${flatIdx > 0 ? '10px' : '0'};">
-                        <span style="font-size:13px;font-weight:700;color:#1f1f1f;">👥 ${esc(gName)}</span>
+                        <span style="font-size:13px;font-weight:700;color:#1f1f1f;display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;color:#5f6368;">groups</span>${esc(gName)}</span>
                         <span style="font-size:11px;color:#80868b;">${gData.subs.length} 份</span>
                         <div style="flex:1;height:1px;background:#e2e8f0;"></div>
                     </div>`;

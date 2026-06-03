@@ -432,7 +432,7 @@ export class SkillBattleGame {
                 for (const [gKey, gData] of sortedGroups) {
                     const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
                     html += `<div class="sb-group-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:8px 4px 4px;margin-top:${flatIdx > 0 ? '12px' : '0'};">
-                        <span style="font-size:13px;font-weight:700;color:#1f1f1f;">${esc(gName)}</span>
+                        <span style="font-size:13px;font-weight:700;color:#1f1f1f;display:flex;align-items:center;gap:4px;">${mi('groups', 16)} ${esc(gName)}</span>
                         <span style="font-size:11px;color:#80868b;font-weight:500;">${gData.subs.length} 人</span>
                         <div style="flex:1;height:1px;background:#e2e8f0;"></div>
                     </div>`;
@@ -1082,7 +1082,7 @@ export class SkillBattleReviewGame {
                 for (const [gKey, gData] of sortedGroups) {
                     const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
                     html += `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:10px 0 4px;margin-top:${flatIdx > 0 ? '8px' : '0'};">
-                        <span style="font-size:14px;font-weight:700;color:#1f1f1f;">${esc(gName)}</span>
+                        <span style="font-size:14px;font-weight:700;color:#1f1f1f;display:flex;align-items:center;gap:4px;">${mi('groups', 16)} ${esc(gName)}</span>
                         <span style="font-size:11px;color:#80868b;">${gData.subs.length} 人</span>
                         <div style="flex:1;height:1px;background:#e2e8f0;"></div>
                     </div>`;

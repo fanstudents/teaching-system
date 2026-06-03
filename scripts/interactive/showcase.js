@@ -335,7 +335,7 @@ export class Showcase {
             for (const [gKey, gData] of sortedGroups) {
                 const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
                 finalGridHtml += `<div class="showcase-group-divider" style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 16px;min-width:fit-content;background:linear-gradient(135deg,#f0f4ff,#e8f0fe);border-radius:10px;border:1px dashed #a8c7fa;">
-                    <div style="font-size:13px;font-weight:700;color:#1a73e8;white-space:nowrap;">👥 ${this.escapeHtml(gName)}</div>
+                    <div style="font-size:13px;font-weight:700;color:#1a73e8;white-space:nowrap;display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:16px;">groups</span>${this.escapeHtml(gName)}</div>
                     <div style="font-size:10px;color:#80868b;margin-top:2px;">${gData.items.length} 份</div>
                 </div>`;
                 finalGridHtml += gData.items.map(({ idx }) => cardHtmlArr[idx]).join('');
