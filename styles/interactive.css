@@ -4098,22 +4098,113 @@
     opacity: 0.5;
 }
 
-/* ── 組別模式修正 ── */
+/* ── 組別排行卡片 ── */
+.lb-group-row {
+    border-left: 3px solid var(--gp-color, #6366f1) !important;
+    border-radius: 4px 10px 10px 4px !important;
+    padding: 0 !important;
+    margin-bottom: 6px !important;
+    background: #fff !important;
+    border-color: #e5e7eb !important;
+    border-left-color: var(--gp-color, #6366f1) !important;
+}
+.lb-group-row:nth-child(1) { background: linear-gradient(135deg, #fffbeb, #fefce8) !important; }
+.lb-group-row:nth-child(2) { background: linear-gradient(135deg, #f8f9fa, #f1f3f4) !important; }
+.lb-group-row:nth-child(3) { background: linear-gradient(135deg, #fff7ed, #ffedd5) !important; }
+
+.lb-group-row .lb-row-top {
+    padding: 8px 10px;
+    gap: 8px;
+    margin-bottom: 0;
+}
 .lb-group-row .lb-name {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
 }
-.lb-group-row .lb-row-top {
-    gap: 6px;
-}
-.lb-group-row .lb-pts {
-    font-size: 16px;
-    min-width: 28px;
+.lb-group-row .lb-bar-wrap {
+    margin: 0 10px 4px;
 }
 .lb-group-members {
-    max-height: 120px;
+    padding: 4px 10px 8px 36px;
+    border-top: 1px solid rgba(0,0,0,.05);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 140px;
     overflow-y: auto;
+}
+.lb-group-members::-webkit-scrollbar { width: 2px; }
+.lb-group-members::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+.lb-member-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+}
+.lb-member-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.lb-member-name {
+    font-size: 11px;
+    color: #5f6368;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.lb-member-pts {
+    font-size: 10px;
+    color: #9ca3af;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+/* 組別分數區 */
+.lb-group-score-area {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 40px;
+}
+.lb-group-total {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+}
+.lb-group-avg {
+    font-size: 9px;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+.lb-group-row:nth-child(1) .lb-group-total { color: #e37400; }
+.lb-group-row:nth-child(2) .lb-group-total { color: #5f6368; }
+.lb-group-row:nth-child(3) .lb-group-total { color: #ea580c; }
+.lb-group-row:nth-child(n+4) .lb-group-total { color: #80868b; font-size: 14px; }
+.lb-group-meta {
+    font-size: 10px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 1px;
+}
+.lb-group-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gp-color, #1f2937);
+}
+.lb-group-toggle {
+    font-size: 14px;
+    color: #cbd5e1;
+    transition: transform .2s;
+    flex-shrink: 0;
+}
+.lb-group-row.expanded .lb-group-toggle {
+    transform: rotate(180deg);
 }
 
 /* ── 加分動畫 ── */

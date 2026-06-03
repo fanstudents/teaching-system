@@ -4021,7 +4021,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 });
             }
 
-            // ★ 組別模式 — 二階式排行
+            // ★ 組別模式 — 精緻卡片排行
             if (this._lbMode === 'group' && hasGroups) {
                 const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
                 list.innerHTML = groupBoard.map((g, i) => {
@@ -4029,40 +4029,43 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     const barPct = Math.round((g.totalPoints / maxPts) * 100);
                     const color = GROUP_COLORS[(parseInt(g.group) - 1) % GROUP_COLORS.length] || '#6366f1';
 
-                    // 組員列表
                     const membersHtml = g.members?.length ? g.members.map(m =>
-                        `<div style="display:flex;align-items:center;gap:6px;padding:2px 0;">
-                            <span style="font-size:11px;color:#9ca3af;width:14px;text-align:right;">${m.pts}</span>
-                            <span style="font-size:11px;color:#5f6368;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this._escHtml(m.name)}</span>
+                        `<div class="lb-member-row">
+                            <span class="lb-member-dot" style="background:${color};"></span>
+                            <span class="lb-member-name">${this._escHtml(m.name)}</span>
+                            <span class="lb-member-pts">${m.pts}</span>
                         </div>`
                     ).join('') : '';
 
-                    return `<div class="lb-row lb-group-row" style="--gp-color:${color}">
+                    return `<div class="lb-row lb-group-row expanded" style="--gp-color:${color}">
                         <div class="lb-row-top" style="cursor:pointer;" data-group-idx="${i}">
                             <div class="lb-rank ${rc}">${i + 1}</div>
-                            <div class="lb-name" style="flex:1;min-width:0;">
-                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-                                    ${mi('groups', 13)}
-                                    <b style="font-size:12px;">${this._escHtml(g.groupName)}</b>
-                                    <span style="font-size:9px;color:#9ca3af;font-weight:400;">${g.memberCount}人</span>
-                                </div>
-                                <div style="font-size:10px;color:#80868b;margin-top:1px;">
-                                    總 <b style="color:#1f1f1f;">${g.totalPoints}</b>　均 <b style="color:#1f1f1f;">${g.avgPoints}</b>
+                            <div style="flex:1;min-width:0;">
+                                <div class="lb-group-name">${this._escHtml(g.groupName)}</div>
+                                <div class="lb-group-meta">
+                                    ${mi('person', 12)} ${g.memberCount}人
                                 </div>
                             </div>
+                            <div class="lb-group-score-area">
+                                <div class="lb-group-total">${g.totalPoints}</div>
+                                <div class="lb-group-avg">均 ${g.avgPoints}</div>
+                            </div>
+                            <span class="material-symbols-outlined lb-group-toggle">expand_more</span>
                         </div>
                         <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
-                        ${membersHtml ? `<div class="lb-group-members" style="padding:2px 8px 6px 32px;border-top:1px solid rgba(0,0,0,.04);">${membersHtml}</div>` : ''}
+                        ${membersHtml ? `<div class="lb-group-members">${membersHtml}</div>` : ''}
                     </div>`;
                 }).join('');
 
                 // 點組別展開/收起成員
                 list.querySelectorAll('.lb-row-top[data-group-idx]').forEach(row => {
                     row.addEventListener('click', () => {
-                        const members = row.closest('.lb-group-row')?.querySelector('.lb-group-members');
+                        const card = row.closest('.lb-group-row');
+                        const members = card?.querySelector('.lb-group-members');
                         if (members) {
-                            const show = members.style.display === 'none';
-                            members.style.display = show ? '' : 'none';
+                            const isOpen = card.classList.contains('expanded');
+                            card.classList.toggle('expanded', !isOpen);
+                            members.style.display = isOpen ? 'none' : '';
                         }
                     });
                 });
