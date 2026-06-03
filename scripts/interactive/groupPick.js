@@ -234,10 +234,26 @@ export class GroupPickGame {
         };
 
         const loadAndRender = async () => {
-            const filter = { type: 'eq.groupPick', element_id: 'eq.' + elementId };
-            if (sessionCode) filter.session_id = 'eq.' + sessionCode;
-            const { data } = await db.select('submissions', { filter });
-            renderUI(data || []);
+            // 用 student_group 來計算各組人數（比 type=groupPick 更可靠）
+            const allFilter = { session_id: 'eq.' + sessionCode };
+            const { data: allRows } = await db.select('submissions', {
+                filter: allFilter,
+                select: 'student_email,student_group,type,content',
+                limit: 5000
+            });
+            // 轉成 groupPick 格式讓 renderUI 渲染人數
+            const emailToGroup = {};
+            (allRows || []).forEach(r => {
+                let g = r.student_group;
+                if (!g && r.type === 'groupPick' && r.content) g = r.content;
+                if (g && r.student_email && !emailToGroup[r.student_email]) {
+                    emailToGroup[r.student_email] = g;
+                }
+            });
+            const picks = Object.entries(emailToGroup).map(([email, g]) => ({
+                content: g, student_email: email
+            }));
+            renderUI(picks);
         };
 
         // 偵測已選組
@@ -309,40 +325,50 @@ export class GroupPickGame {
         });
 
         const load = async () => {
-            const pickFilter = { type: 'eq.groupPick', element_id: 'eq.' + elementId };
-            if (sessionCode) pickFilter.session_id = 'eq.' + sessionCode;
-            const { data: picks } = await db.select('submissions', { filter: pickFilter });
-            const pickList = picks || [];
-
-            const groups = {};
-            pickList.forEach(p => {
-                const g = p.content;
-                if (!groups[g]) groups[g] = [];
-                groups[g].push({
-                    name: p.student_name || p.student_email?.split('@')[0] || '學員',
-                    email: p.student_email
-                });
-            });
-
-            const scoreFilter = { session_id: 'eq.' + sessionCode };
+            // 查所有 submissions，用 student_group 分組（最可靠的來源）
+            const allFilter = { session_id: 'eq.' + sessionCode };
             const { data: allSubs } = await db.select('submissions', {
-                filter: scoreFilter,
-                select: 'student_email,state,student_group'
+                filter: allFilter,
+                select: 'student_email,student_name,student_group,state,type,content',
+                limit: 5000
             });
+            const rows = allSubs || [];
+
+            // 用 student_group 建立成員與分數
+            const groups = {};       // group → [{name, email}] (deduplicated)
             const groupScores = {};
-            (allSubs || []).forEach(s => {
-                const g = s.student_group;
-                if (!g) return;
-                let st = s.state;
+            const seenEmails = {};   // group → Set<email>
+
+            for (const r of rows) {
+                let g = r.student_group;
+                // 也從 groupPick submission 的 content 取得 group（向後相容）
+                if (!g && r.type === 'groupPick' && r.content) g = r.content;
+                if (!g) continue;
+
+                // 成員去重
+                if (!seenEmails[g]) seenEmails[g] = new Set();
+                if (!groups[g]) groups[g] = [];
+                if (r.student_email && !seenEmails[g].has(r.student_email)) {
+                    seenEmails[g].add(r.student_email);
+                    groups[g].push({
+                        name: r.student_name || r.student_email?.split('@')[0] || '學員',
+                        email: r.student_email
+                    });
+                }
+
+                // 累計分數
+                let st = r.state;
                 if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
                 groupScores[g] = (groupScores[g] || 0) + (parseFloat(st?._awarded) || 0);
-            });
+            }
+
+            const totalMembers = Object.values(groups).reduce((s, arr) => s + arr.length, 0);
 
             const hash = JSON.stringify({ groups, groupScores, scoreMode });
             if (hash === lastHash) return;
             lastHash = hash;
 
-            statsEl.textContent = `${pickList.length} 人已分組`;
+            statsEl.textContent = `${totalMembers} 人已分組`;
 
             const calcScore = (total, memberCount) => {
                 if (scoreMode === 'avg' && memberCount > 0) return (total / memberCount).toFixed(2);

@@ -4048,8 +4048,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                             </div>
                         </div>
                         <div style="height:3px;background:#f1f5f9;margin:0 10px 4px;border-radius:2px;overflow:hidden;"><div style="height:100%;width:${barPct}%;background:${color};opacity:.6;border-radius:2px;transition:width .5s;"></div></div>
-                        ${members.length ? `<div class="_gm" style="padding:4px 10px 8px 34px;display:flex;flex-wrap:wrap;gap:4px 12px;">${members.map(m =>
-                            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#475569;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;"></span>${this._escHtml(m.name)}<span style="color:#94a3b8;font-size:10px;font-weight:600;">${m.pts}</span></span>`
+                        ${members.length ? `<div class="_gm" style="padding:4px 10px 8px 34px;display:flex;flex-wrap:wrap;gap:5px 14px;">${members.map(m =>
+                            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#334155;white-space:nowrap;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;"></span>${this._escHtml(m.name)}<span style="color:${color};font-size:13px;font-weight:700;margin-left:2px;">${m.pts}</span></span>`
                         ).join('')}</div>` : ''}
                     </div>`;
                 }).join('');
