@@ -306,9 +306,9 @@ export class GroupPickGame {
             .gp-table-card { position:absolute; cursor:grab; user-select:none; transition:box-shadow .2s; z-index:1; }
             .gp-table-card:hover { z-index:10; box-shadow:0 6px 24px rgba(0,0,0,.12) !important; }
             .gp-table-card.dragging { cursor:grabbing; z-index:100; box-shadow:0 12px 40px rgba(0,0,0,.18) !important; opacity:.92; }
-            .gp-table-card .gp-seat { display:flex;flex-direction:column;align-items:center;gap:1px; }
-            .gp-table-card .gp-seat-avatar { width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #fff; }
-            .gp-table-card .gp-seat-name { font-size:9px;max-width:46px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+            .gp-table-card .gp-seat { display:flex;flex-direction:column;align-items:center;gap:2px; }
+            .gp-table-card .gp-seat-avatar { width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid #fff; }
+            .gp-table-card .gp-seat-name { font-size:11px;max-width:56px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
         </style>
         <div class="gp-canvas gp-canvas--teacher" style="overflow:hidden;display:flex;flex-direction:column;height:100%;">
             <div class="gp-teacher-header" style="position:relative;flex-shrink:0;">
@@ -491,7 +491,7 @@ export class GroupPickGame {
                 const seatHtml = (m) => {
                     if (!m) return `<div class="gp-seat">
                         <div class="gp-seat-avatar" style="border:1.5px dashed ${color}35;color:${color}40;">
-                            ${mi('person', 11)}
+                            ${mi('person', 14)}
                         </div>
                     </div>`;
                     return `<div class="gp-seat" style="animation:gpSeatPop .3s ease;">
@@ -505,21 +505,21 @@ export class GroupPickGame {
                 const pos = savedPositions[i] || defaultPos[i] || { x: 20, y: 20 };
 
                 return `<div class="gp-table-card" data-idx="${i}" style="left:${pos.x}px;top:${pos.y}px;
-                    display:flex;flex-direction:column;align-items:center;padding:6px 6px 5px;
-                    background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);border:1px solid ${color}20;">
-                    <div style="display:flex;gap:4px;justify-content:center;margin-bottom:3px;">
+                    display:flex;flex-direction:column;align-items:center;padding:10px 10px 8px;
+                    background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid ${color}20;">
+                    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:5px;">
                         ${topSeats.map(seatHtml).join('')}
                     </div>
                     <div style="background:linear-gradient(135deg, ${color}10, ${color}20);
-                        border:2px solid ${color}30;border-radius:12px;
-                        padding:5px 14px;min-width:90px;text-align:center;">
-                        <div style="font-size:12px;font-weight:800;color:${color};line-height:1.2;">${esc(name)}</div>
-                        <div style="font-size:10px;color:#64748b;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:6px;">
-                            <span>${mi('person', 10)} ${members.length}</span>
-                            <span>${scoreLabel} <b style="color:${color}">${score}</b></span>
+                        border:2px solid ${color}30;border-radius:14px;
+                        padding:8px 20px;min-width:110px;text-align:center;">
+                        <div style="font-size:14px;font-weight:800;color:${color};line-height:1.3;">${esc(name)}</div>
+                        <div style="font-size:11px;color:#64748b;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:8px;">
+                            <span>${mi('person', 12)} ${members.length}</span>
+                            <span>${scoreLabel} <b style="color:${color};font-size:13px;">${score}</b></span>
                         </div>
                     </div>
-                    <div style="display:flex;gap:4px;justify-content:center;margin-top:3px;">
+                    <div style="display:flex;gap:8px;justify-content:center;margin-top:5px;">
                         ${bottomSeats.map(seatHtml).join('')}
                     </div>
                     ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;padding-top:3px;border-top:1px dashed #e2e8f0;">
