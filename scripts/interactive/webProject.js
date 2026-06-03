@@ -437,18 +437,27 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
 
     /* ═══════════════════════════════════════════════ */
     async _renderTeacher(el, element, elementId) {
-        // 解析 session code：優先用 join_code，若只有 UUID 則查 project_sessions 轉換
-        let sessionCode = window.app?.sessionCode || '';
+        // 解析 session id：學員端 stateManager 存的 session_id 是 UUID（來自 setSessionOverride）
+        // 所以講師端查詢也必須用 UUID，而非 join_code
+        let sessionCode = '';
+
+        // 1) 優先用 stateManager 的 override（與學員端一致）
+        try {
+            const { stateManager: sm } = await import('./stateManager.js');
+            sessionCode = sm.getSessionCode() || '';
+        } catch { /* ignore */ }
+
+        // 2) fallback: _activeSessionUUID（講師廣播時設定）
         if (!sessionCode) {
-            const uuid = window._activeSessionUUID || sessionStorage.getItem('_session_code') || new URLSearchParams(location.search).get('sid') || '';
-            if (uuid) {
-                // 嘗試當 join_code 用；同時查 project_sessions 取真正的 join_code
-                try {
-                    const { data } = await db.select('project_sessions', { filter: { id: `eq.${uuid}` }, select: 'join_code', limit: 1 });
-                    sessionCode = data?.[0]?.join_code || uuid;
-                } catch { sessionCode = uuid; }
-            }
+            sessionCode = window._activeSessionUUID || '';
         }
+
+        // 3) 最後 fallback: join_code（舊行為，向下相容）
+        if (!sessionCode) {
+            sessionCode = window.app?.sessionCode || '';
+        }
+
+        console.log('[WebProject] teacher sessionCode:', sessionCode);
         el.innerHTML = `<div class="wp-teacher">
             <div class="wp-teacher-header">
                 <div class="wp-teacher-title">${mi('web', 22)} 網頁作品展示</div>
