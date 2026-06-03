@@ -290,11 +290,20 @@ export class GroupPickGame {
         let scoreMode = 'total';
 
         el.innerHTML = `
-        <style>@keyframes gpSeatPop { from { opacity:0;transform:scale(.6); } to { opacity:1;transform:scale(1); } }</style>
-        <div class="gp-canvas gp-canvas--teacher" style="overflow-y:auto;display:flex;flex-direction:column;">
-            <div class="gp-teacher-header" style="position:relative;">
+        <style>
+            @keyframes gpSeatPop { from { opacity:0;transform:scale(.7); } to { opacity:1;transform:scale(1); } }
+            .gp-table-card { position:absolute; cursor:grab; user-select:none; transition:box-shadow .2s; z-index:1; }
+            .gp-table-card:hover { z-index:10; box-shadow:0 6px 24px rgba(0,0,0,.12) !important; }
+            .gp-table-card.dragging { cursor:grabbing; z-index:100; box-shadow:0 12px 40px rgba(0,0,0,.18) !important; opacity:.92; }
+            .gp-table-card .gp-seat { display:flex;flex-direction:column;align-items:center;gap:1px; }
+            .gp-table-card .gp-seat-avatar { width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #fff; }
+            .gp-table-card .gp-seat-name { font-size:9px;max-width:46px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+        </style>
+        <div class="gp-canvas gp-canvas--teacher" style="overflow:hidden;display:flex;flex-direction:column;height:100%;">
+            <div class="gp-teacher-header" style="position:relative;flex-shrink:0;">
                 <div class="gp-teacher-title">${mi('groups', 22)} 現場分組</div>
                 <div style="display:flex;align-items:center;gap:8px;">
+                    <button class="gp-reset-pos-btn" title="重置位置" style="padding:3px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:11px;background:#fff;cursor:pointer;color:#64748b;font-family:inherit;">${mi('grid_view', 13)} 重排</button>
                     <div class="gp-score-toggle" style="display:flex;gap:2px;background:rgba(0,0,0,.06);border-radius:6px;padding:2px;">
                         <button class="gp-mode-btn active" data-mode="total" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:#fff;color:#1a73e8;box-shadow:0 1px 3px rgba(0,0,0,.1);">${mi('functions', 14)} 總分</button>
                         <button class="gp-mode-btn" data-mode="avg" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:#80868b;">${mi('calculate', 14)} 平均</button>
@@ -302,12 +311,80 @@ export class GroupPickGame {
                     <div class="gp-teacher-stats"></div>
                 </div>
             </div>
-            <div class="gp-wall" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:12px 8px 16px;flex:1;align-content:start;"></div>
+            <div class="gp-wall" style="position:relative;flex:1;min-height:0;overflow:hidden;"></div>
         </div>`;
 
         const wallEl = el.querySelector('.gp-wall');
         const statsEl = el.querySelector('.gp-teacher-stats');
         let lastHash = '';
+
+        // ── 位置管理 ──
+        const posKey = `gp_pos_${elementId}`;
+        let savedPositions = {};
+        try { savedPositions = JSON.parse(localStorage.getItem(posKey) || '{}'); } catch {}
+
+        const getDefaultPositions = (count, w, h) => {
+            const cols = Math.ceil(Math.sqrt(count * (w / h)));
+            const rows = Math.ceil(count / cols);
+            const cellW = w / cols, cellH = h / rows;
+            const pos = {};
+            for (let i = 0; i < count; i++) {
+                const col = i % cols, row = Math.floor(i / cols);
+                pos[i] = { x: col * cellW + cellW * 0.08, y: row * cellH + cellH * 0.08 };
+            }
+            return pos;
+        };
+
+        const savePositions = () => {
+            const cards = wallEl.querySelectorAll('.gp-table-card');
+            const pos = {};
+            cards.forEach(c => { pos[c.dataset.idx] = { x: parseFloat(c.style.left), y: parseFloat(c.style.top) }; });
+            savedPositions = pos;
+            localStorage.setItem(posKey, JSON.stringify(pos));
+        };
+
+        // ── 拖曳 ──
+        const enableDrag = () => {
+            wallEl.querySelectorAll('.gp-table-card').forEach(card => {
+                let startX, startY, origLeft, origTop;
+                const onDown = (e) => {
+                    e.preventDefault();
+                    const touch = e.touches?.[0] || e;
+                    startX = touch.clientX; startY = touch.clientY;
+                    origLeft = parseFloat(card.style.left); origTop = parseFloat(card.style.top);
+                    card.classList.add('dragging');
+                    card.style.transition = 'none';
+                    const onMove = (ev) => {
+                        const t = ev.touches?.[0] || ev;
+                        card.style.left = (origLeft + t.clientX - startX) + 'px';
+                        card.style.top = (origTop + t.clientY - startY) + 'px';
+                    };
+                    const onUp = () => {
+                        card.classList.remove('dragging');
+                        card.style.transition = '';
+                        savePositions();
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                        document.removeEventListener('touchmove', onMove);
+                        document.removeEventListener('touchend', onUp);
+                    };
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                    document.addEventListener('touchmove', onMove, { passive: false });
+                    document.addEventListener('touchend', onUp);
+                };
+                card.addEventListener('mousedown', onDown);
+                card.addEventListener('touchstart', onDown, { passive: false });
+            });
+        };
+
+        // ── 重排按鈕 ──
+        el.querySelector('.gp-reset-pos-btn').addEventListener('click', () => {
+            localStorage.removeItem(posKey);
+            savedPositions = {};
+            lastHash = '';
+            load();
+        });
 
         // 切換總分/平均
         el.querySelectorAll('.gp-mode-btn').forEach(btn => {
@@ -326,7 +403,6 @@ export class GroupPickGame {
         });
 
         const load = async () => {
-            // 查所有 submissions，用 student_group 分組（最可靠的來源）
             const allFilter = { session_id: 'eq.' + sessionCode };
             const { data: allSubs } = await db.select('submissions', {
                 filter: allFilter,
@@ -335,18 +411,14 @@ export class GroupPickGame {
             });
             const rows = allSubs || [];
 
-            // 用 student_group 建立成員與分數
-            const groups = {};       // group → [{name, email}] (deduplicated)
+            const groups = {};
             const groupScores = {};
-            const seenEmails = {};   // group → Set<email>
+            const seenEmails = {};
 
             for (const r of rows) {
                 let g = r.student_group;
-                // 也從 groupPick submission 的 content 取得 group（向後相容）
                 if (!g && r.type === 'groupPick' && r.content) g = r.content;
                 if (!g) continue;
-
-                // 成員去重
                 if (!seenEmails[g]) seenEmails[g] = new Set();
                 if (!groups[g]) groups[g] = [];
                 if (r.student_email && !seenEmails[g].has(r.student_email)) {
@@ -356,8 +428,6 @@ export class GroupPickGame {
                         email: r.student_email
                     });
                 }
-
-                // 累計分數
                 let st = r.state;
                 if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
                 groupScores[g] = (groupScores[g] || 0) + (parseFloat(st?._awarded) || 0);
@@ -371,10 +441,25 @@ export class GroupPickGame {
 
             statsEl.textContent = `${totalMembers} 人已分組`;
 
+            // 保存當前拖曳位置，以便重新渲染後恢復
+            const existingCards = wallEl.querySelectorAll('.gp-table-card');
+            if (existingCards.length) {
+                existingCards.forEach(c => {
+                    savedPositions[c.dataset.idx] = { x: parseFloat(c.style.left), y: parseFloat(c.style.top) };
+                });
+            }
+
             const calcScore = (total, memberCount) => {
-                if (scoreMode === 'avg' && memberCount > 0) return (total / memberCount).toFixed(2);
+                if (scoreMode === 'avg' && memberCount > 0) return (total / memberCount).toFixed(1);
                 return Math.round(total);
             };
+
+            const ww = wallEl.clientWidth || 800;
+            const hh = wallEl.clientHeight || 500;
+            const defaultPos = getDefaultPositions(groupCount, ww, hh);
+
+            // 計算單張卡片尺寸 — 根據組數自適應
+            const cardW = Math.min(200, Math.floor(ww / Math.ceil(Math.sqrt(groupCount)) - 20));
 
             wallEl.innerHTML = Array.from({length: groupCount}, (_, i) => {
                 const idx = String(i + 1);
@@ -383,64 +468,56 @@ export class GroupPickGame {
                 const members = groups[idx] || [];
                 const totalScore = groupScores[idx] || 0;
                 const score = calcScore(totalScore, members.length);
-                const scoreLabel = scoreMode === 'avg' ? '平均' : '總分';
+                const scoreLabel = scoreMode === 'avg' ? '均' : '分';
 
-                // 6 seat positions: top(3) + bottom(3)
                 const maxSeats = 6;
                 const seatMembers = members.slice(0, maxSeats);
                 const overflow = members.slice(maxSeats);
-                // Pad to 6
                 while (seatMembers.length < maxSeats) seatMembers.push(null);
                 const topSeats = seatMembers.slice(0, 3);
-                const bottomSeats = [seatMembers[5], seatMembers[4], seatMembers[3]]; // reverse for visual symmetry
+                const bottomSeats = [seatMembers[5], seatMembers[4], seatMembers[3]];
 
                 const seatHtml = (m) => {
-                    if (!m) return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:48px;">
-                        <div style="width:38px;height:38px;border-radius:50%;border:2px dashed ${color}40;
-                            display:flex;align-items:center;justify-content:center;
-                            color:${color}50;font-size:16px;">
-                            ${mi('person', 16)}
+                    if (!m) return `<div class="gp-seat">
+                        <div class="gp-seat-avatar" style="border:1.5px dashed ${color}35;color:${color}40;">
+                            ${mi('person', 11)}
                         </div>
-                        <span style="font-size:10px;color:#cbd5e1;">空位</span>
                     </div>`;
-                    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:48px;animation:gpSeatPop .3s ease;">
-                        <div style="width:38px;height:38px;border-radius:50%;background:${color};color:#fff;
-                            display:flex;align-items:center;justify-content:center;
-                            font-size:15px;font-weight:700;box-shadow:0 3px 10px ${color}50;
-                            border:2.5px solid #fff;letter-spacing:-0.5px;">${esc(m.name.charAt(0))}</div>
-                        <span style="font-size:10px;color:#334155;font-weight:500;max-width:60px;text-align:center;
-                            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.name)}</span>
+                    return `<div class="gp-seat" style="animation:gpSeatPop .3s ease;">
+                        <div class="gp-seat-avatar" style="background:${color};color:#fff;box-shadow:0 2px 6px ${color}40;">
+                            ${esc(m.name.charAt(0))}
+                        </div>
+                        <div class="gp-seat-name" style="color:#334155;font-weight:500;">${esc(m.name)}</div>
                     </div>`;
                 };
 
-                return `<div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px 14px;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #f1f5f9;">
-                    <!-- Top seats -->
-                    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:8px;">
+                const pos = savedPositions[i] || defaultPos[i] || { x: 20, y: 20 };
+
+                return `<div class="gp-table-card" data-idx="${i}" style="left:${pos.x}px;top:${pos.y}px;
+                    display:flex;flex-direction:column;align-items:center;padding:6px 6px 5px;
+                    background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.07);border:1px solid ${color}20;">
+                    <div style="display:flex;gap:4px;justify-content:center;margin-bottom:3px;">
                         ${topSeats.map(seatHtml).join('')}
                     </div>
-                    <!-- Table -->
-                    <div style="background:linear-gradient(135deg, ${color}12, ${color}22);
-                        border:2.5px solid ${color}35;border-radius:18px;
-                        padding:14px 24px;min-width:160px;text-align:center;position:relative;
-                        box-shadow:inset 0 1px 3px ${color}10;">
-                        <div style="font-size:15px;font-weight:800;color:${color};letter-spacing:.5px;">${esc(name)}</div>
-                        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:5px;font-size:12px;color:#64748b;">
-                            <span style="display:inline-flex;align-items:center;gap:2px;">${mi('person', 13)} <b>${members.length}</b></span>
-                            <span style="color:#e2e8f0;">|</span>
-                            <span>${scoreLabel} <b style="color:${color};font-size:14px;">${score}</b></span>
+                    <div style="background:linear-gradient(135deg, ${color}10, ${color}20);
+                        border:2px solid ${color}30;border-radius:12px;
+                        padding:5px 14px;min-width:90px;text-align:center;">
+                        <div style="font-size:12px;font-weight:800;color:${color};line-height:1.2;">${esc(name)}</div>
+                        <div style="font-size:10px;color:#64748b;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <span>${mi('person', 10)} ${members.length}</span>
+                            <span>${scoreLabel} <b style="color:${color}">${score}</b></span>
                         </div>
                     </div>
-                    <!-- Bottom seats -->
-                    <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;">
+                    <div style="display:flex;gap:4px;justify-content:center;margin-top:3px;">
                         ${bottomSeats.map(seatHtml).join('')}
                     </div>
-                    ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;margin-top:8px;padding-top:8px;border-top:1px dashed #e2e8f0;">
-                        ${overflow.map(m => `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;background:#f8fafc;padding:2px 8px;border-radius:10px;">
-                            <span style="width:5px;height:5px;border-radius:50%;background:${color};"></span>${esc(m.name)}
-                        </span>`).join('')}
+                    ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;padding-top:3px;border-top:1px dashed #e2e8f0;">
+                        ${overflow.map(m => `<span style="font-size:8px;color:#64748b;background:#f8fafc;padding:1px 5px;border-radius:6px;">${esc(m.name)}</span>`).join('')}
                     </div>` : ''}
                 </div>`;
             }).join('');
+
+            enableDrag();
         };
 
         await load();
