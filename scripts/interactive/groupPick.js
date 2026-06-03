@@ -254,11 +254,19 @@ export class GroupPickGame {
         const groupColors = element.groupColors || GROUP_COLORS.slice(0, groupCount);
         const pos = element.groupPositions || defaultPositions(groupCount);
 
+        let scoreMode = 'total'; // 'total' | 'avg'
+
         el.innerHTML = `
         <div class="gp-canvas gp-canvas--teacher">
             <div class="gp-teacher-header">
                 <div class="gp-teacher-title">${mi('groups', 22)} 現場分組</div>
-                <div class="gp-teacher-stats"></div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="gp-score-toggle" style="display:flex;gap:2px;background:rgba(0,0,0,.06);border-radius:6px;padding:2px;">
+                        <button class="gp-mode-btn active" data-mode="total" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:#fff;color:#1a73e8;box-shadow:0 1px 3px rgba(0,0,0,.1);">${mi('functions', 14)} 總分</button>
+                        <button class="gp-mode-btn" data-mode="avg" style="padding:3px 10px;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:#80868b;">${mi('calculate', 14)} 平均</button>
+                    </div>
+                    <div class="gp-teacher-stats"></div>
+                </div>
             </div>
         </div>`;
 
@@ -266,6 +274,22 @@ export class GroupPickGame {
         const statsEl = el.querySelector('.gp-teacher-stats');
         let lastHash = '';
         let cardsCreated = false;
+
+        // 切換總分/平均
+        el.querySelectorAll('.gp-mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                scoreMode = btn.dataset.mode;
+                el.querySelectorAll('.gp-mode-btn').forEach(b => {
+                    const isActive = b === btn;
+                    b.classList.toggle('active', isActive);
+                    b.style.background = isActive ? '#fff' : 'transparent';
+                    b.style.color = isActive ? '#1a73e8' : '#80868b';
+                    b.style.boxShadow = isActive ? '0 1px 3px rgba(0,0,0,.1)' : 'none';
+                });
+                lastHash = ''; // force refresh
+                load();
+            });
+        });
 
         const load = async () => {
             const pickFilter = { type: 'eq.groupPick', element_id: 'eq.' + elementId };
@@ -300,20 +324,27 @@ export class GroupPickGame {
 
             statsEl.textContent = `${pickList.length} 人已分組`;
 
+            const calcScore = (total, memberCount) => {
+                if (scoreMode === 'avg' && memberCount > 0) {
+                    return (total / memberCount).toFixed(2);
+                }
+                return Math.round(total);
+            };
+
             if (!cardsCreated) {
                 for (let i = 0; i < groupCount; i++) {
                     const idx = String(i + 1);
                     const color = groupColors[i] || GROUP_COLORS[i];
                     const name = groupNames[i] || `第 ${idx} 組`;
                     const members = groups[idx] || [];
-                    const score = Math.round(groupScores[idx] || 0);
+                    const score = calcScore(groupScores[idx] || 0, members.length);
                     const p = pos[i] || { x: 10, y: 10 };
 
                     const card = document.createElement('div');
                     card.className = 'gp-team-card gp-team-card--abs';
                     card.dataset.idx = String(i);
                     card.style.cssText = `--gp-color:${color};left:${p.x}%;top:${p.y}%`;
-                    card.innerHTML = this._teamCardHTML(name, score, members);
+                    card.innerHTML = this._teamCardHTML(name, score, members, scoreMode);
                     canvas.appendChild(card);
                 }
                 cardsCreated = true;
@@ -323,8 +354,8 @@ export class GroupPickGame {
                     const idx = String(i + 1);
                     const name = groupNames[i] || `第 ${idx} 組`;
                     const members = groups[idx] || [];
-                    const score = Math.round(groupScores[idx] || 0);
-                    card.innerHTML = this._teamCardHTML(name, score, members);
+                    const score = calcScore(groupScores[idx] || 0, members.length);
+                    card.innerHTML = this._teamCardHTML(name, score, members, scoreMode);
                 });
             }
         };
@@ -333,11 +364,12 @@ export class GroupPickGame {
         this._teacherTimer = setInterval(load, 5000);
     }
 
-    _teamCardHTML(name, score, members) {
+    _teamCardHTML(name, score, members, mode = 'total') {
+        const label = mode === 'avg' ? '平均' : '總分';
         return `
             <div class="gp-team-card-header">
                 <div class="gp-team-card-name">${esc(name)}</div>
-                <div class="gp-team-card-score">${score}</div>
+                <div class="gp-team-card-score" title="${label}">${score}</div>
             </div>
             <div class="gp-team-card-count">${mi('person', 14)} ${members.length} 人</div>
             <div class="gp-team-card-members">
