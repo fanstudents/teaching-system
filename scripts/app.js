@@ -4040,7 +4040,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;">
                             <div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${rankColor};background:${rankBg};flex-shrink:0;">${i+1}</div>
                             <div style="flex:1;min-width:0;overflow:hidden;">
-                                <div style="font-size:12px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this._escHtml(g.groupName)}<span style="font-size:9px;color:#94a3b8;font-weight:400;margin-left:4px;">${g.memberCount}人</span></div>
+                                <div style="font-size:13px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this._escHtml(g.groupName)}<span style="font-size:9px;color:#94a3b8;font-weight:400;margin-left:4px;">${g.memberCount}人</span></div>
                             </div>
                             <div style="text-align:right;flex-shrink:0;">
                                 <div style="font-size:16px;font-weight:800;color:${sc};line-height:1;">${g.totalPoints}</div>
@@ -4048,8 +4048,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                             </div>
                         </div>
                         <div style="height:3px;background:#f1f5f9;margin:0 10px 4px;border-radius:2px;overflow:hidden;"><div style="height:100%;width:${barPct}%;background:${color};opacity:.6;border-radius:2px;transition:width .5s;"></div></div>
-                        ${members.length ? `<div class="_gm" style="padding:2px 10px 6px 34px;display:flex;flex-wrap:wrap;gap:2px 10px;">${members.map(m =>
-                            `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;white-space:nowrap;"><span style="width:5px;height:5px;border-radius:50%;background:${color};flex-shrink:0;"></span>${this._escHtml(m.name)}<span style="color:#b0b8c1;font-size:9px;font-weight:600;">${m.pts}</span></span>`
+                        ${members.length ? `<div class="_gm" style="padding:4px 10px 8px 34px;display:flex;flex-wrap:wrap;gap:4px 12px;">${members.map(m =>
+                            `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#475569;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;"></span>${this._escHtml(m.name)}<span style="color:#94a3b8;font-size:10px;font-weight:600;">${m.pts}</span></span>`
                         ).join('')}</div>` : ''}
                     </div>`;
                 }).join('');
