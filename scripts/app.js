@@ -4041,17 +4041,15 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                         <div class="lb-row-top" style="cursor:pointer;" data-group-idx="${i}">
                             <div class="lb-rank ${rc}">${i + 1}</div>
                             <div class="lb-name" style="flex:1;min-width:0;">
-                                <div style="display:flex;align-items:center;gap:4px;">
-                                    ${mi('groups', 14)}
+                                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                                    ${mi('groups', 13)}
                                     <b style="font-size:12px;">${this._escHtml(g.groupName)}</b>
-                                    <span style="font-size:10px;color:#9ca3af;font-weight:400;">${g.memberCount}人</span>
+                                    <span style="font-size:9px;color:#9ca3af;font-weight:400;">${g.memberCount}人</span>
                                 </div>
-                                <div style="display:flex;gap:8px;font-size:10px;color:#80868b;margin-top:1px;">
-                                    <span>總分 <b style="color:#1f1f1f;">${g.totalPoints}</b></span>
-                                    <span>平均 <b style="color:#1f1f1f;">${g.avgPoints}</b></span>
+                                <div style="font-size:10px;color:#80868b;margin-top:1px;">
+                                    總 <b style="color:#1f1f1f;">${g.totalPoints}</b>　均 <b style="color:#1f1f1f;">${g.avgPoints}</b>
                                 </div>
                             </div>
-                            <div class="lb-pts">${g.totalPoints}</div>
                         </div>
                         <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
                         ${membersHtml ? `<div class="lb-group-members" style="padding:2px 8px 6px 32px;border-top:1px solid rgba(0,0,0,.04);">${membersHtml}</div>` : ''}

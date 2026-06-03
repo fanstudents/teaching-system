@@ -4098,6 +4098,24 @@
     opacity: 0.5;
 }
 
+/* ── 組別模式修正 ── */
+.lb-group-row .lb-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+.lb-group-row .lb-row-top {
+    gap: 6px;
+}
+.lb-group-row .lb-pts {
+    font-size: 16px;
+    min-width: 28px;
+}
+.lb-group-members {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
 /* ── 加分動畫 ── */
 .lb-score-popup {
     position: absolute;
