@@ -1425,31 +1425,32 @@
                             const GC = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
                             const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
                             list.innerHTML = groupBoard.map((g, i) => {
-                                const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-                                const barPct = Math.round((g.totalPoints / maxPts) * 100);
                                 const color = GC[(parseInt(g.group) - 1) % GC.length] || '#6366f1';
                                 const members = g.members || [];
-                                return `<div class="lb-row lb-group-row" style="--gp-color:${color}" data-group-idx="${i}">
-                                    <div class="lb-row-top">
-                                        <div class="lb-rank ${rc}">${i+1}</div>
-                                        <div class="lb-group-info">
-                                            <span class="lb-group-info-name" style="color:rgba(255,255,255,.9);">${esc(g.groupName)}</span>
-                                            <span class="lb-group-info-count" style="color:rgba(255,255,255,.3);">${g.memberCount}人</span>
+                                const barPct = Math.round((g.totalPoints / maxPts) * 100);
+                                const rankBg = i === 0 ? 'linear-gradient(135deg,#fbbf24,#f59e0b)' : i === 1 ? 'linear-gradient(135deg,#94a3b8,#64748b)' : i === 2 ? 'linear-gradient(135deg,#fb923c,#ea580c)' : 'rgba(255,255,255,.08)';
+                                const rankColor = i < 3 ? '#fff' : 'rgba(255,255,255,.4)';
+
+                                return `<div data-gi="${i}" style="border-left:3px solid ${color};border-radius:3px 8px 8px 3px;margin-bottom:5px;background:rgba(255,255,255,.04);cursor:pointer;overflow:hidden;">
+                                    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;">
+                                        <div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${rankColor};background:${rankBg};flex-shrink:0;">${i+1}</div>
+                                        <div style="flex:1;min-width:0;overflow:hidden;">
+                                            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(g.groupName)}<span style="font-size:9px;color:rgba(255,255,255,.3);font-weight:400;margin-left:4px;">${g.memberCount}人</span></div>
                                         </div>
-                                        <div>
-                                            <div class="lb-group-score" style="color:rgba(255,255,255,.9);">${g.totalPoints}</div>
-                                            <div class="lb-group-avg-label" style="color:rgba(255,255,255,.3);">均${g.avgPoints}</div>
+                                        <div style="text-align:right;flex-shrink:0;">
+                                            <div style="font-size:16px;font-weight:800;color:rgba(255,255,255,.9);line-height:1;">${g.totalPoints}</div>
+                                            <div style="font-size:9px;color:rgba(255,255,255,.3);">均${g.avgPoints}</div>
                                         </div>
                                     </div>
-                                    <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:.6;"></div></div>
-                                    ${members.length ? `<div class="lb-group-members">${members.map(m =>
-                                        `<span class="lb-gm"><span class="lb-gm-dot" style="background:${color}"></span><span style="color:rgba(255,255,255,.65);">${esc(m.name)}</span><span class="lb-gm-pts" style="color:rgba(255,255,255,.3);">${m.pts}</span></span>`
+                                    <div style="height:3px;background:rgba(255,255,255,.06);margin:0 10px 4px;border-radius:2px;overflow:hidden;"><div style="height:100%;width:${barPct}%;background:${color};opacity:.6;border-radius:2px;"></div></div>
+                                    ${members.length ? `<div class="_gm" style="padding:2px 10px 6px 34px;display:flex;flex-wrap:wrap;gap:2px 10px;">${members.map(m =>
+                                        `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:rgba(255,255,255,.6);white-space:nowrap;"><span style="width:5px;height:5px;border-radius:50%;background:${color};flex-shrink:0;"></span>${esc(m.name)}<span style="color:rgba(255,255,255,.25);font-size:9px;font-weight:600;">${m.pts}</span></span>`
                                     ).join('')}</div>` : ''}
                                 </div>`;
                             }).join('');
-                            list.querySelectorAll('.lb-group-row').forEach(row => {
+                            list.querySelectorAll('[data-gi]').forEach(row => {
                                 row.addEventListener('click', () => {
-                                    const mem = row.querySelector('.lb-group-members');
+                                    const mem = row.querySelector('._gm');
                                     if (mem) mem.style.display = mem.style.display === 'none' ? '' : 'none';
                                 });
                             });

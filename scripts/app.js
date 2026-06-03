@@ -4024,35 +4024,39 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             // ★ 組別模式
             if (this._lbMode === 'group' && hasGroups) {
                 const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
+                const bgColors = ['linear-gradient(135deg,#fffbeb,#fef9c3)','linear-gradient(135deg,#f8fafc,#f1f5f9)','linear-gradient(135deg,#fff7ed,#ffedd5)'];
+                const scoreColors = ['#d97706','#64748b','#c2410c'];
+
                 list.innerHTML = groupBoard.map((g, i) => {
-                    const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-                    const barPct = Math.round((g.totalPoints / maxPts) * 100);
                     const color = GROUP_COLORS[(parseInt(g.group) - 1) % GROUP_COLORS.length] || '#6366f1';
                     const members = g.members || [];
+                    const barPct = Math.round((g.totalPoints / maxPts) * 100);
+                    const bg = bgColors[i] || '#fff';
+                    const sc = scoreColors[i] || '#94a3b8';
+                    const rankBg = i === 0 ? 'linear-gradient(135deg,#fbbf24,#f59e0b)' : i === 1 ? 'linear-gradient(135deg,#94a3b8,#64748b)' : i === 2 ? 'linear-gradient(135deg,#fb923c,#ea580c)' : '#f1f5f9';
+                    const rankColor = i < 3 ? '#fff' : '#94a3b8';
 
-                    return `<div class="lb-row lb-group-row" style="--gp-color:${color}" data-group-idx="${i}">
-                        <div class="lb-row-top">
-                            <div class="lb-rank ${rc}">${i + 1}</div>
-                            <div class="lb-group-info">
-                                <span class="lb-group-info-name">${this._escHtml(g.groupName)}</span>
-                                <span class="lb-group-info-count">${g.memberCount}人</span>
+                    return `<div data-gi="${i}" style="border-left:3px solid ${color};border-radius:3px 8px 8px 3px;margin-bottom:5px;background:${bg};cursor:pointer;overflow:hidden;">
+                        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;">
+                            <div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${rankColor};background:${rankBg};flex-shrink:0;">${i+1}</div>
+                            <div style="flex:1;min-width:0;overflow:hidden;">
+                                <div style="font-size:12px;font-weight:700;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this._escHtml(g.groupName)}<span style="font-size:9px;color:#94a3b8;font-weight:400;margin-left:4px;">${g.memberCount}人</span></div>
                             </div>
-                            <div>
-                                <div class="lb-group-score">${g.totalPoints}</div>
-                                <div class="lb-group-avg-label">均${g.avgPoints}</div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div style="font-size:16px;font-weight:800;color:${sc};line-height:1;">${g.totalPoints}</div>
+                                <div style="font-size:9px;color:#b0b8c1;">均${g.avgPoints}</div>
                             </div>
                         </div>
-                        <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:.6;"></div></div>
-                        ${members.length ? `<div class="lb-group-members">${members.map(m =>
-                            `<span class="lb-gm"><span class="lb-gm-dot" style="background:${color}"></span>${this._escHtml(m.name)}<span class="lb-gm-pts">${m.pts}</span></span>`
+                        <div style="height:3px;background:#f1f5f9;margin:0 10px 4px;border-radius:2px;overflow:hidden;"><div style="height:100%;width:${barPct}%;background:${color};opacity:.6;border-radius:2px;transition:width .5s;"></div></div>
+                        ${members.length ? `<div class="_gm" style="padding:2px 10px 6px 34px;display:flex;flex-wrap:wrap;gap:2px 10px;">${members.map(m =>
+                            `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#64748b;white-space:nowrap;"><span style="width:5px;height:5px;border-radius:50%;background:${color};flex-shrink:0;"></span>${this._escHtml(m.name)}<span style="color:#b0b8c1;font-size:9px;font-weight:600;">${m.pts}</span></span>`
                         ).join('')}</div>` : ''}
                     </div>`;
                 }).join('');
 
-                // 點組別收合/展開
-                list.querySelectorAll('.lb-group-row').forEach(row => {
+                list.querySelectorAll('[data-gi]').forEach(row => {
                     row.addEventListener('click', () => {
-                        const mem = row.querySelector('.lb-group-members');
+                        const mem = row.querySelector('._gm');
                         if (mem) mem.style.display = mem.style.display === 'none' ? '' : 'none';
                     });
                 });
