@@ -247,11 +247,13 @@ export class GroupPickGame {
         const loadAndRender = async () => {
             // 用 student_group 來計算各組人數（比 type=groupPick 更可靠）
             const allFilter = { session_id: 'eq.' + sessionCode };
+            console.log('[groupPick] loadAndRender sessionCode:', sessionCode, 'filter:', allFilter);
             const { data: allRows } = await db.select('submissions', {
                 filter: allFilter,
                 select: 'student_email,student_group,type,content',
                 limit: 5000
             });
+            console.log('[groupPick] allRows count:', allRows?.length, 'sample:', allRows?.slice(0, 3));
             // 轉成 groupPick 格式讓 renderUI 渲染人數
             const emailToGroup = {};
             (allRows || []).forEach(r => {
@@ -261,6 +263,7 @@ export class GroupPickGame {
                     emailToGroup[r.student_email] = g;
                 }
             });
+            console.log('[groupPick] emailToGroup:', emailToGroup);
             const picks = Object.entries(emailToGroup).map(([email, g]) => ({
                 content: g, student_email: email
             }));
