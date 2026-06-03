@@ -357,7 +357,7 @@ class InteractionState {
     /**
      * 取得組別排行榜
      * @param {string} sessionId
-     * @returns {Promise<Array<{group: string, groupName: string, totalPoints: number, memberCount: number}>>}
+     * @returns {Promise<Array<{group, groupName, totalPoints, memberCount, avgPoints, members}>>}
      */
     async getGroupLeaderboard(sessionId) {
         if (!sessionId) return [];
@@ -374,6 +374,7 @@ class InteractionState {
             const groupNameMap = {};
             const groupMembers = {};
             const groupScores = {};
+            const memberScores = {}; // group -> email -> { name, pts }
 
             for (const r of rows) {
                 const g = r.student_group;
@@ -389,20 +390,45 @@ class InteractionState {
                 // 累計分數（與個人排行一致，用 _awarded）
                 let st = r.state;
                 if (typeof st === 'string') { try { st = JSON.parse(st); } catch { st = {}; } }
-                groupScores[g] = (groupScores[g] || 0) + (parseFloat(st?._awarded) || 0);
+                const awarded = parseFloat(st?._awarded) || 0;
+                groupScores[g] = (groupScores[g] || 0) + awarded;
 
                 // 成員去重
                 if (!groupMembers[g]) groupMembers[g] = new Set();
                 if (r.student_email) groupMembers[g].add(r.student_email);
+
+                // 成員個人分數
+                if (r.student_email && awarded) {
+                    if (!memberScores[g]) memberScores[g] = {};
+                    if (!memberScores[g][r.student_email]) {
+                        memberScores[g][r.student_email] = {
+                            name: r.student_name || r.student_email.split('@')[0],
+                            email: r.student_email,
+                            pts: 0
+                        };
+                    }
+                    memberScores[g][r.student_email].pts += awarded;
+                    // 更新名字（取最新的）
+                    if (r.student_name) memberScores[g][r.student_email].name = r.student_name;
+                }
             }
 
             return Object.keys(groupScores)
-                .map(g => ({
-                    group: g,
-                    groupName: groupNameMap[g] || `第 ${g} 組`,
-                    totalPoints: Math.round(groupScores[g]),
-                    memberCount: groupMembers[g]?.size || 0
-                }))
+                .map(g => {
+                    const mc = groupMembers[g]?.size || 0;
+                    const total = groupScores[g];
+                    const members = Object.values(memberScores[g] || {})
+                        .map(m => ({ ...m, pts: Math.round(m.pts) }))
+                        .sort((a, b) => b.pts - a.pts);
+                    return {
+                        group: g,
+                        groupName: groupNameMap[g] || `第 ${g} 組`,
+                        totalPoints: Math.round(total),
+                        avgPoints: mc > 0 ? parseFloat((total / mc).toFixed(2)) : 0,
+                        memberCount: mc,
+                        members
+                    };
+                })
                 .sort((a, b) => b.totalPoints - a.totalPoints);
         } catch (e) {
             console.warn('[stateManager] getGroupLeaderboard failed:', e);

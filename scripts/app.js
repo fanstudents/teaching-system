@@ -4001,29 +4001,73 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const list = document.getElementById('lbList');
             if (!list) return;
 
-            // ★ 組別模式
-            if (this._lbMode === 'group') {
-                const groupBoard = await stateManager.getGroupLeaderboard(effectiveSessionId);
-                if (!groupBoard.length) {
-                    if (!list.querySelector('.lb-empty'))
-                        list.innerHTML = '<div class="lb-empty">尚無學員分組</div>';
-                    return;
-                }
-                const GROUP_COLORS = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
+            const GROUP_COLORS = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
+            const mi = (n, sz=14) => `<span class="material-symbols-outlined" style="font-size:${sz}px">${n}</span>`;
+
+            // 先嘗試拉組別資料
+            const groupBoard = (this._lbMode !== 'personal')
+                ? await stateManager.getGroupLeaderboard(effectiveSessionId)
+                : [];
+            const hasGroups = groupBoard.length > 0;
+
+            // 更新 tab 顯示狀態
+            const tabs = document.querySelectorAll('#presLeaderboard .lb-tab');
+            if (tabs.length) {
+                // 如果沒有分組資料，隱藏組別 tab
+                tabs.forEach(t => {
+                    if (t.dataset.lbMode === 'group') {
+                        t.style.display = hasGroups || this._lbMode === 'group' ? '' : 'none';
+                    }
+                });
+            }
+
+            // ★ 組別模式 — 二階式排行
+            if (this._lbMode === 'group' && hasGroups) {
                 const maxPts = Math.max(...groupBoard.map(g => g.totalPoints), 1);
                 list.innerHTML = groupBoard.map((g, i) => {
                     const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
                     const barPct = Math.round((g.totalPoints / maxPts) * 100);
                     const color = GROUP_COLORS[(parseInt(g.group) - 1) % GROUP_COLORS.length] || '#6366f1';
-                    return `<div class="lb-row" style="--gp-color:${color}">
-                        <div class="lb-row-top">
+
+                    // 組員列表
+                    const membersHtml = g.members?.length ? g.members.map(m =>
+                        `<div style="display:flex;align-items:center;gap:6px;padding:2px 0;">
+                            <span style="font-size:11px;color:#9ca3af;width:14px;text-align:right;">${m.pts}</span>
+                            <span style="font-size:11px;color:#5f6368;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this._escHtml(m.name)}</span>
+                        </div>`
+                    ).join('') : '';
+
+                    return `<div class="lb-row lb-group-row" style="--gp-color:${color}">
+                        <div class="lb-row-top" style="cursor:pointer;" data-group-idx="${i}">
                             <div class="lb-rank ${rc}">${i + 1}</div>
-                            <div class="lb-name">${this._escHtml(g.groupName)} <span style="font-size:10px;color:#9ca3af;font-weight:400;">${g.memberCount}人</span></div>
+                            <div class="lb-name" style="flex:1;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:4px;">
+                                    ${mi('groups', 14)}
+                                    <b style="font-size:12px;">${this._escHtml(g.groupName)}</b>
+                                    <span style="font-size:10px;color:#9ca3af;font-weight:400;">${g.memberCount}人</span>
+                                </div>
+                                <div style="display:flex;gap:8px;font-size:10px;color:#80868b;margin-top:1px;">
+                                    <span>總分 <b style="color:#1f1f1f;">${g.totalPoints}</b></span>
+                                    <span>平均 <b style="color:#1f1f1f;">${g.avgPoints}</b></span>
+                                </div>
+                            </div>
                             <div class="lb-pts">${g.totalPoints}</div>
                         </div>
                         <div class="lb-bar-wrap"><div class="lb-bar" style="width:${barPct}%;background:${color};opacity:0.7;"></div></div>
+                        ${membersHtml ? `<div class="lb-group-members" style="padding:2px 8px 6px 32px;display:none;border-top:1px solid rgba(0,0,0,.04);">${membersHtml}</div>` : ''}
                     </div>`;
                 }).join('');
+
+                // 點組別展開/收起成員
+                list.querySelectorAll('.lb-row-top[data-group-idx]').forEach(row => {
+                    row.addEventListener('click', () => {
+                        const members = row.closest('.lb-group-row')?.querySelector('.lb-group-members');
+                        if (members) {
+                            const show = members.style.display === 'none';
+                            members.style.display = show ? 'block' : 'none';
+                        }
+                    });
+                });
                 return;
             }
 
@@ -4043,6 +4087,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             existingRows.forEach(row => existingMap.set(row.dataset.email, row));
 
             list.querySelector('.lb-empty')?.remove();
+            // 清除殘留的 group rows
+            list.querySelectorAll('.lb-group-row').forEach(r => r.remove());
 
             const newEmails = new Set(board.map(s => s.email));
             existingRows.forEach(row => {
