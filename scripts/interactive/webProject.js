@@ -496,7 +496,23 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
             statsEl.innerHTML = statsParts.join('<span class="wp-stats-sep">·</span>');
             if (!subs.length) { gridEl.innerHTML = ''; emptyEl.style.display = ''; return; }
             emptyEl.style.display = 'none';
-            gridEl.innerHTML = subs.map((s, i) => {
+
+            // 分組顯示
+            const groupMap = new Map();
+            subs.forEach(s => {
+                const g = s.student_group || '';
+                if (!groupMap.has(g)) groupMap.set(g, { name: '', subs: [] });
+                groupMap.get(g).subs.push(s);
+                if (g && !groupMap.get(g).name) {
+                    try {
+                        const st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {});
+                        if (st.groupName) groupMap.get(g).name = st.groupName;
+                    } catch {}
+                }
+            });
+            const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
+
+            const renderCard = (s, i) => {
                 let st = {}; try { st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {}); } catch {}
                 const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
                 const mode = st.mode || 'upload';
@@ -538,7 +554,28 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                         <div class="wp-grid-card-meta">${label}</div>
                     </div>
                 </div>`;
-            }).join('');
+            };
+
+            if (hasGroups) {
+                let html = '';
+                const sortedGroups = [...groupMap.entries()].sort((a, b) => {
+                    if (!a[0]) return 1; if (!b[0]) return -1;
+                    return a[0].localeCompare(b[0], 'zh-TW', { numeric: true });
+                });
+                let flatIdx = 0;
+                for (const [gKey, gData] of sortedGroups) {
+                    const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
+                    html += `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:8px 0 4px;margin-top:${flatIdx > 0 ? '10px' : '0'};">
+                        <span style="font-size:13px;font-weight:700;color:#1f1f1f;">👥 ${esc(gName)}</span>
+                        <span style="font-size:11px;color:#80868b;">${gData.subs.length} 份</span>
+                        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+                    </div>`;
+                    html += gData.subs.map(s => renderCard(s, flatIdx++)).join('');
+                }
+                gridEl.innerHTML = html;
+            } else {
+                gridEl.innerHTML = subs.map((s, i) => renderCard(s, i)).join('');
+            }
         };
         await load();
 

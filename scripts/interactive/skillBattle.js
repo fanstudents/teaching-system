@@ -371,43 +371,79 @@ export class SkillBattleGame {
             countScored.textContent = scoredCount;
             countPending.textContent = pendingCount;
 
+            // ── 分組顯示 ──
+            const groupMap = new Map(); // group -> { name, subs }
+            subs.forEach(s => {
+                const g = s.student_group || '';
+                if (!groupMap.has(g)) groupMap.set(g, { name: '', subs: [] });
+                groupMap.get(g).subs.push(s);
+                // 嘗試從 state 取組名
+                if (g && !groupMap.get(g).name) {
+                    try {
+                        const st = JSON.parse(s.state || '{}');
+                        if (st.groupName) groupMap.get(g).name = st.groupName;
+                    } catch {}
+                }
+            });
+            const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
+
+            const renderCard = (s, i) => {
+                let state = {};
+                try { state = JSON.parse(s.state || '{}'); } catch {}
+                const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
+                const status = state.status || 'pending';
+                const score = state.score ?? null;
+                const content = s.content || '';
+                const shortPreview = content.length > 40 ? content.substring(0, 40) + '…' : content;
+                const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
+                return `
+                    <div class="sb-card sb-card-${status}" data-id="${s.id}" data-status="${status}">
+                        <div class="sb-card-header">
+                            <span class="sb-card-name">${esc(name)}</span>
+                            ${status === 'scored'
+                                ? `<span class="sb-card-score" style="color:${scoreColor}">${score}</span>`
+                                : `<span class="sb-card-status-icon">${status === 'running' ? mi('progress_activity', 16) : mi('schedule', 16)}</span>`
+                            }
+                        </div>
+                        <div class="sb-card-preview" title="${esc(content)}">${esc(shortPreview)}</div>
+                        ${status === 'scored' && state.feedback
+                            ? `<div class="sb-card-feedback">${esc(state.feedback)}</div>`
+                            : ''}
+                        ${status === 'scored' && state.output
+                            ? `<details class="sb-card-output-details"><summary>${mi('visibility', 12)} AI 輸出</summary><div class="sb-card-output">${esc(state.output)}</div></details>`
+                            : ''}
+                        ${status === 'pending'
+                            ? `<button class="sb-card-exec-btn" data-submission-id="${s.id}">${mi('play_arrow', 14)} 執行</button>`
+                            : ''}
+                    </div>`;
+            };
+
             // ── 網格卡片 ──
             if (subs.length === 0) {
                 gridEl.innerHTML = `<div class="sb-empty">${mi('inbox', 24)} 等待學員提交 Skill...</div>`;
+            } else if (hasGroups) {
+                // 分組模式
+                let html = '';
+                const sortedGroups = [...groupMap.entries()].sort((a, b) => {
+                    if (!a[0]) return 1; if (!b[0]) return -1;
+                    return a[0].localeCompare(b[0], 'zh-TW', { numeric: true });
+                });
+                let flatIdx = 0;
+                for (const [gKey, gData] of sortedGroups) {
+                    const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
+                    html += `<div class="sb-group-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:8px 4px 4px;margin-top:${flatIdx > 0 ? '12px' : '0'};">
+                        <span style="font-size:13px;font-weight:700;color:#1f1f1f;">${esc(gName)}</span>
+                        <span style="font-size:11px;color:#80868b;font-weight:500;">${gData.subs.length} 人</span>
+                        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+                    </div>`;
+                    html += gData.subs.map((s, i) => {
+                        return renderCard(s, flatIdx++);
+                    }).join('');
+                }
+                gridEl.innerHTML = html;
             } else {
-                gridEl.innerHTML = subs.map((s, i) => {
-                    let state = {};
-                    try { state = JSON.parse(s.state || '{}'); } catch {}
-                    const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
-                    const status = state.status || 'pending';
-                    const score = state.score ?? null;
-                    const content = s.content || '';
-                    const shortPreview = content.length > 40 ? content.substring(0, 40) + '…' : content;
-
-                    // 分數顏色
-                    const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
-
-                    return `
-                        <div class="sb-card sb-card-${status}" data-id="${s.id}" data-status="${status}">
-                            <div class="sb-card-header">
-                                <span class="sb-card-name">${esc(name)}</span>
-                                ${status === 'scored'
-                                    ? `<span class="sb-card-score" style="color:${scoreColor}">${score}</span>`
-                                    : `<span class="sb-card-status-icon">${status === 'running' ? mi('progress_activity', 16) : mi('schedule', 16)}</span>`
-                                }
-                            </div>
-                            <div class="sb-card-preview" title="${esc(content)}">${esc(shortPreview)}</div>
-                            ${status === 'scored' && state.feedback
-                                ? `<div class="sb-card-feedback">${esc(state.feedback)}</div>`
-                                : ''}
-                            ${status === 'scored' && state.output
-                                ? `<details class="sb-card-output-details"><summary>${mi('visibility', 12)} AI 輸出</summary><div class="sb-card-output">${esc(state.output)}</div></details>`
-                                : ''}
-                            ${status === 'pending'
-                                ? `<button class="sb-card-exec-btn" data-submission-id="${s.id}">${mi('play_arrow', 14)} 執行</button>`
-                                : ''}
-                        </div>`;
-                }).join('');
+                let flatIdx = 0;
+                gridEl.innerHTML = subs.map((s, i) => renderCard(s, flatIdx++)).join('');
             }
 
             return subs;
@@ -980,7 +1016,22 @@ export class SkillBattleReviewGame {
             emptyEl.style.display = 'none';
             listEl.style.display = '';
 
-            listEl.innerHTML = subs.map((s, i) => {
+            // ── 分組邏輯 ──
+            const groupMap = new Map();
+            subs.forEach(s => {
+                const g = s.student_group || '';
+                if (!groupMap.has(g)) groupMap.set(g, { name: '', subs: [] });
+                groupMap.get(g).subs.push(s);
+                if (g && !groupMap.get(g).name) {
+                    try {
+                        const st = JSON.parse(s.state || '{}');
+                        if (st.groupName) groupMap.get(g).name = st.groupName;
+                    } catch {}
+                }
+            });
+            const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
+
+            const renderReviewRow = (s, i) => {
                 let state = {};
                 try { state = JSON.parse(s.state || '{}'); } catch {}
                 const name = s.student_name || s.student_email?.split('@')[0] || `學員${i + 1}`;
@@ -991,9 +1042,7 @@ export class SkillBattleReviewGame {
                 const output = state.output || '';
                 const delay = i * 0.08;
 
-                // 分數顏色
                 const scoreColor = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : score >= 40 ? '#f97316' : '#ef4444';
-                // 左邊框顏色
                 const borderColor = status === 'scored' ? scoreColor : '#94a3b8';
 
                 return `
@@ -1021,7 +1070,29 @@ export class SkillBattleReviewGame {
                             ? `<details class="sb-review-output-details"><summary>📄 AI 輸出結果</summary><div class="sb-review-output">${esc(output)}</div></details>`
                             : ''}
                     </div>`;
-            }).join('');
+            };
+
+            if (hasGroups) {
+                let html = '';
+                const sortedGroups = [...groupMap.entries()].sort((a, b) => {
+                    if (!a[0]) return 1; if (!b[0]) return -1;
+                    return a[0].localeCompare(b[0], 'zh-TW', { numeric: true });
+                });
+                let flatIdx = 0;
+                for (const [gKey, gData] of sortedGroups) {
+                    const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
+                    html += `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:10px 0 4px;margin-top:${flatIdx > 0 ? '8px' : '0'};">
+                        <span style="font-size:14px;font-weight:700;color:#1f1f1f;">${esc(gName)}</span>
+                        <span style="font-size:11px;color:#80868b;">${gData.subs.length} 人</span>
+                        <div style="flex:1;height:1px;background:#e2e8f0;"></div>
+                    </div>`;
+                    html += gData.subs.map((s) => renderReviewRow(s, flatIdx++)).join('');
+                }
+                listEl.innerHTML = html;
+            } else {
+                let flatIdx = 0;
+                listEl.innerHTML = subs.map((s) => renderReviewRow(s, flatIdx++)).join('');
+            }
         };
 
         load();

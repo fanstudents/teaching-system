@@ -241,7 +241,7 @@ export class Showcase {
         `;
         }).join('');
 
-        const cardsHtml = submissions.map((s, i) => {
+        const cardHtmlArr = submissions.map((s, i) => {
             const preview = this.getPreview(s);
             const existingScore = (() => {
                 let st = s.state;
@@ -308,7 +308,41 @@ export class Showcase {
                     ${scoreHtml}
                     ${peerHtml}
                 </div>`;
-        }).join('');
+        });
+
+        // ── 分組顯示 ──
+        const groupMap = new Map();
+        submissions.forEach((s, i) => {
+            const g = s.student_group || '';
+            if (!groupMap.has(g)) groupMap.set(g, { name: '', items: [] });
+            groupMap.get(g).items.push({ sub: s, idx: i });
+            if (g && !groupMap.get(g).name) {
+                try {
+                    const st = typeof s.state === 'string' ? JSON.parse(s.state) : (s.state || {});
+                    if (st.groupName) groupMap.get(g).name = st.groupName;
+                } catch {}
+            }
+        });
+        const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
+
+        let finalGridHtml;
+        if (hasGroups) {
+            finalGridHtml = '';
+            const sortedGroups = [...groupMap.entries()].sort((a, b) => {
+                if (!a[0]) return 1; if (!b[0]) return -1;
+                return a[0].localeCompare(b[0], 'zh-TW', { numeric: true });
+            });
+            for (const [gKey, gData] of sortedGroups) {
+                const gName = gData.name || (gKey ? `第 ${gKey} 組` : '未分組');
+                finalGridHtml += `<div class="showcase-group-divider" style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 16px;min-width:fit-content;background:linear-gradient(135deg,#f0f4ff,#e8f0fe);border-radius:10px;border:1px dashed #a8c7fa;">
+                    <div style="font-size:13px;font-weight:700;color:#1a73e8;white-space:nowrap;">👥 ${this.escapeHtml(gName)}</div>
+                    <div style="font-size:10px;color:#80868b;margin-top:2px;">${gData.items.length} 份</div>
+                </div>`;
+                finalGridHtml += gData.items.map(({ idx }) => cardHtmlArr[idx]).join('');
+            }
+        } else {
+            finalGridHtml = cardHtmlArr.join('');
+        }
 
         const total = this.totalStudents;
         const notSubmitted = Math.max(0, total - count);
@@ -346,7 +380,7 @@ export class Showcase {
                 <span class="showcase-header-count">${countLabel}</span>
             </div>
             <div class="showcase-status-row">${statusHtml}</div>
-            <div class="showcase-grid">${cardsHtml || '<div class="showcase-empty">尚無人繳交</div>'}</div>
+            <div class="showcase-grid">${finalGridHtml || '<div class="showcase-empty">尚無人繳交</div>'}</div>
         `;
 
         // ── 宮格模式切換邏輯 ──
