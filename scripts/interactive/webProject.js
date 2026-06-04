@@ -3,7 +3,7 @@
  * 三種提交方式同時呈現：上傳資料夾 / 貼連結 / AI 提交
  */
 import { stateManager } from './stateManager.js';
-import { db } from '../supabase.js';
+import { db, ai } from '../supabase.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
@@ -734,12 +734,13 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 st._rankPoints = pts;
                 st._rank = i + 1;
 
-                await db.update('submissions', {
+                const { error } = await db.update('submissions', {
                     state: JSON.stringify(st),
                     awarded_points: pts,
                 }, { id: 'eq.' + s.id });
 
                 const name = s.student_name || s.student_email?.split('@')[0] || '?';
+                if (error) appendLog(`⚠️ ${esc(name)} DB 更新失敗`, 'error');
                 const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
                 appendLog(`${medal} ${esc(name)} — ${st.wpScore}分 → <b style="color:#f59e0b;">+${pts} 排名分</b>`, 'success');
             }
@@ -757,8 +758,7 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
 
     /* ── 單一 WebProject LLM 跑分 ── */
     async _scoreOneWebProject(sub, task, reference, model, appendLog) {
-        const { ai } = await import('../supabase.js');
-        const { db } = await import('../supabase.js');
+        // ai, db 已靜態 import
         const name = sub.student_name || sub.student_email?.split('@')[0] || '?';
         const content = sub.content || '';
         let st = {};
@@ -766,8 +766,9 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
 
         appendLog(`${mi('person', 14)} ${esc(name)} — 評分中...`, 'info');
 
-        // 截取 HTML 前 3000 字（避免 token 爆）
-        const htmlSnippet = content.length > 3000 ? content.substring(0, 3000) + '\n...(截斷)' : content;
+        // ★ P1-5: 先 strip data URI，再截取前 8000 字
+        const strippedContent = content.replace(/data:[^;]+;base64,[A-Za-z0-9+/=]+/g, '[DATA_URI_REMOVED]');
+        const htmlSnippet = strippedContent.length > 8000 ? strippedContent.substring(0, 8000) + '\n...(截斷)' : strippedContent;
         const prompt = st.prompt || '';
 
         const judgePrompt = `你是一位嚴格的網頁作品評審。請根據學員提交的 HTML 網頁進行評估。

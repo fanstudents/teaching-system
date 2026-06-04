@@ -197,7 +197,10 @@ export class FillBlank {
             points,
             state: { answers, correct, total },
         });
-        if (_r?.isRetry) stateManager.showRetryBanner(container);
+        if (_r?.isRetry) {
+            const _container = document.querySelector(`[data-id="${elementId}"] .fill-blank-container`) || el;
+            stateManager.showRetryBanner(_container);
+        }
     }
 
     /**

@@ -17,6 +17,10 @@ export class MatchingGame {
     }
 
     async setupContainer(container) {
+        // ★ P1-10: 防止重複綁定（除非是 overlay clone）
+        if (container.dataset._matchReady && !container.closest('.matching-mobile-overlay')) return;
+        container.dataset._matchReady = '1';
+
         const leftItems = container.querySelectorAll('.left-column .matching-item');
         const rightItems = container.querySelectorAll('.right-column .matching-item');
         const svg = container.querySelector('.matching-lines');

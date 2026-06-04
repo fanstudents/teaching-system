@@ -3919,6 +3919,9 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         realtime.publish(`session:${this.sessionCode}`, 'session_end', {});
         realtime.unsubscribe(`session:${this.sessionCode}`);
         if (this._realtimeStatusCleanup) { this._realtimeStatusCleanup(); this._realtimeStatusCleanup = null; }
+        // ★ P1-8: 清除所有 bare-event listeners 防止累積
+        ['student_join','student_leave','student_heartbeat','student_rename',
+         'poll_vote','hw_submitted','submission_saved','qa','reaction'].forEach(e => realtime._listeners.delete(e));
         realtime.disconnect();
 
         this.broadcasting = false;

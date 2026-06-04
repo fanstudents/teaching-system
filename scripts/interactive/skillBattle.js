@@ -571,12 +571,12 @@ export class SkillBattleGame {
                 st._rankPoints = pts;
                 st._rank = i + 1;
 
-                await db.update('submissions', {
+                const { error } = await db.update('submissions', {
                     state: JSON.stringify(st),
                     awarded_points: pts,
                 }, { id: 'eq.' + s.id });
-
                 const name = s.student_name || s.student_email?.split('@')[0] || '?';
+                if (error) this._appendLog(logEl, `⚠️ ${esc(name)} DB 更新失敗`, 'error');
                 const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
                 this._appendLog(logEl, `${medal} ${esc(name)} — ${st.score}分 → <b style="color:#f59e0b;">+${pts} 排名分</b>`, 'success');
             }
