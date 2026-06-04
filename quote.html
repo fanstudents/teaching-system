@@ -15,8 +15,8 @@
   --font:'Inter','Noto Sans TC',system-ui,sans-serif;
   --ink:#1a1a2e;--ink-2:#475569;--ink-3:#94a3b8;
   --bg:#f8f9fc;--white:#fff;
-  --card:#fff;
-  --border:#e8ecf4;
+  --card:#fff;--card-hover:#fafbff;
+  --border:#e8ecf4;--border-focus:#818cf8;
   --accent:#6366f1;--accent-light:#ede9fe;--accent-text:#4f46e5;
   --gold:#d97706;--gold-bg:#fef3c7;--gold-text:#92400e;
   --green:#059669;--green-bg:#d1fae5;
@@ -30,439 +30,520 @@ body{
   font-family:var(--font);background:var(--bg);color:var(--ink);
   min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;
 }
-.page{max-width:960px;margin:0 auto;padding:40px 24px 80px}
 
-/* ── Hero ── */
-.hero{text-align:center;padding:48px 0 40px;position:relative}
-.hero::after{content:'';display:block;width:60px;height:3px;background:linear-gradient(90deg,var(--accent),#818cf8);margin:24px auto 0;border-radius:2px}
-.hero-badge{
+/* ── Layout ── */
+.page{max-width:880px;margin:0 auto;padding:40px 24px 80px}
+
+/* ── Header ── */
+.header{text-align:center;padding:40px 0 32px}
+.header-badge{
   display:inline-flex;align-items:center;gap:6px;
-  padding:5px 16px;border-radius:20px;
+  padding:5px 14px;border-radius:20px;
   background:var(--accent-light);color:var(--accent-text);
-  font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
+  font-size:.7rem;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:14px;
 }
-.hero-badge .material-symbols-outlined{font-size:14px}
-.hero h1{font-size:2.1rem;font-weight:900;letter-spacing:-.5px;line-height:1.35}
-.hero h1 span{background:linear-gradient(135deg,var(--accent),#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:var(--ink-2);font-size:.88rem;margin-top:8px;max-width:520px;margin-left:auto;margin-right:auto}
+.header-badge .material-symbols-outlined{font-size:14px}
+.header h1{font-size:2rem;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
+.header p{color:var(--ink-2);font-size:.88rem;margin-top:6px}
 
-/* ── Section ── */
-.section{margin-bottom:40px}
-.section-label{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:.68rem;font-weight:700;color:var(--accent-text);
-  text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;
+/* ── Card ── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:26px 28px;margin-bottom:16px;
+  box-shadow:var(--shadow-sm);transition:box-shadow .3s,border-color .3s;
 }
-.section-label .material-symbols-outlined{font-size:16px}
-.section-title{font-size:1.25rem;font-weight:800;margin-bottom:6px}
-.section-desc{font-size:.82rem;color:var(--ink-2);margin-bottom:20px}
+.card:hover{box-shadow:var(--shadow);border-color:#dde1ec}
+.card-title{
+  font-size:.72rem;font-weight:700;color:var(--accent-text);
+  text-transform:uppercase;letter-spacing:2px;margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title .material-symbols-outlined{font-size:17px}
+
+/* ── Rate Row ── */
+.rate-row{
+  display:flex;align-items:center;gap:14px;padding:12px 0;
+  border-bottom:1px solid #f1f5f9;
+}
+.rate-row:last-child{border-bottom:none}
+.rate-icon{font-size:1.3rem;flex-shrink:0}
+.rate-info{flex:1;min-width:0}
+.rate-name{font-size:.88rem;font-weight:700}
+.rate-desc{font-size:.68rem;color:var(--ink-3)}
+.rate-input-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.rate-input-wrap span{font-size:.78rem;color:var(--ink-3);font-weight:500}
+.rate-input{
+  width:90px;text-align:right;padding:8px 12px;border-radius:10px;
+  border:1.5px solid var(--border);background:var(--bg);
+  font-size:.95rem;font-weight:700;color:var(--accent-text);
+  font-family:var(--font);outline:none;transition:border-color .2s;
+  font-variant-numeric:tabular-nums;
+}
+.rate-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
 
 /* ── Price Table ── */
 .price-table-wrap{
   background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  overflow:hidden;box-shadow:var(--shadow);
+  overflow:hidden;box-shadow:var(--shadow);margin-top:16px;
 }
 .price-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.price-table thead{background:linear-gradient(135deg,#1e1b4b,#312e81)}
-.price-table thead th{color:#e0e7ff;padding:14px 16px;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;text-align:center;white-space:nowrap}
-.price-table thead th:first-child{text-align:left;border-radius:0}
-.price-table tbody tr{transition:background .2s}
+.price-table thead{background:linear-gradient(135deg,#312e81,#4338ca)}
+.price-table thead th{
+  color:#e0e7ff;padding:14px 16px;font-weight:700;font-size:.7rem;
+  text-transform:uppercase;letter-spacing:1.5px;text-align:center;white-space:nowrap;
+}
+.price-table thead th:first-child{text-align:left}
+.price-table tbody tr{transition:background .15s}
 .price-table tbody tr:hover{background:#fafbff}
 .price-table tbody tr:not(:last-child) td{border-bottom:1px solid #f1f5f9}
 .price-table td{padding:14px 16px;vertical-align:middle}
 .price-table td:first-child{font-weight:700;color:var(--ink)}
-.price-table .price-cell{text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
-.price-table .per-person{display:block;font-size:.65rem;color:var(--ink-3);font-weight:400;margin-top:2px}
-.course-badge{
-  display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;
-  font-size:.62rem;font-weight:600;white-space:nowrap;
+.price-cell{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.price-cell .per{display:block;font-size:.64rem;color:var(--ink-3);font-weight:400;margin-top:2px}
+.price-cell.popular{
+  background:linear-gradient(135deg,#f0edff,#ede9fe);border-radius:8px;
+  color:var(--accent-text);padding:10px 8px;
+}
+.row-badge{
+  display:inline-block;padding:2px 8px;border-radius:5px;
+  font-size:.6rem;font-weight:600;margin-top:3px;
 }
 .badge-mgmt{background:#fef3c7;color:#92400e}
 .badge-eng{background:#dbeafe;color:#1e40af}
 .badge-gen{background:#d1fae5;color:#065f46}
 .badge-spec{background:#ede9fe;color:#5b21b6}
 
-/* Row category headers */
-.cat-row td{
-  background:linear-gradient(135deg,#fafafe,#f5f3ff);
-  padding:10px 16px;font-size:.72rem;font-weight:700;color:var(--accent-text);
-  text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid var(--border)!important;
+/* ── People Stepper ── */
+.people-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;padding:14px 0;border-bottom:1px solid var(--border);
 }
+.people-label{font-size:.82rem;font-weight:600;color:var(--ink-2)}
+.stepper{display:inline-flex;align-items:center;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
+.stepper-btn{
+  width:36px;height:36px;border:none;background:var(--bg);color:var(--ink);
+  font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s;font-family:var(--font);
+}
+.stepper-btn:hover{background:var(--accent-light);color:var(--accent)}
+.stepper-val{
+  width:50px;text-align:center;font-size:.95rem;font-weight:700;
+  color:var(--accent-text);background:transparent;border:none;font-family:var(--font);
+}
+.stepper-unit{font-size:.8rem;color:var(--ink-3);margin-left:8px;font-weight:500}
 
-/* ── Highlight ── */
-.highlight-price{
-  background:linear-gradient(135deg,#f0edff,#e8e5ff);color:var(--accent-text);
-  border-radius:8px;padding:4px 10px;display:inline-block;
+/* ── Quote Preview ── */
+.preview-section{margin-top:16px}
+.quote-preview{background:#fff;color:var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg)}
+.qp-header{
+  padding:28px 32px 18px;border-bottom:2px solid #e8ecf4;
+  display:flex;justify-content:space-between;align-items:flex-start;
 }
-
-/* ── Profile Card ── */
-.profile-card{
-  display:flex;gap:28px;background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);
-  align-items:flex-start;
+.qp-brand-name{font-size:1.1rem;font-weight:800;color:var(--ink)}
+.qp-brand-sub{font-size:.68rem;color:var(--ink-3);margin-top:2px}
+.qp-meta{text-align:right;font-size:.72rem;color:var(--ink-3);line-height:1.8}
+.qp-meta b{color:var(--ink)}
+.qp-body{padding:22px 32px}
+.qp-section-title{
+  font-size:.7rem;font-weight:700;color:var(--accent-text);
+  text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px solid var(--border);
 }
-.profile-avatar{
-  width:100px;height:100px;border-radius:16px;flex-shrink:0;
-  background:linear-gradient(135deg,#6366f1,#818cf8);
-  display:flex;align-items:center;justify-content:center;
-  font-size:2.5rem;color:#fff;font-weight:900;
-  box-shadow:0 4px 20px rgba(99,102,241,.25);
+.qp-table{width:100%;border-collapse:collapse;margin-bottom:22px;font-size:.8rem}
+.qp-table th{
+  text-align:left;padding:9px 12px;font-weight:600;color:var(--ink-3);
+  border-bottom:2px solid var(--border);font-size:.68rem;text-transform:uppercase;letter-spacing:1px;
 }
-.profile-info{flex:1;min-width:0}
-.profile-name{font-size:1.15rem;font-weight:800;margin-bottom:2px}
-.profile-title{font-size:.78rem;color:var(--accent-text);font-weight:600;margin-bottom:10px}
-.profile-bio{font-size:.8rem;color:var(--ink-2);line-height:1.8}
-.profile-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.profile-tag{
-  padding:4px 12px;border-radius:6px;font-size:.68rem;font-weight:600;
-  background:var(--accent-light);color:var(--accent-text);
+.qp-table td{padding:11px 12px;border-bottom:1px solid #f1f5f9;color:#334155}
+.qp-table tr:last-child td{border-bottom:none}
+.qp-table .text-right{text-align:right}
+.qp-table .total-row td{font-weight:800;font-size:.92rem;color:var(--ink);border-top:2px solid var(--ink);border-bottom:none;padding-top:14px}
+.qp-notes{background:#f8fafc;border-radius:10px;padding:14px 18px;margin-bottom:18px}
+.qp-notes-title{font-size:.68rem;font-weight:700;color:var(--accent-text);margin-bottom:6px}
+.qp-notes ul{padding-left:16px;font-size:.75rem;color:#475569;line-height:1.9}
+.qp-footer{
+  padding:18px 32px;background:#f8fafc;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
 }
-
-/* ── Features ── */
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px}
-.feature-card{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:18px 16px;transition:all .25s;
-}
-.feature-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
-.feature-icon{font-size:1.3rem;margin-bottom:8px}
-.feature-title{font-size:.82rem;font-weight:700;margin-bottom:4px}
-.feature-desc{font-size:.72rem;color:var(--ink-3);line-height:1.6}
+.qp-footer-brand{font-size:.75rem;font-weight:700;color:var(--ink)}
+.qp-footer-info{font-size:.65rem;color:var(--ink-3);text-align:right;line-height:1.8}
 
 /* ── Curriculum ── */
-.curriculum{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-.curr-header{
-  padding:24px 28px 16px;
-  background:linear-gradient(135deg,#1e1b4b,#312e81);color:#e0e7ff;
-}
-.curr-header h3{font-size:1.05rem;font-weight:800;color:#fff}
-.curr-header p{font-size:.75rem;color:#a5b4fc;margin-top:4px}
-.curr-timeline{padding:0 28px 28px}
+.curr-timeline{padding:0}
 .curr-block{
-  position:relative;padding:20px 0 20px 32px;
+  position:relative;padding:16px 0 16px 28px;
   border-left:2px solid var(--border);
 }
 .curr-block:last-child{border-left-color:transparent}
 .curr-block::before{
-  content:'';position:absolute;left:-7px;top:22px;
-  width:12px;height:12px;border-radius:50%;
-  background:var(--accent);border:3px solid var(--accent-light);
+  content:'';position:absolute;left:-6px;top:18px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--accent-light);
 }
 .curr-time{
-  display:inline-block;padding:2px 10px;border-radius:5px;
+  display:inline-block;padding:2px 8px;border-radius:5px;
   background:var(--accent-light);color:var(--accent-text);
-  font-size:.65rem;font-weight:700;margin-bottom:6px;
+  font-size:.62rem;font-weight:700;margin-bottom:4px;
 }
-.curr-title{font-size:.88rem;font-weight:700;margin-bottom:4px}
-.curr-items{font-size:.78rem;color:var(--ink-2);line-height:1.8;padding-left:16px}
+.curr-title{font-size:.82rem;font-weight:700;margin-bottom:3px}
+.curr-items{font-size:.74rem;color:var(--ink-2);line-height:1.8;padding-left:14px}
 
-/* ── Notes Card ── */
-.notes-card{
-  background:linear-gradient(135deg,#fafafe,#f5f3ff);border:1px solid #ddd6fe;
-  border-radius:var(--radius);padding:24px 28px;
+/* ── Actions ── */
+.actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:11px 24px;border-radius:10px;border:none;
+  font-size:.85rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;
 }
-.notes-card h4{font-size:.82rem;font-weight:700;color:var(--accent-text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.notes-card ul{font-size:.78rem;color:var(--ink-2);line-height:2;padding-left:16px}
+.btn .material-symbols-outlined{font-size:17px}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.2)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.3);background:#4f46e5}
+.btn-secondary{background:var(--white);color:var(--ink);border:1.5px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ── Footer ── */
 .site-footer{margin-top:60px;padding:32px 0;border-top:1px solid var(--border);text-align:center}
 .footer-brand{font-size:1rem;font-weight:800;color:var(--ink);margin-bottom:6px}
 .footer-desc{font-size:.75rem;color:var(--ink-3);max-width:460px;margin:0 auto 14px;line-height:1.7}
 .footer-links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:14px}
-.footer-link{font-size:.7rem;color:var(--ink-3);display:flex;align-items:center;gap:4px;text-decoration:none}
-.footer-link:hover{color:var(--accent)}
+.footer-link{font-size:.7rem;color:var(--ink-3);display:flex;align-items:center;gap:4px}
 .footer-link .material-symbols-outlined{font-size:13px}
 .footer-copy{font-size:.62rem;color:#cbd5e1}
 
-/* ── Animations ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.section{animation:fadeUp .5s ease-out both}
-.section:nth-child(2){animation-delay:.1s}
-.section:nth-child(3){animation-delay:.15s}
-.section:nth-child(4){animation-delay:.2s}
-.section:nth-child(5){animation-delay:.25s}
+/* ── Auth Gate ── */
+.auth-gate{
+  position:fixed;inset:0;z-index:9999;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeUp .4s ease-out;
+}
+.auth-box{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:40px 36px;max-width:380px;width:90%;text-align:center;
+  box-shadow:var(--shadow-lg);
+}
+.auth-box-icon{font-size:2.4rem;margin-bottom:12px}
+.auth-box h2{font-size:1.15rem;font-weight:800;color:var(--ink);margin-bottom:4px}
+.auth-box p{font-size:.8rem;color:var(--ink-3);margin-bottom:20px}
+.auth-input{
+  width:100%;padding:12px 16px;border-radius:10px;
+  border:1.5px solid var(--border);background:var(--bg);
+  font-size:.9rem;font-family:var(--font);color:var(--ink);
+  outline:none;transition:border-color .2s;text-align:center;letter-spacing:2px;
+}
+.auth-input:focus{border-color:var(--accent)}
+.auth-input.error{border-color:#ef4444;animation:shake .4s ease}
+.auth-submit{
+  margin-top:12px;width:100%;padding:12px;border:none;border-radius:10px;
+  background:var(--accent);color:#fff;font-size:.88rem;font-weight:700;
+  font-family:var(--font);cursor:pointer;transition:all .2s;
+}
+.auth-submit:hover{background:#4f46e5}
+.auth-err{font-size:.72rem;color:#ef4444;margin-top:8px;min-height:1em}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.page.locked{display:none}
 
 /* ── Print ── */
 @media print{
   body{background:#fff}
-  .page{max-width:none;padding:20px}
-  .hero::after{display:none}
+  .page{max-width:none;padding:0}
+  .auth-gate{display:none!important}
+  .header,.rate-card,.site-footer,.no-print{display:none!important}
+  .preview-section{display:block!important}
+  .quote-preview{box-shadow:none;border:1px solid #ddd}
   .price-table thead{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .price-table thead th{color:#1e1b4b!important;background:#e0e7ff!important}
-  .cat-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .curr-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .site-footer{display:none}
-  .section{animation:none!important}
 }
 /* ── Responsive ── */
 @media(max-width:640px){
   .page{padding:24px 16px 40px}
-  .hero h1{font-size:1.5rem}
-  .profile-card{flex-direction:column;align-items:center;text-align:center;padding:24px}
-  .profile-tags{justify-content:center}
+  .header h1{font-size:1.5rem}
+  .card{padding:20px}
+  .rate-row{flex-direction:column;align-items:flex-start;gap:8px}
   .price-table{font-size:.72rem}
   .price-table thead th,.price-table td{padding:10px 8px}
-  .features{grid-template-columns:1fr 1fr}
+  .qp-header,.qp-body,.qp-footer{padding-left:18px;padding-right:18px}
 }
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.card{animation:fadeUp .45s ease-out both}
+.card:nth-child(2){animation-delay:.06s}
+.card:nth-child(3){animation-delay:.12s}
+.card:nth-child(4){animation-delay:.18s}
 </style>
 </head>
 <body>
-<div class="page">
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-badge"><span class="material-symbols-outlined">verified</span>ENTERPRISE AI TRAINING</div>
-    <h1>企業 <span>AI 培訓</span> 報價方案</h1>
-    <p>以 30 人為單位，提供四種課程類型 × 三種時數方案<br>讓每一場培訓都成為組織數位轉型的起點</p>
+<!-- Auth Gate -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <div class="auth-box-icon">🔐</div>
+    <h2>講師專區</h2>
+    <p>請輸入存取密碼以檢視報價方案</p>
+    <input type="password" class="auth-input" id="authInput" placeholder="請輸入密碼" autocomplete="off">
+    <button class="auth-submit" id="authSubmit">進入</button>
+    <div class="auth-err" id="authErr"></div>
+  </div>
+</div>
+
+<div class="page locked" id="mainPage">
+  <div class="header">
+    <div class="header-badge"><span class="material-symbols-outlined">verified</span>ENTERPRISE AI TRAINING</div>
+    <h1>企業 AI 培訓報價方案</h1>
+    <p>調整鐘點費即時試算 · 以 30 人為基準單位 · 四種課程類型 × 三種時數</p>
   </div>
 
-  <!-- ═══ 報價表 ═══ -->
-  <div class="section">
-    <div class="section-label"><span class="material-symbols-outlined">payments</span>PRICING</div>
-    <div class="section-title">課程報價總覽</div>
-    <div class="section-desc">以下報價以 <b>30 人</b> 為基準單位，含講師費、教材費及互動教學系統授權。</div>
+  <!-- ═══ 鐘點費設定 ═══ -->
+  <div class="card rate-card">
+    <div class="card-title"><span class="material-symbols-outlined">tune</span>鐘點費設定（每小時）</div>
 
-    <div class="price-table-wrap">
-      <table class="price-table">
-        <thead>
-          <tr>
-            <th style="width:30%">課程類型</th>
-            <th>4 小時<br><span style="font-weight:400;font-size:.6rem;opacity:.7">半天精華</span></th>
-            <th>7 小時<br><span style="font-weight:400;font-size:.6rem;opacity:.7">全天實戰</span></th>
-            <th>14 小時<br><span style="font-weight:400;font-size:.6rem;opacity:.7">雙日深化</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- 營運管理層 -->
-          <tr class="cat-row"><td colspan="4">🏢 營運管理層</td></tr>
-          <tr>
-            <td>
-              <div>AI 策略思維與決策</div>
-              <span class="course-badge badge-mgmt">高階主管 · 策略導向</span>
-            </td>
-            <td class="price-cell">NT$ 28,000<span class="per-person">每人 ≈ NT$ 933</span></td>
-            <td class="price-cell"><span class="highlight-price">NT$ 48,000</span><span class="per-person">每人 ≈ NT$ 1,600</span></td>
-            <td class="price-cell">NT$ 90,000<span class="per-person">每人 ≈ NT$ 3,000</span></td>
-          </tr>
+    <div class="people-bar">
+      <span class="people-label">基準人數</span>
+      <div style="display:flex;align-items:center">
+        <div class="stepper">
+          <button class="stepper-btn" id="pMinus">−</button>
+          <input type="text" class="stepper-val" id="pVal" value="30" readonly>
+          <button class="stepper-btn" id="pPlus">+</button>
+        </div>
+        <span class="stepper-unit">人</span>
+      </div>
+    </div>
 
-          <!-- 工程部門 -->
-          <tr class="cat-row"><td colspan="4">💻 工程部門</td></tr>
-          <tr>
-            <td>
-              <div>AI 開發與技術整合</div>
-              <span class="course-badge badge-eng">工程團隊 · 技術深度</span>
-            </td>
-            <td class="price-cell">NT$ 24,000<span class="per-person">每人 ≈ NT$ 800</span></td>
-            <td class="price-cell"><span class="highlight-price">NT$ 42,000</span><span class="per-person">每人 ≈ NT$ 1,400</span></td>
-            <td class="price-cell">NT$ 78,000<span class="per-person">每人 ≈ NT$ 2,600</span></td>
-          </tr>
-
-          <!-- 一般員工 -->
-          <tr class="cat-row"><td colspan="4">👥 一般員工</td></tr>
-          <tr>
-            <td>
-              <div>AI 工具應用實戰</div>
-              <span class="course-badge badge-gen">全員普及 · 即學即用</span>
-            </td>
-            <td class="price-cell">NT$ 18,000<span class="per-person">每人 ≈ NT$ 600</span></td>
-            <td class="price-cell"><span class="highlight-price">NT$ 32,000</span><span class="per-person">每人 ≈ NT$ 1,067</span></td>
-            <td class="price-cell">NT$ 58,000<span class="per-person">每人 ≈ NT$ 1,933</span></td>
-          </tr>
-
-          <!-- 特定特殊場景 -->
-          <tr class="cat-row"><td colspan="4">✨ 特定特殊場景</td></tr>
-          <tr>
-            <td>
-              <div>客製化 AI 應用方案</div>
-              <span class="course-badge badge-spec">場景定制 · 深度客製</span>
-            </td>
-            <td class="price-cell">NT$ 26,000<span class="per-person">每人 ≈ NT$ 867</span></td>
-            <td class="price-cell"><span class="highlight-price">NT$ 45,000</span><span class="per-person">每人 ≈ NT$ 1,500</span></td>
-            <td class="price-cell">NT$ 84,000<span class="per-person">每人 ≈ NT$ 2,800</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="rate-row">
+      <div class="rate-icon">🏢</div>
+      <div class="rate-info"><div class="rate-name">營運管理層</div><div class="rate-desc">高階主管 · AI 策略思維與決策</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_mgmt" value="7000" step="500" min="0"></div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-icon">💻</div>
+      <div class="rate-info"><div class="rate-name">工程部門</div><div class="rate-desc">工程團隊 · AI 開發與技術整合</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_eng" value="9000" step="500" min="0"></div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-icon">👥</div>
+      <div class="rate-info"><div class="rate-name">一般員工</div><div class="rate-desc">全員普及 · AI 工具應用實戰</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_gen" value="5000" step="500" min="0"></div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-icon">✨</div>
+      <div class="rate-info"><div class="rate-name">特定特殊場景</div><div class="rate-desc">場景定制 · 客製化 AI 應用方案</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_spec" value="8000" step="500" min="0"></div>
     </div>
   </div>
 
-  <!-- ═══ 服務亮點 ═══ -->
-  <div class="section">
-    <div class="section-label"><span class="material-symbols-outlined">star</span>INCLUDED</div>
-    <div class="section-title">每場培訓皆包含</div>
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon">🎯</div>
-        <div class="feature-title">課前需求訪談</div>
-        <div class="feature-desc">深度了解企業痛點與學員背景，量身調整教材內容與案例</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📱</div>
-        <div class="feature-title">互動教學系統</div>
-        <div class="feature-desc">即時投票、排行榜、AI 技能實戰，讓學員從「聽課」變「參與」</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📋</div>
-        <div class="feature-title">完整教材講義</div>
-        <div class="feature-desc">課後提供數位講義與 Prompt 範本庫，持續內化學習成果</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🤖</div>
-        <div class="feature-title">AI 實作環境</div>
-        <div class="feature-desc">每位學員皆有獨立 AI 帳號，現場實際操作、即時回饋</div>
-      </div>
-    </div>
+  <!-- ═══ 即時報價表 ═══ -->
+  <div class="price-table-wrap">
+    <table class="price-table" id="priceTable">
+      <thead>
+        <tr>
+          <th style="width:28%">課程類型</th>
+          <th>4 小時<br><span style="font-weight:400;font-size:.58rem;opacity:.7">半天精華</span></th>
+          <th>7 小時<br><span style="font-weight:400;font-size:.58rem;opacity:.7">全天實戰</span></th>
+          <th>14 小時<br><span style="font-weight:400;font-size:.58rem;opacity:.7">雙日深化</span></th>
+        </tr>
+      </thead>
+      <tbody id="priceBody"></tbody>
+    </table>
   </div>
 
-  <!-- ═══ 講師介紹 ═══ -->
-  <div class="section">
-    <div class="section-label"><span class="material-symbols-outlined">person</span>INSTRUCTOR</div>
-    <div class="section-title">關於數位簡報室</div>
-    <div class="profile-card">
-      <div class="profile-avatar">范</div>
-      <div class="profile-info">
-        <div class="profile-name">范廷凡 Tingfan</div>
-        <div class="profile-title">數位簡報室 Digital Presentation Lab 創辦人</div>
-        <div class="profile-bio">
-          專注於 AI 教學與企業數位轉型培訓，結合自主開發的互動教學系統，打造沉浸式學習體驗。
-          曾為多家上市公司、政府機構與非營利組織提供 AI 應用內訓，累計培訓超過數千名學員。
-          擅長將複雜的 AI 概念轉化為可落地的工作流程，讓每一位學員都能帶著即戰力回到崗位。
-        </div>
-        <div class="profile-tags">
-          <span class="profile-tag">AI 企業內訓</span>
-          <span class="profile-tag">Prompt Engineering</span>
-          <span class="profile-tag">互動教學系統</span>
-          <span class="profile-tag">數位轉型顧問</span>
-          <span class="profile-tag">AI 簡報設計</span>
-        </div>
-      </div>
-    </div>
+  <div class="actions no-print" style="margin-top:20px">
+    <button class="btn btn-primary" id="previewBtn"><span class="material-symbols-outlined">preview</span>產生報價單預覽</button>
+    <button class="btn btn-secondary" id="printBtn" style="display:none"><span class="material-symbols-outlined">print</span>列印 / PDF</button>
   </div>
 
-  <!-- ═══ 7 小時課綱 ═══ -->
-  <div class="section">
-    <div class="section-label"><span class="material-symbols-outlined">menu_book</span>SAMPLE CURRICULUM</div>
-    <div class="section-title">課綱示範：AI 應用班 — 全天 7 小時</div>
-    <div class="section-desc">以下為一般員工 / 全部門適用的 7 小時全天課程規劃，可依需求調整。</div>
-
-    <div class="curriculum">
-      <div class="curr-header">
-        <h3>🤖 AI 工具應用實戰班</h3>
-        <p>7 小時 · 30 人 · 含午休 1 小時 · 實際授課 6 小時 + 互動演練</p>
-      </div>
-      <div class="curr-timeline">
-
-        <div class="curr-block">
-          <div class="curr-time">09:00 — 09:30</div>
-          <div class="curr-title">開場 ＆ AI 素養暖身</div>
-          <ul class="curr-items">
-            <li>講師介紹 ＆ 課程目標說明</li>
-            <li>互動教學系統登入 ＆ 破冰活動</li>
-            <li>「你心中的 AI」即時投票與討論</li>
-          </ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">09:30 — 10:30</div>
-          <div class="curr-title">模組一：AI 全景 — 從概念到落地</div>
-          <ul class="curr-items">
-            <li>生成式 AI 的核心原理（不講數學，講直覺）</li>
-            <li>ChatGPT / Claude / Gemini 三大平台比較與選擇策略</li>
-            <li>企業導入 AI 的成功案例與常見誤區</li>
-            <li>🎯 互動：AI 應用場景配對挑戰</li>
-          </ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">10:30 — 10:40</div>
-          <div class="curr-title">☕ 休息</div>
-          <ul class="curr-items"></ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">10:40 — 12:00</div>
-          <div class="curr-title">模組二：Prompt 工程 — 從指令到結果</div>
-          <ul class="curr-items">
-            <li>Prompt 設計的黃金框架：角色 × 情境 × 指令 × 格式</li>
-            <li>進階技巧：Few-shot、Chain-of-Thought、反思提示</li>
-            <li>實戰練習：用 AI 完成一份會議摘要 / 客戶回覆 / 報告初稿</li>
-            <li>🏆 Prompt 技能對戰 ＆ 即時排行榜</li>
-          </ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">12:00 — 13:00</div>
-          <div class="curr-title">🍱 午餐休息</div>
-          <ul class="curr-items"></ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">13:00 — 14:30</div>
-          <div class="curr-title">模組三：AI 融入日常工作流</div>
-          <ul class="curr-items">
-            <li>文件處理：摘要、翻譯、格式轉換的自動化流程</li>
-            <li>資料分析：用 AI 快速解讀 Excel / CSV 數據</li>
-            <li>簡報製作：從大綱到視覺化的 AI 輔助設計</li>
-            <li>實作演練：選擇一個你的真實工作場景，現場打造 AI 工作流</li>
-          </ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">14:30 — 14:40</div>
-          <div class="curr-title">☕ 休息</div>
-          <ul class="curr-items"></ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">14:40 — 15:50</div>
-          <div class="curr-title">模組四：進階應用 ＆ 團隊實戰</div>
-          <ul class="curr-items">
-            <li>AI + 搜尋：Deep Research 與資料查證技巧</li>
-            <li>AI + 圖像：用 AI 生成簡報素材、社群圖片</li>
-            <li>分組挑戰：用 AI 完成一個完整的專案提案（含簡報）</li>
-            <li>🏆 團隊作品展示 ＆ 互評計分</li>
-          </ul>
-        </div>
-
-        <div class="curr-block">
-          <div class="curr-time">15:50 — 16:00</div>
-          <div class="curr-title">結業 ＆ 行動計畫</div>
-          <ul class="curr-items">
-            <li>學習成果回顧 ＆ 排行榜頒獎</li>
-            <li>「回到工作崗位的第一步」— 個人 AI 行動承諾</li>
-            <li>課後資源包發放 ＆ Q&A</li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
+  <!-- ═══ Preview ═══ -->
+  <div class="preview-section" id="previewSection" style="display:none">
+    <div class="quote-preview" id="quotePreview"></div>
   </div>
 
-  <!-- ═══ 備註 ═══ -->
-  <div class="section">
-    <div class="notes-card">
-      <h4><span class="material-symbols-outlined" style="font-size:16px">info</span>報價備註</h4>
-      <ul>
-        <li>以上報價含講師費、教材費、互動教學系統授權，<b>不含</b>場地及交通費用</li>
-        <li>人數超過 30 人可加開梯次，或依比例調整報價（歡迎洽談）</li>
-        <li>課程內容可依企業產業別、部門需求進行深度客製化</li>
-        <li>如需課後輔導、延伸諮詢或長期合作方案，可另行報價</li>
-        <li>本報價單有效期限 <b>30 天</b>，逾期請重新確認</li>
-        <li>可開立發票（二聯 / 三聯），付款方式可配合企業採購流程</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Footer -->
+  <!-- ═══ Footer ═══ -->
   <div class="site-footer">
-    <div class="footer-brand">📊 數位簡報室 Digital Presentation Lab</div>
+    <div class="footer-brand">數位簡報室 Digital Presentation Lab</div>
     <div class="footer-desc">專注於 AI 教學、企業內訓與數位轉型培訓。透過互動式教學系統，讓每一場培訓都成為改變的起點。</div>
     <div class="footer-links">
-      <a class="footer-link" href="https://tbr.digital" target="_blank"><span class="material-symbols-outlined">language</span>tbr.digital</a>
-      <a class="footer-link" href="mailto:hi@tbr.digital"><span class="material-symbols-outlined">mail</span>聯繫報價</a>
+      <span class="footer-link"><span class="material-symbols-outlined">language</span>tbr.digital</span>
+      <span class="footer-link"><span class="material-symbols-outlined">mail</span>聯繫報價</span>
     </div>
     <div class="footer-copy">© 2024–2026 數位簡報室. All rights reserved.</div>
   </div>
-
 </div>
+
+<script>
+(()=>{
+  // ── Auth ──
+  const PWD='tbrclass';
+  const gate=document.getElementById('authGate');
+  const mainPage=document.getElementById('mainPage');
+  const authInput=document.getElementById('authInput');
+  const authErr=document.getElementById('authErr');
+  if(sessionStorage.getItem('qc_auth')==='1'){
+    gate.style.display='none';mainPage.classList.remove('locked');
+  }
+  const doAuth=()=>{
+    if(authInput.value===PWD){
+      sessionStorage.setItem('qc_auth','1');
+      gate.animate([{opacity:1},{opacity:0}],{duration:300,fill:'forwards'});
+      setTimeout(()=>{gate.style.display='none';mainPage.classList.remove('locked')},300);
+    } else {
+      authInput.classList.add('error');authErr.textContent='密碼錯誤，請重新輸入';
+      setTimeout(()=>{authInput.classList.remove('error');authErr.textContent=''},1500);
+    }
+  };
+  document.getElementById('authSubmit').onclick=doAuth;
+  authInput.addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()});
+
+  // ── Data ──
+  const COURSES = [
+    { id:'mgmt', icon:'🏢', name:'營運管理層', sub:'AI 策略思維與決策', badge:'badge-mgmt', badgeText:'高階主管 · 策略導向' },
+    { id:'eng',  icon:'💻', name:'工程部門',   sub:'AI 開發與技術整合', badge:'badge-eng',  badgeText:'工程團隊 · 技術深度' },
+    { id:'gen',  icon:'👥', name:'一般員工',   sub:'AI 工具應用實戰',  badge:'badge-gen',  badgeText:'全員普及 · 即學即用' },
+    { id:'spec', icon:'✨', name:'特定特殊場景', sub:'客製化 AI 應用方案', badge:'badge-spec', badgeText:'場景定制 · 深度客製' },
+  ];
+  const HOURS = [4, 7, 14];
+  const fmt = n => 'NT$ ' + Math.round(n).toLocaleString();
+
+  const $ = id => document.getElementById(id);
+  const rInputs = COURSES.map(c => $('r_' + c.id));
+  const body = $('priceBody');
+  let people = 30;
+
+  // ── People stepper ──
+  $('pPlus').onclick = () => { if(people<200){people+=5;$('pVal').value=people;update()} };
+  $('pMinus').onclick = () => { if(people>5){people-=5;$('pVal').value=people;update()} };
+
+  // ── Update table ──
+  function update() {
+    body.innerHTML = COURSES.map((c, i) => {
+      const rate = parseInt(rInputs[i].value) || 0;
+      return `<tr>
+        <td>
+          <div>${c.icon} ${c.name}</div>
+          <div style="font-size:.72rem;color:var(--ink-3);margin-top:1px">${c.sub}</div>
+          <span class="row-badge ${c.badge}">${c.badgeText}</span>
+        </td>
+        ${HOURS.map(h => {
+          const total = rate * h;
+          const per = people > 0 ? total / people : 0;
+          const isPopular = h === 7;
+          return `<td class="price-cell${isPopular ? ' popular' : ''}">
+            ${fmt(total)}
+            <span class="per">每人 ≈ ${fmt(per)}</span>
+          </td>`;
+        }).join('')}
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Listen to rate changes ──
+  rInputs.forEach(inp => inp.addEventListener('input', update));
+
+  // ── Curriculum data ──
+  const CURRICULUM = [
+    { time:'09:00 — 09:30', title:'開場 ＆ AI 素養暖身', items:['講師介紹 ＆ 課程目標說明','互動教學系統登入 ＆ 破冰活動','「你心中的 AI」即時投票與討論'] },
+    { time:'09:30 — 10:30', title:'模組一：AI 全景 — 從概念到落地', items:['生成式 AI 的核心原理（不講數學，講直覺）','ChatGPT / Claude / Gemini 三大平台比較','企業導入 AI 的成功案例與常見誤區','🎯 互動：AI 應用場景配對挑戰'] },
+    { time:'10:30 — 10:40', title:'☕ 休息', items:[] },
+    { time:'10:40 — 12:00', title:'模組二：Prompt 工程 — 從指令到結果', items:['Prompt 設計黃金框架：角色 × 情境 × 指令 × 格式','進階技巧：Few-shot、Chain-of-Thought、反思提示','實戰練習：用 AI 完成會議摘要 / 客戶回覆 / 報告初稿','🏆 Prompt 技能對戰 ＆ 即時排行榜'] },
+    { time:'12:00 — 13:00', title:'🍱 午餐休息', items:[] },
+    { time:'13:00 — 14:30', title:'模組三：AI 融入日常工作流', items:['文件處理：摘要、翻譯、格式轉換的自動化流程','資料分析：用 AI 快速解讀 Excel / CSV 數據','簡報製作：從大綱到視覺化的 AI 輔助設計','實作演練：選擇真實工作場景，現場打造 AI 工作流'] },
+    { time:'14:30 — 14:40', title:'☕ 休息', items:[] },
+    { time:'14:40 — 15:50', title:'模組四：進階應用 ＆ 團隊實戰', items:['AI + 搜尋：Deep Research 與資料查證技巧','AI + 圖像：用 AI 生成簡報素材、社群圖片','分組挑戰：用 AI 完成完整的專案提案（含簡報）','🏆 團隊作品展示 ＆ 互評計分'] },
+    { time:'15:50 — 16:00', title:'結業 ＆ 行動計畫', items:['學習成果回顧 ＆ 排行榜頒獎','「回到工作崗位的第一步」— 個人 AI 行動承諾','課後資源包發放 ＆ Q&A'] },
+  ];
+
+  // ── Preview ──
+  $('previewBtn').onclick = () => {
+    const now = new Date();
+    const d = s => `${s.getFullYear()} / ${String(s.getMonth()+1).padStart(2,'0')} / ${String(s.getDate()).padStart(2,'0')}`;
+    const vd = new Date(now.getTime() + 30 * 864e5);
+
+    // Build price rows for quote
+    let priceRows = '';
+    COURSES.forEach((c, i) => {
+      const rate = parseInt(rInputs[i].value) || 0;
+      priceRows += HOURS.map(h => {
+        const total = rate * h;
+        const per = people > 0 ? (total / people) : 0;
+        return `<tr>
+          <td><b>${c.icon} ${c.name}</b></td>
+          <td>${h} 小時（${h===4?'半天':h===7?'全天':'雙日'}）</td>
+          <td>鐘點 ${fmt(rate)} × ${h}h</td>
+          <td class="text-right"><b>${fmt(total)}</b><br><span style="font-size:.65rem;color:var(--green)">每人 ${fmt(per)}</span></td>
+        </tr>`;
+      }).join('');
+    });
+
+    // Curriculum HTML
+    const currHtml = CURRICULUM.map(b =>
+      `<div class="curr-block">
+        <div class="curr-time">${b.time}</div>
+        <div class="curr-title">${b.title}</div>
+        ${b.items.length ? `<ul class="curr-items">${b.items.map(i=>`<li>${i}</li>`).join('')}</ul>` : ''}
+      </div>`
+    ).join('');
+
+    $('quotePreview').innerHTML = `
+      <div class="qp-header">
+        <div><div class="qp-brand-name">📊 數位簡報室</div><div class="qp-brand-sub">Digital Presentation Lab — 企業 AI 培訓報價單</div></div>
+        <div class="qp-meta"><div>報價日期：<b>${d(now)}</b></div><div>有效期限：<b>${d(vd)}</b></div><div>報價編號：<b>Q-${Date.now().toString(36).toUpperCase()}</b></div><div>基準人數：<b>${people} 人</b></div></div>
+      </div>
+      <div class="qp-body">
+        <div class="qp-section-title">課程報價總覽（${people} 人 / 梯次）</div>
+        <table class="qp-table"><thead><tr><th>課程類型</th><th>時數</th><th>計算方式</th><th class="text-right">金額</th></tr></thead><tbody>
+          ${priceRows}
+        </tbody></table>
+
+        <div class="qp-section-title">服務包含</div>
+        <table class="qp-table"><tbody>
+          <tr><td>✅ 互動教學系統授權</td><td>即時投票、排行榜、AI 技能對戰、作品展示</td><td class="text-right">含於報價</td></tr>
+          <tr><td>✅ 課前需求訪談</td><td>依學員背景 ＆ 企業產業客製教材</td><td class="text-right">含於報價</td></tr>
+          <tr><td>✅ 完整教材講義</td><td>數位講義 + Prompt 範本庫</td><td class="text-right">含於報價</td></tr>
+          <tr><td>✅ AI 實作環境</td><td>每位學員獨立 AI 帳號</td><td class="text-right">含於報價</td></tr>
+        </tbody></table>
+
+        <div class="qp-section-title">課綱示範 — AI 應用班（7 小時）</div>
+        <div class="curr-timeline" style="margin-bottom:22px">${currHtml}</div>
+
+        <div class="qp-notes"><div class="qp-notes-title">備註</div><ul>
+          <li>以上報價含講師費、教材費與互動系統授權，不含場地及交通費用</li>
+          <li>人數超過 30 人可加開梯次或依比例調整報價</li>
+          <li>課程內容可依企業產業別、部門需求深度客製化</li>
+          <li>如需課後輔導、延伸諮詢或長期合作方案，可另行報價</li>
+          <li>可開立發票（二聯 / 三聯），付款方式可配合企業採購流程</li>
+          <li>本報價單有效期限 30 天，逾期請重新確認</li>
+        </ul></div>
+
+        <div class="qp-section-title">關於我們</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:12px">
+          <div style="width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;font-weight:900;flex-shrink:0">范</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.92rem;font-weight:800">范廷凡 Tingfan</div>
+            <div style="font-size:.72rem;color:var(--accent-text);font-weight:600;margin-bottom:6px">數位簡報室 Digital Presentation Lab 創辦人</div>
+            <div style="font-size:.74rem;color:var(--ink-2);line-height:1.8">
+              專注於 AI 教學與企業數位轉型培訓，結合自主開發的互動教學系統，打造沉浸式學習體驗。
+              曾為多家上市公司、政府機構與非營利組織提供 AI 應用內訓，累計培訓超過數千名學員。
+              擅長將複雜的 AI 概念轉化為可落地的工作流程，讓每一位學員都能帶著即戰力回到崗位。
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">
+              ${['AI 企業內訓','Prompt Engineering','互動教學系統','數位轉型顧問','AI 簡報設計'].map(t =>
+                `<span style="padding:3px 10px;border-radius:5px;font-size:.62rem;font-weight:600;background:var(--accent-light);color:var(--accent-text)">${t}</span>`
+              ).join('')}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="qp-footer">
+        <div class="qp-footer-brand">📊 數位簡報室 Digital Presentation Lab</div>
+        <div class="qp-footer-info">專注 AI 教學 × 企業內訓 × 互動簡報系統<br>讓每一場培訓都成為改變的起點</div>
+      </div>`;
+
+    const ps = $('previewSection');
+    ps.style.display = 'block';
+    ps.scrollIntoView({ behavior:'smooth', block:'start' });
+    $('printBtn').style.display = '';
+  };
+
+  $('printBtn').onclick = () => window.print();
+  update();
+})();
+</script>
 </body>
 </html>
