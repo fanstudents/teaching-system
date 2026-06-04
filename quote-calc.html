@@ -65,7 +65,8 @@ body{
   border-bottom:1px solid #f1f5f9;
 }
 .rate-row:last-child{border-bottom:none}
-.rate-icon{font-size:1.3rem;flex-shrink:0}
+.rate-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rate-icon .material-symbols-outlined{font-size:20px;color:#fff}
 .rate-info{flex:1;min-width:0}
 .rate-name{font-size:.88rem;font-weight:700}
 .rate-desc{font-size:.68rem;color:var(--ink-3)}
@@ -240,7 +241,7 @@ body{
 <!-- Auth Gate -->
 <div class="auth-gate" id="authGate">
   <div class="auth-box">
-    <div class="auth-box-icon">🔐</div>
+    <div class="auth-box-icon"><span class="material-symbols-outlined" style="font-size:2.4rem;color:var(--accent)">lock</span></div>
     <h2>講師專區</h2>
     <p>請輸入存取密碼以使用報價試算</p>
     <input type="password" class="auth-input" id="authInput" placeholder="請輸入密碼" autocomplete="off">
@@ -271,22 +272,22 @@ body{
       </div>
     </div>
     <div class="rate-row">
-      <div class="rate-icon">🏢</div>
+      <div class="rate-icon" style="background:linear-gradient(135deg,#d97706,#f59e0b)"><span class="material-symbols-outlined">corporate_fare</span></div>
       <div class="rate-info"><div class="rate-name">營運管理層</div><div class="rate-desc">高階主管 · AI 策略思維與決策</div></div>
       <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_mgmt" value="7000" step="500" min="0"></div>
     </div>
     <div class="rate-row">
-      <div class="rate-icon">💻</div>
+      <div class="rate-icon" style="background:linear-gradient(135deg,#2563eb,#3b82f6)"><span class="material-symbols-outlined">terminal</span></div>
       <div class="rate-info"><div class="rate-name">工程部門</div><div class="rate-desc">工程團隊 · AI 開發與技術整合</div></div>
       <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_eng" value="9000" step="500" min="0"></div>
     </div>
     <div class="rate-row">
-      <div class="rate-icon">👥</div>
+      <div class="rate-icon" style="background:linear-gradient(135deg,#059669,#10b981)"><span class="material-symbols-outlined">groups</span></div>
       <div class="rate-info"><div class="rate-name">一般員工</div><div class="rate-desc">全員普及 · AI 工具應用實戰</div></div>
       <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_gen" value="5000" step="500" min="0"></div>
     </div>
     <div class="rate-row">
-      <div class="rate-icon">✨</div>
+      <div class="rate-icon" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)"><span class="material-symbols-outlined">auto_awesome</span></div>
       <div class="rate-info"><div class="rate-name">特定特殊場景</div><div class="rate-desc">場景定制 · 客製化 AI 應用方案</div></div>
       <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_spec" value="8000" step="500" min="0"></div>
     </div>
@@ -357,10 +358,10 @@ body{
 
   // ── Data ──
   const COURSES=[
-    {id:'mgmt',icon:'🏢',name:'營運管理層',sub:'主管如何用 AI 做決策',badge:'badge-mgmt',badgeText:'高階主管'},
-    {id:'eng', icon:'💻',name:'工程部門',  sub:'把 AI 接進你的技術棧',badge:'badge-eng', badgeText:'工程團隊'},
-    {id:'gen', icon:'👥',name:'一般員工',  sub:'馬上能用的 AI 工作技巧', badge:'badge-gen', badgeText:'全員適用'},
-    {id:'spec',icon:'✨',name:'特定特殊場景',sub:'依你的產業量身打造',badge:'badge-spec',badgeText:'客製課程'},
+    {id:'mgmt',icon:'corporate_fare',name:'營運管理層',sub:'主管如何用 AI 做決策',badge:'badge-mgmt',badgeText:'高階主管'},
+    {id:'eng', icon:'terminal',name:'工程部門',  sub:'把 AI 接進你的技術棧',badge:'badge-eng', badgeText:'工程團隊'},
+    {id:'gen', icon:'groups',name:'一般員工',  sub:'馬上能用的 AI 工作技巧', badge:'badge-gen', badgeText:'全員適用'},
+    {id:'spec',icon:'auto_awesome',name:'特定特殊場景',sub:'依你的產業量身打造',badge:'badge-spec',badgeText:'客製課程'},
   ];
   const HOURS=[4,7,14];
   const fmt=n=>'NT$ '+Math.round(n).toLocaleString();
@@ -376,7 +377,7 @@ body{
     body.innerHTML=COURSES.map((c,i)=>{
       const rate=parseInt(rInputs[i].value)||0;
       return `<tr>
-        <td><div style="font-size:.95rem">${c.icon} ${c.name}</div><div style="font-size:.8rem;color:var(--ink-3);margin-top:2px">${c.sub}</div><span class="row-badge ${c.badge}">${c.badgeText}</span></td>
+        <td><div style="font-size:.95rem"><span class="material-symbols-outlined" style="font-size:16px;vertical-align:-2px;margin-right:4px;color:var(--accent)">${c.icon}</span>${c.name}</div><div style="font-size:.8rem;color:var(--ink-3);margin-top:2px">${c.sub}</div><span class="row-badge ${c.badge}">${c.badgeText}</span></td>
         ${HOURS.map(h=>{
           const raw=rate*h,disc=h===14?0.9:1,total=Math.round(raw*disc),per=people>0?total/people:0,pop=h===7;
           const discLabel=h===14?'<span class="per" style="color:var(--green);font-weight:600">9 折優惠</span>':'';
@@ -390,13 +391,13 @@ body{
   // ── Curriculum ──
   const CURR=[
     {time:'09:00 — 09:30',title:'開場暖身',items:['講師自我介紹、今天的課程地圖','登入互動系統、快速破冰','「你平常怎麼用 AI？」現場投票']},
-    {time:'09:30 — 10:30',title:'AI 到底能幹嘛？',items:['生成式 AI 怎麼運作（白話版，不講公式）','ChatGPT / Claude / Gemini 各自的強項','真實企業導入案例 & 最常踩的坑','🎯 互動：替你的工作找到 AI 切入點']},
-    {time:'10:30 — 10:40',title:'☕ 休息',items:[]},
-    {time:'10:40 — 12:00',title:'Prompt 寫法大全',items:['一套你帶得走的 Prompt 框架','進階招式：Few-shot、思維鏈、讓 AI 自己抓漏','練習時間：用 AI 寫會議紀錄 / 客戶回信 / 簡報初稿','🏆 Prompt 對戰 — 看誰寫的指令最強']},
-    {time:'12:00 — 13:00',title:'🍱 午餐',items:[]},
+    {time:'09:30 — 10:30',title:'AI 到底能幹嘛？',items:['生成式 AI 怎麼運作（白話版，不講公式）','ChatGPT / Claude / Gemini 各自的強項','真實企業導入案例 & 最常踩的坑','互動：替你的工作找到 AI 切入點']},
+    {time:'10:30 — 10:40',title:'休息',items:[]},
+    {time:'10:40 — 12:00',title:'Prompt 寫法大全',items:['一套你帶得走的 Prompt 框架','進階招式：Few-shot、思維鏈、讓 AI 自己抓漏','練習時間：用 AI 寫會議紀錄 / 客戶回信 / 簡報初稿','Prompt 對戰 — 看誰寫的指令最強']},
+    {time:'12:00 — 13:00',title:'午餐',items:[]},
     {time:'13:00 — 14:30',title:'把 AI 塞進你的日常',items:['文件苦工：摘要、翻譯、格式轉換一鍵搞定','數據分析：丟 Excel 給 AI，兩分鐘出結論','簡報製作：從大綱到排版，讓 AI 當你的設計助理','動手做：挑一件你明天上班就能用的事，現場跑一遍']},
-    {time:'14:30 — 14:40',title:'☕ 休息',items:[]},
-    {time:'14:40 — 15:50',title:'進階玩法 & 分組挑戰',items:['Deep Research：讓 AI 幫你做功課、查資料','AI 圖片生成：社群素材、簡報配圖','分組任務：用 AI 從零做出一份提案簡報','🏆 各組上台 Demo，大家互評打分']},
+    {time:'14:30 — 14:40',title:'休息',items:[]},
+    {time:'14:40 — 15:50',title:'進階玩法 & 分組挑戰',items:['Deep Research：讓 AI 幫你做功課、查資料','AI 圖片生成：社群素材、簡報配圖','分組任務：用 AI 從零做出一份提案簡報','各組上台 Demo，大家互評打分']},
     {time:'15:50 — 16:00',title:'結業 & 下一步',items:['今天學了什麼？排行榜頒獎','寫下你「回去第一件要做的事」','課後懶人包 & 自由 Q&A']},
   ];
 
@@ -412,7 +413,7 @@ body{
       priceRows+=HOURS.map(h=>{
         const raw=rate*h,disc=h===14?0.9:1,total=Math.round(raw*disc),per=people>0?total/people:0;
         const discNote=h===14?' <span style="font-size:.6rem;color:var(--green);font-weight:600">（9 折）</span>':'';
-        return `<tr><td><b>${c.icon} ${c.name}</b></td><td>${h} 小時（${h===4?'半天':h===7?'全天':'雙日'}）${discNote}</td><td>鐘點 ${fmt(rate)} × ${h}h${h===14?' × 0.9':''}</td><td class="text-right"><b>${fmt(total)}</b><br><span style="font-size:.65rem;color:var(--green)">每人 ${fmt(per)}</span></td></tr>`;
+        return `<tr><td><b><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;margin-right:3px;color:var(--accent)">${c.icon}</span>${c.name}</b></td><td>${h} 小時（${h===4?'半天':h===7?'全天':'雙日'}）${discNote}</td><td>鐘點 ${fmt(rate)} × ${h}h${h===14?' × 0.9':''}</td><td class="text-right"><b>${fmt(total)}</b><br><span style="font-size:.65rem;color:var(--green)">每人 ${fmt(per)}</span></td></tr>`;
       }).join('');
     });
 
@@ -425,7 +426,7 @@ body{
 
     $('quotePreview').innerHTML=`
       <div class="qp-header">
-        <div><div class="qp-brand-name">📊 數位簡報室</div><div class="qp-brand-sub">Digital Presentation Lab — 企業 AI 培訓報價單</div></div>
+        <div><div class="qp-brand-name">數位簡報室</div><div class="qp-brand-sub">Digital Presentation Lab — 企業 AI 培訓報價單</div></div>
         <div class="qp-meta"><div>報價日期：<b>${d(now)}</b></div><div>有效期限：<b>${d(vd)}</b></div><div>報價編號：<b>Q-${Date.now().toString(36).toUpperCase()}</b></div><div>基準人數：<b>${people} 人</b></div></div>
       </div>
       <div class="qp-body">
@@ -434,9 +435,9 @@ body{
 
         <div class="qp-section-title">服務包含</div>
         <table class="qp-table"><tbody>
-          <tr><td>✅ 互動教學系統授權</td><td>即時投票、排行榜、AI 技能對戰、作品展示</td><td class="text-right">含於報價</td></tr>
-          <tr><td>✅ 課前需求訪談</td><td>依學員背景＆企業產業客製教材</td><td class="text-right">含於報價</td></tr>
-          <tr><td>✅ 完整教材講義</td><td>數位講義 + Prompt 範本庫</td><td class="text-right">含於報價</td></tr>
+          <tr><td><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;color:var(--green);margin-right:4px">check_circle</span>互動教學系統授權</td><td>即時投票、排行榜、AI 技能對戰、作品展示</td><td class="text-right">含於報價</td></tr>
+          <tr><td><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;color:var(--green);margin-right:4px">check_circle</span>課前需求訪談</td><td>依學員背景＆企業產業客製教材</td><td class="text-right">含於報價</td></tr>
+          <tr><td><span class="material-symbols-outlined" style="font-size:15px;vertical-align:-2px;color:var(--green);margin-right:4px">check_circle</span>完整教材講義</td><td>數位講義 + Prompt 範本庫</td><td class="text-right">含於報價</td></tr>
         </tbody></table>
 
         <div class="qp-section-title">課綱示範 — AI 應用班（7 小時）</div>
@@ -496,7 +497,7 @@ body{
         </div>
       </div>
       <div class="qp-footer">
-        <div class="qp-footer-brand">📊 數位簡報室 TBR.Digital</div>
+        <div class="qp-footer-brand">數位簡報室 TBR.Digital</div>
         <div class="qp-footer-info">專注 AI 教學 × 企業內訓 × 互動簡報系統<br>讓每一場培訓都成為改變的起點</div>
       </div>`;
 
