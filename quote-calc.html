@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>課程報價試算 — 數位簡報室</title>
+<title>企業 AI 培訓報價試算 — 數位簡報室</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" href="assets/images/tbrlogo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,11 +28,8 @@
 html{font-size:16px;scroll-behavior:smooth}
 body{
   font-family:var(--font);background:var(--bg);color:var(--ink);
-  min-height:100vh;line-height:1.6;
-  -webkit-font-smoothing:antialiased;
+  min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;
 }
-
-/* ── Layout ── */
 .page{max-width:880px;margin:0 auto;padding:40px 24px 80px}
 
 /* ── Header ── */
@@ -45,9 +42,7 @@ body{
   text-transform:uppercase;margin-bottom:14px;
 }
 .header-badge .material-symbols-outlined{font-size:14px}
-.header h1{
-  font-size:2rem;font-weight:900;letter-spacing:-.5px;color:var(--ink);
-}
+.header h1{font-size:2rem;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
 .header p{color:var(--ink-2);font-size:.88rem;margin-top:6px}
 
 /* ── Card ── */
@@ -64,54 +59,33 @@ body{
 }
 .card-title .material-symbols-outlined{font-size:17px}
 
-/* ── Pills ── */
-.pill-group{display:flex;flex-wrap:wrap;gap:8px}
-.pill-input{display:none}
-.pill-label{
-  padding:9px 16px;border-radius:10px;
-  background:var(--bg);border:1.5px solid var(--border);
-  color:var(--ink-2);font-size:.8rem;font-weight:600;
-  cursor:pointer;transition:all .2s;user-select:none;
-  display:flex;align-items:center;gap:5px;
+/* ── Rate Row ── */
+.rate-row{
+  display:flex;align-items:center;gap:14px;padding:12px 0;
+  border-bottom:1px solid #f1f5f9;
 }
-.pill-label:hover{border-color:var(--accent);color:var(--ink);background:#f5f3ff}
-.pill-input:checked + .pill-label{
-  background:var(--accent-light);border-color:var(--accent);color:var(--accent-text);
-  box-shadow:0 0 0 3px rgba(99,102,241,.08);
+.rate-row:last-child{border-bottom:none}
+.rate-icon{font-size:1.3rem;flex-shrink:0}
+.rate-info{flex:1;min-width:0}
+.rate-name{font-size:.88rem;font-weight:700}
+.rate-desc{font-size:.68rem;color:var(--ink-3)}
+.rate-input-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.rate-input-wrap span{font-size:.78rem;color:var(--ink-3);font-weight:500}
+.rate-input{
+  width:90px;text-align:right;padding:8px 12px;border-radius:10px;
+  border:1.5px solid var(--border);background:var(--bg);
+  font-size:.95rem;font-weight:700;color:var(--accent-text);
+  font-family:var(--font);outline:none;transition:border-color .2s;
+  font-variant-numeric:tabular-nums;
 }
-.pill-sub{font-size:.6rem;color:var(--ink-3);font-weight:400}
-.pill-input:checked + .pill-label .pill-sub{color:var(--accent)}
+.rate-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
 
-/* ── Custom Input ── */
-.custom-topic-input{
-  display:none;margin-top:10px;width:100%;
-  padding:10px 14px;border-radius:10px;
-  background:var(--bg);border:1.5px solid var(--border);
-  color:var(--ink);font-size:.85rem;font-family:var(--font);
-  outline:none;transition:border-color .2s;
+/* ── People Bar ── */
+.people-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;padding:14px 0;border-bottom:1px solid var(--border);
 }
-.custom-topic-input:focus{border-color:var(--accent)}
-.custom-topic-input.visible{display:block}
-
-/* ── Slider ── */
-.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.slider-value{font-size:1.5rem;font-weight:900;color:var(--accent-text);font-variant-numeric:tabular-nums}
-.slider-value span{font-size:.78rem;font-weight:500;color:var(--ink-3)}
-input[type="range"]{
-  -webkit-appearance:none;width:100%;height:5px;border-radius:3px;outline:none;cursor:pointer;
-  background:linear-gradient(to right,var(--accent) 0%,var(--accent) var(--pct,50%),#e2e8f0 var(--pct,50%));
-}
-input[type="range"]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
-  background:var(--white);border:3px solid var(--accent);cursor:grab;
-  box-shadow:0 2px 8px rgba(99,102,241,.25);transition:box-shadow .2s;
-}
-input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,102,241,.35)}
-.slider-ticks{display:flex;justify-content:space-between;margin-top:6px;padding:0 2px}
-.slider-tick{font-size:.6rem;color:var(--ink-3);cursor:pointer;transition:color .2s}
-.slider-tick:hover{color:var(--accent)}
-
-/* ── Stepper ── */
+.people-label{font-size:.82rem;font-weight:600;color:var(--ink-2)}
 .stepper{display:inline-flex;align-items:center;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
 .stepper-btn{
   width:38px;height:38px;border:none;background:var(--bg);color:var(--ink);
@@ -125,28 +99,31 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
 }
 .stepper-unit{font-size:.8rem;color:var(--ink-3);margin-left:8px;font-weight:500}
 
-/* ── Price Display ── */
-.price-card{
-  background:linear-gradient(135deg,#fafafe,#f0edff);
-  border:1.5px solid #ddd6fe;border-radius:var(--radius);
-  padding:32px 28px;margin-bottom:16px;text-align:center;
-  box-shadow:var(--shadow);
+/* ── Price Table ── */
+.price-table-wrap{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow);
 }
-.price-tag{font-size:.72rem;color:var(--ink-3);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
-.price-amount{
-  font-size:2.8rem;font-weight:900;letter-spacing:-1px;color:var(--accent-text);
-  font-variant-numeric:tabular-nums;transition:all .3s;
+.price-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.price-table thead{background:linear-gradient(135deg,#312e81,#4338ca)}
+.price-table thead th{
+  color:#e0e7ff;padding:14px 16px;font-weight:700;font-size:.7rem;
+  text-transform:uppercase;letter-spacing:1.5px;text-align:center;white-space:nowrap;
 }
-.price-per{font-size:.85rem;color:var(--ink-2);margin-top:4px}
-.price-per b{color:var(--green);font-weight:700}
-.price-breakdown{display:flex;justify-content:center;gap:16px;margin-top:18px;flex-wrap:wrap}
-.price-item{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:12px 18px;border-radius:12px;background:var(--white);
-  border:1px solid var(--border);min-width:110px;
-}
-.price-item-label{font-size:.65rem;color:var(--ink-3)}
-.price-item-value{font-size:.92rem;font-weight:700;color:var(--ink)}
+.price-table thead th:first-child{text-align:left}
+.price-table tbody tr{transition:background .15s}
+.price-table tbody tr:hover{background:#fafbff}
+.price-table tbody tr:not(:last-child) td{border-bottom:1px solid #f1f5f9}
+.price-table td{padding:14px 16px;vertical-align:middle}
+.price-table td:first-child{font-weight:700;color:var(--ink)}
+.price-cell{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.price-cell .per{display:block;font-size:.64rem;color:var(--ink-3);font-weight:400;margin-top:2px}
+.price-cell.popular{background:linear-gradient(135deg,#f0edff,#ede9fe);border-radius:8px;color:var(--accent-text);padding:10px 8px}
+.row-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.6rem;font-weight:600;margin-top:3px}
+.badge-mgmt{background:#fef3c7;color:#92400e}
+.badge-eng{background:#dbeafe;color:#1e40af}
+.badge-gen{background:#d1fae5;color:#065f46}
+.badge-spec{background:#ede9fe;color:#5b21b6}
 
 /* ── Actions ── */
 .actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
@@ -161,59 +138,37 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
 .btn-secondary{background:var(--white);color:var(--ink);border:1.5px solid var(--border)}
 .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 
-/* ── Compare ── */
-.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
-.compare-card{
-  background:var(--bg);border:1.5px solid var(--border);border-radius:12px;
-  padding:16px 12px;text-align:center;cursor:pointer;transition:all .25s;
-}
-.compare-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
-.compare-card.active{border-color:var(--accent);background:var(--accent-light);box-shadow:0 0 0 3px rgba(99,102,241,.08)}
-.compare-card-people{font-size:1.4rem;font-weight:900;color:var(--accent-text)}
-.compare-card-people span{font-size:.7rem;color:var(--ink-3);font-weight:500}
-.compare-card-price{font-size:.95rem;font-weight:700;color:var(--ink);margin-top:4px}
-.compare-card-per{font-size:.68rem;color:var(--green);margin-top:2px}
-.compare-card-discount{
-  display:inline-block;margin-top:6px;padding:2px 8px;border-radius:6px;
-  font-size:.6rem;font-weight:700;background:var(--green-bg);color:var(--green);
-}
-
-/* ── Preview ── */
+/* ── Quote Preview ── */
 .preview-section{display:none}
 .preview-section.visible{display:block;animation:fadeUp .4s ease-out}
 .quote-preview{background:#fff;color:var(--ink);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg)}
-.qp-header{
-  padding:28px 32px 18px;border-bottom:2px solid #e8ecf4;
-  display:flex;justify-content:space-between;align-items:flex-start;
-}
+.qp-header{padding:28px 32px 18px;border-bottom:2px solid #e8ecf4;display:flex;justify-content:space-between;align-items:flex-start}
 .qp-brand-name{font-size:1.1rem;font-weight:800;color:var(--ink)}
 .qp-brand-sub{font-size:.68rem;color:var(--ink-3);margin-top:2px}
 .qp-meta{text-align:right;font-size:.72rem;color:var(--ink-3);line-height:1.8}
 .qp-meta b{color:var(--ink)}
 .qp-body{padding:22px 32px}
-.qp-section-title{
-  font-size:.7rem;font-weight:700;color:var(--accent-text);
-  text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;
-  padding-bottom:8px;border-bottom:1px solid var(--border);
-}
+.qp-section-title{font-size:.7rem;font-weight:700;color:var(--accent-text);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .qp-table{width:100%;border-collapse:collapse;margin-bottom:22px;font-size:.8rem}
-.qp-table th{
-  text-align:left;padding:9px 12px;font-weight:600;color:var(--ink-3);
-  border-bottom:2px solid var(--border);font-size:.68rem;text-transform:uppercase;letter-spacing:1px;
-}
+.qp-table th{text-align:left;padding:9px 12px;font-weight:600;color:var(--ink-3);border-bottom:2px solid var(--border);font-size:.68rem;text-transform:uppercase;letter-spacing:1px}
 .qp-table td{padding:11px 12px;border-bottom:1px solid #f1f5f9;color:#334155}
 .qp-table tr:last-child td{border-bottom:none}
 .qp-table .text-right{text-align:right}
-.qp-table .total-row td{font-weight:800;font-size:.92rem;color:var(--ink);border-top:2px solid var(--ink);border-bottom:none;padding-top:14px}
 .qp-notes{background:#f8fafc;border-radius:10px;padding:14px 18px;margin-bottom:18px}
 .qp-notes-title{font-size:.68rem;font-weight:700;color:var(--accent-text);margin-bottom:6px}
 .qp-notes ul{padding-left:16px;font-size:.75rem;color:#475569;line-height:1.9}
-.qp-footer{
-  padding:18px 32px;background:#f8fafc;border-top:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-}
+.qp-footer{padding:18px 32px;background:#f8fafc;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .qp-footer-brand{font-size:.75rem;font-weight:700;color:var(--ink)}
 .qp-footer-info{font-size:.65rem;color:var(--ink-3);text-align:right;line-height:1.8}
+
+/* ── Curriculum ── */
+.curr-timeline{padding:0}
+.curr-block{position:relative;padding:16px 0 16px 28px;border-left:2px solid var(--border)}
+.curr-block:last-child{border-left-color:transparent}
+.curr-block::before{content:'';position:absolute;left:-6px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--accent-light)}
+.curr-time{display:inline-block;padding:2px 8px;border-radius:5px;background:var(--accent-light);color:var(--accent-text);font-size:.62rem;font-weight:700;margin-bottom:4px}
+.curr-title{font-size:.82rem;font-weight:700;margin-bottom:3px}
+.curr-items{font-size:.74rem;color:var(--ink-2);line-height:1.8;padding-left:14px}
 
 /* ── Footer ── */
 .site-footer{margin-top:60px;padding:32px 0;border-top:1px solid var(--border);text-align:center}
@@ -225,33 +180,15 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
 .footer-copy{font-size:.62rem;color:#cbd5e1}
 
 /* ── Auth Gate ── */
-.auth-gate{
-  position:fixed;inset:0;z-index:9999;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  animation:fadeUp .4s ease-out;
-}
-.auth-box{
-  background:var(--card);border:1px solid var(--border);border-radius:20px;
-  padding:40px 36px;max-width:380px;width:90%;text-align:center;
-  box-shadow:var(--shadow-lg);
-}
+.auth-gate{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;animation:fadeUp .4s ease-out}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px 36px;max-width:380px;width:90%;text-align:center;box-shadow:var(--shadow-lg)}
 .auth-box-icon{font-size:2.4rem;margin-bottom:12px}
 .auth-box h2{font-size:1.15rem;font-weight:800;color:var(--ink);margin-bottom:4px}
 .auth-box p{font-size:.8rem;color:var(--ink-3);margin-bottom:20px}
-.auth-input{
-  width:100%;padding:12px 16px;border-radius:10px;
-  border:1.5px solid var(--border);background:var(--bg);
-  font-size:.9rem;font-family:var(--font);color:var(--ink);
-  outline:none;transition:border-color .2s;text-align:center;
-  letter-spacing:2px;
-}
+.auth-input{width:100%;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:.9rem;font-family:var(--font);color:var(--ink);outline:none;transition:border-color .2s;text-align:center;letter-spacing:2px}
 .auth-input:focus{border-color:var(--accent)}
 .auth-input.error{border-color:#ef4444;animation:shake .4s ease}
-.auth-submit{
-  margin-top:12px;width:100%;padding:12px;border:none;border-radius:10px;
-  background:var(--accent);color:#fff;font-size:.88rem;font-weight:700;
-  font-family:var(--font);cursor:pointer;transition:all .2s;
-}
+.auth-submit{margin-top:12px;width:100%;padding:12px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:.88rem;font-weight:700;font-family:var(--font);cursor:pointer;transition:all .2s}
 .auth-submit:hover{background:#4f46e5}
 .auth-err{font-size:.72rem;color:#ef4444;margin-top:8px;min-height:1em}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
@@ -262,25 +199,23 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
   body{background:#fff}
   .page{max-width:none;padding:0}
   .auth-gate{display:none!important}
-  .header,.card,.price-card,.actions,.compare-section,.site-footer{display:none!important}
+  .header,.card,.price-table-wrap,.actions,.site-footer{display:none!important}
   .preview-section{display:block!important}
   .quote-preview{box-shadow:none;border:1px solid #ddd}
 }
-/* ── Responsive ── */
 @media(max-width:640px){
   .page{padding:24px 16px 40px}
   .header h1{font-size:1.5rem}
-  .card,.price-card{padding:20px}
-  .pill-label{padding:8px 12px;font-size:.75rem}
-  .price-amount{font-size:2.2rem}
+  .card{padding:20px}
+  .rate-row{flex-direction:column;align-items:flex-start;gap:8px}
+  .price-table{font-size:.72rem}
+  .price-table thead th,.price-table td{padding:10px 8px}
   .qp-header,.qp-body,.qp-footer{padding-left:18px;padding-right:18px}
-  .compare-grid{grid-template-columns:repeat(3,1fr)}
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.card,.price-card{animation:fadeUp .45s ease-out both}
+.card,.price-table-wrap{animation:fadeUp .45s ease-out both}
 .card:nth-child(2){animation-delay:.06s}
-.card:nth-child(3){animation-delay:.12s}
-.price-card{animation-delay:.18s}
+.price-table-wrap{animation-delay:.12s}
 </style>
 </head>
 <body>
@@ -300,99 +235,74 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
 <div class="page locked" id="mainPage">
   <div class="header">
     <div class="header-badge"><span class="material-symbols-outlined">calculate</span>QUOTE CALCULATOR</div>
-    <h1>課程報價試算</h1>
-    <p>根據人數、主題與授課對象，即時計算最適合的方案</p>
+    <h1>企業 AI 培訓報價試算</h1>
+    <p>調整鐘點費即時試算 · 四種課程類型 × 三種時數方案</p>
   </div>
 
-  <!-- 課程主題 -->
+  <!-- ═══ 鐘點費設定 ═══ -->
   <div class="card">
-    <div class="card-title"><span class="material-symbols-outlined">school</span>課程主題</div>
-    <div class="pill-group" id="topicGroup">
-      <input type="radio" name="topic" value="ai_intro" id="t1" class="pill-input" checked>
-      <label for="t1" class="pill-label">AI 基礎入門<span class="pill-sub">· 半天/全天</span></label>
-      <input type="radio" name="topic" value="ai_app" id="t2" class="pill-input">
-      <label for="t2" class="pill-label">ChatGPT / Claude 實戰<span class="pill-sub">· 進階應用</span></label>
-      <input type="radio" name="topic" value="ai_ppt" id="t3" class="pill-input">
-      <label for="t3" class="pill-label">AI 簡報製作<span class="pill-sub">· 企業簡報</span></label>
-      <input type="radio" name="topic" value="ai_dev" id="t4" class="pill-input">
-      <label for="t4" class="pill-label">AI 程式開發<span class="pill-sub">· Coding</span></label>
-      <input type="radio" name="topic" value="ai_data" id="t5" class="pill-input">
-      <label for="t5" class="pill-label">AI 數據分析<span class="pill-sub">· BI / 報表</span></label>
-      <input type="radio" name="topic" value="custom" id="t6" class="pill-input">
-      <label for="t6" class="pill-label">🎯 自訂主題</label>
-    </div>
-    <input type="text" class="custom-topic-input" id="customTopic" placeholder="請輸入自訂課程主題…">
-  </div>
-
-  <!-- 授課對象 -->
-  <div class="card">
-    <div class="card-title"><span class="material-symbols-outlined">groups</span>授課對象</div>
-    <div class="pill-group">
-      <input type="radio" name="audience" value="general" id="a1" class="pill-input" checked>
-      <label for="a1" class="pill-label">🏢 一般部門<span class="pill-sub">· 標準方案</span></label>
-      <input type="radio" name="audience" value="management" id="a2" class="pill-input">
-      <label for="a2" class="pill-label">👔 管理層<span class="pill-sub">· 高階主管</span></label>
-      <input type="radio" name="audience" value="engineering" id="a3" class="pill-input">
-      <label for="a3" class="pill-label">💻 工程團隊<span class="pill-sub">· 技術深度</span></label>
-      <input type="radio" name="audience" value="special" id="a4" class="pill-input">
-      <label for="a4" class="pill-label">✨ 特殊場景<span class="pill-sub">· 客製化</span></label>
-    </div>
-  </div>
-
-  <!-- 人數與時數 -->
-  <div class="card">
-    <div class="card-title"><span class="material-symbols-outlined">tune</span>人數與時數</div>
-    <div style="margin-bottom:20px">
-      <div class="slider-header">
-        <span style="font-size:.8rem;font-weight:600;color:var(--ink-2)">參加人數</span>
-        <div class="slider-value"><span id="peopleVal">30</span> <span>人</span></div>
-      </div>
-      <input type="range" id="peopleSlider" min="5" max="200" value="30" step="5">
-      <div class="slider-ticks">
-        <span class="slider-tick" data-v="5">5</span><span class="slider-tick" data-v="20">20</span>
-        <span class="slider-tick" data-v="50">50</span><span class="slider-tick" data-v="100">100</span>
-        <span class="slider-tick" data-v="150">150</span><span class="slider-tick" data-v="200">200</span>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:.8rem;font-weight:600;color:var(--ink-2)">授課時數</span>
+    <div class="card-title"><span class="material-symbols-outlined">tune</span>鐘點費設定（每小時）</div>
+    <div class="people-bar">
+      <span class="people-label">基準人數</span>
       <div style="display:flex;align-items:center">
         <div class="stepper">
-          <button class="stepper-btn" id="hourMinus">−</button>
-          <input type="text" class="stepper-val" id="hourVal" value="6" readonly>
-          <button class="stepper-btn" id="hourPlus">+</button>
+          <button class="stepper-btn" id="pMinus">−</button>
+          <input type="text" class="stepper-val" id="pVal" value="30" readonly>
+          <button class="stepper-btn" id="pPlus">+</button>
         </div>
-        <span class="stepper-unit">小時</span>
+        <span class="stepper-unit">人</span>
       </div>
     </div>
-  </div>
-
-  <!-- 總價 -->
-  <div class="price-card">
-    <div class="price-tag">估算總價</div>
-    <div class="price-amount" id="totalPrice">NT$ 0</div>
-    <div class="price-per">每人約 <b id="perPersonPrice">NT$ 0</b></div>
-    <div class="price-breakdown" id="priceBreakdown"></div>
-    <div class="actions">
-      <button class="btn btn-primary" id="previewBtn"><span class="material-symbols-outlined">preview</span>產生報價單預覽</button>
-      <button class="btn btn-secondary" id="printBtn" style="display:none"><span class="material-symbols-outlined">print</span>列印 / PDF</button>
+    <div class="rate-row">
+      <div class="rate-icon">🏢</div>
+      <div class="rate-info"><div class="rate-name">營運管理層</div><div class="rate-desc">高階主管 · AI 策略思維與決策</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_mgmt" value="7000" step="500" min="0"></div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-icon">💻</div>
+      <div class="rate-info"><div class="rate-name">工程部門</div><div class="rate-desc">工程團隊 · AI 開發與技術整合</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_eng" value="9000" step="500" min="0"></div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-icon">👥</div>
+      <div class="rate-info"><div class="rate-name">一般員工</div><div class="rate-desc">全員普及 · AI 工具應用實戰</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_gen" value="5000" step="500" min="0"></div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-icon">✨</div>
+      <div class="rate-info"><div class="rate-name">特定特殊場景</div><div class="rate-desc">場景定制 · 客製化 AI 應用方案</div></div>
+      <div class="rate-input-wrap"><span>NT$</span><input type="number" class="rate-input" id="r_spec" value="8000" step="500" min="0"></div>
     </div>
   </div>
 
-  <!-- 對照 -->
-  <div class="card compare-section">
-    <div class="card-title"><span class="material-symbols-outlined">compare_arrows</span>不同人數方案對照</div>
-    <div class="compare-grid" id="compareGrid"></div>
+  <!-- ═══ 即時報價表 ═══ -->
+  <div class="price-table-wrap">
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th style="width:28%">課程類型</th>
+          <th>4 小時<br><span style="font-weight:400;font-size:.58rem;opacity:.7">半天精華</span></th>
+          <th>7 小時<br><span style="font-weight:400;font-size:.58rem;opacity:.7">全天實戰</span></th>
+          <th>14 小時<br><span style="font-weight:400;font-size:.58rem;opacity:.7">雙日深化</span></th>
+        </tr>
+      </thead>
+      <tbody id="priceBody"></tbody>
+    </table>
   </div>
 
-  <!-- Preview -->
+  <div class="actions" style="margin-top:20px">
+    <button class="btn btn-primary" id="previewBtn"><span class="material-symbols-outlined">preview</span>產生報價單預覽</button>
+    <button class="btn btn-secondary" id="printBtn" style="display:none"><span class="material-symbols-outlined">print</span>列印 / PDF</button>
+  </div>
+
+  <!-- ═══ Preview ═══ -->
   <div class="preview-section" id="previewSection">
     <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg)">
       <div class="quote-preview" id="quotePreview"></div>
     </div>
   </div>
 
-  <!-- Footer -->
+  <!-- ═══ Footer ═══ -->
   <div class="site-footer">
     <div class="footer-brand">數位簡報室 Digital Presentation Lab</div>
     <div class="footer-desc">專注於 AI 教學、企業內訓與數位轉型培訓。透過互動式教學系統，讓每一場培訓都成為改變的起點。</div>
@@ -418,7 +328,6 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
   const doAuth=()=>{
     if(authInput.value===PWD){
       sessionStorage.setItem('qc_auth','1');
-      gate.style.opacity='1';
       gate.animate([{opacity:1},{opacity:0}],{duration:300,fill:'forwards'});
       setTimeout(()=>{gate.style.display='none';mainPage.classList.remove('locked')},300);
     } else {
@@ -429,105 +338,118 @@ input[type="range"]::-webkit-slider-thumb:hover{box-shadow:0 2px 14px rgba(99,10
   document.getElementById('authSubmit').onclick=doAuth;
   authInput.addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()});
 
-  const TOPIC={
-    ai_intro:{name:'AI 基礎入門',base:3000},
-    ai_app:{name:'ChatGPT / Claude 實戰',base:3500},
-    ai_ppt:{name:'AI 簡報製作',base:3200},
-    ai_dev:{name:'AI 程式開發',base:4000},
-    ai_data:{name:'AI 數據分析',base:3800},
-    custom:{name:'自訂主題',base:3500},
-  };
-  const AUD={
-    general:{name:'一般部門',m:1},management:{name:'管理層',m:1.5},
-    engineering:{name:'工程團隊',m:1.3},special:{name:'特殊場景',m:1.4},
-  };
-  const disc=n=>{
-    if(n>=150)return{r:.25,l:'75 折'};if(n>=100)return{r:.20,l:'8 折'};
-    if(n>=50)return{r:.15,l:'85 折'};if(n>=30)return{r:.10,l:'9 折'};
-    return{r:0,l:'原價'};
-  };
+  // ── Data ──
+  const COURSES=[
+    {id:'mgmt',icon:'🏢',name:'營運管理層',sub:'AI 策略思維與決策',badge:'badge-mgmt',badgeText:'高階主管 · 策略導向'},
+    {id:'eng', icon:'💻',name:'工程部門',  sub:'AI 開發與技術整合',badge:'badge-eng', badgeText:'工程團隊 · 技術深度'},
+    {id:'gen', icon:'👥',name:'一般員工',  sub:'AI 工具應用實戰', badge:'badge-gen', badgeText:'全員普及 · 即學即用'},
+    {id:'spec',icon:'✨',name:'特定特殊場景',sub:'客製化 AI 應用方案',badge:'badge-spec',badgeText:'場景定制 · 深度客製'},
+  ];
+  const HOURS=[4,7,14];
   const fmt=n=>'NT$ '+Math.round(n).toLocaleString();
   const $=id=>document.getElementById(id);
-  const slider=$('peopleSlider'),pVal=$('peopleVal'),hVal=$('hourVal');
-  const totalEl=$('totalPrice'),perEl=$('perPersonPrice'),bdEl=$('priceBreakdown'),cGrid=$('compareGrid');
-  const customIn=$('customTopic');
-  let hours=6;
-  const gT=()=>document.querySelector('input[name="topic"]:checked')?.value||'ai_intro';
-  const gA=()=>document.querySelector('input[name="audience"]:checked')?.value||'general';
-  const gP=()=>+slider.value;
+  const rInputs=COURSES.map(c=>$('r_'+c.id));
+  const body=$('priceBody');
+  let people=30;
 
-  const calc=(p,tk,ak,h)=>{
-    const t=TOPIC[tk]||TOPIC.ai_intro,a=AUD[ak]||AUD.general;
-    const hr=t.base*a.m,sub=hr*h,d=disc(p),tot=sub*(1-d.r);
-    return{hr,sub,tot,d,tn:t.name,an:a.name};
-  };
+  $('pPlus').onclick=()=>{if(people<200){people+=5;$('pVal').value=people;update()}};
+  $('pMinus').onclick=()=>{if(people>5){people-=5;$('pVal').value=people;update()}};
 
-  const update=()=>{
-    const p=gP(),tk=gT(),ak=gA(),h=hours;
-    const pct=((p-5)/195)*100;
-    slider.style.setProperty('--pct',pct+'%');
-    pVal.textContent=p;
-    const r=calc(p,tk,ak,h);
-    totalEl.textContent=fmt(r.tot);
-    perEl.textContent=fmt(r.tot/p);
-    bdEl.innerHTML=[
-      ['時薪單價',fmt(r.hr),''],['小計 ('+h+'h)',fmt(r.sub),''],['人數折扣',r.d.l,'color:var(--green)']
-    ].map(([l,v,s])=>`<div class="price-item"><span class="price-item-label">${l}</span><span class="price-item-value"${s?' style="'+s+'"':''}>${v}</span></div>`).join('');
-
-    const presets=[10,20,30,50,80,100];
-    cGrid.innerHTML=presets.map(n=>{
-      const x=calc(n,tk,ak,h),act=n===p;
-      return`<div class="compare-card${act?' active':''}" data-people="${n}">
-        <div class="compare-card-people">${n} <span>人</span></div>
-        <div class="compare-card-price">${fmt(x.tot)}</div>
-        <div class="compare-card-per">每人 ${fmt(x.tot/n)}</div>
-        ${x.d.r>0?`<div class="compare-card-discount">${x.d.l}</div>`:''}
-      </div>`;
+  function update(){
+    body.innerHTML=COURSES.map((c,i)=>{
+      const rate=parseInt(rInputs[i].value)||0;
+      return `<tr>
+        <td><div>${c.icon} ${c.name}</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:1px">${c.sub}</div><span class="row-badge ${c.badge}">${c.badgeText}</span></td>
+        ${HOURS.map(h=>{
+          const total=rate*h,per=people>0?total/people:0,pop=h===7;
+          return `<td class="price-cell${pop?' popular':''}">${fmt(total)}<span class="per">每人 ≈ ${fmt(per)}</span></td>`;
+        }).join('')}
+      </tr>`;
     }).join('');
-    customIn.classList.toggle('visible',tk==='custom');
-  };
+  }
+  rInputs.forEach(inp=>inp.addEventListener('input',update));
 
-  slider.addEventListener('input',update);
-  document.querySelectorAll('input[name="topic"],input[name="audience"]').forEach(r=>r.addEventListener('change',update));
-  document.querySelectorAll('.slider-tick').forEach(t=>t.addEventListener('click',()=>{slider.value=t.dataset.v;update()}));
-  cGrid.addEventListener('click',e=>{const c=e.target.closest('.compare-card');if(c){slider.value=c.dataset.people;update()}});
-  $('hourPlus').onclick=()=>{if(hours<24){hours++;hVal.value=hours;update()}};
-  $('hourMinus').onclick=()=>{if(hours>1){hours--;hVal.value=hours;update()}};
+  // ── Curriculum ──
+  const CURR=[
+    {time:'09:00 — 09:30',title:'開場 ＆ AI 素養暖身',items:['講師介紹 ＆ 課程目標說明','互動教學系統登入 ＆ 破冰活動','「你心中的 AI」即時投票與討論']},
+    {time:'09:30 — 10:30',title:'模組一：AI 全景 — 從概念到落地',items:['生成式 AI 的核心原理（不講數學，講直覺）','ChatGPT / Claude / Gemini 三大平台比較','企業導入 AI 的成功案例與常見誤區','🎯 互動：AI 應用場景配對挑戰']},
+    {time:'10:30 — 10:40',title:'☕ 休息',items:[]},
+    {time:'10:40 — 12:00',title:'模組二：Prompt 工程 — 從指令到結果',items:['Prompt 設計黃金框架：角色 × 情境 × 指令 × 格式','進階技巧：Few-shot、Chain-of-Thought、反思提示','實戰練習：用 AI 完成會議摘要 / 客戶回覆 / 報告初稿','🏆 Prompt 技能對戰 ＆ 即時排行榜']},
+    {time:'12:00 — 13:00',title:'🍱 午餐休息',items:[]},
+    {time:'13:00 — 14:30',title:'模組三：AI 融入日常工作流',items:['文件處理：摘要、翻譯、格式轉換的自動化流程','資料分析：用 AI 快速解讀 Excel / CSV 數據','簡報製作：從大綱到視覺化的 AI 輔助設計','實作演練：選擇真實工作場景，現場打造 AI 工作流']},
+    {time:'14:30 — 14:40',title:'☕ 休息',items:[]},
+    {time:'14:40 — 15:50',title:'模組四：進階應用 ＆ 團隊實戰',items:['AI + 搜尋：Deep Research 與資料查證技巧','AI + 圖像：用 AI 生成簡報素材、社群圖片','分組挑戰：用 AI 完成完整的專案提案（含簡報）','🏆 團隊作品展示 ＆ 互評計分']},
+    {time:'15:50 — 16:00',title:'結業 ＆ 行動計畫',items:['學習成果回顧 ＆ 排行榜頒獎','「回到工作崗位的第一步」— 個人 AI 行動承諾','課後資源包發放 ＆ Q&A']},
+  ];
 
+  // ── Preview ──
   $('previewBtn').onclick=()=>{
-    const p=gP(),tk=gT(),ak=gA(),h=hours,r=calc(p,tk,ak,h);
-    const tn=tk==='custom'?(customIn.value||'自訂主題'):r.tn;
-    const now=new Date(),d=s=>`${s.getFullYear()} / ${String(s.getMonth()+1).padStart(2,'0')} / ${String(s.getDate()).padStart(2,'0')}`;
+    const now=new Date();
+    const d=s=>`${s.getFullYear()} / ${String(s.getMonth()+1).padStart(2,'0')} / ${String(s.getDate()).padStart(2,'0')}`;
     const vd=new Date(now.getTime()+30*864e5);
+
+    let priceRows='';
+    COURSES.forEach((c,i)=>{
+      const rate=parseInt(rInputs[i].value)||0;
+      priceRows+=HOURS.map(h=>{
+        const total=rate*h,per=people>0?total/people:0;
+        return `<tr><td><b>${c.icon} ${c.name}</b></td><td>${h} 小時（${h===4?'半天':h===7?'全天':'雙日'}）</td><td>鐘點 ${fmt(rate)} × ${h}h</td><td class="text-right"><b>${fmt(total)}</b><br><span style="font-size:.65rem;color:var(--green)">每人 ${fmt(per)}</span></td></tr>`;
+      }).join('');
+    });
+
+    const currHtml=CURR.map(b=>
+      `<div class="curr-block"><div class="curr-time">${b.time}</div><div class="curr-title">${b.title}</div>${b.items.length?`<ul class="curr-items">${b.items.map(i=>`<li>${i}</li>`).join('')}</ul>`:''}</div>`
+    ).join('');
+
+    const tags=['AI 企業內訓','Prompt Engineering','互動教學系統','數位轉型顧問','AI 簡報設計'].map(t=>
+      `<span style="padding:3px 10px;border-radius:5px;font-size:.62rem;font-weight:600;background:var(--accent-light);color:var(--accent-text)">${t}</span>`
+    ).join('');
+
     $('quotePreview').innerHTML=`
       <div class="qp-header">
-        <div><div class="qp-brand-name">📊 數位簡報室</div><div class="qp-brand-sub">Digital Presentation Lab — 企業培訓報價單</div></div>
-        <div class="qp-meta"><div>報價日期：<b>${d(now)}</b></div><div>有效期限：<b>${d(vd)}</b></div><div>報價編號：<b>Q-${Date.now().toString(36).toUpperCase()}</b></div></div>
+        <div><div class="qp-brand-name">📊 數位簡報室</div><div class="qp-brand-sub">Digital Presentation Lab — 企業 AI 培訓報價單</div></div>
+        <div class="qp-meta"><div>報價日期：<b>${d(now)}</b></div><div>有效期限：<b>${d(vd)}</b></div><div>報價編號：<b>Q-${Date.now().toString(36).toUpperCase()}</b></div><div>基準人數：<b>${people} 人</b></div></div>
       </div>
       <div class="qp-body">
-        <div class="qp-section-title">課程方案</div>
-        <table class="qp-table"><thead><tr><th style="width:40%">項目</th><th>說明</th><th class="text-right">金額</th></tr></thead><tbody>
-          <tr><td><b>${tn}</b></td><td>${r.an} · ${p} 人 · ${h} 小時</td><td class="text-right">${fmt(r.sub)}</td></tr>
-          <tr><td>互動教學系統授權</td><td>即時互動、排行榜、作品展示</td><td class="text-right">含於報價</td></tr>
-          <tr><td>課前客製化調整</td><td>依學員背景調整教材內容</td><td class="text-right">含於報價</td></tr>
-          ${r.d.r>0?`<tr><td style="color:var(--green)">人數優惠（${r.d.l}）</td><td>${p} 人以上適用</td><td class="text-right" style="color:var(--green)">- ${fmt(r.sub*r.d.r)}</td></tr>`:''}
-          <tr class="total-row"><td colspan="2">總　計</td><td class="text-right">${fmt(r.tot)}</td></tr>
+        <div class="qp-section-title">課程報價總覽（${people} 人 / 梯次）</div>
+        <table class="qp-table"><thead><tr><th>課程類型</th><th>時數</th><th>計算方式</th><th class="text-right">金額</th></tr></thead><tbody>${priceRows}</tbody></table>
+
+        <div class="qp-section-title">服務包含</div>
+        <table class="qp-table"><tbody>
+          <tr><td>✅ 互動教學系統授權</td><td>即時投票、排行榜、AI 技能對戰、作品展示</td><td class="text-right">含於報價</td></tr>
+          <tr><td>✅ 課前需求訪談</td><td>依學員背景 ＆ 企業產業客製教材</td><td class="text-right">含於報價</td></tr>
+          <tr><td>✅ 完整教材講義</td><td>數位講義 + Prompt 範本庫</td><td class="text-right">含於報價</td></tr>
+          <tr><td>✅ AI 實作環境</td><td>每位學員獨立 AI 帳號</td><td class="text-right">含於報價</td></tr>
         </tbody></table>
-        <div class="qp-section-title">不同人數方案參考</div>
-        <table class="qp-table"><thead><tr><th>人數</th><th>總價</th><th>每人費用</th><th>優惠</th></tr></thead><tbody>
-          ${[10,20,30,50,80,100].map(n=>{const x=calc(n,tk,ak,h),cur=n===p;return`<tr${cur?' style="background:#f0f5ff;font-weight:600"':''}><td>${n} 人${cur?' ★':''}</td><td>${fmt(x.tot)}</td><td>${fmt(x.tot/n)}</td><td>${x.d.r>0?x.d.l:'—'}</td></tr>`}).join('')}
-        </tbody></table>
+
+        <div class="qp-section-title">課綱示範 — AI 應用班（7 小時）</div>
+        <div class="curr-timeline" style="margin-bottom:22px">${currHtml}</div>
+
         <div class="qp-notes"><div class="qp-notes-title">備註</div><ul>
           <li>以上報價含講師費、教材費與互動系統授權，不含場地及交通費用</li>
-          <li>課程可依企業需求客製化調整，歡迎進一步洽談</li>
-          <li>如需課後輔導或額外諮詢，可加購延伸服務</li>
-          <li>本報價單有效期限 30 天，逾期請重新報價</li>
+          <li>人數超過 30 人可加開梯次或依比例調整報價</li>
+          <li>課程內容可依企業產業別、部門需求深度客製化</li>
+          <li>如需課後輔導、延伸諮詢或長期合作方案，可另行報價</li>
+          <li>可開立發票（二聯 / 三聯），付款方式可配合企業採購流程</li>
+          <li>本報價單有效期限 30 天，逾期請重新確認</li>
         </ul></div>
+
+        <div class="qp-section-title">關於我們</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:12px">
+          <div style="width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;font-weight:900;flex-shrink:0">范</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.92rem;font-weight:800">范廷凡 Tingfan</div>
+            <div style="font-size:.72rem;color:var(--accent-text);font-weight:600;margin-bottom:6px">數位簡報室 Digital Presentation Lab 創辦人</div>
+            <div style="font-size:.74rem;color:var(--ink-2);line-height:1.8">專注於 AI 教學與企業數位轉型培訓，結合自主開發的互動教學系統，打造沉浸式學習體驗。曾為多家上市公司、政府機構與非營利組織提供 AI 應用內訓，累計培訓超過數千名學員。擅長將複雜的 AI 概念轉化為可落地的工作流程，讓每一位學員都能帶著即戰力回到崗位。</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${tags}</div>
+          </div>
+        </div>
       </div>
       <div class="qp-footer">
         <div class="qp-footer-brand">📊 數位簡報室 Digital Presentation Lab</div>
         <div class="qp-footer-info">專注 AI 教學 × 企業內訓 × 互動簡報系統<br>讓每一場培訓都成為改變的起點</div>
       </div>`;
+
     const ps=$('previewSection');ps.classList.add('visible');
     ps.scrollIntoView({behavior:'smooth',block:'start'});
     $('printBtn').style.display='';
