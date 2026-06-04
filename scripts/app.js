@@ -3409,59 +3409,142 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         const input = document.createElement('input');
         input.type = 'file';
         input.multiple = true;
-        input.accept = 'image/*';
+        input.accept = '.pptx,image/*';
         input.style.display = 'none';
         document.body.appendChild(input);
 
         input.addEventListener('change', async () => {
-            const files = [...input.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-            if (files.length === 0) return;
+            const allFiles = [...input.files];
+            if (allFiles.length === 0) return;
 
-            const toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:10px;z-index:99999;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;';
-            toast.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>匯入中 0/' + files.length;
-            document.body.appendChild(toast);
+            // 偵測是 .pptx 還是圖片
+            const pptxFile = allFiles.find(f => f.name.toLowerCase().endsWith('.pptx'));
 
-            let count = 0;
-            for (const file of files) {
-                const dataUrl = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
-
-                const slide = {
-                    id: this.slideManager.generateId(),
-                    elements: [{
-                        id: this.slideManager.generateId(),
-                        type: 'image',
-                        src: dataUrl,
-                        x: 0,
-                        y: 0,
-                        width: 960,
-                        height: 540,
-                        locked: true
-                    }],
-                    background: '#ffffff'
-                };
-                this.slideManager.slides.push(slide);
-                count++;
-                toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>匯入中 ${count}/${files.length}`;
+            if (pptxFile) {
+                // ── PPTX 原生解析模式 ──
+                await this._importPptxNative(pptxFile);
+            } else {
+                // ── 圖片模式（舊的） ──
+                await this._importPptAsImages(allFiles);
             }
-
-            this.slideManager.navigateTo(this.slideManager.slides.length - files.length);
-            this.slideManager.renderThumbnails();
-            this.slideManager.renderCurrentSlide();
-            this.slideManager.updateCounter();
-            this.slideManager.saveNow();
-
-            toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;color:#34d399;">check_circle</span>已匯入 ${files.length} 張投影片`;
-            setTimeout(() => toast.remove(), 2500);
             input.remove();
         });
 
         input.click();
     }
+
+    async _importPptxNative(file) {
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:10px;z-index:99999;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;';
+        toast.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>解析 PPTX 中...';
+        document.body.appendChild(toast);
+
+        try {
+            const { PptxImporter } = await import('./pptxImporter.js');
+            const importer = new PptxImporter();
+            const slides = await importer.import(file, (cur, total, msg) => {
+                toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>${msg}`;
+            });
+
+            if (slides.length === 0) {
+                toast.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;color:#f87171;">warning</span>PPTX 中沒有找到投影片';
+                setTimeout(() => toast.remove(), 2500);
+                return;
+            }
+
+            // 上傳內嵌圖片到 Storage（data URI → 公開 URL）
+            const { storage } = await import('./supabase.js');
+            const projectId = this.slideManager?.currentProjectId || 'default';
+            let imgCount = 0;
+
+            for (const slide of slides) {
+                for (const el of slide.elements) {
+                    if (el.type === 'image' && el.src?.startsWith('data:')) {
+                        try {
+                            // 轉 Blob
+                            const res = await fetch(el.src);
+                            const blob = await res.blob();
+                            const ext = blob.type.split('/')[1] || 'png';
+                            const key = `pptx-import/${projectId}/${Date.now()}_${imgCount++}.${ext}`;
+                            const uploadResult = await storage.upload('slides', key, blob);
+                            if (!uploadResult.error && uploadResult.data?.url) {
+                                el.src = uploadResult.data.url;
+                            }
+                            // 上傳失敗就保留 data URI（離線也能看）
+                        } catch (e) {
+                            console.warn('[PptxImport] Image upload failed, keeping data URI:', e);
+                        }
+                    }
+                }
+            }
+
+            // 加入投影片
+            for (const slide of slides) {
+                slide.id = this.slideManager.generateId();
+                this.slideManager.slides.push(slide);
+            }
+
+            this.slideManager.navigateTo(this.slideManager.slides.length - slides.length);
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.saveNow();
+
+            toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;color:#34d399;">check_circle</span>已匯入 ${slides.length} 張投影片（可編輯元素）`;
+            setTimeout(() => toast.remove(), 3000);
+
+        } catch (e) {
+            console.error('[PptxImport]', e);
+            toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;color:#f87171;">error</span>匯入失敗：${e.message}`;
+            setTimeout(() => toast.remove(), 4000);
+        }
+    }
+
+    async _importPptAsImages(files) {
+        files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:10px;z-index:99999;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;';
+        toast.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>匯入中 0/' + files.length;
+        document.body.appendChild(toast);
+
+        let count = 0;
+        for (const file of files) {
+            const dataUrl = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+
+            const slide = {
+                id: this.slideManager.generateId(),
+                elements: [{
+                    id: this.slideManager.generateId(),
+                    type: 'image',
+                    src: dataUrl,
+                    x: 0,
+                    y: 0,
+                    width: 960,
+                    height: 540,
+                    locked: true
+                }],
+                background: '#ffffff'
+            };
+            this.slideManager.slides.push(slide);
+            count++;
+            toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>匯入中 ${count}/${files.length}`;
+        }
+
+        this.slideManager.navigateTo(this.slideManager.slides.length - files.length);
+        this.slideManager.renderThumbnails();
+        this.slideManager.renderCurrentSlide();
+        this.slideManager.updateCounter();
+        this.slideManager.saveNow();
+
+        toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;color:#34d399;">check_circle</span>已匯入 ${files.length} 張投影片`;
+        setTimeout(() => toast.remove(), 2500);
+    }
+
 
     /* =========================================
    模板選擇器
