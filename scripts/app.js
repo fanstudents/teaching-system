@@ -1977,8 +1977,8 @@ ${slideContents}
 
         const handleFile = async (file) => {
             if (!file) return;
-            if (file.size > 100 * 1024 * 1024) {
-                alert('影片檔案超過 100MB 上限');
+            if (file.size > 200 * 1024 * 1024) {
+                alert('影片檔案超過 200MB 上限');
                 return;
             }
             const progress = document.getElementById('vidProgress');
