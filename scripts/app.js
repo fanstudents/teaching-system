@@ -3403,6 +3403,67 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
     }
 
     /* =========================================
+   匯入 PPT 圖片（將每張圖片建立為一張投影片）
+   ========================================= */
+    importPptImages() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.addEventListener('change', async () => {
+            const files = [...input.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+            if (files.length === 0) return;
+
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:10px;z-index:99999;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:8px;';
+            toast.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>匯入中 0/' + files.length;
+            document.body.appendChild(toast);
+
+            let count = 0;
+            for (const file of files) {
+                const dataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+
+                const slide = {
+                    id: this.slideManager.generateId(),
+                    elements: [{
+                        id: this.slideManager.generateId(),
+                        type: 'image',
+                        src: dataUrl,
+                        x: 0,
+                        y: 0,
+                        width: 960,
+                        height: 540,
+                        locked: true
+                    }],
+                    background: '#ffffff'
+                };
+                this.slideManager.slides.push(slide);
+                count++;
+                toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>匯入中 ${count}/${files.length}`;
+            }
+
+            this.slideManager.navigateTo(this.slideManager.slides.length - files.length);
+            this.slideManager.renderThumbnails();
+            this.slideManager.renderCurrentSlide();
+            this.slideManager.updateCounter();
+            this.slideManager.saveNow();
+
+            toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;color:#34d399;">check_circle</span>已匯入 ${files.length} 張投影片`;
+            setTimeout(() => toast.remove(), 2500);
+            input.remove();
+        });
+
+        input.click();
+    }
+
+    /* =========================================
    模板選擇器
    ========================================= */
     openTemplatePicker() {
