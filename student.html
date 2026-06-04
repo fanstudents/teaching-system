@@ -1254,7 +1254,7 @@
                     try {
                         await db.update('submissions',
                             { student_name: studentName },
-                            { student_email: `eq.${studentEmail}`, session_id: `eq.${sessionCode}` }
+                            { student_email: `eq.${studentEmail}`, session_id: `eq.${window._activeSessionUUID || sessionCode}` }
                         );
                     } catch (e) { console.warn('[Rename] DB update failed:', e); }
                 });
@@ -1351,7 +1351,7 @@
                         type: 'qa',
                         content: text,
                         element_id: questionId,
-                        session_id: sessionCode,
+                        session_id: window._activeSessionUUID || sessionCode,
                         submitted_at: new Date().toISOString(),
                         state: { questionId, image: qaImageData || null }
                     }).catch(e => console.warn('[QA] DB save err:', e));

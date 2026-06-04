@@ -17,6 +17,10 @@ export class QuizGame {
     }
 
     async setupContainer(container) {
+        // ★ P0-4: 防止重複綁定事件
+        if (container.dataset._quizReady) return;
+        container.dataset._quizReady = '1';
+
         const optionEls = container.querySelectorAll('.quiz-option');
         const isMultiple = container.dataset.multiple === 'true';
         const submitBtn = container.querySelector('.quiz-submit');

@@ -378,7 +378,22 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
             });
 
             // 重新提交
-            previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', () => {
+            previewMini.querySelector('.wp-resubmit-btn')?.addEventListener('click', async () => {
+                // ★ P0-3: 排名加分後禁止重新提交
+                try {
+                    const _sid = window._activeSessionUUID || sessionCode;
+                    const _email = JSON.parse(sessionStorage.getItem('homework_user') || '{}').email || '';
+                    if (_sid && _email && elementId) {
+                        const { data: chk } = await db.select('submissions', {
+                            filter: { session_id: `eq.${_sid}`, element_id: `eq.${elementId}`, student_email: `eq.${_email}`, type: 'eq.webProject' },
+                            limit: 1
+                        });
+                        if (chk?.[0]) {
+                            let st = chk[0].state; if (typeof st === 'string') try { st = JSON.parse(st); } catch { st = {}; }
+                            if (st?._rank) { alert(`已完成排名（第 ${st._rank} 名），無法重新提交`); return; }
+                        }
+                    }
+                } catch {}
                 clearInterval(galleryPollId);
                 this._intervals.delete(elementId + '_gallery');
                 previewMini.style.display = 'none'; previewMini.innerHTML = '';

@@ -303,7 +303,7 @@ export class SkillBattleGame {
                         <summary class="sb-result-output-label">${mi('smart_toy', 14)} AI 根據你的 Skill 產出的結果</summary>
                         <div class="sb-result-output">${esc(state.output)}</div>
                     </details>` : ''}
-                <button class="sb-resubmit-btn">${mi('edit', 16)} 重新編輯並提交</button>
+                ${state._rank ? `<div style="margin-top:8px;padding:6px 12px;border-radius:8px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#78350f;font-weight:700;font-size:13px;text-align:center;">🏆 排名第 ${state._rank} 名 · 加分 ${state._awarded || 0} 分</div>` : `<button class="sb-resubmit-btn">${mi('edit', 16)} 重新編輯並提交</button>`}
             </div>`;
 
         // 綁定重新提交按鈕
