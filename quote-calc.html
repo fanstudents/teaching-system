@@ -401,9 +401,8 @@ body{
       `<div class="curr-block"><div class="curr-time">${b.time}</div><div class="curr-title">${b.title}</div>${b.items.length?`<ul class="curr-items">${b.items.map(i=>`<li>${i}</li>`).join('')}</ul>`:''}</div>`
     ).join('');
 
-    const tags=['AI 企業內訓','Prompt Engineering','互動教學系統','數位轉型顧問','AI 簡報設計'].map(t=>
-      `<span style="padding:3px 10px;border-radius:5px;font-size:.62rem;font-weight:600;background:var(--accent-light);color:var(--accent-text)">${t}</span>`
-    ).join('');
+
+
 
     $('quotePreview').innerHTML=`
       <div class="qp-header">
@@ -434,19 +433,50 @@ body{
           <li>本報價單有效期限 30 天，逾期請重新確認</li>
         </ul></div>
 
-        <div class="qp-section-title">關於我們</div>
-        <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:12px">
-          <div style="width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;font-weight:900;flex-shrink:0">范</div>
+        <div class="qp-section-title">關於數位簡報室</div>
+        <div style="font-size:.78rem;color:var(--ink-2);line-height:1.9;margin-bottom:16px">
+          <p>原騰數位科技（數位簡報室）自 2014 年起深耕公開課程與企業培訓，主要營業項目涵蓋<b>數位行銷、AI 科技、數據分析</b>等專業領域，是市面上極少數針對垂直領域深耕的培訓單位。</p>
+          <p style="margin-top:8px">創辦人憑藉豐富的業界實戰經驗與獨家師資團隊，打造出台灣少數的<b>專業型培訓公司</b>——從課程設計到客製化服務，乃至真實企業導入的全鏈路服務，都擁有豐富的實戰經驗。</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
+          <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)"><div style="font-size:1.2rem;font-weight:900;color:var(--accent-text)">30+</div><div style="font-size:.62rem;color:var(--ink-3)">企業培訓實績</div></div>
+          <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)"><div style="font-size:1.2rem;font-weight:900;color:var(--accent-text)">10+</div><div style="font-size:.62rem;color:var(--ink-3)">年培訓經驗</div></div>
+          <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)"><div style="font-size:1.2rem;font-weight:900;color:var(--accent-text)">7+</div><div style="font-size:.62rem;color:var(--ink-3)">橫跨產業</div></div>
+          <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)"><div style="font-size:1.2rem;font-weight:900;color:var(--accent-text)">5,000+</div><div style="font-size:.62rem;color:var(--ink-3)">培訓學員</div></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;padding:18px;background:var(--bg);border-radius:12px;border:1px solid var(--border);margin-bottom:16px">
+          <img src="assets/images/fan-songpu.jpg" alt="樊松蒲" style="width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">
           <div style="flex:1;min-width:0">
-            <div style="font-size:.92rem;font-weight:800">范廷凡 Tingfan</div>
-            <div style="font-size:.72rem;color:var(--accent-text);font-weight:600;margin-bottom:6px">數位簡報室 Digital Presentation Lab 創辦人</div>
-            <div style="font-size:.74rem;color:var(--ink-2);line-height:1.8">專注於 AI 教學與企業數位轉型培訓，結合自主開發的互動教學系統，打造沉浸式學習體驗。曾為多家上市公司、政府機構與非營利組織提供 AI 應用內訓，累計培訓超過數千名學員。擅長將複雜的 AI 概念轉化為可落地的工作流程，讓每一位學員都能帶著即戰力回到崗位。</div>
-            <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">${tags}</div>
+            <div style="font-size:.88rem;font-weight:800">樊松蒲 <span style="font-size:.72rem;font-weight:500;color:var(--ink-3)">負責人 / 首席顧問</span></div>
+            <div style="font-size:.74rem;color:var(--ink-2);line-height:1.8;margin-top:4px">擁有超過十年的企業培訓與顧問實戰經驗，同時是資深 AI 企業顧問。專注於將 AI 技術轉化為企業可操作的解決方案，協助各行業導入 AI 應用提升營運效率。</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+              ${['汽車業','製造業','旅遊業','管顧業','餐飲業','電商行業','非營利組織','SaaS 軟體','物流業'].map(t=>
+                '<span style="padding:2px 8px;border-radius:5px;font-size:.58rem;font-weight:600;background:var(--accent-light);color:var(--accent-text)">'+t+'</span>'
+              ).join('')}
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="display:flex;gap:10px;padding:14px;border:1px solid var(--border);border-radius:10px;align-items:flex-start">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:2px">edit_note</span>
+            <div style="font-size:.72rem;color:var(--ink-2);line-height:1.7"><b style="color:var(--ink)">課程設計</b><br>每一堂課程皆由負責人親自設計，確保內容貼合產業需求與學員程度</div>
+          </div>
+          <div style="display:flex;gap:10px;padding:14px;border:1px solid var(--border);border-radius:10px;align-items:flex-start">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:2px">groups</span>
+            <div style="font-size:.72rem;color:var(--ink-2);line-height:1.7"><b style="color:var(--ink)">專業師資團隊</b><br>講師群皆具備企業實戰與 AI 工具應用經驗，不只教，更帶著你做</div>
+          </div>
+          <div style="display:flex;gap:10px;padding:14px;border:1px solid var(--border);border-radius:10px;align-items:flex-start">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:2px">hub</span>
+            <div style="font-size:.72rem;color:var(--ink-2);line-height:1.7"><b style="color:var(--ink)">全鏈路服務</b><br>從課程設計、客製化內容、到真實企業導入，提供完整的培訓解決方案</div>
+          </div>
+          <div style="display:flex;gap:10px;padding:14px;border:1px solid var(--border);border-radius:10px;align-items:flex-start">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent);flex-shrink:0;margin-top:2px">verified</span>
+            <div style="font-size:.72rem;color:var(--ink-2);line-height:1.7"><b style="color:var(--ink)">垂直領域深耕</b><br>專注於數位行銷、AI 科技、數據分析三大核心領域，提供最前沿的培訓內容</div>
           </div>
         </div>
       </div>
       <div class="qp-footer">
-        <div class="qp-footer-brand">📊 數位簡報室 Digital Presentation Lab</div>
+        <div class="qp-footer-brand">📊 數位簡報室 TBR.Digital</div>
         <div class="qp-footer-info">專注 AI 教學 × 企業內訓 × 互動簡報系統<br>讓每一場培訓都成為改變的起點</div>
       </div>`;
 
