@@ -361,8 +361,9 @@ body{
       return `<tr>
         <td><div>${c.icon} ${c.name}</div><div style="font-size:.72rem;color:var(--ink-3);margin-top:1px">${c.sub}</div><span class="row-badge ${c.badge}">${c.badgeText}</span></td>
         ${HOURS.map(h=>{
-          const total=rate*h,per=people>0?total/people:0,pop=h===7;
-          return `<td class="price-cell${pop?' popular':''}">${fmt(total)}<span class="per">每人 ≈ ${fmt(per)}</span></td>`;
+          const raw=rate*h,disc=h===14?0.9:1,total=Math.round(raw*disc),per=people>0?total/people:0,pop=h===7;
+          const discLabel=h===14?'<span class="per" style="color:var(--green);font-weight:600">9 折優惠</span>':'';
+          return `<td class="price-cell${pop?' popular':''}">${fmt(total)}${discLabel}<span class="per">每人 ≈ ${fmt(per)}</span></td>`;
         }).join('')}
       </tr>`;
     }).join('');
@@ -392,8 +393,9 @@ body{
     COURSES.forEach((c,i)=>{
       const rate=parseInt(rInputs[i].value)||0;
       priceRows+=HOURS.map(h=>{
-        const total=rate*h,per=people>0?total/people:0;
-        return `<tr><td><b>${c.icon} ${c.name}</b></td><td>${h} 小時（${h===4?'半天':h===7?'全天':'雙日'}）</td><td>鐘點 ${fmt(rate)} × ${h}h</td><td class="text-right"><b>${fmt(total)}</b><br><span style="font-size:.65rem;color:var(--green)">每人 ${fmt(per)}</span></td></tr>`;
+        const raw=rate*h,disc=h===14?0.9:1,total=Math.round(raw*disc),per=people>0?total/people:0;
+        const discNote=h===14?' <span style="font-size:.6rem;color:var(--green);font-weight:600">（9 折）</span>':'';
+        return `<tr><td><b>${c.icon} ${c.name}</b></td><td>${h} 小時（${h===4?'半天':h===7?'全天':'雙日'}）${discNote}</td><td>鐘點 ${fmt(rate)} × ${h}h${h===14?' × 0.9':''}</td><td class="text-right"><b>${fmt(total)}</b><br><span style="font-size:.65rem;color:var(--green)">每人 ${fmt(per)}</span></td></tr>`;
       }).join('');
     });
 
@@ -425,7 +427,9 @@ body{
         <div class="curr-timeline" style="margin-bottom:22px">${currHtml}</div>
 
         <div class="qp-notes"><div class="qp-notes-title">備註</div><ul>
-          <li>以上報價含講師費、教材費與互動系統授權，不含場地及交通費用</li>
+          <li>以上報價含講師費、教材費與互動系統授權，不含場地費用</li>
+          <li><b>14 小時（雙日）方案享 9 折優惠</b>，已反映於報價金額</li>
+          <li><b>車馬費與助教費另計</b>，依實際需求報價</li>
           <li>人數超過 30 人可加開梯次或依比例調整報價</li>
           <li>課程內容可依企業產業別、部門需求深度客製化</li>
           <li>如需課後輔導、延伸諮詢或長期合作方案，可另行報價</li>
