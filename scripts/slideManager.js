@@ -1152,7 +1152,7 @@ export class SlideManager {
 
                     // 立即載入 + 5 秒輪詢
                     const fetchAndRender = () => {
-                        import('./interactive/stateManager.js?v=20260604').then(({ stateManager }) => {
+                        import('./interactive/stateManager.js').then(({ stateManager }) => {
                             // ★ 使用與側欄相同的 effectiveSessionId（場次 UUID 優先）
                             const effectiveSessionId = stateManager.getSessionCode()
                                 || (window.app && window.app.sessionCode)
@@ -1617,7 +1617,7 @@ export class SlideManager {
                         (async () => {
                             try {
                                 const { db } = await import('./supabase.js');
-                                const { stateManager } = await import('./interactive/stateManager.js?v=20260604');
+                                const { stateManager } = await import('./interactive/stateManager.js');
                                 const sessionCode = stateManager.getSessionCode()
                                     || new URLSearchParams(location.search).get('code')
                                     || new URLSearchParams(location.search).get('session') || '';
@@ -2634,7 +2634,7 @@ export class SlideManager {
                 // 計分
                 const elementId = el.dataset?.id || el.closest('[data-id]')?.dataset.id || '';
                 if (elementId) {
-                    const { stateManager } = await import('./interactive/stateManager.js?v=20260604');
+                    const { stateManager } = await import('./interactive/stateManager.js');
                     const points = parseInt(el.dataset?.points) || 1;
                     await stateManager.save(elementId, {
                         type: 'copycard',

@@ -3851,7 +3851,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const sessionUUID = this.slideManager.currentSessionId || null;
             window._activeSessionUUID = sessionUUID;
             if (sessionUUID) {
-                import('./interactive/stateManager.js?v=20260604').then(({ stateManager }) => {
+                import('./interactive/stateManager.js').then(({ stateManager }) => {
                     stateManager.setSessionOverride(sessionUUID);
                     console.log('[Broadcast] session UUID:', sessionUUID);
                 }).catch(() => {});
@@ -3961,7 +3961,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         // ★ 解除場次級簡報綁定，回到專案模式
         this.slideManager.currentSessionId = null;
         window._activeSessionUUID = null;
-        import('./interactive/stateManager.js?v=20260604').then(({ stateManager }) => {
+        import('./interactive/stateManager.js').then(({ stateManager }) => {
             stateManager.setSessionOverride(null);
         }).catch(() => {});
         await this.slideManager.load();
@@ -3972,20 +3972,23 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this.stopLeaderboardPolling();
         if (!this._lbMode) this._lbMode = 'group';
 
-        // Tab 切換
-        document.querySelectorAll('#presLeaderboard .lb-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                this._lbMode = tab.dataset.lbMode;
-                document.querySelectorAll('#presLeaderboard .lb-tab').forEach(t => {
-                    const active = t.dataset.lbMode === this._lbMode;
-                    t.classList.toggle('active', active);
-                    t.style.background = active ? 'rgba(26,115,232,0.1)' : 'transparent';
-                    t.style.color = active ? '#1a73e8' : '#9ca3af';
+        // Tab 切換（只綁定一次）
+        if (!this._lbTabsBound) {
+            this._lbTabsBound = true;
+            document.querySelectorAll('#presLeaderboard .lb-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    this._lbMode = tab.dataset.lbMode;
+                    document.querySelectorAll('#presLeaderboard .lb-tab').forEach(t => {
+                        const active = t.dataset.lbMode === this._lbMode;
+                        t.classList.toggle('active', active);
+                        t.style.background = active ? 'rgba(26,115,232,0.1)' : 'transparent';
+                        t.style.color = active ? '#1a73e8' : '#9ca3af';
+                    });
+                    this._lbScoreCache = new Map();
+                    this.updateLeaderboard();
                 });
-                this._lbScoreCache = new Map();
-                this.updateLeaderboard();
             });
-        });
+        }
 
         this.updateLeaderboard(); // 立即更新一次
         this._lbTimer = setInterval(() => this.updateLeaderboard(), 5000);
@@ -3999,7 +4002,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         if (!this.sessionCode) return;
         if (!this._lbScoreCache) this._lbScoreCache = new Map();
         try {
-            const { stateManager } = await import('./interactive/stateManager.js?v=20260604');
+            const { stateManager } = await import('./interactive/stateManager.js');
             const effectiveSessionId = stateManager.getSessionCode() || this.sessionCode;
             const list = document.getElementById('lbList');
             if (!list) return;

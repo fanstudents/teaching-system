@@ -95,6 +95,10 @@ export const db = {
      * 用法: db.update('sessions', { current_slide: '3' }, { session_code: 'eq.ABC123' })
      */
     async update(table, values, filter = {}) {
+        if (!Object.keys(filter).length) {
+            console.error('[db.update] 拒絕空 filter — 會 PATCH 整表！');
+            return { data: null, error: { message: 'Empty filter rejected' } };
+        }
         const params = new URLSearchParams();
         for (const [col, val] of Object.entries(filter)) {
             params.set(col, val);
@@ -114,6 +118,10 @@ export const db = {
      * DELETE
      */
     async delete(table, filter = {}) {
+        if (!Object.keys(filter).length) {
+            console.error('[db.delete] 拒絕空 filter — 會 DELETE 整表！');
+            return { data: null, error: { message: 'Empty filter rejected' } };
+        }
         const params = new URLSearchParams();
         for (const [col, val] of Object.entries(filter)) {
             params.set(col, val);

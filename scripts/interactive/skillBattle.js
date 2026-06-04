@@ -519,9 +519,12 @@ export class SkillBattleGame {
                 });
 
                 const CONCURRENCY = 3;
+                let doneCount = 0;
                 for (let i = 0; i < pending.length; i += CONCURRENCY) {
                     const batch = pending.slice(i, i + CONCURRENCY);
                     await Promise.all(batch.map(s => this._executeOne(s.id, element, logEl)));
+                    doneCount = Math.min(i + CONCURRENCY, pending.length);
+                    execAllBtn.innerHTML = `${mi('hourglass_top', 16)} ${doneCount}/${pending.length} 已完成`;
                     await loadSubmissions();
                 }
 

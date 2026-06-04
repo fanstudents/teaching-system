@@ -121,9 +121,13 @@ class InteractionState {
                 if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
 
                 const { awarded_points, max_points, _isRetry, ...dbRecord } = record;
-                await db.insert('submissions', dbRecord, {
+                const { error } = await db.insert('submissions', dbRecord, {
                     onConflict: 'session_id,element_id,student_email'
                 });
+                if (error) {
+                    console.warn(`[stateManager] insert error:`, error);
+                    throw new Error(error.message || 'DB insert failed');
+                }
                 saved = true;
 
                 // 通知儀表板即時更新
@@ -231,7 +235,7 @@ class InteractionState {
         try {
             const raw = await db.select('submissions', {
                 filter: {
-                    session_id: `eq.${sessionId || ''}`,
+                    session_id: sessionId ? `eq.${sessionId}` : 'is.null',
                     element_id: `eq.${elementId}`,
                     student_email: `eq.${email}`,
                 },
