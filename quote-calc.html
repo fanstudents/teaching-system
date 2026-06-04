@@ -199,10 +199,10 @@ body{
 @media print{
   html{font-size:11pt}
   body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  @page{size:A4;margin:30mm 21mm}
+  @page{size:A4;margin:0}
 
   /* hide everything except preview */
-  .page{max-width:none;padding:0;display:block!important}
+  .page{max-width:none;padding:30mm 21mm!important;display:block!important}
   .page.locked{display:block!important}
   .auth-gate,.header,.card,.price-table-wrap,.actions,.site-footer{display:none!important}
   .preview-section{display:block!important}
