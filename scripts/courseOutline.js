@@ -2092,10 +2092,10 @@ async function saveOutlineData() {
         if (outlineVersions.length > 0) {
             outlineVersions[activeVersionIdx].data = outline_data;
         }
-        // outline_data field always stores version 0 (default for student view)
+        // outline_data field stores the active version (shown to student/client view)
         // outline_versions stores ALL versions with their data
         const payload = {
-            outline_data: outlineVersions[0]?.data || outline_data,
+            outline_data: outlineVersions[activeVersionIdx]?.data || outline_data,
             active_version_idx: activeVersionIdx
         };
         if (outlineVersions.length > 0) {
