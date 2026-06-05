@@ -540,6 +540,34 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                     } catch {}
                 }
             });
+
+            // 補查 groupPick submissions 取得組別名稱（webProject state 通常沒存 groupName）
+            const missingNames = [...groupMap.entries()].filter(([k, v]) => k && !v.name);
+            if (missingNames.length && sessionCode) {
+                try {
+                    const { data: gpSubs } = await db.select('submissions', {
+                        filter: { type: 'eq.groupPick', session_id: `eq.${sessionCode}` },
+                        select: 'content,state', limit: 200
+                    });
+                    if (gpSubs?.length) {
+                        const nameMap = new Map();
+                        gpSubs.forEach(r => {
+                            const gIdx = r.content; // e.g. "8"
+                            if (!gIdx || nameMap.has(gIdx)) return;
+                            try {
+                                const st = typeof r.state === 'string' ? JSON.parse(r.state) : (r.state || {});
+                                if (st.groupName) nameMap.set(gIdx, st.groupName);
+                            } catch {}
+                        });
+                        for (const [gKey, gData] of groupMap) {
+                            if (gKey && !gData.name && nameMap.has(gKey)) {
+                                gData.name = nameMap.get(gKey);
+                            }
+                        }
+                    }
+                } catch {}
+            }
+
             const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
 
             const renderCard = (s, i) => {
