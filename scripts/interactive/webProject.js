@@ -438,12 +438,13 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                     if (data?.length) {
                         const sub = data[0];
                         let st = {}; try { st = typeof sub.state === 'string' ? JSON.parse(sub.state) : (sub.state || {}); } catch {}
-                        if (st.mode === 'api' && sub.content) {
+                        if (sub.content) {
+                            console.log('[WebProject] API poll detected submission:', sub.id, 'mode:', st.mode);
                             clearInterval(apiPollId);
-                            showPreview(sub.content, 'api');
+                            showPreview(sub.content, st.mode || 'api');
                         }
                     }
-                } catch {}
+                } catch (e) { console.warn('[WebProject] poll error:', e); }
             };
             const apiPollId = setInterval(pollApi, 5000);
             this._intervals.set(elementId + '_api_poll', apiPollId);
