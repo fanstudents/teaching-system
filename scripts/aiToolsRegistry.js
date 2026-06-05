@@ -44,6 +44,13 @@ export const AI_TOOLS_REGISTRY = [
     { name: 'Figma', slug: 'figma', logo: 'https://static.figma.com/app/icon/1/touch-76.png', url: 'https://figma.com', category: 'design' },
     { name: 'Replit', slug: 'replit', logo: 'https://replit.com/public/images/sm-thumbnail.png', url: 'https://replit.com', category: 'coding' },
     { name: 'Windsurf', slug: 'windsurf', logo: 'https://windsurf.com/apple-touch-icon.png', url: 'https://windsurf.com', category: 'coding' },
+    { name: 'n8n', slug: 'n8n', logo: 'https://n8n.io/favicon.ico', url: 'https://n8n.io', category: 'automation' },
+
+    { name: 'Whisper', slug: 'whisper', logo: 'https://cdn.oaistatic.com/assets/favicon-o20zuaf7.svg', url: 'https://openai.com/research/whisper', category: 'audio' },
+    { name: 'Grok', slug: 'grok', logo: 'https://grok.com/apple-touch-icon.png', url: 'https://grok.com', category: 'llm' },
+    { name: 'DeepSeek', slug: 'deepseek', logo: 'https://chat.deepseek.com/favicon.ico', url: 'https://chat.deepseek.com', category: 'llm' },
+    { name: 'Flux', slug: 'flux', logo: 'https://flux1.ai/favicon.ico', url: 'https://flux1.ai', category: 'image' },
+    { name: 'DALL·E', slug: 'dall-e-dot', logo: 'https://cdn.oaistatic.com/assets/favicon-o20zuaf7.svg', url: 'https://openai.com/dall-e', category: 'image' },
 ];
 
 // Build lookup map (name → logo) for fast access
