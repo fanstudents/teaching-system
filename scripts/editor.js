@@ -1841,6 +1841,28 @@ export class Editor {
             </div>
         `;
 
+        // ★ 可見性設定（所有元素通用）
+        const _vt = elementData.visibleTo || 'all';
+        html += `
+            <div class="property-section">
+                <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                    <span class="material-symbols-outlined" style="font-size:16px;color:#6366f1;">visibility</span>
+                    顯示對象
+                </div>
+                <div class="property-row">
+                    <label>可見</label>
+                    <select id="propVisibleTo" style="flex:1;padding:4px 6px;border:1px solid var(--border-light);border-radius:6px;font-size:12px;background:var(--bg-primary);color:var(--text-primary);">
+                        <option value="all" ${_vt === 'all' ? 'selected' : ''}>全部（預設）</option>
+                        <option value="presenter" ${_vt === 'presenter' ? 'selected' : ''}>僅講師端</option>
+                        <option value="student" ${_vt === 'student' ? 'selected' : ''}>僅學員端</option>
+                    </select>
+                </div>
+                <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;line-height:1.4;">
+                    講師投影幕與學員手機可看到不同內容
+                </div>
+            </div>
+        `;
+
         // 圖層與刪除
         html += `
             <div class="property-section">
@@ -2062,6 +2084,18 @@ export class Editor {
             animOrderSelect.addEventListener('change', () => {
                 const val = parseInt(animOrderSelect.value);
                 this.slideManager.updateElement(elementId, { animOrder: val });
+                this.slideManager.renderCurrentSlide();
+                this.slideManager.renderThumbnails();
+                this.selectElementById(elementId);
+            });
+        }
+
+        // ★ 可見性
+        const visibleToSelect = document.getElementById('propVisibleTo');
+        if (visibleToSelect) {
+            visibleToSelect.addEventListener('change', () => {
+                const val = visibleToSelect.value;
+                this.slideManager.updateElement(elementId, { visibleTo: val === 'all' ? undefined : val });
                 this.slideManager.renderCurrentSlide();
                 this.slideManager.renderThumbnails();
                 this.selectElementById(elementId);

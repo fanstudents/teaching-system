@@ -131,6 +131,10 @@ export class DragDrop {
                 items.push({ icon: 'workspaces', label: '解散群組', shortcut: '⇧⌘G', action: 'ungroup' });
             }
             if (isMulti || hasGroup) items.push('---');
+            items.push('---');
+            const _vt = elData?.visibleTo || 'all';
+            const _vtLabel = { all: '全部可見', presenter: '僅講師可見', student: '僅學員可見' }[_vt];
+            items.push({ icon: 'visibility', label: `👁 ${_vtLabel}`, action: 'cycleVisibility' });
             items.push({ icon: 'delete', label: '刪除', shortcut: '⌫', action: 'delete', danger: true });
         } else {
             // 空白區域右鍵
@@ -292,6 +296,16 @@ export class DragDrop {
             case 'selectAll': {
                 const ev = new KeyboardEvent('keydown', { key: 'a', metaKey: true, bubbles: true });
                 document.dispatchEvent(ev);
+                break;
+            }
+            case 'cycleVisibility': {
+                const elData = selectedId ? slide.elements.find(d => d.id === selectedId) : null;
+                if (!elData) break;
+                const current = elData.visibleTo || 'all';
+                const next = current === 'all' ? 'presenter' : current === 'presenter' ? 'student' : 'all';
+                this.slideManager.updateElement(elData.id, { visibleTo: next });
+                this.slideManager.saveCurrentSlide();
+                this.slideManager.renderCurrentSlide();
                 break;
             }
         }

@@ -6016,6 +6016,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         this._maxBuildStep = maxStep;
 
         slide.elements.forEach(element => {
+                if (element.visibleTo === 'student') return; // 講師端跳過 student-only 元素
             const el = this.slideManager.createElementNode(element);
             if (el) {
                 el.classList.add('presentation-element');

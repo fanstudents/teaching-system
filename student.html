@@ -1732,6 +1732,7 @@
 
                 // 元素
                 (slide.elements || []).forEach(element => {
+                    if (element.visibleTo === 'presenter') return; // 學員端跳過 presenter-only 元素
                     const el = createElementNode(element);
                     if (el) {
                         el.classList.add('presentation-element');

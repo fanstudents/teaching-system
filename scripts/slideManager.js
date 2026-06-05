@@ -932,6 +932,19 @@ export class SlideManager {
         el.dataset.id = element.id;
         el.dataset.type = element.type;
 
+        // ★ 可見性徽章（編輯器中提示）
+        if (element.visibleTo && element.visibleTo !== 'all') {
+            el.dataset.visibleTo = element.visibleTo;
+            const badge = document.createElement('div');
+            badge.className = 'visibility-badge';
+            badge.innerHTML = element.visibleTo === 'presenter'
+                ? '<span class="material-symbols-outlined" style="font-size:11px;">podium</span>僅講師'
+                : '<span class="material-symbols-outlined" style="font-size:11px;">person</span>僅學員';
+            badge.style.cssText = 'position:absolute;top:-8px;right:-8px;background:rgba(99,102,241,0.92);color:#fff;font-size:10px;padding:1px 6px;border-radius:4px;z-index:10;display:flex;align-items:center;gap:2px;pointer-events:none;white-space:nowrap;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.15);line-height:18px;';
+            el.appendChild(badge);
+            el.style.outline = '2px dashed rgba(99,102,241,0.4)';
+        }
+
         el.style.left = `${element.x}px`;
         el.style.top = `${element.y}px`;
         el.style.width = `${element.width}px`;
