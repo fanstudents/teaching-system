@@ -159,6 +159,7 @@ export class GroupPickGame {
         const groupNames = element.groupNames || Array.from({length: groupCount}, (_, i) => `第 ${i+1} 組`);
         const groupColors = element.groupColors || GROUP_COLORS.slice(0, groupCount);
         const pos = element.groupPositions || defaultPositions(groupCount);
+        const maxPerGroup = element.maxPerGroup || 0; // 0 = 不限
 
         let myGroup = user.group || null;
 
@@ -177,10 +178,11 @@ export class GroupPickGame {
                     const color = groupColors[i] || GROUP_COLORS[i];
                     const sel = myGroup === idx;
                     const cnt = counts[idx] || 0;
-                    return `<button class="gp-pos-btn ${sel ? 'selected' : ''}" data-group="${idx}"
-                        style="--gp-color:${color};left:${p.x}%;top:${p.y}%">
+                    const isFull = maxPerGroup > 0 && cnt >= maxPerGroup && !sel;
+                    return `<button class="gp-pos-btn ${sel ? 'selected' : ''} ${isFull ? 'gp-full' : ''}" data-group="${idx}"
+                        style="--gp-color:${color};left:${p.x}%;top:${p.y}%" ${isFull ? 'disabled' : ''}>
                         <div class="gp-pos-btn-name">${esc(groupNames[i])}</div>
-                        <div class="gp-pos-btn-count">${cnt} 人</div>
+                        <div class="gp-pos-btn-count">${isFull ? '已滿' : cnt + ' 人'}${maxPerGroup > 0 ? ' / ' + maxPerGroup : ''}</div>
                         ${sel ? `<div class="gp-pos-btn-check">${mi('check_circle', 16)}</div>` : ''}
                     </button>`;
                 }).join('')}
@@ -191,7 +193,7 @@ export class GroupPickGame {
                 </div>` : ''}
             </div>`;
 
-            el.querySelectorAll('.gp-pos-btn').forEach(btn => {
+            el.querySelectorAll('.gp-pos-btn:not([disabled])').forEach(btn => {
                 btn.addEventListener('click', () => selectGroup(btn.dataset.group));
             });
         };
@@ -200,6 +202,23 @@ export class GroupPickGame {
             // 防止快速連點
             if (this._selectingGroup) return;
             this._selectingGroup = true;
+
+            // ★ 人數上限檢查
+            if (maxPerGroup > 0 && groupIdx !== myGroup) {
+                try {
+                    const { data: gpRows } = await db.select('submissions', {
+                        filter: { session_id: `eq.${sessionCode}`, type: 'eq.groupPick', content: `eq.${groupIdx}` },
+                        select: 'student_email',
+                        limit: maxPerGroup + 1
+                    });
+                    const currentCount = (gpRows || []).filter(r => r.student_email !== studentEmail).length;
+                    if (currentCount >= maxPerGroup) {
+                        this._selectingGroup = false;
+                        alert(`此組別已滿（上限 ${maxPerGroup} 人），請選擇其他組別`);
+                        return;
+                    }
+                } catch { /* proceed */ }
+            }
 
             myGroup = groupIdx;
             user.group = groupIdx;
@@ -527,14 +546,15 @@ export class GroupPickGame {
                 const topSeats = seatMembers.slice(0, 3);
                 const bottomSeats = [seatMembers[5], seatMembers[4], seatMembers[3]];
 
-                const seatHtml = (m) => {
+                const seatHtml = (m, gIdx) => {
                     if (!m) return `<div class="gp-seat" style="width:${seatSize + 12}px;flex-shrink:0;">
                         <div class="gp-seat-avatar" style="width:${seatSize}px;height:${seatSize}px;border:1.5px dashed ${color}35;color:${color}40;">
                             ${mi('person', Math.floor(seatSize * 0.42))}
                         </div>
                         <div class="gp-seat-name" style="color:transparent;font-size:${nameFontSize}px;">&nbsp;</div>
                     </div>`;
-                    return `<div class="gp-seat" style="width:${seatSize + 12}px;flex-shrink:0;animation:gpSeatPop .3s ease;">
+                    return `<div class="gp-seat gp-seat-filled" data-email="${esc(m.email)}" data-group="${gIdx}" data-name="${esc(m.name)}"
+                        style="width:${seatSize + 12}px;flex-shrink:0;animation:gpSeatPop .3s ease;cursor:pointer;" title="點擊移除 ${esc(m.name)}">
                         <div class="gp-seat-avatar" style="width:${seatSize}px;height:${seatSize}px;background:${color};color:#fff;box-shadow:0 2px 6px ${color}40;font-size:${Math.floor(seatSize * 0.38)}px;">
                             ${esc(m.name.charAt(0))}
                         </div>
@@ -548,7 +568,7 @@ export class GroupPickGame {
                     display:flex;flex-direction:column;align-items:center;padding:10px 10px 8px;
                     background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid ${color}20;">
                     <div style="display:flex;gap:6px;justify-content:center;margin-bottom:5px;height:${seatSize + nameFontSize + 14}px;align-items:flex-start;">
-                        ${topSeats.map(seatHtml).join('')}
+                        ${topSeats.map(m => seatHtml(m, idx)).join('')}
                     </div>
                     <div style="background:linear-gradient(135deg, ${color}10, ${color}20);
                         border:2px solid ${color}30;border-radius:14px;
@@ -560,7 +580,7 @@ export class GroupPickGame {
                         </div>
                     </div>
                     <div style="display:flex;gap:6px;justify-content:center;margin-top:5px;height:${seatSize + nameFontSize + 14}px;align-items:flex-start;">
-                        ${bottomSeats.map(seatHtml).join('')}
+                        ${bottomSeats.map(m => seatHtml(m, idx)).join('')}
                     </div>
                     ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;padding-top:3px;border-top:1px dashed #e2e8f0;width:100%;">
                         ${overflow.map(m => `<span style="font-size:8px;color:#64748b;background:#f8fafc;padding:1px 5px;border-radius:6px;">${esc(m.name)}</span>`).join('')}
@@ -569,6 +589,37 @@ export class GroupPickGame {
             }).join('');
 
             enableDrag();
+
+            // ★ 講師點擊座位移除學員
+            wallEl.querySelectorAll('.gp-seat-filled').forEach(seat => {
+                seat.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const email = seat.dataset.email;
+                    const name = seat.dataset.name;
+                    const group = seat.dataset.group;
+                    if (!email || !confirm(`確定要將「${name}」從第 ${group} 組移除嗎？\n移除後該學員需要重新選組。`)) return;
+
+                    try {
+                        // 刪除 groupPick submission
+                        await db.delete('submissions', {
+                            session_id: `eq.${sessionCode}`,
+                            student_email: `eq.${email}`,
+                            type: 'eq.groupPick'
+                        });
+                        // 清除 student_group
+                        await db.update('submissions',
+                            { student_group: '' },
+                            { student_email: `eq.${email}`, session_id: `eq.${sessionCode}` }
+                        ).catch(() => {});
+                        console.log(`[groupPick] removed ${name} (${email}) from group ${group}`);
+                        lastHash = '';
+                        load();
+                    } catch (err) {
+                        console.warn('[groupPick] remove member failed:', err);
+                        alert('移除失敗，請重試');
+                    }
+                });
+            });
         };
 
         await load();
