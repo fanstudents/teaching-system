@@ -1505,8 +1505,18 @@
                             slidesCache = slides;
 
                             // ★ 遲到學員：檢查是否有分組但尚未選組
-                            const _gpElement = slides.flatMap(s => (s.elements || []))
+                            // 優先從 project.slides_data（最新版）取 groupPick，避免場次快照過期
+                            let _gpElement = slides.flatMap(s => (s.elements || []))
                                 .find(e => e.type === 'groupPick');
+                            try {
+                                const _projSlides = project?.slides_data;
+                                if (_projSlides) {
+                                    const _projData = typeof _projSlides === 'string' ? JSON.parse(_projSlides) : _projSlides;
+                                    const _freshGp = (_projData.slides || []).flatMap(s => (s.elements || []))
+                                        .find(e => e.type === 'groupPick');
+                                    if (_freshGp) _gpElement = _freshGp;
+                                }
+                            } catch { /* use session version */ }
                             let _hwUser = {};
                             try { _hwUser = JSON.parse(sessionStorage.getItem('homework_user') || '{}'); } catch {}
 
