@@ -1505,18 +1505,25 @@
                             slidesCache = slides;
 
                             // ★ 遲到學員：檢查是否有分組但尚未選組
-                            // 優先從 project.slides_data（最新版）取 groupPick，避免場次快照過期
+                            // 即時從 DB 查最新的 project.slides_data（不用快取，確保組別是最新）
                             let _gpElement = slides.flatMap(s => (s.elements || []))
                                 .find(e => e.type === 'groupPick');
                             try {
-                                const _projSlides = project?.slides_data;
-                                if (_projSlides) {
-                                    const _projData = typeof _projSlides === 'string' ? JSON.parse(_projSlides) : _projSlides;
-                                    const _freshGp = (_projData.slides || []).flatMap(s => (s.elements || []))
-                                        .find(e => e.type === 'groupPick');
-                                    if (_freshGp) _gpElement = _freshGp;
+                                if (project?.id) {
+                                    const { data: _freshProj } = await db.select('projects', {
+                                        filter: { id: `eq.${project.id}` },
+                                        select: 'slides_data',
+                                        limit: 1
+                                    });
+                                    const _projSlides = _freshProj?.[0]?.slides_data;
+                                    if (_projSlides) {
+                                        const _projData = typeof _projSlides === 'string' ? JSON.parse(_projSlides) : _projSlides;
+                                        const _freshGp = (_projData.slides || []).flatMap(s => (s.elements || []))
+                                            .find(e => e.type === 'groupPick');
+                                        if (_freshGp) _gpElement = _freshGp;
+                                    }
                                 }
-                            } catch { /* use session version */ }
+                            } catch (e) { console.warn('[GroupCheck] fresh fetch failed:', e); }
                             let _hwUser = {};
                             try { _hwUser = JSON.parse(sessionStorage.getItem('homework_user') || '{}'); } catch {}
 
