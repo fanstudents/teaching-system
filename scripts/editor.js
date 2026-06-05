@@ -649,6 +649,19 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
+    /**
+     * 新增排行榜元件
+     */
+    addLeaderboard() {
+        this.addElement({
+            type: 'leaderboard',
+            lbMode: 'group',
+            lbTopN: 10,
+            width: 800,
+            height: 500,
+        });
+    }
+
 
     /**
      * 新增可複製文字卡片
@@ -1581,6 +1594,32 @@ export class Editor {
                     </div>
                 </div>
             `;
+        } else if (type === 'leaderboard') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#f59e0b;">leaderboard</span>
+                        排行榜設定
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">預設模式</label>
+                        <select id="lbModeSelect" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;">
+                            <option value="group" ${elementData.lbMode==='group'?'selected':''}>🏆 組別排行</option>
+                            <option value="personal" ${elementData.lbMode==='personal'?'selected':''}>👤 個人排行</option>
+                            <option value="both" ${elementData.lbMode==='both'?'selected':''}>📊 雙欄模式</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">顯示名次</label>
+                        <select id="lbTopN" style="width:100%;padding:6px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;">
+                            <option value="3" ${elementData.lbTopN==3?'selected':''}>Top 3</option>
+                            <option value="5" ${elementData.lbTopN==5?'selected':''}>Top 5</option>
+                            <option value="10" ${elementData.lbTopN==10?'selected':''}>Top 10</option>
+                            <option value="0" ${elementData.lbTopN==0?'selected':''}>全部</option>
+                        </select>
+                    </div>
+                </div>
+            `;
         } else if (type === 'groupPick') {
             const gpCount = elementData.groupCount || 4;
             const gpNames = elementData.groupNames || Array.from({length: gpCount}, (_, i) => `第 ${i+1} 組`);
@@ -1607,8 +1646,15 @@ export class Editor {
                             `).join('')}
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">每組人數上限 <span id="gpMaxDisplay" style="color:#7c3aed;font-weight:700;">${elementData.maxPerGroup || '不限'}</span></label>
+                        <input type="range" id="gpMaxPerGroup" min="0" max="10" value="${elementData.maxPerGroup || 0}"
+                            style="width:100%;accent-color:#7c3aed;">
+                        <div style="font-size:10px;color:#94a3b8;margin-top:2px;">0 = 不限制人數</div>
+                    </div>
                     <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
-                        在預覽中點「排列座位」可拖曳排列組別位置，模擬教室桌位。
+                        在預覽中點「排列座位」可拖曳排列組別位置，模擬教室桌位。<br>
+                        💡 講師端簡報中，點擊有人的座位可移除該學員的組別。
                     </div>
                 </div>
             `;
@@ -3107,6 +3153,37 @@ ${truncated}
                     this.slideManager.renderCurrentSlide();
                 });
             });
+            const gpMaxSlider = document.getElementById('gpMaxPerGroup');
+            const gpMaxDisplay = document.getElementById('gpMaxDisplay');
+            if (gpMaxSlider) {
+                gpMaxSlider.addEventListener('input', () => {
+                    const val = parseInt(gpMaxSlider.value);
+                    gpMaxDisplay.textContent = val || '不限';
+                    this.slideManager.updateElement(elementId, { maxPerGroup: val });
+                });
+            }
+        }
+
+        // ── leaderboard bindings ──
+        if (elementData.type === 'leaderboard') {
+            const lbModeSelect = document.getElementById('lbModeSelect');
+            if (lbModeSelect) {
+                lbModeSelect.addEventListener('change', () => {
+                    elementData.lbMode = lbModeSelect.value;
+                    window.dispatchEvent(new Event('slideContentChanged'));
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
+            const lbTopN = document.getElementById('lbTopN');
+            if (lbTopN) {
+                lbTopN.addEventListener('change', () => {
+                    elementData.lbTopN = parseInt(lbTopN.value) || 10;
+                    window.dispatchEvent(new Event('slideContentChanged'));
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
         }
 
         // Skill Battle 事件

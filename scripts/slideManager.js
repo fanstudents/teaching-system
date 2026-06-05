@@ -1145,51 +1145,15 @@ export class SlideManager {
             }
 
             case 'leaderboard': {
-                el.classList.add('leaderboard-element');
+                el.classList.add('interactive-element', 'leaderboard-element');
                 el.style.overflow = 'hidden';
-                const title = element.lbTitle || '🏆 排行榜';
-                // 判斷是否在廣播模式（不用 closest，因為此時元素尚未插入 DOM）
-                const hasSession = !!window.app?.sessionCode;
-                const placeholder = [
-                    { name: '冠軍同學', totalPoints: 850 },
-                    { name: '亞軍同學', totalPoints: 720 },
-                    { name: '季軍同學', totalPoints: 680 },
-                    { name: '同學 D', totalPoints: 550 },
-                    { name: '同學 E', totalPoints: 420 },
-                ];
-                this._renderLeaderboardContent(el, title, hasSession ? [] : placeholder);
-
-                if (hasSession) {
-                    const projectId = this.currentProjectId || null;
-                    const self = this;
-
-                    // 立即載入 + 5 秒輪詢
-                    const fetchAndRender = () => {
-                        import('./interactive/stateManager.js').then(({ stateManager }) => {
-                            // ★ 使用與側欄相同的 effectiveSessionId（場次 UUID 優先）
-                            const effectiveSessionId = stateManager.getSessionCode()
-                                || (window.app && window.app.sessionCode)
-                                || new URLSearchParams(location.search).get('code')
-                                || new URLSearchParams(location.search).get('session')
-                                || '';
-                            stateManager.getLeaderboard(effectiveSessionId, projectId).then(data => {
-                                if (data.length > 0) self._renderLeaderboardContent(el, title, data);
-                            });
-                        });
-                    };
-
-                    fetchAndRender();
-                    const lbTimer = setInterval(fetchAndRender, 5000);
-
-                    // 清理：當元素被移除時停止輪詢
-                    const observer = new MutationObserver(() => {
-                        if (!document.contains(el)) {
-                            clearInterval(lbTimer);
-                            observer.disconnect();
-                        }
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                    import('./interactive/leaderboard.js').then(({ LeaderboardGame }) => {
+                        if (isLive) new LeaderboardGame().render(el, element);
+                        else new LeaderboardGame().renderPreview(el, element);
                     });
-                    observer.observe(document.body, { childList: true, subtree: true });
-                }
+                });
                 break;
             }
 

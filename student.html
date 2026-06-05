@@ -1556,6 +1556,22 @@
                                         const gpNames = _gpElement.groupNames || Array.from({length: gpCount}, (_, i) => `第 ${i+1} 組`);
                                         const gpColors = Array.from({length: gpCount}, (_, i) => (_gpElement.groupColors?.[i]) || ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'][i % 10]);
                                         const gpCols = gpCount <= 4 ? gpCount : Math.ceil(gpCount / 2);
+                                        const gpMax = _gpElement.maxPerGroup || 0;
+
+                                        // 查各組目前人數
+                                        let gpCounts = {};
+                                        if (gpMax > 0) {
+                                            try {
+                                                const { stateManager: _sm } = await import('./scripts/interactive/stateManager.js');
+                                                const _sid = _sm.getSessionCode();
+                                                const { data: _gpSubs } = await db.select('submissions', {
+                                                    filter: { session_id: `eq.${_sid}`, type: 'eq.groupPick' },
+                                                    select: 'content',
+                                                    limit: 500
+                                                });
+                                                (_gpSubs || []).forEach(r => { gpCounts[r.content] = (gpCounts[r.content] || 0) + 1; });
+                                            } catch {}
+                                        }
 
                                         const overlay = document.createElement('div');
                                         overlay.id = 'gpForceOverlay';
@@ -1565,7 +1581,8 @@
                                                 @keyframes gpOverlayIn { from { opacity:0; } to { opacity:1; } }
                                                 @keyframes gpCardPop { from { opacity:0;transform:translateY(20px) scale(.9); } to { opacity:1;transform:translateY(0) scale(1); } }
                                                 .gp-force-card { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 16px;border-radius:16px;border:2.5px solid;cursor:pointer;transition:all .25s;background:rgba(255,255,255,.06);backdrop-filter:blur(8px);animation:gpCardPop .4s ease both; }
-                                                .gp-force-card:hover { transform:translateY(-4px) scale(1.05);box-shadow:0 12px 40px rgba(0,0,0,.3); }
+                                                .gp-force-card:hover:not(.gp-force-full) { transform:translateY(-4px) scale(1.05);box-shadow:0 12px 40px rgba(0,0,0,.3); }
+                                                .gp-force-full { opacity:0.35;cursor:not-allowed;filter:grayscale(.5); }
                                             </style>
                                             <div style="display:flex;align-items:center;gap:10px;">
                                                 <span class="material-symbols-outlined" style="font-size:32px;color:#60a5fa;">groups</span>
@@ -1573,16 +1590,19 @@
                                             </div>
                                             <div style="font-size:0.85rem;color:#94a3b8;">選擇組別後才能進入簡報</div>
                                             <div style="display:grid;grid-template-columns:repeat(${gpCols}, 1fr);gap:14px;padding:8px;width:min(90vw, ${gpCols * 160}px);">
-                                                ${gpNames.map((name, i) => `
-                                                    <div class="gp-force-card" data-gidx="${i+1}" style="border-color:${gpColors[i]};animation-delay:${i*0.08}s;">
+                                                ${gpNames.map((name, i) => {
+                                                    const cnt = gpCounts[String(i+1)] || 0;
+                                                    const isFull = gpMax > 0 && cnt >= gpMax;
+                                                    return `<div class="gp-force-card ${isFull ? 'gp-force-full' : ''}" data-gidx="${i+1}" style="border-color:${gpColors[i]};animation-delay:${i*0.08}s;">
                                                         <span style="font-size:1.2rem;font-weight:900;color:${gpColors[i]};text-align:center;line-height:1.3;">${name.replace(/[<>&"]/g, '')}</span>
-                                                    </div>
-                                                `).join('')}
+                                                        ${isFull ? '<span style="font-size:.75rem;color:#94a3b8;">已滿</span>' : (gpMax > 0 ? `<span style="font-size:.7rem;color:#64748b;">${cnt}/${gpMax}</span>` : '')}
+                                                    </div>`;
+                                                }).join('')}
                                             </div>
                                         `;
                                         document.body.appendChild(overlay);
 
-                                        overlay.querySelectorAll('.gp-force-card').forEach(card => {
+                                        overlay.querySelectorAll('.gp-force-card:not(.gp-force-full)').forEach(card => {
                                             card.addEventListener('click', async () => {
                                                 const gIdx = card.dataset.gidx;
                                                 _hwUser.group = gIdx;
@@ -2137,39 +2157,11 @@
                 }
 
                 case 'leaderboard': {
-                    el.classList.add('leaderboard-element');
+                    el.classList.add('interactive-element', 'leaderboard-element');
                     el.style.overflow = 'hidden';
-                    const lbTitle = element.lbTitle || '🏆 排行榜';
-                    // 先用 placeholder，然後載入真實資料
-                    const medals = ['🥇', '🥈', '🥉'];
-                    const pColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-                    const pHeights = [140, 110, 90];
-                    const pOrder = [1, 0, 2];
-                    const renderLB = (data) => {
-                        const top3 = data.slice(0, 3);
-                        const rest = data.slice(3, 10);
-                        let podium = '<div class="lb-podium">';
-                        pOrder.forEach(rank => {
-                            const s = top3[rank];
-                            if (!s) { podium += '<div class="lb-podium-slot lb-empty-slot"></div>'; return; }
-                            const nm = s.name?.length > 6 ? s.name.slice(0, 6) + '…' : (s.name || '—');
-                            podium += `<div class="lb-podium-slot"><div class="lb-podium-avatar" style="border-color:${pColors[rank]}"><span class="lb-medal">${medals[rank]}</span></div><div class="lb-podium-name">${nm}</div><div class="lb-podium-pts">${s.totalPoints} 分</div><div class="lb-podium-bar" style="height:${pHeights[rank]}px;background:linear-gradient(135deg,${pColors[rank]}40,${pColors[rank]}20);border-top:3px solid ${pColors[rank]};"><span class="lb-podium-rank">${rank + 1}</span></div></div>`;
-                        });
-                        podium += '</div>';
-                        let list = '';
-                        if (rest.length > 0) {
-                            list = '<div class="lb-rest">' + rest.map((s, i) => `<div class="lb-row"><span class="lb-row-rank">${i + 4}</span><span class="lb-row-name">${s.name || '—'}</span><span class="lb-row-pts">${s.totalPoints} 分</span></div>`).join('') + '</div>';
-                        }
-                        el.innerHTML = `<div class="lb-widget"><div class="lb-widget-title"><span class="lb-trophy">🏆</span><span>${lbTitle}</span></div>${podium}${list}${data.length === 0 ? '<div class="lb-no-data">尚無排行資料</div>' : ''}</div>`;
-                    };
-                    renderLB([]);
-                    // 載入真實資料（使用 session UUID，與側欄排行榜一致）
-                    import('./scripts/interactive/stateManager.js').then(({ stateManager }) => {
-                        const sc = stateManager.getSessionCode() || new URLSearchParams(location.search).get('code') || '';
-                        if (sc) {
-                            stateManager.getLeaderboard(sc).then(d => renderLB(d));
-                        }
-                    }).catch(() => { });
+                    import('./scripts/interactive/leaderboard.js').then(({ LeaderboardGame }) => {
+                        new LeaderboardGame().render(el, element);
+                    });
                     break;
                 }
 
