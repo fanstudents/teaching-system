@@ -4158,6 +4158,24 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             const groupBoard = (this._lbMode !== 'personal')
                 ? await stateManager.getGroupLeaderboard(effectiveSessionId)
                 : [];
+
+            // ★ 用投影片設定的最新組名覆蓋 DB 中的舊組名
+            if (groupBoard.length > 0 && this.slideManager?.slides) {
+                let gpElement = null;
+                for (const slide of this.slideManager.slides) {
+                    gpElement = (slide.elements || []).find(e => e.type === 'groupPick');
+                    if (gpElement) break;
+                }
+                if (gpElement?.groupNames) {
+                    for (const g of groupBoard) {
+                        const idx = parseInt(g.group) - 1;
+                        if (idx >= 0 && idx < gpElement.groupNames.length) {
+                            g.groupName = gpElement.groupNames[idx];
+                        }
+                    }
+                }
+            }
+
             const hasGroups = groupBoard.length > 0;
 
             // 更新 tab 顯示狀態
