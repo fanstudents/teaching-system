@@ -134,19 +134,7 @@ export class Editor {
         this.selectElementById(element.id);
     }
 
-    addLeaderboard() {
-        const element = {
-            type: 'leaderboard',
-            x: 60,
-            y: 40,
-            width: 520,
-            height: 420,
-            lbTitle: '🏆 排行榜',
-        };
-
-        this.slideManager.addElement(element);
-        this.selectElementById(element.id);
-    }
+    /* addLeaderboard 已移至下方（含 lbMode/lbTopN 屬性） */
 
     /**
      * 從素材庫插入 SVG 素材

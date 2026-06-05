@@ -141,7 +141,11 @@ export class LeaderboardGame {
     async _fetchAndRender() {
         if (this._destroyed) return;
 
-        const sessionId = window._activeSessionUUID || stateManager.getSessionCode() || '';
+        let sessionId = '';
+        try {
+            sessionId = window._activeSessionUUID || stateManager.getSessionCode() || '';
+        } catch { /* stateManager not ready */ }
+
         if (!sessionId) {
             this._renderEmpty('尚未開始場次');
             return;
@@ -149,8 +153,8 @@ export class LeaderboardGame {
 
         try {
             const [groupData, personalData] = await Promise.all([
-                stateManager.getGroupLeaderboard(sessionId),
-                stateManager.getLeaderboard(sessionId),
+                stateManager.getGroupLeaderboard(sessionId).catch(() => []),
+                stateManager.getLeaderboard(sessionId).catch(() => []),
             ]);
             this._groupData = groupData || [];
             this._personalData = personalData || [];
