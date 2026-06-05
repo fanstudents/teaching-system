@@ -641,13 +641,15 @@ export class Editor {
      * 新增排行榜元件
      */
     addLeaderboard() {
-        this.addElement({
+        const element = {
             type: 'leaderboard',
             lbMode: 'group',
             lbTopN: 10,
             width: 800,
             height: 500,
-        });
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
     }
 
 
