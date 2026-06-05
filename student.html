@@ -1429,6 +1429,24 @@
                         // ★ 組別模式
                         if (_studentLbMode === 'group') {
                             const groupBoard = await stateManager.getGroupLeaderboard(effectiveSession);
+
+                            // ★ 用 slidesCache 的 groupPick 元素覆蓋組名（與講師端一致）
+                            if (groupBoard.length && slidesCache.length) {
+                                let gpElement = null;
+                                for (const slide of slidesCache) {
+                                    gpElement = (slide.elements || []).find(e => e.type === 'groupPick');
+                                    if (gpElement) break;
+                                }
+                                if (gpElement?.groupNames) {
+                                    for (const g of groupBoard) {
+                                        const idx = parseInt(g.group) - 1;
+                                        if (idx >= 0 && idx < gpElement.groupNames.length) {
+                                            g.groupName = gpElement.groupNames[idx];
+                                        }
+                                    }
+                                }
+                            }
+
                             if (!groupBoard.length) {
                                 if (!list.querySelector('.lb-empty'))
                                     list.innerHTML = '<div class="lb-empty">尚無學員分組</div>';

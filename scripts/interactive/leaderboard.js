@@ -116,6 +116,27 @@ export class LeaderboardGame {
                 stateManager.getGroupLeaderboard(sessionId).catch(() => []),
                 stateManager.getLeaderboard(sessionId).catch(() => []),
             ]);
+
+            // ★ 覆蓋組名：從投影片 groupPick 元素讀取實際組名
+            if (g?.length) {
+                const slides = window.app?.slideManager?.slides   // 講師端
+                    || window.slidesCache                         // 學員端
+                    || [];
+                let gpElement = null;
+                for (const slide of slides) {
+                    gpElement = (slide.elements || []).find(e => e.type === 'groupPick');
+                    if (gpElement) break;
+                }
+                if (gpElement?.groupNames) {
+                    for (const item of g) {
+                        const idx = parseInt(item.group) - 1;
+                        if (idx >= 0 && idx < gpElement.groupNames.length) {
+                            item.groupName = gpElement.groupNames[idx];
+                        }
+                    }
+                }
+            }
+
             this._groupData = g || [];
             this._personalData = p || [];
             this._renderData(false);
