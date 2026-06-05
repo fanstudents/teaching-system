@@ -422,7 +422,12 @@
 
         // ── Google 登入按鈕 ──
         document.getElementById('btnGoogleStudent')?.addEventListener('click', () => {
-            auth.signInWithGoogle(location.href.split('#')[0]);
+            // 把目前輸入的課堂代碼帶進 redirect URL，OAuth 回來後才不會丟失
+            const baseUrl = location.href.split('#')[0].split('?')[0];
+            const codeVal = document.getElementById('sessionCode').value.trim().toUpperCase();
+            const params = new URLSearchParams(location.search);
+            if (codeVal) params.set('code', codeVal);
+            auth.signInWithGoogle(`${baseUrl}?${params.toString()}`);
         });
 
         // ── Join ──
