@@ -636,6 +636,7 @@ export class HomeworkSubmission {
         const row = {
             student_name: user.name,
             student_email: user.email || '',
+            student_group: user.group || '',
             assignment_title: assignmentTitle,
             type,
             content: submission.content,

@@ -748,7 +748,7 @@ D. 差異化加分/扣分（10 分）
             this._appendLog(logEl, `${mi('bug_report', 14)} Judge raw: ${esc(judgeResult.substring(0, 100))}`, 'info');
 
             // Step 3: 更新 DB（★ 修正參數順序：data 在前，filter 在後）
-            const newState = { ...state, output, score, feedback, suggestions, status: 'scored', executedAt: new Date().toISOString() };
+            const newState = { ...state, output, score, feedback, suggestions, status: 'scored', executedAt: new Date().toISOString(), _awarded: score, _maxPts: 100 };
             await db.update('submissions', {
                 state: JSON.stringify(newState),
                 score: String(score),
