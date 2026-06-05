@@ -505,8 +505,11 @@ export class GroupPickGame {
             const hh = wallEl.clientHeight || 500;
             const defaultPos = getDefaultPositions(groupCount, ww, hh);
 
-            // 計算單張卡片尺寸 — 根據組數自適應
-            const cardW = Math.min(200, Math.floor(ww / Math.ceil(Math.sqrt(groupCount)) - 20));
+            // 計算單張卡片尺寸 — 根據組數自適應，固定大小
+            const cols = Math.ceil(Math.sqrt(groupCount * (ww / hh)));
+            const cardW = Math.max(140, Math.min(200, Math.floor(ww / cols - 24)));
+            const seatSize = Math.max(28, Math.min(34, Math.floor(cardW / 5.5)));
+            const nameFontSize = Math.max(9, Math.min(11, Math.floor(seatSize * 0.32)));
 
             wallEl.innerHTML = Array.from({length: groupCount}, (_, i) => {
                 const idx = String(i + 1);
@@ -525,40 +528,41 @@ export class GroupPickGame {
                 const bottomSeats = [seatMembers[5], seatMembers[4], seatMembers[3]];
 
                 const seatHtml = (m) => {
-                    if (!m) return `<div class="gp-seat">
-                        <div class="gp-seat-avatar" style="border:1.5px dashed ${color}35;color:${color}40;">
-                            ${mi('person', 14)}
+                    if (!m) return `<div class="gp-seat" style="width:${seatSize + 12}px;flex-shrink:0;">
+                        <div class="gp-seat-avatar" style="width:${seatSize}px;height:${seatSize}px;border:1.5px dashed ${color}35;color:${color}40;">
+                            ${mi('person', Math.floor(seatSize * 0.42))}
                         </div>
+                        <div class="gp-seat-name" style="color:transparent;font-size:${nameFontSize}px;">&nbsp;</div>
                     </div>`;
-                    return `<div class="gp-seat" style="animation:gpSeatPop .3s ease;">
-                        <div class="gp-seat-avatar" style="background:${color};color:#fff;box-shadow:0 2px 6px ${color}40;">
+                    return `<div class="gp-seat" style="width:${seatSize + 12}px;flex-shrink:0;animation:gpSeatPop .3s ease;">
+                        <div class="gp-seat-avatar" style="width:${seatSize}px;height:${seatSize}px;background:${color};color:#fff;box-shadow:0 2px 6px ${color}40;font-size:${Math.floor(seatSize * 0.38)}px;">
                             ${esc(m.name.charAt(0))}
                         </div>
-                        <div class="gp-seat-name" style="color:#334155;font-weight:500;">${esc(m.name)}</div>
+                        <div class="gp-seat-name" style="color:#334155;font-weight:500;font-size:${nameFontSize}px;max-width:${seatSize + 10}px;">${esc(m.name)}</div>
                     </div>`;
                 };
 
                 const pos = savedPositions[i] || defaultPos[i] || { x: 20, y: 20 };
 
-                return `<div class="gp-table-card" data-idx="${i}" style="left:${pos.x}px;top:${pos.y}px;
+                return `<div class="gp-table-card" data-idx="${i}" style="left:${pos.x}px;top:${pos.y}px;width:${cardW}px;
                     display:flex;flex-direction:column;align-items:center;padding:10px 10px 8px;
                     background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid ${color}20;">
-                    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:5px;">
+                    <div style="display:flex;gap:6px;justify-content:center;margin-bottom:5px;height:${seatSize + nameFontSize + 14}px;align-items:flex-start;">
                         ${topSeats.map(seatHtml).join('')}
                     </div>
                     <div style="background:linear-gradient(135deg, ${color}10, ${color}20);
                         border:2px solid ${color}30;border-radius:14px;
-                        padding:8px 20px;min-width:110px;text-align:center;">
-                        <div style="font-size:14px;font-weight:800;color:${color};line-height:1.3;">${esc(name)}</div>
-                        <div style="font-size:11px;color:#64748b;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:8px;">
+                        padding:6px 14px;width:calc(100% - 12px);text-align:center;box-sizing:border-box;">
+                        <div style="font-size:13px;font-weight:800;color:${color};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(name)}</div>
+                        <div style="font-size:11px;color:#64748b;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:8px;">
                             <span>${mi('person', 12)} ${members.length}</span>
                             <span>${scoreLabel} <b style="color:${color};font-size:13px;">${score}</b></span>
                         </div>
                     </div>
-                    <div style="display:flex;gap:8px;justify-content:center;margin-top:5px;">
+                    <div style="display:flex;gap:6px;justify-content:center;margin-top:5px;height:${seatSize + nameFontSize + 14}px;align-items:flex-start;">
                         ${bottomSeats.map(seatHtml).join('')}
                     </div>
-                    ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;padding-top:3px;border-top:1px dashed #e2e8f0;">
+                    ${overflow.length ? `<div style="display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;padding-top:3px;border-top:1px dashed #e2e8f0;width:100%;">
                         ${overflow.map(m => `<span style="font-size:8px;color:#64748b;background:#f8fafc;padding:1px 5px;border-radius:6px;">${esc(m.name)}</span>`).join('')}
                     </div>` : ''}
                 </div>`;
