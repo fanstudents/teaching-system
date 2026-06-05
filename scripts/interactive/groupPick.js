@@ -552,8 +552,8 @@ export class GroupPickGame {
                     </div>
                     <div style="background:linear-gradient(135deg, ${color}10, ${color}20);
                         border:2px solid ${color}30;border-radius:14px;
-                        padding:6px 14px;width:calc(100% - 12px);text-align:center;box-sizing:border-box;">
-                        <div style="font-size:13px;font-weight:800;color:${color};line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(name)}</div>
+                        padding:6px 10px;width:calc(100% - 8px);text-align:center;box-sizing:border-box;">
+                        <div style="font-size:${Math.min(13, Math.max(10, Math.floor((cardW - 32) / Math.max(name.length, 1) * 1.1)))}px;font-weight:800;color:${color};line-height:1.3;word-break:keep-all;overflow-wrap:break-word;">${esc(name)}</div>
                         <div style="font-size:11px;color:#64748b;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:8px;">
                             <span>${mi('person', 12)} ${members.length}</span>
                             <span>${scoreLabel} <b style="color:${color};font-size:13px;">${score}</b></span>
