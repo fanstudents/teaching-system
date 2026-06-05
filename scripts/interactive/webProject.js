@@ -484,8 +484,8 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 <div style="display:flex;align-items:center;gap:6px;">
                     <div class="wp-teacher-stats"></div>
                     <button class="wp-btn wp-btn-refresh" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;color:#64748b;font-family:inherit;">${mi('refresh', 14)} 刷新</button>
-                    <button class="wp-btn wp-btn-score-all" style="padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;color:#1a73e8;font-family:inherit;font-weight:600;">${mi('play_arrow', 14)} 全部跑分</button>
-                    <button class="wp-btn wp-btn-rank-score" style="padding:4px 10px;border:none;border-radius:6px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;cursor:pointer;font-family:inherit;font-weight:700;">${mi('emoji_events', 14)} 排名加分</button>
+                    <button class="wp-btn wp-btn-score-all" style="display:none;padding:4px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;color:#1a73e8;font-family:inherit;font-weight:600;">${mi('play_arrow', 14)} 全部跑分</button>
+                    <button class="wp-btn wp-btn-rank-score" style="display:none;padding:4px 10px;border:none;border-radius:6px;font-size:11px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;cursor:pointer;font-family:inherit;font-weight:700;">${mi('emoji_events', 14)} 排名加分</button>
                 </div>
             </div>
             <div class="wp-teacher-grid"></div>
