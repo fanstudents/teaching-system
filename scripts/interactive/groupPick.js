@@ -163,16 +163,19 @@ export class GroupPickGame {
 
         let myGroup = user.group || null;
 
-        const renderUI = (picks) => {
+        const renderUI = (picks, myGroupMembers) => {
             const counts = {};
             (picks || []).forEach(p => {
                 const g = p.content;
                 counts[g] = (counts[g] || 0) + 1;
             });
 
+            const myColor = myGroup ? (groupColors[parseInt(myGroup)-1] || '#475569') : '';
+            const myName = myGroup ? (groupNames[parseInt(myGroup)-1] || '第'+myGroup+'組') : '';
+
             el.innerHTML = `
             <div class="gp-canvas gp-canvas--student">
-                <div class="gp-student-title">${mi('groups', 20)} 點擊選擇你的組別</div>
+                <div class="gp-student-title">${mi('groups', 20)} ${myGroup ? '已選擇組別' : '點擊選擇你的組別'}</div>
                 ${pos.slice(0, groupCount).map((p, i) => {
                     const idx = String(i + 1);
                     const color = groupColors[i] || GROUP_COLORS[i];
@@ -188,10 +191,30 @@ export class GroupPickGame {
                 }).join('')}
                 ${myGroup ? `
                 <div class="gp-float-info">
-                    已加入 <b style="color:${groupColors[parseInt(myGroup)-1] || '#475569'}">${esc(groupNames[parseInt(myGroup)-1] || '第'+myGroup+'組')}</b>
+                    已加入 <b style="color:${myColor}">${esc(myName)}</b>
                     · 點擊其他組別可換組
                 </div>` : ''}
-            </div>`;
+            </div>
+            ${myGroup && myGroupMembers && myGroupMembers.length ? `
+            <div style="margin-top:12px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,${myColor}08,${myColor}15);border:1.5px solid ${myColor}25;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="font-size:14px;font-weight:700;color:${myColor};">${esc(myName)}</span>
+                    <span style="font-size:11px;color:#94a3b8;font-weight:500;">${myGroupMembers.length} 位成員</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    ${myGroupMembers.map(m => {
+                        const isMe = m.email === studentEmail;
+                        return `<div style="display:flex;align-items:center;gap:6px;padding:5px 10px 5px 5px;border-radius:20px;
+                            background:${isMe ? myColor : '#fff'};color:${isMe ? '#fff' : '#334155'};
+                            border:1px solid ${isMe ? myColor : '#e2e8f0'};font-size:12px;font-weight:${isMe ? '600' : '500'};">
+                            <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+                                background:${isMe ? 'rgba(255,255,255,.25)' : myColor};color:${isMe ? '#fff' : '#fff'};
+                                font-size:11px;font-weight:700;flex-shrink:0;">${esc(m.name.charAt(0))}</div>
+                            ${esc(m.name)}${isMe ? ' (你)' : ''}
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>` : ''}`;
 
             el.querySelectorAll('.gp-pos-btn:not([disabled])').forEach(btn => {
                 btn.addEventListener('click', () => selectGroup(btn.dataset.group));
@@ -264,18 +287,18 @@ export class GroupPickGame {
         };
 
         const loadAndRender = async () => {
-            // 用 student_group 來計算各組人數（比 type=groupPick 更可靠）
             const allFilter = { session_id: 'eq.' + sessionCode };
 
             const { data: allRows } = await db.select('submissions', {
                 filter: allFilter,
-                select: 'student_email,student_group,type,content',
+                select: 'student_email,student_name,student_group,type,content',
                 limit: 5000
             });
 
-            // 轉成 groupPick 格式讓 renderUI 渲染人數
             const emailToGroup = {};
+            const emailToName = {};
             (allRows || []).forEach(r => {
+                if (r.student_email && r.student_name) emailToName[r.student_email] = r.student_name;
                 let g = r.student_group;
                 if (!g && r.type === 'groupPick' && r.content) g = r.content;
                 if (g && r.student_email && !emailToGroup[r.student_email]) {
@@ -286,7 +309,23 @@ export class GroupPickGame {
             const picks = Object.entries(emailToGroup).map(([email, g]) => ({
                 content: g, student_email: email
             }));
-            renderUI(picks);
+
+            let myGroupMembers = [];
+            if (myGroup) {
+                const seen = new Set();
+                Object.entries(emailToGroup).forEach(([email, g]) => {
+                    if (g === myGroup && !seen.has(email)) {
+                        seen.add(email);
+                        myGroupMembers.push({
+                            email,
+                            name: emailToName[email] || email.split('@')[0] || '學員'
+                        });
+                    }
+                });
+                myGroupMembers.sort((a, b) => (a.email === studentEmail ? -1 : b.email === studentEmail ? 1 : a.name.localeCompare(b.name)));
+            }
+
+            renderUI(picks, myGroupMembers);
         };
 
         // 偵測已選組
