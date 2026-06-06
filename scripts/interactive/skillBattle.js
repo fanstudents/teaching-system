@@ -877,6 +877,7 @@ export class SkillBattleBoardGame {
                 return {
                     name: s.student_name || s.student_email?.split('@')[0] || '?',
                     email: s.student_email || s.student_name || '?',
+                    group: s.student_group || '',
                     score: state.score ?? 0,
                     feedback: state.feedback || '',
                     elementId: s.element_id || '',
@@ -885,12 +886,11 @@ export class SkillBattleBoardGame {
 
             let scored;
             if (cumulative) {
-                // 累積模式：按學員 group，加總分數
                 const grouped = new Map();
                 allScored.forEach(s => {
                     const key = s.email;
                     if (!grouped.has(key)) {
-                        grouped.set(key, { name: s.name, totalScore: 0, count: 0, feedbacks: [] });
+                        grouped.set(key, { name: s.name, group: s.group, totalScore: 0, count: 0, feedbacks: [] });
                     }
                     const g = grouped.get(key);
                     g.totalScore += s.score;
@@ -898,12 +898,11 @@ export class SkillBattleBoardGame {
                     if (s.feedback) g.feedbacks.push(s.feedback);
                 });
                 scored = [...grouped.values()].map(g => ({
-                    name: g.name,
+                    name: g.name, group: g.group,
                     score: g.totalScore,
                     feedback: g.count > 1 ? `${g.count} 題累積` : (g.feedbacks[0] || ''),
                 })).sort((a, b) => b.score - a.score);
             } else {
-                // 單題模式：每筆提交獨立顯示
                 scored = allScored.sort((a, b) => b.score - a.score);
             }
 
@@ -921,8 +920,51 @@ export class SkillBattleBoardGame {
             emptyEl.style.display = 'none';
             listEl.style.display = '';
 
+            // ── 組別統計 ──
+            let groupHtml = '';
+            const groupEntries = new Map();
+            scored.forEach(s => {
+                if (!s.group) return;
+                if (!groupEntries.has(s.group)) groupEntries.set(s.group, { total: 0, count: 0 });
+                const ge = groupEntries.get(s.group);
+                ge.total += s.score;
+                ge.count++;
+            });
+            if (groupEntries.size > 0) {
+                // 從 slides 讀組名
+                const _sl = window.app?.slideManager?.slides || window.slidesCache || [];
+                let _gp = null;
+                for (const sl of _sl) { _gp = (sl.elements || []).find(e => e.type === 'groupPick'); if (_gp) break; }
+                const GC = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#f97316','#14b8a6','#6366f1'];
+                const groups = [...groupEntries.entries()]
+                    .map(([gKey, gd]) => {
+                        const idx = parseInt(gKey) - 1;
+                        const gName = (_gp?.groupNames && idx >= 0 && idx < _gp.groupNames.length) ? _gp.groupNames[idx] : `第 ${gKey} 組`;
+                        return { gKey, gName, total: gd.total, count: gd.count, avg: Math.round(gd.total / gd.count) };
+                    })
+                    .sort((a, b) => b.avg - a.avg);
+                const maxAvg = Math.max(groups[0]?.avg || 1, 1);
+                groupHtml = `<div style="margin-bottom:16px;padding:12px;border-radius:10px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;">
+                    <div style="font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px;display:flex;align-items:center;gap:4px;">${mi('groups', 15)} 組別成績</div>
+                    ${groups.map((g, i) => {
+                        const color = GC[(parseInt(g.gKey) - 1) % GC.length] || '#6366f1';
+                        const barW = Math.max(6, (g.avg / maxAvg) * 100);
+                        return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">
+                            <div style="width:18px;height:18px;border-radius:50%;background:${color};color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px;">
+                                    <span style="font-size:13px;font-weight:600;color:#1e293b;">${esc(g.gName)}<span style="font-size:10px;color:#94a3b8;font-weight:400;margin-left:4px;">${g.count}人</span></span>
+                                    <span style="font-size:12px;color:#64748b;">總 <b style="color:#1e293b;">${g.total}</b>　均 <b style="color:${color};">${g.avg}</b></span>
+                                </div>
+                                <div style="height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden;"><div style="height:100%;width:${barW}%;background:${color};border-radius:3px;"></div></div>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+            }
+
             const topScore = Math.max(scored[0]?.score || 1, 1);
-            listEl.innerHTML = scored.map((s, i) => {
+            listEl.innerHTML = groupHtml + scored.map((s, i) => {
                 const rank = i + 1;
                 const isTop3 = rank <= 3;
                 const tierClass = rank === 1 ? 'sb-board-gold' : rank === 2 ? 'sb-board-silver' : rank === 3 ? 'sb-board-bronze' : '';
