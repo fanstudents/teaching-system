@@ -940,7 +940,7 @@ export class SkillBattleBoardGame {
                     .map(([gKey, gd]) => {
                         const idx = parseInt(gKey) - 1;
                         const gName = (_gp?.groupNames && idx >= 0 && idx < _gp.groupNames.length) ? _gp.groupNames[idx] : `第 ${gKey} 組`;
-                        return { gKey, gName, total: gd.total, count: gd.count, avg: Math.round(gd.total / gd.count) };
+                        return { gKey, gName, total: gd.total, count: gd.count, avg: (gd.total / gd.count).toFixed(1) };
                     })
                     .sort((a, b) => b.avg - a.avg);
                 const maxAvg = Math.max(groups[0]?.avg || 1, 1);
@@ -954,7 +954,7 @@ export class SkillBattleBoardGame {
                             <div style="flex:1;min-width:0;">
                                 <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px;">
                                     <span style="font-size:13px;font-weight:600;color:#1e293b;">${esc(g.gName)}<span style="font-size:10px;color:#94a3b8;font-weight:400;margin-left:4px;">${g.count}人</span></span>
-                                    <span style="font-size:12px;color:#64748b;">總 <b style="color:#1e293b;">${g.total}</b>　均 <b style="color:${color};">${g.avg}</b></span>
+                                    <span style="font-size:12px;color:#64748b;">總 <b style="color:#1e293b;">${g.total}</b>　平均 <b style="color:${color};">${g.avg}</b></span>
                                 </div>
                                 <div style="height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden;"><div style="height:100%;width:${barW}%;background:${color};border-radius:3px;"></div></div>
                             </div>
