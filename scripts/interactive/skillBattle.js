@@ -329,7 +329,7 @@ export class SkillBattleGame {
                         <button class="sb-btn sb-btn-refresh">${mi('refresh', 16)} 刷新</button>
                         <button class="sb-btn sb-btn-reset-all">${mi('restart_alt', 16)} 重置全部</button>
                         <button class="sb-btn sb-btn-execute-all">${mi('play_arrow', 16)} 全部執行</button>
-                        <button class="sb-btn sb-btn-rank-score" style="background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;font-weight:700;">${mi('emoji_events', 16)} 排名加分</button>
+                        <button class="sb-btn sb-btn-rank-score" style="display:none;">排名加分</button>
                     </div>
                 </div>
                 <div class="sb-teacher-stats">
@@ -837,11 +837,13 @@ export class SkillBattleBoardGame {
                             <span class="sb-toggle-slider"></span>
                             <span class="sb-toggle-label">累積計分</span>
                         </label>
+                        <button class="sb-btn sb-btn-rank-score" style="padding:4px 12px;border:none;border-radius:6px;font-size:12px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;cursor:pointer;font-family:inherit;font-weight:700;display:none;">${mi('emoji_events', 14)} 排名加分</button>
                         <div class="sb-board-subtitle">即時更新</div>
                     </div>
                 </div>
                 <div class="sb-board-list"></div>
                 <div class="sb-board-empty">${mi('pending', 22)} 等待評分結果...</div>
+                <div class="sb-board-log" style="max-height:120px;overflow-y:auto;font-size:11px;padding:4px 8px;"></div>
             </div>`;
 
         const listEl = el.querySelector('.sb-board-list');
@@ -950,6 +952,71 @@ export class SkillBattleBoardGame {
 
         load();
         this._tid = setInterval(load, 6000);
+
+        // ── 排名加分（只在講師端顯示）──
+        const isPresenter = !!el.closest('.presentation-slide');
+        const rankScoreBtn = el.querySelector('.sb-btn-rank-score');
+        const logEl = el.querySelector('.sb-board-log');
+        if (isPresenter && rankScoreBtn) {
+            rankScoreBtn.style.display = '';
+            const RANK_POINTS = [10, 7, 5, 3];
+            const appendLog = (html, type = 'info') => {
+                if (!logEl) return;
+                const line = document.createElement('div');
+                line.style.cssText = `padding:2px 0;color:${type === 'error' ? '#ef4444' : type === 'success' ? '#16a34a' : '#64748b'};`;
+                line.innerHTML = `<span style="color:#94a3b8;margin-right:4px;">${new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit', second:'2-digit' })}</span> ${html}`;
+                logEl.appendChild(line);
+                logEl.scrollTop = logEl.scrollHeight;
+            };
+            rankScoreBtn.addEventListener('click', async () => {
+                const sessionId = window._activeSessionUUID
+                    || sessionStorage.getItem('_session_code')
+                    || new URLSearchParams(location.search).get('code') || '';
+                const filter = { type: 'eq.skillBattle' };
+                if (sessionId) filter.session_id = 'eq.' + sessionId;
+                const { data: subs } = await db.select('submissions', { filter });
+                const scored = (subs || []).filter(s => {
+                    try { return JSON.parse(s.state || '{}').status === 'scored'; } catch { return false; }
+                });
+                if (!scored.length) { appendLog('沒有已評分的提交，請先執行全部', 'error'); return; }
+
+                scored.sort((a, b) => {
+                    let sa = {}, sb2 = {};
+                    try { sa = JSON.parse(a.state || '{}'); } catch {}
+                    try { sb2 = JSON.parse(b.state || '{}'); } catch {}
+                    const diff = (sb2.score || 0) - (sa.score || 0);
+                    if (diff !== 0) return diff;
+                    return new Date(a.submitted_at || a.created_at) - new Date(b.submitted_at || b.created_at);
+                });
+
+                rankScoreBtn.disabled = true;
+                rankScoreBtn.innerHTML = `${mi('progress_activity', 14)} 計算中...`;
+                appendLog(`🏆 開始排名加分（${scored.length} 人）`, 'info');
+
+                for (let i = 0; i < scored.length; i++) {
+                    const pts = i < RANK_POINTS.length ? RANK_POINTS[i] : 1;
+                    const s = scored[i];
+                    let st = {};
+                    try { st = JSON.parse(s.state || '{}'); } catch {}
+                    st._awarded = pts;
+                    st._rankPoints = pts;
+                    st._rank = i + 1;
+                    const { error } = await db.update('submissions', {
+                        state: JSON.stringify(st),
+                    }, { id: 'eq.' + s.id });
+                    const name = s.student_name || s.student_email?.split('@')[0] || '?';
+                    if (error) appendLog(`⚠️ ${esc(name)} DB 更新失敗`, 'error');
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+                    appendLog(`${medal} ${esc(name)} — ${st.score}分 → <b style="color:#f59e0b;">+${pts} 排名分</b>`, 'success');
+                }
+
+                rankScoreBtn.disabled = false;
+                rankScoreBtn.innerHTML = `${mi('emoji_events', 14)} 排名加分`;
+                appendLog('✅ 排名加分完成！已寫入排行榜', 'success');
+                lastHash = '';
+                load();
+            });
+        }
     }
 
     destroy() {
