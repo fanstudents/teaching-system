@@ -380,14 +380,19 @@ export class SkillBattleGame {
                 const g = s.student_group || '';
                 if (!groupMap.has(g)) groupMap.set(g, { name: '', subs: [] });
                 groupMap.get(g).subs.push(s);
-                // 嘗試從 state 取組名
-                if (g && !groupMap.get(g).name) {
-                    try {
-                        const st = JSON.parse(s.state || '{}');
-                        if (st.groupName) groupMap.get(g).name = st.groupName;
-                    } catch {}
-                }
             });
+            // 從 slides groupPick 元素讀取實際組名
+            const _slides = window.app?.slideManager?.slides || window.slidesCache || [];
+            let _gpEl = null;
+            for (const sl of _slides) { _gpEl = (sl.elements || []).find(e => e.type === 'groupPick'); if (_gpEl) break; }
+            if (_gpEl?.groupNames) {
+                for (const [gKey, gData] of groupMap) {
+                    if (gKey && !gData.name) {
+                        const idx = parseInt(gKey) - 1;
+                        if (idx >= 0 && idx < _gpEl.groupNames.length) gData.name = _gpEl.groupNames[idx];
+                    }
+                }
+            }
             const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
 
             const renderCard = (s, i) => {
@@ -1082,13 +1087,19 @@ export class SkillBattleReviewGame {
                 const g = s.student_group || '';
                 if (!groupMap.has(g)) groupMap.set(g, { name: '', subs: [] });
                 groupMap.get(g).subs.push(s);
-                if (g && !groupMap.get(g).name) {
-                    try {
-                        const st = JSON.parse(s.state || '{}');
-                        if (st.groupName) groupMap.get(g).name = st.groupName;
-                    } catch {}
-                }
             });
+            // 從 slides groupPick 元素讀取實際組名
+            const _slides2 = window.app?.slideManager?.slides || window.slidesCache || [];
+            let _gpEl2 = null;
+            for (const sl of _slides2) { _gpEl2 = (sl.elements || []).find(e => e.type === 'groupPick'); if (_gpEl2) break; }
+            if (_gpEl2?.groupNames) {
+                for (const [gKey, gData] of groupMap) {
+                    if (gKey && !gData.name) {
+                        const idx = parseInt(gKey) - 1;
+                        if (idx >= 0 && idx < _gpEl2.groupNames.length) gData.name = _gpEl2.groupNames[idx];
+                    }
+                }
+            }
             const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
 
             const renderReviewRow = (s, i) => {
