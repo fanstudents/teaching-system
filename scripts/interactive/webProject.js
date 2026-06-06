@@ -7,7 +7,7 @@ import { db, ai } from '../supabase.js';
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
-const MAX_TOTAL_SIZE = 5 * 1024 * 1024;
+const MAX_TOTAL_SIZE = 20 * 1024 * 1024;
 const TEXT_EXTS = new Set(['html', 'htm', 'css', 'js', 'json', 'svg', 'txt']);
 const ALLOWED_EXTS = new Set([...TEXT_EXTS, 'png', 'jpg', 'jpeg', 'gif', 'webp']);
 const getExt = n => (n.split('.').pop() || '').toLowerCase();
