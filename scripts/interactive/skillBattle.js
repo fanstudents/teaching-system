@@ -581,7 +581,6 @@ export class SkillBattleGame {
 
                 const { error } = await db.update('submissions', {
                     state: JSON.stringify(st),
-                    awarded_points: pts,
                 }, { id: 'eq.' + s.id });
                 const name = s.student_name || s.student_email?.split('@')[0] || '?';
                 if (error) this._appendLog(logEl, `⚠️ ${esc(name)} DB 更新失敗`, 'error');
@@ -753,7 +752,7 @@ D. 差異化加分/扣分（10 分）
             this._appendLog(logEl, `${mi('bug_report', 14)} Judge raw: ${esc(judgeResult.substring(0, 100))}`, 'info');
 
             // Step 3: 更新 DB（★ 修正參數順序：data 在前，filter 在後）
-            const newState = { ...state, output, score, feedback, suggestions, status: 'scored', executedAt: new Date().toISOString(), _awarded: score, _maxPts: 100 };
+            const newState = { ...state, output, score, feedback, suggestions, status: 'scored', executedAt: new Date().toISOString(), _awarded: 0, _maxPts: 100 };
             await db.update('submissions', {
                 state: JSON.stringify(newState),
                 score: String(score),
