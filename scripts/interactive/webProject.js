@@ -542,31 +542,28 @@ Body: {"session_id":"${sessionCode}","element_id":"${elementId}","student_name":
                 }
             });
 
-            // 補查 groupPick submissions 取得組別名稱（webProject state 通常沒存 groupName）
+            // 補查組別名稱：優先從 slides data 的 groupPick 元素讀取
             const missingNames = [...groupMap.entries()].filter(([k, v]) => k && !v.name);
-            if (missingNames.length && sessionCode) {
-                try {
-                    const { data: gpSubs } = await db.select('submissions', {
-                        filter: { type: 'eq.groupPick', session_id: `eq.${sessionCode}` },
-                        select: 'content,state', limit: 200
-                    });
-                    if (gpSubs?.length) {
-                        const nameMap = new Map();
-                        gpSubs.forEach(r => {
-                            const gIdx = r.content; // e.g. "8"
-                            if (!gIdx || nameMap.has(gIdx)) return;
-                            try {
-                                const st = typeof r.state === 'string' ? JSON.parse(r.state) : (r.state || {});
-                                if (st.groupName) nameMap.set(gIdx, st.groupName);
-                            } catch {}
-                        });
-                        for (const [gKey, gData] of groupMap) {
-                            if (gKey && !gData.name && nameMap.has(gKey)) {
-                                gData.name = nameMap.get(gKey);
+            if (missingNames.length) {
+                // 方法 1：從 slides data 讀 groupPick 元素（最可靠）
+                const slides = window.app?.slideManager?.slides   // 講師端
+                    || window.slidesCache                         // 學員端
+                    || [];
+                let gpElement = null;
+                for (const slide of slides) {
+                    gpElement = (slide.elements || []).find(e => e.type === 'groupPick');
+                    if (gpElement) break;
+                }
+                if (gpElement?.groupNames) {
+                    for (const [gKey, gData] of groupMap) {
+                        if (gKey && !gData.name) {
+                            const idx = parseInt(gKey) - 1;
+                            if (idx >= 0 && idx < gpElement.groupNames.length) {
+                                gData.name = gpElement.groupNames[idx];
                             }
                         }
                     }
-                } catch {}
+                }
             }
 
             const hasGroups = groupMap.size > 1 || (groupMap.size === 1 && !groupMap.has(''));
