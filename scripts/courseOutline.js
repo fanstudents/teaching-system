@@ -1756,6 +1756,122 @@ window.updateDiscountDisplay = function() {
     }
 };
 
+window.toggleOutlineNote = function() {
+    const cb = document.getElementById('oeOutlineNoteEnabled');
+    const input = document.getElementById('oeOutlineNote');
+    if (cb && input) {
+        input.style.display = cb.checked ? '' : 'none';
+    }
+};
+
+// ═══ Department-based outline generation ═══
+window.openDeptGenerator = function() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'background:#fff;border-radius:16px;padding:28px 32px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
+
+    const presets = [
+        { name: '新聞採編班', focus: '優化採訪大綱、海內外新聞編譯、即時重點摘要、新聞稿改寫與潤稿' },
+        { name: '數位媒體班', focus: '社群內容生成、影音腳本撰寫、圖文素材企劃、數據報表視覺化' },
+        { name: '技術研發班', focus: '程式碼輔助撰寫、技術文件生成、需求分析自動化、Bug 報告摘要' },
+        { name: '行政管理班', focus: '加速報表處理、公文與庶務流程自動化、會議記錄整理、差勤表單處理' },
+        { name: '出版文創班', focus: '書稿校對與潤飾、文案創意發想、版權摘要整理、翻譯輔助' },
+        { name: '行銷業務班', focus: '自動化產出社群素材、活動企劃案構思、客戶提案簡報、市場調查分析' },
+    ];
+
+    modal.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center">
+                <span class="material-symbols-outlined" style="color:#fff;font-size:20px">groups</span>
+            </div>
+            <div>
+                <h3 style="margin:0;font-size:1.1rem;font-weight:700">按部門生成課綱版本</h3>
+                <p style="margin:2px 0 0;font-size:.78rem;color:#64748b">勾選需要的部門，將自動建立對應的課綱版本</p>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px" id="deptPresetList">
+            ${presets.map((p, i) => `
+                <label style="display:flex;gap:10px;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .15s;align-items:flex-start"
+                    onmouseenter="this.style.borderColor='#6366f1';this.style.background='#f5f3ff'"
+                    onmouseleave="this.style.borderColor=this.querySelector('input').checked?'#6366f1':'#e2e8f0';this.style.background=this.querySelector('input').checked?'#f5f3ff':'#fff'">
+                    <input type="checkbox" data-idx="${i}" style="accent-color:#6366f1;margin-top:2px;flex-shrink:0">
+                    <div style="flex:1">
+                        <div style="font-weight:700;font-size:.88rem;margin-bottom:2px">${p.name}</div>
+                        <div style="font-size:.76rem;color:#64748b;line-height:1.5">${p.focus}</div>
+                    </div>
+                </label>
+            `).join('')}
+        </div>
+        <div style="margin-bottom:16px">
+            <div style="font-size:.78rem;font-weight:600;color:#64748b;margin-bottom:6px">自訂部門（每行一個，格式：部門名稱 | 重點方向）</div>
+            <textarea id="deptCustomInput" rows="3" placeholder="例：法務合規班 | 合約審閱、法規摘要、風險評估報告" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;font-family:inherit;resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button id="deptCancel" style="padding:9px 20px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;cursor:pointer;font-size:.85rem;font-family:inherit;color:#64748b">取消</button>
+            <button id="deptGenerate" style="padding:9px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer;font-size:.85rem;font-weight:700;font-family:inherit;display:flex;align-items:center;gap:6px">
+                <span class="material-symbols-outlined" style="font-size:16px">auto_awesome</span> 生成版本
+            </button>
+        </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    modal.querySelector('#deptCancel').addEventListener('click', () => overlay.remove());
+    modal.querySelector('#deptGenerate').addEventListener('click', () => {
+        const checked = [...modal.querySelectorAll('#deptPresetList input:checked')].map(cb => presets[cb.dataset.idx]);
+        const customText = modal.querySelector('#deptCustomInput').value.trim();
+        const customDepts = customText ? customText.split('\n').filter(Boolean).map(line => {
+            const parts = line.split('|').map(s => s.trim());
+            return { name: parts[0], focus: parts[1] || '' };
+        }) : [];
+        const allDepts = [...checked, ...customDepts];
+        if (allDepts.length === 0) { alert('請至少選擇一個部門'); return; }
+
+        // Save current version first
+        outlineVersions[activeVersionIdx].data = collectOutlineData();
+        const baseData = JSON.parse(JSON.stringify(outlineVersions[activeVersionIdx].data));
+
+        let created = 0;
+        allDepts.forEach(dept => {
+            // Check if version with same name already exists
+            if (outlineVersions.some(v => v.name === dept.name)) return;
+            const vData = JSON.parse(JSON.stringify(baseData));
+            // Tag all timeline blocks with dept name
+            if (vData.timeline) {
+                vData.timeline.forEach(b => { b.dept = dept.name; });
+            }
+            // Store dept focus for reference
+            vData.dept_focus = dept.focus;
+            vData.dept_name = dept.name;
+            outlineVersions.push({
+                name: dept.name,
+                data: vData,
+                created_at: new Date().toISOString()
+            });
+            created++;
+        });
+
+        if (created > 0) {
+            activeVersionIdx = outlineVersions.length - 1;
+            renderVersionTabs();
+            _applyOutlineData(outlineVersions[activeVersionIdx].data);
+            const status = document.getElementById('outlineSaveStatus');
+            if (status) {
+                status.textContent = `✓ 已建立 ${created} 個部門版本，請逐一編輯後按「儲存」`;
+                status.style.display = 'block';
+                status.style.color = '#6366f1';
+                setTimeout(() => { status.style.display = 'none'; }, 5000);
+            }
+        } else {
+            alert('所選部門版本皆已存在');
+        }
+        overlay.remove();
+    });
+};
+
 function collectPricingItems() {
     const rows = document.querySelectorAll('#oePricingList .oe-pricing-row');
     const items = [];
@@ -2075,6 +2191,13 @@ function collectOutlineData() {
     od.pricing = collectPricingItems();
     const discVal = parseFloat(document.getElementById('oeDiscountTotal')?.value) || 0;
     if (discVal > 0) od.discount_total = discVal;
+
+    // Outline note
+    const noteEnabled = document.getElementById('oeOutlineNoteEnabled')?.checked;
+    if (noteEnabled) {
+        const noteText = document.getElementById('oeOutlineNote')?.value.trim();
+        if (noteText) od.outline_note = noteText;
+    }
 
     return od;
 }
@@ -2483,6 +2606,20 @@ function _applyOutlineData(od) {
     applyPricingItems(od.pricing);
     _v('oeDiscountTotal', od.discount_total || '');
     updateDiscountDisplay();
+
+    // Outline note
+    const noteCheckbox = document.getElementById('oeOutlineNoteEnabled');
+    const noteInput = document.getElementById('oeOutlineNote');
+    if (noteCheckbox && noteInput) {
+        if (od.outline_note) {
+            noteCheckbox.checked = true;
+            noteInput.value = od.outline_note;
+            noteInput.style.display = '';
+        } else {
+            noteCheckbox.checked = false;
+            noteInput.style.display = 'none';
+        }
+    }
 
     initDragAndDrop();
     if (typeof _updateTimelineTimeRanges === 'function') _updateTimelineTimeRanges();

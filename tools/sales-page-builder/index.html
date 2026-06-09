@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>銷售頁製作工具</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+<style>
+/* ═══ Builder Tool Styles ═══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Noto Sans TC','Inter',sans-serif;background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column}
+
+/* ─ Top Bar ─ */
+.top-bar{height:52px;background:#1e293b;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.top-bar-title{font-size:15px;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:8px}
+.top-bar-title .material-symbols-outlined{font-size:22px;color:#f59e0b}
+.top-bar-actions{display:flex;gap:8px}
+.btn{padding:7px 16px;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:all .2s}
+.btn .material-symbols-outlined{font-size:16px}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #475569}.btn-ghost:hover{background:#334155;color:#e2e8f0}
+.btn-primary{background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff}.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}.btn-success:hover{filter:brightness(1.1)}
+
+/* ─ Main Layout ─ */
+.main-layout{flex:1;display:flex;min-height:0}
+.form-panel{width:420px;flex-shrink:0;overflow-y:auto;background:#1e293b;border-right:1px solid #334155;padding:20px}
+.preview-panel{flex:1;display:flex;flex-direction:column;background:#0f172a}
+.preview-header{height:40px;background:#1e293b;border-bottom:1px solid #334155;display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.preview-header span{font-size:11px;color:#64748b;font-weight:500}
+.preview-dots{display:flex;gap:5px}.preview-dots i{width:10px;height:10px;border-radius:50%}
+.preview-dots i:nth-child(1){background:#ef4444}.preview-dots i:nth-child(2){background:#eab308}.preview-dots i:nth-child(3){background:#22c55e}
+.preview-frame{flex:1;background:#fff;margin:12px;border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.preview-frame iframe{width:100%;height:100%;border:none}
+
+/* ─ Form Styles ─ */
+.form-section{margin-bottom:20px}
+.form-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#f59e0b;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.form-section-title .material-symbols-outlined{font-size:16px}
+.form-group{margin-bottom:12px}
+.form-label{font-size:11px;font-weight:600;color:#94a3b8;margin-bottom:4px;display:block}
+.form-input,.form-textarea,.form-select{width:100%;padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:13px;font-family:inherit;transition:border-color .2s}
+.form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:#f59e0b}
+.form-textarea{resize:vertical;min-height:60px}
+.form-select{cursor:pointer}
+.form-hint{font-size:10px;color:#64748b;margin-top:2px}
+.form-row{display:flex;gap:8px}
+.form-row .form-group{flex:1}
+.form-color-row{display:flex;align-items:center;gap:10px}
+.form-color-input{width:40px;height:32px;border:none;border-radius:6px;cursor:pointer;background:transparent}
+.form-color-hex{flex:1}
+
+/* ─ Repeater ─ */
+.repeater-list{display:flex;flex-direction:column;gap:6px}
+.repeater-item{display:flex;gap:6px;align-items:start}
+.repeater-item .form-input,.repeater-item .form-textarea{flex:1}
+.repeater-remove{width:28px;height:28px;border:none;border-radius:6px;background:#dc262620;color:#ef4444;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.repeater-remove:hover{background:#dc262640}
+.repeater-add{padding:5px 12px;border:1px dashed #475569;border-radius:6px;background:transparent;color:#94a3b8;font-size:11px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;margin-top:4px}
+.repeater-add:hover{border-color:#f59e0b;color:#f59e0b}
+.repeater-add .material-symbols-outlined{font-size:14px}
+
+/* ─ Image Upload ─ */
+.img-upload{border:2px dashed #334155;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.img-upload:hover,.img-upload.dragover{border-color:#f59e0b;background:#f59e0b08}
+.img-upload-icon{font-size:32px;color:#475569;margin-bottom:6px}
+.img-upload-text{font-size:11px;color:#64748b}
+.img-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.img-preview{margin-top:8px;border-radius:8px;overflow:hidden;position:relative}
+.img-preview img{width:100%;height:auto;display:block;border-radius:8px}
+.img-preview-remove{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+
+/* ─ Testimonial ─ */
+.testimonial-item{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px;margin-bottom:8px}
+.testimonial-item .form-group{margin-bottom:6px}
+
+/* ─ Divider ─ */
+.form-divider{height:1px;background:#334155;margin:16px 0}
+
+/* ─ Toast ─ */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#22c55e;color:#fff;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;transition:transform .3s ease;pointer-events:none;box-shadow:0 4px 20px rgba(34,197,94,.3)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Scrollbar */
+.form-panel::-webkit-scrollbar{width:6px}
+.form-panel::-webkit-scrollbar-track{background:transparent}
+.form-panel::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+.form-panel::-webkit-scrollbar-thumb:hover{background:#475569}
+
+/* ─ Template selector ─ */
+.template-cards{display:flex;gap:8px;margin-bottom:16px}
+.template-card{flex:1;padding:12px;border:2px solid #334155;border-radius:10px;cursor:pointer;text-align:center;transition:all .2s}
+.template-card:hover{border-color:#64748b}
+.template-card.active{border-color:#f59e0b;background:#f59e0b10}
+.template-card-icon{font-size:28px;margin-bottom:4px}
+.template-card-name{font-size:11px;font-weight:700;color:#e2e8f0}
+.template-card-desc{font-size:9px;color:#64748b;margin-top:2px}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-title">
+    <span class="material-symbols-outlined">rocket_launch</span>
+    銷售頁製作工具
+  </div>
+  <div class="top-bar-actions">
+    <button class="btn btn-ghost" onclick="copyHTML()">
+      <span class="material-symbols-outlined">content_copy</span> 複製 HTML
+    </button>
+    <button class="btn btn-primary" onclick="downloadHTML()">
+      <span class="material-symbols-outlined">download</span> 下載 HTML
+    </button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main-layout">
+
+  <!-- Form Panel -->
+  <div class="form-panel" id="formPanel">
+
+    <!-- Template -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">palette</span> 模板選擇</div>
+      <div class="template-cards">
+        <div class="template-card active" data-tpl="long" onclick="selectTemplate('long',this)">
+          <div class="template-card-icon">📄</div>
+          <div class="template-card-name">長頁式</div>
+          <div class="template-card-desc">高單價課程</div>
+        </div>
+        <div class="template-card" data-tpl="compact" onclick="selectTemplate('compact',this)">
+          <div class="template-card-icon">⚡</div>
+          <div class="template-card-name">簡潔式</div>
+          <div class="template-card-desc">引流/低價課程</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic Info -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">info</span> 基本資訊</div>
+      <div class="form-group">
+        <label class="form-label">課程名稱 *</label>
+        <input class="form-input" id="courseName" placeholder="例：AI 時代的高效工作術" oninput="update()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">副標題</label>
+        <input class="form-input" id="subtitle" placeholder="例：用 AI 工具讓你的工作效率提升 10 倍" oninput="update()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">目標受眾</label>
+        <input class="form-input" id="audience" placeholder="例：想提升生產力的上班族與主管" oninput="update()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teachify 購課連結 *</label>
+        <input class="form-input" id="ctaUrl" placeholder="https://你的學院.teachify.tw/courses/xxx" oninput="update()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CTA 按鈕文字</label>
+        <input class="form-input" id="ctaText" placeholder="立即報名" value="立即報名" oninput="update()">
+      </div>
+    </div>
+
+    <!-- Colors -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">format_paint</span> 品牌色系</div>
+      <div class="form-group">
+        <label class="form-label">主色</label>
+        <div class="form-color-row">
+          <input type="color" class="form-color-input" id="primaryColor" value="#f59e0b" oninput="syncColor('primary')">
+          <input class="form-input form-color-hex" id="primaryColorHex" value="#f59e0b" oninput="syncColorHex('primary')">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">深色背景</label>
+        <div class="form-color-row">
+          <input type="color" class="form-color-input" id="darkColor" value="#0f172a" oninput="syncColor('dark')">
+          <input class="form-input form-color-hex" id="darkColorHex" value="#0f172a" oninput="syncColorHex('dark')">
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Image -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">image</span> Hero 圖片</div>
+      <div class="img-upload" id="heroUpload">
+        <div class="img-upload-icon"><span class="material-symbols-outlined" style="font-size:32px">cloud_upload</span></div>
+        <div class="img-upload-text">拖曳圖片到此處，或點擊上傳</div>
+        <input type="file" accept="image/*" onchange="handleImageUpload(event,'hero')">
+      </div>
+      <div class="img-preview" id="heroPreview" style="display:none">
+        <img id="heroImg">
+        <button class="img-preview-remove" onclick="removeImage('hero')">✕</button>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Pain Points -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">warning</span> 痛點描述</div>
+      <div class="form-hint" style="margin-bottom:8px">學員目前面臨的問題，建議 3-5 個</div>
+      <div class="repeater-list" id="painList">
+        <div class="repeater-item">
+          <input class="form-input" placeholder="痛點 1" oninput="update()">
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>
+        </div>
+        <div class="repeater-item">
+          <input class="form-input" placeholder="痛點 2" oninput="update()">
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>
+        </div>
+        <div class="repeater-item">
+          <input class="form-input" placeholder="痛點 3" oninput="update()">
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>
+        </div>
+      </div>
+      <button class="repeater-add" onclick="addRepeaterItem('painList','痛點')">
+        <span class="material-symbols-outlined">add</span> 新增痛點
+      </button>
+    </div>
+
+    <!-- Benefits -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">stars</span> 課程賣點</div>
+      <div class="repeater-list" id="benefitList">
+        <div class="repeater-item">
+          <input class="form-input" placeholder="賣點 1" oninput="update()">
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>
+        </div>
+        <div class="repeater-item">
+          <input class="form-input" placeholder="賣點 2" oninput="update()">
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>
+        </div>
+        <div class="repeater-item">
+          <input class="form-input" placeholder="賣點 3" oninput="update()">
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>
+        </div>
+      </div>
+      <button class="repeater-add" onclick="addRepeaterItem('benefitList','賣點')">
+        <span class="material-symbols-outlined">add</span> 新增賣點
+      </button>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Modules -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">menu_book</span> 課程模組</div>
+      <div class="repeater-list" id="moduleList">
+        <div class="repeater-item" style="flex-direction:column;gap:4px">
+          <input class="form-input" placeholder="模組名稱" oninput="update()" data-role="title">
+          <textarea class="form-textarea" rows="2" placeholder="模組簡述" oninput="update()" data-role="desc"></textarea>
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)" style="align-self:flex-end">×</button>
+        </div>
+      </div>
+      <button class="repeater-add" onclick="addModuleItem()">
+        <span class="material-symbols-outlined">add</span> 新增模組
+      </button>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Instructor -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">person</span> 講師資訊</div>
+      <div class="form-group">
+        <label class="form-label">講師姓名</label>
+        <input class="form-input" id="instructorName" placeholder="例：范老師" oninput="update()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">講師簡介</label>
+        <textarea class="form-textarea" id="instructorBio" rows="3" placeholder="講師經歷、專長..." oninput="update()"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">講師照片</label>
+        <div class="img-upload" id="instructorUpload" style="padding:12px">
+          <div class="img-upload-text">拖曳或點擊上傳</div>
+          <input type="file" accept="image/*" onchange="handleImageUpload(event,'instructor')">
+        </div>
+        <div class="img-preview" id="instructorPreview" style="display:none">
+          <img id="instructorImg" style="width:80px;height:80px;object-fit:cover;border-radius:50%">
+          <button class="img-preview-remove" onclick="removeImage('instructor')">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Pricing -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">sell</span> 定價資訊</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">原價 (NT$)</label>
+          <input class="form-input" id="originalPrice" type="number" placeholder="9900" oninput="update()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">特價 (NT$)</label>
+          <input class="form-input" id="salePrice" type="number" placeholder="4900" oninput="update()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">優惠標語（選填）</label>
+        <input class="form-input" id="promoText" placeholder="例：限時早鳥優惠，名額有限！" oninput="update()">
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <!-- Testimonials -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="material-symbols-outlined">reviews</span> 學員見證（選填）</div>
+      <div id="testimonialList">
+        <div class="testimonial-item">
+          <div class="form-group"><input class="form-input" placeholder="學員姓名" oninput="update()" data-role="name"></div>
+          <div class="form-group"><input class="form-input" placeholder="身份/職稱" oninput="update()" data-role="title"></div>
+          <div class="form-group"><textarea class="form-textarea" rows="2" placeholder="學員評語..." oninput="update()" data-role="quote"></textarea></div>
+          <button class="repeater-remove" onclick="removeRepeaterItem(this)" style="float:right">×</button>
+          <div style="clear:both"></div>
+        </div>
+      </div>
+      <button class="repeater-add" onclick="addTestimonialItem()">
+        <span class="material-symbols-outlined">add</span> 新增見證
+      </button>
+    </div>
+
+    <div style="height:40px"></div>
+  </div>
+
+  <!-- Preview Panel -->
+  <div class="preview-panel">
+    <div class="preview-header">
+      <div class="preview-dots"><i></i><i></i><i></i></div>
+      <span>即時預覽</span>
+    </div>
+    <div class="preview-frame">
+      <iframe id="previewFrame"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══ State ═══ */
+let currentTemplate = 'long';
+const images = { hero: null, instructor: null };
+
+/* ═══ Helpers ═══ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function showToast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* ═══ Template select ═══ */
+function selectTemplate(tpl, el) {
+  currentTemplate = tpl;
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  update();
+}
+
+/* ═══ Color sync ═══ */
+function syncColor(key) {
+  const v = $(key+'Color').value;
+  $(key+'ColorHex').value = v;
+  update();
+}
+function syncColorHex(key) {
+  const v = $(key+'ColorHex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) $(key+'Color').value = v;
+  update();
+}
+
+/* ═══ Image upload ═══ */
+function handleImageUpload(e, key) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    images[key] = ev.target.result;
+    $(key+'Preview').style.display = '';
+    $(key+'Img').src = ev.target.result;
+    update();
+  };
+  reader.readAsDataURL(file);
+}
+function removeImage(key) {
+  images[key] = null;
+  $(key+'Preview').style.display = 'none';
+  $(key+'Img').src = '';
+  update();
+}
+
+// Drag & drop
+document.querySelectorAll('.img-upload').forEach(el => {
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+  el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.classList.remove('dragover');
+    const file = e.dataTransfer.files[0]; if (!file?.type.startsWith('image/')) return;
+    const key = el.id.replace('Upload','');
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      images[key] = ev.target.result;
+      $(key+'Preview').style.display = '';
+      $(key+'Img').src = ev.target.result;
+      update();
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+/* ═══ Repeater ═══ */
+function addRepeaterItem(listId, placeholder) {
+  const list = $(listId);
+  const idx = list.children.length + 1;
+  const item = document.createElement('div');
+  item.className = 'repeater-item';
+  item.innerHTML = `<input class="form-input" placeholder="${placeholder} ${idx}" oninput="update()"><button class="repeater-remove" onclick="removeRepeaterItem(this)">×</button>`;
+  list.appendChild(item);
+}
+function addModuleItem() {
+  const list = $('moduleList');
+  const item = document.createElement('div');
+  item.className = 'repeater-item';
+  item.style.cssText = 'flex-direction:column;gap:4px';
+  item.innerHTML = `<input class="form-input" placeholder="模組名稱" oninput="update()" data-role="title"><textarea class="form-textarea" rows="2" placeholder="模組簡述" oninput="update()" data-role="desc"></textarea><button class="repeater-remove" onclick="removeRepeaterItem(this)" style="align-self:flex-end">×</button>`;
+  list.appendChild(item);
+}
+function addTestimonialItem() {
+  const list = $('testimonialList');
+  const item = document.createElement('div');
+  item.className = 'testimonial-item';
+  item.innerHTML = `<div class="form-group"><input class="form-input" placeholder="學員姓名" oninput="update()" data-role="name"></div><div class="form-group"><input class="form-input" placeholder="身份/職稱" oninput="update()" data-role="title"></div><div class="form-group"><textarea class="form-textarea" rows="2" placeholder="學員評語..." oninput="update()" data-role="quote"></textarea></div><button class="repeater-remove" onclick="removeRepeaterItem(this)" style="float:right">×</button><div style="clear:both"></div>`;
+  list.appendChild(item);
+}
+function removeRepeaterItem(btn) {
+  btn.closest('.repeater-item,.testimonial-item').remove();
+  update();
+}
+
+/* ═══ Data collection ═══ */
+function collectData() {
+  const getList = (id) => [...$(id).querySelectorAll('.form-input')].map(i => i.value.trim()).filter(Boolean);
+  const getModules = () => {
+    const items = [...$('moduleList').querySelectorAll('.repeater-item')];
+    return items.map(item => ({
+      title: (item.querySelector('[data-role=title]')?.value || '').trim(),
+      desc: (item.querySelector('[data-role=desc]')?.value || '').trim(),
+    })).filter(m => m.title);
+  };
+  const getTestimonials = () => {
+    const items = [...$('testimonialList').querySelectorAll('.testimonial-item')];
+    return items.map(item => ({
+      name: (item.querySelector('[data-role=name]')?.value || '').trim(),
+      title: (item.querySelector('[data-role=title]')?.value || '').trim(),
+      quote: (item.querySelector('[data-role=quote]')?.value || '').trim(),
+    })).filter(t => t.name && t.quote);
+  };
+  return {
+    courseName: $('courseName').value.trim(),
+    subtitle: $('subtitle').value.trim(),
+    audience: $('audience').value.trim(),
+    ctaUrl: $('ctaUrl').value.trim() || '#',
+    ctaText: $('ctaText').value.trim() || '立即報名',
+    primaryColor: $('primaryColor').value,
+    darkColor: $('darkColor').value,
+    heroImage: images.hero,
+    instructorImage: images.instructor,
+    pains: getList('painList'),
+    benefits: getList('benefitList'),
+    modules: getModules(),
+    instructorName: $('instructorName').value.trim(),
+    instructorBio: $('instructorBio').value.trim(),
+    originalPrice: $('originalPrice').value,
+    salePrice: $('salePrice').value,
+    promoText: $('promoText').value.trim(),
+    testimonials: getTestimonials(),
+    template: currentTemplate,
+  };
+}
+
+/* ═══ Generate HTML ═══ */
+function generateHTML(d) {
+  const pc = d.primaryColor || '#f59e0b';
+  const dc = d.darkColor || '#0f172a';
+  // Lighten helper
+  const pcLight = pc + '18';
+  const pcMedium = pc + '30';
+
+  const benefitIcons = ['🚀','💡','🎯','⚡','🔥','✨','💎','🏆'];
+  const painIcons = ['😫','😰','😤','😓','😵'];
+
+  const heroSection = `
+    <div class="tfs-hero" ${d.heroImage ? `style="background-image:linear-gradient(to bottom,${dc}cc,${dc}ee),url('${d.heroImage}');background-size:cover;background-position:center;"` : `style="background:linear-gradient(135deg,${dc},${dc}dd);"`}>
+      ${d.audience ? `<div class="tfs-hero-badge">${esc(d.audience)}</div>` : ''}
+      <h2 class="tfs-hero-title">${esc(d.courseName || '你的課程名稱')}</h2>
+      ${d.subtitle ? `<p class="tfs-hero-subtitle">${esc(d.subtitle)}</p>` : ''}
+      <a class="tfs-cta-btn" href="${esc(d.ctaUrl)}" target="_blank" rel="noopener">${esc(d.ctaText)}</a>
+      ${d.promoText ? `<div class="tfs-promo-badge">${esc(d.promoText)}</div>` : ''}
+    </div>`;
+
+  const painSection = d.pains.length ? `
+    <div class="tfs-section tfs-pain-section">
+      <h3 class="tfs-section-title">你是否也遇到這些問題？</h3>
+      <div class="tfs-pain-grid">
+        ${d.pains.map((p, i) => `
+          <div class="tfs-pain-card">
+            <span class="tfs-pain-icon">${painIcons[i % painIcons.length]}</span>
+            <span class="tfs-pain-text">${esc(p)}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+
+  const benefitSection = d.benefits.length ? `
+    <div class="tfs-section tfs-benefit-section">
+      <h3 class="tfs-section-title">這堂課將帶給你</h3>
+      <div class="tfs-benefit-grid">
+        ${d.benefits.map((b, i) => `
+          <div class="tfs-benefit-card">
+            <span class="tfs-benefit-icon">${benefitIcons[i % benefitIcons.length]}</span>
+            <div class="tfs-benefit-text">${esc(b)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+
+  const moduleSection = d.modules.length ? `
+    <div class="tfs-section tfs-module-section">
+      <h3 class="tfs-section-title">課程大綱</h3>
+      <div class="tfs-module-list">
+        ${d.modules.map((m, i) => `
+          <div class="tfs-module-item">
+            <div class="tfs-module-num">${String(i+1).padStart(2,'0')}</div>
+            <div class="tfs-module-body">
+              <div class="tfs-module-title">${esc(m.title)}</div>
+              ${m.desc ? `<div class="tfs-module-desc">${esc(m.desc)}</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+
+  const instructorSection = (d.instructorName || d.instructorBio) ? `
+    <div class="tfs-section tfs-instructor-section">
+      <h3 class="tfs-section-title">關於講師</h3>
+      <div class="tfs-instructor-card">
+        ${d.instructorImage ? `<img class="tfs-instructor-img" src="${d.instructorImage}" alt="${esc(d.instructorName)}">` : `<div class="tfs-instructor-avatar">${esc((d.instructorName||'?').charAt(0))}</div>`}
+        <div class="tfs-instructor-info">
+          <div class="tfs-instructor-name">${esc(d.instructorName)}</div>
+          <div class="tfs-instructor-bio">${esc(d.instructorBio)}</div>
+        </div>
+      </div>
+    </div>` : '';
+
+  const testimonialSection = d.testimonials.length ? `
+    <div class="tfs-section tfs-testimonial-section">
+      <h3 class="tfs-section-title">學員怎麼說</h3>
+      <div class="tfs-testimonial-grid">
+        ${d.testimonials.map(t => `
+          <div class="tfs-testimonial-card">
+            <div class="tfs-testimonial-quote">"${esc(t.quote)}"</div>
+            <div class="tfs-testimonial-author">
+              <div class="tfs-testimonial-avatar">${esc(t.name.charAt(0))}</div>
+              <div>
+                <div class="tfs-testimonial-name">${esc(t.name)}</div>
+                ${t.title ? `<div class="tfs-testimonial-title">${esc(t.title)}</div>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+
+  const pricingSection = (d.salePrice || d.originalPrice) ? `
+    <div class="tfs-section tfs-pricing-section">
+      <h3 class="tfs-section-title">立即加入</h3>
+      <div class="tfs-pricing-card">
+        ${d.originalPrice && d.salePrice ? `<div class="tfs-price-original">NT$ ${Number(d.originalPrice).toLocaleString()}</div>` : ''}
+        <div class="tfs-price-current">NT$ ${Number(d.salePrice || d.originalPrice || 0).toLocaleString()}</div>
+        ${d.originalPrice && d.salePrice ? `<div class="tfs-price-save">現省 NT$ ${(Number(d.originalPrice) - Number(d.salePrice)).toLocaleString()}</div>` : ''}
+        <a class="tfs-cta-btn tfs-cta-btn-lg" href="${esc(d.ctaUrl)}" target="_blank" rel="noopener">${esc(d.ctaText)}</a>
+        ${d.promoText ? `<div class="tfs-promo-text">${esc(d.promoText)}</div>` : ''}
+      </div>
+    </div>` : '';
+
+  // Compact template: skip modules detail, pain section is simpler
+  const isCompact = d.template === 'compact';
+
+  return `<!-- 銷售頁 — 由銷售頁製作工具產生 -->
+<div class="tfs-root" data-tfs-sales-page>
+<style data-tfs>
+/* ═══ Teachify-Safe Scoped Styles ═══ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap');
+.tfs-root{all:initial;display:block;font-family:'Noto Sans TC','Helvetica Neue',Arial,sans-serif;color:#1e293b;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+.tfs-root *,.tfs-root *::before,.tfs-root *::after{box-sizing:border-box;margin:0;padding:0}
+.tfs-root img{max-width:100%;height:auto;display:block}
+.tfs-root a{text-decoration:none;color:inherit}
+
+/* Hero */
+.tfs-hero{padding:80px 24px;text-align:center;color:#fff;position:relative}
+.tfs-hero-badge{display:inline-block;padding:6px 18px;background:${pc}25;border:1px solid ${pc}50;border-radius:30px;font-size:13px;font-weight:600;color:${pc};margin-bottom:20px;letter-spacing:.5px}
+.tfs-hero-title{font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.25;margin-bottom:16px;color:#fff}
+.tfs-hero-subtitle{font-size:clamp(15px,2.5vw,20px);color:#cbd5e1;max-width:640px;margin:0 auto 32px;font-weight:400;line-height:1.7}
+.tfs-cta-btn{display:inline-block;padding:16px 40px;background:linear-gradient(135deg,${pc},${pc}dd);color:#fff;font-size:17px;font-weight:700;border-radius:12px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px ${pc}40;border:none;font-family:inherit;letter-spacing:.5px}
+.tfs-cta-btn:hover{transform:translateY(-3px);box-shadow:0 8px 30px ${pc}50;filter:brightness(1.08)}
+.tfs-promo-badge{margin-top:16px;font-size:13px;color:${pc};font-weight:600}
+
+/* Sections */
+.tfs-section{padding:60px 24px;max-width:800px;margin:0 auto}
+.tfs-section-title{font-size:clamp(22px,4vw,32px);font-weight:800;text-align:center;margin-bottom:36px;color:${dc};position:relative}
+
+/* Pain */
+.tfs-pain-section{background:#fef2f2;border-radius:0;max-width:100%;padding:60px 24px}
+.tfs-pain-section .tfs-section-title{color:#991b1b}
+.tfs-pain-grid{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.tfs-pain-card{display:flex;align-items:center;gap:14px;padding:16px 20px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid #fee2e2}
+.tfs-pain-icon{font-size:24px;flex-shrink:0}
+.tfs-pain-text{font-size:15px;color:#374151;font-weight:500}
+
+/* Benefits */
+.tfs-benefit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:800px;margin:0 auto}
+.tfs-benefit-card{padding:24px 20px;background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #f1f5f9;text-align:center;transition:transform .2s}
+.tfs-benefit-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.tfs-benefit-icon{font-size:32px;display:block;margin-bottom:10px}
+.tfs-benefit-text{font-size:14px;color:#475569;font-weight:500;line-height:1.6}
+
+/* Modules */
+.tfs-module-list{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.tfs-module-item{display:flex;align-items:flex-start;gap:16px;padding:20px 0;border-bottom:1px solid #f1f5f9}
+.tfs-module-item:last-child{border-bottom:none}
+.tfs-module-num{width:40px;height:40px;border-radius:10px;background:${pc}15;color:${pc};font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tfs-module-title{font-size:16px;font-weight:700;color:${dc};margin-bottom:4px}
+.tfs-module-desc{font-size:13px;color:#64748b;line-height:1.6}
+
+/* Instructor */
+.tfs-instructor-card{display:flex;align-items:center;gap:24px;max-width:600px;margin:0 auto;padding:28px;background:#f8fafc;border-radius:16px}
+.tfs-instructor-img{width:90px;height:90px;border-radius:50%;object-fit:cover;flex-shrink:0;border:3px solid ${pc}30}
+.tfs-instructor-avatar{width:90px;height:90px;border-radius:50%;background:${pc};color:#fff;font-size:32px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tfs-instructor-name{font-size:20px;font-weight:700;color:${dc};margin-bottom:6px}
+.tfs-instructor-bio{font-size:14px;color:#64748b;line-height:1.7;white-space:pre-line}
+
+/* Testimonials */
+.tfs-testimonial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:800px;margin:0 auto}
+.tfs-testimonial-card{padding:24px;background:#f8fafc;border-radius:14px;border:1px solid #e2e8f0}
+.tfs-testimonial-quote{font-size:14px;color:#374151;line-height:1.7;margin-bottom:14px;font-style:italic}
+.tfs-testimonial-author{display:flex;align-items:center;gap:10px}
+.tfs-testimonial-avatar{width:36px;height:36px;border-radius:50%;background:${pc};color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tfs-testimonial-name{font-size:13px;font-weight:700;color:${dc}}
+.tfs-testimonial-title{font-size:11px;color:#94a3b8}
+
+/* Pricing */
+.tfs-pricing-section{text-align:center;padding:80px 24px;background:linear-gradient(180deg,#f8fafc,#fff);max-width:100%}
+.tfs-pricing-card{max-width:420px;margin:0 auto;padding:40px 32px;background:#fff;border-radius:20px;box-shadow:0 4px 30px rgba(0,0,0,.08);border:2px solid ${pc}30}
+.tfs-price-original{font-size:18px;color:#94a3b8;text-decoration:line-through;margin-bottom:4px}
+.tfs-price-current{font-size:clamp(36px,6vw,52px);font-weight:800;color:${pc};margin-bottom:6px}
+.tfs-price-save{font-size:13px;color:#16a34a;font-weight:600;margin-bottom:24px;background:#dcfce7;display:inline-block;padding:4px 14px;border-radius:20px}
+.tfs-cta-btn-lg{display:block;width:100%;padding:18px;font-size:18px;margin-top:20px;text-align:center}
+.tfs-promo-text{margin-top:14px;font-size:13px;color:#f97316;font-weight:600}
+
+/* Responsive */
+@media(max-width:640px){
+  .tfs-hero{padding:50px 20px}
+  .tfs-section{padding:40px 16px}
+  .tfs-instructor-card{flex-direction:column;text-align:center}
+  .tfs-benefit-grid{grid-template-columns:1fr}
+  .tfs-testimonial-grid{grid-template-columns:1fr}
+}
+
+/* Scroll animation */
+.tfs-fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.tfs-fade-in.tfs-visible{opacity:1;transform:translateY(0)}
+</style>
+
+${heroSection}
+${isCompact ? '' : painSection}
+${benefitSection}
+${isCompact ? '' : moduleSection}
+${instructorSection}
+${testimonialSection}
+${pricingSection}
+
+<script data-tfs>
+(function(){
+  var root=document.querySelector('.tfs-root[data-tfs-sales-page]');
+  if(!root)return;
+  var els=root.querySelectorAll('.tfs-section');
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('tfs-visible');obs.unobserve(e.target);}});
+  },{threshold:0.15});
+  els.forEach(function(el){el.classList.add('tfs-fade-in');obs.observe(el);});
+})();
+<\/script>
+</div>
+<!-- /銷售頁 -->`;
+}
+
+/* ═══ Update preview ═══ */
+let updateTimer = null;
+function update() {
+  clearTimeout(updateTimer);
+  updateTimer = setTimeout(() => {
+    const data = collectData();
+    const html = generateHTML(data);
+    const frame = $('previewFrame');
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:0;font-family:sans-serif}</style></head><body>${html}</body></html>`);
+    doc.close();
+  }, 150);
+}
+
+/* ═══ Copy / Download ═══ */
+function getOutputHTML() {
+  const data = collectData();
+  return generateHTML(data);
+}
+
+function copyHTML() {
+  const html = getOutputHTML();
+  navigator.clipboard.writeText(html).then(() => showToast('✅ 已複製到剪貼簿')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = html; ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    showToast('✅ 已複製到剪貼簿');
+  });
+}
+
+function downloadHTML() {
+  const data = collectData();
+  const html = generateHTML(data);
+  const fullHTML = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(data.courseName || '銷售頁')}</title>
+<meta name="description" content="${esc(data.subtitle || data.courseName || '')}">
+</head>
+<body style="margin:0;padding:0">
+${html}
+</body>
+</html>`;
+  const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (data.courseName || 'sales-page').replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g, '_') + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ 已下載 HTML 檔案');
+}
+
+/* ═══ Init ═══ */
+update();
+</script>
+</body>
+</html>

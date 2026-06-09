@@ -410,6 +410,9 @@
                 <button id="btnImportProject" class="oe-topbar-btn">
                     <span class="material-symbols-outlined">content_copy</span><span class="oe-topbar-btn-label">導入專案</span>
                 </button>
+                <button class="oe-topbar-btn" onclick="openDeptGenerator()" title="按部門批次生成課綱版本">
+                    <span class="material-symbols-outlined">groups</span><span class="oe-topbar-btn-label">部門課綱</span>
+                </button>
                 <button id="btnSaveOutline" class="oe-topbar-btn oe-topbar-btn-save">
                     <span class="material-symbols-outlined">check</span><span class="oe-topbar-btn-label">儲存</span>
                 </button>
@@ -506,6 +509,13 @@
                 <button class="btn btn-outline oe-add-btn" onclick="addTimelineBlock()">
                     <span class="material-symbols-outlined" style="font-size:14px">add</span> 新增時段
                 </button>
+                <div style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.82rem;color:var(--text-2);font-weight:600;white-space:nowrap">
+                        <input type="checkbox" id="oeOutlineNoteEnabled" onchange="toggleOutlineNote()" style="accent-color:var(--accent)">
+                        顯示課綱附註
+                    </label>
+                    <input type="text" id="oeOutlineNote" placeholder="實際課綱根據貴司訪談結果後進行客製化調整" value="實際課綱根據貴司訪談結果後進行客製化調整" style="flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:inherit;display:none">
+                </div>
             </details>
 
             <!-- 工具 -->
