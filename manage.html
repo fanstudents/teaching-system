@@ -960,6 +960,7 @@
     <script type="module">
         import { db, storage, auth, functions, ai, requireAuth, getUserProfile, clearProfileCache } from './scripts/supabase.js';
         import { exportSession } from './scripts/sessionExport.js';
+        import { exportSessionReport } from './scripts/sessionReportPDF.js';
 
         // ── Auth Guard ──
         const authResult = await requireAuth();
@@ -1569,6 +1570,9 @@
                         </a>
                         <button class="btn btn-sm" data-export-sid="${s.id}" onclick="window._exportSession('${s.id}')" title="匯出學員互動資料">
                             <span class="material-symbols-outlined">download</span> 匯出
+                        </button>
+                        <button class="btn btn-sm" data-report-sid="${s.id}" onclick="window._exportReport('${s.id}')" title="產出精美互動成效報告 PDF" style="background:#6366f1;color:#fff;border-color:#6366f1">
+                            <span class="material-symbols-outlined">assessment</span> 📊 報告
                         </button>
                         <button class="btn btn-sm" onclick="editSession('${s.id}')">
                             <span class="material-symbols-outlined">edit</span> 編輯
@@ -3927,6 +3931,13 @@ ${gscQueriesStr || '無搜尋資料'}
             const s = sessions.find(x => x.id === sessionId);
             const p = projects.find(x => x.id === s?.project_id);
             exportSession(sessionId, p?.name || '課程', s);
+        };
+
+        // ── 匯出精美 PDF 報告 ──
+        window._exportReport = function(sessionId) {
+            const s = sessions.find(x => x.id === sessionId);
+            const p = projects.find(x => x.id === s?.project_id);
+            exportSessionReport(sessionId, p?.name || '課程', s);
         };
 
         init();
