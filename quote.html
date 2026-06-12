@@ -99,7 +99,7 @@
             <section class="q-section">
                 <div class="q-section-header">
                     <div class="q-section-icon"><span class="material-symbols-outlined">view_timeline</span></div>
-                    <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc">完整課程時間規劃</div></div>
+                    <div><div class="q-section-title">教學架構大綱</div><div class="q-section-desc" id="outlineSectionDesc">完整課程時間規劃</div></div>
                 </div>
                 <div class="q-timeline timeline" id="outlineTimeline"></div>
                 <div class="suggest-topic-area" style="padding:28px 12px;border-top:1px dashed #ddd;margin-top:8px">
@@ -776,6 +776,10 @@ window.switchVariant = function(idx) {
     document.getElementById('equipSection').style.display = 'none';
     document.getElementById('instructorSection').style.display = 'none';
 
+    // Update date display for this variant
+    const schedule = variant.outline_data?.schedule || [];
+    updateDateDisplay(schedule, currentQuotation.created_at);
+
     // Render outline (includes tools, equipment, instructor)
     if (variant.outline_data) {
         blockCounter = 0;
@@ -1089,21 +1093,8 @@ function renderQuote(q) {
         logo.style.display = 'block';
     }
 
-    // Show course date from outline schedule, fallback to created_at
-    const schedule = q.variants?.[0]?.outline_data?.schedule || [];
-    if (schedule.length > 0 && schedule[0].date) {
-        const dates = schedule.map(s => s.date).filter(Boolean).sort();
-        const firstDate = new Date(dates[0] + 'T00:00:00');
-        if (dates.length === 1) {
-            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> 預定日期：${firstDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
-        } else {
-            const lastDate = new Date(dates[dates.length - 1] + 'T00:00:00');
-            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${firstDate.toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' })} — ${lastDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
-        }
-    } else {
-        const created = new Date(q.created_at);
-        document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
-    }
+    // Show course date from active variant's schedule
+    updateDateDisplay(q.variants?.[0]?.outline_data?.schedule, q.created_at);
     if (q.valid_until) {
         const validDate = new Date(q.valid_until);
         document.getElementById('validUntilDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">schedule</span> 有效期限：${validDate.toLocaleDateString('zh-TW')}`;
@@ -1531,10 +1522,46 @@ async function loadInvoiceEmail() {
     } catch (e) { console.warn('loadInvoiceEmail:', e); }
 }
 
+// Update date display for a given schedule
+function updateDateDisplay(schedule, fallbackCreatedAt) {
+    schedule = schedule || [];
+    if (schedule.length > 0 && schedule[0].date) {
+        const dates = schedule.map(s => s.date).filter(Boolean).sort();
+        const firstDate = new Date(dates[0] + 'T00:00:00');
+        if (dates.length === 1) {
+            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> 預定日期：${firstDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
+        } else {
+            const lastDate = new Date(dates[dates.length - 1] + 'T00:00:00');
+            document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${firstDate.toLocaleDateString('zh-TW', { month:'numeric', day:'numeric' })} — ${lastDate.toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric' })}`;
+        }
+    } else if (fallbackCreatedAt) {
+        const created = new Date(fallbackCreatedAt);
+        document.getElementById('quoteDateDisplay').innerHTML = `<span class="material-symbols-outlined" style="font-size:15px">calendar_today</span> ${created.toLocaleDateString('zh-TW')}`;
+    }
+}
+
 // Render outline data (reusable for variants and project outlines)
 function renderOutlineData(outline) {
     if (!outline) return;
     document.getElementById('outlineSection').style.display = 'block';
+
+    // Update section desc with schedule hours
+    const schedule = outline.schedule || [];
+    const descEl = document.getElementById('outlineSectionDesc');
+    if (descEl && schedule.length > 0) {
+        const totalHours = schedule.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0);
+        if (schedule.length > 1 && totalHours) {
+            descEl.textContent = `${schedule.length} 天共 ${totalHours} 小時的完整課程時間規劃`;
+        } else if (totalHours) {
+            descEl.textContent = `${totalHours} 小時的完整課程時間規劃`;
+        } else if (outline.hero?.duration) {
+            descEl.textContent = `${outline.hero.duration}的完整課程時間規劃`;
+        } else {
+            descEl.textContent = '完整課程時間規劃';
+        }
+    } else if (descEl) {
+        descEl.textContent = '完整課程時間規劃';
+    }
 
     if (outline.timeline && outline.timeline.length > 0) {
         const container = document.getElementById('outlineTimeline');
@@ -1549,6 +1576,14 @@ function renderOutlineData(outline) {
         }
 
         if (hasDays) {
+            // Build schedule hours lookup: { dayNum: hours }
+            const schedHours = {};
+            if (outline.schedule) {
+                outline.schedule.forEach(s => {
+                    if (s.hours) schedHours[s.day || 1] = s.hours;
+                });
+            }
+
             const days = {};
             outline.timeline.forEach(b => {
                 const d = b.day || 1;
@@ -1561,7 +1596,10 @@ function renderOutlineData(outline) {
                     }
                     const baseLabel = b.dayLabel || `Day ${d}`;
                     const label = topic ? `${baseLabel} — ${topic}` : baseLabel;
-                    days[d] = { label, info: b.dayInfo || '', blocks: [] };
+                    // Use schedule hours if available, fallback to dayInfo
+                    const hoursText = schedHours[d] ? `${schedHours[d]} 小時` : '';
+                    const info = hoursText || b.dayInfo || '';
+                    days[d] = { label, info, blocks: [] };
                 }
                 days[d].blocks.push(b);
             });
