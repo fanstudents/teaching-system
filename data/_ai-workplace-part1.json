@@ -1,0 +1,204 @@
+{
+  "slides": [
+    {
+      "id": "el_s1a0cover",
+      "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)",
+      "elements": [
+        {"id":"el_s1bg0rect","type":"shape","shapeType":"rectangle","x":0,"y":0,"width":960,"height":540,"background":"linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)"},
+        {"id":"el_s1deco01","type":"shape","shapeType":"rectangle","x":60,"y":60,"width":4,"height":120,"background":"#38bdf8"},
+        {"id":"el_s1title01","type":"text","x":80,"y":55,"width":600,"height":70,"content":"<b style=\"font-size:44px;color:#f1f5f9;letter-spacing:1px;\">AI 職場應用</b>","fontSize":44,"bold":true},
+        {"id":"el_s1sub01","type":"text","x":80,"y":130,"width":600,"height":40,"content":"<span style=\"font-size:20px;color:#94a3b8;\">讓 AI 成為你的超級工作夥伴</span>","fontSize":20},
+        {"id":"el_s1line01","type":"shape","shapeType":"rectangle","x":80,"y":190,"width":50,"height":3,"background":"#38bdf8"},
+        {"id":"el_s1auth01","type":"text","x":80,"y":400,"width":500,"height":30,"content":"<span style=\"font-size:16px;color:#64748b;\">講師：樊松蒲 Dennis ∣ 數位簡報室</span>","fontSize":16}
+      ]
+    },
+    {
+      "id": "el_s2a1poll",
+      "background": "#f8fafc",
+      "elements": [
+        {"id":"el_s2title01","type":"text","x":60,"y":30,"width":700,"height":50,"content":"<b style=\"font-size:30px;color:#1e293b;\">你目前用過哪些 AI 工具？</b>","fontSize":30,"bold":true},
+        {"id":"el_s2line01","type":"shape","shapeType":"rectangle","x":60,"y":75,"width":50,"height":3,"background":"#7c3aed"},
+        {"id":"el_s2desc01","type":"text","x":60,"y":90,"width":840,"height":28,"content":"<span style=\"font-size:15px;color:#64748b;\">選出你最常使用的（可多選）</span>","fontSize":15},
+        {"id":"el_s2poll01","type":"poll","x":60,"y":130,"width":840,"height":320,"question":"你目前用過哪些 AI 工具？","options":[{"text":"ChatGPT"},{"text":"Google Gemini"},{"text":"Microsoft Copilot"},{"text":"Claude"},{"text":"其他 / 都沒用過"}]}
+      ]
+    },
+    {
+      "id": "el_s3a2toc",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s3title01","type":"text","x":60,"y":35,"width":700,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">今天的學習路線圖</b>","fontSize":32,"bold":true},
+        {"id":"el_s3line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s3card1bg","type":"shape","shapeType":"rectangle","x":60,"y":120,"width":270,"height":100,"background":"#f0f9ff"},
+        {"id":"el_s3card1tx","type":"text","x":75,"y":135,"width":240,"height":70,"content":"<b style=\"font-size:18px;color:#0284c7;\">🌊 AI 浪潮現況</b><br><span style=\"font-size:13px;color:#64748b;\">趨勢數據與工具總覽</span>","fontSize":18},
+
+        {"id":"el_s3card2bg","type":"shape","shapeType":"rectangle","x":340,"y":120,"width":270,"height":100,"background":"#faf5ff"},
+        {"id":"el_s3card2tx","type":"text","x":355,"y":135,"width":240,"height":70,"content":"<b style=\"font-size:18px;color:#7c3aed;\">💼 職場六大場景</b><br><span style=\"font-size:13px;color:#64748b;\">實際應用案例解析</span>","fontSize":18},
+
+        {"id":"el_s3card3bg","type":"shape","shapeType":"rectangle","x":620,"y":120,"width":270,"height":100,"background":"#f0fdf4"},
+        {"id":"el_s3card3tx","type":"text","x":635,"y":135,"width":240,"height":70,"content":"<b style=\"font-size:18px;color:#16a34a;\">✏️ 提示工程實戰</b><br><span style=\"font-size:13px;color:#64748b;\">Prompt 撰寫技巧</span>","fontSize":18},
+
+        {"id":"el_s3card4bg","type":"shape","shapeType":"rectangle","x":60,"y":240,"width":270,"height":100,"background":"#fffbeb"},
+        {"id":"el_s3card4tx","type":"text","x":75,"y":255,"width":240,"height":70,"content":"<b style=\"font-size:18px;color:#d97706;\">🛡️ 使用原則與風險</b><br><span style=\"font-size:13px;color:#64748b;\">安全與倫理守則</span>","fontSize":18},
+
+        {"id":"el_s3card5bg","type":"shape","shapeType":"rectangle","x":340,"y":240,"width":270,"height":100,"background":"#fef2f2"},
+        {"id":"el_s3card5tx","type":"text","x":355,"y":255,"width":240,"height":70,"content":"<b style=\"font-size:18px;color:#dc2626;\">🔨 動手實作</b><br><span style=\"font-size:13px;color:#64748b;\">現場練習與回饋</span>","fontSize":18},
+
+        {"id":"el_s3card6bg","type":"shape","shapeType":"rectangle","x":620,"y":240,"width":270,"height":100,"background":"#f1f5f9"},
+        {"id":"el_s3card6tx","type":"text","x":635,"y":255,"width":240,"height":70,"content":"<b style=\"font-size:18px;color:#475569;\">🎯 總結 Q&A</b><br><span style=\"font-size:13px;color:#64748b;\">重點回顧與問答</span>","fontSize":18}
+      ]
+    },
+    {
+      "id": "el_s4a3adopt",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s4title01","type":"text","x":60,"y":35,"width":700,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">AI 採用率急速攀升</b>","fontSize":32,"bold":true},
+        {"id":"el_s4line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s4stat1bg","type":"shape","shapeType":"rectangle","x":60,"y":120,"width":270,"height":160,"background":"#f0f9ff"},
+        {"id":"el_s4stat1n","type":"text","x":75,"y":130,"width":240,"height":55,"content":"<b style=\"font-size:48px;color:#0284c7;\">72%</b>","fontSize":48,"bold":true},
+        {"id":"el_s4stat1d","type":"text","x":75,"y":190,"width":240,"height":70,"content":"<div style=\"font-size:15px;color:#334155;line-height:1.6;\">企業已導入 AI<br><span style=\"font-size:12px;color:#94a3b8;\">McKinsey 2024</span></div>","fontSize":15},
+
+        {"id":"el_s4stat2bg","type":"shape","shapeType":"rectangle","x":345,"y":120,"width":270,"height":160,"background":"#f0fdf4"},
+        {"id":"el_s4stat2n","type":"text","x":360,"y":130,"width":240,"height":55,"content":"<b style=\"font-size:48px;color:#16a34a;\">65%</b>","fontSize":48,"bold":true},
+        {"id":"el_s4stat2d","type":"text","x":360,"y":190,"width":240,"height":70,"content":"<div style=\"font-size:15px;color:#334155;line-height:1.6;\">員工日常使用 AI<br><span style=\"font-size:12px;color:#94a3b8;\">Microsoft 2024</span></div>","fontSize":15},
+
+        {"id":"el_s4stat3bg","type":"shape","shapeType":"rectangle","x":630,"y":120,"width":270,"height":160,"background":"#faf5ff"},
+        {"id":"el_s4stat3n","type":"text","x":645,"y":130,"width":240,"height":55,"content":"<b style=\"font-size:48px;color:#7c3aed;\">2×</b>","fontSize":48,"bold":true},
+        {"id":"el_s4stat3d","type":"text","x":645,"y":190,"width":240,"height":70,"content":"<div style=\"font-size:15px;color:#334155;line-height:1.6;\">AI 工具年增率<br><span style=\"font-size:12px;color:#94a3b8;\">Gartner 2025</span></div>","fontSize":15},
+
+        {"id":"el_s4src01","type":"text","x":60,"y":495,"width":840,"height":30,"content":"<span style=\"font-size:11px;color:#94a3b8;\">— McKinsey Global AI Survey (2024) / Microsoft Work Trend Index (2024) / Gartner (2025)</span>","fontSize":11}
+      ]
+    },
+    {
+      "id": "el_s5a4effic",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s5title01","type":"text","x":60,"y":35,"width":700,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">導入 AI 後的效率提升</b>","fontSize":32,"bold":true},
+        {"id":"el_s5line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s5c1bg","type":"shape","shapeType":"rectangle","x":60,"y":120,"width":420,"height":100,"background":"#f0f9ff"},
+        {"id":"el_s5c1n","type":"text","x":75,"y":128,"width":120,"height":45,"content":"<b style=\"font-size:36px;color:#0284c7;\">40%</b>","fontSize":36,"bold":true},
+        {"id":"el_s5c1d","type":"text","x":75,"y":173,"width":390,"height":35,"content":"<div style=\"font-size:14px;color:#334155;\">文書處理時間減少<span style=\"font-size:11px;color:#94a3b8;\"> — Harvard Business Review, 2024</span></div>","fontSize":14},
+
+        {"id":"el_s5c2bg","type":"shape","shapeType":"rectangle","x":500,"y":120,"width":420,"height":100,"background":"#faf5ff"},
+        {"id":"el_s5c2n","type":"text","x":515,"y":128,"width":120,"height":45,"content":"<b style=\"font-size:36px;color:#7c3aed;\">26%</b>","fontSize":36,"bold":true},
+        {"id":"el_s5c2d","type":"text","x":515,"y":173,"width":390,"height":35,"content":"<div style=\"font-size:14px;color:#334155;\">程式開發效率提升<span style=\"font-size:11px;color:#94a3b8;\"> — GitHub Copilot Study, 2024</span></div>","fontSize":14},
+
+        {"id":"el_s5c3bg","type":"shape","shapeType":"rectangle","x":60,"y":240,"width":420,"height":100,"background":"#f0f9ff"},
+        {"id":"el_s5c3n","type":"text","x":75,"y":248,"width":120,"height":45,"content":"<b style=\"font-size:36px;color:#0284c7;\">37%</b>","fontSize":36,"bold":true},
+        {"id":"el_s5c3d","type":"text","x":75,"y":293,"width":390,"height":35,"content":"<div style=\"font-size:14px;color:#334155;\">行銷內容產出速度提升<span style=\"font-size:11px;color:#94a3b8;\"> — BCG, 2024</span></div>","fontSize":14},
+
+        {"id":"el_s5c4bg","type":"shape","shapeType":"rectangle","x":500,"y":240,"width":420,"height":100,"background":"#faf5ff"},
+        {"id":"el_s5c4n","type":"text","x":515,"y":248,"width":120,"height":45,"content":"<b style=\"font-size:36px;color:#7c3aed;\">55%</b>","fontSize":36,"bold":true},
+        {"id":"el_s5c4d","type":"text","x":515,"y":293,"width":390,"height":35,"content":"<div style=\"font-size:14px;color:#334155;\">客服回應時間縮短<span style=\"font-size:11px;color:#94a3b8;\"> — Zendesk AI Report, 2024</span></div>","fontSize":14},
+
+        {"id":"el_s5src01","type":"text","x":60,"y":495,"width":840,"height":30,"content":"<span style=\"font-size:11px;color:#94a3b8;\">— Harvard Business Review (2024) / GitHub Copilot Study (2024) / BCG (2024) / Zendesk AI Report (2024)</span>","fontSize":11}
+      ]
+    },
+    {
+      "id": "el_s6a5tools",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s6title01","type":"text","x":60,"y":35,"width":700,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">主流 AI 工具一覽</b>","fontSize":32,"bold":true},
+        {"id":"el_s6line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s6t1bg","type":"shape","shapeType":"rectangle","x":60,"y":110,"width":200,"height":280,"background":"#10a37f"},
+        {"id":"el_s6t1name","type":"text","x":75,"y":130,"width":170,"height":45,"content":"<b style=\"font-size:28px;color:#ffffff;\">ChatGPT</b>","fontSize":28,"bold":true},
+        {"id":"el_s6t1comp","type":"text","x":75,"y":180,"width":170,"height":25,"content":"<span style=\"font-size:13px;color:rgba(255,255,255,0.7);\">OpenAI</span>","fontSize":13},
+        {"id":"el_s6t1desc","type":"text","x":75,"y":220,"width":170,"height":60,"content":"<div style=\"font-size:14px;color:#ffffff;line-height:1.6;\">最泛用的文字生成工具</div>","fontSize":14},
+
+        {"id":"el_s6t2bg","type":"shape","shapeType":"rectangle","x":280,"y":110,"width":200,"height":280,"background":"#4285f4"},
+        {"id":"el_s6t2name","type":"text","x":295,"y":130,"width":170,"height":45,"content":"<b style=\"font-size:28px;color:#ffffff;\">Gemini</b>","fontSize":28,"bold":true},
+        {"id":"el_s6t2comp","type":"text","x":295,"y":180,"width":170,"height":25,"content":"<span style=\"font-size:13px;color:rgba(255,255,255,0.7);\">Google</span>","fontSize":13},
+        {"id":"el_s6t2desc","type":"text","x":295,"y":220,"width":170,"height":60,"content":"<div style=\"font-size:14px;color:#ffffff;line-height:1.6;\">整合搜尋與多模態</div>","fontSize":14},
+
+        {"id":"el_s6t3bg","type":"shape","shapeType":"rectangle","x":500,"y":110,"width":200,"height":280,"background":"#d4a574"},
+        {"id":"el_s6t3name","type":"text","x":515,"y":130,"width":170,"height":45,"content":"<b style=\"font-size:28px;color:#ffffff;\">Claude</b>","fontSize":28,"bold":true},
+        {"id":"el_s6t3comp","type":"text","x":515,"y":180,"width":170,"height":25,"content":"<span style=\"font-size:13px;color:rgba(255,255,255,0.7);\">Anthropic</span>","fontSize":13},
+        {"id":"el_s6t3desc","type":"text","x":515,"y":220,"width":170,"height":60,"content":"<div style=\"font-size:14px;color:#ffffff;line-height:1.6;\">長文分析與安全性</div>","fontSize":14},
+
+        {"id":"el_s6t4bg","type":"shape","shapeType":"rectangle","x":720,"y":110,"width":200,"height":280,"background":"#0078d4"},
+        {"id":"el_s6t4name","type":"text","x":735,"y":130,"width":170,"height":45,"content":"<b style=\"font-size:28px;color:#ffffff;\">Copilot</b>","fontSize":28,"bold":true},
+        {"id":"el_s6t4comp","type":"text","x":735,"y":180,"width":170,"height":25,"content":"<span style=\"font-size:13px;color:rgba(255,255,255,0.7);\">Microsoft</span>","fontSize":13},
+        {"id":"el_s6t4desc","type":"text","x":735,"y":220,"width":170,"height":60,"content":"<div style=\"font-size:14px;color:#ffffff;line-height:1.6;\">Office 深度整合</div>","fontSize":14}
+      ]
+    },
+    {
+      "id": "el_s7a6quiz",
+      "background": "#f8fafc",
+      "elements": [
+        {"id":"el_s7title01","type":"text","x":60,"y":30,"width":700,"height":50,"content":"<b style=\"font-size:30px;color:#1e293b;\">快問快答：AI 工具知多少？</b>","fontSize":30,"bold":true},
+        {"id":"el_s7line01","type":"shape","shapeType":"rectangle","x":60,"y":75,"width":50,"height":3,"background":"#7c3aed"},
+        {"id":"el_s7desc01","type":"text","x":60,"y":90,"width":840,"height":28,"content":"<span style=\"font-size:15px;color:#64748b;\">根據剛才的介紹，選出正確答案</span>","fontSize":15},
+        {"id":"el_s7quiz01","type":"quiz","x":60,"y":130,"width":840,"height":320,"question":"以下哪個 AI 工具與 Microsoft Office 深度整合？","multiple":false,"options":[{"text":"ChatGPT","correct":false},{"text":"Google Gemini","correct":false},{"text":"Microsoft Copilot","correct":true},{"text":"Claude","correct":false}]}
+      ]
+    },
+    {
+      "id": "el_s8a7taiwan",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s8title01","type":"text","x":60,"y":35,"width":700,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">台灣企業 AI 應用現況</b>","fontSize":32,"bold":true},
+        {"id":"el_s8line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s8body01","type":"text","x":60,"y":110,"width":500,"height":210,"content":"<div style=\"font-size:16px;line-height:2.2;color:#334155;\">• 超過 60% 台灣企業已開始評估或導入 AI<br>• 金融、製造、零售三大產業領先<br>• 人才缺口與數據品質是最大挑戰<br>• 政府推動「AI 行動計畫」加速產業升級</div>","fontSize":16},
+
+        {"id":"el_s8statbg","type":"shape","shapeType":"rectangle","x":600,"y":120,"width":310,"height":180,"background":"#fffbeb"},
+        {"id":"el_s8statn","type":"text","x":620,"y":140,"width":270,"height":60,"content":"<b style=\"font-size:40px;color:#d97706;\">NT$100億+</b>","fontSize":40,"bold":true},
+        {"id":"el_s8statd","type":"text","x":620,"y":210,"width":270,"height":60,"content":"<div style=\"font-size:15px;color:#92400e;line-height:1.6;\">2025 年台灣<br>AI 產業產值</div>","fontSize":15},
+
+        {"id":"el_s8src01","type":"text","x":60,"y":495,"width":840,"height":30,"content":"<span style=\"font-size:11px;color:#94a3b8;\">— 資策會 MIC (2024)</span>","fontSize":11}
+      ]
+    },
+    {
+      "id": "el_s9a8scenes",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s9title01","type":"text","x":60,"y":35,"width":800,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">AI 在職場的六大應用場景</b>","fontSize":32,"bold":true},
+        {"id":"el_s9line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s9sc1bg","type":"shape","shapeType":"rectangle","x":60,"y":120,"width":270,"height":110,"background":"#f0f9ff"},
+        {"id":"el_s9sc1tx","type":"text","x":75,"y":132,"width":240,"height":85,"content":"<b style=\"font-size:18px;color:#0284c7;\">📝 文書處理</b><br><span style=\"font-size:13px;color:#64748b;\">Email、會議紀錄</span>","fontSize":18},
+
+        {"id":"el_s9sc2bg","type":"shape","shapeType":"rectangle","x":340,"y":120,"width":270,"height":110,"background":"#faf5ff"},
+        {"id":"el_s9sc2tx","type":"text","x":355,"y":132,"width":240,"height":85,"content":"<b style=\"font-size:18px;color:#7c3aed;\">📢 行銷內容</b><br><span style=\"font-size:13px;color:#64748b;\">社群貼文、廣告</span>","fontSize":18},
+
+        {"id":"el_s9sc3bg","type":"shape","shapeType":"rectangle","x":620,"y":120,"width":270,"height":110,"background":"#f0fdf4"},
+        {"id":"el_s9sc3tx","type":"text","x":635,"y":132,"width":240,"height":85,"content":"<b style=\"font-size:18px;color:#16a34a;\">📊 數據分析</b><br><span style=\"font-size:13px;color:#64748b;\">報表、視覺化</span>","fontSize":18},
+
+        {"id":"el_s9sc4bg","type":"shape","shapeType":"rectangle","x":60,"y":250,"width":270,"height":110,"background":"#fffbeb"},
+        {"id":"el_s9sc4tx","type":"text","x":75,"y":262,"width":240,"height":85,"content":"<b style=\"font-size:18px;color:#d97706;\">💬 客服溝通</b><br><span style=\"font-size:13px;color:#64748b;\">自動回覆、話術</span>","fontSize":18},
+
+        {"id":"el_s9sc5bg","type":"shape","shapeType":"rectangle","x":340,"y":250,"width":270,"height":110,"background":"#fef2f2"},
+        {"id":"el_s9sc5tx","type":"text","x":355,"y":262,"width":240,"height":85,"content":"<b style=\"font-size:18px;color:#dc2626;\">📋 專案管理</b><br><span style=\"font-size:13px;color:#64748b;\">腦力激盪、規劃</span>","fontSize":18},
+
+        {"id":"el_s9sc6bg","type":"shape","shapeType":"rectangle","x":620,"y":250,"width":270,"height":110,"background":"#f1f5f9"},
+        {"id":"el_s9sc6tx","type":"text","x":635,"y":262,"width":240,"height":85,"content":"<b style=\"font-size:18px;color:#475569;\">🎓 學習成長</b><br><span style=\"font-size:13px;color:#64748b;\">個人化學習</span>","fontSize":18}
+      ]
+    },
+    {
+      "id": "el_s10a9doc",
+      "background": "#ffffff",
+      "elements": [
+        {"id":"el_s10title01","type":"text","x":60,"y":35,"width":600,"height":50,"content":"<b style=\"font-size:32px;color:#1e293b;\">場景 1｜文書處理與摘要</b>","fontSize":32,"bold":true},
+        {"id":"el_s10tagbg","type":"shape","shapeType":"rectangle","x":680,"y":40,"width":72,"height":30,"background":"#0284c7"},
+        {"id":"el_s10tagtx","type":"text","x":685,"y":42,"width":62,"height":26,"content":"<b style=\"font-size:12px;color:#ffffff;\">最常用</b>","fontSize":12,"bold":true},
+        {"id":"el_s10line01","type":"shape","shapeType":"rectangle","x":60,"y":85,"width":50,"height":3,"background":"#38bdf8"},
+
+        {"id":"el_s10c1bg","type":"shape","shapeType":"rectangle","x":60,"y":110,"width":480,"height":90,"background":"#f0f9ff"},
+        {"id":"el_s10c1tx","type":"text","x":75,"y":120,"width":450,"height":70,"content":"<b style=\"font-size:17px;color:#0284c7;\">✉️ Email 草稿</b><br><span style=\"font-size:14px;color:#334155;\">自動生成專業信件回覆</span>","fontSize":17},
+
+        {"id":"el_s10c2bg","type":"shape","shapeType":"rectangle","x":60,"y":210,"width":480,"height":90,"background":"#f0f9ff"},
+        {"id":"el_s10c2tx","type":"text","x":75,"y":220,"width":450,"height":70,"content":"<b style=\"font-size:17px;color:#0284c7;\">📄 會議紀錄</b><br><span style=\"font-size:14px;color:#334155;\">語音轉文字 + 重點摘要</span>","fontSize":17},
+
+        {"id":"el_s10c3bg","type":"shape","shapeType":"rectangle","x":60,"y":310,"width":480,"height":90,"background":"#f0f9ff"},
+        {"id":"el_s10c3tx","type":"text","x":75,"y":320,"width":450,"height":70,"content":"<b style=\"font-size:17px;color:#0284c7;\">📋 文件摘要</b><br><span style=\"font-size:14px;color:#334155;\">長文快速抓重點</span>","fontSize":17},
+
+        {"id":"el_s10rbg","type":"shape","shapeType":"rectangle","x":580,"y":120,"width":330,"height":250,"background":"#1e293b"},
+        {"id":"el_s10rn","type":"text","x":610,"y":160,"width":270,"height":65,"content":"<b style=\"font-size:52px;color:#38bdf8;\">40%</b>","fontSize":52,"bold":true},
+        {"id":"el_s10rd1","type":"text","x":610,"y":235,"width":270,"height":35,"content":"<span style=\"font-size:18px;color:#f1f5f9;\">處理時間減少</span>","fontSize":18},
+        {"id":"el_s10rd2","type":"text","x":610,"y":280,"width":270,"height":50,"content":"<span style=\"font-size:14px;color:#94a3b8;\">平均每天省下 1.5 小時</span>","fontSize":14}
+      ]
+    }
+  ]
+}

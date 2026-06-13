@@ -1,0 +1,915 @@
+{
+  "slides": [
+    {
+      "id": "el_p11slide01",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p11txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">場景 2｜行銷內容生成</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p11shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p11shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 270,
+          "height": 200,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_p11txt02",
+          "type": "text",
+          "x": 75,
+          "y": 120,
+          "width": 240,
+          "height": 180,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:28px;\">🎯</b><br><b style=\"font-size:18px;color:#7c3aed;\">社群貼文</b><br><br>根據品牌調性自動產生 Threads / IG 文案</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p11shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 110,
+          "width": 270,
+          "height": 200,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_p11txt03",
+          "type": "text",
+          "x": 360,
+          "y": 120,
+          "width": 240,
+          "height": 180,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:28px;\">📸</b><br><b style=\"font-size:18px;color:#0284c7;\">廣告文案</b><br><br>A/B Test 標題、CTA 變體一次給你 5 版</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p11shp04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 110,
+          "width": 270,
+          "height": 200,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p11txt04",
+          "type": "text",
+          "x": 645,
+          "y": 120,
+          "width": 240,
+          "height": 180,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:28px;\">📰</b><br><b style=\"font-size:18px;color:#16a34a;\">SEO 文章</b><br><br>從關鍵字到完稿，30 分鐘搞定千字文</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p11shp05",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 340,
+          "width": 840,
+          "height": 50,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_p11txt05",
+          "type": "text",
+          "x": 80,
+          "y": 348,
+          "width": 800,
+          "height": 35,
+          "content": "<b style=\"font-size:18px;color:#0284c7;\">📈 37% 內容產出速度提升</b><span style=\"font-size:15px;color:#64748b;\"> — BCG (2024)</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_p11src01",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:11px;color:#94a3b8;\">— BCG: How CMOs Are Shaping Their GenAI Transformation (2024)<br>https://www.bcg.com/publications/2024/how-cmos-are-shaping-genai-transformation</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_p12slide02",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p12txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">場景 3｜數據分析與報表</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p12shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p12txt02",
+          "type": "text",
+          "x": 60,
+          "y": 110,
+          "width": 440,
+          "height": 250,
+          "content": "<div style=\"font-size:16px;line-height:2.2;color:#334155;\">• 上傳 Excel / CSV → AI 自動產生分析摘要<br><br>• 用自然語言下查詢指令（不用寫公式）<br><br>• 自動建議視覺化圖表類型<br><br>• 異常值偵測與趨勢預測</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p12shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 520,
+          "y": 110,
+          "width": 400,
+          "height": 250,
+          "background": "#1e293b"
+        },
+        {
+          "id": "el_p12txt03",
+          "type": "text",
+          "x": 545,
+          "y": 135,
+          "width": 350,
+          "height": 50,
+          "content": "<b style=\"font-size:22px;color:#f1f5f9;\">ChatGPT Advanced Data Analysis</b>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_p12shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 545,
+          "y": 200,
+          "width": 40,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p12txt04",
+          "type": "text",
+          "x": 545,
+          "y": 220,
+          "width": 350,
+          "height": 100,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#94a3b8;\">📁 拖曳檔案<br>💬 對話式分析<br>📊 自動出圖</div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_p13slide03",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p13txt01",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">場景配對挑戰</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p13shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_p13txt02",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">把工作場景和最適合的 AI 應用配對起來</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p13match01",
+          "type": "matching",
+          "x": 60,
+          "y": 130,
+          "width": 840,
+          "height": 350,
+          "pairs": [
+            { "left": "週一早上收到 50 封 Email", "right": "AI 信件分類與摘要" },
+            { "left": "老闆要求下班前交月報", "right": "AI 數據分析與視覺化" },
+            { "left": "需要產出 5 版 IG 貼文", "right": "AI 行銷內容生成" },
+            { "left": "客戶抱怨等太久", "right": "AI 自動客服回覆" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_p14slide04",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p14txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">場景 4｜客服與溝通優化</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p14shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p14shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 400,
+          "height": 260,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_p14txt02",
+          "type": "text",
+          "x": 80,
+          "y": 120,
+          "width": 360,
+          "height": 240,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\"><b style=\"font-size:20px;color:#dc2626;\">Before ❌</b><br><br>• 人工逐一回覆客訴<br>• 回覆品質不一致<br>• 平均等待 2 小時</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p14shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 110,
+          "width": 400,
+          "height": 260,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p14txt03",
+          "type": "text",
+          "x": 520,
+          "y": 120,
+          "width": 360,
+          "height": 240,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\"><b style=\"font-size:20px;color:#16a34a;\">After ✅</b><br><br>• AI 自動分類 + 建議回覆<br>• 標準化語氣與品牌調性<br>• 平均等待 15 分鐘</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p14shp04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 395,
+          "width": 840,
+          "height": 50,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p14txt04",
+          "type": "text",
+          "x": 80,
+          "y": 403,
+          "width": 800,
+          "height": 35,
+          "content": "<b style=\"font-size:18px;color:#16a34a;\">⚡ 55% 回應時間縮短</b><span style=\"font-size:15px;color:#64748b;\"> — Zendesk AI Report (2024)</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_p14src01",
+          "type": "text",
+          "x": 60,
+          "y": 495,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:11px;color:#94a3b8;\">— Zendesk CX Trends Report (2024)<br>https://www.zendesk.com/cx-trends-report/</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_p15slide05",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p15txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">場景 5｜專案管理與決策</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p15shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p15shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 840,
+          "height": 65,
+          "background": "#f1f5f9"
+        },
+        {
+          "id": "el_p15txt02",
+          "type": "text",
+          "x": 80,
+          "y": 118,
+          "width": 800,
+          "height": 50,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:20px;\">💡 腦力激盪</b><span style=\"font-size:15px;color:#64748b;\"> — 給 AI 一個主題，5 分鐘得到 20 個點子</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p15shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 185,
+          "width": 840,
+          "height": 65,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_p15txt03",
+          "type": "text",
+          "x": 80,
+          "y": 193,
+          "width": 800,
+          "height": 50,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:20px;\">📊 SWOT 分析</b><span style=\"font-size:15px;color:#64748b;\"> — 餵入市場資料，AI 幫你拆解優劣勢</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p15shp04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 260,
+          "width": 840,
+          "height": 65,
+          "background": "#f1f5f9"
+        },
+        {
+          "id": "el_p15txt04",
+          "type": "text",
+          "x": 80,
+          "y": 268,
+          "width": 800,
+          "height": 50,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:20px;\">⚠️ 風險評估</b><span style=\"font-size:15px;color:#64748b;\"> — 列出專案風險 + 發生機率 + 應對方案</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p15shp05",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 335,
+          "width": 840,
+          "height": 65,
+          "background": "#ffffff"
+        },
+        {
+          "id": "el_p15txt05",
+          "type": "text",
+          "x": 80,
+          "y": 343,
+          "width": 800,
+          "height": 50,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:20px;\">📅 時程規劃</b><span style=\"font-size:15px;color:#64748b;\"> — AI 建議里程碑 + 自動拆解任務</span></div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_p16slide06",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p16txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">場景 6｜學習與技能提升</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p16shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p16shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 450,
+          "height": 90,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_p16txt02",
+          "type": "text",
+          "x": 75,
+          "y": 118,
+          "width": 420,
+          "height": 75,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:18px;\">🤖 AI 家教</b><br>不懂的概念隨時問，AI 用你聽得懂的方式解釋</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p16shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 210,
+          "width": 450,
+          "height": 90,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p16txt03",
+          "type": "text",
+          "x": 75,
+          "y": 218,
+          "width": 420,
+          "height": 75,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:18px;\">💻 程式輔助</b><br>不會寫 Code？AI 幫你寫、幫你除錯</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p16shp04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 310,
+          "width": 450,
+          "height": 90,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_p16txt04",
+          "type": "text",
+          "x": 75,
+          "y": 318,
+          "width": 420,
+          "height": 75,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:18px;\">🌐 語言學習</b><br>AI 當你的對話練習夥伴</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p16shp05",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 530,
+          "y": 110,
+          "width": 380,
+          "height": 290,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_p16txt05",
+          "type": "text",
+          "x": 555,
+          "y": 175,
+          "width": 330,
+          "height": 60,
+          "content": "<b style=\"font-size:34px;color:#7c3aed;\">Vibe Learning</b>",
+          "fontSize": 34
+        },
+        {
+          "id": "el_p16shp06",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 555,
+          "y": 245,
+          "width": 40,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_p16txt06",
+          "type": "text",
+          "x": 555,
+          "y": 265,
+          "width": 330,
+          "height": 60,
+          "content": "<div style=\"font-size:18px;line-height:1.8;color:#64748b;\">用聊天的方式<br>學任何東西</div>",
+          "fontSize": 18
+        }
+      ]
+    },
+    {
+      "id": "el_p17slide07",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p17txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">提示工程的基本框架</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p17shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p17shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 108,
+          "width": 840,
+          "height": 60,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_p17txt02",
+          "type": "text",
+          "x": 80,
+          "y": 116,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:22px;color:#0284c7;\">R</b>　<b>角色（Role）</b><span style=\"color:#64748b;\"> — 告訴 AI 它扮演什麼專家</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p17shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 178,
+          "width": 840,
+          "height": 60,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_p17txt03",
+          "type": "text",
+          "x": 80,
+          "y": 186,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:22px;color:#7c3aed;\">C</b>　<b>情境（Context）</b><span style=\"color:#64748b;\"> — 說明背景和使用場景</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p17shp04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 248,
+          "width": 840,
+          "height": 60,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p17txt04",
+          "type": "text",
+          "x": 80,
+          "y": 256,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:22px;color:#16a34a;\">T</b>　<b>任務（Task）</b><span style=\"color:#64748b;\"> — 明確指定你要什麼產出</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p17shp05",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 318,
+          "width": 840,
+          "height": 60,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_p17txt05",
+          "type": "text",
+          "x": 80,
+          "y": 326,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:22px;color:#d97706;\">F</b>　<b>格式（Format）</b><span style=\"color:#64748b;\"> — 規定產出的結構語言</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p17shp06",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 388,
+          "width": 840,
+          "height": 60,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_p17txt06",
+          "type": "text",
+          "x": 80,
+          "y": 396,
+          "width": 800,
+          "height": 45,
+          "content": "<div style=\"font-size:16px;color:#334155;\"><b style=\"font-size:22px;color:#dc2626;\">C</b>　<b>限制（Constraint）</b><span style=\"color:#64748b;\"> — 加上邊界條件</span></div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_p18slide08",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p18txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">好 Prompt vs 壞 Prompt</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p18shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p18shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 420,
+          "height": 340,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_p18txt02",
+          "type": "text",
+          "x": 80,
+          "y": 120,
+          "width": 380,
+          "height": 320,
+          "content": "<div style=\"font-size:16px;line-height:1.9;color:#334155;\"><b style=\"font-size:22px;color:#dc2626;\">❌ 壞的 Prompt</b><br><br><div style=\"background:#fff;padding:12px;border-radius:8px;font-size:15px;color:#64748b;border:1px solid #fecaca;\">「幫我寫一封 Email」</div><br><b style=\"font-size:14px;color:#dc2626;\">問題：</b><br><span style=\"font-size:14px;color:#64748b;\">太模糊、沒有角色、沒有情境</span></div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_p18shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 110,
+          "width": 420,
+          "height": 340,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p18txt03",
+          "type": "text",
+          "x": 520,
+          "y": 120,
+          "width": 380,
+          "height": 320,
+          "content": "<div style=\"font-size:16px;line-height:1.9;color:#334155;\"><b style=\"font-size:22px;color:#16a34a;\">✅ 好的 Prompt</b><br><br><div style=\"background:#fff;padding:12px;border-radius:8px;font-size:14px;color:#334155;border:1px solid #bbf7d0;\">「你是一位資深 HR 主管。我需要寫一封婉拒面試者的 Email，語氣專業但溫暖，150 字以內，繁體中文。」</div><br><b style=\"font-size:14px;color:#16a34a;\">優點：</b><br><span style=\"font-size:14px;color:#64748b;\">有角色、有任務、有格式、有限制</span></div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_p19slide09",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p19txt01",
+          "type": "text",
+          "x": 60,
+          "y": 30,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">完成一個完整的 Prompt</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p19shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 75,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_p19txt02",
+          "type": "text",
+          "x": 60,
+          "y": 90,
+          "width": 840,
+          "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">試著把空格填上正確的框架要素</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p19fill01",
+          "type": "fillblank",
+          "x": 60,
+          "y": 130,
+          "width": 840,
+          "height": 360,
+          "title": "Prompt 框架填空練習",
+          "content": "你是一位 ___1___（角色設定）。\n\n目前的背景是 ___2___（情境說明）。\n\n請幫我 ___3___（具體任務）。\n\n請用 ___4___（輸出格式）呈現。\n\n注意 ___5___（限制條件）。",
+          "blanks": [
+            { "answer": "資深行銷經理" },
+            { "answer": "公司即將推出新產品" },
+            { "answer": "撰寫社群貼文" },
+            { "answer": "繁體中文、200字以內" },
+            { "answer": "語氣活潑、加入 emoji" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_p20slide10",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p20txt01",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 700,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">進階 Prompt 技巧</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p20shp01",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p20shp02",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 270,
+          "height": 280,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_p20txt02",
+          "type": "text",
+          "x": 75,
+          "y": 120,
+          "width": 240,
+          "height": 260,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:26px;\">🔗</b><br><b style=\"font-size:18px;color:#0284c7;\">Chain of Thought</b><br><br>讓 AI 一步一步推理，回答更精準<br><br><div style=\"font-size:13px;color:#94a3b8;background:#fff;padding:8px;border-radius:6px;\">💬「請一步步分析這個行銷方案的優缺點」</div></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p20shp03",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 110,
+          "width": 270,
+          "height": 280,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_p20txt03",
+          "type": "text",
+          "x": 360,
+          "y": 120,
+          "width": 240,
+          "height": 260,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:26px;\">📝</b><br><b style=\"font-size:18px;color:#16a34a;\">Few-shot</b><br><br>給 AI 2-3 個範例，讓它學你的風格<br><br><div style=\"font-size:13px;color:#94a3b8;background:#fff;padding:8px;border-radius:6px;\">💬「以下是我之前寫的社群貼文風格...」</div></div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p20shp04",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 110,
+          "width": 270,
+          "height": 280,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_p20txt04",
+          "type": "text",
+          "x": 645,
+          "y": 120,
+          "width": 240,
+          "height": 260,
+          "content": "<div style=\"font-size:15px;line-height:1.8;color:#334155;\"><b style=\"font-size:26px;\">🎭</b><br><b style=\"font-size:18px;color:#7c3aed;\">Role-play</b><br><br>讓 AI 扮演特定角色，得到更專業的回答<br><br><div style=\"font-size:13px;color:#94a3b8;background:#fff;padding:8px;border-radius:6px;\">💬「你是 10 年經驗的財務長...」</div></div>",
+          "fontSize": 15
+        }
+      ]
+    }
+  ]
+}

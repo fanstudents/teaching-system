@@ -1,0 +1,1050 @@
+{
+  "slides": [
+    {
+      "id": "el_p21slide0a",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p21ttl01b",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">排出最佳 Prompt 撰寫順序</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p21line02c",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_p21desc03d",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">把以下步驟拖曳到正確的順序</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p21ord04e",
+          "type": "ordering",
+          "x": 60,
+          "y": 140,
+          "width": 840,
+          "height": 340,
+          "steps": [
+            "設定角色（Role）",
+            "描述情境（Context）",
+            "指定任務（Task）",
+            "規定格式（Format）",
+            "加上限制（Constraint）"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_p22slide1f",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p22ttl01g",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">五大萬用 Prompt 範本</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p22line02h",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p22desc03i",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">點擊複製，直接貼到 ChatGPT 使用</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p22card04j",
+          "type": "copycard",
+          "x": 60,
+          "y": 135,
+          "width": 840,
+          "height": 370,
+          "title": "職場萬用 Prompt 範本",
+          "content": "1️⃣ 信件回覆\n你是專業的商務秘書。請幫我回覆以下 Email，語氣禮貌專業，繁體中文，150字內。\n\n2️⃣ 會議摘要\n你是資深 PM。請將以下會議內容整理成：1)決議事項 2)待辦事項 3)下次會議重點，用條列式呈現。\n\n3️⃣ 社群貼文\n你是社群行銷專家。請根據以下產品資訊，寫出一篇 Instagram 貼文，200字內，加入 3-5 個 hashtag。\n\n4️⃣ 數據分析\n你是資料分析師。請分析以下數據，找出 3 個關鍵發現，並建議下一步行動方案。\n\n5️⃣ 簡報大綱\n你是簡報設計顧問。請根據以下主題，設計一份 10 頁簡報大綱，每頁一個重點，附上建議的視覺呈現方式。"
+        }
+      ]
+    },
+    {
+      "id": "el_p23slide2k",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p23ttl01l",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">AI 的三大使用原則</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p23line02m",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p23bg1n3o",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 840,
+          "height": 100,
+          "background": "#f0fdf4",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p23ic1p4q",
+          "type": "text",
+          "x": 80,
+          "y": 120,
+          "width": 50,
+          "height": 40,
+          "content": "<span style=\"font-size:32px;\">🔍</span>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_p23t1r5s",
+          "type": "text",
+          "x": 140,
+          "y": 118,
+          "width": 740,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#16a34a;\">不盲信</b>",
+          "fontSize": 20,
+          "bold": true
+        },
+        {
+          "id": "el_p23d1t6u",
+          "type": "text",
+          "x": 140,
+          "y": 152,
+          "width": 740,
+          "height": 40,
+          "content": "<span style=\"font-size:15px;color:#334155;\">AI 會產生幻覺（Hallucination），關鍵數據一定要交叉驗證</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p23bg2v7w",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 230,
+          "width": 840,
+          "height": 100,
+          "background": "#fef2f2",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p23ic2x8y",
+          "type": "text",
+          "x": 80,
+          "y": 240,
+          "width": 50,
+          "height": 40,
+          "content": "<span style=\"font-size:32px;\">🔒</span>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_p23t2z9a",
+          "type": "text",
+          "x": 140,
+          "y": 238,
+          "width": 740,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#dc2626;\">不洩密</b>",
+          "fontSize": 20,
+          "bold": true
+        },
+        {
+          "id": "el_p23d2b0c",
+          "type": "text",
+          "x": 140,
+          "y": 272,
+          "width": 740,
+          "height": 40,
+          "content": "<span style=\"font-size:15px;color:#334155;\">不要把客戶機密、個資直接貼給公開版 AI，請用企業版</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p23bg3d1e",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 350,
+          "width": 840,
+          "height": 100,
+          "background": "#f0f9ff",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p23ic3f2g",
+          "type": "text",
+          "x": 80,
+          "y": 360,
+          "width": 50,
+          "height": 40,
+          "content": "<span style=\"font-size:32px;\">🎯</span>",
+          "fontSize": 32
+        },
+        {
+          "id": "el_p23t3h3i",
+          "type": "text",
+          "x": 140,
+          "y": 358,
+          "width": 740,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#0284c7;\">要給情境</b>",
+          "fontSize": 20,
+          "bold": true
+        },
+        {
+          "id": "el_p23d3j4k",
+          "type": "text",
+          "x": 140,
+          "y": 392,
+          "width": 740,
+          "height": 40,
+          "content": "<span style=\"font-size:15px;color:#334155;\">AI 不是通靈，你給的背景越多，產出越精準</span>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_p24slide3l",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p24ttl01m",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">AI 翻車現場：真實案例</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p24line02n",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p24bg1o5p",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 840,
+          "height": 170,
+          "background": "#fef2f2",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p24ic1q6r",
+          "type": "text",
+          "x": 80,
+          "y": 118,
+          "width": 780,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#dc2626;\">⚖️ 律師引用 AI 捏造的判例</b>",
+          "fontSize": 20,
+          "bold": true
+        },
+        {
+          "id": "el_p24d1s7t",
+          "type": "text",
+          "x": 80,
+          "y": 155,
+          "width": 780,
+          "height": 60,
+          "content": "<span style=\"font-size:15px;color:#334155;line-height:1.8;\">2023 年美國律師用 ChatGPT 準備訴狀，引用了 6 個完全不存在的判例</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p24l1u8v",
+          "type": "text",
+          "x": 80,
+          "y": 205,
+          "width": 780,
+          "height": 30,
+          "content": "<b style=\"font-size:14px;color:#dc2626;\">💡 教訓：AI 產出的事實必須人工驗證</b>",
+          "fontSize": 14,
+          "bold": true
+        },
+        {
+          "id": "el_p24src1w9",
+          "type": "text",
+          "x": 80,
+          "y": 245,
+          "width": 780,
+          "height": 25,
+          "content": "<span style=\"font-size:11px;color:#94a3b8;\">來源：The New York Times (2023)</span>",
+          "fontSize": 11
+        },
+        {
+          "id": "el_p24bg2x0y",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 300,
+          "width": 840,
+          "height": 170,
+          "background": "#fffbeb",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p24ic2z1a",
+          "type": "text",
+          "x": 80,
+          "y": 308,
+          "width": 780,
+          "height": 35,
+          "content": "<b style=\"font-size:20px;color:#d97706;\">🏢 企業機密被 AI 學走</b>",
+          "fontSize": 20,
+          "bold": true
+        },
+        {
+          "id": "el_p24d2b2c",
+          "type": "text",
+          "x": 80,
+          "y": 345,
+          "width": 780,
+          "height": 60,
+          "content": "<span style=\"font-size:15px;color:#334155;line-height:1.8;\">Samsung 工程師將機密程式碼貼入 ChatGPT，導致公司機密外洩</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p24l2d3e",
+          "type": "text",
+          "x": 80,
+          "y": 395,
+          "width": 780,
+          "height": 30,
+          "content": "<b style=\"font-size:14px;color:#d97706;\">💡 教訓：敏感資料不能丟給公開版 AI</b>",
+          "fontSize": 14,
+          "bold": true
+        },
+        {
+          "id": "el_p24src2f4",
+          "type": "text",
+          "x": 80,
+          "y": 435,
+          "width": 780,
+          "height": 25,
+          "content": "<span style=\"font-size:11px;color:#94a3b8;\">來源：Bloomberg (2023)</span>",
+          "fontSize": 11
+        }
+      ]
+    },
+    {
+      "id": "el_p25slide4g",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p25ttl01h",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">AI 使用安全知識測驗</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p25line02i",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_p25desc03j",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">選出最正確的做法</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p25quiz04k",
+          "type": "quiz",
+          "x": 60,
+          "y": 140,
+          "width": 840,
+          "height": 340,
+          "question": "你的老闆請你用 AI 分析一份含有客戶個資的銷售報表，正確的做法是？",
+          "multiple": false,
+          "options": [
+            { "text": "直接上傳到 ChatGPT 免費版分析", "correct": false },
+            { "text": "先去除個資，再用 AI 分析趨勢", "correct": true },
+            { "text": "完全不用 AI，手動分析", "correct": false },
+            { "text": "把檔案傳給同事，請他用 AI 幫忙", "correct": false }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_p26slide5l",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p26ttl01m",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">企業導入 AI 的注意事項</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p26line02n",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p26bg1o5p",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 110,
+          "width": 400,
+          "height": 100,
+          "background": "#f0f9ff",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p26t1q6r",
+          "type": "text",
+          "x": 80,
+          "y": 118,
+          "width": 360,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#0284c7;\">📜 制定 AI 使用政策</b>",
+          "fontSize": 17,
+          "bold": true
+        },
+        {
+          "id": "el_p26d1s7t",
+          "type": "text",
+          "x": 80,
+          "y": 150,
+          "width": 360,
+          "height": 50,
+          "content": "<span style=\"font-size:13px;color:#334155;line-height:1.7;\">明確規範哪些資料可以／不可以用 AI 處理</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_p26bg2u8v",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 110,
+          "width": 400,
+          "height": 100,
+          "background": "#f0fdf4",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p26t2w9x",
+          "type": "text",
+          "x": 520,
+          "y": 118,
+          "width": 360,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#16a34a;\">🔐 選擇企業版工具</b>",
+          "fontSize": 17,
+          "bold": true
+        },
+        {
+          "id": "el_p26d2y0z",
+          "type": "text",
+          "x": 520,
+          "y": 150,
+          "width": 360,
+          "height": 50,
+          "content": "<span style=\"font-size:13px;color:#334155;line-height:1.7;\">ChatGPT Team/Enterprise, Azure OpenAI 等有隱私保障</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_p26bg3a1b",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 230,
+          "width": 400,
+          "height": 100,
+          "background": "#faf5ff",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p26t3c2d",
+          "type": "text",
+          "x": 80,
+          "y": 238,
+          "width": 360,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#7c3aed;\">📚 全員教育訓練</b>",
+          "fontSize": 17,
+          "bold": true
+        },
+        {
+          "id": "el_p26d3e3f",
+          "type": "text",
+          "x": 80,
+          "y": 270,
+          "width": 360,
+          "height": 50,
+          "content": "<span style=\"font-size:13px;color:#334155;line-height:1.7;\">不只教工具，更要教安全意識和判斷力</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_p26bg4g4h",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 230,
+          "width": 400,
+          "height": 100,
+          "background": "#fffbeb",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p26t4i5j",
+          "type": "text",
+          "x": 520,
+          "y": 238,
+          "width": 360,
+          "height": 30,
+          "content": "<b style=\"font-size:17px;color:#d97706;\">📊 建立評估機制</b>",
+          "fontSize": 17,
+          "bold": true
+        },
+        {
+          "id": "el_p26d4k6l",
+          "type": "text",
+          "x": 520,
+          "y": 270,
+          "width": 360,
+          "height": 50,
+          "content": "<span style=\"font-size:13px;color:#334155;line-height:1.7;\">定期追蹤 AI 帶來的效率提升和風險事件</span>",
+          "fontSize": 13
+        }
+      ]
+    },
+    {
+      "id": "el_p27slide6m",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_p27ttl01n",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">AI 導入三步驟</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_p27line02o",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p27bg1p7q",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 120,
+          "width": 270,
+          "height": 280,
+          "background": "#f0f9ff",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p27n1r8s",
+          "type": "text",
+          "x": 80,
+          "y": 135,
+          "width": 230,
+          "height": 60,
+          "content": "<b style=\"font-size:48px;color:#0284c7;opacity:0.3;\">01</b>",
+          "fontSize": 48,
+          "bold": true
+        },
+        {
+          "id": "el_p27t1t9u",
+          "type": "text",
+          "x": 80,
+          "y": 200,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:22px;color:#0284c7;\">找痛點</b>",
+          "fontSize": 22,
+          "bold": true
+        },
+        {
+          "id": "el_p27d1v0w",
+          "type": "text",
+          "x": 80,
+          "y": 245,
+          "width": 230,
+          "height": 120,
+          "content": "<span style=\"font-size:14px;color:#334155;line-height:1.8;\">列出你每天最花時間、最重複、最無聊的 3 項工作</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p27bg2x1y",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345,
+          "y": 120,
+          "width": 270,
+          "height": 280,
+          "background": "#faf5ff",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p27n2z2a",
+          "type": "text",
+          "x": 365,
+          "y": 135,
+          "width": 230,
+          "height": 60,
+          "content": "<b style=\"font-size:48px;color:#7c3aed;opacity:0.3;\">02</b>",
+          "fontSize": 48,
+          "bold": true
+        },
+        {
+          "id": "el_p27t2b3c",
+          "type": "text",
+          "x": 365,
+          "y": 200,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:22px;color:#7c3aed;\">選工具</b>",
+          "fontSize": 22,
+          "bold": true
+        },
+        {
+          "id": "el_p27d2d4e",
+          "type": "text",
+          "x": 365,
+          "y": 245,
+          "width": 230,
+          "height": 120,
+          "content": "<span style=\"font-size:14px;color:#334155;line-height:1.8;\">根據任務類型選擇最適合的 AI 工具</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p27bg3f5g",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630,
+          "y": 120,
+          "width": 270,
+          "height": 280,
+          "background": "#f0fdf4",
+          "borderRadius": 12
+        },
+        {
+          "id": "el_p27n3h6i",
+          "type": "text",
+          "x": 650,
+          "y": 135,
+          "width": 230,
+          "height": 60,
+          "content": "<b style=\"font-size:48px;color:#16a34a;opacity:0.3;\">03</b>",
+          "fontSize": 48,
+          "bold": true
+        },
+        {
+          "id": "el_p27t3j7k",
+          "type": "text",
+          "x": 650,
+          "y": 200,
+          "width": 230,
+          "height": 35,
+          "content": "<b style=\"font-size:22px;color:#16a34a;\">寫 Prompt</b>",
+          "fontSize": 22,
+          "bold": true
+        },
+        {
+          "id": "el_p27d3l8m",
+          "type": "text",
+          "x": 650,
+          "y": 245,
+          "width": 230,
+          "height": 120,
+          "content": "<span style=\"font-size:14px;color:#334155;line-height:1.8;\">用 RCTFC 框架寫出精準的 Prompt</span>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_p28slide7n",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p28ttl01o",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">課堂練習：用 AI 解決工作痛點</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p28line02p",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p28desc03q",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">現在就動手試試看！</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p28hw04r",
+          "type": "homework",
+          "x": 60,
+          "y": 140,
+          "width": 840,
+          "height": 370,
+          "title": "用 AI 解決你的一個工作痛點",
+          "description": "請根據以下步驟完成練習：\n\n1. 寫出你工作中最花時間的一件事\n2. 選擇一個 AI 工具\n3. 用 RCTFC 框架寫出 Prompt\n4. 把 AI 的回覆截圖上傳\n\n💡 提示：Prompt 寫得越詳細，AI 回答越精準！",
+          "submissionMode": "image_prompt",
+          "example": "痛點：每天要回覆 30+ 封客戶信件\n工具：ChatGPT\nPrompt：你是一位專業的客服主管（Role）。我在一家電商公司負責售後服務（Context）。請幫我回覆以下客戶的退換貨詢問（Task）。用繁體中文、禮貌但簡潔的語氣（Format）。控制在 100 字以內（Constraint）。"
+        }
+      ]
+    },
+    {
+      "id": "el_p29slide8s",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_p29ttl01t",
+          "type": "text",
+          "x": 60,
+          "y": 35,
+          "width": 840,
+          "height": 45,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">學完之後，你最想先用 AI 解決什麼？</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_p29line02u",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 85,
+          "width": 50,
+          "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_p29desc03v",
+          "type": "text",
+          "x": 60,
+          "y": 100,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">選出你最迫不及待想嘗試的應用</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_p29poll04w",
+          "type": "poll",
+          "x": 60,
+          "y": 140,
+          "width": 840,
+          "height": 340,
+          "question": "你最想先用 AI 解決什麼工作場景？",
+          "options": [
+            { "text": "📧 Email 回覆與文書處理" },
+            { "text": "📊 數據分析與報表製作" },
+            { "text": "✍️ 行銷內容與社群文案" },
+            { "text": "💬 客服溝通優化" },
+            { "text": "📋 專案管理與企劃" },
+            { "text": "🎓 個人學習與技能提升" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_p30slide9x",
+      "background": "linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f172a 100%)",
+      "elements": [
+        {
+          "id": "el_p30bar01y",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60,
+          "y": 40,
+          "width": 4,
+          "height": 120,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p30ttl02z",
+          "type": "text",
+          "x": 80,
+          "y": 50,
+          "width": 800,
+          "height": 50,
+          "content": "<b style=\"font-size:38px;color:#f1f5f9;\">重點回顧</b>",
+          "fontSize": 38,
+          "bold": true
+        },
+        {
+          "id": "el_p30line03a",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 105,
+          "width": 50,
+          "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_p30tag1b1",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 170,
+          "width": 400,
+          "height": 38,
+          "background": "rgba(56,189,248,0.1)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_p30r1c2d",
+          "type": "text",
+          "x": 92,
+          "y": 176,
+          "width": 380,
+          "height": 28,
+          "content": "<span style=\"font-size:14px;color:#38bdf8;\">✅ AI 工具選擇：ChatGPT / Gemini / Claude / Copilot</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p30tag2e3f",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 170,
+          "width": 400,
+          "height": 38,
+          "background": "rgba(56,189,248,0.1)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_p30r2g4h",
+          "type": "text",
+          "x": 512,
+          "y": 176,
+          "width": 380,
+          "height": 28,
+          "content": "<span style=\"font-size:14px;color:#38bdf8;\">✅ 六大場景：文書、行銷、數據、客服、專案、學習</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p30tag3i5j",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 220,
+          "width": 400,
+          "height": 38,
+          "background": "rgba(124,58,237,0.1)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_p30r3k6l",
+          "type": "text",
+          "x": 92,
+          "y": 226,
+          "width": 380,
+          "height": 28,
+          "content": "<span style=\"font-size:14px;color:#a78bfa;\">✅ Prompt 框架：RCTFC 五要素</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p30tag4m7n",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 220,
+          "width": 400,
+          "height": 38,
+          "background": "rgba(124,58,237,0.1)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_p30r4o8p",
+          "type": "text",
+          "x": 512,
+          "y": 226,
+          "width": 380,
+          "height": 28,
+          "content": "<span style=\"font-size:14px;color:#a78bfa;\">✅ 進階技巧：CoT / Few-shot / Role-play</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p30tag5q9r",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 270,
+          "width": 400,
+          "height": 38,
+          "background": "rgba(22,163,106,0.1)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_p30r5s0t",
+          "type": "text",
+          "x": 92,
+          "y": 276,
+          "width": 380,
+          "height": 28,
+          "content": "<span style=\"font-size:14px;color:#4ade80;\">✅ 三大原則：不盲信、不洩密、要給情境</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p30tag6u1v",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 500,
+          "y": 270,
+          "width": 400,
+          "height": 38,
+          "background": "rgba(22,163,106,0.1)",
+          "borderRadius": 8
+        },
+        {
+          "id": "el_p30r6w2x",
+          "type": "text",
+          "x": 512,
+          "y": 276,
+          "width": 380,
+          "height": 28,
+          "content": "<span style=\"font-size:14px;color:#4ade80;\">✅ 實作流程：找痛點 → 選工具 → 寫 Prompt</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_p30divd3e",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80,
+          "y": 360,
+          "width": 800,
+          "height": 1,
+          "background": "rgba(148,163,184,0.2)"
+        },
+        {
+          "id": "el_p30qa4f5g",
+          "type": "text",
+          "x": 60,
+          "y": 390,
+          "width": 840,
+          "height": 50,
+          "content": "<b style=\"font-size:28px;color:#38bdf8;text-align:center;display:block;\">Q & A</b>",
+          "fontSize": 28,
+          "bold": true
+        },
+        {
+          "id": "el_p30sub6h7",
+          "type": "text",
+          "x": 60,
+          "y": 445,
+          "width": 840,
+          "height": 30,
+          "content": "<span style=\"font-size:16px;color:#94a3b8;text-align:center;display:block;\">有任何問題歡迎提出！</span>",
+          "fontSize": 16
+        }
+      ]
+    }
+  ]
+}
