@@ -596,10 +596,17 @@ async function init() {
                     q.variants = versions.map(v => {
                         const od = v.data || {};
                         const pricing = od.pricing || [];
+                        const schedule = od.schedule || [];
+                        // Calculate total hours from schedule for auto-fill
+                        const schedTotalHours = schedule.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0);
                         let vTotal = 0;
                         const items = pricing.map(p => {
                             let item = { label: p.label, type: p.type };
-                            if (p.type === 'hourly') { item.hours = p.hours||0; item.rate = p.rate||0; vTotal += item.hours * item.rate; }
+                            if (p.type === 'hourly') {
+                                item.hours = p.hours || schedTotalHours || 0;
+                                item.rate = p.rate||0;
+                                vTotal += item.hours * item.rate;
+                            }
                             else if (p.type === 'perhead') { item.count = p.count||0; item.rate = p.rate||0; vTotal += item.count * item.rate; }
                             else { item.amount = p.amount||0; vTotal += item.amount; }
                             return item;

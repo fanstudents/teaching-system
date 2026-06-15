@@ -842,7 +842,9 @@ function initOutlineEditor() {
     // Init version management tabs
     initVersions();
 
-    const od = getOutlineData();
+    // Use the active version's data (not always projectData.outline_data)
+    // This ensures the form matches the selected version tab
+    const od = outlineVersions[activeVersionIdx]?.data || getOutlineData();
 
     // Suppress column rebuild during initial population
     _suppressRebuild = true;
@@ -898,8 +900,8 @@ function initOutlineEditor() {
         _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
     }
 
-    // Populate pricing items
-    applyPricingItems(od?.pricing);
+    // Populate pricing items (pass schedule for auto-sync of hourly hours)
+    applyPricingItems(od?.pricing, od?.schedule);
 
     // Populate Course Notes
     const notesData = od?.courseNotes?.length ? od.courseNotes : DEFAULT_COURSE_NOTES;
@@ -1889,16 +1891,32 @@ function collectPricingItems() {
     return items;
 }
 
-function applyPricingItems(pricing) {
+function applyPricingItems(pricing, scheduleData) {
     const list = document.getElementById('oePricingList');
     if (!list) return;
     list.innerHTML = '';
     _pricingCounter = 0;
     if (pricing && pricing.length > 0) {
-        pricing.forEach(item => addPricingItem(item));
+        // Auto-sync: calculate total hours from schedule for hourly items
+        let schedTotalHours = 0;
+        if (scheduleData && scheduleData.length > 0) {
+            schedTotalHours = scheduleData.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0);
+        }
+        pricing.forEach(item => {
+            // If hourly item has hours=0 and we have schedule data, auto-fill
+            if (item.type === 'hourly' && (!item.hours || item.hours === 0) && schedTotalHours > 0) {
+                item = { ...item, hours: schedTotalHours };
+            }
+            addPricingItem(item);
+        });
     } else {
         // Smart defaults based on current outline data
-        addPricingItem({ label: '講師鐘點費', type: 'hourly', hours: 0, rate: 8000 });
+        // Calculate hours from schedule if available
+        let defaultHours = 0;
+        if (scheduleData && scheduleData.length > 0) {
+            defaultHours = scheduleData.reduce((sum, s) => sum + (parseFloat(s.hours) || 0), 0);
+        }
+        addPricingItem({ label: '講師鐘點費', type: 'hourly', hours: defaultHours, rate: 8000 });
         addPricingItem({ label: '車馬費', type: 'fixed', amount: 0 });
         const taCount = parseInt(document.getElementById('oeTaCount')?.value) || 0;
         addPricingItem({ label: '助教費', type: 'perhead', count: taCount, rate: 3000 });
@@ -1983,6 +2001,13 @@ window.switchVersion = function(idx) {
         _applyOutlineData(vData);
     } else {
         _clearEditorFields();
+    }
+    // Visual feedback: briefly highlight pricing section
+    const pricingList = document.getElementById('oePricingList');
+    if (pricingList) {
+        pricingList.style.transition = 'background 0.3s';
+        pricingList.style.background = 'rgba(99,102,241,0.06)';
+        setTimeout(() => { pricingList.style.background = ''; }, 600);
     }
 };
 
@@ -2602,8 +2627,8 @@ function _applyOutlineData(od) {
         _v('oeTaDuties', (od.taConfig.duties || []).join('\n'));
     }
 
-    // Pricing
-    applyPricingItems(od.pricing);
+    // Pricing (pass schedule for auto-sync of hourly hours)
+    applyPricingItems(od.pricing, od.schedule);
     _v('oeDiscountTotal', od.discount_total || '');
     updateDiscountDisplay();
 
