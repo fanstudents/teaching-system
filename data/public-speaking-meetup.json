@@ -1,0 +1,1493 @@
+{
+  "slides": [
+    {
+      "id": "el_ps01cover",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_ps01bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0, "y": 0, "width": 960, "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a1040 40%, #1e293b 100%)"
+        },
+        {
+          "id": "el_ps01accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 120, "width": 4, "height": 140,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps01title",
+          "type": "text",
+          "x": 80, "y": 115,
+          "width": 750, "height": 90,
+          "content": "<b style=\"font-size:46px;color:#f1f5f9;letter-spacing:2px;\">公眾表達練習小聚</b>",
+          "fontSize": 46,
+          "bold": true
+        },
+        {
+          "id": "el_ps01sub",
+          "type": "text",
+          "x": 80, "y": 215,
+          "width": 600, "height": 40,
+          "content": "<span style=\"font-size:22px;color:#c4b5fd;\">簡報的四個時代 — 從 PPT 到互動式簡報</span>",
+          "fontSize": 22
+        },
+        {
+          "id": "el_ps01line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80, "y": 270, "width": 60, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps01speaker",
+          "type": "text",
+          "x": 80, "y": 400,
+          "width": 400, "height": 30,
+          "content": "<span style=\"font-size:18px;color:#94a3b8;\">講者：樊松蒲 Dennis</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps01date",
+          "type": "text",
+          "x": 80, "y": 440,
+          "width": 400, "height": 30,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">公眾表達練習小聚 ｜ 2026</span>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps02poll",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_ps02title",
+          "type": "text",
+          "x": 60, "y": 30,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🙋 暖場：你平常怎麼做簡報？</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps02line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 78, "width": 50, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps02desc",
+          "type": "text",
+          "x": 60, "y": 90,
+          "width": 840, "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">選出最接近你目前的簡報方式</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps02pollel",
+          "type": "poll",
+          "x": 60, "y": 130, "width": 840, "height": 320,
+          "question": "你目前做簡報最常用的工具是？",
+          "options": [
+            { "text": "PowerPoint / Keynote" },
+            { "text": "Canva / 線上設計工具" },
+            { "text": "AI 生成（Gamma / Beautiful.ai 等）" },
+            { "text": "其他方式或很少做簡報" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_ps03agenda",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps03title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:32px;color:#1e293b;\">📋 今天聊什麼</b>",
+          "fontSize": 32,
+          "bold": true
+        },
+        {
+          "id": "el_ps03line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps03card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 110, "width": 410, "height": 80,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps03card1",
+          "type": "text",
+          "x": 80, "y": 120,
+          "width": 370, "height": 60,
+          "content": "<b style=\"font-size:18px;color:#0284c7;\">📊 簡報的四個時代</b><br><span style=\"font-size:14px;color:#64748b;\">從 PPT → Canva → AI 生成 → 互動式</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps03card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490, "y": 110, "width": 410, "height": 80,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps03card2",
+          "type": "text",
+          "x": 510, "y": 120,
+          "width": 370, "height": 60,
+          "content": "<b style=\"font-size:18px;color:#7c3aed;\">🎯 互動式教學示範</b><br><span style=\"font-size:14px;color:#64748b;\">AI 用法 + 作業互動 + 即時回饋</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps03card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 210, "width": 410, "height": 80,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps03card3",
+          "type": "text",
+          "x": 80, "y": 220,
+          "width": 370, "height": 60,
+          "content": "<b style=\"font-size:18px;color:#16a34a;\">🤖 AI 怎麼幫我做簡報</b><br><span style=\"font-size:14px;color:#64748b;\">實際案例 + 工作流程分享</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps03card4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490, "y": 210, "width": 410, "height": 80,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps03card4",
+          "type": "text",
+          "x": 510, "y": 220,
+          "width": 370, "height": 60,
+          "content": "<b style=\"font-size:18px;color:#d97706;\">👋 關於我 — Dennis</b><br><span style=\"font-size:14px;color:#64748b;\">自我介紹 + Q&A</span>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps03time",
+          "type": "text",
+          "x": 60, "y": 480,
+          "width": 840, "height": 30,
+          "content": "<span style=\"font-size:14px;color:#94a3b8;\">⏱ 預計時間：約 30 分鐘</span>",
+          "fontSize": 14
+        }
+      ]
+    },
+    {
+      "id": "el_ps04section1",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_ps04bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0, "y": 0, "width": 960, "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a1040 50%, #1e293b 100%)"
+        },
+        {
+          "id": "el_ps04num",
+          "type": "text",
+          "x": 60, "y": 160,
+          "width": 200, "height": 80,
+          "content": "<b style=\"font-size:72px;color:#a78bfa;opacity:0.3;\">01</b>",
+          "fontSize": 72
+        },
+        {
+          "id": "el_ps04accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 245, "width": 60, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps04stitle",
+          "type": "text",
+          "x": 60, "y": 260,
+          "width": 700, "height": 60,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;\">簡報的四個時代</b>",
+          "fontSize": 40,
+          "bold": true
+        },
+        {
+          "id": "el_ps04ssub",
+          "type": "text",
+          "x": 60, "y": 330,
+          "width": 600, "height": 35,
+          "content": "<span style=\"font-size:18px;color:#94a3b8;\">從手刻 PPT 到 AI 幫你做，簡報工具怎麼進化的？</span>",
+          "fontSize": 18
+        }
+      ]
+    },
+    {
+      "id": "el_ps05era1",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps05title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🖥️ 第一階段：傳統 PPT 時代</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps05line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_ps05era",
+          "type": "text",
+          "x": 60, "y": 95,
+          "width": 300, "height": 25,
+          "content": "<span style=\"font-size:14px;color:#94a3b8;\">📅 2000 年代 ~ 2015 年</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps05card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 130, "width": 270, "height": 160,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps05card1",
+          "type": "text",
+          "x": 75, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#0284c7;\">📦</b><br><b style=\"font-size:16px;color:#0284c7;\">工具</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">PowerPoint<br>Keynote<br>LibreOffice</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps05card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345, "y": 130, "width": 270, "height": 160,
+          "background": "#fef2f2"
+        },
+        {
+          "id": "el_ps05card2",
+          "type": "text",
+          "x": 360, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#dc2626;\">😩</b><br><b style=\"font-size:16px;color:#dc2626;\">痛點</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">排版超耗時<br>模板很醜<br>動畫容易崩壞</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps05card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630, "y": 130, "width": 270, "height": 160,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps05card3",
+          "type": "text",
+          "x": 645, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#16a34a;\">⏱️</b><br><b style=\"font-size:16px;color:#16a34a;\">製作時間</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">10 頁簡報<br>大約 3~5 小時<br>含排版+找素材</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps05quote",
+          "type": "text",
+          "x": 60, "y": 320,
+          "width": 840, "height": 60,
+          "content": "<div style=\"font-size:18px;color:#64748b;font-style:italic;border-left:3px solid #38bdf8;padding-left:15px;\">「每次做簡報都在對齊文字框、找 icon、調配色...」<br>— 大部分上班族的心聲</div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps05feature",
+          "type": "text",
+          "x": 60, "y": 410,
+          "width": 840, "height": 90,
+          "content": "<div style=\"font-size:15px;line-height:2;color:#334155;\"><b style=\"color:#0284c7;\">✦ 特色：</b>完全手動操作，所有排版、動畫、配色都要自己來<br><b style=\"color:#0284c7;\">✦ 技能要求：</b>設計感 + 軟體操作能力 + 大量耐心<br><b style=\"color:#0284c7;\">✦ 產出品質：</b>取決於個人設計能力，差異極大</div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps06era2",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps06title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🎨 第二階段：Canva 時代</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps06line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_ps06era",
+          "type": "text",
+          "x": 60, "y": 95,
+          "width": 300, "height": 25,
+          "content": "<span style=\"font-size:14px;color:#94a3b8;\">📅 2015 年 ~ 2022 年</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps06card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 130, "width": 270, "height": 160,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps06card1",
+          "type": "text",
+          "x": 75, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#7c3aed;\">🎨</b><br><b style=\"font-size:16px;color:#7c3aed;\">工具</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">Canva<br>Google Slides<br>Prezi</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps06card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345, "y": 130, "width": 270, "height": 160,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps06card2",
+          "type": "text",
+          "x": 360, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#16a34a;\">✨</b><br><b style=\"font-size:16px;color:#16a34a;\">優勢</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">海量模板<br>拖拉式操作<br>線上協作方便</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps06card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630, "y": 130, "width": 270, "height": 160,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps06card3",
+          "type": "text",
+          "x": 645, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#d97706;\">⏱️</b><br><b style=\"font-size:16px;color:#d97706;\">製作時間</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">10 頁簡報<br>大約 1~2 小時<br>套模板+微調</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps06quote",
+          "type": "text",
+          "x": 60, "y": 320,
+          "width": 840, "height": 60,
+          "content": "<div style=\"font-size:18px;color:#64748b;font-style:italic;border-left:3px solid #7c3aed;padding-left:15px;\">「Canva 讓每個人都能做出好看的簡報」<br>— 模板經濟的崛起</div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps06feature",
+          "type": "text",
+          "x": 60, "y": 410,
+          "width": 840, "height": 90,
+          "content": "<div style=\"font-size:15px;line-height:2;color:#334155;\"><b style=\"color:#7c3aed;\">✦ 革命：</b>把設計門檻降到接近零，人人都能做出「不醜」的簡報<br><b style=\"color:#7c3aed;\">✦ 但是：</b>大家的簡報開始長得一樣 — 模板同質化<br><b style=\"color:#7c3aed;\">✦ 本質：</b>還是「人去選模板、排內容」，只是效率提升</div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps07era3",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps07title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🤖 第三階段：AI 生成時代</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps07line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_ps07era",
+          "type": "text",
+          "x": 60, "y": 95,
+          "width": 300, "height": 25,
+          "content": "<span style=\"font-size:14px;color:#94a3b8;\">📅 2023 年 ~ 現在</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps07card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 130, "width": 270, "height": 160,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps07card1",
+          "type": "text",
+          "x": 75, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#16a34a;\">🤖</b><br><b style=\"font-size:16px;color:#16a34a;\">工具</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">Gamma<br>Beautiful.ai<br>Tome / SlidesAI</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps07card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345, "y": 130, "width": 270, "height": 160,
+          "background": "#eff6ff"
+        },
+        {
+          "id": "el_ps07card2",
+          "type": "text",
+          "x": 360, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#0284c7;\">⚡</b><br><b style=\"font-size:16px;color:#0284c7;\">革命性變化</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">一句話生成簡報<br>AI 自動排版配色<br>內容結構自動生成</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps07card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630, "y": 130, "width": 270, "height": 160,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps07card3",
+          "type": "text",
+          "x": 645, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#7c3aed;\">⏱️</b><br><b style=\"font-size:16px;color:#7c3aed;\">製作時間</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">10 頁簡報<br>大約 5~15 分鐘<br>AI 生成 + 微調</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps07quote",
+          "type": "text",
+          "x": 60, "y": 320,
+          "width": 840, "height": 60,
+          "content": "<div style=\"font-size:18px;color:#64748b;font-style:italic;border-left:3px solid #16a34a;padding-left:15px;\">「告訴 AI 主題，它幫你生好整份簡報」<br>— 從操作者變成指揮者</div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps07feature",
+          "type": "text",
+          "x": 60, "y": 410,
+          "width": 840, "height": 90,
+          "content": "<div style=\"font-size:15px;line-height:2;color:#334155;\"><b style=\"color:#16a34a;\">✦ 突破：</b>連「想內容」這件事都可以交給 AI，人只需要審核和調整<br><b style=\"color:#16a34a;\">✦ 限制：</b>產出的簡報仍然是「靜態」的 — 觀眾只能看，不能互動<br><b style=\"color:#16a34a;\">✦ 關鍵問題：</b>簡報好看了，但學員真的有在聽嗎？</div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps08quiz1",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_ps08title",
+          "type": "text",
+          "x": 60, "y": 30,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🧠 小測驗：你記得嗎？</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps08line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 78, "width": 50, "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_ps08desc",
+          "type": "text",
+          "x": 60, "y": 90,
+          "width": 840, "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">回顧一下剛剛的三個時代</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps08quizel",
+          "type": "quiz",
+          "x": 60, "y": 130, "width": 840, "height": 320,
+          "question": "「一句話生成整份簡報」是哪個時代的特色？",
+          "multiple": false,
+          "options": [
+            { "text": "傳統 PPT 時代", "correct": false },
+            { "text": "Canva 時代", "correct": false },
+            { "text": "AI 生成時代", "correct": true },
+            { "text": "互動式簡報時代", "correct": false }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_ps09era4",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps09title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🚀 未來形式：互動式簡報時代</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps09line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#d97706"
+        },
+        {
+          "id": "el_ps09era",
+          "type": "text",
+          "x": 60, "y": 95,
+          "width": 300, "height": 25,
+          "content": "<span style=\"font-size:14px;color:#94a3b8;\">📅 未來進行式 — 正在發生</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps09card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 130, "width": 270, "height": 160,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps09card1",
+          "type": "text",
+          "x": 75, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#d97706;\">🎯</b><br><b style=\"font-size:16px;color:#d97706;\">核心理念</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">觀眾不只是「看」<br>而是「參與」<br>即時互動 + 回饋</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps09card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345, "y": 130, "width": 270, "height": 160,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps09card2",
+          "type": "text",
+          "x": 360, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#16a34a;\">🔧</b><br><b style=\"font-size:16px;color:#16a34a;\">互動元素</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">即時投票 Poll<br>選擇題 Quiz<br>填空 / 配對 / 作業</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps09card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630, "y": 130, "width": 270, "height": 160,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps09card3",
+          "type": "text",
+          "x": 645, "y": 140,
+          "width": 240, "height": 140,
+          "content": "<b style=\"font-size:28px;color:#7c3aed;\">💡</b><br><b style=\"font-size:16px;color:#7c3aed;\">關鍵差異</b><br><span style=\"font-size:14px;color:#334155;line-height:1.8;\">講師即時看到<br>學員理解程度<br>動態調整教學</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps09quote",
+          "type": "text",
+          "x": 60, "y": 320,
+          "width": 840, "height": 60,
+          "content": "<div style=\"font-size:18px;color:#64748b;font-style:italic;border-left:3px solid #d97706;padding-left:15px;\">「簡報不再是講者的獨角戲，而是一場雙向對話」<br>— 從「播放」到「互動」的範式轉移</div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps09feature",
+          "type": "text",
+          "x": 60, "y": 410,
+          "width": 840, "height": 90,
+          "content": "<div style=\"font-size:15px;line-height:2;color:#334155;\"><b style=\"color:#d97706;\">✦ 講師端：</b>即時掌握學員狀態，不用猜「大家聽懂了嗎？」<br><b style=\"color:#d97706;\">✦ 學員端：</b>手機掃碼就能回答問題、交作業、做測驗<br><b style=\"color:#d97706;\">✦ 數據端：</b>每堂課的互動數據自動記錄，可以分析教學成效</div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps10compare",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps10title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">📊 四個時代一次看</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps10line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps10headbg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 110, "width": 840, "height": 40,
+          "background": "#1e293b"
+        },
+        {
+          "id": "el_ps10head",
+          "type": "text",
+          "x": 70, "y": 115,
+          "width": 820, "height": 30,
+          "content": "<span style=\"font-size:14px;color:#f1f5f9;\"><b>　　　　階段　　　　　　　工具　　　　　　　　時間　　　　　　互動性　　　　　門檻</b></span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps10row1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 150, "width": 840, "height": 50,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps10row1",
+          "type": "text",
+          "x": 70, "y": 157,
+          "width": 820, "height": 35,
+          "content": "<span style=\"font-size:14px;color:#334155;\">🖥️ <b>傳統 PPT</b>　　　　PPT / Keynote　　  3~5 hr　　　　❌ 無　　　　　🔴 高</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps10row2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 200, "width": 840, "height": 50,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps10row2",
+          "type": "text",
+          "x": 70, "y": 207,
+          "width": 820, "height": 35,
+          "content": "<span style=\"font-size:14px;color:#334155;\">🎨 <b>Canva 時代</b>　　　Canva / Prezi　　  1~2 hr　　　　❌ 無　　　　　🟡 中</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps10row3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 250, "width": 840, "height": 50,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps10row3",
+          "type": "text",
+          "x": 70, "y": 257,
+          "width": 820, "height": 35,
+          "content": "<span style=\"font-size:14px;color:#334155;\">🤖 <b>AI 生成</b>　　　　  Gamma / Tome　　5~15 min　　  ❌ 無　　　　　🟢 低</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps10row4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 300, "width": 840, "height": 50,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps10row4",
+          "type": "text",
+          "x": 70, "y": 307,
+          "width": 820, "height": 35,
+          "content": "<span style=\"font-size:14px;color:#334155;\">🚀 <b>互動式簡報</b>　　  自製系統　　　　 10~20 min　  ✅ <b style=\"color:#16a34a;\">完整互動</b>　 🟢 低</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps10insight",
+          "type": "text",
+          "x": 60, "y": 380,
+          "width": 840, "height": 90,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\"><b style=\"color:#a78bfa;\">💡 觀察：</b>製作時間越來越短，但真正的突破不在「做得快」<br>　　　　而在「觀眾是否參與」— 這就是互動式簡報的價值<br>　　　　<b style=\"color:#a78bfa;\">簡報的終點不是「做完」，是「被理解」</b></div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_ps11ordering",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_ps11title",
+          "type": "text",
+          "x": 60, "y": 30,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🔢 互動：排列四個時代</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps11line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 78, "width": 50, "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_ps11desc",
+          "type": "text",
+          "x": 60, "y": 90,
+          "width": 840, "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">把簡報的四個時代從早到晚排列</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps11order",
+          "type": "ordering",
+          "x": 60, "y": 130, "width": 840, "height": 320,
+          "steps": ["傳統 PPT 時代", "Canva 時代", "AI 生成時代", "互動式簡報時代"]
+        }
+      ]
+    },
+    {
+      "id": "el_ps12section2",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_ps12bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0, "y": 0, "width": 960, "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a1040 50%, #1e293b 100%)"
+        },
+        {
+          "id": "el_ps12num",
+          "type": "text",
+          "x": 60, "y": 160,
+          "width": 200, "height": 80,
+          "content": "<b style=\"font-size:72px;color:#a78bfa;opacity:0.3;\">02</b>",
+          "fontSize": 72
+        },
+        {
+          "id": "el_ps12accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 245, "width": 60, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps12stitle",
+          "type": "text",
+          "x": 60, "y": 260,
+          "width": 700, "height": 60,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;\">我的互動式教學方式</b>",
+          "fontSize": 40,
+          "bold": true
+        },
+        {
+          "id": "el_ps12ssub",
+          "type": "text",
+          "x": 60, "y": 330,
+          "width": 600, "height": 35,
+          "content": "<span style=\"font-size:18px;color:#94a3b8;\">AI 生成簡報 × 即時互動 × 作業系統 — 實際教學示範</span>",
+          "fontSize": 18
+        }
+      ]
+    },
+    {
+      "id": "el_ps13aiflow",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps13title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🤖 AI 怎麼幫我做簡報？</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps13line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_ps13step1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 110, "width": 270, "height": 170,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps13step1",
+          "type": "text",
+          "x": 75, "y": 120,
+          "width": 240, "height": 150,
+          "content": "<b style=\"font-size:36px;color:#0284c7;\">①</b><br><b style=\"font-size:16px;color:#0284c7;\">給 AI 主題大綱</b><br><span style=\"font-size:13px;color:#334155;line-height:1.8;\">用一段描述告訴 AI<br>「我要講什麼、對象<br>是誰、要多久」</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_ps13step2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345, "y": 110, "width": 270, "height": 170,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps13step2",
+          "type": "text",
+          "x": 360, "y": 120,
+          "width": 240, "height": 150,
+          "content": "<b style=\"font-size:36px;color:#7c3aed;\">②</b><br><b style=\"font-size:16px;color:#7c3aed;\">AI 自動生成 JSON</b><br><span style=\"font-size:13px;color:#334155;line-height:1.8;\">AI 產出完整的投影片<br>資料結構，包含排版<br>互動元素、配色</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_ps13step3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630, "y": 110, "width": 270, "height": 170,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps13step3",
+          "type": "text",
+          "x": 645, "y": 120,
+          "width": 240, "height": 150,
+          "content": "<b style=\"font-size:36px;color:#16a34a;\">③</b><br><b style=\"font-size:16px;color:#16a34a;\">Console 貼上匯入</b><br><span style=\"font-size:13px;color:#334155;line-height:1.8;\">在瀏覽器 Console<br>貼上一段指令<br>簡報立刻出現 ✨</span>",
+          "fontSize": 13
+        },
+        {
+          "id": "el_ps13arrow1",
+          "type": "text",
+          "x": 315, "y": 175,
+          "width": 40, "height": 40,
+          "content": "<b style=\"font-size:28px;color:#94a3b8;\">→</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_ps13arrow2",
+          "type": "text",
+          "x": 600, "y": 175,
+          "width": 40, "height": 40,
+          "content": "<b style=\"font-size:28px;color:#94a3b8;\">→</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_ps13demo",
+          "type": "text",
+          "x": 60, "y": 310,
+          "width": 840, "height": 90,
+          "content": "<div style=\"font-size:15px;line-height:2;color:#334155;\"><b style=\"color:#0284c7;\">📌 實際流程：</b><br>• 我跟 AI 說：「幫我做一份 30 分鐘的簡報，主題是公眾表達」<br>• AI 回傳 20 頁完整的 JSON 資料，包含投票、測驗、作業<br>• 我在瀏覽器 Console 貼上匯入指令 → 簡報就做好了</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps13highlight",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 420, "width": 840, "height": 70,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps13highlighttxt",
+          "type": "text",
+          "x": 80, "y": 430,
+          "width": 800, "height": 50,
+          "content": "<div style=\"font-size:16px;color:#92400e;\"><b>💡 沒錯，你正在看的這份簡報，就是用這個方法做的！</b><br><span style=\"font-size:14px;\">從想好要講什麼到簡報完成 → 大約 10 分鐘</span></div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_ps14interact",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps14title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🎯 教學中的互動設計</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps14line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_ps14card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 110, "width": 200, "height": 140,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps14card1",
+          "type": "text",
+          "x": 72, "y": 118,
+          "width": 176, "height": 124,
+          "content": "<b style=\"font-size:24px;color:#0284c7;\">📊</b><br><b style=\"font-size:15px;color:#0284c7;\">投票 Poll</b><br><span style=\"font-size:12px;color:#334155;line-height:1.7;\">暖場收集背景<br>即時了解學員</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps14card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 275, "y": 110, "width": 200, "height": 140,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps14card2",
+          "type": "text",
+          "x": 287, "y": 118,
+          "width": 176, "height": 124,
+          "content": "<b style=\"font-size:24px;color:#7c3aed;\">🧠</b><br><b style=\"font-size:15px;color:#7c3aed;\">測驗 Quiz</b><br><span style=\"font-size:12px;color:#334155;line-height:1.7;\">選擇題檢驗<br>理解是否到位</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps14card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490, "y": 110, "width": 200, "height": 140,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps14card3",
+          "type": "text",
+          "x": 502, "y": 118,
+          "width": 176, "height": 124,
+          "content": "<b style=\"font-size:24px;color:#16a34a;\">✍️</b><br><b style=\"font-size:15px;color:#16a34a;\">填空 Fill</b><br><span style=\"font-size:12px;color:#334155;line-height:1.7;\">強化記憶<br>主動回想概念</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps14card4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 705, "y": 110, "width": 200, "height": 140,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps14card4",
+          "type": "text",
+          "x": 717, "y": 118,
+          "width": 176, "height": 124,
+          "content": "<b style=\"font-size:24px;color:#d97706;\">📋</b><br><b style=\"font-size:15px;color:#d97706;\">作業 HW</b><br><span style=\"font-size:12px;color:#334155;line-height:1.7;\">上傳作品<br>課後也能交</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps14flow",
+          "type": "text",
+          "x": 60, "y": 275,
+          "width": 840, "height": 120,
+          "content": "<div style=\"font-size:16px;line-height:2.2;color:#334155;\"><b style=\"color:#a78bfa;\">🔄 我的教學節奏：</b><br>　 📖 講 3~5 頁知識內容<br>　 → 🧠 插入互動（測驗 / 投票 / 填空）確認理解<br>　 → 📖 繼續下一個知識區塊<br>　 → 📋 最後用作業讓學員動手實作</div>",
+          "fontSize": 16
+        },
+        {
+          "id": "el_ps14benefit",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 420, "width": 840, "height": 70,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps14benefittxt",
+          "type": "text",
+          "x": 80, "y": 430,
+          "width": 800, "height": 50,
+          "content": "<div style=\"font-size:15px;color:#166534;\"><b>✅ 好處：學員隨時有事做、不會恍神，講師也能即時掌握教學效果</b><br><span style=\"font-size:13px;\">每次互動的數據都會自動記錄，課後可以做教學分析</span></div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps15aihw",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps15title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🤖 AI 互動的實際用法</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps15line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#38bdf8"
+        },
+        {
+          "id": "el_ps15ex1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 105, "width": 410, "height": 190,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps15ex1",
+          "type": "text",
+          "x": 80, "y": 115,
+          "width": 370, "height": 170,
+          "content": "<b style=\"font-size:18px;color:#0284c7;\">📌 案例一：AI 出題</b><br><span style=\"font-size:14px;color:#334155;line-height:2;\">教完一個概念後<br>AI 自動根據內容<br>生成選擇題、填空題<br>穿插在簡報中<br>學員即時作答</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps15ex2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490, "y": 105, "width": 410, "height": 190,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps15ex2",
+          "type": "text",
+          "x": 510, "y": 115,
+          "width": 370, "height": 170,
+          "content": "<b style=\"font-size:18px;color:#7c3aed;\">📌 案例二：AI 生成簡報</b><br><span style=\"font-size:14px;color:#334155;line-height:2;\">我只要給 AI 一段描述<br>「主題、對象、時長」<br>AI 生成完整投影片 JSON<br>含排版 + 互動 + 配色<br>貼到 Console 就能用</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps15ex3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 315, "width": 840, "height": 90,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps15ex3",
+          "type": "text",
+          "x": 80, "y": 325,
+          "width": 800, "height": 70,
+          "content": "<b style=\"font-size:18px;color:#d97706;\">📌 案例三：AI 幫我研究數據</b><br><span style=\"font-size:14px;color:#334155;line-height:2;\">AI 先搜尋最新的研究報告和數據 → 整理成「數據彈藥庫」 → 自動放入簡報中引用，讓每個論點都有數據佐證</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps15key",
+          "type": "text",
+          "x": 60, "y": 430,
+          "width": 840, "height": 60,
+          "content": "<div style=\"font-size:16px;line-height:2;color:#334155;\"><b style=\"color:#0284c7;\">🎯 重點：</b>AI 不只是做投影片的工具，它是「教學助理」<br>　　　　幫你出題、幫你研究、幫你排版 — 你只需要專注在「教學」</div>",
+          "fontSize": 16
+        }
+      ]
+    },
+    {
+      "id": "el_ps16hwdemo",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps16title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">📱 學員上傳作業的互動方式</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps16line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_ps16step1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 110, "width": 200, "height": 160,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps16step1",
+          "type": "text",
+          "x": 72, "y": 118,
+          "width": 176, "height": 145,
+          "content": "<b style=\"font-size:32px;color:#16a34a;\">①</b><br><b style=\"font-size:14px;color:#16a34a;\">掃碼進入</b><br><span style=\"font-size:12px;color:#334155;line-height:1.8;\">學員用手機掃<br>QR Code 進入<br>互動頁面</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps16step2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 275, "y": 110, "width": 200, "height": 160,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps16step2",
+          "type": "text",
+          "x": 287, "y": 118,
+          "width": 176, "height": 145,
+          "content": "<b style=\"font-size:32px;color:#7c3aed;\">②</b><br><b style=\"font-size:14px;color:#7c3aed;\">作答 / 上傳</b><br><span style=\"font-size:12px;color:#334155;line-height:1.8;\">可以文字回答<br>拍照上傳<br>或截圖分享</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps16step3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 490, "y": 110, "width": 200, "height": 160,
+          "background": "#fffbeb"
+        },
+        {
+          "id": "el_ps16step3",
+          "type": "text",
+          "x": 502, "y": 118,
+          "width": 176, "height": 145,
+          "content": "<b style=\"font-size:32px;color:#d97706;\">③</b><br><b style=\"font-size:14px;color:#d97706;\">即時顯示</b><br><span style=\"font-size:12px;color:#334155;line-height:1.8;\">學員作品立刻<br>出現在投影幕<br>大家一起看</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps16step4bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 705, "y": 110, "width": 200, "height": 160,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps16step4",
+          "type": "text",
+          "x": 717, "y": 118,
+          "width": 176, "height": 145,
+          "content": "<b style=\"font-size:32px;color:#0284c7;\">④</b><br><b style=\"font-size:14px;color:#0284c7;\">講師回饋</b><br><span style=\"font-size:12px;color:#334155;line-height:1.8;\">講師即時點評<br>優秀作品分享<br>形成學習社群</span>",
+          "fontSize": 12
+        },
+        {
+          "id": "el_ps16modes",
+          "type": "text",
+          "x": 60, "y": 295,
+          "width": 840, "height": 120,
+          "content": "<div style=\"font-size:15px;line-height:2.2;color:#334155;\"><b style=\"color:#16a34a;\">📋 支援的作業模式：</b><br>　 📝 <b>純文字</b> — 適合寫 Prompt、撰寫行銷文案<br>　 📷 <b>圖片上傳</b> — 適合截圖 AI 對話結果、拍照實作成果<br>　 🔀 <b>圖文混合</b> — 搭配 Prompt 描述 + 截圖結果，完整記錄學習歷程</div>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps16bottom",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 430, "width": 840, "height": 65,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps16bottomtxt",
+          "type": "text",
+          "x": 80, "y": 440,
+          "width": 800, "height": 45,
+          "content": "<div style=\"font-size:15px;color:#166534;\"><b>✅ 所有作業都存在雲端，學員課後可以回顧，講師可以統計分析</b></div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps17hwpractice",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_ps17title",
+          "type": "text",
+          "x": 60, "y": 30,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">✍️ 來試試看！你的練習</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps17line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 78, "width": 50, "height": 3,
+          "background": "#16a34a"
+        },
+        {
+          "id": "el_ps17desc",
+          "type": "text",
+          "x": 60, "y": 90,
+          "width": 840, "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">用你的手機完成以下練習，體驗互動式簡報的作業功能</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps17hw",
+          "type": "homework",
+          "x": 60, "y": 130, "width": 840, "height": 350,
+          "title": "練習：用一句話介紹你自己",
+          "description": "請用一句話（30 字以內）介紹你自己，包含你的名字和你做的事。\n\n例如：「我是 Dennis，我用 AI 幫企業做教育訓練」",
+          "submissionMode": "text_only",
+          "example": "我是 Dennis，我用 AI 幫企業做教育訓練"
+        }
+      ]
+    },
+    {
+      "id": "el_ps18section3",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_ps18bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0, "y": 0, "width": 960, "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a1040 50%, #1e293b 100%)"
+        },
+        {
+          "id": "el_ps18num",
+          "type": "text",
+          "x": 60, "y": 160,
+          "width": 200, "height": 80,
+          "content": "<b style=\"font-size:72px;color:#a78bfa;opacity:0.3;\">03</b>",
+          "fontSize": 72
+        },
+        {
+          "id": "el_ps18accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 245, "width": 60, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps18stitle",
+          "type": "text",
+          "x": 60, "y": 260,
+          "width": 700, "height": 60,
+          "content": "<b style=\"font-size:40px;color:#f1f5f9;\">關於我 — Dennis</b>",
+          "fontSize": 40,
+          "bold": true
+        },
+        {
+          "id": "el_ps18ssub",
+          "type": "text",
+          "x": 60, "y": 330,
+          "width": 600, "height": 35,
+          "content": "<span style=\"font-size:18px;color:#94a3b8;\">樊松蒲 ｜ AI 教育訓練講師 × 系統開發者</span>",
+          "fontSize": 18
+        }
+      ]
+    },
+    {
+      "id": "el_ps19about",
+      "background": "#ffffff",
+      "elements": [
+        {
+          "id": "el_ps19title",
+          "type": "text",
+          "x": 60, "y": 35,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">👋 我是樊松蒲 Dennis</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps19line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 85, "width": 50, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps19card1bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 110, "width": 270, "height": 170,
+          "background": "#faf5ff"
+        },
+        {
+          "id": "el_ps19card1",
+          "type": "text",
+          "x": 75, "y": 120,
+          "width": 240, "height": 150,
+          "content": "<b style=\"font-size:28px;color:#7c3aed;\">🎓</b><br><b style=\"font-size:16px;color:#7c3aed;\">教學領域</b><br><span style=\"font-size:14px;color:#334155;line-height:1.9;\">AI 應用教學<br>數位行銷實戰<br>ChatGPT / Gemini<br>企業內訓講師</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps19card2bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 345, "y": 110, "width": 270, "height": 170,
+          "background": "#f0f9ff"
+        },
+        {
+          "id": "el_ps19card2",
+          "type": "text",
+          "x": 360, "y": 120,
+          "width": 240, "height": 150,
+          "content": "<b style=\"font-size:28px;color:#0284c7;\">💻</b><br><b style=\"font-size:16px;color:#0284c7;\">技術專長</b><br><span style=\"font-size:14px;color:#334155;line-height:1.9;\">自製教學系統<br>互動式簡報引擎<br>AI 自動化工具<br>全端開發</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps19card3bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 630, "y": 110, "width": 270, "height": 170,
+          "background": "#f0fdf4"
+        },
+        {
+          "id": "el_ps19card3",
+          "type": "text",
+          "x": 645, "y": 120,
+          "width": 240, "height": 150,
+          "content": "<b style=\"font-size:28px;color:#16a34a;\">🚀</b><br><b style=\"font-size:16px;color:#16a34a;\">理念</b><br><span style=\"font-size:14px;color:#334155;line-height:1.9;\">讓每個人都能<br>用 AI 提升效率<br>簡報不是獨角戲<br>而是雙向對話</span>",
+          "fontSize": 14
+        },
+        {
+          "id": "el_ps19quote",
+          "type": "text",
+          "x": 60, "y": 310,
+          "width": 840, "height": 60,
+          "content": "<div style=\"font-size:18px;color:#64748b;font-style:italic;border-left:3px solid #a78bfa;padding-left:15px;\">「我不只教 AI 工具怎麼用，我自己就是用 AI 來教學」<br>— 吃自己的狗糧（Eat my own dog food）</div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps19whyme",
+          "type": "text",
+          "x": 60, "y": 400,
+          "width": 840, "height": 100,
+          "content": "<div style=\"font-size:15px;line-height:2;color:#334155;\"><b style=\"color:#a78bfa;\">✦ 為什麼我自己做教學系統？</b><br>　 市面上的工具不夠用 → 自己寫一套互動式簡報引擎<br>　 AI 可以幫我備課 → 把課程設計和製作時間壓縮到極致<br>　 學員數據自動收集 → 每堂課都能回顧和改進</div>",
+          "fontSize": 15
+        }
+      ]
+    },
+    {
+      "id": "el_ps20matching",
+      "background": "#f8fafc",
+      "elements": [
+        {
+          "id": "el_ps20title",
+          "type": "text",
+          "x": 60, "y": 30,
+          "width": 700, "height": 50,
+          "content": "<b style=\"font-size:30px;color:#1e293b;\">🔗 配對練習：連連看</b>",
+          "fontSize": 30,
+          "bold": true
+        },
+        {
+          "id": "el_ps20line",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 78, "width": 50, "height": 3,
+          "background": "#7c3aed"
+        },
+        {
+          "id": "el_ps20desc",
+          "type": "text",
+          "x": 60, "y": 90,
+          "width": 840, "height": 28,
+          "content": "<span style=\"font-size:15px;color:#64748b;\">把左邊的互動類型和右邊的用途配對起來</span>",
+          "fontSize": 15
+        },
+        {
+          "id": "el_ps20match",
+          "type": "matching",
+          "x": 60, "y": 130, "width": 840, "height": 320,
+          "pairs": [
+            { "left": "Poll 投票", "right": "暖場收集學員背景" },
+            { "left": "Quiz 測驗", "right": "檢驗學員理解程度" },
+            { "left": "Homework 作業", "right": "讓學員動手實作" },
+            { "left": "Fillblank 填空", "right": "強化記憶鞏固概念" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "el_ps21end",
+      "background": "#0f172a",
+      "elements": [
+        {
+          "id": "el_ps21bg",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 0, "y": 0, "width": 960, "height": 540,
+          "background": "linear-gradient(160deg, #0f172a 0%, #1a1040 40%, #1e293b 100%)"
+        },
+        {
+          "id": "el_ps21accent",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 60, "y": 100, "width": 4, "height": 120,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps21title",
+          "type": "text",
+          "x": 80, "y": 95,
+          "width": 700, "height": 70,
+          "content": "<b style=\"font-size:42px;color:#f1f5f9;letter-spacing:2px;\">今天的重點回顧</b>",
+          "fontSize": 42,
+          "bold": true
+        },
+        {
+          "id": "el_ps21linedeco",
+          "type": "shape",
+          "shapeType": "rectangle",
+          "x": 80, "y": 175, "width": 60, "height": 3,
+          "background": "#a78bfa"
+        },
+        {
+          "id": "el_ps21recap",
+          "type": "text",
+          "x": 80, "y": 200,
+          "width": 800, "height": 180,
+          "content": "<div style=\"font-size:18px;line-height:2.2;color:#cbd5e1;\"><b style=\"color:#38bdf8;\">1.</b> 簡報從「手動排版」進化到「AI 生成」，但互動才是下一步<br><b style=\"color:#7c3aed;\">2.</b> 互動式簡報讓學員參與，講師即時掌握理解狀況<br><b style=\"color:#16a34a;\">3.</b> AI 是教學助理 — 幫你出題、研究、排版<br><b style=\"color:#d97706;\">4.</b> 作業系統讓學員用手機即時交作品，數據自動收集</div>",
+          "fontSize": 18
+        },
+        {
+          "id": "el_ps21qa",
+          "type": "text",
+          "x": 80, "y": 400,
+          "width": 500, "height": 50,
+          "content": "<b style=\"font-size:28px;color:#a78bfa;\">💬 Q&A — 有什麼想問的嗎？</b>",
+          "fontSize": 28
+        },
+        {
+          "id": "el_ps21contact",
+          "type": "text",
+          "x": 80, "y": 465,
+          "width": 500, "height": 40,
+          "content": "<span style=\"font-size:16px;color:#64748b;\">樊松蒲 Dennis ｜ 公眾表達練習小聚 ｜ 2026</span>",
+          "fontSize": 16
+        }
+      ]
+    }
+  ]
+}
