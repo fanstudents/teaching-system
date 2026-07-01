@@ -631,9 +631,9 @@ export class SkillBattleGame {
             if (element.judgePrompt) {
                 // 自訂評分規則：由程式自動注入學員資料 + 補上 JSON 回傳契約，
                 // 避免評審看不到學員內容、或回傳非 JSON 導致解析失敗
-                judgePrompt = `你是一位嚴格的評審。請根據以下「評分規則」對學員的內容評分。
+                judgePrompt = `你是一位嚴格的評審。請根據下方「評分規則」對學員的內容評分。
 
-═══ 評分規則 ═══
+═══ 評分規則（僅供你內部判斷使用）═══
 ${element.judgePrompt}
 
 ═══ 評分資料 ═══
@@ -649,7 +649,8 @@ ${skill}
 【AI 使用該${element.battleMode === 'skill' ? ' Skill' : '提示詞'}後的實際輸出】
 ${output}
 
-只回傳 JSON，不要有任何其他文字：
+═══ 輸出格式（最高優先，必須遵守）═══
+無論上方「評分規則」內描述了什麼呈現方式或格式，你的最終回覆都【只能】是一個 JSON 物件，不得有任何前後文字、說明或 Markdown。score 必須是你依評分規則算出的最終總分（整數）。
 {"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>", "suggestions": "<80字以內的改進建議，具體說明如何修改可以得到更好的結果>"}`;
             } else if (element.battleMode === 'skill') {
                 judgePrompt = `你是一位嚴格的 AI Skill 設計評審。請根據學員設計的 Skill 進行全面評估。
@@ -751,8 +752,8 @@ D. 差異化加分/扣分（10 分）
                 { role: 'user', content: judgePrompt },
             ], { model, maxTokens: 500, temperature: 0.5 });
 
-            // 解析分數
-            let score = 50;
+            // 解析分數（優先 JSON；失敗則從散文擷取，避免盲目 fallback 成 50）
+            let score = null;
             let feedback = '';
             let suggestions = '';
             try {
@@ -761,14 +762,30 @@ D. 差異化加分/扣分（10 分）
                     const parsed = JSON.parse(jsonMatch[0]);
                     // 用 Number 而非 parseInt || 50，避免 0 分被 fallback
                     const rawScore = Number(parsed.score);
-                    score = isNaN(rawScore) ? 50 : Math.min(100, Math.max(0, Math.round(rawScore)));
+                    if (!isNaN(rawScore)) score = Math.min(100, Math.max(0, Math.round(rawScore)));
                     feedback = parsed.feedback || '';
                     suggestions = parsed.suggestions || '';
                 }
             } catch (e) {
-                console.warn('Judge parse error:', e, judgeResult);
-                feedback = '評分解析失敗';
+                console.warn('Judge JSON parse failed, fallback to text:', e);
             }
+            // Fallback：模型回傳散文（常見於自訂評分 Prompt 指定了自己的輸出格式）
+            if (score === null) {
+                const m = judgeResult.match(/(?:總分|得分|分數|score)[^\d]{0,8}(\d{1,3})/i)
+                    || judgeResult.match(/(\d{1,3})\s*分/);
+                if (m) score = Math.min(100, Math.max(0, parseInt(m[1], 10)));
+            }
+            // 評語缺漏時，用散文全文補到「改進建議」，讓學員仍看得到好在哪、差在哪
+            if (!feedback && !suggestions) {
+                const cleanText = judgeResult.replace(/```[a-z]*|```/gi, '').trim();
+                if (cleanText) {
+                    feedback = 'AI 評分詳解（見下方）';
+                    suggestions = cleanText.slice(0, 600);
+                } else {
+                    feedback = '評分解析失敗';
+                }
+            }
+            if (score === null) score = 50;
             console.log(`[SkillBattle] ${studentName}: score=${score}, raw=`, judgeResult);
             this._appendLog(logEl, `${mi('bug_report', 14)} Judge raw: ${esc(judgeResult.substring(0, 100))}`, 'info');
 
