@@ -629,7 +629,28 @@ export class SkillBattleGame {
             // Step 2: LLM-as-Judge 評分（細緻版）
             let judgePrompt;
             if (element.judgePrompt) {
-                judgePrompt = element.judgePrompt;
+                // 自訂評分規則：由程式自動注入學員資料 + 補上 JSON 回傳契約，
+                // 避免評審看不到學員內容、或回傳非 JSON 導致解析失敗
+                judgePrompt = `你是一位嚴格的評審。請根據以下「評分規則」對學員的內容評分。
+
+═══ 評分規則 ═══
+${element.judgePrompt}
+
+═══ 評分資料 ═══
+
+【任務描述】
+${task}
+
+${reference ? `【標準答案 / 理想輸出】\n${reference}\n` : '（無標準答案，請依評分規則綜合判斷）'}
+
+【學員撰寫的${element.battleMode === 'skill' ? ' Skill' : '提示詞'}】
+${skill}
+
+【AI 使用該${element.battleMode === 'skill' ? ' Skill' : '提示詞'}後的實際輸出】
+${output}
+
+只回傳 JSON，不要有任何其他文字：
+{"score": <整數0到100>, "feedback": "<30字以內的中文評語，要具體指出優缺點>", "suggestions": "<80字以內的改進建議，具體說明如何修改可以得到更好的結果>"}`;
             } else if (element.battleMode === 'skill') {
                 judgePrompt = `你是一位嚴格的 AI Skill 設計評審。請根據學員設計的 Skill 進行全面評估。
 
