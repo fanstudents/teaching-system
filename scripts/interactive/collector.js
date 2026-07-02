@@ -53,6 +53,25 @@ Body 格式（JSON）：
 3. 如果呼叫回傳非 2xx 的錯誤，請直接告訴我發生了什麼錯誤，我會自己
    確認處理（可能是憑證過期，我會回到課堂頁面重新整理拿新的）。`;
 
+const DEFAULT_AGENT_BUILDER_PROMPT = `我要設計一個屬於我自己的「業務開發 Agent」，目標是幫我找出符合
+特定客群條件的潛在客戶名單。
+
+我這次鎖定的目標客群是：{{目標客群}}
+
+請你協助我完成以下事情：
+1. 幫我釐清「符合這個目標客群的好客戶」應該具備哪些具體特徵（不是
+   只看產業別，還要包含公司規模、痛點、購買訊號等）。
+2. 幫我寫一份可以直接用在 Agent／Custom GPT／Claude Skill 的系統
+   提示詞（system prompt），讓這個 Agent 之後可以：
+   - 理解我的目標客群與篩選條件
+   - 主動尋找或整理出符合條件的潛在客戶資料
+   - 產出結構化的客戶資訊（至少包含：Email、名稱、產業、備注／推薦理由）
+3. 系統提示詞裡「如何判斷這是不是一個好的潛在客戶」的邏輯請寫清楚，
+   我之後上台報告會需要說明這個判斷依據。
+
+完成後，請把最終版的系統提示詞完整輸出給我，我會把它設定成一個新的
+Agent（或直接繼續在這個對話裡扮演這個 Agent 也可以）。`;
+
 function exampleFor(label) {
     const l = String(label).toLowerCase();
     if (l.includes('email') || label.includes('信箱') || label.includes('郵件')) return 'example@company.com';
@@ -168,20 +187,27 @@ export class CollectorGame {
         const anonKey = db._anonKey;
         const bodyExample = { token, ...Object.fromEntries(fields.map(f => [f.label, exampleFor(f.label)])) };
 
-        // ── Prompt 範本：系統保留變數（端點/金鑰/token/JSON 範例）自動代入，
-        //    其餘 {{變數}} 由老師自訂，顯示成學員必填的輸入框（比照複製卡） ──
-        const rawTemplate = element.promptTemplate || DEFAULT_PROMPT_TEMPLATE;
-        const systemFilled = rawTemplate
+        // ── Prompt 1：打造你的業務開發 Agent（此時還沒有 Agent，純文字提示詞，無系統變數） ──
+        const builderText = element.agentBuilderPrompt || DEFAULT_AGENT_BUILDER_PROMPT;
+
+        // ── Prompt 2：把回報格式教給做好的 Agent（系統保留變數自動代入端點/金鑰/token/JSON 範例） ──
+        const reportRaw = element.promptTemplate || DEFAULT_PROMPT_TEMPLATE;
+        const reportText = reportRaw
             .replaceAll('{{API_ENDPOINT}}', endpoint)
             .replaceAll('{{API_KEY}}', anonKey)
             .replaceAll('{{TOKEN}}', token)
             .replaceAll('{{JSON_EXAMPLE}}', JSON.stringify(bodyExample, null, 2));
-        const studentVars = this._extractVars(systemFilled);
-        let promptDisplayHtml = systemFilled.replace(/\n/g, '<br>');
-        if (studentVars.length) {
-            promptDisplayHtml = promptDisplayHtml.replace(/\{\{([^}]+)\}\}/g, (_, name) =>
-                `<input type="text" class="col-var-input" data-var="${name}" placeholder="${name}" autocomplete="off">`);
-        }
+
+        // 兩段共用同一組「學員自訂變數」（例如 {{目標客群}}），填一次、兩段都套用
+        const allVars = [...new Set([...this._extractVars(builderText), ...this._extractVars(reportText)])];
+        const toDisplayHtml = text => {
+            let html = text.replace(/\n/g, '<br>');
+            if (allVars.length) {
+                html = html.replace(/\{\{([^}]+)\}\}/g, (_, name) =>
+                    `<input type="text" class="col-var-input" data-var="${name}" placeholder="${name}" autocomplete="off">`);
+            }
+            return html;
+        };
 
         el.innerHTML = `
             <div class="col-student">
@@ -193,35 +219,56 @@ export class CollectorGame {
 
                 <div class="col-block col-prompt-block">
                     <div class="col-block-title">
-                        ${mi('smart_toy', 14)} 貼給你的 AI Agent 的完整指令
-                        <button class="col-copy-btn col-copy-prompt" ${studentVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製整段指令</button>
+                        ${mi('looks_one', 14)} 步驟 1：貼給 AI，打造你的業務開發 Agent
+                        <button class="col-copy-btn col-copy-prompt" data-target="builder" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
                     </div>
-                    ${studentVars.length ? `<div class="col-var-hint">請先填寫上方反白欄位，再複製指令</div>` : ''}
-                    <div class="col-prompt-template">${promptDisplayHtml}</div>
+                    ${allVars.length ? `<div class="col-var-hint">請先填寫下方反白欄位</div>` : ''}
+                    <div class="col-prompt-template">${toDisplayHtml(builderText)}</div>
+                </div>
+
+                <div class="col-block col-prompt-block">
+                    <div class="col-block-title">
+                        ${mi('looks_two', 14)} 步驟 2：把回報格式教給做好的 Agent
+                        <button class="col-copy-btn col-copy-prompt" data-target="report" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
+                    </div>
+                    <div class="col-prompt-template">${toDisplayHtml(reportText)}</div>
                 </div>
             </div>`;
 
-        // 學員自訂變數：全填滿才能複製；複製時把 {{變數}} 換成學員填的值
-        const copyPromptBtn = el.querySelector('.col-copy-prompt');
+        // 學員自訂變數：全填滿才能複製；同名變數跨兩段自動同步；複製時把 {{變數}} 換成填入的值
+        const copyBtns = el.querySelectorAll('.col-copy-prompt');
         const varHintEl = el.querySelector('.col-var-hint');
-        if (studentVars.length) {
+        if (allVars.length) {
             const checkFilled = () => {
-                const inputs = el.querySelectorAll('.col-var-input');
-                const allFilled = [...inputs].every(inp => inp.value.trim() !== '');
-                copyPromptBtn.disabled = !allFilled;
+                const byVar = new Map();
+                el.querySelectorAll('.col-var-input').forEach(inp => {
+                    if (!byVar.has(inp.dataset.var)) byVar.set(inp.dataset.var, inp.value.trim());
+                });
+                const allFilled = [...byVar.values()].every(v => v !== '');
+                copyBtns.forEach(btn => { btn.disabled = !allFilled; });
                 if (varHintEl) varHintEl.style.display = allFilled ? 'none' : '';
             };
-            el.querySelectorAll('.col-var-input').forEach(inp => inp.addEventListener('input', checkFilled));
-        }
-        copyPromptBtn.addEventListener('click', () => {
-            let finalText = systemFilled;
             el.querySelectorAll('.col-var-input').forEach(inp => {
-                finalText = finalText.replaceAll(`{{${inp.dataset.var}}}`, inp.value.trim());
+                inp.addEventListener('input', () => {
+                    // 同名變數跨區塊同步
+                    el.querySelectorAll(`.col-var-input[data-var="${inp.dataset.var}"]`).forEach(other => {
+                        if (other !== inp) other.value = inp.value;
+                    });
+                    checkFilled();
+                });
             });
-            copyText(finalText);
-            const orig = copyPromptBtn.innerHTML;
-            copyPromptBtn.innerHTML = `${mi('check', 14)} 已複製`;
-            setTimeout(() => { copyPromptBtn.innerHTML = orig; }, 1500);
+        }
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                let finalText = btn.dataset.target === 'builder' ? builderText : reportText;
+                el.querySelectorAll('.col-var-input').forEach(inp => {
+                    finalText = finalText.replaceAll(`{{${inp.dataset.var}}}`, inp.value.trim());
+                });
+                copyText(finalText);
+                const orig = btn.innerHTML;
+                btn.innerHTML = `${mi('check', 14)} 已複製`;
+                setTimeout(() => { btn.innerHTML = orig; }, 1500);
+            });
         });
 
         const updateCount = async () => {

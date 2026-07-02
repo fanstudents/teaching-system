@@ -594,6 +594,7 @@ export class Editor {
                 { label: '客戶名稱' },
                 { label: '客戶備注' },
             ],
+            agentBuilderPrompt: '',
             promptTemplate: '',
         };
         this.slideManager.addElement(element);
@@ -1774,8 +1775,29 @@ export class Editor {
                 </div>
                 <div class="property-section">
                     <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
-                        <span class="material-symbols-outlined" style="font-size:16px;color:#0891b2;">content_copy</span>
-                        Agent 提示詞範本（進階，選填）
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#0891b2;">looks_one</span>
+                        Prompt 1：打造 Agent 提示詞（進階，選填）
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
+                        學員此時還沒有 Agent，這段是貼給一般 AI 聊天視窗用的，
+                        目的是請 AI 協助設計出他自己的業務開發 Agent。
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-input" id="colAgentBuilderPrompt" rows="6" placeholder="留空使用預設範本" style="resize:vertical;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;line-height:1.6;">${elementData.agentBuilderPrompt || ''}</textarea>
+                        <div style="margin-top:8px;padding:10px 12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:0.72rem;color:#0c4a6e;line-height:1.6;">
+                            用 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{變數名}}</code> 讓學員自己輸入內容（例如
+                            <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{目標客群}}</code>），
+                            跟 Prompt 2 用同一個變數名稱的話，學員只要填一次、兩段都會自動套用。
+                        </div>
+                    </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#0891b2;">looks_two</span>
+                        Prompt 2：回報格式指令（進階，選填）
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;">
+                        這段是貼給 Prompt 1 做出來的 Agent 用的，教它怎麼把資料回報到這個系統。
                     </div>
                     <div class="form-group">
                         <textarea class="form-input" id="colPromptTemplate" rows="6" placeholder="留空使用預設範本" style="resize:vertical;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;line-height:1.6;">${elementData.promptTemplate || ''}</textarea>
@@ -3350,6 +3372,7 @@ ${truncated}
         // 資料收集器事件
         if (elementData.type === 'collector') {
             bindSimple('colQuestion', 'question');
+            bindSimple('colAgentBuilderPrompt', 'agentBuilderPrompt');
             bindSimple('colPromptTemplate', 'promptTemplate');
 
             const colFields = () => (elementData.fields && elementData.fields.length)
