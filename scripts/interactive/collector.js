@@ -300,8 +300,12 @@ export class CollectorGame {
         this._intervals.set(elementId + '_student', tid);
     }
 
-    /** select-or-insert：同一位學員重整頁面拿到同一組 token */
-    async _mintToken(sessionId, elementId, email, name) {
+    /**
+     * select-or-insert：同一位學員重整頁面拿到同一組 token。
+     * 多位學員同時翻到這頁時，任何一次請求都可能碰上瞬斷，
+     * 失敗時重試最多 2 次（遞增等待），降低偶發錯誤直接卡住學員的機率。
+     */
+    async _mintToken(sessionId, elementId, email, name, attempt = 0) {
         const { data } = await db.insert('collector_tokens', {
             session_id: sessionId, element_id: elementId,
             student_email: email, student_name: name,
@@ -314,7 +318,13 @@ export class CollectorGame {
             filter: { session_id: `eq.${sessionId}`, element_id: `eq.${elementId}`, student_email: `eq.${email}` },
             limit: 1,
         });
-        return sel.data?.[0]?.token || null;
+        if (sel.data?.[0]?.token) return sel.data[0].token;
+
+        if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 600 * (attempt + 1)));
+            return this._mintToken(sessionId, elementId, email, name, attempt + 1);
+        }
+        return null;
     }
 
     /** 找出範本中「非系統保留」的 {{變數}}，即需要學員自己填寫的欄位 */
