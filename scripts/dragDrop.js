@@ -59,6 +59,10 @@ export class DragDrop {
             if (document.hidden) this.forceReset();
         });
 
+        // 視窗失焦時清除內部複製暫存（_copiedElements 永久保留、且貼上時永遠優先於外部剪貼簿，
+        // 導致切去別處複製文字/內容後回來貼上，仍被舊元件攔截、無法貼上外部內容）
+        window.addEventListener('blur', () => { this._copiedElements = null; });
+
         // 雙擊編輯文字
         this.canvasContentEl.addEventListener('dblclick', safe(this.handleDoubleClick));
 
