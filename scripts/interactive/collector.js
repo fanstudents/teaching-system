@@ -188,7 +188,10 @@ export class CollectorGame {
         const fields = this._fields(element);
         const endpoint = `${db._baseUrl}/rest/v1/collector_entries`;
         const anonKey = db._anonKey;
-        const bodyExample = { token, ...Object.fromEntries(fields.map(f => [f.label, exampleFor(f.label)])) };
+        // 注意：自訂欄位必須包在 data（jsonb）裡面，不能跟 token 平級 ——
+        // collector_entries 表只有 token/data 等固定欄位，"客戶 Email" 這類
+        // 老師自訂欄位不是真實的資料表欄位，寫在最外層會被 PostgREST 拒絕（PGRST204）
+        const bodyExample = { token, data: Object.fromEntries(fields.map(f => [f.label, exampleFor(f.label)])) };
 
         // ── Prompt 1：打造你的業務開發 Agent（此時還沒有 Agent，純文字提示詞，無系統變數） ──
         const builderText = element.agentBuilderPrompt || DEFAULT_AGENT_BUILDER_PROMPT;
