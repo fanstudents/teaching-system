@@ -224,13 +224,14 @@ export class CollectorGame {
                 </div>
                 <div class="col-student-desc">${esc(element.question || '把你的 AI Agent 開發到的資料，依照下方格式即時回報到這裡。')}</div>
 
+                ${allVars.length ? `<div class="col-var-hint">請先填寫下方反白欄位，兩段會一起解鎖</div>` : ''}
+
                 <div class="col-prompt-row">
                     <div class="col-block col-prompt-block">
                         <div class="col-block-title">
                             ${mi('looks_one', 14)} 步驟 1：貼給 AI，打造你的業務開發 Agent
                             <button class="col-copy-btn col-copy-prompt" data-target="builder" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
                         </div>
-                        ${allVars.length ? `<div class="col-var-hint">請先填寫下方反白欄位</div>` : ''}
                         <div class="col-prompt-template">${toDisplayHtml(builderText)}</div>
                     </div>
 
