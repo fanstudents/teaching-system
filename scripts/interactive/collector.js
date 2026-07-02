@@ -53,24 +53,31 @@ Body 格式（JSON）：
 3. 如果呼叫回傳非 2xx 的錯誤，請直接告訴我發生了什麼錯誤，我會自己
    確認處理（可能是憑證過期，我會回到課堂頁面重新整理拿新的）。`;
 
-const DEFAULT_AGENT_BUILDER_PROMPT = `我要設計一個屬於我自己的「業務開發 Agent」，目標是幫我找出符合
-特定客群條件的潛在客戶名單。
+const DEFAULT_AGENT_BUILDER_PROMPT = `我要打造一個屬於我自己的「業務開發 Agent」，請你直接幫我完成它的
+設計，並開始運作。
 
-我這次鎖定的目標客群是：{{目標客群}}
+【我的開發條件】
+- 目標對象（我想開發的客戶類型）：{{目標對象}}
+- 地區：{{地區}}
+- 客戶屬性（規模、產業、痛點等篩選條件）：{{客戶屬性}}
+- 我希望 Agent 產出的內容：{{產出內容}}
 
-請你協助我完成以下事情：
-1. 幫我釐清「符合這個目標客群的好客戶」應該具備哪些具體特徵（不是
+請你依照以上條件，完成以下事情：
+
+1. 幫我釐清「符合這些條件的好客戶」應該具備哪些具體判斷依據（不是
    只看產業別，還要包含公司規模、痛點、購買訊號等）。
-2. 幫我寫一份可以直接用在 Agent／Custom GPT／Claude Skill 的系統
-   提示詞（system prompt），讓這個 Agent 之後可以：
-   - 理解我的目標客群與篩選條件
+
+2. 幫我寫一份完整、可以直接使用的系統提示詞（system prompt），
+   讓這個 Agent 之後可以：
+   - 理解上面這些篩選條件
    - 主動尋找或整理出符合條件的潛在客戶資料
-   - 產出結構化的客戶資訊（至少包含：Email、名稱、產業、備注／推薦理由）
+   - 依照我指定的「產出內容」格式，輸出結構化的客戶資訊
+
 3. 系統提示詞裡「如何判斷這是不是一個好的潛在客戶」的邏輯請寫清楚，
    我之後上台報告會需要說明這個判斷依據。
 
-完成後，請把最終版的系統提示詞完整輸出給我，我會把它設定成一個新的
-Agent（或直接繼續在這個對話裡扮演這個 Agent 也可以）。`;
+4. 完成後，直接在這個對話裡扮演這個 Agent，開始依照上面的條件幫我
+   找出符合條件的潛在客戶名單。`;
 
 function exampleFor(label) {
     const l = String(label).toLowerCase();
@@ -217,21 +224,23 @@ export class CollectorGame {
                 </div>
                 <div class="col-student-desc">${esc(element.question || '把你的 AI Agent 開發到的資料，依照下方格式即時回報到這裡。')}</div>
 
-                <div class="col-block col-prompt-block">
-                    <div class="col-block-title">
-                        ${mi('looks_one', 14)} 步驟 1：貼給 AI，打造你的業務開發 Agent
-                        <button class="col-copy-btn col-copy-prompt" data-target="builder" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
+                <div class="col-prompt-row">
+                    <div class="col-block col-prompt-block">
+                        <div class="col-block-title">
+                            ${mi('looks_one', 14)} 步驟 1：貼給 AI，打造你的業務開發 Agent
+                            <button class="col-copy-btn col-copy-prompt" data-target="builder" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
+                        </div>
+                        ${allVars.length ? `<div class="col-var-hint">請先填寫下方反白欄位</div>` : ''}
+                        <div class="col-prompt-template">${toDisplayHtml(builderText)}</div>
                     </div>
-                    ${allVars.length ? `<div class="col-var-hint">請先填寫下方反白欄位</div>` : ''}
-                    <div class="col-prompt-template">${toDisplayHtml(builderText)}</div>
-                </div>
 
-                <div class="col-block col-prompt-block">
-                    <div class="col-block-title">
-                        ${mi('looks_two', 14)} 步驟 2：把回報格式教給做好的 Agent
-                        <button class="col-copy-btn col-copy-prompt" data-target="report" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
+                    <div class="col-block col-prompt-block">
+                        <div class="col-block-title">
+                            ${mi('looks_two', 14)} 步驟 2：把回報格式教給做好的 Agent
+                            <button class="col-copy-btn col-copy-prompt" data-target="report" ${allVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製</button>
+                        </div>
+                        <div class="col-prompt-template">${toDisplayHtml(reportText)}</div>
                     </div>
-                    <div class="col-prompt-template">${toDisplayHtml(reportText)}</div>
                 </div>
             </div>`;
 

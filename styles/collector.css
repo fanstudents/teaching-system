@@ -56,6 +56,18 @@
     margin: 0;
 }
 
+/* 兩段提示詞並排顯示；容器窄時（如手機）改為上下堆疊 */
+.col-prompt-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+}
+.col-prompt-row .col-prompt-block { min-width: 0; }
+@media (max-width: 680px) {
+    .col-prompt-row { grid-template-columns: 1fr; }
+}
+
 .col-prompt-block .col-block-title { justify-content: space-between; }
 .col-copy-btn {
     padding: 3px 10px; border: 1px solid #a5f3fc; border-radius: 6px;
