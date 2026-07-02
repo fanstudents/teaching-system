@@ -167,7 +167,6 @@ export class CollectorGame {
         const endpoint = `${db._baseUrl}/rest/v1/collector_entries`;
         const anonKey = db._anonKey;
         const bodyExample = { token, ...Object.fromEntries(fields.map(f => [f.label, exampleFor(f.label)])) };
-        const headersExample = { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json' };
 
         // ── Prompt 範本：系統保留變數（端點/金鑰/token/JSON 範例）自動代入，
         //    其餘 {{變數}} 由老師自訂，顯示成學員必填的輸入框（比照複製卡） ──
@@ -191,21 +190,6 @@ export class CollectorGame {
                     <span class="col-contribution-badge"><span class="col-contribution-num">…</span> 筆已貢獻</span>
                 </div>
                 <div class="col-student-desc">${esc(element.question || '把你的 AI Agent 開發到的資料，依照下方格式即時回報到這裡。')}</div>
-
-                <div class="col-block">
-                    <div class="col-block-title">${mi('link', 14)} API 端點</div>
-                    <div class="col-code-block">${esc(endpoint)}</div>
-                </div>
-
-                <div class="col-block">
-                    <div class="col-block-title">${mi('key', 14)} Headers</div>
-                    <pre class="col-code-block">${esc(JSON.stringify(headersExample, null, 2))}</pre>
-                </div>
-
-                <div class="col-block">
-                    <div class="col-block-title">${mi('data_object', 14)} JSON Body 範例</div>
-                    <pre class="col-code-block">${esc(JSON.stringify(bodyExample, null, 2))}</pre>
-                </div>
 
                 <div class="col-block col-prompt-block">
                     <div class="col-block-title">
