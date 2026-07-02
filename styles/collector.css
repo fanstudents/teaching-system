@@ -69,11 +69,40 @@
     background: #0f172a; color: #e2e8f0;
     padding: 14px; border-radius: 8px;
     font-family: 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.75rem; line-height: 1.7;
+    font-size: 0.75rem; line-height: 1.9;
     white-space: pre-wrap; word-break: break-word;
     max-height: 260px; overflow-y: auto;
     margin: 0;
 }
+
+/* 學員自填變數（比照複製卡 .cc-var-input，改用 cyan 色系） */
+.col-var-input {
+    display: inline-block;
+    min-width: 80px; max-width: 220px;
+    padding: 2px 10px; margin: 1px 3px;
+    border: 1.5px solid #22d3ee;
+    background: rgba(34, 211, 238, 0.1);
+    border-radius: 14px;
+    font-size: inherit; font-family: 'SFMono-Regular', Consolas, monospace;
+    color: #67e8f9; font-weight: 600; text-align: center;
+    vertical-align: baseline; transition: all 0.2s;
+}
+.col-var-input::placeholder { color: #0891b2; font-family: inherit; }
+.col-var-input:focus {
+    outline: none; border-color: #67e8f9;
+    background: rgba(34, 211, 238, 0.18);
+    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+}
+.col-var-input:not(:placeholder-shown) {
+    border-color: #4ade80; background: rgba(74, 222, 128, 0.1); color: #86efac;
+}
+.col-var-hint {
+    font-size: 11px; color: #f59e0b;
+    display: flex; align-items: center; gap: 4px;
+    margin-bottom: 6px; font-weight: 600;
+}
+.col-var-hint::before { content: '⚠'; }
+.col-copy-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ── 教師端（簡報播放） ── */
 .col-teacher-live { display: flex; flex-direction: column; gap: 10px; padding: 16px; height: 100%; }

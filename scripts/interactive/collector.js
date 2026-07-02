@@ -14,6 +14,43 @@ const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-s
 
 const DEFAULT_FIELDS = [{ label: '客戶 Email' }, { label: '客戶名稱' }, { label: '客戶備注' }];
 
+/* 系統保留變數：由程式自動代入，不會顯示成學員填寫欄位 */
+const RESERVED_VARS = ['API_ENDPOINT', 'API_KEY', 'TOKEN', 'JSON_EXAMPLE'];
+
+const DEFAULT_PROMPT_TEMPLATE = `你現在要協助我執行一項「業務開發資料回報」任務。
+
+【背景】
+我正在使用一套線上教學系統的「資料收集器」功能。每當你（我的 AI Agent）幫我開發到
+一筆新的潛在客戶資料時，請立刻用 HTTP POST 的方式，把資料回報到下方指定的 API，
+讓我可以即時在課堂排行榜上看到自己的進度。
+
+【重要】下面的 token 就是用來辨識「這是我送出的資料」的唯一憑證，
+請完整保留、不要省略、不要換成別的值，也不需要額外附上我的姓名或 email。
+
+【API 網址】
+POST {{API_ENDPOINT}}
+
+【HTTP Headers】
+apikey: {{API_KEY}}
+Authorization: Bearer {{API_KEY}}
+Content-Type: application/json
+
+【JSON Body 格式】
+{{JSON_EXAMPLE}}
+（"token" 欄位請固定填 "{{TOKEN}}"，其餘欄位請填入你實際開發到的真實資料）
+
+【執行時機】
+每當你完成「一組」完整的客戶開發資料（也就是上面 JSON 裡列出的所有欄位都有內容了），
+就立刻發送一次這個 POST 請求，不要等到所有客戶都找完才一次送出。
+每一組客戶資料都是獨立的一次 POST（不要把多組客戶塞進同一個請求）。
+
+【注意事項】
+1. 欄位名稱請完全比照上面 JSON 範例的 key（一字不差），不要自己翻譯或改名。
+2. 如果某個欄位暫時沒有資料，可以留空字串 ""，但請不要省略這個 key。
+3. 送出後不需要等待或解析回應內容，繼續進行下一組客戶開發即可。
+4. 如果收到錯誤（HTTP 狀態碼非 2xx），代表 token 可能已失效，
+   請提醒我回到課堂簡報頁面重新整理，取得新的憑證。`;
+
 function exampleFor(label) {
     const l = String(label).toLowerCase();
     if (l.includes('email') || label.includes('信箱') || label.includes('郵件')) return 'example@company.com';
@@ -129,7 +166,21 @@ export class CollectorGame {
         const anonKey = db._anonKey;
         const bodyExample = { token, ...Object.fromEntries(fields.map(f => [f.label, exampleFor(f.label)])) };
         const headersExample = { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json' };
-        const promptTemplate = this._buildPromptTemplate(endpoint, anonKey, token, fields);
+
+        // ── Prompt 範本：系統保留變數（端點/金鑰/token/JSON 範例）自動代入，
+        //    其餘 {{變數}} 由老師自訂，顯示成學員必填的輸入框（比照複製卡） ──
+        const rawTemplate = element.promptTemplate || DEFAULT_PROMPT_TEMPLATE;
+        const systemFilled = rawTemplate
+            .replaceAll('{{API_ENDPOINT}}', endpoint)
+            .replaceAll('{{API_KEY}}', anonKey)
+            .replaceAll('{{TOKEN}}', token)
+            .replaceAll('{{JSON_EXAMPLE}}', JSON.stringify(bodyExample, null, 2));
+        const studentVars = this._extractVars(systemFilled);
+        let promptDisplayHtml = systemFilled.replace(/\n/g, '<br>');
+        if (studentVars.length) {
+            promptDisplayHtml = promptDisplayHtml.replace(/\{\{([^}]+)\}\}/g, (_, name) =>
+                `<input type="text" class="col-var-input" data-var="${name}" placeholder="${name}" autocomplete="off">`);
+        }
 
         el.innerHTML = `
             <div class="col-student">
@@ -157,13 +208,35 @@ export class CollectorGame {
                 <div class="col-block col-prompt-block">
                     <div class="col-block-title">
                         ${mi('smart_toy', 14)} 貼給你的 AI Agent 的完整指令
-                        <button class="col-copy-btn col-copy-prompt">${mi('content_copy', 14)} 複製整段指令</button>
+                        <button class="col-copy-btn col-copy-prompt" ${studentVars.length ? 'disabled' : ''}>${mi('content_copy', 14)} 複製整段指令</button>
                     </div>
-                    <pre class="col-prompt-template">${esc(promptTemplate)}</pre>
+                    ${studentVars.length ? `<div class="col-var-hint">請先填寫上方反白欄位，再複製指令</div>` : ''}
+                    <div class="col-prompt-template">${promptDisplayHtml}</div>
                 </div>
             </div>`;
 
-        this._bindCopy(el, '.col-copy-prompt', () => promptTemplate);
+        // 學員自訂變數：全填滿才能複製；複製時把 {{變數}} 換成學員填的值
+        const copyPromptBtn = el.querySelector('.col-copy-prompt');
+        const varHintEl = el.querySelector('.col-var-hint');
+        if (studentVars.length) {
+            const checkFilled = () => {
+                const inputs = el.querySelectorAll('.col-var-input');
+                const allFilled = [...inputs].every(inp => inp.value.trim() !== '');
+                copyPromptBtn.disabled = !allFilled;
+                if (varHintEl) varHintEl.style.display = allFilled ? 'none' : '';
+            };
+            el.querySelectorAll('.col-var-input').forEach(inp => inp.addEventListener('input', checkFilled));
+        }
+        copyPromptBtn.addEventListener('click', () => {
+            let finalText = systemFilled;
+            el.querySelectorAll('.col-var-input').forEach(inp => {
+                finalText = finalText.replaceAll(`{{${inp.dataset.var}}}`, inp.value.trim());
+            });
+            copyText(finalText);
+            const orig = copyPromptBtn.innerHTML;
+            copyPromptBtn.innerHTML = `${mi('check', 14)} 已複製`;
+            setTimeout(() => { copyPromptBtn.innerHTML = orig; }, 1500);
+        });
 
         const updateCount = async () => {
             const { data } = await db.select('collector_entries', {
@@ -195,44 +268,15 @@ export class CollectorGame {
         return sel.data?.[0]?.token || null;
     }
 
-    _buildPromptTemplate(endpoint, anonKey, token, fields) {
-        const bodyLines = fields.map(f => `  "${f.label}": ""`).join(',\n');
-        return `你現在要協助我執行一項「業務開發資料回報」任務。
-
-【背景】
-我正在使用一套線上教學系統的「資料收集器」功能。每當你（我的 AI Agent）幫我開發到
-一筆新的潛在客戶資料時，請立刻用 HTTP POST 的方式，把資料回報到下方指定的 API，
-讓我可以即時在課堂排行榜上看到自己的進度。
-
-【重要】下面的 token 就是用來辨識「這是我送出的資料」的唯一憑證，
-請完整保留、不要省略、不要換成別的值，也不需要額外附上我的姓名或 email。
-
-【API 網址】
-POST ${endpoint}
-
-【HTTP Headers】
-apikey: ${anonKey}
-Authorization: Bearer ${anonKey}
-Content-Type: application/json
-
-【JSON Body 格式】
-{
-  "token": "${token}",
-${bodyLines}
-}
-（"token" 欄位請固定填 "${token}"，其餘欄位請填入你實際開發到的真實資料）
-
-【執行時機】
-每當你完成「一組」完整的客戶開發資料（也就是上面 JSON 裡列出的所有欄位都有內容了），
-就立刻發送一次這個 POST 請求，不要等到所有客戶都找完才一次送出。
-每一組客戶資料都是獨立的一次 POST（不要把多組客戶塞進同一個請求）。
-
-【注意事項】
-1. 欄位名稱請完全比照上面 JSON 範例的 key（一字不差），不要自己翻譯或改名。
-2. 如果某個欄位暫時沒有資料，可以留空字串 ""，但請不要省略這個 key。
-3. 送出後不需要等待或解析回應內容，繼續進行下一組客戶開發即可。
-4. 如果收到錯誤（HTTP 狀態碼非 2xx），代表 token 可能已失效，
-   請提醒我回到課堂簡報頁面重新整理，取得新的憑證。`;
+    /** 找出範本中「非系統保留」的 {{變數}}，即需要學員自己填寫的欄位 */
+    _extractVars(text) {
+        const re = /\{\{([^}]+)\}\}/g;
+        const vars = [];
+        let m;
+        while ((m = re.exec(text)) !== null) {
+            if (!RESERVED_VARS.includes(m[1]) && !vars.includes(m[1])) vars.push(m[1]);
+        }
+        return vars;
     }
 
     /* ═══════════════════════════════════════════════ */

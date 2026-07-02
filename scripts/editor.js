@@ -594,6 +594,7 @@ export class Editor {
                 { label: '客戶名稱' },
                 { label: '客戶備注' },
             ],
+            promptTemplate: '',
         };
         this.slideManager.addElement(element);
         this.selectElementById(element.id);
@@ -1769,6 +1770,29 @@ export class Editor {
                     <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
                         每個欄位就是學員 Agent 要回報的一個 JSON key，直接用欄位文字當 key。
                         學員畫面會自動顯示對應的 API 端點、憑證與可複製的 Agent 提示詞範本。
+                    </div>
+                </div>
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#0891b2;">content_copy</span>
+                        Agent 提示詞範本（進階，選填）
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-input" id="colPromptTemplate" rows="6" placeholder="留空使用預設範本" style="resize:vertical;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;line-height:1.6;">${elementData.promptTemplate || ''}</textarea>
+                        <div style="margin-top:8px;padding:10px 12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
+                            <div style="font-size:0.78rem;font-weight:600;color:#0369a1;margin-bottom:4px;">💡 系統變數（自動代入，不會顯示成輸入框）</div>
+                            <div style="font-size:0.72rem;color:#0c4a6e;line-height:1.7;">
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{API_ENDPOINT}}</code>
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{API_KEY}}</code>
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{TOKEN}}</code>
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{JSON_EXAMPLE}}</code>
+                            </div>
+                            <div style="font-size:0.78rem;font-weight:600;color:#0369a1;margin:8px 0 4px;">✏️ 自訂變數（比照複製卡，學員需填完才能複製）</div>
+                            <div style="font-size:0.72rem;color:#0c4a6e;line-height:1.6;">
+                                用其他 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{變數名}}</code> 讓學員自己輸入內容，
+                                例如 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">目標產業：{{目標產業}}</code>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -3326,6 +3350,7 @@ ${truncated}
         // 資料收集器事件
         if (elementData.type === 'collector') {
             bindSimple('colQuestion', 'question');
+            bindSimple('colPromptTemplate', 'promptTemplate');
 
             const colFields = () => (elementData.fields && elementData.fields.length)
                 ? elementData.fields
