@@ -3443,7 +3443,8 @@
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    align-content: center;
+    /* flex-start：字多溢出時往下堆疊、可捲動；用 center 會讓頂端溢出被邊框裁掉且捲不到 */
+    align-content: flex-start;
     align-items: center;
     justify-content: center;
     gap: 10px;
