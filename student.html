@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="styles/skill-battle.css?v=20260603">
     <link rel="stylesheet" href="styles/web-project.css?v=20260603">
     <link rel="stylesheet" href="styles/group-pick.css?v=20260603">
+    <link rel="stylesheet" href="styles/collector.css?v=20260702">
 </head>
 
 <body>
@@ -1846,7 +1847,7 @@
         }
 
         // ── QR Code 顯示 ──
-        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'multiChoice', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall', 'skillBattle'];
+        const interactiveTypes = ['quiz', 'poll', 'truefalse', 'multiChoice', 'opentext', 'scale', 'buzzer', 'wordcloud', 'hotspot', 'matching', 'fillblank', 'ordering', 'homework', 'copycard', 'document', 'showcase', 'assessment', 'icebreaker', 'assessmentWall', 'skillBattle', 'collector'];
         function updateStudentQR(slide) {
             let qrEl = document.getElementById('studentQRCode');
             const hasInteractive = slide?.elements?.some(el => interactiveTypes.includes(el.type));
@@ -2995,6 +2996,15 @@
                     import('./scripts/interactive/skillBattle.js?v=20260604').then(({ SkillBattleGame }) => {
                         const isLive = true; // student page is always live
                         new SkillBattleGame().render(el, element, isLive);
+                    });
+                    break;
+                }
+
+                case 'collector': {
+                    el.classList.add('interactive-element', 'collector-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/collector.js?v=20260702').then(({ CollectorGame }) => {
+                        new CollectorGame().render(el, element, true); // forceStudent = true
                     });
                     break;
                 }

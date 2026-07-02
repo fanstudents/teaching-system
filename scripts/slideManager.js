@@ -1245,6 +1245,23 @@ export class SlideManager {
                 break;
             }
 
+            case 'collector': {
+                el.classList.add('interactive-element', 'collector-element');
+                el.style.overflow = 'hidden';
+                this._applyInteractiveStyles(el, element);
+                requestAnimationFrame(() => {
+                    const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
+                    import('./interactive/collector.js?v=20260702').then(({ CollectorGame }) => {
+                        if (isLive) {
+                            new CollectorGame().render(el, element);
+                        } else {
+                            new CollectorGame().renderPreview(el, element);
+                        }
+                    });
+                });
+                break;
+            }
+
             case 'skillBattleBoard': {
                 el.classList.add('interactive-element', 'skill-battle-board-element');
                 el.style.overflow = 'hidden';

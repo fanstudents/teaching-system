@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>即時儀表板 — 數位簡報室</title>
+    <meta name="description" content="數位簡報室 — 資料收集器即時儀表板">
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <style>
+        * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #083344 0%, #0f172a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .dash-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+            margin-bottom: 24px;
+        }
+        .dash-title {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.6rem; font-weight: 700; color: #67e8f9;
+        }
+        .dash-title .material-symbols-outlined { font-size: 32px; color: #22d3ee; }
+        .dash-meta {
+            display: flex; gap: 20px; font-size: 0.9rem; color: #94a3b8;
+        }
+        .dash-meta b { color: #67e8f9; font-size: 1.1rem; }
+
+        .dash-body {
+            display: grid; grid-template-columns: 380px 1fr; gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .dash-body { grid-template-columns: 1fr; }
+        }
+
+        .dash-panel {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .dash-panel-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 1.1rem; font-weight: 700; color: #f1f5f9;
+            margin-bottom: 16px;
+        }
+
+        /* ── 排行榜 ── */
+        .rank-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom: 8px;
+            animation: rankIn 0.3s ease;
+        }
+        @keyframes rankIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        .rank-medal { font-size: 1.3rem; width: 28px; text-align: center; flex-shrink: 0; }
+        .rank-gold { background: linear-gradient(90deg, rgba(251,191,36,0.18), transparent); }
+        .rank-silver { background: linear-gradient(90deg, rgba(203,213,225,0.15), transparent); }
+        .rank-bronze { background: linear-gradient(90deg, rgba(217,119,6,0.15), transparent); }
+        .rank-name { flex: 1; font-weight: 600; color: #f1f5f9; font-size: 0.92rem; }
+        .rank-bar-wrap { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; max-width: 90px; }
+        .rank-bar-fill { height: 100%; background: linear-gradient(90deg, #22d3ee, #06b6d4); border-radius: 4px; transition: width 0.4s; }
+        .rank-count { font-weight: 700; color: #22d3ee; font-size: 0.9rem; min-width: 40px; text-align: right; }
+
+        /* ── Feed ── */
+        .feed-list { display: flex; flex-direction: column; gap: 10px; max-height: 70vh; overflow-y: auto; }
+        .feed-item {
+            padding: 12px 16px; border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid #22d3ee;
+            animation: feedIn 0.4s ease;
+        }
+        @keyframes feedIn { from { opacity: 0; transform: translateX(-8px); background: rgba(34,211,238,0.15); } to { opacity: 1; transform: translateX(0); } }
+        .feed-item-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .feed-item-name { font-weight: 700; color: #67e8f9; font-size: 0.9rem; }
+        .feed-item-time { font-size: 0.75rem; color: #64748b; }
+        .feed-item-fields { display: flex; flex-direction: column; gap: 2px; }
+        .feed-field { font-size: 0.82rem; color: #cbd5e1; }
+        .feed-field b { color: #94a3b8; font-weight: 600; }
+
+        .dash-empty {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 60px 20px; color: #64748b; font-size: 0.95rem;
+        }
+        .dash-empty .material-symbols-outlined { font-size: 40px; opacity: 0.5; }
+    </style>
+</head>
+
+<body>
+    <div class="dash-header">
+        <div class="dash-title">
+            <span class="material-symbols-outlined">database</span>
+            <span>資料收集競賽儀表板</span>
+        </div>
+        <div class="dash-meta">
+            <span>總筆數：<b id="totalCount">0</b></span>
+            <span>參與人數：<b id="participantCount">0</b></span>
+        </div>
+    </div>
+
+    <div class="dash-body">
+        <div class="dash-panel">
+            <div class="dash-panel-title">
+                <span class="material-symbols-outlined">leaderboard</span> 排行榜
+            </div>
+            <div id="leaderboardList"></div>
+        </div>
+        <div class="dash-panel">
+            <div class="dash-panel-title">
+                <span class="material-symbols-outlined">bolt</span> 最新動態
+            </div>
+            <div id="feedList" class="feed-list"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './scripts/supabase.js';
+
+        const params = new URLSearchParams(location.search);
+        const sessionId = params.get('session') || '';
+        const elementId = params.get('element') || '';
+
+        const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
+        const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const medal = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+        const rankClass = i => i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
+
+        const leaderboardEl = document.getElementById('leaderboardList');
+        const feedEl = document.getElementById('feedList');
+        const totalCountEl = document.getElementById('totalCount');
+        const participantCountEl = document.getElementById('participantCount');
+
+        let lastHash = '';
+
+        function formatTime(iso) {
+            const d = new Date(iso);
+            const h = d.getHours().toString().padStart(2, '0');
+            const m = d.getMinutes().toString().padStart(2, '0');
+            const s = d.getSeconds().toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function renderEmpty(container, text) {
+            container.innerHTML = `<div class="dash-empty">${mi('hourglass_top', 32)}<span>${text}</span></div>`;
+        }
+
+        async function load() {
+            if (!sessionId || !elementId) {
+                renderEmpty(leaderboardEl, '網址缺少 session/element 參數');
+                renderEmpty(feedEl, '網址缺少 session/element 參數');
+                return;
+            }
+
+            const { data } = await db.select('collector_entries', {
+                filter: { session_id: `eq.${sessionId}`, element_id: `eq.${elementId}` },
+                order: 'created_at.desc',
+            });
+            const entries = data || [];
+
+            const hash = JSON.stringify(entries.map(e => e.id));
+            if (hash === lastHash) return;
+            lastHash = hash;
+
+            totalCountEl.textContent = entries.length;
+
+            if (!entries.length) {
+                renderEmpty(leaderboardEl, '等待第一筆資料...');
+                renderEmpty(feedEl, '等待第一筆資料...');
+                participantCountEl.textContent = 0;
+                return;
+            }
+
+            // ── 排行榜：依學員分組計數 ──
+            const byStudent = new Map();
+            for (const e of entries) {
+                const key = e.student_email || e.student_name || '?';
+                if (!byStudent.has(key)) byStudent.set(key, { name: e.student_name || key, count: 0 });
+                byStudent.get(key).count++;
+            }
+            const ranking = [...byStudent.values()].sort((a, b) => b.count - a.count);
+            const maxCount = ranking[0]?.count || 1;
+            participantCountEl.textContent = byStudent.size;
+
+            leaderboardEl.innerHTML = ranking.map((r, i) => `
+                <div class="rank-row ${rankClass(i)}">
+                    <span class="rank-medal">${medal(i)}</span>
+                    <span class="rank-name">${esc(r.name)}</span>
+                    <span class="rank-bar-wrap"><span class="rank-bar-fill" style="width:${Math.max(6, (r.count / maxCount) * 100)}%"></span></span>
+                    <span class="rank-count">${r.count} 筆</span>
+                </div>`).join('');
+
+            // ── 最新動態：最新 20 筆，欄位由資料自己長出來 ──
+            feedEl.innerHTML = entries.slice(0, 20).map(e => {
+                const fields = Object.entries(e.data || {}).map(([k, v]) =>
+                    `<div class="feed-field"><b>${esc(k)}</b>：${esc(v)}</div>`).join('');
+                return `
+                    <div class="feed-item">
+                        <div class="feed-item-head">
+                            <span class="feed-item-name">${esc(e.student_name || e.student_email || '?')}</span>
+                            <span class="feed-item-time">${formatTime(e.created_at)}</span>
+                        </div>
+                        <div class="feed-item-fields">${fields}</div>
+                    </div>`;
+            }).join('');
+        }
+
+        renderEmpty(leaderboardEl, '載入中...');
+        renderEmpty(feedEl, '載入中...');
+        load();
+        setInterval(load, 5000);
+    </script>
+</body>
+
+</html>

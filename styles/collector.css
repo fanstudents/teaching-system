@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════════════
+   資料收集器（Collector）UI 樣式
+   ═══════════════════════════════════════════════ */
+
+.collector-container {
+    font-family: 'Noto Sans TC', 'Google Sans', sans-serif;
+    overflow-y: auto;
+}
+
+/* ── 編輯器預覽 ── */
+.col-preview {
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 20px; height: 100%;
+    background: linear-gradient(135deg, #083344 0%, #0e2f3a 100%);
+    border-radius: 12px; color: #fff;
+}
+.col-preview-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 1.1rem; font-weight: 700; color: #67e8f9;
+}
+.col-preview-header .material-symbols-outlined { color: #22d3ee; }
+.col-preview-fields, .col-preview-count {
+    font-size: 0.85rem; color: #a5f3fc; display: flex; align-items: center; gap: 6px;
+}
+.col-preview-count-num { font-weight: 700; color: #fff; }
+
+/* ── 學員端 ── */
+.col-student { display: flex; flex-direction: column; gap: 12px; padding: 16px; height: 100%; overflow-y: auto; }
+.col-student-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 1.05rem; font-weight: 700; color: #0e7490;
+}
+.col-contribution-badge {
+    margin-left: auto; padding: 4px 12px; border-radius: 999px;
+    background: #cffafe; color: #0e7490; font-size: 0.78rem; font-weight: 700;
+}
+.col-contribution-num { font-size: 0.95rem; }
+.col-student-desc { font-size: 0.85rem; color: #475569; line-height: 1.6; }
+.col-loading, .col-error {
+    display: flex; align-items: center; gap: 8px;
+    padding: 24px; color: #64748b; font-size: 0.9rem;
+}
+.col-error { color: #dc2626; }
+
+.col-block { display: flex; flex-direction: column; gap: 6px; }
+.col-block-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; font-weight: 700; color: #0891b2;
+}
+.col-code-block {
+    background: #0f172a; color: #67e8f9;
+    padding: 10px 14px; border-radius: 8px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.78rem; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-all;
+    margin: 0;
+}
+
+.col-prompt-block .col-block-title { justify-content: space-between; }
+.col-copy-btn {
+    padding: 3px 10px; border: 1px solid #a5f3fc; border-radius: 6px;
+    background: #ecfeff; color: #0891b2;
+    font-size: 0.7rem; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 3px; white-space: nowrap;
+    transition: all 0.2s;
+}
+.col-copy-btn:hover { background: #a5f3fc; }
+.col-prompt-template {
+    background: #0f172a; color: #e2e8f0;
+    padding: 14px; border-radius: 8px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.75rem; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+    max-height: 260px; overflow-y: auto;
+    margin: 0;
+}
+
+/* ── 教師端（簡報播放） ── */
+.col-teacher-live { display: flex; flex-direction: column; gap: 10px; padding: 16px; height: 100%; }
+.col-teacher-header {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 1.05rem; font-weight: 700; color: #0e7490;
+}
+.col-open-dashboard-btn {
+    margin-left: auto; padding: 5px 14px; border-radius: 8px;
+    background: #0891b2; color: #fff; text-decoration: none;
+    font-size: 0.78rem; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+    transition: background 0.2s;
+}
+.col-open-dashboard-btn:hover { background: #0e7490; }
+.col-teacher-fields { font-size: 0.82rem; color: #475569; display: flex; align-items: center; gap: 6px; }
+.col-teacher-stats { display: flex; gap: 16px; }
+.col-stat { font-size: 0.82rem; color: #64748b; display: flex; align-items: center; gap: 4px; }
+.col-stat b { color: #0e7490; }
+
+.col-teacher-top5 { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.col-top5-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; background: #f0fdff; border-radius: 8px;
+    font-size: 0.85rem;
+}
+.col-top5-rank {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #0891b2; color: #fff; font-weight: 700; font-size: 0.75rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.col-top5-name { flex: 1; color: #1e293b; font-weight: 600; }
+.col-top5-count { color: #0e7490; font-weight: 700; }
+.col-empty { padding: 16px; text-align: center; color: #94a3b8; font-size: 0.85rem; }
+
+/* ── 屬性面板：欄位清單編輯器 ── */
+.collector-field-row {
+    display: flex; align-items: center; gap: 6px;
+}
+.collector-field-row .form-input { flex: 1; }
+.collector-field-move, .collector-field-remove {
+    display: flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border: none; border-radius: 6px;
+    background: #f1f5f9; color: #64748b; cursor: pointer; transition: all 0.15s;
+}
+.collector-field-move:hover { background: #e2e8f0; }
+.collector-field-remove:hover { background: #fee2e2; color: #dc2626; }
+.collector-field-move:disabled, .collector-field-remove:disabled {
+    opacity: 0.35; cursor: not-allowed;
+}
+.collector-field-move:disabled:hover, .collector-field-remove:disabled:hover { background: #f1f5f9; color: #64748b; }

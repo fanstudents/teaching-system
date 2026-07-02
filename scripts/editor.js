@@ -581,6 +581,25 @@ export class Editor {
     }
 
     /**
+     * 新增資料收集器 — 業務開發競賽儀表板
+     */
+    addCollector() {
+        const element = {
+            type: 'collector',
+            x: 50, y: 30,
+            width: 700, height: 460,
+            question: '把你的 AI Agent 開發到的資料，依照下方格式即時回報到這裡。',
+            fields: [
+                { label: '客戶 Email' },
+                { label: '客戶名稱' },
+                { label: '客戶備注' },
+            ],
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增 Skill Battle 排行榜（獨立元件）
      */
     addSkillBattleBoard() {
@@ -1708,6 +1727,48 @@ export class Editor {
                     <div class="form-group">
                         <label class="form-label">自訂評分 Prompt（選填）</label>
                         <textarea class="form-input" id="sbJudgePrompt" rows="2" placeholder="留空使用預設評分 prompt" style="resize:vertical;font-family:inherit;font-size:12px;">${elementData.judgePrompt || ''}</textarea>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'collector') {
+            const colFields = (elementData.fields && elementData.fields.length)
+                ? elementData.fields
+                : [{ label: '客戶 Email' }, { label: '客戶名稱' }, { label: '客戶備注' }];
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#0891b2;">database</span>
+                        資料收集器設定
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">說明文字（顯示給學員）</label>
+                        <textarea class="form-input" id="colQuestion" rows="2" style="resize:vertical;font-family:inherit;">${elementData.question || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">欄位清單（學員的 Agent 要 POST 的 JSON key）</label>
+                        <div id="collectorFieldList" style="display:flex;flex-direction:column;gap:6px;">
+                            ${colFields.map((f, i) => `
+                                <div class="collector-field-row" data-idx="${i}">
+                                    <button class="collector-field-move" data-dir="up" data-idx="${i}" title="上移" ${i === 0 ? 'disabled' : ''}>
+                                        <span class="material-symbols-outlined" style="font-size:16px;">arrow_upward</span>
+                                    </button>
+                                    <button class="collector-field-move" data-dir="down" data-idx="${i}" title="下移" ${i === colFields.length - 1 ? 'disabled' : ''}>
+                                        <span class="material-symbols-outlined" style="font-size:16px;">arrow_downward</span>
+                                    </button>
+                                    <input class="form-input collector-field-input" data-idx="${i}" value="${f.label}" style="flex:1;padding:4px 8px;font-size:12px;">
+                                    <button class="collector-field-remove" data-idx="${i}" title="刪除欄位" ${colFields.length <= 1 ? 'disabled' : ''}>
+                                        <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button id="collectorAddFieldBtn" class="form-input" style="margin-top:8px;cursor:pointer;color:#0891b2;font-weight:600;">
+                            + 新增欄位
+                        </button>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
+                        每個欄位就是學員 Agent 要回報的一個 JSON key，直接用欄位文字當 key。
+                        學員畫面會自動顯示對應的 API 端點、憑證與可複製的 Agent 提示詞範本。
                     </div>
                 </div>
             `;
@@ -3256,6 +3317,56 @@ ${truncated}
                         question: preset.question,
                         referenceAnswer: preset.referenceAnswer,
                     });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            }
+        }
+
+        // 資料收集器事件
+        if (elementData.type === 'collector') {
+            bindSimple('colQuestion', 'question');
+
+            const colFields = () => (elementData.fields && elementData.fields.length)
+                ? elementData.fields
+                : [{ label: '客戶 Email' }, { label: '客戶名稱' }, { label: '客戶備注' }];
+
+            document.querySelectorAll('.collector-field-input').forEach(input => {
+                input.addEventListener('change', () => {
+                    const idx = parseInt(input.dataset.idx);
+                    const fields = [...colFields()];
+                    fields[idx] = { ...fields[idx], label: input.value.trim() || `欄位${idx + 1}` };
+                    this.slideManager.updateElement(elementId, { fields });
+                });
+            });
+            document.querySelectorAll('.collector-field-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.idx);
+                    const fields = colFields().filter((_, i) => i !== idx);
+                    if (!fields.length) return; // 至少保留 1 欄
+                    this.slideManager.updateElement(elementId, { fields });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            });
+            document.querySelectorAll('.collector-field-move').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.idx);
+                    const dir = btn.dataset.dir === 'up' ? -1 : 1;
+                    const fields = [...colFields()];
+                    const target = idx + dir;
+                    if (target < 0 || target >= fields.length) return;
+                    [fields[idx], fields[target]] = [fields[target], fields[idx]];
+                    this.slideManager.updateElement(elementId, { fields });
+                    this.slideManager.renderCurrentSlide();
+                    this.selectElementById(elementId);
+                });
+            });
+            const colAddFieldBtn = document.getElementById('collectorAddFieldBtn');
+            if (colAddFieldBtn) {
+                colAddFieldBtn.addEventListener('click', () => {
+                    const fields = [...colFields(), { label: `新欄位${colFields().length + 1}` }];
+                    this.slideManager.updateElement(elementId, { fields });
                     this.slideManager.renderCurrentSlide();
                     this.selectElementById(elementId);
                 });

@@ -536,6 +536,11 @@ class App {
             this.editor.addSkillBattleReview();
         });
 
+        // 資料收集器
+        document.getElementById('addCollectorBtn')?.addEventListener('click', () => {
+            this.editor.addCollector();
+        });
+
         // 網頁作品展示
         document.getElementById('addWebProjectBtn')?.addEventListener('click', () => {
             this.editor.addWebProject();
@@ -6269,10 +6274,10 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                 preview.style.cssText = 'width:100%;height:100%;position:relative;overflow:hidden;';
                 if (slide.elements?.length) {
                     const texts = slide.elements.filter(e => e.type === 'text').slice(0, 2);
-                    const hasInteractive = slide.elements.some(e => ['quiz','poll','wordcloud','homework','assessment','skillBattle','groupPick'].includes(e.type));
+                    const hasInteractive = slide.elements.some(e => ['quiz','poll','wordcloud','homework','assessment','skillBattle','groupPick','collector'].includes(e.type));
                     let inner = '';
                     if (hasInteractive) {
-                        const intEl = slide.elements.find(e => ['quiz','poll','wordcloud','homework','assessment','skillBattle','groupPick'].includes(e.type));
+                        const intEl = slide.elements.find(e => ['quiz','poll','wordcloud','homework','assessment','skillBattle','groupPick','collector'].includes(e.type));
                         inner += `<div style="position:absolute;bottom:2px;right:2px;font-size:8px;background:rgba(99,102,241,0.8);color:white;padding:1px 4px;border-radius:2px;">${intEl.type}</div>`;
                     }
                     texts.forEach(t => {
