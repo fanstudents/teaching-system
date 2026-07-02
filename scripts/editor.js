@@ -1784,10 +1784,18 @@ export class Editor {
                     </div>
                     <div class="form-group">
                         <textarea class="form-input" id="colAgentBuilderPrompt" rows="6" placeholder="留空使用預設範本" style="resize:vertical;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;line-height:1.6;">${elementData.agentBuilderPrompt || ''}</textarea>
-                        <div style="margin-top:8px;padding:10px 12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:0.72rem;color:#0c4a6e;line-height:1.6;">
-                            用 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{變數名}}</code> 讓學員自己輸入內容（例如
-                            <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{目標對象}}</code>），
-                            跟 Prompt 2 用同一個變數名稱的話，學員只要填一次、兩段都會自動套用。
+                        <div style="margin-top:8px;padding:10px 12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;">
+                            <div style="font-size:0.78rem;font-weight:600;color:#0369a1;margin-bottom:4px;">💡 系統變數（自動代入，不需要學員手動輸入）</div>
+                            <div style="font-size:0.72rem;color:#0c4a6e;line-height:1.7;">
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{FIELD_LIST}}</code>
+                                會自動代入左邊「欄位清單」設定的欄位名稱，確保 Agent 產出的資料跟 Prompt 2 要回報的欄位一致。
+                            </div>
+                            <div style="font-size:0.78rem;font-weight:600;color:#0369a1;margin:8px 0 4px;">✏️ 自訂變數（比照複製卡，學員需填完才能複製）</div>
+                            <div style="font-size:0.72rem;color:#0c4a6e;line-height:1.6;">
+                                用 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{變數名}}</code> 讓學員自己輸入內容（例如
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{目標對象}}</code>），
+                                跟 Prompt 2 用同一個變數名稱的話，學員只要填一次、兩段都會自動套用。
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1808,6 +1816,7 @@ export class Editor {
                                 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{API_KEY}}</code>
                                 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{TOKEN}}</code>
                                 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{JSON_EXAMPLE}}</code>
+                                <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">{{FIELD_LIST}}</code>
                             </div>
                             <div style="font-size:0.78rem;font-weight:600;color:#0369a1;margin:8px 0 4px;">✏️ 自訂變數（比照複製卡，學員需填完才能複製）</div>
                             <div style="font-size:0.72rem;color:#0c4a6e;line-height:1.6;">

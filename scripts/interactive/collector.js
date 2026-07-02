@@ -15,7 +15,7 @@ const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-s
 const DEFAULT_FIELDS = [{ label: '客戶 Email' }, { label: '客戶名稱' }, { label: '客戶備注' }];
 
 /* 系統保留變數：由程式自動代入，不會顯示成學員填寫欄位 */
-const RESERVED_VARS = ['API_ENDPOINT', 'API_KEY', 'TOKEN', 'JSON_EXAMPLE'];
+const RESERVED_VARS = ['API_ENDPOINT', 'API_KEY', 'TOKEN', 'JSON_EXAMPLE', 'FIELD_LIST'];
 
 const DEFAULT_PROMPT_TEMPLATE = `【背景與授權】
 接續你剛才在這個對話裡，依照 Agent 設定檔找到的那 10 組潛在客戶
@@ -61,16 +61,17 @@ const DEFAULT_AGENT_BUILDER_PROMPT = `我要打造一個屬於我自己的「業
 - 目標對象（我想開發的客戶類型）：{{目標對象}}
 - 地區：{{地區}}
 - 客戶屬性（規模、產業、痛點等篩選條件）：{{客戶屬性}}
-- 我希望 Agent 產出的內容：{{產出內容}}
+- 產出欄位（請完全比照，一字不差，不要自己翻譯或改名）：{{FIELD_LIST}}
 
 請直接動手做，不要先列一堆說明或跟我確認：
 
 1. 在目前這個專案資料夾裡建立一個檔案（例如 CLAUDE.md 或
    agents/業務開發-agent.md），把這個 Agent 的設定寫進去：目標客群、
-   篩選條件、判斷一個潛在客戶是否合格的具體標準、以及輸出格式。
+   篩選條件、判斷一個潛在客戶是否合格的具體標準、以及上面列出的
+   產出欄位格式。
 
 2. 建好之後，直接依照這份設定，實際找出 10 組符合條件的潛在客戶
-   名單，列成清單給我看。
+   名單，每一組都要包含「產出欄位」列出的所有項目，列成清單給我看。
 
 除了那個設定檔和這 10 筆名單以外，不要輸出其他說明、選項比較或
 討論過程 —— 我只要「做好的 Agent 設定檔」和「10 筆名單」這兩個結果。`;
@@ -193,16 +194,22 @@ export class CollectorGame {
         // 老師自訂欄位不是真實的資料表欄位，寫在最外層會被 PostgREST 拒絕（PGRST204）
         const bodyExample = { token, data: Object.fromEntries(fields.map(f => [f.label, exampleFor(f.label)])) };
 
-        // ── Prompt 1：打造你的業務開發 Agent（此時還沒有 Agent，純文字提示詞，無系統變數） ──
-        const builderText = element.agentBuilderPrompt || DEFAULT_AGENT_BUILDER_PROMPT;
+        // 系統保留變數：兩段提示詞都能用，自動代入，不需要學員手動輸入
+        const systemValues = {
+            API_ENDPOINT: endpoint,
+            API_KEY: anonKey,
+            TOKEN: token,
+            JSON_EXAMPLE: JSON.stringify(bodyExample, null, 2),
+            FIELD_LIST: fields.map(f => f.label).join('、'),
+        };
+        const applySystemVars = text => Object.entries(systemValues)
+            .reduce((t, [k, v]) => t.replaceAll(`{{${k}}}`, v), text);
 
-        // ── Prompt 2：把回報格式教給做好的 Agent（系統保留變數自動代入端點/金鑰/token/JSON 範例） ──
-        const reportRaw = element.promptTemplate || DEFAULT_PROMPT_TEMPLATE;
-        const reportText = reportRaw
-            .replaceAll('{{API_ENDPOINT}}', endpoint)
-            .replaceAll('{{API_KEY}}', anonKey)
-            .replaceAll('{{TOKEN}}', token)
-            .replaceAll('{{JSON_EXAMPLE}}', JSON.stringify(bodyExample, null, 2));
+        // ── Prompt 1：打造你的業務開發 Agent（此時還沒有 Agent） ──
+        const builderText = applySystemVars(element.agentBuilderPrompt || DEFAULT_AGENT_BUILDER_PROMPT);
+
+        // ── Prompt 2：把回報格式教給做好的 Agent ──
+        const reportText = applySystemVars(element.promptTemplate || DEFAULT_PROMPT_TEMPLATE);
 
         // 兩段共用同一組「學員自訂變數」（例如 {{目標客群}}），填一次、兩段都套用
         const allVars = [...new Set([...this._extractVars(builderText), ...this._extractVars(reportText)])];

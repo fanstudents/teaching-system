@@ -18,8 +18,8 @@
 
         body {
             font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #083344 0%, #0f172a 100%);
-            color: #e2e8f0;
+            background: linear-gradient(135deg, #ecfeff 0%, #f0f9ff 100%);
+            color: #1e293b;
             min-height: 100vh;
             padding: 24px;
         }
@@ -31,13 +31,13 @@
         }
         .dash-title {
             display: flex; align-items: center; gap: 10px;
-            font-size: 1.6rem; font-weight: 700; color: #67e8f9;
+            font-size: 1.6rem; font-weight: 700; color: #0e7490;
         }
-        .dash-title .material-symbols-outlined { font-size: 32px; color: #22d3ee; }
+        .dash-title .material-symbols-outlined { font-size: 32px; color: #0891b2; }
         .dash-meta {
-            display: flex; gap: 20px; font-size: 0.9rem; color: #94a3b8;
+            display: flex; gap: 20px; font-size: 0.9rem; color: #64748b;
         }
-        .dash-meta b { color: #67e8f9; font-size: 1.1rem; }
+        .dash-meta b { color: #0e7490; font-size: 1.1rem; }
 
         .dash-body {
             display: grid; grid-template-columns: 380px 1fr; gap: 20px;
@@ -47,57 +47,59 @@
         }
 
         .dash-panel {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
             padding: 20px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
         }
         .dash-panel-title {
             display: flex; align-items: center; gap: 8px;
-            font-size: 1.1rem; font-weight: 700; color: #f1f5f9;
+            font-size: 1.1rem; font-weight: 700; color: #1e293b;
             margin-bottom: 16px;
         }
+        .dash-panel-title .material-symbols-outlined { color: #0891b2; }
 
         /* ── 排行榜 ── */
         .rank-row {
             display: flex; align-items: center; gap: 12px;
             padding: 10px 14px; border-radius: 10px;
-            background: rgba(255,255,255,0.03);
+            background: #f0fdff;
             margin-bottom: 8px;
             animation: rankIn 0.3s ease;
         }
         @keyframes rankIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .rank-medal { font-size: 1.3rem; width: 28px; text-align: center; flex-shrink: 0; }
-        .rank-gold { background: linear-gradient(90deg, rgba(251,191,36,0.18), transparent); }
-        .rank-silver { background: linear-gradient(90deg, rgba(203,213,225,0.15), transparent); }
-        .rank-bronze { background: linear-gradient(90deg, rgba(217,119,6,0.15), transparent); }
-        .rank-name { flex: 1; font-weight: 600; color: #f1f5f9; font-size: 0.92rem; }
-        .rank-bar-wrap { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; max-width: 90px; }
-        .rank-bar-fill { height: 100%; background: linear-gradient(90deg, #22d3ee, #06b6d4); border-radius: 4px; transition: width 0.4s; }
-        .rank-count { font-weight: 700; color: #22d3ee; font-size: 0.9rem; min-width: 40px; text-align: right; }
+        .rank-gold { background: linear-gradient(90deg, rgba(251,191,36,0.22), #f0fdff); }
+        .rank-silver { background: linear-gradient(90deg, rgba(148,163,184,0.22), #f0fdff); }
+        .rank-bronze { background: linear-gradient(90deg, rgba(217,119,6,0.18), #f0fdff); }
+        .rank-name { flex: 1; font-weight: 600; color: #1e293b; font-size: 0.92rem; }
+        .rank-bar-wrap { flex: 1; height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden; max-width: 90px; }
+        .rank-bar-fill { height: 100%; background: linear-gradient(90deg, #22d3ee, #0891b2); border-radius: 4px; transition: width 0.4s; }
+        .rank-count { font-weight: 700; color: #0e7490; font-size: 0.9rem; min-width: 40px; text-align: right; }
 
         /* ── Feed ── */
         .feed-list { display: flex; flex-direction: column; gap: 10px; max-height: 70vh; overflow-y: auto; }
         .feed-item {
             padding: 12px 16px; border-radius: 10px;
-            background: rgba(255,255,255,0.03);
+            background: #f8fafc;
             border-left: 3px solid #22d3ee;
             animation: feedIn 0.4s ease;
         }
-        @keyframes feedIn { from { opacity: 0; transform: translateX(-8px); background: rgba(34,211,238,0.15); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes feedIn { from { opacity: 0; transform: translateX(-8px); background: rgba(34,211,238,0.15); } to { opacity: 1; transform: translateX(0); background: #f8fafc; } }
         .feed-item-head {
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 6px;
         }
-        .feed-item-name { font-weight: 700; color: #67e8f9; font-size: 0.9rem; }
-        .feed-item-time { font-size: 0.75rem; color: #64748b; }
+        .feed-item-name { font-weight: 700; color: #0e7490; font-size: 0.9rem; }
+        .feed-item-time { font-size: 0.75rem; color: #94a3b8; }
         .feed-item-fields { display: flex; flex-direction: column; gap: 2px; }
-        .feed-field { font-size: 0.82rem; color: #cbd5e1; }
-        .feed-field b { color: #94a3b8; font-weight: 600; }
+        .feed-field { font-size: 0.82rem; color: #475569; }
+        .feed-field b { color: #64748b; font-weight: 600; }
 
         .dash-empty {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
-            padding: 60px 20px; color: #64748b; font-size: 0.95rem;
+            padding: 60px 20px; color: #94a3b8; font-size: 0.95rem;
         }
         .dash-empty .material-symbols-outlined { font-size: 40px; opacity: 0.5; }
     </style>
@@ -141,6 +143,17 @@
         const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const medal = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
         const rankClass = i => i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
+
+        // 客戶名單含真實 email，公開儀表板上把帳號名稱中間遮成 *****，只留頭尾各一小段
+        function maskValue(v) {
+            const s = String(v ?? '');
+            const m = s.match(/^([^\s@]+)@([^\s@]+\.[^\s@]+)$/);
+            if (!m) return s;
+            const [, local, domain] = m;
+            const head = local.slice(0, Math.min(2, local.length));
+            const tail = local.length > head.length ? local.slice(-1) : '';
+            return `${head}*****${tail}@${domain}`;
+        }
 
         const leaderboardEl = document.getElementById('leaderboardList');
         const feedEl = document.getElementById('feedList');
@@ -209,7 +222,7 @@
             // ── 最新動態：最新 20 筆，欄位由資料自己長出來 ──
             feedEl.innerHTML = entries.slice(0, 20).map(e => {
                 const fields = Object.entries(e.data || {}).map(([k, v]) =>
-                    `<div class="feed-field"><b>${esc(k)}</b>：${esc(v)}</div>`).join('');
+                    `<div class="feed-field"><b>${esc(k)}</b>：${esc(maskValue(v))}</div>`).join('');
                 return `
                     <div class="feed-item">
                         <div class="feed-item-head">
