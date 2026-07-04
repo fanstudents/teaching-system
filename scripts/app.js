@@ -541,6 +541,11 @@ class App {
             this.editor.addCollector();
         });
 
+        // 學員個人回憶錄
+        document.getElementById('addMemoirBtn')?.addEventListener('click', () => {
+            this.editor.addMemoir();
+        });
+
         // 網頁作品展示
         document.getElementById('addWebProjectBtn')?.addEventListener('click', () => {
             this.editor.addWebProject();

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的課程回憶錄 — 數位簡報室</title>
+    <meta name="description" content="數位簡報室 — 學員個人課後回憶錄">
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <style>
+        * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #fdf8f0 0%, #faf3e6 100%);
+            color: #3a2e22;
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        .memoir-wrap { max-width: 760px; margin: 0 auto; }
+
+        /* ── 封面 ── */
+        .memoir-cover {
+            text-align: center;
+            padding: 48px 32px;
+            margin-bottom: 36px;
+            background: #fffdf9;
+            border: 1px solid #ecdfc8;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(120, 90, 40, 0.08);
+        }
+        .memoir-cover-eyebrow {
+            font-size: 0.8rem; letter-spacing: 3px; color: #b8935a;
+            text-transform: uppercase; font-weight: 600; margin-bottom: 14px;
+        }
+        .memoir-cover-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2rem; font-weight: 700; color: #4a3520;
+            line-height: 1.4; margin-bottom: 10px;
+        }
+        .memoir-cover-meta {
+            font-size: 0.9rem; color: #8a7355;
+            display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+        }
+        .memoir-cover-student {
+            margin-top: 20px; font-size: 1.1rem; color: #6b4f2e; font-weight: 600;
+        }
+        .memoir-cover-student::before { content: '— '; }
+        .memoir-cover-student::after { content: ' 的回憶錄 —'; }
+
+        /* ── 開篇敘事 ── */
+        .memoir-narrative {
+            background: #fffdf9;
+            border-left: 4px solid #d4a95e;
+            border-radius: 0 16px 16px 0;
+            padding: 28px 32px;
+            margin-bottom: 36px;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.02rem;
+            line-height: 2;
+            color: #4a3a28;
+            white-space: pre-wrap;
+        }
+        .memoir-narrative-loading {
+            display: flex; align-items: center; gap: 10px;
+            color: #a08862; font-style: italic; font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        /* ── 時間軸 ── */
+        .memoir-timeline-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.3rem; font-weight: 700; color: #4a3520;
+            margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+        }
+        .memoir-timeline { position: relative; padding-left: 28px; }
+        .memoir-timeline::before {
+            content: ''; position: absolute; left: 9px; top: 6px; bottom: 6px;
+            width: 2px; background: #e8d7b8;
+        }
+        .memoir-item {
+            position: relative; margin-bottom: 18px;
+            background: #fffdf9; border: 1px solid #ecdfc8; border-radius: 14px;
+            padding: 16px 20px;
+        }
+        .memoir-item::before {
+            content: ''; position: absolute; left: -28px; top: 20px;
+            width: 11px; height: 11px; border-radius: 50%;
+            background: #d4a95e; border: 2px solid #fdf8f0;
+        }
+        .memoir-item-head {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+        }
+        .memoir-item-icon {
+            width: 26px; height: 26px; border-radius: 8px;
+            background: #f5e9d3; color: #a3793f;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .memoir-item-type { font-size: 0.72rem; color: #a3793f; font-weight: 700; }
+        .memoir-item-time { margin-left: auto; font-size: 0.72rem; color: #b3a184; }
+        .memoir-item-question { font-size: 0.92rem; font-weight: 600; color: #4a3520; margin-bottom: 6px; }
+        .memoir-item-answer { font-size: 0.88rem; color: #5c4a34; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+        .memoir-item-badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            margin-top: 8px; padding: 2px 10px; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .memoir-badge-correct { background: #e3f5e6; color: #2f7d3f; }
+        .memoir-badge-wrong { background: #fbe9e7; color: #b1483a; }
+        .memoir-item-image {
+            margin-top: 10px; max-width: 260px; border-radius: 10px;
+            border: 1px solid #ecdfc8; display: block;
+        }
+
+        .memoir-empty {
+            text-align: center; padding: 40px 20px; color: #a3793f; font-size: 0.95rem;
+        }
+
+        /* ── 底部總結 ── */
+        .memoir-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+            margin-top: 36px;
+        }
+        .memoir-stat-card {
+            background: #fffdf9; border: 1px solid #ecdfc8; border-radius: 14px;
+            padding: 20px; text-align: center;
+        }
+        .memoir-stat-num { font-family: 'Noto Serif TC', serif; font-size: 1.8rem; font-weight: 700; color: #a3793f; }
+        .memoir-stat-label { font-size: 0.78rem; color: #8a7355; margin-top: 4px; }
+
+        @media (max-width: 560px) {
+            .memoir-stats { grid-template-columns: 1fr; }
+            .memoir-cover-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="memoir-wrap">
+        <div class="memoir-cover">
+            <div class="memoir-cover-eyebrow">Course Memoir</div>
+            <div class="memoir-cover-title" id="courseTitleEl">課程回憶錄</div>
+            <div class="memoir-cover-meta">
+                <span id="courseDateEl"></span>
+            </div>
+            <div class="memoir-cover-student" id="studentNameEl">你</div>
+        </div>
+
+        <div class="memoir-narrative" id="narrativeEl">
+            <div class="memoir-narrative-loading">
+                <span class="material-symbols-outlined" style="font-size:18px;">auto_stories</span>
+                正在為你撰寫這堂課的回憶錄...
+            </div>
+        </div>
+
+        <div class="memoir-timeline-title">
+            <span class="material-symbols-outlined" style="color:#a3793f;">history_edu</span>
+            今天的足跡
+        </div>
+        <div class="memoir-timeline" id="timelineEl"></div>
+
+        <div class="memoir-stats" id="statsEl"></div>
+    </div>
+
+    <script type="module">
+        import { db, ai } from './scripts/supabase.js';
+
+        const params = new URLSearchParams(location.search);
+        const sessionId = params.get('session') || '';
+        const email = params.get('email') || '';
+        const name = params.get('name') || '你';
+
+        const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
+        const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const TYPE_META = {
+            quiz: { icon: 'quiz', label: '測驗' },
+            truefalse: { icon: 'rule', label: '是非題' },
+            multiChoice: { icon: 'checklist', label: '選擇' },
+            opentext: { icon: 'edit_note', label: '開放回答' },
+            wordcloud: { icon: 'cloud', label: '文字雲' },
+            poll: { icon: 'how_to_vote', label: '投票' },
+            matching: { icon: 'compare_arrows', label: '配對' },
+            ordering: { icon: 'low_priority', label: '排序' },
+            fillblank: { icon: 'edit', label: '填空' },
+            scale: { icon: 'linear_scale', label: '量表' },
+            buzzer: { icon: 'bolt', label: '搶答' },
+            copycard: { icon: 'content_copy', label: '複製卡' },
+            document: { icon: 'description', label: '文件' },
+            survey: { icon: 'assignment', label: '問卷' },
+            assessment: { icon: 'fact_check', label: '評量' },
+            skillBattle: { icon: 'science', label: '競技場' },
+            homework: { icon: 'photo_camera', label: '作業' },
+            hotspot: { icon: 'my_location', label: '標註' },
+            icebreaker: { icon: 'celebration', label: '破冰' },
+        };
+        const metaFor = t => TYPE_META[t] || { icon: 'star', label: t || '活動' };
+
+        function parseState(raw) {
+            if (!raw) return {};
+            if (typeof raw === 'object') return raw;
+            try { return JSON.parse(raw); } catch { return {}; }
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+        }
+        function formatTime(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        /** 解析單筆 submission，回傳可顯示的 { question, answerHtml, imageUrl } */
+        function renderEntry(row) {
+            let meta = metaFor(row.type);
+            let question = row.assignment_title || meta.label;
+            let answerHtml = '';
+            let imageUrl = '';
+
+            // 作業的真實內容列，type 實際存的是 image/text/link（不是 'homework'，
+            // 是既有存檔流程的既有行為），這裡改用內容特徵判斷，不依賴 type 欄位
+            let parsedJson = null;
+            if (typeof row.content === 'string' && row.content.trim().startsWith('{')) {
+                try { parsedJson = JSON.parse(row.content); } catch { /* 不是 JSON，當純文字 */ }
+            }
+
+            if (parsedJson && parsedJson.image) {
+                meta = TYPE_META.homework;
+                imageUrl = parsedJson.image;
+                answerHtml = esc(parsedJson.prompt || '');
+            } else if (row.file_url) {
+                meta = TYPE_META.homework;
+                imageUrl = row.file_url;
+                answerHtml = esc(row.content || '');
+            } else {
+                answerHtml = esc(row.content || '');
+            }
+
+            return { question, answerHtml, imageUrl, meta };
+        }
+
+        /** 給 AI 生成敘事用的精簡摘要（截斷過長內容，避免 prompt 過大） */
+        function summarizeForAI(row) {
+            const { question, answerHtml, meta } = renderEntry(row);
+            const shortAnswer = String(answerHtml).replace(/\s+/g, ' ').slice(0, 120);
+            return `- [${meta.label}] ${question}：${shortAnswer}`;
+        }
+
+        async function findSessionInfo(sid) {
+            let { data } = await db.select('project_sessions', { filter: { session_code: `eq.${sid}` }, limit: 1 });
+            if (!data?.length) {
+                ({ data } = await db.select('project_sessions', { filter: { id: `eq.${sid}` }, limit: 1 }));
+            }
+            const session = data?.[0];
+            if (!session) return { courseTitle: '課程回憶錄', date: '' };
+            let courseTitle = '課程回憶錄';
+            if (session.project_id) {
+                const { data: proj } = await db.select('projects', { filter: { id: `eq.${session.project_id}` }, limit: 1 });
+                if (proj?.[0]?.name) courseTitle = proj[0].name;
+            }
+            return { courseTitle, date: session.date || '' };
+        }
+
+        async function loadSubmissions() {
+            const { data } = await db.select('submissions', {
+                filter: { session_id: `eq.${sessionId}`, student_email: `eq.${email}` },
+                order: 'created_at.asc',
+            });
+            const rows = data || [];
+
+            // homework 會產生兩筆列：一筆純計分（type=homework，空內容），
+            // 另一筆才是真實內容（帶版本號 element_id，如 el_xxx__v169...）。
+            // 既有的 homework.js 存檔流程有個 bug：真實內容那筆的 student_email
+            // 常常被存成空字串（只有 student_name 是對的），用 email 查不到，
+            // 這裡改用 student_name + 版本化 element_id 把它找回來。
+            const emptyHwRows = rows.filter(r => r.type === 'homework' && !r.content && !r.file_url);
+            let hwContentRows = [];
+            if (emptyHwRows.length && name) {
+                const { data: byName } = await db.select('submissions', {
+                    filter: { session_id: `eq.${sessionId}`, student_name: `eq.${name}` },
+                });
+                hwContentRows = (byName || []).filter(r =>
+                    emptyHwRows.some(hw => r.element_id?.startsWith(hw.element_id + '__v'))
+                );
+            }
+
+            const displayRows = [
+                ...rows.filter(r => !(r.type === 'homework' && !r.content && !r.file_url)),
+                ...hwContentRows,
+            ].sort((a, b) => new Date(a.submitted_at || a.created_at) - new Date(b.submitted_at || b.created_at));
+
+            return { allRows: rows, displayRows };
+        }
+
+        async function getOrCreateNarrative(courseTitle, date, displayRows) {
+            const { data: cached } = await db.select('memoir_summaries', {
+                filter: { session_id: `eq.${sessionId}`, student_email: `eq.${email}` },
+                limit: 1,
+            });
+            if (cached?.[0]?.summary) return cached[0].summary;
+
+            if (!displayRows.length) {
+                return `這堂「${courseTitle}」還沒有留下太多紀錄，不過沒關係，學習本來就有快有慢——下一堂課再一起繼續累積吧！`;
+            }
+
+            const activityList = displayRows.map(summarizeForAI).join('\n');
+            const prompt = `你是一位溫暖細膩的寫作者，請幫學員「${name}」寫一段課後回憶錄的開篇敘事。
+
+課程主題：${courseTitle}
+上課日期：${date || '今天'}
+這位學員在這堂課裡的活動紀錄：
+${activityList}
+
+請寫 2 到 3 段溫暖、真誠、有畫面感的中文敘事（繁體中文），內容要具體引用上面列出的活動（不要只寫空泛的鼓勵語），像是在回顧「今天這堂課，你做了什麼、學到了什麼」。語氣像朋友寫給朋友的回憶錄開篇，不要用條列式，不要加標題，直接輸出敘事文字本身。`;
+
+            let summary;
+            try {
+                summary = await ai.chat([{ role: 'user', content: prompt }], { maxTokens: 600 });
+            } catch (e) {
+                console.warn('[Memoir] AI 生成失敗:', e);
+                summary = `這堂「${courseTitle}」，你完成了 ${displayRows.length} 項活動，每一步都是這堂課留下的足跡。`;
+            }
+
+            try {
+                await db.insert('memoir_summaries', {
+                    session_id: sessionId, student_email: email, student_name: name,
+                    course_title: courseTitle, summary,
+                }, { onConflict: 'session_id,student_email' });
+            } catch (e) { console.warn('[Memoir] 快取寫入失敗:', e); }
+
+            return summary;
+        }
+
+        function renderTimeline(displayRows) {
+            const timelineEl = document.getElementById('timelineEl');
+            if (!displayRows.length) {
+                timelineEl.innerHTML = `<div class="memoir-empty">${mi('inbox', 28)}<br>這堂課還沒有留下紀錄</div>`;
+                return;
+            }
+            timelineEl.innerHTML = displayRows.map(row => {
+                const { question, answerHtml, imageUrl, meta } = renderEntry(row);
+                let badge = '';
+                if (row.is_correct === true) badge = `<span class="memoir-item-badge memoir-badge-correct">${mi('check_circle', 12)} 答對了</span>`;
+                else if (row.is_correct === false) badge = `<span class="memoir-item-badge memoir-badge-wrong">${mi('cancel', 12)} 差一點</span>`;
+
+                const state = parseState(row.state);
+                let extra = '';
+                if (row.type === 'skillBattle' && state.feedback) {
+                    extra = `<div class="memoir-item-answer" style="margin-top:6px;opacity:0.8;">${mi('smart_toy', 14)} AI 評語：${esc(state.feedback)}</div>`;
+                }
+
+                return `
+                    <div class="memoir-item">
+                        <div class="memoir-item-head">
+                            <span class="memoir-item-icon">${mi(meta.icon, 15)}</span>
+                            <span class="memoir-item-type">${esc(meta.label)}</span>
+                            <span class="memoir-item-time">${formatTime(row.submitted_at || row.created_at)}</span>
+                        </div>
+                        <div class="memoir-item-question">${esc(question)}</div>
+                        ${answerHtml ? `<div class="memoir-item-answer">${answerHtml}</div>` : ''}
+                        ${imageUrl ? `<img class="memoir-item-image" src="${esc(imageUrl)}" alt="作品圖片">` : ''}
+                        ${badge}${extra}
+                    </div>`;
+            }).join('');
+        }
+
+        function renderStats(allRows, displayRows) {
+            const totalAwarded = Math.round(allRows.reduce((sum, r) => sum + (parseState(r.state)._awarded || 0), 0));
+            const homeworkCount = displayRows.filter(r => renderEntry(r).imageUrl).length;
+            const statsEl = document.getElementById('statsEl');
+            statsEl.innerHTML = `
+                <div class="memoir-stat-card">
+                    <div class="memoir-stat-num">${displayRows.length}</div>
+                    <div class="memoir-stat-label">完成活動</div>
+                </div>
+                <div class="memoir-stat-card">
+                    <div class="memoir-stat-num">${totalAwarded}</div>
+                    <div class="memoir-stat-label">累積得分</div>
+                </div>
+                <div class="memoir-stat-card">
+                    <div class="memoir-stat-num">${homeworkCount}</div>
+                    <div class="memoir-stat-label">作品產出</div>
+                </div>`;
+        }
+
+        async function main() {
+            document.getElementById('studentNameEl').textContent = name;
+
+            if (!sessionId || !email) {
+                document.getElementById('courseTitleEl').textContent = '找不到你的回憶錄';
+                document.getElementById('narrativeEl').innerHTML = `<div class="memoir-narrative-loading">${mi('error', 18)} 網址缺少必要參數，請從課堂簡報頁面重新點擊連結。</div>`;
+                return;
+            }
+
+            const [{ courseTitle, date }, { allRows, displayRows }] = await Promise.all([
+                findSessionInfo(sessionId),
+                loadSubmissions(),
+            ]);
+
+            document.getElementById('courseTitleEl').textContent = courseTitle;
+            document.getElementById('courseDateEl').textContent = date ? formatDate(date) : '';
+
+            renderTimeline(displayRows);
+            renderStats(allRows, displayRows);
+
+            const narrative = await getOrCreateNarrative(courseTitle, date, displayRows);
+            document.getElementById('narrativeEl').textContent = narrative;
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

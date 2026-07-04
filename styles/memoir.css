@@ -1,0 +1,44 @@
+/* ═══════════════════════════════════════════════
+   學員個人回憶錄（Memoir）— 簡報內入口卡片樣式
+   實際回憶錄頁面樣式在 student-memoir.html 內嵌
+   ═══════════════════════════════════════════════ */
+
+.memoir-container {
+    font-family: 'Noto Sans TC', 'Google Sans', sans-serif;
+}
+
+/* ── 編輯器預覽 ── */
+.memoir-preview {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; height: 100%; padding: 24px; text-align: center;
+    background: linear-gradient(135deg, #fdf8f0 0%, #f5e9d3 100%);
+    border-radius: 12px; color: #6b4f2e;
+}
+.memoir-preview-icon { color: #b8935a; }
+.memoir-preview-title { font-size: 1.05rem; font-weight: 700; color: #4a3520; }
+.memoir-preview-desc { font-size: 0.78rem; color: #8a7355; max-width: 320px; }
+
+/* ── 學員端入口卡片 ── */
+.memoir-entry {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; height: 100%; padding: 32px 24px; text-align: center;
+    background: linear-gradient(135deg, #fdf8f0 0%, #f5e9d3 100%);
+    border-radius: 16px; color: #4a3520;
+}
+.memoir-entry-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #fff; color: #b8935a;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 10px rgba(120, 90, 40, 0.12);
+}
+.memoir-entry-title { font-size: 1.2rem; font-weight: 700; }
+.memoir-entry-desc { font-size: 0.85rem; color: #8a7355; max-width: 360px; line-height: 1.6; }
+.memoir-entry-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 6px; padding: 10px 24px; border-radius: 999px;
+    background: #b8935a; color: #fff; text-decoration: none;
+    font-size: 0.9rem; font-weight: 700;
+    box-shadow: 0 3px 12px rgba(184, 147, 90, 0.35);
+    transition: all 0.2s;
+}
+.memoir-entry-btn:hover { background: #a3793f; transform: translateY(-1px); }

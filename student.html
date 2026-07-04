@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="styles/web-project.css?v=20260603">
     <link rel="stylesheet" href="styles/group-pick.css?v=20260603">
     <link rel="stylesheet" href="styles/collector.css?v=20260702">
+    <link rel="stylesheet" href="styles/memoir.css?v=20260704">
 </head>
 
 <body>
@@ -3005,6 +3006,15 @@
                     el.style.overflow = 'hidden';
                     import('./scripts/interactive/collector.js?v=20260702').then(({ CollectorGame }) => {
                         new CollectorGame().render(el, element, true); // forceStudent = true
+                    });
+                    break;
+                }
+
+                case 'memoir': {
+                    el.classList.add('interactive-element', 'memoir-element');
+                    el.style.overflow = 'hidden';
+                    import('./scripts/interactive/memoir.js?v=20260704').then(({ MemoirGame }) => {
+                        new MemoirGame().render(el, element);
                     });
                     break;
                 }

@@ -602,6 +602,21 @@ export class Editor {
     }
 
     /**
+     * 新增學員個人回憶錄入口（放在簡報最後一頁）
+     */
+    addMemoir() {
+        const element = {
+            type: 'memoir',
+            x: 50, y: 30,
+            width: 700, height: 380,
+            question: '你的課程回憶錄已經準備好了',
+            description: '整理了你這堂課的所有作答、投票、文字雲貢獻與作品，寫成一份專屬於你的回憶錄。',
+        };
+        this.slideManager.addElement(element);
+        this.selectElementById(element.id);
+    }
+
+    /**
      * 新增 Skill Battle 排行榜（獨立元件）
      */
     addSkillBattleBoard() {
@@ -1824,6 +1839,27 @@ export class Editor {
                                 例如 <code style="background:#e0f2fe;padding:1px 4px;border-radius:3px;">目標產業：{{目標產業}}</code>
                             </div>
                         </div>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'memoir') {
+            html += `
+                <div class="property-section">
+                    <div class="property-section-title" style="display:flex;align-items:center;gap:6px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;color:#b8935a;">auto_stories</span>
+                        回憶錄設定
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">標題</label>
+                        <input type="text" class="form-input" id="memoirQuestion" value="${(elementData.question || '').replace(/"/g, '&quot;')}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">說明文字</label>
+                        <textarea class="form-input" id="memoirDescription" rows="3" style="resize:vertical;font-family:inherit;">${elementData.description || ''}</textarea>
+                    </div>
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px;">
+                        建議放在簡報的最後一頁。學員點擊按鈕後，會在新分頁看到
+                        自己這堂課的所有作答、投票、文字雲貢獻與作品彙整成的回憶錄。
                     </div>
                 </div>
             `;
@@ -3428,6 +3464,12 @@ ${truncated}
                     this.selectElementById(elementId);
                 });
             }
+        }
+
+        // 回憶錄事件
+        if (elementData.type === 'memoir') {
+            bindSimple('memoirQuestion', 'question');
+            bindSimple('memoirDescription', 'description');
         }
 
         // 流動線條事件
