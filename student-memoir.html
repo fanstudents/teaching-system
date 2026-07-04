@@ -336,9 +336,16 @@
         async function computeClassmateHighlights() {
             const { data } = await db.select('submissions', { filter: { session_id: `eq.${sessionId}` } });
             const rows = data || [];
+
+            // 學員在不同互動元件裡常常自己重複輸入姓名/email（不是登入帳號），
+            // 同一個人很容易因為打錯字（例如 gmail 打成 gamil、漏了 .net）
+            // 被系統當成好幾個不同的人。姓名比 email 更少打錯，這裡改用姓名
+            // 為主要識別依據，只有姓名是空的才退回 email，減少重複計算人數。
             const byStudent = new Map();
             for (const r of rows) {
-                const key = r.student_email || r.student_name || '?';
+                const nm = (r.student_name || '').trim();
+                const em = (r.student_email || '').trim().toLowerCase();
+                const key = nm || em || '?';
                 if (!byStudent.has(key)) byStudent.set(key, { activities: 0, score: 0 });
                 const isEmptyHwScoring = r.type === 'homework' && !r.content && !r.file_url;
                 const st = byStudent.get(key);
@@ -346,7 +353,7 @@
                 st.score += (parseState(r.state)._awarded || 0);
             }
 
-            const myKey = email || name;
+            const myKey = (name || '').trim() || (email || '').trim().toLowerCase();
             const me = byStudent.get(myKey);
             if (!me || byStudent.size < 3) return [];
 
@@ -360,14 +367,18 @@
             const avgActivities = others.reduce((s, o) => s + o.activities, 0) / others.length;
             const avgScore = others.reduce((s, o) => s + o.score, 0) / others.length;
 
+            // 注意：不要講出具體班級人數或名次（例如「全班 71 位同學中排名第 X」）。
+            // 學員自填的姓名/email 品質沒辦法保證完全去重乾淨，講出一個可能
+            // 不準確的精確數字，一旦被老師或學員發現對不上，會直接破壞信任感。
+            // 只用「名列前茅／高於平均」這種質化描述，不承諾具體精確度。
             const highlights = [];
             if (activityRank <= topThreshold) {
-                highlights.push(`完成的活動數在全班 ${byStudent.size} 位同學中排名第 ${activityRank} 名`);
+                highlights.push(`完成的活動數在班上名列前茅`);
             } else if (me.activities > avgActivities) {
                 highlights.push(`完成的活動數比班上平均還要多`);
             }
             if (scoreRank <= topThreshold) {
-                highlights.push(`累積得分在全班排名第 ${scoreRank} 名`);
+                highlights.push(`累積得分在班上名列前茅`);
             } else if (me.score > avgScore) {
                 highlights.push(`累積得分高於班上平均`);
             }
