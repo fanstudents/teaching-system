@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的課程回憶錄 — 數位簡報室</title>
-    <meta name="description" content="數位簡報室 — 學員個人課後回憶錄">
+    <title>我的課程成果 — 數位簡報室</title>
+    <meta name="description" content="數位簡報室 — 學員個人課後成果紀錄">
     <meta name="robots" content="noindex, nofollow">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -18,202 +18,145 @@
 
         body {
             font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #fdf8f0 0%, #faf3e6 100%);
-            color: #3a2e22;
+            background: #fbfaf8;
+            color: #232019;
             min-height: 100vh;
-            padding: 40px 20px 80px;
+            overflow-anchor: none;
+            padding: 56px 24px 90px;
         }
 
-        .memoir-wrap { max-width: 760px; margin: 0 auto; }
+        .wrap { max-width: 860px; margin: 0 auto; }
 
-        /* ── 封面 ── */
-        .memoir-cover {
-            text-align: center;
-            padding: 48px 32px;
-            margin-bottom: 36px;
-            background: #fffdf9;
-            border: 1px solid #ecdfc8;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(120, 90, 40, 0.08);
+        /* ── 頁首 ── */
+        .m-header { margin-bottom: 40px; }
+        .m-student-name { font-size: 2rem; font-weight: 800; letter-spacing: -0.01em; color: #1a1815; }
+        .m-course-line {
+            margin-top: 8px; font-size: 0.95rem; color: #726b5c;
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
         }
-        .memoir-cover-eyebrow {
-            font-size: 0.8rem; letter-spacing: 3px; color: #b8935a;
-            text-transform: uppercase; font-weight: 600; margin-bottom: 14px;
-        }
-        .memoir-cover-title {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 2rem; font-weight: 700; color: #4a3520;
-            line-height: 1.4; margin-bottom: 10px;
-        }
-        .memoir-cover-meta {
-            font-size: 0.9rem; color: #8a7355;
-            display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
-        }
-        .memoir-cover-student {
-            margin-top: 20px; font-size: 1.1rem; color: #6b4f2e; font-weight: 600;
-        }
-        .memoir-cover-student::before { content: '— '; }
-        .memoir-cover-student::after { content: ' 的回憶錄 —'; }
+        .m-course-line b { color: #4a4436; font-weight: 600; }
+        .m-course-line .dot { opacity: 0.5; }
 
-        /* ── 開篇敘事 ── */
-        .memoir-narrative {
-            background: #fffdf9;
-            border-left: 4px solid #d4a95e;
-            border-radius: 0 16px 16px 0;
-            padding: 28px 32px;
-            margin-bottom: 36px;
-            font-family: 'Noto Serif TC', serif;
-            font-size: 1.02rem;
-            line-height: 2;
-            color: #4a3a28;
+        /* ── 開篇回饋（純文字，不加卡片外框）── */
+        .m-narrative {
+            margin: 28px 0 8px;
+            padding-top: 28px;
+            border-top: 1px solid #e8e3d8;
+            font-size: 1.02rem; line-height: 1.95; color: #34302a;
             white-space: pre-wrap;
         }
-        .memoir-narrative-loading {
-            display: flex; align-items: center; gap: 10px;
-            color: #a08862; font-style: italic; font-family: 'Noto Sans TC', sans-serif;
+        .m-narrative-loading {
+            display: flex; align-items: center; gap: 8px;
+            color: #a49a83; font-style: italic; font-size: 0.92rem;
         }
 
-        /* ── 創辦人簽名檔（固定文字，不經 AI 生成）── */
-        .memoir-founder-note {
-            display: flex; align-items: center; gap: 14px;
-            background: #fffdf9; border: 1px solid #ecdfc8; border-radius: 14px;
-            padding: 18px 22px; margin: -16px 0 36px;
-            font-size: 0.85rem; color: #6b5a42; line-height: 1.7;
+        /* ── 創辦人簽名（安靜的簽名檔風格，非卡片）── */
+        .m-founder {
+            margin: 20px 0 48px; padding-top: 16px;
+            font-size: 0.82rem; color: #93897a; line-height: 1.8;
         }
-        .memoir-founder-avatar {
-            width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-            background: #f5e9d3; color: #a3793f;
-            display: flex; align-items: center; justify-content: center; font-weight: 700;
-        }
-        .memoir-founder-note a { color: #a3793f; font-weight: 700; text-decoration: none; }
-        .memoir-founder-note a:hover { text-decoration: underline; }
+        .m-founder a { color: #ad6b2e; font-weight: 600; text-decoration: none; }
+        .m-founder a:hover { text-decoration: underline; }
 
-        /* ── 網頁作品卡片 ── */
-        .memoir-webcard {
-            display: flex; gap: 12px; align-items: center;
-            text-decoration: none; color: inherit;
-            margin-top: 10px; padding: 10px; border-radius: 12px;
-            border: 1px solid #ecdfc8; background: #fffaf0;
-            transition: all 0.15s;
+        /* ── 區塊標題 ── */
+        .m-section-title {
+            font-size: 1.05rem; font-weight: 700; color: #1a1815;
+            margin-bottom: 4px;
         }
-        .memoir-webcard:hover { border-color: #d4a95e; background: #fdf5e4; }
-        .memoir-webcard-thumb {
-            position: relative; width: 96px; height: 64px; border-radius: 8px;
-            overflow: hidden; flex-shrink: 0; background: #fff; border: 1px solid #ecdfc8;
+        .m-section-sub {
+            font-size: 0.82rem; color: #93897a; margin-bottom: 20px;
         }
-        .memoir-webcard-thumb iframe {
-            width: 384px; height: 256px; border: none;
+
+        /* ── 作品成果 Portfolio Grid ── */
+        .m-portfolio { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+        @media (max-width: 620px) { .m-portfolio { grid-template-columns: 1fr; } }
+
+        .port-card {
+            border: 1px solid #e8e3d8; border-radius: 12px; overflow: hidden;
+            background: #fff; display: flex; flex-direction: column;
+        }
+        .port-media { position: relative; width: 100%; aspect-ratio: 16/10; background: #f2efe8; overflow: hidden; }
+        .port-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .port-web-frame { width: 100%; height: 100%; position: relative; }
+        .port-web-frame iframe {
+            width: 400%; height: 400%; border: none;
             transform: scale(0.25); transform-origin: top left;
-            pointer-events: none;
+            pointer-events: none; background: #fff;
         }
-        .memoir-webcard-info { flex: 1; min-width: 0; }
-        .memoir-webcard-title { font-size: 0.85rem; font-weight: 700; color: #4a3520; }
-        .memoir-webcard-sub {
-            font-size: 0.76rem; color: #a3793f; display: flex; align-items: center; gap: 3px; margin-top: 2px;
+        .port-web-badge {
+            position: absolute; top: 8px; right: 8px;
+            background: rgba(26,24,21,0.75); color: #fff;
+            font-size: 0.68rem; padding: 3px 8px; border-radius: 999px;
+            display: flex; align-items: center; gap: 3px;
         }
+        .port-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .port-label { font-size: 0.72rem; color: #ad6b2e; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+        .port-title { font-size: 0.92rem; font-weight: 700; color: #1a1815; line-height: 1.4; }
+        .port-text { font-size: 0.85rem; color: #4d473c; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+        .port-text a { color: #ad6b2e; }
+        .port-link {
+            margin-top: auto; padding-top: 8px;
+            font-size: 0.8rem; color: #ad6b2e; font-weight: 600;
+            display: flex; align-items: center; gap: 3px; text-decoration: none;
+        }
+        .port-link:hover { text-decoration: underline; }
 
-        /* ── 時間軸 ── */
-        .memoir-timeline-title {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 1.3rem; font-weight: 700; color: #4a3520;
-            margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
-        }
-        .memoir-timeline { position: relative; padding-left: 28px; }
-        .memoir-timeline::before {
-            content: ''; position: absolute; left: 9px; top: 6px; bottom: 6px;
-            width: 2px; background: #e8d7b8;
-        }
-        .memoir-item {
-            position: relative; margin-bottom: 18px;
-            background: #fffdf9; border: 1px solid #ecdfc8; border-radius: 14px;
-            padding: 16px 20px;
-        }
-        .memoir-item::before {
-            content: ''; position: absolute; left: -28px; top: 20px;
-            width: 11px; height: 11px; border-radius: 50%;
-            background: #d4a95e; border: 2px solid #fdf8f0;
-        }
-        .memoir-item-head {
-            display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-        }
-        .memoir-item-icon {
-            width: 26px; height: 26px; border-radius: 8px;
-            background: #f5e9d3; color: #a3793f;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        }
-        .memoir-item-type { font-size: 0.72rem; color: #a3793f; font-weight: 700; }
-        .memoir-item-time { margin-left: auto; font-size: 0.72rem; color: #b3a184; }
-        .memoir-item-question { font-size: 0.92rem; font-weight: 600; color: #4a3520; margin-bottom: 6px; }
-        .memoir-item-answer { font-size: 0.88rem; color: #5c4a34; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-        .memoir-item-badge {
-            display: inline-flex; align-items: center; gap: 3px;
-            margin-top: 8px; padding: 2px 10px; border-radius: 999px;
-            font-size: 0.72rem; font-weight: 700;
-        }
-        .memoir-badge-correct { background: #e3f5e6; color: #2f7d3f; }
-        .memoir-badge-wrong { background: #fbe9e7; color: #b1483a; }
-        .memoir-item-image {
-            margin-top: 10px; max-width: 260px; border-radius: 10px;
-            border: 1px solid #ecdfc8; display: block;
-        }
+        details.port-details summary { cursor: pointer; list-style: none; }
+        details.port-details summary::-webkit-details-marker { display: none; }
+        details.port-details summary .m-more { color: #ad6b2e; font-weight: 600; white-space: nowrap; }
+        details.port-details[open] summary .m-more { display: none; }
+        details.port-details .port-text-full { margin-top: 6px; }
 
-        .memoir-empty {
-            text-align: center; padding: 40px 20px; color: #a3793f; font-size: 0.95rem;
+        /* ── 其他課堂互動（安靜的標籤列）── */
+        .m-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+        .m-chip {
+            font-size: 0.8rem; color: #5c5546; background: #f2efe8;
+            padding: 6px 14px; border-radius: 999px;
         }
+        .m-chip b { color: #1a1815; }
 
-        /* ── 底部總結 ── */
-        .memoir-stats {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-            margin-top: 36px;
-        }
-        .memoir-stat-card {
-            background: #fffdf9; border: 1px solid #ecdfc8; border-radius: 14px;
-            padding: 20px; text-align: center;
-        }
-        .memoir-stat-num { font-family: 'Noto Serif TC', serif; font-size: 1.8rem; font-weight: 700; color: #a3793f; }
-        .memoir-stat-label { font-size: 0.78rem; color: #8a7355; margin-top: 4px; }
+        .m-empty { color: #93897a; font-size: 0.9rem; padding: 20px 0; }
 
         @media (max-width: 560px) {
-            .memoir-stats { grid-template-columns: 1fr; }
-            .memoir-cover-title { font-size: 1.5rem; }
+            .m-student-name { font-size: 1.6rem; }
         }
     </style>
 </head>
 
 <body>
-    <div class="memoir-wrap">
-        <div class="memoir-cover">
-            <div class="memoir-cover-eyebrow">Course Memoir</div>
-            <div class="memoir-cover-title" id="courseTitleEl">課程回憶錄</div>
-            <div class="memoir-cover-meta">
+    <div class="wrap">
+        <div class="m-header">
+            <div class="m-student-name" id="studentNameEl">你</div>
+            <div class="m-course-line">
+                <b id="courseTitleEl">課程成果</b>
+                <span class="dot">·</span>
                 <span id="courseDateEl"></span>
             </div>
-            <div class="memoir-cover-student" id="studentNameEl">你</div>
         </div>
 
-        <div class="memoir-narrative" id="narrativeEl">
-            <div class="memoir-narrative-loading">
-                <span class="material-symbols-outlined" style="font-size:18px;">auto_stories</span>
-                正在為你撰寫這堂課的回憶錄...
+        <div class="m-narrative" id="narrativeEl">
+            <div class="m-narrative-loading">
+                <span class="material-symbols-outlined" style="font-size:16px;">hourglass_top</span>
+                正在整理你這堂課的學習成果...
             </div>
         </div>
 
-        <div class="memoir-founder-note">
-            <div class="memoir-founder-avatar">D</div>
-            <div>
-                我是數位簡報室的創辦人 樊松蒲 Dennis，歡迎在我的
-                <a href="https://www.threads.com/@tbr.digital" target="_blank" rel="noopener">Threads</a>
-                上追蹤我，或標記我分享你今天的學習感想！
-            </div>
+        <div class="m-founder">
+            我是數位簡報室的創辦人 樊松蒲 Dennis，歡迎在我的
+            <a href="https://www.threads.com/@tbr.digital" target="_blank" rel="noopener">Threads</a>
+            上追蹤我，或標記我分享你今天的學習感想！
         </div>
 
-        <div class="memoir-timeline-title">
-            <span class="material-symbols-outlined" style="color:#a3793f;">history_edu</span>
-            今天的足跡
+        <div id="portfolioSection">
+            <div class="m-section-title">作品成果</div>
+            <div class="m-section-sub">這堂課你實際完成的產出</div>
+            <div class="m-portfolio" id="portfolioEl"></div>
         </div>
-        <div class="memoir-timeline" id="timelineEl"></div>
 
-        <div class="memoir-stats" id="statsEl"></div>
+        <div id="othersSection">
+            <div class="m-section-title">其他課堂互動</div>
+            <div class="m-chips" id="chipsEl"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -224,117 +167,121 @@
         const email = params.get('email') || '';
         const name = params.get('name') || '你';
 
-        const mi = (n, s = 18) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
+        const mi = (n, s = 16) => `<span class="material-symbols-outlined" style="font-size:${s}px;vertical-align:middle">${n}</span>`;
         const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+        /** 把純文字裡的網址轉成可點擊的超連結（esc() 之後才呼叫，安全） */
+        function autoLink(escapedText) {
+            return escapedText.replace(/(https?:\/\/[^\s<]+)/g, url =>
+                `<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+        }
+
         const TYPE_META = {
-            quiz: { icon: 'quiz', label: '測驗' },
-            truefalse: { icon: 'rule', label: '是非題' },
-            multiChoice: { icon: 'checklist', label: '選擇' },
-            opentext: { icon: 'edit_note', label: '開放回答' },
-            wordcloud: { icon: 'cloud', label: '文字雲' },
-            poll: { icon: 'how_to_vote', label: '投票' },
-            matching: { icon: 'compare_arrows', label: '配對' },
-            ordering: { icon: 'low_priority', label: '排序' },
-            fillblank: { icon: 'edit', label: '填空' },
-            scale: { icon: 'linear_scale', label: '量表' },
-            buzzer: { icon: 'bolt', label: '搶答' },
-            copycard: { icon: 'content_copy', label: '複製卡' },
-            document: { icon: 'description', label: '文件' },
-            survey: { icon: 'assignment', label: '問卷' },
-            assessment: { icon: 'fact_check', label: '評量' },
-            skillBattle: { icon: 'science', label: '競技場' },
-            homework: { icon: 'photo_camera', label: '作業' },
-            hotspot: { icon: 'my_location', label: '標註' },
-            icebreaker: { icon: 'celebration', label: '破冰' },
+            quiz: { label: '測驗' },
+            truefalse: { label: '是非題' },
+            multiChoice: { label: '選擇' },
+            opentext: { label: '開放回答' },
+            wordcloud: { label: '文字雲' },
+            poll: { label: '投票' },
+            matching: { label: '配對' },
+            ordering: { label: '排序' },
+            fillblank: { label: '填空' },
+            scale: { label: '量表' },
+            buzzer: { label: '搶答' },
+            copycard: { label: '複製卡' },
+            document: { label: '文件' },
+            survey: { label: '問卷' },
+            assessment: { label: '評量' },
+            skillBattle: { label: '競技場' },
+            homework: { label: '作業' },
+            webProject: { label: '網頁作品' },
+            hotspot: { label: '標註' },
+            icebreaker: { label: '破冰' },
+            join: { label: '出席' },
         };
-        const metaFor = t => TYPE_META[t] || { icon: 'star', label: t || '活動' };
+        const metaFor = t => TYPE_META[t] || { label: t || '活動' };
 
         function parseState(raw) {
             if (!raw) return {};
             if (typeof raw === 'object') return raw;
             try { return JSON.parse(raw); } catch { return {}; }
         }
-
         function formatDate(iso) {
             if (!iso) return '';
             const d = new Date(iso);
             return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
         }
-        function formatTime(iso) {
-            if (!iso) return '';
-            const d = new Date(iso);
-            return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-        }
 
-        /** 網頁作品：raw HTML 內容用 Blob URL 開啟，連結型內容直接使用原網址 */
+        /** 網頁作品一律轉成可點擊卡片，絕不顯示原始程式碼；raw HTML 用 Blob URL 開啟 */
         function buildWebCard(question, content) {
             const c = String(content || '').trim();
-            if (!c) return '';
-            const isRawHtml = /^<!DOCTYPE html/i.test(c) || /^<html[\s>]/i.test(c);
+            if (!c) return null;
+            const isRawHtml = /<!DOCTYPE html/i.test(c) || /<html[\s>]/i.test(c);
             let href, iframeAttr;
-            if (isRawHtml) {
-                const blob = new Blob([c], { type: 'text/html' });
-                href = URL.createObjectURL(blob);
-                iframeAttr = `srcdoc="${esc(c)}" sandbox="allow-scripts"`;
-            } else if (/^https?:\/\//i.test(c)) {
+            if (/^https?:\/\//i.test(c)) {
                 href = c;
                 iframeAttr = `src="${esc(c)}" sandbox="allow-scripts allow-same-origin"`;
             } else {
-                return ''; // 不是連結也不是 HTML，交回一般文字顯示
+                // 不論是不是完整文件，只要是 webProject 類型都當作網頁內容處理，
+                // 用 Blob URL 開啟，永遠不把程式碼原文印出來
+                const blob = new Blob([c], { type: 'text/html' });
+                href = URL.createObjectURL(blob);
+                iframeAttr = `srcdoc="${esc(c)}" sandbox="allow-scripts"`;
             }
             const titleMatch = c.match(/<title[^>]*>([^<]*)<\/title>/i);
             const title = titleMatch?.[1]?.trim() || question;
-            return `
-                <a class="memoir-webcard" href="${esc(href)}" target="_blank" rel="noopener">
-                    <div class="memoir-webcard-thumb"><iframe ${iframeAttr} loading="lazy" tabindex="-1"></iframe></div>
-                    <div class="memoir-webcard-info">
-                        <div class="memoir-webcard-title">${esc(title)}</div>
-                        <div class="memoir-webcard-sub">${mi('open_in_new', 12)} 點擊查看你的網頁作品</div>
-                    </div>
-                </a>`;
+            return { href, iframeAttr, title, hasPreview: isRawHtml || /^https?:\/\//i.test(c) };
         }
 
-        /** 解析單筆 submission，回傳可顯示的 { question, answerHtml, imageUrl, webCardHtml } */
-        function renderEntry(row) {
-            let meta = metaFor(row.type);
-            let question = row.assignment_title || meta.label;
-            let answerHtml = '';
-            let imageUrl = '';
-            let webCardHtml = '';
+        /** 解析單筆 submission */
+        /** 作業（homework）的真實內容列，element_id 會帶 __v 版本號後綴 */
+        function isHomeworkContentRow(row) {
+            return /__v\d+$/.test(row.element_id || '');
+        }
 
-            // 作業的真實內容列，type 實際存的是 image/text/link（不是 'homework'，
-            // 是既有存檔流程的既有行為），這裡改用內容特徵判斷，不依賴 type 欄位
+        function renderEntry(row) {
+            const isHwContent = isHomeworkContentRow(row);
+            const meta = isHwContent ? TYPE_META.homework : metaFor(row.type);
+            const question = row.assignment_title || meta.label;
+            let imageUrl = '', promptText = '', webCard = null, plainAnswer = '';
+
             let parsedJson = null;
             if (typeof row.content === 'string' && row.content.trim().startsWith('{')) {
-                try { parsedJson = JSON.parse(row.content); } catch { /* 不是 JSON，當純文字 */ }
+                try { parsedJson = JSON.parse(row.content); } catch { /* 不是 JSON */ }
             }
 
             if (parsedJson && parsedJson.image) {
-                meta = TYPE_META.homework;
                 imageUrl = parsedJson.image;
-                answerHtml = esc(parsedJson.prompt || '');
+                promptText = parsedJson.prompt || '';
             } else if (row.file_url) {
-                meta = TYPE_META.homework;
                 imageUrl = row.file_url;
-                answerHtml = esc(row.content || '');
+                promptText = row.content || '';
             } else if (row.type === 'webProject') {
-                webCardHtml = buildWebCard(question, row.content);
-                if (!webCardHtml) answerHtml = esc(row.content || '');
+                webCard = buildWebCard(question, row.content);
             } else {
-                answerHtml = esc(row.content || '');
+                plainAnswer = row.content || '';
             }
 
-            return { question, answerHtml, imageUrl, webCardHtml, meta };
+            return { question, meta, imageUrl, promptText, webCard, plainAnswer, isHwContent };
         }
 
-        /** 給 AI 生成敘事用的精簡摘要（截斷過長內容，避免 prompt 過大） */
+        const PORTFOLIO_TEXT_TYPES = new Set(['copycard', 'opentext', 'skillBattle', 'assessment', 'document']);
+
+        function classify(row, entry) {
+            if (entry.imageUrl || entry.webCard) return 'portfolio';
+            if (entry.isHwContent && entry.plainAnswer?.trim()) return 'portfolio-text'; // 文字/連結繳交模式的作業
+            if (PORTFOLIO_TEXT_TYPES.has(row.type) && entry.plainAnswer?.trim().length > 15) return 'portfolio-text';
+            return 'other';
+        }
+
+        /** 給 AI 生成回饋用的精簡摘要 */
         function summarizeForAI(row) {
-            const { question, answerHtml, webCardHtml, meta } = renderEntry(row);
-            const shortAnswer = webCardHtml
-                ? '完成並提交了一個網頁作品'
-                : String(answerHtml).replace(/\s+/g, ' ').slice(0, 120);
-            return `- [${meta.label}] ${question}：${shortAnswer}`;
+            const entry = renderEntry(row);
+            let desc;
+            if (entry.webCard) desc = '完成並提交了一個網頁作品';
+            else if (entry.imageUrl) desc = `上傳了作品圖片，說明／提示詞：${(entry.promptText || '').replace(/\s+/g, ' ').slice(0, 100)}`;
+            else desc = (entry.plainAnswer || '').replace(/\s+/g, ' ').slice(0, 100);
+            return `- [${entry.meta.label}] ${entry.question}：${desc}`;
         }
 
         async function findSessionInfo(sid) {
@@ -343,8 +290,8 @@
                 ({ data } = await db.select('project_sessions', { filter: { id: `eq.${sid}` }, limit: 1 }));
             }
             const session = data?.[0];
-            if (!session) return { courseTitle: '課程回憶錄', date: '' };
-            let courseTitle = '課程回憶錄';
+            if (!session) return { courseTitle: '課程成果', date: '' };
+            let courseTitle = '課程成果';
             if (session.project_id) {
                 const { data: proj } = await db.select('projects', { filter: { id: `eq.${session.project_id}` }, limit: 1 });
                 if (proj?.[0]?.name) courseTitle = proj[0].name;
@@ -360,9 +307,8 @@
             const rows = data || [];
 
             // homework 會產生兩筆列：一筆純計分（type=homework，空內容），
-            // 另一筆才是真實內容（帶版本號 element_id，如 el_xxx__v169...）。
-            // 既有的 homework.js 存檔流程有個 bug：真實內容那筆的 student_email
-            // 常常被存成空字串（只有 student_name 是對的），用 email 查不到，
+            // 另一筆才是真實內容（帶版本號 element_id）。既有 homework.js 存檔
+            // 流程有個 bug：真實內容那筆的 student_email 常被存成空字串，
             // 這裡改用 student_name + 版本化 element_id 把它找回來。
             const emptyHwRows = rows.filter(r => r.type === 'homework' && !r.content && !r.file_url);
             let hwContentRows = [];
@@ -387,7 +333,7 @@
          * 只挑對這位學員「正面、值得鼓勵」的班級比較，沒有就回傳空陣列
          * （絕不提到低於平均、落後等負面比較）
          */
-        async function computeClassmateHighlights(myActivityCount) {
+        async function computeClassmateHighlights() {
             const { data } = await db.select('submissions', { filter: { session_id: `eq.${sessionId}` } });
             const rows = data || [];
             const byStudent = new Map();
@@ -402,7 +348,7 @@
 
             const myKey = email || name;
             const me = byStudent.get(myKey);
-            if (!me || byStudent.size < 3) return []; // 人數太少，比較沒意義
+            if (!me || byStudent.size < 3) return [];
 
             const sortedByActivities = [...byStudent.values()].sort((a, b) => b.activities - a.activities);
             const sortedByScore = [...byStudent.values()].sort((a, b) => b.score - a.score);
@@ -428,7 +374,7 @@
             return highlights;
         }
 
-        async function getOrCreateNarrative(courseTitle, date, displayRows) {
+        async function getOrCreateNarrative(courseTitle, displayRows) {
             const { data: cached } = await db.select('memoir_summaries', {
                 filter: { session_id: `eq.${sessionId}`, student_email: `eq.${email}` },
                 limit: 1,
@@ -441,11 +387,11 @@
 
             const activityList = displayRows.map(summarizeForAI).join('\n');
             let highlights = [];
-            try { highlights = await computeClassmateHighlights(displayRows.length); }
+            try { highlights = await computeClassmateHighlights(); }
             catch (e) { console.warn('[Memoir] 班級比較計算失敗:', e); }
             const highlightsText = highlights.length ? highlights.map(h => `- ${h}`).join('\n') : '';
 
-            const prompt = `你是一位溫暖、擅長給予具體且真誠鼓勵的老師，請幫學員「${name}」寫一段課後回饋文字。
+            const prompt = `你是一位溫暖、擅長給予具體且真誠鼓勵的老師，請幫學員「${name}」寫一段簡短的課後回饋。
 
 課程主題：${courseTitle}
 這位學員在這堂課完成的活動：
@@ -455,18 +401,18 @@ ${highlightsText
     ? `這位學員在班上表現的正面亮點（只能提到下面列出的內容，不要自己編造或猜測任何比較）：\n${highlightsText}`
     : '（沒有足夠資料可以跟其他同學比較，請不要提到任何比較或猜測，專注在鼓勵他的學習內容就好）'}
 
-請寫 2 段左右溫暖、具體的繁體中文回饋，重點：
-1. 針對他實際完成的活動給予具體肯定（引用上面列出的實際內容，不要空泛的鼓勵語）。
-2. 幫助他建立信心，語氣像一位真心關心他學習狀況的老師。
-3. 完全不要編造他當天的心情、動機、為什麼來上課、教室場景等你不知道的資訊——只根據上面提供的活動紀錄與班級比較資料書寫。
-4. 不要下標題、不要用條列式，直接輸出整段文字。`;
+請寫 3 到 5 句話的繁體中文回饋，重點：
+1. 簡短點出他這堂課學到／完成了什麼（引用實際內容，不要空泛的鼓勵語）。
+2. 如果有提供班上正面亮點，自然帶入 1 句，幫助他建立信心；沒有的話就不要提任何比較。
+3. 完全不要編造他當天的心情、動機、為什麼來上課、教室場景等你不知道的資訊。
+4. 不要下標題、不要條列、不要分段太多，直接輸出一小段連貫文字即可（這是頁面最上面的簡短開場，不是長篇文章）。`;
 
             let summary;
             try {
-                summary = await ai.chat([{ role: 'user', content: prompt }], { maxTokens: 600 });
+                summary = await ai.chat([{ role: 'user', content: prompt }], { maxTokens: 350 });
             } catch (e) {
                 console.warn('[Memoir] AI 生成失敗:', e);
-                summary = `這堂「${courseTitle}」，你完成了 ${displayRows.length} 項活動，每一步都是這堂課留下的足跡。`;
+                summary = `這堂「${courseTitle}」，你完成了 ${displayRows.length} 項活動，每一項都是扎實的學習成果。`;
             }
 
             try {
@@ -479,69 +425,111 @@ ${highlightsText
             return summary;
         }
 
-        function renderTimeline(displayRows) {
-            const timelineEl = document.getElementById('timelineEl');
-            if (!displayRows.length) {
-                timelineEl.innerHTML = `<div class="memoir-empty">${mi('inbox', 28)}<br>這堂課還沒有留下紀錄</div>`;
-                return;
-            }
-            timelineEl.innerHTML = displayRows.map(row => {
-                const { question, answerHtml, imageUrl, webCardHtml, meta } = renderEntry(row);
-                let badge = '';
-                if (row.is_correct === true) badge = `<span class="memoir-item-badge memoir-badge-correct">${mi('check_circle', 12)} 答對了</span>`;
-                else if (row.is_correct === false) badge = `<span class="memoir-item-badge memoir-badge-wrong">${mi('cancel', 12)} 差一點</span>`;
+        function renderPortfolioCard(row) {
+            const entry = renderEntry(row);
 
-                const state = parseState(row.state);
-                let extra = '';
-                if (row.type === 'skillBattle' && state.feedback) {
-                    extra = `<div class="memoir-item-answer" style="margin-top:6px;opacity:0.8;">${mi('smart_toy', 14)} AI 評語：${esc(state.feedback)}</div>`;
-                }
-
+            if (entry.webCard) {
+                const wc = entry.webCard;
                 return `
-                    <div class="memoir-item">
-                        <div class="memoir-item-head">
-                            <span class="memoir-item-icon">${mi(meta.icon, 15)}</span>
-                            <span class="memoir-item-type">${esc(meta.label)}</span>
-                            <span class="memoir-item-time">${formatTime(row.submitted_at || row.created_at)}</span>
+                    <a class="port-card" href="${esc(wc.href)}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">
+                        <div class="port-media">
+                            ${wc.hasPreview
+                                ? `<div class="port-web-frame"><iframe ${wc.iframeAttr} loading="lazy" tabindex="-1"></iframe></div>`
+                                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#c2b8a3;">${mi('web', 40)}</div>`}
+                            <span class="port-web-badge">${mi('open_in_new', 12)} 網頁作品</span>
                         </div>
-                        <div class="memoir-item-question">${esc(question)}</div>
-                        ${answerHtml ? `<div class="memoir-item-answer">${answerHtml}</div>` : ''}
-                        ${imageUrl ? `<img class="memoir-item-image" src="${esc(imageUrl)}" alt="作品圖片">` : ''}
-                        ${webCardHtml || ''}
-                        ${badge}${extra}
+                        <div class="port-body">
+                            <div class="port-label">${esc(entry.meta.label)}</div>
+                            <div class="port-title">${esc(wc.title)}</div>
+                            <span class="port-link">${mi('open_in_new', 13)} 開啟你的網頁作品</span>
+                        </div>
+                    </a>`;
+            }
+
+            if (entry.imageUrl) {
+                return `
+                    <div class="port-card">
+                        <div class="port-media"><img src="${esc(entry.imageUrl)}" alt="作品圖片" loading="lazy"></div>
+                        <div class="port-body">
+                            <div class="port-label">${esc(entry.meta.label)}</div>
+                            <div class="port-title">${esc(entry.question)}</div>
+                            ${entry.promptText ? `<div class="port-text">${autoLink(esc(entry.promptText))}</div>` : ''}
+                        </div>
                     </div>`;
-            }).join('');
+            }
+
+            // 文字型作品（複製卡 / 開放回答 / 競技場 等）
+            const linked = autoLink(esc(entry.plainAnswer));
+            const isLong = entry.plainAnswer.length > 140;
+            const state = parseState(row.state);
+            const skillNote = row.type === 'skillBattle' && state.feedback
+                ? `<div class="port-text" style="opacity:0.75;margin-top:2px;">${mi('smart_toy', 13)} AI 評語：${esc(state.feedback)}</div>` : '';
+
+            return `
+                <div class="port-card">
+                    <div class="port-body">
+                        <div class="port-label">${esc(entry.meta.label)}</div>
+                        <div class="port-title">${esc(entry.question)}</div>
+                        ${isLong
+                            ? `<details class="port-details"><summary>${linked.replace(/<[^>]+>/g, '').slice(0, 100)}...　<span class="m-more">展開全文</span></summary><div class="port-text-full port-text">${linked}</div></details>`
+                            : `<div class="port-text">${linked}</div>`}
+                        ${skillNote}
+                    </div>
+                </div>`;
         }
 
-        function renderStats(allRows, displayRows) {
-            const totalAwarded = Math.round(allRows.reduce((sum, r) => sum + (parseState(r.state)._awarded || 0), 0));
-            const homeworkCount = displayRows.filter(r => renderEntry(r).imageUrl).length;
-            const statsEl = document.getElementById('statsEl');
-            statsEl.innerHTML = `
-                <div class="memoir-stat-card">
-                    <div class="memoir-stat-num">${displayRows.length}</div>
-                    <div class="memoir-stat-label">完成活動</div>
-                </div>
-                <div class="memoir-stat-card">
-                    <div class="memoir-stat-num">${totalAwarded}</div>
-                    <div class="memoir-stat-label">累積得分</div>
-                </div>
-                <div class="memoir-stat-card">
-                    <div class="memoir-stat-num">${homeworkCount}</div>
-                    <div class="memoir-stat-label">作品產出</div>
-                </div>`;
+        function renderPortfolioAndChips(displayRows) {
+            const portfolioEl = document.getElementById('portfolioEl');
+            const chipsEl = document.getElementById('chipsEl');
+            const portfolioSection = document.getElementById('portfolioSection');
+            const othersSection = document.getElementById('othersSection');
+
+            const portfolioRows = [];
+            const otherRows = [];
+            for (const row of displayRows) {
+                const entry = renderEntry(row);
+                const kind = classify(row, entry);
+                if (kind === 'portfolio' || kind === 'portfolio-text') portfolioRows.push(row);
+                else otherRows.push(row);
+            }
+
+            if (portfolioRows.length) {
+                portfolioEl.innerHTML = portfolioRows.map(renderPortfolioCard).join('');
+            } else {
+                portfolioSection.style.display = 'none';
+            }
+
+            if (otherRows.length) {
+                const counts = new Map();
+                for (const r of otherRows) {
+                    const label = metaFor(r.type).label;
+                    counts.set(label, (counts.get(label) || 0) + 1);
+                }
+                chipsEl.innerHTML = [...counts.entries()]
+                    .map(([label, count]) => `<span class="m-chip"><b>${count}</b> 次 ${esc(label)}</span>`)
+                    .join('');
+            } else {
+                othersSection.style.display = 'none';
+            }
+
+            if (!displayRows.length) {
+                portfolioSection.style.display = 'none';
+                othersSection.style.display = 'none';
+            }
         }
 
         async function main() {
             document.getElementById('studentNameEl').textContent = name;
 
             if (!sessionId || !email) {
-                document.getElementById('courseTitleEl').textContent = '找不到你的回憶錄';
-                document.getElementById('narrativeEl').innerHTML = `<div class="memoir-narrative-loading">${mi('error', 18)} 網址缺少必要參數，請從課堂簡報頁面重新點擊連結。</div>`;
+                document.getElementById('courseTitleEl').textContent = '找不到你的成果紀錄';
+                document.getElementById('narrativeEl').innerHTML = `<div class="m-narrative-loading">${mi('error', 16)} 網址缺少必要參數，請從課堂簡報頁面重新點擊連結。</div>`;
+                document.getElementById('portfolioSection').style.display = 'none';
+                document.getElementById('othersSection').style.display = 'none';
                 return;
             }
 
-            const [{ courseTitle, date }, { allRows, displayRows }] = await Promise.all([
+            const [{ courseTitle, date }, { displayRows }] = await Promise.all([
                 findSessionInfo(sessionId),
                 loadSubmissions(),
             ]);
@@ -549,10 +537,9 @@ ${highlightsText
             document.getElementById('courseTitleEl').textContent = courseTitle;
             document.getElementById('courseDateEl').textContent = date ? formatDate(date) : '';
 
-            renderTimeline(displayRows);
-            renderStats(allRows, displayRows);
+            renderPortfolioAndChips(displayRows);
 
-            const narrative = await getOrCreateNarrative(courseTitle, date, displayRows);
+            const narrative = await getOrCreateNarrative(courseTitle, displayRows);
             document.getElementById('narrativeEl').textContent = narrative;
         }
 
