@@ -73,6 +73,45 @@
             color: #a08862; font-style: italic; font-family: 'Noto Sans TC', sans-serif;
         }
 
+        /* ── 創辦人簽名檔（固定文字，不經 AI 生成）── */
+        .memoir-founder-note {
+            display: flex; align-items: center; gap: 14px;
+            background: #fffdf9; border: 1px solid #ecdfc8; border-radius: 14px;
+            padding: 18px 22px; margin: -16px 0 36px;
+            font-size: 0.85rem; color: #6b5a42; line-height: 1.7;
+        }
+        .memoir-founder-avatar {
+            width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+            background: #f5e9d3; color: #a3793f;
+            display: flex; align-items: center; justify-content: center; font-weight: 700;
+        }
+        .memoir-founder-note a { color: #a3793f; font-weight: 700; text-decoration: none; }
+        .memoir-founder-note a:hover { text-decoration: underline; }
+
+        /* ── 網頁作品卡片 ── */
+        .memoir-webcard {
+            display: flex; gap: 12px; align-items: center;
+            text-decoration: none; color: inherit;
+            margin-top: 10px; padding: 10px; border-radius: 12px;
+            border: 1px solid #ecdfc8; background: #fffaf0;
+            transition: all 0.15s;
+        }
+        .memoir-webcard:hover { border-color: #d4a95e; background: #fdf5e4; }
+        .memoir-webcard-thumb {
+            position: relative; width: 96px; height: 64px; border-radius: 8px;
+            overflow: hidden; flex-shrink: 0; background: #fff; border: 1px solid #ecdfc8;
+        }
+        .memoir-webcard-thumb iframe {
+            width: 384px; height: 256px; border: none;
+            transform: scale(0.25); transform-origin: top left;
+            pointer-events: none;
+        }
+        .memoir-webcard-info { flex: 1; min-width: 0; }
+        .memoir-webcard-title { font-size: 0.85rem; font-weight: 700; color: #4a3520; }
+        .memoir-webcard-sub {
+            font-size: 0.76rem; color: #a3793f; display: flex; align-items: center; gap: 3px; margin-top: 2px;
+        }
+
         /* ── 時間軸 ── */
         .memoir-timeline-title {
             font-family: 'Noto Serif TC', serif;
@@ -159,6 +198,15 @@
             </div>
         </div>
 
+        <div class="memoir-founder-note">
+            <div class="memoir-founder-avatar">D</div>
+            <div>
+                我是數位簡報室的創辦人 樊松蒲 Dennis，歡迎在我的
+                <a href="https://www.threads.com/@tbr.digital" target="_blank" rel="noopener">Threads</a>
+                上追蹤我，或標記我分享你今天的學習感想！
+            </div>
+        </div>
+
         <div class="memoir-timeline-title">
             <span class="material-symbols-outlined" style="color:#a3793f;">history_edu</span>
             今天的足跡
@@ -219,12 +267,41 @@
             return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
         }
 
-        /** 解析單筆 submission，回傳可顯示的 { question, answerHtml, imageUrl } */
+        /** 網頁作品：raw HTML 內容用 Blob URL 開啟，連結型內容直接使用原網址 */
+        function buildWebCard(question, content) {
+            const c = String(content || '').trim();
+            if (!c) return '';
+            const isRawHtml = /^<!DOCTYPE html/i.test(c) || /^<html[\s>]/i.test(c);
+            let href, iframeAttr;
+            if (isRawHtml) {
+                const blob = new Blob([c], { type: 'text/html' });
+                href = URL.createObjectURL(blob);
+                iframeAttr = `srcdoc="${esc(c)}" sandbox="allow-scripts"`;
+            } else if (/^https?:\/\//i.test(c)) {
+                href = c;
+                iframeAttr = `src="${esc(c)}" sandbox="allow-scripts allow-same-origin"`;
+            } else {
+                return ''; // 不是連結也不是 HTML，交回一般文字顯示
+            }
+            const titleMatch = c.match(/<title[^>]*>([^<]*)<\/title>/i);
+            const title = titleMatch?.[1]?.trim() || question;
+            return `
+                <a class="memoir-webcard" href="${esc(href)}" target="_blank" rel="noopener">
+                    <div class="memoir-webcard-thumb"><iframe ${iframeAttr} loading="lazy" tabindex="-1"></iframe></div>
+                    <div class="memoir-webcard-info">
+                        <div class="memoir-webcard-title">${esc(title)}</div>
+                        <div class="memoir-webcard-sub">${mi('open_in_new', 12)} 點擊查看你的網頁作品</div>
+                    </div>
+                </a>`;
+        }
+
+        /** 解析單筆 submission，回傳可顯示的 { question, answerHtml, imageUrl, webCardHtml } */
         function renderEntry(row) {
             let meta = metaFor(row.type);
             let question = row.assignment_title || meta.label;
             let answerHtml = '';
             let imageUrl = '';
+            let webCardHtml = '';
 
             // 作業的真實內容列，type 實際存的是 image/text/link（不是 'homework'，
             // 是既有存檔流程的既有行為），這裡改用內容特徵判斷，不依賴 type 欄位
@@ -241,17 +318,22 @@
                 meta = TYPE_META.homework;
                 imageUrl = row.file_url;
                 answerHtml = esc(row.content || '');
+            } else if (row.type === 'webProject') {
+                webCardHtml = buildWebCard(question, row.content);
+                if (!webCardHtml) answerHtml = esc(row.content || '');
             } else {
                 answerHtml = esc(row.content || '');
             }
 
-            return { question, answerHtml, imageUrl, meta };
+            return { question, answerHtml, imageUrl, webCardHtml, meta };
         }
 
         /** 給 AI 生成敘事用的精簡摘要（截斷過長內容，避免 prompt 過大） */
         function summarizeForAI(row) {
-            const { question, answerHtml, meta } = renderEntry(row);
-            const shortAnswer = String(answerHtml).replace(/\s+/g, ' ').slice(0, 120);
+            const { question, answerHtml, webCardHtml, meta } = renderEntry(row);
+            const shortAnswer = webCardHtml
+                ? '完成並提交了一個網頁作品'
+                : String(answerHtml).replace(/\s+/g, ' ').slice(0, 120);
             return `- [${meta.label}] ${question}：${shortAnswer}`;
         }
 
@@ -301,6 +383,51 @@
             return { allRows: rows, displayRows };
         }
 
+        /**
+         * 只挑對這位學員「正面、值得鼓勵」的班級比較，沒有就回傳空陣列
+         * （絕不提到低於平均、落後等負面比較）
+         */
+        async function computeClassmateHighlights(myActivityCount) {
+            const { data } = await db.select('submissions', { filter: { session_id: `eq.${sessionId}` } });
+            const rows = data || [];
+            const byStudent = new Map();
+            for (const r of rows) {
+                const key = r.student_email || r.student_name || '?';
+                if (!byStudent.has(key)) byStudent.set(key, { activities: 0, score: 0 });
+                const isEmptyHwScoring = r.type === 'homework' && !r.content && !r.file_url;
+                const st = byStudent.get(key);
+                if (!isEmptyHwScoring) st.activities++;
+                st.score += (parseState(r.state)._awarded || 0);
+            }
+
+            const myKey = email || name;
+            const me = byStudent.get(myKey);
+            if (!me || byStudent.size < 3) return []; // 人數太少，比較沒意義
+
+            const sortedByActivities = [...byStudent.values()].sort((a, b) => b.activities - a.activities);
+            const sortedByScore = [...byStudent.values()].sort((a, b) => b.score - a.score);
+            const activityRank = sortedByActivities.indexOf(me) + 1;
+            const scoreRank = sortedByScore.indexOf(me) + 1;
+            const topThreshold = Math.max(3, Math.ceil(byStudent.size * 0.3));
+
+            const others = [...byStudent.values()].filter(v => v !== me);
+            const avgActivities = others.reduce((s, o) => s + o.activities, 0) / others.length;
+            const avgScore = others.reduce((s, o) => s + o.score, 0) / others.length;
+
+            const highlights = [];
+            if (activityRank <= topThreshold) {
+                highlights.push(`完成的活動數在全班 ${byStudent.size} 位同學中排名第 ${activityRank} 名`);
+            } else if (me.activities > avgActivities) {
+                highlights.push(`完成的活動數比班上平均還要多`);
+            }
+            if (scoreRank <= topThreshold) {
+                highlights.push(`累積得分在全班排名第 ${scoreRank} 名`);
+            } else if (me.score > avgScore) {
+                highlights.push(`累積得分高於班上平均`);
+            }
+            return highlights;
+        }
+
         async function getOrCreateNarrative(courseTitle, date, displayRows) {
             const { data: cached } = await db.select('memoir_summaries', {
                 filter: { session_id: `eq.${sessionId}`, student_email: `eq.${email}` },
@@ -313,14 +440,26 @@
             }
 
             const activityList = displayRows.map(summarizeForAI).join('\n');
-            const prompt = `你是一位溫暖細膩的寫作者，請幫學員「${name}」寫一段課後回憶錄的開篇敘事。
+            let highlights = [];
+            try { highlights = await computeClassmateHighlights(displayRows.length); }
+            catch (e) { console.warn('[Memoir] 班級比較計算失敗:', e); }
+            const highlightsText = highlights.length ? highlights.map(h => `- ${h}`).join('\n') : '';
+
+            const prompt = `你是一位溫暖、擅長給予具體且真誠鼓勵的老師，請幫學員「${name}」寫一段課後回饋文字。
 
 課程主題：${courseTitle}
-上課日期：${date || '今天'}
-這位學員在這堂課裡的活動紀錄：
+這位學員在這堂課完成的活動：
 ${activityList}
 
-請寫 2 到 3 段溫暖、真誠、有畫面感的中文敘事（繁體中文），內容要具體引用上面列出的活動（不要只寫空泛的鼓勵語），像是在回顧「今天這堂課，你做了什麼、學到了什麼」。語氣像朋友寫給朋友的回憶錄開篇，不要用條列式，不要加標題，直接輸出敘事文字本身。`;
+${highlightsText
+    ? `這位學員在班上表現的正面亮點（只能提到下面列出的內容，不要自己編造或猜測任何比較）：\n${highlightsText}`
+    : '（沒有足夠資料可以跟其他同學比較，請不要提到任何比較或猜測，專注在鼓勵他的學習內容就好）'}
+
+請寫 2 段左右溫暖、具體的繁體中文回饋，重點：
+1. 針對他實際完成的活動給予具體肯定（引用上面列出的實際內容，不要空泛的鼓勵語）。
+2. 幫助他建立信心，語氣像一位真心關心他學習狀況的老師。
+3. 完全不要編造他當天的心情、動機、為什麼來上課、教室場景等你不知道的資訊——只根據上面提供的活動紀錄與班級比較資料書寫。
+4. 不要下標題、不要用條列式，直接輸出整段文字。`;
 
             let summary;
             try {
@@ -347,7 +486,7 @@ ${activityList}
                 return;
             }
             timelineEl.innerHTML = displayRows.map(row => {
-                const { question, answerHtml, imageUrl, meta } = renderEntry(row);
+                const { question, answerHtml, imageUrl, webCardHtml, meta } = renderEntry(row);
                 let badge = '';
                 if (row.is_correct === true) badge = `<span class="memoir-item-badge memoir-badge-correct">${mi('check_circle', 12)} 答對了</span>`;
                 else if (row.is_correct === false) badge = `<span class="memoir-item-badge memoir-badge-wrong">${mi('cancel', 12)} 差一點</span>`;
@@ -368,6 +507,7 @@ ${activityList}
                         <div class="memoir-item-question">${esc(question)}</div>
                         ${answerHtml ? `<div class="memoir-item-answer">${answerHtml}</div>` : ''}
                         ${imageUrl ? `<img class="memoir-item-image" src="${esc(imageUrl)}" alt="作品圖片">` : ''}
+                        ${webCardHtml || ''}
                         ${badge}${extra}
                     </div>`;
             }).join('');
