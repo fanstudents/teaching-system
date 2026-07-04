@@ -62,10 +62,23 @@
             background: none; padding: 0;
         }
 
-        /* ── 創辦人簽名（安靜的簽名檔風格）── */
+        /* ── 創辦人簽名（像在跟學員說話的小對話卡）── */
         .m-founder {
-            margin: 0 0 48px; font-size: 0.82rem; color: #93897a; line-height: 1.8;
+            display: flex; align-items: flex-start; gap: 12px;
+            margin: 0 0 48px; padding: 14px 18px;
+            background: #f5f2ec; border-radius: 14px;
         }
+        .m-founder-avatar-wrap {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+            background: #e8d7b8; color: #a3793f; font-weight: 800; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative;
+        }
+        .m-founder-avatar {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+        }
+        .m-founder-body { font-size: 0.85rem; color: #6b6252; line-height: 1.75; padding-top: 2px; }
+        .m-founder-name { font-weight: 700; color: #3a3527; margin-bottom: 2px; }
         .m-founder a { color: #1f7a6c; font-weight: 700; text-decoration: none; }
         .m-founder a:hover { text-decoration: underline; }
 
@@ -88,11 +101,17 @@
         }
         .port-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(30,24,16,0.09); }
         .port-card.featured { grid-column: 1 / -1; }
-        .port-card.featured .port-media { aspect-ratio: 21/9; }
-        @media (max-width: 620px) { .port-card.featured .port-media { aspect-ratio: 16/10; } }
+        .port-card.featured .port-media { max-height: 480px; min-height: 240px; }
 
-        .port-media { position: relative; width: 100%; aspect-ratio: 16/10; background: #f2efe8; overflow: hidden; }
-        .port-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* 作品圖片完整顯示、絕不裁切——高矮胖瘦都讓學員看到完整的作品。
+           min-height 保留版位：圖片載入前容器不能塌陷成 0，否則瀏覽器的
+           lazy-load 偵測不到元素「進入畫面」，圖片會永遠卡在載入前狀態。 */
+        .port-media {
+            position: relative; width: 100%; min-height: 160px; max-height: 340px;
+            background: #f2efe8; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .port-media img { width: 100%; height: auto; max-height: inherit; object-fit: contain; display: block; }
 
         /* 網頁作品：瀏覽器視窗造型 */
         .port-browser-bar {
@@ -172,9 +191,19 @@
         </div>
 
         <div class="m-founder">
-            我是數位簡報室的創辦人 樊松蒲 Dennis，歡迎在我的
-            <a href="https://www.threads.com/@tbr.digital" target="_blank" rel="noopener">Threads</a>
-            上追蹤我，或標記我分享你今天的學習感想！
+            <div class="m-founder-avatar-wrap">D
+                <img class="m-founder-avatar" alt="樊松蒲 Dennis"
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfgfWcWa_JFQWPyal4fti-rDWXS8pTSi4P0OVrAtcn8ydMJp0PNvNwqOw&s=10"
+                    onerror="this.remove()">
+            </div>
+            <div class="m-founder-body">
+                <div class="m-founder-name">樊松蒲 Dennis・數位簡報室創辦人</div>
+                如果覺得課程不錯，可以參加數位簡報室
+                <a href="https://tbr.digital" target="_blank" rel="noopener">tbr.digital</a>
+                的其他課程，或是在社群上幫我們分享心得喔！也歡迎在
+                <a href="https://www.threads.com/@tbr.digital" target="_blank" rel="noopener">Threads</a>
+                上追蹤我、標記我分享你今天的學習感想。
+            </div>
         </div>
 
         <div id="portfolioSection">
