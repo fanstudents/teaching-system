@@ -582,6 +582,30 @@ body {
 .q-about-link .material-symbols-outlined { font-size: 18px; }
 
 /* ═══════════════════════════════════
+   SHOWCASE (Interactive Slides gallery)
+   ═══════════════════════════════════ */
+.q-showcase-desc { padding: 4px 0 20px; }
+.q-showcase-desc p { font-size: .95rem; color: var(--q-text-2); line-height: 1.75; }
+.q-showcase-desc strong { color: var(--q-text); font-weight: 700; }
+.q-showcase-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.q-showcase-gallery img:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+.q-showcase-gallery img {
+    width: 100%; height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid var(--q-border);
+    display: block;
+}
+
+/* ═══════════════════════════════════
    WHY US
    ═══════════════════════════════════ */
 .q-why-us-list { padding: 20px 0; display: flex; flex-direction: column; gap: 0; }
