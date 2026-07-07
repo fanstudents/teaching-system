@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════════════════
+   互動模組 — 手機／平板優化
+   ───────────────────────────────────────────────────────────────
+   僅供 student.html 使用，載於所有互動樣式之後以覆蓋桌面預設。
+   目標裝置：viewport ≤ 1024px（與 student.html 內 JS 的
+   `isMobile = window.innerWidth <= 1024` 判定一致）。
+
+   注意：投影片是固定 960×540 畫布，用 transform:scale(~0.4) 整體縮放，
+   因此「實體點擊尺寸」無法單靠 min-height 補到 44px（會一起被縮小）。
+   本檔專注於「不受縮放影響、真正有效」的修正：
+     ① 輸入框字級 ≥16px → 消除 iOS Safari 聚焦自動放大（iOS 讀的是
+        CSS font-size 值，與 transform 無關，故此修正確實生效）
+     ② 雙欄版面改單欄堆疊 → 輸入欄拿到整寬、不再被壓成 180px
+     ③ scale 評分滑桿加大軌道與拇指
+     ④ webProject 三欄改單欄，並隱藏 iOS 無法運作的資料夾上傳
+   重輸入流程（skillBattle、survey）的全螢幕作答層屬第二階段改動。
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+
+    /* ① 消除 iOS 聚焦放大：所有互動輸入字級補到 16px */
+    .opentext-input,
+    .wordcloud-input,
+    .buzzer-input,
+    .sb-skill-input,
+    .sb-skill-name-input,
+    .sb-skill-desc-input,
+    .sb-skill-detail-input,
+    .col-var-input,
+    .survey-textarea,
+    .fill-blank-input,
+    .scale-container input[type="text"],
+    .scale-container input[type="number"] {
+        font-size: 16px !important;
+    }
+
+    /* ② 雙欄版面 → 單欄堆疊 */
+    .wordcloud-body {
+        flex-direction: column !important;
+    }
+    .wordcloud-multi-input {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    .sb-student-layout {
+        flex-direction: column !important;
+    }
+
+    /* ③ scale 評分滑桿：加大軌道 + 拇指，擴大觸控命中區 */
+    .scale-slider {
+        height: 14px !important;
+        touch-action: none;
+    }
+    .scale-slider::-webkit-slider-thumb {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    .scale-slider::-moz-range-thumb {
+        width: 40px !important;
+        height: 40px !important;
+        border: none;
+    }
+    .scale-slider-wrap {
+        width: 94% !important;
+        max-width: none !important;
+    }
+
+    /* ④ webProject：三欄 → 單欄；隱藏 iOS 無法運作的資料夾上傳卡 */
+    .wp-cards {
+        grid-template-columns: 1fr !important;
+    }
+    .wp-card-upload {
+        display: none !important;
+    }
+
+    /* ⑤ 長選項清單不再直接被裁掉（改為容器內捲動） */
+    .poll-options {
+        overflow-y: auto !important;
+        max-height: 70% !important;
+    }
+}
