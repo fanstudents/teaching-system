@@ -589,7 +589,7 @@ body {
 .q-showcase-desc strong { color: var(--q-text); font-weight: 700; }
 .q-showcase-gallery {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 .q-showcase-gallery img {
@@ -599,6 +599,15 @@ body {
     border-radius: 10px;
     border: 1px solid var(--q-border);
     display: block;
+}
+.q-showcase-caption {
+    text-align: center;
+    font-size: .8rem;
+    color: var(--q-text-3);
+    margin-top: 10px;
+}
+@media (max-width: 640px) {
+    .q-showcase-gallery { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ═══════════════════════════════════
