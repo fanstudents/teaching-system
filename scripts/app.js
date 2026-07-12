@@ -402,18 +402,42 @@ class App {
                 }
 
                 grid.innerHTML = items.map(a => `
-                    <div data-asset-id="${a.id}" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.15s;" 
+                    <div data-asset-id="${a.id}" style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.15s;"
                          onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';this.style.transform='translateY(-1px)'"
                          onmouseout="this.style.boxShadow='none';this.style.transform='none'">
-                        <div style="height:140px;background:#fafbfc;display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid #f1f5f9;padding:8px;">
+                        <div data-asset-thumb="${a.id}" style="height:140px;background:#fafbfc;display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid #f1f5f9;padding:8px;">
                             ${a.type === 'svg' || a.type === 'html' ? a.content.replace(/<script[\s\S]*?<\/script>/gi, '') : ''}
                         </div>
                         <div style="padding:10px 12px;">
-                            <div style="font-weight:600;font-size:0.82rem;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name}</div>
+                            <div style="font-weight:600;font-size:0.82rem;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.type === 'elements' ? '🧩 ' : ''}${a.name}</div>
                             <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">${(a.tags || []).join(' · ')}</div>
                         </div>
                     </div>
                 `).join('');
+
+                // elements 型素材：用原生渲染器畫縮圖（可編輯元件組）
+                items.filter(a => a.type === 'elements').forEach(a => {
+                    const thumb = grid.querySelector(`[data-asset-thumb="${a.id}"]`);
+                    if (!thumb) return;
+                    try {
+                        const parsed = JSON.parse(a.content);
+                        const scale = 200 / 960;
+                        thumb.style.padding = '0';
+                        thumb.innerHTML = '';
+                        const wrap = document.createElement('div');
+                        wrap.style.cssText = `width:200px;height:${Math.round(540 * scale)}px;overflow:hidden;border-radius:6px;`;
+                        const mini = document.createElement('div');
+                        mini.style.cssText = `width:960px;height:540px;position:relative;transform:scale(${scale});transform-origin:top left;background:${parsed.background || '#fff'};`;
+                        (parsed.elements || []).forEach(el => {
+                            try {
+                                const node = this.slideManager.createElementNode(el);
+                                if (node) { node.style.pointerEvents = 'none'; mini.appendChild(node); }
+                            } catch (_) { }
+                        });
+                        wrap.appendChild(mini);
+                        thumb.appendChild(wrap);
+                    } catch (_) { }
+                });
 
                 // Bind click
                 grid.querySelectorAll('[data-asset-id]').forEach(card => {
@@ -421,7 +445,15 @@ class App {
                         const id = card.dataset.assetId;
                         const asset = (_assetCache || []).find(a => a.id === id);
                         if (!asset) return;
-                        this.editor.addSvgAsset(asset.content, asset.name);
+                        if (asset.type === 'elements') {
+                            // 元件組：插入原生可編輯元素（含動畫設定）
+                            try {
+                                const parsed = JSON.parse(asset.content);
+                                this.editor.addElementGroup(parsed.elements || []);
+                            } catch (e) { alert('素材資料損毀，無法插入'); return; }
+                        } else {
+                            this.editor.addSvgAsset(asset.content, asset.name);
+                        }
                         assetOverlay.style.display = 'none';
                     });
                 });
@@ -435,6 +467,9 @@ class App {
                 if (e.key === 'Escape' && assetOverlay.style.display === 'flex') assetOverlay.style.display = 'none';
             });
         }
+
+        // ── 圖轉元件（資訊圖表 → 原生可編輯元素）──
+        this.bindImg2Slide();
 
         // 課後問卷設定（專案層級）
         document.getElementById('addSurveyBtn')?.addEventListener('click', () => {
@@ -5480,6 +5515,154 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         document.getElementById('presQAPanel')?.remove();
         // 不清空 _qaQuestions，保留歷史問題
         this._qaOpen = false;
+    }
+
+    // ═══════════ 圖轉元件（Image → Slide Elements）═══════════
+    bindImg2Slide() {
+        const overlay = document.getElementById('img2slideOverlay');
+        if (!overlay) return;
+
+        const drop = document.getElementById('img2slideDrop');
+        const fileInput = document.getElementById('img2slideFile');
+        const previewImg = document.getElementById('img2slidePreview');
+        const dropHint = document.getElementById('img2slideDropHint');
+        const analyzeBtn = document.getElementById('img2slideAnalyzeBtn');
+        const statusEl = document.getElementById('img2slideStatus');
+        const canvasHost = document.getElementById('img2slideCanvasHost');
+        const actionsEl = document.getElementById('img2slideActions');
+
+        // 狀態
+        const state = { file: null, dataUrl: null, spec: null, elements: null, background: null, busy: false };
+
+        const setStatus = (msg, color = '#94a3b8') => {
+            statusEl.style.display = 'block';
+            canvasHost.style.display = 'none';
+            statusEl.innerHTML = msg;
+            statusEl.style.color = color;
+        };
+
+        const setImage = async (fileOrUrl) => {
+            state.file = fileOrUrl;
+            state.spec = null; state.elements = null;
+            actionsEl.style.display = 'none';
+            // 顯示縮圖
+            const url = typeof fileOrUrl === 'string' ? fileOrUrl : URL.createObjectURL(fileOrUrl);
+            previewImg.src = url;
+            previewImg.style.display = 'block';
+            dropHint.style.display = 'none';
+            analyzeBtn.disabled = false;
+            analyzeBtn.style.opacity = '1';
+            setStatus('按「開始 AI 轉換」進行分析');
+        };
+
+        /** 用系統原生渲染器畫出 960×540 縮放預覽 */
+        const renderPreview = () => {
+            const hostW = Math.min(560, canvasHost.parentElement.clientWidth - 4) || 520;
+            const scale = hostW / 960;
+            canvasHost.innerHTML = '';
+            canvasHost.style.cssText = `display:block;width:${hostW}px;height:${Math.round(540 * scale)}px;overflow:hidden;border-radius:8px;`;
+            const canvas = document.createElement('div');
+            canvas.style.cssText = `width:960px;height:540px;position:relative;transform:scale(${scale});transform-origin:top left;background:${state.background || '#fff'};`;
+            (state.elements || []).forEach(el => {
+                try {
+                    const node = this.slideManager.createElementNode(el);
+                    if (node) {
+                        node.style.pointerEvents = 'none';
+                        canvas.appendChild(node);
+                    }
+                } catch (e) { console.warn('[img2slide] preview skip:', el.type, e); }
+            });
+            canvasHost.appendChild(canvas);
+            statusEl.style.display = 'none';
+            canvasHost.style.display = 'block';
+        };
+
+        const runConvert = async () => {
+            if (!state.file || state.busy) return;
+            state.busy = true;
+            analyzeBtn.disabled = true;
+            analyzeBtn.style.opacity = '0.5';
+            actionsEl.style.display = 'none';
+            try {
+                const { convertImage } = await import('./imageToSlide.js');
+                const result = await convertImage(state.file, {
+                    onProgress: (msg) => setStatus(
+                        `<span class="material-symbols-outlined" style="font-size:28px;color:#7c3aed;animation:spin 1.2s linear infinite;display:inline-block;">progress_activity</span><br>${msg}`, '#7c3aed')
+                });
+                state.spec = result.spec;
+                state.elements = result.elements;
+                state.background = result.background;
+                renderPreview();
+                actionsEl.style.display = 'flex';
+            } catch (e) {
+                console.error('[img2slide]', e);
+                setStatus('❌ ' + (e.message || '轉換失敗，請重試'), '#ef4444');
+            } finally {
+                state.busy = false;
+                analyzeBtn.disabled = false;
+                analyzeBtn.style.opacity = '1';
+            }
+        };
+
+        // ── 事件綁定 ──
+        document.getElementById('openImg2SlideBtn')?.addEventListener('click', () => {
+            overlay.style.display = 'flex';
+        });
+        document.getElementById('img2slideClose')?.addEventListener('click', () => { overlay.style.display = 'none'; });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.style.display = 'none'; });
+
+        drop.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files?.[0]) setImage(e.target.files[0]);
+            fileInput.value = '';
+        });
+        drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.background = '#f3efff'; });
+        drop.addEventListener('dragleave', () => { drop.style.background = '#faf9ff'; });
+        drop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            drop.style.background = '#faf9ff';
+            const f = [...(e.dataTransfer?.files || [])].find(f => f.type.startsWith('image/'));
+            if (f) setImage(f);
+        });
+        // Ctrl+V 貼上（modal 開啟時）
+        document.addEventListener('paste', (e) => {
+            if (overlay.style.display !== 'flex') return;
+            const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+            if (item) { setImage(item.getAsFile()); e.preventDefault(); }
+        });
+
+        analyzeBtn.addEventListener('click', runConvert);
+        document.getElementById('img2slideRetryBtn')?.addEventListener('click', runConvert);
+
+        document.getElementById('img2slideInsertBtn')?.addEventListener('click', () => {
+            if (!state.elements) return;
+            this.editor.addElementGroup(state.elements);
+            overlay.style.display = 'none';
+            this.showToast('已插入 ' + state.elements.length + ' 個可編輯元素 ✨');
+        });
+        document.getElementById('img2slideNewSlideBtn')?.addEventListener('click', () => {
+            if (!state.elements) return;
+            this.editor.addElementGroup(state.elements, { newSlide: true, background: state.background });
+            overlay.style.display = 'none';
+            this.showToast('已新增一頁並套用轉換結果 ✨');
+        });
+        document.getElementById('img2slideSaveAssetBtn')?.addEventListener('click', async () => {
+            if (!state.elements) return;
+            const name = prompt('素材名稱：', state.spec?.title?.text || '圖轉元件素材');
+            if (!name) return;
+            try {
+                await db.insert('assets', {
+                    name,
+                    type: 'elements',
+                    content: JSON.stringify({ background: state.background, elements: state.elements }),
+                    tags: ['圖轉元件'],
+                    description: `由圖片轉換（${state.spec?.pattern || ''} 版型，${state.elements.length} 個元素）`,
+                });
+                this.showToast('已存入素材庫 🎨');
+            } catch (e) {
+                alert('儲存失敗：' + e.message);
+            }
+        });
     }
 
     // ═══════════ Survey Settings Overlay ═══════════

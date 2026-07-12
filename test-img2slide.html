@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>圖轉元件 E2E 測試</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="styles/editor.css">
+<style>
+body { font-family:'Noto Sans TC',sans-serif; background:#f1f5f9; margin:0; padding:20px; }
+h3 { margin:8px 0; }
+.row { display:flex; gap:20px; flex-wrap:wrap; }
+.panel { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; }
+#result960 { width:960px; height:540px; position:relative; background:#fff; overflow:hidden; border:1px solid #cbd5e1; }
+button { padding:10px 18px; font-family:inherit; font-weight:700; cursor:pointer; border-radius:8px; border:1px solid #7c3aed; background:#7c3aed; color:#fff; margin-right:8px; }
+#status { color:#7c3aed; font-weight:600; margin:10px 0; }
+pre { max-height:200px; overflow:auto; background:#f8fafc; padding:8px; font-size:11px; }
+</style>
+</head>
+<body>
+<h3>圖轉元件 E2E 測試（真實 AI 呼叫 + 原生渲染器）</h3>
+<button id="runRadial">測試放射狀版型</button>
+<button id="runCards">測試卡片版型</button>
+<div id="status">待命</div>
+<div class="row">
+  <div class="panel"><div>來源圖（canvas 合成）</div><canvas id="src" width="1200" height="675" style="width:480px;height:270px;"></canvas></div>
+  <div class="panel"><div>轉換結果（960×540 原生元素渲染）</div><div id="result960"></div></div>
+</div>
+<pre id="specDump"></pre>
+
+<script type="module">
+import { convertImage } from './scripts/imageToSlide.js';
+import { SlideManager } from './scripts/slideManager.js';
+
+const statusEl = document.getElementById('status');
+const canvas = document.getElementById('src');
+const ctx = canvas.getContext('2d');
+
+// 假 context 借用原生渲染器
+const fakeSM = Object.assign(Object.create(SlideManager.prototype), {
+    slides: [{ elements: [] }], currentIndex: 0, _isRendering: false, canvasContentEl: null,
+});
+
+function drawRadialSample() {
+    const W = 1200, H = 675;
+    ctx.fillStyle = '#f2f1fa'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#1e2b56'; ctx.font = '800 44px "Noto Sans TC"'; ctx.textAlign = 'center';
+    ctx.fillText('AI 工具可以幫你做哪些事？', W/2, 62);
+    ctx.fillStyle = '#5f6b7a'; ctx.font = '20px "Noto Sans TC"';
+    ctx.fillText('一套工具，多種應用，讓效率發揮最大價值', W/2, 100);
+    const cx = W/2, cy = 390;
+    ctx.fillStyle = '#e8e4fb'; ctx.beginPath(); ctx.arc(cx, cy, 120, 0, 7); ctx.fill();
+    ctx.font = '56px serif'; ctx.fillText('🤖', cx, cy - 40);
+    ctx.fillStyle = '#6c5ce7'; ctx.font = '800 34px "Noto Sans TC"'; ctx.fillText('AI 助手', cx, cy + 18);
+    ctx.fillStyle = '#6b7280'; ctx.font = '15px "Noto Sans TC"'; ctx.fillText('集中管理．智慧應用', cx, cy + 52);
+    const items = [
+        ['✍️', '文案撰寫', '快速產出貼文與文案', '#4285f4', -0.85],
+        ['🔍', '資料查詢', '快速找到所需資訊', '#0d9488', -1.35],
+        ['🎨', '圖片生成', '製作品牌視覺素材', '#16a34a', -1.95],
+        ['📊', '數據分析', '看懂報表做出決策', '#eab308', 3.14159],
+        ['📧', '信件回覆', '專業回覆節省時間', '#f59e0b', 1.95],
+        ['🗂️', '文件整理', '摘要長文重點清晰', '#ec4899', 1.35],
+        ['💬', '客服應答', '即時回答客戶問題', '#8b5cf6', 0.85],
+    ];
+    items.forEach(([emoji, label, desc, color, ang]) => {
+        const ix = cx + 380 * Math.sin(ang), iy = cy - 240 * Math.cos(ang);
+        ctx.strokeStyle = color; ctx.setLineDash([4, 5]); ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(cx + 128 * Math.sin(ang), cy - 128 * Math.cos(ang)); ctx.lineTo(ix, iy); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ix, iy, 44, 0, 7); ctx.fill();
+        ctx.strokeStyle = color; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.arc(ix, iy, 44, 0, 7); ctx.stroke();
+        ctx.font = '38px serif'; ctx.textAlign = 'center'; ctx.fillText(emoji, ix, iy + 13);
+        const side = ix < cx - 40 ? -1 : ix > cx + 40 ? 1 : 0;
+        ctx.textAlign = side === -1 ? 'right' : side === 1 ? 'left' : 'center';
+        const tx = ix + side * 58, ty = side === 0 ? iy + 72 : iy;
+        ctx.fillStyle = color; ctx.font = '700 22px "Noto Sans TC"'; ctx.fillText(label, tx, ty - 4);
+        ctx.fillStyle = '#5f6b7a'; ctx.font = '15px "Noto Sans TC"'; ctx.fillText(desc, tx, ty + 22);
+    });
+}
+
+function drawCardsSample() {
+    const W = 1200, H = 675;
+    ctx.fillStyle = '#fdfcf8'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#1f2937'; ctx.font = '800 46px "Noto Sans TC"'; ctx.textAlign = 'center';
+    ctx.fillText('打造好簡報 4 個最重要的事！', W/2, 66);
+    ctx.fillStyle = '#5f6b7a'; ctx.font = '20px "Noto Sans TC"';
+    ctx.fillText('掌握這四步，讓簡報更清楚、更有說服力！', W/2, 104);
+    const cards = [
+        ['1', '內容準備好', '收集、整理素材\n確保資訊正確完整', '💡 乾淨的內容是基礎', '#2563eb', '📄'],
+        ['2', '結構切清楚', '把內容分成清楚段落\n讓聽眾容易跟上', '💡 一頁只講一件事', '#16a34a', '✂️'],
+        ['3', '視覺做到位', '用圖表與圖示呈現\n減少大段文字', '💡 好視覺勝過千言', '#7c3aed', '🎨'],
+        ['4', '練習講得順', '反覆演練掌握時間\n自信開口不冷場', '💡 練三次就不會慌', '#ea580c', '🎤'],
+    ];
+    cards.forEach(([num, title, desc, hint, color, emoji], i) => {
+        const cw = 265, gap = 22, x = (W - 4*cw - 3*gap)/2 + i*(cw+gap), y = 150, ch = 420;
+        ctx.fillStyle = color + '18'; ctx.beginPath(); ctx.roundRect(x, y, cw, ch, 16); ctx.fill();
+        ctx.strokeStyle = color + '55'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x + 36, y + 40, 20, 0, 7); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = '700 20px "Noto Sans TC"'; ctx.textAlign = 'center'; ctx.fillText(num, x + 36, y + 47);
+        ctx.fillStyle = '#111827'; ctx.font = '700 24px "Noto Sans TC"'; ctx.textAlign = 'left'; ctx.fillText(title, x + 66, y + 48);
+        ctx.font = '64px serif'; ctx.textAlign = 'center'; ctx.fillText(emoji, x + cw/2, y + 170);
+        ctx.fillStyle = '#475569'; ctx.font = '16px "Noto Sans TC"';
+        desc.split('\n').forEach((line, li) => ctx.fillText(line, x + cw/2, y + 235 + li * 26));
+        ctx.fillStyle = color + '22'; ctx.beginPath(); ctx.roundRect(x + 14, y + ch - 66, cw - 28, 48, 10); ctx.fill();
+        ctx.fillStyle = '#44403c'; ctx.font = '14px "Noto Sans TC"'; ctx.fillText(hint, x + cw/2, y + ch - 37);
+    });
+    ctx.fillStyle = '#ede9fe'; ctx.beginPath(); ctx.roundRect(120, 600, 960, 52, 12); ctx.fill();
+    ctx.fillStyle = '#334155'; ctx.font = '700 20px "Noto Sans TC"'; ctx.textAlign = 'center';
+    ctx.fillText('🎯 記住：好內容 + 好結構 + 好視覺 + 好演練 = 成功簡報！', W/2, 633);
+}
+
+async function run(drawFn) {
+    drawFn();
+    statusEl.textContent = '轉換中…（真實 AI 呼叫）';
+    document.getElementById('result960').innerHTML = '';
+    document.getElementById('specDump').textContent = '';
+    const t0 = Date.now();
+    try {
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const { spec, elements, background } = await convertImage(dataUrl, {
+            onProgress: m => statusEl.textContent = m,
+        });
+        const host = document.getElementById('result960');
+        host.style.background = background;
+        elements.forEach(el => {
+            const node = fakeSM.createElementNode(el);
+            if (node) { node.style.pointerEvents = 'none'; host.appendChild(node); }
+        });
+        statusEl.textContent = `✅ 完成（${((Date.now()-t0)/1000).toFixed(1)}s，${elements.length} 個元素，版型 ${spec.pattern}）`;
+        document.getElementById('specDump').textContent = JSON.stringify(spec, null, 2);
+        window.__testDone = { ok: true, pattern: spec.pattern, count: elements.length };
+    } catch (e) {
+        statusEl.textContent = '❌ ' + e.message;
+        window.__testDone = { ok: false, error: e.message };
+        console.error(e);
+    }
+}
+
+document.getElementById('runRadial').onclick = () => run(drawRadialSample);
+document.getElementById('runCards').onclick = () => run(drawCardsSample);
+drawRadialSample();
+</script>
+</body>
+</html>

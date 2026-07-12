@@ -169,6 +169,38 @@ export class Editor {
     }
 
     /**
+     * 插入一組原生元素（圖轉元件 / elements 型素材）
+     * @param {Array} elements — 元素陣列（座標為 960×540 絕對座標）
+     * @param {Object} opts — { background: 套用投影片背景, newSlide: 先新增一頁 }
+     */
+    addElementGroup(elements, opts = {}) {
+        if (!Array.isArray(elements) || elements.length === 0) return;
+
+        if (opts.newSlide) {
+            this.slideManager.createSlide();
+        }
+        const slide = this.slideManager.getCurrentSlide();
+        if (!slide) return;
+
+        if (opts.background) {
+            slide.background = opts.background;
+        }
+
+        let firstId = null;
+        elements.forEach(raw => {
+            const el = JSON.parse(JSON.stringify(raw));
+            el.id = this.slideManager.generateId();
+            if (!firstId) firstId = el.id;
+            slide.elements.push(el);
+        });
+
+        this.slideManager.renderCurrentSlide();
+        this.slideManager.renderThumbnails();
+        this.slideManager.saveNow();
+        if (firstId) this.selectElementById(firstId);
+    }
+
+    /**
      * 新增形狀元素
      */
     addShape(shapeType) {

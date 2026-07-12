@@ -657,6 +657,22 @@ function _resolveModel(model, provider) {
     return map[provider]?.[model] || model;
 }
 
+/**
+ * 把 OpenAI 格式的 image_url content block 轉成 Anthropic 格式
+ * （imageToSlide 等視覺功能統一用 OpenAI image_url 當中立格式；
+ *   直連 Anthropic API 時在此轉換）
+ */
+function _toAnthropicContent(content) {
+    if (!Array.isArray(content)) return content;
+    return content.map(block => {
+        if (block.type === 'image_url' && block.image_url?.url?.startsWith('data:')) {
+            const m = block.image_url.url.match(/^data:([^;]+);base64,(.*)$/s);
+            if (m) return { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } };
+        }
+        return block;
+    });
+}
+
 async function _chatOpenAI(messages, opts) {
     const model = _resolveModel(opts.model || 'gpt-4o-mini', 'openai');
     const baseUrl = _aiConfig.baseUrl || 'https://api.openai.com';
@@ -694,7 +710,7 @@ async function _chatAnthropic(messages, opts) {
         body: JSON.stringify({
             model,
             system: systemMsg?.content || '',
-            messages: userMsgs.map(m => ({ role: m.role, content: m.content })),
+            messages: userMsgs.map(m => ({ role: m.role, content: _toAnthropicContent(m.content) })),
             temperature: opts.temperature ?? 0.7,
             max_tokens: opts.maxTokens ?? 4096,
         }),
