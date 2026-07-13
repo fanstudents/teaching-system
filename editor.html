@@ -2341,15 +2341,27 @@
             modal.style.display = 'flex';
             const select = document.getElementById('importProjectSelect');
 
-            // Load all projects
-            const { data: projects } = await db.select('projects', { order: 'updated_at.desc' });
+            // Load all projects（含客戶名稱，方便在同名/相似專案間辨識）
+            const { data: projects } = await db.select('projects', {
+                select: 'id,name,join_code,updated_at,organization_id,organizations(name)',
+                order: 'updated_at.desc'
+            });
             select.innerHTML = '<option value="">選擇來源專案…</option>';
             const currentPid = window.slideManager?.currentProjectId;
-            (projects || []).forEach(p => {
-                if (p.id === currentPid) return; // skip current project
+            const rows = (projects || []).filter(p => p.id !== currentPid);
+            // 依客戶名稱排序，同一客戶的專案會排在一起；未歸屬客戶的排最後
+            rows.sort((a, b) => {
+                const oa = a.organizations?.name || '￿';
+                const ob = b.organizations?.name || '￿';
+                if (oa !== ob) return oa.localeCompare(ob, 'zh-Hant');
+                return (b.updated_at || '').localeCompare(a.updated_at || '');
+            });
+            rows.forEach(p => {
+                const orgName = p.organizations?.name || '';
+                const projName = p.name || p.join_code || p.id;
                 const opt = document.createElement('option');
                 opt.value = p.id;
-                opt.textContent = p.name || p.join_code || p.id;
+                opt.textContent = orgName ? `${orgName} — ${projName}` : `（未歸屬客戶）${projName}`;
                 select.appendChild(opt);
             });
             document.getElementById('importSlidesGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#444746;padding:40px 0;">請先選擇來源專案</div>';
