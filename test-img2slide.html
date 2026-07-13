@@ -21,6 +21,7 @@ pre { max-height:200px; overflow:auto; background:#f8fafc; padding:8px; font-siz
 <h3>圖轉元件 E2E 測試（真實 AI 呼叫 + 原生渲染器）</h3>
 <button id="runRadial">測試放射狀版型</button>
 <button id="runCards">測試卡片版型</button>
+<button id="runSunburst" style="background:#0d9488;border-color:#0d9488;">測試風味輪版型（純渲染器，跳過 AI）</button>
 <div id="status">待命</div>
 <div class="row">
   <div class="panel"><div>來源圖（canvas 合成）</div><canvas id="src" width="1200" height="675" style="width:480px;height:270px;"></canvas></div>
@@ -138,6 +139,83 @@ async function run(drawFn) {
 
 document.getElementById('runRadial').onclick = () => run(drawRadialSample);
 document.getElementById('runCards').onclick = () => run(drawCardsSample);
+
+// 手工撰寫的規格，模擬使用者提供的「茶葉風味輪」結構（2 個中心分支、4 層深、多詞葉節點）
+// 直接測試 buildSunburst() 渲染邏輯，跳過 AI 視覺分析這一段
+async function runSunburstSpec() {
+    statusEl.textContent = '渲染中…（跳過 AI，直接測 buildFromSpec）';
+    document.getElementById('result960').innerHTML = '';
+    document.getElementById('specDump').textContent = '';
+    const t0 = Date.now();
+    try {
+        const { buildFromSpec } = await import('./scripts/imageToSlide.js');
+        const spec = {
+            pattern: 'sunburst',
+            background: '#ffffff',
+            title: null, subtitle: null, titleIcon: null, center: null, items: [], footer: null,
+            sunburst: {
+                root: [
+                    {
+                        label: '滋味', color: '#c2185b',
+                        children: [
+                            { label: '口感', children: [
+                                { label: '澀感 細膩度' }, { label: '滑順度 粗糙度' }, { label: '濃稠度 餘韻感' },
+                            ] },
+                            { label: '酸' }, { label: '甜' }, { label: '鹹' }, { label: '鮮' },
+                        ],
+                    },
+                    {
+                        label: '氣', color: '#1565c0',
+                        children: [
+                            { label: '果香', children: [
+                                { label: '青果', children: [{ label: '芭樂 青柿子 橄欖' }] },
+                                { label: '熟果', children: [{ label: '香蕉 鳳梨 荔枝 熟樣' }] },
+                                { label: '乾果', children: [{ label: '龍眼乾 梅子乾 芒果乾' }] },
+                            ] },
+                            { label: '甜香', children: [
+                                { label: '糖香', children: [{ label: '蔗糖 黑糖 焦糖' }] },
+                                { label: '蜜香', children: [{ label: '蜂蜜' }] },
+                            ] },
+                            { label: '花香', children: [
+                                { label: '清香', children: [{ label: '茉莉花 桂花 龍眼花' }] },
+                                { label: '濃香', children: [{ label: '梔子花 野薑花 玫瑰花' }] },
+                            ] },
+                            { label: '焙香', children: [
+                                { label: '焙烤', children: [{ label: '白巧克力 杏仁 焦糖' }] },
+                                { label: '煙焦', children: [{ label: '煙燻 木炭' }] },
+                            ] },
+                            { label: '青香', children: [
+                                { label: '梗', children: [{ label: '青草 乾草 仙草' }] },
+                                { label: '身', children: [{ label: '薰衣草 甜菊 薄荷' }] },
+                            ] },
+                            { label: '其他', children: [
+                                { label: '化學類', children: [{ label: '塑膠 汽油' }] },
+                                { label: '陳舊味', children: [{ label: '泥土 油耗 紙箱 霉味' }] },
+                                { label: '中草藥', children: [{ label: '陳皮 甘草 人參' }] },
+                            ] },
+                        ],
+                    },
+                ],
+            },
+        };
+        const { elements, background } = buildFromSpec(spec);
+        const host = document.getElementById('result960');
+        host.style.background = background;
+        elements.forEach(el => {
+            const node = fakeSM.createElementNode(el);
+            if (node) { node.style.pointerEvents = 'none'; host.appendChild(node); }
+        });
+        statusEl.textContent = `✅ 完成（${((Date.now() - t0) / 1000).toFixed(1)}s，${elements.length} 個元素，版型 sunburst，純渲染無 AI）`;
+        document.getElementById('specDump').textContent = JSON.stringify(spec, null, 2);
+        window.__testDone = { ok: true, pattern: 'sunburst', count: elements.length };
+    } catch (e) {
+        statusEl.textContent = '❌ ' + e.message;
+        window.__testDone = { ok: false, error: e.message };
+        console.error(e);
+    }
+}
+document.getElementById('runSunburst').onclick = runSunburstSpec;
+
 drawRadialSample();
 </script>
 </body>

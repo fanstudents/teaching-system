@@ -2995,7 +2995,7 @@
                 case 'skillBattle': {
                     el.classList.add('interactive-element', 'skill-battle-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/skillBattle.js?v=20260711').then(({ SkillBattleGame }) => {
+                    import('./scripts/interactive/skillBattle.js?v=20260712').then(({ SkillBattleGame }) => {
                         const isLive = true; // student page is always live
                         new SkillBattleGame().render(el, element, isLive);
                     });
@@ -3023,7 +3023,7 @@
                 case 'skillBattleBoard': {
                     el.classList.add('interactive-element', 'skill-battle-board-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/skillBattle.js?v=20260711').then(({ SkillBattleBoardGame }) => {
+                    import('./scripts/interactive/skillBattle.js?v=20260712').then(({ SkillBattleBoardGame }) => {
                         new SkillBattleBoardGame().render(el, element);
                     });
                     break;
@@ -3032,7 +3032,7 @@
                 case 'skillBattleReview': {
                     el.classList.add('interactive-element', 'skill-battle-review-element');
                     el.style.overflow = 'hidden';
-                    import('./scripts/interactive/skillBattle.js?v=20260711').then(({ SkillBattleReviewGame }) => {
+                    import('./scripts/interactive/skillBattle.js?v=20260712').then(({ SkillBattleReviewGame }) => {
                         new SkillBattleReviewGame().render(el, element);
                     });
                     break;
@@ -3049,7 +3049,7 @@
 
                 case 'groupPick': {
                     el.classList.add('group-pick-element');
-                    import('./scripts/interactive/groupPick.js?v=20260711h').then(({ GroupPickGame }) => {
+                    import('./scripts/interactive/groupPick.js?v=20260712h').then(({ GroupPickGame }) => {
                         new GroupPickGame().render(el, element);
                     });
                     break;

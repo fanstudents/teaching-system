@@ -1234,7 +1234,7 @@ export class SlideManager {
                 this._addScoreBadge(el, element);
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/skillBattle.js?v=20260711').then(({ SkillBattleGame }) => {
+                    import('./interactive/skillBattle.js?v=20260712').then(({ SkillBattleGame }) => {
                         if (isLive) {
                             new SkillBattleGame().render(el, element);
                         } else {
@@ -1284,7 +1284,7 @@ export class SlideManager {
                 el.style.overflow = 'hidden';
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/skillBattle.js?v=20260711').then(({ SkillBattleBoardGame }) => {
+                    import('./interactive/skillBattle.js?v=20260712').then(({ SkillBattleBoardGame }) => {
                         if (isLive) {
                             new SkillBattleBoardGame().render(el, element);
                         } else {
@@ -1300,7 +1300,7 @@ export class SlideManager {
                 el.style.overflow = 'hidden';
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/skillBattle.js?v=20260711').then(({ SkillBattleReviewGame }) => {
+                    import('./interactive/skillBattle.js?v=20260712').then(({ SkillBattleReviewGame }) => {
                         if (isLive) {
                             new SkillBattleReviewGame().render(el, element);
                         } else {
@@ -1331,7 +1331,7 @@ export class SlideManager {
                 el.classList.add('interactive-element', 'group-pick-element');
                 requestAnimationFrame(() => {
                     const isLive = el.closest('.presentation-slide') || el.closest('.aud-interaction-wrap');
-                    import('./interactive/groupPick.js?v=20260711h').then(({ GroupPickGame }) => {
+                    import('./interactive/groupPick.js?v=20260712h').then(({ GroupPickGame }) => {
                         if (isLive) new GroupPickGame().render(el, element);
                         else new GroupPickGame().renderPreview(el, element);
                     });

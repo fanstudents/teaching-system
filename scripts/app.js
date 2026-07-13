@@ -47,32 +47,32 @@ const audioStore = {
     }
 };
 
-import { SlideManager } from './slideManager.js?v=20260711';
-import { Editor } from './editor.js?v=20260711';
-import { DragDrop } from './dragDrop.js?v=20260711';
-import { showToast, showConfirm, showInput } from './ui.js?v=20260711';
-import { MatchingGame } from './interactive/matching.js?v=20260711';
-import { FillBlank } from './interactive/fillBlank.js?v=20260711';
-import { CardCopy } from './interactive/cardCopy.js?v=20260711';
-import { Showcase } from './interactive/showcase.js?v=20260711';
-import { OrderingGame } from './interactive/ordering.js?v=20260711';
-import { QuizGame } from './interactive/quiz.js?v=20260711';
-import { PollGame } from './interactive/poll.js?v=20260711';
-import { CountdownTimer } from './interactive/countdown.js?v=20260711';
-import { TrueFalseGame } from './interactive/truefalse.js?v=20260711';
-import { MultiChoiceGame } from './interactive/multiChoice.js?v=20260711';
-import { OpenTextGame } from './interactive/opentext.js?v=20260711';
-import { ScaleGame } from './interactive/scale.js?v=20260711';
-import { BuzzerGame } from './interactive/buzzer.js?v=20260711';
-import { WordCloudGame } from './interactive/wordcloud.js?v=20260711';
-import { HotspotGame } from './interactive/hotspot.js?v=20260711';
-import { DocumentViewer } from './interactive/documentViewer.js?v=20260711';
+import { SlideManager } from './slideManager.js?v=20260712';
+import { Editor } from './editor.js?v=20260712';
+import { DragDrop } from './dragDrop.js?v=20260712';
+import { showToast, showConfirm, showInput } from './ui.js?v=20260712';
+import { MatchingGame } from './interactive/matching.js?v=20260712';
+import { FillBlank } from './interactive/fillBlank.js?v=20260712';
+import { CardCopy } from './interactive/cardCopy.js?v=20260712';
+import { Showcase } from './interactive/showcase.js?v=20260712';
+import { OrderingGame } from './interactive/ordering.js?v=20260712';
+import { QuizGame } from './interactive/quiz.js?v=20260712';
+import { PollGame } from './interactive/poll.js?v=20260712';
+import { CountdownTimer } from './interactive/countdown.js?v=20260712';
+import { TrueFalseGame } from './interactive/truefalse.js?v=20260712';
+import { MultiChoiceGame } from './interactive/multiChoice.js?v=20260712';
+import { OpenTextGame } from './interactive/opentext.js?v=20260712';
+import { ScaleGame } from './interactive/scale.js?v=20260712';
+import { BuzzerGame } from './interactive/buzzer.js?v=20260712';
+import { WordCloudGame } from './interactive/wordcloud.js?v=20260712';
+import { HotspotGame } from './interactive/hotspot.js?v=20260712';
+import { DocumentViewer } from './interactive/documentViewer.js?v=20260712';
 
-import { HomeworkSubmission } from './homework.js?v=20260711';
+import { HomeworkSubmission } from './homework.js?v=20260712';
 import { db, realtime, generateSessionCode, ai } from './supabase.js';
-import { SLIDE_TEMPLATES } from './templates.js?v=20260711';
-import { IconLibrary } from './iconLibrary.js?v=20260711';
-import { SlideExporter } from './exportSlides.js?v=20260711';
+import { SLIDE_TEMPLATES } from './templates.js?v=20260712';
+import { IconLibrary } from './iconLibrary.js?v=20260712';
+import { SlideExporter } from './exportSlides.js?v=20260712';
 
 class App {
     constructor() {
@@ -5584,7 +5584,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
             analyzeBtn.style.opacity = '0.5';
             actionsEl.style.display = 'none';
             try {
-                const { convertImage } = await import('./imageToSlide.js');
+                const { convertImage } = await import('./imageToSlide.js?v=20260712');
                 const result = await convertImage(state.file, {
                     onProgress: (msg) => setStatus(
                         `<span class="material-symbols-outlined" style="font-size:28px;color:#7c3aed;animation:spin 1.2s linear infinite;display:inline-block;">progress_activity</span><br>${msg}`, '#7c3aed')

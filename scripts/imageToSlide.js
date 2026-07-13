@@ -34,7 +34,7 @@ export async function prepareImage(fileOrDataUrl) {
         i.src = dataUrl;
     });
 
-    const MAX = 1400;
+    const MAX = 1600;
     let { width, height } = img;
     if (width > MAX || height > MAX) {
         const s = Math.min(MAX / width, MAX / height);
@@ -63,13 +63,14 @@ const ANALYZE_PROMPT = `你是資訊圖表逆向工程專家。仔細觀察這�
 - "radial"：中央一個核心節點，周圍放射狀環繞多個項目（有連接線）
 - "cards"：並排的卡片欄位（含編號步驟卡）
 - "list"：垂直列表逐行排列
+- "sunburst"：多層同心圓 / 環狀圖 / 風味輪 / 分類輪（中心一圈，往外一層層分裂成更多扇形格子）
 - "freeform"：無法歸類的其他版面
 
 ## 輸出格式（只輸出 JSON，不要任何其他文字或 markdown 圍欄）
 {
-  "pattern": "radial|cards|list|freeform",
+  "pattern": "radial|cards|list|sunburst|freeform",
   "background": "頁面背景，純色 hex 或 CSS linear-gradient",
-  "title": {"text": "主標題完整文字", "color": "#hex"},
+  "title": {"text": "主標題完整文字", "color": "#hex"} 或 null,
   "subtitle": {"text": "副標題完整文字", "color": "#hex"} 或 null,
   "titleIcon": "主標題旁若有 icon，給清單內名稱" 或 null,
   "center": {"label": "核心節點主文字", "sub": "核心節點副文字或null", "icon": "清單內名稱", "color": "#hex"} 或 null,
@@ -83,7 +84,23 @@ const ANALYZE_PROMPT = `你是資訊圖表逆向工程專家。仔細觀察這�
       "hint": "卡片底部的提示/備註小字（若有）" 或 null
     }
   ],
-  "footer": {"text": "底部總結列完整文字", "icon": "清單內名稱", "color": "#hex"} 或 null
+  "footer": {"text": "底部總結列完整文字", "icon": "清單內名稱", "color": "#hex"} 或 null,
+  "sunburst": {
+    "root": [
+      {
+        "label": "最中心圈文字（完整照抄，例如：滋味）",
+        "color": "#hex 這一整個分支的代表色（從該分支的扇形實際取色）",
+        "children": [
+          {
+            "label": "下一圈文字",
+            "children": [
+              { "label": "再下一圈文字，同一格內若有好幾個詞就用空白全部列在同一個 label 裡", "children": [ "可以繼續往下巢狀，深度不限" ] }
+            ]
+          }
+        ]
+      }
+    ]
+  } 或 null（只有 sunburst 版型才需要填）
 }
 
 ## 規則
@@ -92,7 +109,13 @@ const ANALYZE_PROMPT = `你是資訊圖表逆向工程專家。仔細觀察這�
 3. icon「只能」從下列清單挑選語意最接近的名稱：${ICON_NAMES.join(',')}
 4. items 依視覺閱讀順序排列（由上而下、由左而右）。
 5. radial 版型時 center 必填；cards 版型有編號就填 num。
-6. 只輸出 JSON。`;
+6. sunburst 版型時：
+   - "root" 陣列代表最中心那一圈——如果中心被分成左右（或上下）幾等份，就給幾個項目；如果中心只有一個整體，就給一個項目。
+   - 每個節點都可以有 "children" 往外延伸一圈，深度不限（有幾圈就往下巢狀幾層）；沒有 children 就是這條分支的最外圈（葉節點）。
+   - 只有 root 陣列裡的節點需要給 "color"（代表整個分支的主色），更深的子節點不用給顏色，系統會自動依深度做漸層。
+   - 最外圈如果一格內塞了很多個風味詞/關鍵字，就把它們全部用空白分開、合成一個 label 字串放在同一個節點，不要因為擠不下就漏字或省略任何一個詞。
+   - 每一圈的節點數量、每個分支的子節點數量都要跟圖片實際看到的一致，不要為了對稱而增減。
+7. 只輸出 JSON。`;
 
 export async function analyzeImage(prepared, { onProgress } = {}) {
     onProgress?.('AI 正在解析圖片結構…');
@@ -109,13 +132,15 @@ export async function analyzeImage(prepared, { onProgress } = {}) {
 
     let raw;
     try {
-        raw = await ai.chat(messages, { maxTokens: 4096, temperature: 0.2 });
+        raw = await ai.chat(messages, { maxTokens: 8000, temperature: 0.2 });
     } catch (e) {
         throw new Error('視覺分析失敗：' + e.message);
     }
 
     const spec = extractJson(raw);
-    if (!spec || !Array.isArray(spec.items) || spec.items.length === 0) {
+    const hasItems = Array.isArray(spec?.items) && spec.items.length > 0;
+    const hasSunburst = Array.isArray(spec?.sunburst?.root) && spec.sunburst.root.length > 0;
+    if (!spec || (!hasItems && !hasSunburst)) {
         throw new Error('AI 回傳的規格無法解析，請重試一次');
     }
     return normalizeSpec(spec);
@@ -164,10 +189,23 @@ function vivid(hexColor) {
     return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
 }
 
+/** 遞迴清理 sunburst 節點樹（labels 轉字串、children 遞迴、深度/子節點數上限防暴走） */
+function normalizeSunburstNode(node, depth) {
+    if (!node || typeof node !== 'object') return null;
+    const label = String(node.label ?? '').trim();
+    if (!label) return null;
+    const out = { label };
+    if (depth >= 6) return out; // 深度上限，避免異常巢狀
+    const children = Array.isArray(node.children) ? node.children : [];
+    const kids = children.slice(0, 16).map(c => normalizeSunburstNode(c, depth + 1)).filter(Boolean);
+    if (kids.length) out.children = kids;
+    return out;
+}
+
 function normalizeSpec(spec) {
     const hex = (c, fb) => (typeof c === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(c.trim())) ? c.trim() : fb;
     const s = {
-        pattern: ['radial', 'cards', 'list', 'freeform'].includes(spec.pattern) ? spec.pattern : 'cards',
+        pattern: ['radial', 'cards', 'list', 'sunburst', 'freeform'].includes(spec.pattern) ? spec.pattern : 'cards',
         background: spec.background || '#ffffff',
         title: spec.title?.text ? { text: String(spec.title.text), color: hex(spec.title?.color, '#1e293b') } : null,
         subtitle: spec.subtitle?.text ? { text: String(spec.subtitle.text), color: hex(spec.subtitle?.color, '#64748b') } : null,
@@ -191,8 +229,22 @@ function normalizeSpec(spec) {
             icon: spec.footer.icon ? validIcon(spec.footer.icon) : null,
             color: vivid(hex(spec.footer?.color, '#7c3aed')),
         } : null,
+        sunburst: null,
     };
+    if (s.pattern === 'sunburst') {
+        const rootRaw = Array.isArray(spec.sunburst?.root) ? spec.sunburst.root : [];
+        const palette = ['#4285f4', '#0d9488', '#16a34a', '#eab308', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#e11d48', '#7c3aed'];
+        const root = rootRaw.slice(0, 8).map((n, i) => {
+            const node = normalizeSunburstNode(n, 0);
+            if (!node) return null;
+            node.color = vivid(hex(n.color, palette[i % palette.length]));
+            return node;
+        }).filter(Boolean);
+        if (root.length) s.sunburst = { root };
+    }
     if (s.pattern === 'radial' && !s.center) s.pattern = 'cards';
+    if (s.pattern === 'sunburst' && !s.sunburst) s.pattern = 'cards';
+    if (s.pattern !== 'sunburst' && s.items.length === 0) s.pattern = 'cards'; // 保底
     return s;
 }
 
@@ -503,12 +555,149 @@ function buildList(spec) {
     return els;
 }
 
+// ── 多層同心圓（sunburst / 風味輪 / 分類輪）版型 ──
+
+/** 顏色朝白色混合，amount 0=原色 1=全白，用來做外圈的漸層變淡 */
+function shade(hexColor, amount) {
+    const h = hexColor.replace('#', '');
+    const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h.slice(0, 6);
+    const n = parseInt(f, 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    const mix = (c) => Math.round(c + (255 - c) * amount);
+    return '#' + [mix(r), mix(g), mix(b)].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+/** 依亮度挑黑或白字，確保在該色塊上可讀 */
+function textOn(hexColor) {
+    const h = hexColor.replace('#', '');
+    const n = parseInt(h, 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return lum > 0.62 ? '#2b2620' : '#ffffff';
+}
+
+/** 遞迴計算每個節點（含中間節點）的角度區間與深度，回傳攤平陣列 */
+function layoutSunburst(root) {
+    function countLeaves(node) {
+        if (!node.children || node.children.length === 0) return 1;
+        return node.children.reduce((s, c) => s + countLeaves(c), 0);
+    }
+    const out = [];
+    const total = root.reduce((s, n) => s + countLeaves(n), 0) || 1;
+    let maxDepth = 0;
+    function walk(node, a0, a1, depth, color) {
+        maxDepth = Math.max(maxDepth, depth);
+        out.push({ label: node.label, depth, a0, a1, color });
+        if (node.children && node.children.length) {
+            const span = a1 - a0;
+            const totalLeaves = countLeaves(node);
+            let cursor = a0;
+            node.children.forEach(child => {
+                const leaves = countLeaves(child);
+                const childSpan = span * (leaves / totalLeaves);
+                walk(child, cursor, cursor + childSpan, depth + 1, color);
+                cursor += childSpan;
+            });
+        }
+    }
+    let cursor = 0;
+    root.forEach(node => {
+        const leaves = countLeaves(node);
+        const span = (leaves / total) * Math.PI * 2;
+        walk(node, cursor, cursor + span, 0, node.color);
+        cursor += span;
+    });
+    return { nodes: out, maxDepth };
+}
+
+/** annular sector（環狀扇形）SVG path */
+function wedgePath(cx, cy, r1, r2, a0, a1) {
+    const pt = (r, a) => [cx + r * Math.sin(a), cy - r * Math.cos(a)];
+    const [x1, y1] = pt(r1, a0), [x2, y2] = pt(r2, a0);
+    const [x3, y3] = pt(r2, a1), [x4, y4] = pt(r1, a1);
+    const large = (a1 - a0) > Math.PI ? 1 : 0;
+    return `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} ` +
+        `A${r2.toFixed(1)},${r2.toFixed(1)} 0 ${large} 1 ${x3.toFixed(1)},${y3.toFixed(1)} ` +
+        `L${x4.toFixed(1)},${y4.toFixed(1)} ` +
+        `A${r1.toFixed(1)},${r1.toFixed(1)} 0 ${large} 0 ${x1.toFixed(1)},${y1.toFixed(1)} Z`;
+}
+
+/** 中文直書字元堆疊（多個詞用空白分開時，並排多欄） */
+function verticalLabelSvg(label, x, y, fontSize, color) {
+    const terms = String(label).trim().split(/\s+/).filter(Boolean).slice(0, 4);
+    if (terms.length === 0) return '';
+    const colGap = fontSize * 1.05;
+    const totalW = (terms.length - 1) * colGap;
+    return terms.map((term, ci) => {
+        const chars = Array.from(term).slice(0, 8);
+        const colX = x - totalW / 2 + ci * colGap;
+        const startY = y - ((chars.length - 1) * fontSize * 0.92) / 2;
+        return chars.map((ch, li) =>
+            `<text x="${colX.toFixed(1)}" y="${(startY + li * fontSize * 0.92).toFixed(1)}" ` +
+            `font-family="'Noto Sans TC',sans-serif" font-size="${fontSize}" font-weight="700" ` +
+            `fill="${color}" text-anchor="middle" dominant-baseline="central">${esc(ch)}</text>`
+        ).join('');
+    }).join('');
+}
+
+/** 建立整個 sunburst 為一張自包含 SVG，包成單一 image 元素 */
+function buildSunburst(spec) {
+    const els = [];
+    const { elements: headerEls, contentTop } = buildHeader(spec);
+    els.push(...headerEls);
+    const hasHeader = headerEls.length > 0;
+
+    const { nodes, maxDepth } = layoutSunburst(spec.sunburst.root);
+    const depths = Math.max(maxDepth + 1, 1);
+    const D = 520; // SVG 畫布邊長
+    const cx = D / 2, cy = D / 2;
+    const hubR = D * 0.10;
+    const outerR = D * 0.49;
+    const band = (outerR - hubR) / depths;
+
+    const wedges = [];
+    const labels = [];
+    nodes.forEach(n => {
+        const r1 = hubR + band * n.depth;
+        const r2 = hubR + band * (n.depth + 1);
+        const fill = shade(n.color, Math.min(0.72, n.depth * 0.16));
+        const span = n.a1 - n.a0;
+        wedges.push(`<path d="${wedgePath(cx, cy, r1, r2, n.a0, n.a1)}" fill="${fill}" stroke="#ffffff" stroke-width="1.5"/>`);
+
+        // 文字只在格子夠大且有內容時畫（避免最外圈極小格子塞爆）
+        const arcLen = span * (r1 + r2) / 2;
+        const bandW = r2 - r1;
+        if (arcLen > 14 && bandW > 16 && n.label) {
+            const amid = (n.a0 + n.a1) / 2;
+            const rmid = (r1 + r2) / 2;
+            const lx = cx + rmid * Math.sin(amid);
+            const ly = cy - rmid * Math.cos(amid);
+            const fontSize = Math.max(8, Math.min(15, bandW * 0.32, arcLen / Math.max(1, Array.from(n.label).length) * 1.15));
+            labels.push(verticalLabelSvg(n.label, lx, ly, fontSize, textOn(fill)));
+        }
+    });
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${D} ${D}">` +
+        `<circle cx="${cx}" cy="${cy}" r="${outerR + 3}" fill="#ffffff"/>` +
+        wedges.join('') + labels.join('') +
+        `<circle cx="${cx}" cy="${cy}" r="${hubR}" fill="none" stroke="#e2e8f0" stroke-width="1"/>` +
+        `</svg>`;
+
+    const size = Math.min(490, hasHeader ? 460 : 500);
+    const px = 480 - size / 2;
+    const py = (hasHeader ? contentTop + 6 : 20) + (540 - (hasHeader ? contentTop + 6 : 20) - size) / 2;
+    els.push({ type: 'image', x: Math.round(px), y: Math.round(py), width: size, height: size, src: svgUri(svg), animOrder: 1 });
+
+    return els;
+}
+
 /** 主入口：規格 → 元素陣列（含動畫） */
 export function buildFromSpec(spec) {
     let elements;
     switch (spec.pattern) {
         case 'radial': elements = buildRadial(spec); break;
         case 'list': elements = buildList(spec); break;
+        case 'sunburst': elements = buildSunburst(spec); break;
         case 'cards':
         case 'freeform':
         default: elements = buildCards(spec); break;
