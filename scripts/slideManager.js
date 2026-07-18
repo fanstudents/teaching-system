@@ -966,6 +966,7 @@ export class SlideManager {
                 el.classList.add(element.shapeType);
                 el.style.background = element.background || '';
                 if (element.borderRadius) el.style.borderRadius = `${element.borderRadius}px`;
+                if (element.border) el.style.border = element.border; // 外框線（如 PPTX 匯入的手機框、標示框）
                 if (element.opacity !== undefined) el.style.opacity = element.opacity;
                 break;
 

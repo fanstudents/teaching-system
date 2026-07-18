@@ -47,7 +47,7 @@ const audioStore = {
     }
 };
 
-import { SlideManager } from './slideManager.js?v=20260712';
+import { SlideManager } from './slideManager.js?v=20260718c';
 import { Editor } from './editor.js?v=20260712';
 import { DragDrop } from './dragDrop.js?v=20260712';
 import { showToast, showConfirm, showInput } from './ui.js?v=20260712';
