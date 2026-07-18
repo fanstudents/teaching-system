@@ -199,19 +199,83 @@ export class PptxImporter {
 
         // 純形狀
         const fill = this._getFillColor(node);
-        if (!fill && !hasText) return null; // 空的不可見形狀，跳過
+        const border = this._getStroke(node);
+        if (!fill && !border) return null; // 無填色也無邊框 → 隱形，略過
 
-        return {
+        // 依 prstGeom 還原幾何：橢圓→圓形、圓角矩形→帶圓角，其餘→矩形
+        const geo = this._getGeometry(node, pos);
+
+        const el = {
             id: genId(),
             type: 'shape',
-            shapeType: 'rectangle',
+            shapeType: geo.shapeType,
             x: pos.x,
             y: pos.y,
             width: pos.w,
             height: pos.h,
-            background: fill || '#e2e8f0',
-            borderRadius: 0,
+            background: fill || 'transparent', // 只有邊框的外框（如手機外框、紅色標示框）
+            borderRadius: geo.borderRadius,
         };
+        if (border) el.border = border;
+        return el;
+    }
+
+    // ── 取得外框線（僅描邊、無填色的形狀也要保留）──
+    _getStroke(node) {
+        const ln = node.querySelector('spPr > ln');
+        if (!ln) return null;
+        if (ln.querySelector('noFill')) return null; // 明確設定無線條
+
+        let color = null;
+        const srgb = ln.querySelector('solidFill > srgbClr');
+        if (srgb) {
+            color = '#' + srgb.getAttribute('val');
+        } else {
+            const scheme = ln.querySelector('solidFill > schemeClr');
+            if (scheme) {
+                const map = {
+                    dk1: '#1a1a2e', dk2: '#44546a', lt1: '#ffffff', lt2: '#e7e6e6',
+                    accent1: '#4472c4', accent2: '#ed7d31', accent3: '#a5a5a5',
+                    accent4: '#ffc000', accent5: '#5b9bd5', accent6: '#70ad47',
+                    tx1: '#1a1a2e', tx2: '#44546a', bg1: '#ffffff', bg2: '#e7e6e6',
+                };
+                color = map[scheme.getAttribute('val')] || null;
+            }
+        }
+        if (!color) return null;
+
+        const w = parseInt(ln.getAttribute('w')) || 12700; // EMU，預設 1pt
+        const px = Math.max(1, Math.round(w / 9525));       // EMU → px
+        return `${px}px solid ${color}`;
+    }
+
+    // ── 依 prstGeom 判斷形狀類型與圓角 ──
+    _getGeometry(node, pos) {
+        const geom = node.querySelector('prstGeom');
+        const prst = geom?.getAttribute('prst') || 'rect';
+
+        if (prst === 'ellipse') {
+            return { shapeType: 'circle', borderRadius: 0 };
+        }
+
+        if (prst === 'roundRect') {
+            // PowerPoint 圓角比例：adj/100000 × 短邊（預設 adj=16667）
+            let adj = 16667;
+            if (geom) {
+                for (const gd of geom.querySelectorAll('gd')) {
+                    if (gd.getAttribute('name') === 'adj') {
+                        const m = (gd.getAttribute('fmla') || '').match(/val\s+(-?\d+)/);
+                        if (m) adj = parseInt(m[1]);
+                        break;
+                    }
+                }
+            }
+            const short = Math.min(pos.w, pos.h);
+            const r = Math.round(short * (adj / 100000));
+            return { shapeType: 'rectangle', borderRadius: Math.min(r, Math.floor(short / 2)) };
+        }
+
+        return { shapeType: 'rectangle', borderRadius: 0 };
     }
 
     // ── 解析文字方塊 ──

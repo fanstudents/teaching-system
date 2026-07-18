@@ -3485,7 +3485,7 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
         document.body.appendChild(toast);
 
         try {
-            const { PptxImporter } = await import('./pptxImporter.js');
+            const { PptxImporter } = await import('./pptxImporter.js?v=20260718b');
             const importer = new PptxImporter();
             const slides = await importer.import(file, (cur, total, msg) => {
                 toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:18px;animation:spin 1s linear infinite;">progress_activity</span>${msg}`;
