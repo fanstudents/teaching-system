@@ -6598,7 +6598,8 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     return;
                 }
                 this.exitPresentation();
-            } else if (e.key === 'ArrowRight' || e.key === ' ') {
+            } else if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'ArrowDown') {
+                // ArrowRight / 空白鍵 / PageDown / ArrowDown（無線簡報筆的「下一頁」鍵，各廠牌不一）
                 // 在文字輸入框內不攔截
                 const tag = document.activeElement?.tagName;
                 if (['INPUT', 'TEXTAREA'].includes(tag)) return;
@@ -6613,7 +6614,11 @@ ${types.map((t, i) => `第 ${i + 1} 題：${typeNameMap[t]}`).join('\n')}
                     this.renderPresentationSlide();
                     this.broadcastSlideData(this.presentationIndex);
                 }
-            } else if (e.key === 'ArrowLeft') {
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') {
+                // ArrowLeft / PageUp / ArrowUp（無線簡報筆的「上一頁」鍵，各廠牌不一）
+                const tag = document.activeElement?.tagName;
+                if (['INPUT', 'TEXTAREA'].includes(tag)) return;
+                if (tag === 'BUTTON' || tag === 'SELECT') document.activeElement.blur();
                 e.preventDefault();
                 if (this.presentationIndex > 0) {
                     this.presentationIndex--;
