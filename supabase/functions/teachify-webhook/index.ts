@@ -11,7 +11,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
  */
 
 // ── Resend 設定 ──
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || 're_DxAbQkWb_PxLtAcFT1bACsR7BVaa4i6kK';
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
 const FROM_EMAIL = 'service@mail.tbr.digital';
 const FROM_NAME = '數位簡報室';
 const AFFILIATE_DASHBOARD_URL = 'https://tbr.digital/affiliate-dashboard';
@@ -346,7 +346,9 @@ serve(async (req) => {
 
     const secret = req.headers.get('x-webhook-secret');
     const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
+    console.log(`[webhook] inbound POST, secret_header=${secret ? 'present' : 'absent'}, secret_expected=${expectedSecret ? 'set' : 'unset'}`);
     if (expectedSecret && secret !== expectedSecret) {
+        console.warn('[webhook] rejected: x-webhook-secret mismatch');
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
             status: 401,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -368,6 +370,7 @@ serve(async (req) => {
         const body = await req.json();
         const eventType = body.type || '';
         const d = body.data || body;
+        console.log(`[webhook] event=${eventType || '(none)'}`);
 
         switch (eventType) {
 

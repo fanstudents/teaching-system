@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>即時報名狀況 — 數位簡報室</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/base.css">
+    <style>
+        body {
+            font-family: 'Google Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f6f8fb;
+            color: #1f1f1f;
+            min-height: 100vh;
+            padding: 32px 20px 56px;
+        }
+
+        .wrap {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        /* base.css 只定義了 outlined，rounded 這裡補上，避免字體載入前露出 ligature 文字 */
+        .material-symbols-rounded {
+            font-family: 'Material Symbols Rounded';
+            font-weight: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .head h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        .head .sub {
+            margin-top: 4px;
+            font-size: 0.9rem;
+            color: #5f6368;
+        }
+
+        .live-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: #e6f4ea;
+            color: #1e8e3e;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .live-chip.stale {
+            background: #fef7e0;
+            color: #b06000;
+        }
+
+        .live-chip .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.35;
+                transform: scale(0.8);
+            }
+        }
+
+        /* ── Hero number ── */
+        .hero {
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            padding: 36px 32px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .hero .label {
+            font-size: 0.85rem;
+            color: #5f6368;
+            letter-spacing: 0.08em;
+            font-weight: 500;
+        }
+
+        .hero .num {
+            font-size: 5.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #1a73e8;
+            margin: 10px 0 4px;
+            font-variant-numeric: tabular-nums;
+            transition: color .3s;
+        }
+
+        .hero .num.bump {
+            animation: bump .6s ease;
+        }
+
+        @keyframes bump {
+            0% {
+                transform: scale(1);
+            }
+
+            35% {
+                transform: scale(1.12);
+                color: #1e8e3e;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .hero .unit {
+            font-size: 1rem;
+            color: #5f6368;
+        }
+
+        /* ── Capacity bar ── */
+        .cap {
+            margin: 24px auto 0;
+            max-width: 420px;
+        }
+
+        .cap-bar {
+            height: 10px;
+            border-radius: 999px;
+            background: #e8eaed;
+            overflow: hidden;
+        }
+
+        .cap-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #1a73e8, #4285f4);
+            width: 0;
+            transition: width .6s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .cap-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #5f6368;
+            margin-top: 8px;
+        }
+
+        /* ── Stat row ── */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 560px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat {
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 14px;
+            padding: 16px 18px;
+        }
+
+        .stat .k {
+            font-size: 0.78rem;
+            color: #5f6368;
+            margin-bottom: 6px;
+        }
+
+        .stat .v {
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Panels ── */
+        .panel {
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 16px;
+            padding: 22px 24px;
+            margin-bottom: 20px;
+        }
+
+        .panel h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #444746;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel h2 .material-symbols-rounded {
+            font-size: 20px;
+            color: #1a73e8;
+        }
+
+        /* ── Daily chart ── */
+        .chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        /* 固定高度的軌道，讓 .bar 的百分比高度有依據可算 */
+        .bar-track {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .bar {
+            width: 100%;
+            max-width: 46px;
+            background: #1a73e8;
+            border-radius: 6px 6px 2px 2px;
+            min-height: 3px;
+            transition: height .5s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .bar.zero {
+            background: #e8eaed;
+        }
+
+        .bar-val {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1f1f1f;
+        }
+
+        .bar-lbl {
+            font-size: 0.68rem;
+            color: #80868b;
+            white-space: nowrap;
+        }
+
+        /* ── Recent list ── */
+        .roster {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 4px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .row .idx {
+            width: 26px;
+            font-size: 0.78rem;
+            color: #80868b;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row .who {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .row .when {
+            font-size: 0.82rem;
+            color: #5f6368;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .row.fresh .who::after {
+            content: 'NEW';
+            margin-left: 8px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #1e8e3e;
+            background: #e6f4ea;
+            padding: 2px 6px;
+            border-radius: 4px;
+            vertical-align: 1px;
+        }
+
+        /* ── States ── */
+        .empty,
+        .fail {
+            text-align: center;
+            padding: 48px 20px;
+            color: #5f6368;
+        }
+
+        .fail {
+            color: #d93025;
+        }
+
+        .empty .material-symbols-rounded,
+        .fail .material-symbols-rounded {
+            font-size: 44px;
+            opacity: .5;
+            display: block;
+            margin: 0 auto 12px;
+        }
+
+        .foot {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #9aa0a6;
+            margin-top: 28px;
+            line-height: 1.8;
+        }
+
+        .skeleton {
+            opacity: .35;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="head">
+            <div>
+                <h1 id="title" class="skeleton">載入中…</h1>
+                <div class="sub" id="subtitle"></div>
+            </div>
+            <div class="live-chip" id="liveChip">
+                <span class="dot"></span><span id="liveText">連線中</span>
+            </div>
+        </div>
+
+        <div id="content" hidden>
+            <div class="hero">
+                <div class="label">目前報名人數</div>
+                <div class="num" id="bigNum">—</div>
+                <div class="unit">人已完成報名</div>
+                <div class="cap" id="capBox" hidden>
+                    <div class="cap-bar">
+                        <div class="cap-fill" id="capFill"></div>
+                    </div>
+                    <div class="cap-meta">
+                        <span id="capPct">—</span>
+                        <span id="capLeft">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="k">未完成付款</div>
+                    <div class="v" id="sUnpaid">—</div>
+                </div>
+                <div class="stat">
+                    <div class="k">已退款</div>
+                    <div class="v" id="sRefund">—</div>
+                </div>
+                <div class="stat">
+                    <div class="k">最後一筆報名</div>
+                    <div class="v" id="sLatest" style="font-size:1.05rem;">—</div>
+                </div>
+            </div>
+
+            <div class="panel" id="chartPanel">
+                <h2><span class="material-symbols-rounded">bar_chart</span>每日報名趨勢</h2>
+                <div class="chart" id="chart"></div>
+            </div>
+
+            <div class="panel" id="rosterPanel">
+                <h2><span class="material-symbols-rounded">group</span>最近報名</h2>
+                <div class="roster" id="roster"></div>
+            </div>
+        </div>
+
+        <div class="fail" id="failBox" hidden>
+            <span class="material-symbols-rounded">link_off</span>
+            <div id="failMsg"></div>
+        </div>
+
+        <div class="foot">
+            姓名已做遮罩處理，不顯示 email 與聯絡方式<br>
+            每 30 秒自動更新 · 數位簡報室
+        </div>
+    </div>
+
+    <script>
+        const API = 'https://wsaknnhjgiqmkendeyrj.supabase.co/functions/v1/signup-stats';
+        const token = new URLSearchParams(location.search).get('token') || '';
+
+        const $ = (id) => document.getElementById(id);
+        let lastPaid = null;
+        let lastSeenAt = null;
+
+        function fmtTime(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function fmtDay(key) {
+            const [, m, d] = key.split('-');
+            return `${Number(m)}/${Number(d)}`;
+        }
+
+        function showFail(msg) {
+            $('content').hidden = true;
+            $('failBox').hidden = false;
+            $('failMsg').textContent = msg;
+            $('title').textContent = '無法載入';
+            $('title').classList.remove('skeleton');
+            $('liveChip').classList.add('stale');
+            $('liveText').textContent = '離線';
+        }
+
+        function renderChart(daily) {
+            const box = $('chart');
+            if (!daily.length) {
+                $('chartPanel').hidden = true;
+                return;
+            }
+            $('chartPanel').hidden = false;
+            // 最多顯示最近 14 天，避免長跑的課程擠成一團
+            const slice = daily.slice(-14);
+            const max = Math.max(...slice.map((d) => d.count), 1);
+            box.innerHTML = slice.map((d) => {
+                const h = Math.round((d.count / max) * 100);
+                return `<div class="bar-col">
+                    <div class="bar-val">${d.count}</div>
+                    <div class="bar-track">
+                        <div class="bar ${d.count === 0 ? 'zero' : ''}" style="height:${d.count === 0 ? 3 : Math.max(h, 6)}%"></div>
+                    </div>
+                    <div class="bar-lbl">${fmtDay(d.date)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderRoster(recent, total) {
+            const box = $('roster');
+            if (!recent.length) {
+                $('rosterPanel').hidden = true;
+                return;
+            }
+            $('rosterPanel').hidden = false;
+            box.innerHTML = recent.map((r, i) => {
+                const isFresh = lastSeenAt && new Date(r.at) > new Date(lastSeenAt);
+                return `<div class="row ${isFresh ? 'fresh' : ''}">
+                    <span class="idx">${total - i}</span>
+                    <span class="who">${r.name}</span>
+                    <span class="when">${fmtTime(r.at)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function render(data) {
+            $('content').hidden = false;
+            $('failBox').hidden = true;
+
+            $('title').textContent = data.title;
+            $('title').classList.remove('skeleton');
+            $('subtitle').textContent = data.subtitle || '';
+
+            const paid = data.counts.paid;
+            const num = $('bigNum');
+            num.textContent = paid;
+            if (lastPaid !== null && paid > lastPaid) {
+                num.classList.remove('bump');
+                void num.offsetWidth;
+                num.classList.add('bump');
+            }
+
+            if (data.capacity) {
+                $('capBox').hidden = false;
+                const pct = Math.min(100, Math.round((paid / data.capacity) * 100));
+                $('capFill').style.width = pct + '%';
+                $('capPct').textContent = `已達 ${pct}%`;
+                $('capLeft').textContent = `名額 ${paid} / ${data.capacity}`;
+            } else {
+                $('capBox').hidden = true;
+            }
+
+            $('sUnpaid').textContent = data.counts.unpaid;
+            $('sRefund').textContent = data.counts.refunded;
+            $('sLatest').textContent = fmtTime(data.latest_at);
+
+            renderChart(data.daily || []);
+            renderRoster(data.recent || [], paid);
+
+            lastSeenAt = data.latest_at;
+            lastPaid = paid;
+
+            $('liveChip').classList.remove('stale');
+            $('liveText').textContent = '即時 · ' + fmtTime(data.generated_at);
+            document.title = `${data.title} — 即時報名`;
+        }
+
+        async function load() {
+            if (!token) {
+                showFail('這個連結缺少 token 參數，請向課程負責人索取完整網址。');
+                return;
+            }
+            try {
+                const res = await fetch(`${API}?token=${encodeURIComponent(token)}`, { cache: 'no-store' });
+                if (res.status === 404) {
+                    showFail('找不到這個看板，連結可能已失效或被停用。');
+                    return;
+                }
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                render(await res.json());
+            } catch (err) {
+                if ($('content').hidden) {
+                    showFail('連線失敗，請稍後再試。');
+                } else {
+                    // 已經有畫面時不清空，只把狀態標成過期
+                    $('liveChip').classList.add('stale');
+                    $('liveText').textContent = '更新失敗，重試中';
+                }
+            }
+        }
+
+        load();
+        setInterval(load, 30000);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') load();
+        });
+    </script>
+</body>
+
+</html>
