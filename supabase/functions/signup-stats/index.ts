@@ -80,10 +80,17 @@ serve(async (req) => {
         const board = boards?.[0];
         if (!board) return json({ error: 'Board not found' }, 404);
 
-        const { data: rows, error } = await supabase
+        // 優先用 course_id 比對：方案名稱常被改（「早鳥價」→「晚鳥價」），
+        // 課名字串比對會無聲失準。沒設 course_id 才退回 ILIKE。
+        let query = supabase
             .from('orders')
-            .select('payment_status, payment_time, created_at, student_name, amount, plan_name, course_name')
-            .ilike('course_name', board.course_match)
+            .select('payment_status, payment_time, created_at, student_name, amount, plan_name, course_name');
+
+        query = board.course_id
+            ? query.eq('course_id', board.course_id)
+            : query.ilike('course_name', board.course_match);
+
+        const { data: rows, error } = await query
             .order('payment_time', { ascending: false, nullsFirst: false });
 
         if (error) throw error;

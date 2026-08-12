@@ -490,13 +490,17 @@ serve(async (req) => {
                 const name = d.user?.name || '';
                 const phone = d.user?.phone_number || '';
                 const order_id = d.trade_no || '';
-                const amount = d.amount || 0;
+                // Teachify 送的 amount 是字串（"0.0" / "6000.0"），orders.amount 是 integer，
+                // 直接塞會被 Postgres 擋成 22P02，所以先轉成數字
+                const amount = toInt(d.amount);
 
                 let course_id = '';
                 let plan_id = '';
+                let course_slug = '';
                 if (d.lineitems?.length > 0) {
                     course_id = d.lineitems[0].product_id || d.lineitems[0].item_slug || '';
                     plan_id = d.lineitems[0].item_id || '';
+                    course_slug = d.lineitems[0].item_slug || '';
                 }
 
                 if (!email && !order_id) {
@@ -521,6 +525,7 @@ serve(async (req) => {
 
                 const purchase = purchaseResult?.[0];
                 let syncedSession = null;
+                let matchedProjectName = '';
 
                 if (course_id) {
                     const { data: projects } = await supabase
@@ -530,6 +535,7 @@ serve(async (req) => {
 
                     if (projects?.length > 0) {
                         const project = projects[0];
+                        matchedProjectName = project.name || '';
 
                         // 1) Try exact match by teachify_plan_id
                         let session = null;
@@ -612,10 +618,13 @@ serve(async (req) => {
                 // ── Sync to orders table ──
                 const couponCode = d.coupon_code || d.coupon_name || '';
                 const lineitem = d.lineitems?.[0] || {};
-                const courseName = lineitem.name || lineitem.item_name || d.course_name || '';
-                const planName = lineitem.plan_name || lineitem.item_plan_name || '';
+                // webhook 的 lineitems[0].name 只有方案／票種名（例如「餐飲業 Vibe Coding 兩日實戰課 - 限時免費票」），
+                // 不含課程標題 — 跟 CSV 匯入的 orders 慣例（course_name = 課程標題）對不起來，
+                // 所以課程標題優先取本地 projects 的名稱，取不到才退回方案名。
+                const planName = lineitem.name || lineitem.item_name || lineitem.plan_name || '';
+                const courseName = matchedProjectName || d.course_name || planName;
 
-                await supabase.from('orders').upsert([{
+                const { error: ordersError } = await supabase.from('orders').upsert([{
                     transaction_id: order_id || `wh-${Date.now()}`,
                     amount,
                     currency: d.currency || 'TWD',
@@ -626,11 +635,20 @@ serve(async (req) => {
                     coupon_name: d.coupon_name || couponCode,
                     course_name: courseName,
                     plan_name: planName,
+                    course_id,
+                    course_slug,
+                    plan_id,
                     student_email: email,
                     student_name: name,
                     student_phone: phone,
                     source: 'webhook'
                 }], { onConflict: 'transaction_id' });
+
+                // 這裡以前沒收 error，orders 寫失敗時 webhook 照樣回 200，
+                // 結果是「看起來一切正常但資料從來沒進去」
+                if (ordersError) {
+                    console.error('[webhook] orders upsert failed:', ordersError.code, ordersError.message);
+                }
 
                 // ── Sync to affiliate_orders if coupon matches an affiliate ──
                 if (couponCode) {
@@ -646,7 +664,7 @@ serve(async (req) => {
                         const rate = Number(aff.commission_rate) || 0.20;
                         const commissionAmount = Math.round(amount * rate);
 
-                        await supabase.from('affiliate_orders').upsert([{
+                        const { error: affError } = await supabase.from('affiliate_orders').upsert([{
                             transaction_id: order_id || `wh-${Date.now()}`,
                             amount,
                             currency: d.currency || 'TWD',
@@ -666,6 +684,10 @@ serve(async (req) => {
                             commission_amount: commissionAmount,
                             commission_status: 'pending'
                         }], { onConflict: 'transaction_id' });
+
+                        if (affError) {
+                            console.error('[webhook] affiliate_orders upsert failed:', affError.code, affError.message);
+                        }
 
                         console.log(`[webhook] Affiliate order created for ${aff.name} (${aff.coupon_code}), commission: $${commissionAmount}`);
 
@@ -699,8 +721,8 @@ serve(async (req) => {
                 const name = d.user?.name || '';
                 const phone = d.user?.phone_number || '';
                 const order_id = d.trade_no || '';
-                const amount = d.amount || 0;
-                const refunded_amount = d.refunded_amount || 0;
+                const amount = toInt(d.amount);
+                const refunded_amount = toInt(d.refunded_amount);
 
                 let course_id = '';
                 if (d.lineitems?.length > 0) {
@@ -714,6 +736,21 @@ serve(async (req) => {
                         .select('*')
                         .eq('order_id', order_id);
                     existingPurchase = found?.[0];
+                }
+
+                // 退款也要回寫 orders，否則即時報名看板會把已退款的人算進去
+                if (order_id) {
+                    const { error: refundOrderError } = await supabase
+                        .from('orders')
+                        .update({
+                            payment_status: 'Refunded',
+                            refund_time: d.refunded_at || new Date().toISOString()
+                        })
+                        .eq('transaction_id', order_id);
+
+                    if (refundOrderError) {
+                        console.error('[webhook] orders refund update failed:', refundOrderError.code, refundOrderError.message);
+                    }
                 }
 
                 if (existingPurchase) {
@@ -788,6 +825,13 @@ serve(async (req) => {
         }, 500);
     }
 });
+
+// Teachify 的金額欄位是字串（"0.0" / "6000.0"），而 orders / affiliate_orders
+// 的 amount 是 integer — 不轉會被 Postgres 以 22P02 擋下來
+function toInt(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? Math.round(n) : 0;
+}
 
 function generateCode(length) {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
